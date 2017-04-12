@@ -1,0 +1,111 @@
+{
+  "title": "Double Chocolate Chunk Cookies",
+  "source": "from Bouchon Bakery Cookbook",
+  "quantity": 24,
+  "servings": 24,
+  "unit": "cookies",
+  "totalMinutes": 100,
+  "equipment": [
+    "sheet pan",
+    "oven"
+  ],
+  "sections": [
+    {
+      "ingredients": [
+        {
+          "name": "butter",
+          "grams": 334
+        }
+      ],
+      "instructions": [
+        "cream in mixer"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "dark brown sugar",
+          "substitute": "light brown sugar",
+          "grams": 268.1,
+          "measurement": {
+            "unit": "cup",
+            "amount": 1
+          }
+        },
+        {
+          "name": "molasses",
+          "grams": 24
+        },
+        {
+          "name": "sugar",
+          "grams": 208
+        }
+      ],
+      "instructions": [
+        "add to mixer for 4 min"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "eggs",
+          "grams": 120
+        }
+      ],
+      "instructions": [
+        "add to mixer",
+        "mix for 30 seconds"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "flour",
+          "modifier": "sifted",
+          "optional": true,
+          "grams": 380
+        },
+        {
+          "name": "cocoa powder",
+          "modifier": "sifted",
+          "grams": 96
+        },
+        {
+          "name": "baking soda",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 1
+          }
+        },
+        {
+          "name": "salt",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 2
+          }
+        }
+      ],
+      "instructions": [
+        "add in 2 additions to mixer, mix for 40 seconds inbetween"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "chocolate chunks",
+          "modifier": "coarsely chopped",
+          "grams": 214
+        },
+        {
+          "name": "chocolate chips",
+          "grams": 214
+        }
+      ],
+      "instructions": [
+        "mix to incorporate",
+        "fridge for 1-24 hours",
+        "bake at 325 for 20 min"
+      ]
+    }
+  ]
+}

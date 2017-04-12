@@ -23,7 +23,8 @@ export default class Recipe extends Component {
             let ingredientList = [], weightList = [], volumeList = [];
 
             recipeSection.ingredients.forEach((i,n)=>{
-                ingredientList.push(<div className="ingredientCellItem" key={n}>{i.name}</div>);
+                let ingredientName = `${i.name}${i.modifier ? `, ${i.modifier}` : ''}`;
+                ingredientList.push(<div className="ingredientCellItem" key={n}>{ingredientName}</div>);
                 if(i.grams) totalWeight+=i.grams;
                 weightList.push(<div className="ingredientCellItem" key={n}>
                     <GramMeasurement grams={i.grams} scale={this.state.scale}/>
@@ -35,11 +36,25 @@ export default class Recipe extends Component {
 
             let instructionList = recipeSection.instructions.map((i,n)=><div key={n}>{`${instructionNum++}. ${i}`}</div>);
 
+            let test = [];
+            let x = 0;
+            for(x=0; x < ingredientList.length; x++) {
+                test.push(<tr>
+                    <td style={{width: "45%"}}>{ingredientList[x]}</td>
+                    <td>{weightList[x]}</td>
+                    <td>{volumeList[x]}</td>
+                </tr>)
+            }
+
             return <tr key={`r-${num}`}>
                 <td style={{verticalAlign: 'middle'}}>{String.fromCharCode(num+65)}.</td>
-                <td>{ingredientList}</td>
-                <td>{weightList}</td>
-                <td>{volumeList}</td>{/*<td style={{"borderRight":"solid 1px grey"}}>*/}
+                <td colSpan="3" style={{verticalAlign: 'middle'}}>
+                    <table style={{width: "100%"}} className='table borderless'>
+                        {test}
+                    </table>
+                </td>
+                {/*<td>{weightList}</td>*/}
+                {/*<td>{volumeList}</td>*/}
                 <td>{instructionList}</td>
             </tr>
         });
@@ -47,13 +62,13 @@ export default class Recipe extends Component {
         return (
             <div>
                 <h1>{recipe.title}</h1>
-                <h4>{recipe.source}. Makes <i>{recipe.quantity * this.state.scale}</i> {recipe.unit}</h4>
+                <h4>{recipe.source}. Makes <i>{parseFloat((recipe.quantity * this.state.scale).toFixed(1))}</i> {recipe.unit}</h4>
                 <div className="row">
-                    <div className="col-9">
-                        <table className="table table-sm ">
+                    <div className="col col-sm-9">
+                        <table className="table table-sm borderheavy">
                             <thead className="thead-default">
                             <tr>
-                                <td>&nbsp;</td>
+                                <th>&nbsp;</th>
                                 <th>ingredients</th>
                                 <th>weight</th>
                                 <th>volume</th>
@@ -65,20 +80,20 @@ export default class Recipe extends Component {
                             </tbody>
                         </table>
                     </div>
+                    <div className="w-100 hidden-md-up"></div>
 
-
-                    <div className="col">
+                    <div className="col col-sm-3">
                         <div className="card">
                             <div className="card-block">
                                 <h4 className="card-title">Scaling</h4>
                                 <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                <p>approx weight: <b>{totalWeight*this.state.scale}g</b></p>
+                                <p>approx weight: <b>{parseFloat((totalWeight*this.state.scale).toFixed(1))}g</b></p>
                                 {/*Scaling ratio: <input type="text" value={this.state.scale} onChange={this.handleScaleChange} />*/}
 
                                 <div className="form-group row">
                                     <label htmlFor="example-text-input" className="col-4 col-form-label">Multiplier</label>
                                     <div className="col-7">
-                                        <input className="form-control" type="number"  min="0" value={this.state.scale} onChange={this.handleScaleChange} id="example-text-input"/>
+                                        <input className="form-control" type="number"  min="0" max="10" step=".1" value={this.state.scale} onChange={this.handleScaleChange} id="example-text-input"/>
                                     </div>
                                 </div>
                             </div>

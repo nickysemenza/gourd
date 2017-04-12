@@ -15,10 +15,10 @@ export default class Home extends Component {
     }
     render () {
 
-        let a = this.state.recipeList.map(a=><li key={a}><Link to={`/${a}`}>{a}</Link></li>);
+        let a = this.state.recipeList.map(a=><div key={a}><Link to={`/${a}`}>{a}</Link></div>);
         return (
             <div>
-                <h2>Recipes:</h2>
+                <h2>Nicky's Recipe Stash</h2>
                 {a}
             </div>
         );
