@@ -1,16 +1,27 @@
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom'
-
+import { NavItem, Navbar, NavbarToggler, Collapse, NavbarBrand } from 'reactstrap';
 export default class Nav extends Component {
+    constructor(props) {
+        super(props);
+
+        this.toggle = this.toggle.bind(this);
+        this.state = {
+            isOpen: false
+        };
+    }
+    toggle() {
+        this.setState({
+            isOpen: !this.state.isOpen
+        });
+    }
     render () {
         return (
             <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-                <button className="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <a className="navbar-brand" href="#">Navbar</a>
+                <a className="navbar-brand" href="#">Recipes <NavbarToggler right onClick={this.toggle} /></a>
 
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
+
+                <Collapse isOpen={this.state.isOpen} navbar>
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item">
                             <NavLink exact to="/" className="nav-link" activeClassName="active">Home</NavLink>
@@ -28,7 +39,7 @@ export default class Nav extends Component {
                         <input className="form-control mr-sm-2" type="text" placeholder="Search"/>
                             <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
                     </form>
-                </div>
+                </Collapse>
             </nav>
         );
     }
