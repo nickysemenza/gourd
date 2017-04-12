@@ -9,18 +9,28 @@ export default class RecipePage extends Component {
             slug: props.match.params.recipe_id
         }
     }
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps,this.props);
+        if(nextProps.match !== this.props.match) {
+            this.setState({slug: nextProps.match.params.recipe_id});
+            this.fetchData(nextProps.match.params.recipe_id);
+        }
+    }
     componentDidMount() {
-        fetch(`/api/recipes/${this.state.slug}`, {accept: 'application/json'})
+        this.fetchData(this.state.slug);
+    }
+    fetchData(r) {
+        fetch(`/api/recipes/${r}`, {accept: 'application/json'})
             .then((response) => response.json())
             .then((json) => this.setState({recipe: json}));
     }
-
     render () {
-        // let slug = this.props.match.params.recipe_id;
         return (
             <div>
                 <Recipe recipe={this.state.recipe} slug={this.state.slug}/>
             </div>
         );
     }
+
+
 }
