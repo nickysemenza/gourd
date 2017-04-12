@@ -6,12 +6,15 @@
   "dependencies": {
     "bootstrap": "4.0.0-alpha.6",
     "codecov": "^2.1.0",
+    "enzyme": "^2.8.1",
     "express": "^4.15.2",
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.5.2",
-    "react-addons-transition-group": "^15.5.2",
+    "react-addons-test-utils": "^15.5.1",
+    "react-addons-transition-group": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-router-dom": "^4.1.0",
+    "react-test-renderer": "^15.5.4",
     "reactstrap": "^4.5.0"
   },
   "devDependencies": {
