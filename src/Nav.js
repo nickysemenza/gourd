@@ -32,7 +32,7 @@ export default class Nav extends Component {
 
                         </li>
                         <li className="nav-item">
-                            <NavLink to="/chocolate" className="nav-link" activeClassName="active">Chocolate</NavLink>
+                            <NavLink to="/chocolate-chunk-cookies" className="nav-link" activeClassName="active">Chocolate</NavLink>
                         </li>
                     </ul>
                     <form className="form-inline my-2 my-lg-0">

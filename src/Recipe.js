@@ -39,7 +39,7 @@ export default class Recipe extends Component {
             let test = [];
             let x = 0;
             for(x=0; x < ingredientList.length; x++) {
-                test.push(<tr>
+                test.push(<tr key={`il-${x}`}>
                     <td style={{width: "45%"}}>{ingredientList[x]}</td>
                     <td>{weightList[x]}</td>
                     <td>{volumeList[x]}</td>
@@ -50,7 +50,7 @@ export default class Recipe extends Component {
                 <td style={{verticalAlign: 'middle'}}>{String.fromCharCode(num+65)}.</td>
                 <td colSpan="3" style={{verticalAlign: 'middle'}}>
                     <table style={{width: "100%"}} className='table borderless'>
-                        {test}
+                        <tbody>{test}</tbody>
                     </table>
                 </td>
                 {/*<td>{weightList}</td>*/}
