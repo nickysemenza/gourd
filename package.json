@@ -61,7 +61,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "codecov": "cat coverage/lcov.info | codecov"
+    "codecov": "codecov < ./coverage/lcov.info"
   },
   "jest": {
     "collectCoverageFrom": [
