@@ -1,0 +1,133 @@
+{
+  "title": "Pecan Bars",
+  "source": "Cooks Illustrated Baking Book",
+  "quantity": 24,
+  "servings": 12,
+  "unit": "bars",
+  "totalMinutes": 65,
+  "activeMinutes": 10,
+  "equipment": [
+    "9x13 baking pan with foil sling",
+    "food processor"
+  ],
+  "sections": [
+    {
+      "ingredients": [
+        {
+          "name": "baking powder",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 0.5
+          }
+        },
+        {
+          "name": "salt",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 2
+          }
+        },
+        {
+          "name": "flour",
+          "grams": 285
+        },
+        {
+          "name": "dark brown sugar",
+          "grams": 132
+        },
+        {
+          "name": "pecans",
+          "grams": 55
+        }
+      ],
+      "instructions": [
+        "add to food processor",
+        "pulse 5 times"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "butter",
+          "grams": 170,
+          "measurement": {
+            "unit": "sticks",
+            "amount": 1.5
+          }
+        }
+      ],
+      "instructions": [
+        "add to food processor",
+        "pulse 8 times",
+        "pour crumble into pan and pat down",
+        "bake for 20 min"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "butter",
+          "grams": 113,
+          "modifier": "melted",
+          "measurement": {
+            "unit": "sticks",
+            "amount": 1
+          }
+        },
+        {
+          "name": "salt",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 1
+          }
+        },
+        {
+          "name": "corn syrup",
+          "grams": 208
+        },
+        {
+          "name": "dark brown sugar",
+          "grams": 200
+        },
+        {
+          "name": "eggs",
+          "measurement": {
+            "unit": "large",
+            "amount": 2
+          }
+        },
+        {
+          "name": "vanilla",
+          "measurement": {
+            "unit": "tsp",
+            "amount": 4
+          }
+        },
+        {
+          "name": "bourbon",
+          "measurement": {
+            "unit": "tbsp",
+            "amount": 4
+          }
+        }
+      ],
+      "instructions": [
+        "mix together",
+        "pour onto hot crust"
+      ]
+    },
+    {
+      "ingredients": [
+        {
+          "name": "pecans",
+          "grams": 382,
+          "modifier": "coarsely chopped"
+        }
+      ],
+      "instructions": [
+        "sprinkle on top",
+        "bake for 25 min"
+      ]
+    }
+  ]
+}

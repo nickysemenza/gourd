@@ -81,7 +81,7 @@ export default class Recipe extends Component {
       <div>
         <h1>{recipe.title}</h1>
         <h4>
-          {recipe.source}
+          From {recipe.source}
           . Makes
           {" "}
           <i>{parseFloat((recipe.quantity * this.state.scale).toFixed(1))}</i>
