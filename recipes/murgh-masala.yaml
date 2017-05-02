@@ -1,0 +1,100 @@
+---
+title: Chicken in Onion Tomato Gravy
+source: Classic Indian Cooking
+quantity: 1
+servings: 6
+unit: curry
+totalMinutes: 90
+activeMinutes: 15
+equipment:
+- stockpot
+sections:
+- ingredients:
+  - name: chicken
+    measurement:
+      unit: pounds
+      amount: 2
+  - name: oil
+    measurement:
+      unit: tbsp
+      amount: 2
+  instructions:
+  - heat oil in stockpot to high
+  - brown chicken in batches, set aside
+- ingredients:
+  - name: onions
+    modifier: thinly sliced
+    measurement:
+      unit: cups
+      amount: 6
+  - name: oil
+    measurement:
+      unit: tbsp
+      amount: 8
+  instructions:
+  - add onions and oil
+  - brown on medium-high for 30 min
+- ingredients:
+  - name: garlic
+    modifier: finely chopped
+    measurement:
+      unit: tbsp
+      amount: 2
+  - name: ginger
+    modifier: finely chopped
+    measurement:
+      unit: tbsp
+      amount: 3
+  instructions:
+  - add to pot, fry for 5 min
+- ingredients:
+  - name: cinnamon stick
+    measurement:
+      unit: sticks
+      amount: 2
+  - name: black cardamon
+    measurement:
+      unit: pods
+      amount: 4
+  instructions:
+  - add to pot, fry for 2 min
+- ingredients:
+  - name: turmeric
+    measurement:
+      unit: tbsp
+      amount: 1
+  - name: red pepper
+    measurement:
+      unit: tsp
+      amount: 2
+  - name: salt
+    measurement:
+      unit: tbsp
+      amount: 1
+  instructions:
+  - add to pot, fry for 15 sec
+- ingredients:
+  - name: chopped tomatoes
+    measurement:
+      unit: large can
+      amount: 1
+  - name: water
+    modifier: boiling
+    measurement:
+      unit: cups
+      amount: 2
+  instructions:
+  - add to pot, along with chicken
+  - simmer for 45 min
+- ingredients:
+  - name: cilantro
+    modifier: chopped
+    measurement:
+      unit: bunch
+      amount: 0.5
+  - name: cumin
+    measurement:
+      unit: tbsp
+      amount: 1
+  instructions:
+  - stir in

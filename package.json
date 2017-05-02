@@ -16,7 +16,8 @@
     "react-dom": "^15.5.4",
     "react-router-dom": "^4.1.0",
     "react-test-renderer": "^15.5.4",
-    "reactstrap": "^4.5.0"
+    "reactstrap": "^4.5.0",
+    "yamljs": "^0.2.10"
   },
   "devDependencies": {
     "autoprefixer": "6.7.2",

@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const fs = require('fs');
 const path = require('path');
+const YAML = require('yamljs');
 app.set('port', (process.env.PORT || 4000));
 
 if (process.env.NODE_ENV === 'production') {
@@ -16,18 +17,20 @@ app.get('/api/test', (req, res) => {
 });
 app.get('/api/recipes', (req, res) => {
     fs.readdir('recipes',(err, files) => {
-        let l = files.filter(file=>path.extname(file) == ".json").map(file => {
-            return path.basename(file,'.json');
+        let l = files.filter(file=>path.extname(file) == ".yaml").map(file => {
+            return path.basename(file,'.yaml');
         });
         res.json(l);
     })
 });
 app.get('/api/recipes/:slug', (req, res) => {
-   fs.readFile(`recipes/${req.params.slug}.json`, (err, fileData) => {
-       if(err) {res.send(err); return}
-       data = JSON.parse(fileData);
-       res.json(data);
-   })
+    nativeObject = YAML.load(`recipes/${req.params.slug}.yaml`);
+    res.json(nativeObject);
+   // fs.readFile(`recipes/${req.params.slug}.yaml`, (err, fileData) => {
+   //     if(err) {res.send(err); return}
+   //     data = YAML.parse(fileData);
+   //     res.json(data);
+   // })
 });
 
 
