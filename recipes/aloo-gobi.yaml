@@ -1,0 +1,122 @@
+---
+title: Aloo Gobi
+source: 'ecurry.com'
+quantity: 1
+servings: 6
+unit: dish
+totalMinutes: 30
+equipment:
+- stockpot
+sections:
+- ingredients:
+  - name: cauliflower
+    modifier: cut into florets
+    measurement:
+      unit: head
+      amount: 1
+  - name: turmeric
+    measurement:
+      unit: tsp
+      amount: 0.5
+  instructions:
+  - toss together
+  - saute for 7 minutes on medium until browned
+  - set aside
+  minutes: 7
+- ingredients:
+  - name: potatoes
+    modifier: peeled and cubed
+    measurement:
+      unit: medium
+      amount: 3
+  - name: turmeric
+    measurement:
+      unit: tsp
+      amount: 0.5
+  instructions:
+  - toss together
+  - saute for 7 minutes on medium until browned
+  - set aside
+  minutes: 7
+- ingredients:
+  - name: cinnamon
+    measurement:
+      unit: stick
+      amount: 1
+  - name: cloves
+    measurement:
+      unit: whole
+      amount: 2
+  - name: green cardamon
+    measurement:
+      unit: whole
+      amount: 2
+  - name: cumin seeds
+    measurement:
+      unit: tsp
+      amount: 1
+  instructions:
+  - add to hot oil and cook until seeds sizzle
+  minutes: 1
+- ingredients:
+  - name: onion
+    modifier: thinly sliced
+    grams: 150
+    measurement:
+      unit: small
+      amount: 1
+  instructions:
+  - add, fry at medium until softened
+  minutes: 5
+
+- ingredients:
+  - name: ginger
+    modifer: grated
+    measurement:
+      unit: inches
+      amount: 3
+  - name: seranno peppers
+    modifier: diced
+    measurement:
+      unit: whole
+      amount: 2
+  - name: diced tomatoes
+    measurement:
+      unit: small can
+      amount: .5
+  - name: salt
+    measurement:
+      unit: tsp
+      amount: 1
+  - name: turmeric
+    measurement:
+      unit: tsp
+      amount: .5
+  - name: ground corrainder
+    measurement:
+      unit: tsp
+      amount: 1
+  instructions:
+  - add to onions, cook for 3 minutes
+  minutes: 3
+- instructions:
+  - add sauteed potatoes, cook on medium low, covered until half done
+  minutes: 5
+- ingredients:
+  - name: water
+    modifier: warm
+    measurement:
+      unit: cup
+      amount: .5
+  instructions:
+  - add sauteed cauliflower, water and cook on medium low, covered
+  minutes: 5
+- ingredients:
+  - name: cilantro
+    modifer: minced
+    measurement:
+      unit: bunch
+      amount: .25
+  instructions:
+  - cook without lid on high until dry, garnish with cilantro
+  minutes: 2

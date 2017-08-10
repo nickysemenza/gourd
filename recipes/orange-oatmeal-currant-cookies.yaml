@@ -1,0 +1,92 @@
+---
+title: Orange Oatmeal Currant Cookies
+source: Tartine
+quantity: 80
+servings: 40
+unit: cookies
+totalMinutes: 29
+image: http://i.imgur.com/jtgROe1.jpg
+equipment:
+- sheet pan
+- oven
+- mixer
+sections:
+- ingredients:
+  - name: currants
+    grams: 200
+  - name: water
+    modifier: warm
+  minutes: 10
+  instructions:
+  - soak for 10 min, then drain
+
+- ingredients:
+  - name: butter
+    measurement:
+      unit: cup
+      amount: 1
+    grams: 225
+  minutes: 4
+  instructions:
+  - cream in mixer on med-high
+- ingredients:
+  - name: sugar
+    grams: 250
+  minutes: 2
+  instructions:
+  - add to mixer, go on medium till fluffy
+
+
+- ingredients:
+  - name: egg
+    measurement:
+      unit: egg
+      amount: 1
+  - name: egg yolk
+    measurement:
+      unit: yolk
+      amount: 1
+  - name: vanilla
+    measurement:
+      unit: tsp
+      amount: 1
+  - name: corn syrup
+    measurement:
+      unit: tbsp
+      amount: 2
+  - name: molasses
+    measurement:
+      unit: tbsp
+      amount: 1
+  - name: salt
+    measurement:
+      unit: tsp
+      amount: .5
+  - name: orange zest
+    measurement:
+      unit: tsp
+      amount: 4
+  minutes: .5
+  instructions:
+  - add to mixer
+- ingredients:
+  - name: flour
+    grams: 285
+  - name: oats
+    grams: 155
+  - name: baking soda
+    measurement:
+      unit: tsp
+      amount: .5
+  - name: nutmeg
+    measurement:
+      unit: tsp
+      amount: .5
+  minutes: 10
+  instructions:
+  - add to mixer, mix in carefully
+  - mix in currants from above
+  - form into 2x logs, on parchment
+  - fridge for 12 hours
+  - slice thingly
+  - bake at 350 for 7-10 min

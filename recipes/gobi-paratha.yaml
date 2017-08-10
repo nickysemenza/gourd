@@ -1,0 +1,82 @@
+---
+title: Gobi Paratha
+source: Jaffrey's Classic Indian Cooking, pg. 409
+quantity: 12
+servings: 6
+unit: paratha
+totalMinutes: 45
+equipment:
+- food processor
+- skillet
+sections:
+- ingredients:
+  - name: cauliflower
+    grams: 500
+    measurement:
+      unit: small head
+      amount: 1
+  - name: oil
+    measurement:
+      unit: tbsp
+      amount: 3
+  instructions:
+  - rice cauliflower in a food processor
+  - heat oil in pan on medium
+  - add cauliflower, cook till dry (5 min)
+  - turn off heat
+- ingredients:
+  - name: ginger
+    modifier: grated
+    measurement:
+      unit: tbsp
+      amount: 1
+  - name: red pepper
+    measurement:
+      unit: tsp
+      amount: 0.5
+  - name: salt
+    measurement:
+      unit: tsp
+      amount: 1.25
+  instructions:
+  - add to pan and mix
+
+- ingredients:
+  - name: whole wheat flour
+    measurement:
+      unit: cups
+      amount: 2
+  - name: all purpose flour
+    measurement:
+      unit: cup
+      amount: 1
+  - name: salt
+    measurement:
+      unit: tsp
+      amount: 1
+  - name: shortening or oil
+    measurement:
+        unit: tbsp
+        amount: 3
+  instructions:
+  - add to food processor and pulse
+
+- ingredients:
+  - name: water
+    modifier: warm at 100F
+    measurement:
+      unit: cup
+      amount: 1
+  instructions:
+  - drizzle into running food processor
+  - knead, then put in greased bowl in fridge until 30 min before rolling
+- ingredients:
+  - name: ''
+  instructions:
+  - divide into 12, add filling
+  - cover with moist towel
+  - roll out to a 6 in circle
+  - cook for 2 minutes
+  - flip, cook for 30 sec, brush with oil
+  - flip, cook for 30 sec, brush with oil
+
