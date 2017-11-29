@@ -34,6 +34,30 @@ func (a *App) Initialize(config *config.Config) {
 	a.DB = model.DBMigrate(db)
 	a.Router = mux.NewRouter()
 	a.setRouters()
+
+	i := model.Ingredient{}
+	db.FirstOrCreate(&i, model.Ingredient{Name: "flour"})
+
+	test := model.Recipe{
+		Title: "test",
+		Sections: []model.Section{
+			{
+				Ingredients: []model.SectionIngredient{
+					{Grams: 4, Unit: "cups", Item: i},
+				},
+				Instructions: []model.SectionInstruction{
+					{Name: "thing1"},
+					{Name: "thing2"},
+				},
+			},
+			{
+				Instructions: []model.SectionInstruction{
+					{Name: "thing3"},
+					{Name: "thing4"},
+				},
+			}},
+	}
+	db.Create(&test)
 }
 
 // setRouters sets the all required routers
@@ -46,6 +70,8 @@ func (a *App) setRouters() {
 	a.Delete("/projects/{title}", a.DeleteProject)
 	a.Put("/projects/{title}/archive", a.ArchiveProject)
 	a.Delete("/projects/{title}/archive", a.RestoreProject)
+
+	a.Get("/recipes", a.GetAllRecipes)
 
 	// Routing for handling the tasks
 	a.Get("/projects/{title}/tasks", a.GetAllTasks)
@@ -75,6 +101,13 @@ func (a *App) Put(path string, f func(w http.ResponseWriter, r *http.Request)) {
 // Delete wraps the router for DELETE method
 func (a *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)) {
 	a.Router.HandleFunc(path, f).Methods("DELETE")
+}
+
+/*
+** Recipe Handlers
+ */
+func (a *App) GetAllRecipes(w http.ResponseWriter, r *http.Request) {
+	handler.GetAllRecipes(a.DB, w, r)
 }
 
 /*
