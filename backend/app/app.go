@@ -40,6 +40,7 @@ func (a *App) Initialize(config *config.Config) {
 
 	test := model.Recipe{
 		Title: "test",
+		Slug:  "derp",
 		Sections: []model.Section{
 			{
 				Ingredients: []model.SectionIngredient{
@@ -71,7 +72,8 @@ func (a *App) setRouters() {
 	a.Put("/projects/{title}/archive", a.ArchiveProject)
 	a.Delete("/projects/{title}/archive", a.RestoreProject)
 
-	a.Get("/recipes", a.GetAllRecipes)
+	a.Get("/api/recipes", a.GetAllRecipes)
+	a.Get("/api/recipes/{slug}", a.GetRecipe)
 
 	// Routing for handling the tasks
 	a.Get("/projects/{title}/tasks", a.GetAllTasks)
@@ -108,6 +110,9 @@ func (a *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)
  */
 func (a *App) GetAllRecipes(w http.ResponseWriter, r *http.Request) {
 	handler.GetAllRecipes(a.DB, w, r)
+}
+func (a *App) GetRecipe(w http.ResponseWriter, r *http.Request) {
+	handler.GetRecipe(a.DB, w, r)
 }
 
 /*

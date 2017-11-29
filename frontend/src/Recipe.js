@@ -49,7 +49,7 @@ export default class Recipe extends Component {
       });
 
       let instructionList = recipeSection.instructions.map((i, n) => (
-        <div key={n}><b>{`${instructionNum++}`}. </b>{i}</div>
+        <div key={n}><b>{`${instructionNum++}`}. </b>{i.name}</div>
       ));
 
       let test = [];
@@ -131,7 +131,7 @@ export default class Recipe extends Component {
                     <b>Total minutes (calculated):</b>&nbsp;{totalMinutes}
                   </li>
                   <li className="list-group-item">
-                    <b>Equipment:</b>&nbsp;{recipe.equipment.join(", ")}
+                    <b>Equipment:</b>&nbsp;{recipe.equipment}
                   </li>
                 </ul>
               </div>

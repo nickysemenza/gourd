@@ -16,8 +16,9 @@ type Model struct {
 
 type Recipe struct {
 	Model
-	TotalMinutes uint      `json:"total_minutes"`
+	Slug         string    `json:"slug" gorm:"unique"`
 	Title        string    `json:"total_minutes"`
+	TotalMinutes uint      `json:"total_minutes"`
 	Equipment    string    `json:"equipment"`
 	Source       string    `json:"source"`
 	Servings     uint      `json:"servings"`
