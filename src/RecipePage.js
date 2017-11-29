@@ -25,7 +25,7 @@ export default class RecipePage extends Component {
   }
   render() {
     return (
-      <div>
+      <div className="container">
         <Recipe recipe={this.state.recipe} slug={this.state.slug} />
       </div>
     );

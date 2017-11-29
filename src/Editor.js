@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Recipe from './Recipe';
+import YAML from 'yamljs';
 class About extends Component {
   constructor(props) {
     super(props);
@@ -49,15 +51,25 @@ class About extends Component {
       });
       this.setState({sections})
   }
-  editIngredient(sectionNum,ingredientNum,e) {
+  editIngredient(sectionNum,ingredientNum,field,e) {
       let sections = this.state.sections;
-      sections[sectionNum].ingredients[ingredientNum] = e.target.value;
+      if(field === "unit" || field === "amount") {
+          if(!sections[sectionNum].ingredients[ingredientNum]['measurement']) {
+              sections[sectionNum].ingredients[ingredientNum]['measurement'] = {};
+          }
+          sections[sectionNum].ingredients[ingredientNum]['measurement'][field] = e.target.value;
+      } else {
+          sections[sectionNum].ingredients[ingredientNum][field] = e.target.value;
+      }
+      // sections[sectionNum].ingredients[ingredientNum] = e.target.value;
       this.setState({sections})
   }
   render() {
+      const recipe = this.state;
     return (
-      <div>
-
+      <div className="row">
+          <div className="col-md-6">
+          {/*EDITOR*/}
         <div className="form-group row">
           <label htmlFor="example-text-input" className="col-2 col-form-label">Title</label>
           <div className="col-10">
@@ -108,7 +120,36 @@ class About extends Component {
                     </div>)}
               <h2>Ingredients</h2>
                 { section.ingredients.map((ingredient, ingredientNum) => <div key={`section-${sectionNum}-ingredient-${ingredientNum}`}>
-                    {/*<input type="text" value={ingredient} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum)}/>*/}
+
+                    <div className="form-group row">
+                        <label htmlFor="example-text-input" className="col-2 col-form-label">name</label>
+                        <div className="col-10">
+                            <input className="form-control" type="text" value={ingredient.name} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"name")} />
+                        </div>
+                    </div>
+
+                    <div className="form-group row">
+                        <label htmlFor="example-text-input" className="col-2 col-form-label">Grams</label>
+                        <div className="col-10">
+                            <input className="form-control" type="number" value={ingredient.grams} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"grams")} />
+                        </div>
+                    </div>
+
+                    <div className="form-group row">
+                        <label htmlFor="example-text-input" className="col-2 col-form-label">unit</label>
+                        <div className="col-10">
+                            <input className="form-control" type="text" value={ingredient.measurement ? ingredient.measurement.unit : ""} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"unit")} />
+                        </div>
+                    </div>
+
+                    <div className="form-group row">
+                        <label htmlFor="example-text-input" className="col-2 col-form-label">amount</label>
+                        <div className="col-10">
+                            <input className="form-control" type="number" value={ingredient.measurement ? ingredient.measurement.amount : ""} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"amount")} />
+                        </div>
+                    </div>
+
+
                     <pre>{JSON.stringify(ingredient,null, 2)} {ingredientNum}</pre>
 
                     <a onClick={this.deleteIngredient.bind(this,sectionNum,ingredientNum)}>delete</a>
@@ -118,11 +159,17 @@ class About extends Component {
                     <a onClick={this.addIngredient.bind(this,sectionNum,ingredientNum+1)}>add after</a>
                 </div>)}
 
-              <hr/>
+                <hr/>
             </div>);
           })}
+          <pre>{YAML.stringify(recipe,10,2)}</pre>
+              <hr/>
+          <pre>{JSON.stringify(recipe,null, 2)}</pre>
+          </div>
+          <div className="col-md-6" style={{position: 'fixed', left: '50%'}}>
+              <Recipe recipe={recipe}/>
 
-        {/*<pre>{JSON.stringify(this.state,null, 2)}</pre>*/}
+          </div>
       </div>
     );
   }

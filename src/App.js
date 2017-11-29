@@ -11,7 +11,7 @@ const App = () => (
   <Router>
     <div>
       <Nav />
-      <div className="container">
+      <div className="container-fluid">
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />
