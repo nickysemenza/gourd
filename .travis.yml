@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.6
+  - 1.7
 node_js: '7'
 env:
   - DEP_VERSION="0.3.2"
