@@ -19,7 +19,7 @@ export default class Nav extends Component {
     return (
       <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
         <a className="navbar-brand">
-          Recipes <NavbarToggler right onClick={this.toggle} />
+          Recipes <NavbarToggler onClick={this.toggle} />
         </a>
 
         <Collapse isOpen={this.state.isOpen} navbar>

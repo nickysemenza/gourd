@@ -91,7 +91,6 @@ func (t *Task) Undo() {
 // DBMigrate will create and migrate the tables, and then make the some relationships if necessary
 func DBMigrate(db *gorm.DB) *gorm.DB {
 	db.AutoMigrate(&Project{}, &Task{}, &Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{})
-	//db.Model(&Task{}).AddForeignKey("project_id", "projects(id)", "RESTRICT", "RESTRICT")
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
