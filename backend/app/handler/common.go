@@ -53,7 +53,7 @@ func (se StatusError) Status() int {
 
 type Env struct {
 	DB   *gorm.DB
-	Port string
+	Port int
 	Host string
 }
 
@@ -78,8 +78,7 @@ func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			// Any error types we don't specifically look out for default
 			// to serving a HTTP 500
-			http.Error(w, http.StatusText(http.StatusInternalServerError),
-				http.StatusInternalServerError)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		}
 	}
 }

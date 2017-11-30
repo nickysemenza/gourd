@@ -1,4 +1,4 @@
-package config
+package app
 
 import (
 	"fmt"
@@ -8,7 +8,8 @@ import (
 )
 
 type Config struct {
-	DB *DBConfig
+	DB   *DBConfig
+	Port int
 }
 
 type DBConfig struct {
@@ -34,6 +35,7 @@ func GetConfig() *Config {
 			Name:     os.Getenv("DB_DATABASE"),
 			Charset:  "utf8",
 		},
+		Port: 4000,
 	}
 	config.DB.URI = fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,

@@ -1,4 +1,4 @@
-package utils
+package app
 
 import (
 	"encoding/json"
@@ -28,9 +28,9 @@ func (u Utils) Import(path string) {
 				os.Exit(1)
 			}
 
-			var c model.Recipe
-			json.Unmarshal(raw, &c)
-			u.Env.DB.Create(&c)
+			var eachRecipe model.Recipe
+			json.Unmarshal(raw, &eachRecipe)
+			u.Env.DB.Create(&eachRecipe)
 		}
 	}
 }
@@ -38,7 +38,6 @@ func (u Utils) Import(path string) {
 func (u Utils) Export(path string) {
 	recipes := []model.Recipe{}
 	u.Env.DB.Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Find(&recipes)
-
 	for _, r := range recipes {
 		jsonData, _ := json.Marshal(r)
 		err := ioutil.WriteFile(path+r.Slug+".json", jsonData, 0644)
@@ -46,4 +45,5 @@ func (u Utils) Export(path string) {
 			log.Fatal(err)
 		}
 	}
+	log.Printf("Exported %d recipes to "+path, len(recipes))
 }
