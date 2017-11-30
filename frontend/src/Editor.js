@@ -4,7 +4,7 @@ import YAML from 'yamljs';
 class About extends Component {
   constructor(props) {
     super(props);
-    this.state = {"title":"Chocolate Chip Cookies","source":"from Bouchon Bakery Cookbook","quantity":24,"servings":24,"unit":"cookies","totalMinutes":100,"equipment":["sheet pan","oven"],"sections":[{"ingredients":[{"name":"butter","grams":334}],"instructions":["cream in mixer"]},{"ingredients":[{"name":"dark brown sugar","substitute":"light brown sugar","grams":268.1,"measurement":{"unit":"cup","amount":1}},{"name":"molasses","grams":24},{"name":"sugar","grams":208}],"instructions":["add to mixer for 4 min"]},{"ingredients":[{"name":"eggs","grams":120}],"instructions":["add to mixer","mix for 30 seconds"]},{"ingredients":[{"name":"flour","modifier":"sifted","optional":true,"grams":476.1},{"name":"baking soda","measurement":{"unit":"tsp","amount":1}},{"name":"salt","measurement":{"unit":"tsp","amount":2}}],"instructions":["add in 2 additions to mixer, mix for 40 seconds inbetween"]},{"ingredients":[{"name":"chocolate chunks","modifier":"coarsely chopped","grams":214},{"name":"chocolate chips","grams":214}],"instructions":["mix to incorporate","fridge for 1-24 hours","bake at 325 for 20 min"]}]}
+    this.state = {"id":5,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"slug":"double-chocolate-chunk-cookies","title":"Double Chocolate Chunk Cookies","total_minutes":100,"equipment":"sheet pan, oven","source":"from Bouchon Bakery Cookbook","servings":24,"unit":"cookies","quantity":24,"sections":[{"id":24,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"sort_order":0,"ingredients":[{"id":52,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"item":{"id":20,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"butter"},"item_id":20,"grams":334,"amount":0,"amount_unit":"","substitute":"","modifier":"","optional":false,"section_id":24}],"instructions":[{"id":37,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"name":"cream in mixer","section_id":24}],"recipe_id":5,"minutes":0},{"id":25,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"sort_order":0,"ingredients":[{"id":53,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"item":{"id":21,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"dark brown sugar"},"item_id":21,"grams":268.1,"amount":1,"amount_unit":"cup","substitute":"light brown sugar","modifier":"","optional":false,"section_id":25},{"id":54,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:39Z","deleted_at":null,"item":{"id":22,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"molasses"},"item_id":22,"grams":24,"amount":0,"amount_unit":"","substitute":"","modifier":"","optional":false,"section_id":25},{"id":55,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":23,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"sugar"},"item_id":23,"grams":208,"amount":0,"amount_unit":"","substitute":"","modifier":"","optional":false,"section_id":25}],"instructions":[{"id":38,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"add to mixer for 4 min","section_id":25}],"recipe_id":5,"minutes":0},{"id":26,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"sort_order":0,"ingredients":[{"id":56,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":17,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"eggs"},"item_id":17,"grams":120,"amount":0,"amount_unit":"","substitute":"","modifier":"","optional":false,"section_id":26}],"instructions":[{"id":39,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"add to mixer","section_id":26},{"id":40,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"mix for 30 seconds","section_id":26}],"recipe_id":5,"minutes":0},{"id":27,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"sort_order":0,"ingredients":[{"id":57,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":1,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"flour"},"item_id":1,"grams":380,"amount":0,"amount_unit":"","substitute":"","modifier":"sifted","optional":false,"section_id":27},{"id":58,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":27,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"cocoa powder"},"item_id":27,"grams":96,"amount":0,"amount_unit":"","substitute":"","modifier":"sifted","optional":false,"section_id":27},{"id":59,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":24,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"baking soda"},"item_id":24,"grams":0,"amount":1,"amount_unit":"tsp","substitute":"","modifier":"","optional":false,"section_id":27},{"id":60,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":13,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"salt"},"item_id":13,"grams":0,"amount":2,"amount_unit":"tsp","substitute":"","modifier":"","optional":false,"section_id":27}],"instructions":[{"id":41,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"add in 2 additions to mixer, mix for 40 seconds inbetween","section_id":27}],"recipe_id":5,"minutes":0},{"id":28,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"sort_order":0,"ingredients":[{"id":61,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":25,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"chocolate chunks"},"item_id":25,"grams":214,"amount":0,"amount_unit":"","substitute":"","modifier":"coarsely chopped","optional":false,"section_id":28},{"id":62,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"item":{"id":26,"created_at":"2017-11-30T01:43:39Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"chocolate chips"},"item_id":26,"grams":214,"amount":0,"amount_unit":"","substitute":"","modifier":"","optional":false,"section_id":28}],"instructions":[{"id":42,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"mix to incorporate","section_id":28},{"id":43,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"fridge for 1-24 hours","section_id":28},{"id":44,"created_at":"2017-11-30T01:43:40Z","updated_at":"2017-11-30T01:43:40Z","deleted_at":null,"name":"bake at 325 for 20 min","section_id":28}],"recipe_id":5,"minutes":0}]}
   }
   editTopLevelItem(fieldName,e) {
       this.setState({[fieldName]: e.target.value});
@@ -26,12 +26,12 @@ class About extends Component {
   }
   addInstruction(sectionNum,instructionNum) {
       let sections = this.state.sections;
-      sections[sectionNum].instructions.splice(instructionNum,0,"");
+      sections[sectionNum].instructions.splice(instructionNum,0,{name: ""});
       this.setState({sections})
   }
   editInstruction(sectionNum,instructionNum,e) {
       let sections = this.state.sections;
-      sections[sectionNum].instructions[instructionNum] = e.target.value;
+      sections[sectionNum].instructions[instructionNum]["name"] = e.target.value;
       this.setState({sections})
   }
   deleteIngredient(sectionNum,ingredientNum) {
@@ -42,25 +42,22 @@ class About extends Component {
   addIngredient(sectionNum,ingredientNum) {
       let sections = this.state.sections;
       sections[sectionNum].ingredients.splice(ingredientNum,0,{
-          name: 'name',
+          item: {name: 'name'},
           grams: 0,
-          measurement: {
-              "unit": "cup",
-              "amount": 1
-          }
+          amount_unit: "cup",
+          amount: 1,
+          substitute: "",
+          modifier: "",
+          optional: false
       });
       this.setState({sections})
   }
   editIngredient(sectionNum,ingredientNum,field,e) {
       let sections = this.state.sections;
-      if(field === "unit" || field === "amount") {
-          if(!sections[sectionNum].ingredients[ingredientNum]['measurement']) {
-              sections[sectionNum].ingredients[ingredientNum]['measurement'] = {};
-          }
-          sections[sectionNum].ingredients[ingredientNum]['measurement'][field] = e.target.value;
-      } else {
+      if(field==="item")
+          sections[sectionNum].ingredients[ingredientNum]["item"]["name"] = e.target.value;
+      else
           sections[sectionNum].ingredients[ingredientNum][field] = e.target.value;
-      }
       // sections[sectionNum].ingredients[ingredientNum] = e.target.value;
       this.setState({sections})
   }
@@ -99,9 +96,9 @@ class About extends Component {
         </div>
 
         <div className="form-group row">
-          <label htmlFor="example-text-input" className="col-2 col-form-label">totalMinutes</label>
+          <label htmlFor="example-text-input" className="col-2 col-form-label">total_minutes</label>
           <div className="col-10">
-            <input className="form-control" type="number" value={this.state.totalMinutes} onChange={this.editTopLevelItem.bind(this,'totalMinutes')} />
+            <input className="form-control" type="number" value={this.state.total_minutes} onChange={this.editTopLevelItem.bind(this,'total_minutes')} />
           </div>
         </div>
           { this.state.sections.map((section, sectionNum)=> {
@@ -111,7 +108,7 @@ class About extends Component {
               <button onClick={this.deleteSection.bind(this,sectionNum)}>Delete Section</button>
               <h2>Instructions</h2>
                     { section.instructions.map((instruction, instructionNum) => <div key={`section-${sectionNum}-instruction-${instructionNum}`}>
-                      <input type="text" value={instruction} onChange={this.editInstruction.bind(this,sectionNum,instructionNum)}/>
+                      <input type="text" value={instruction.name} onChange={this.editInstruction.bind(this,sectionNum,instructionNum)}/>
                       <a onClick={this.deleteInstruction.bind(this,sectionNum,instructionNum)}>delete</a>
                       &nbsp; | &nbsp;
                       <a onClick={this.addInstruction.bind(this,sectionNum,instructionNum)}>add before</a>
@@ -124,7 +121,7 @@ class About extends Component {
                     <div className="form-group row">
                         <label htmlFor="example-text-input" className="col-2 col-form-label">name</label>
                         <div className="col-10">
-                            <input className="form-control" type="text" value={ingredient.name} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"name")} />
+                            <input className="form-control" type="text" value={ingredient.item.name} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"item")} />
                         </div>
                     </div>
 
@@ -138,14 +135,14 @@ class About extends Component {
                     <div className="form-group row">
                         <label htmlFor="example-text-input" className="col-2 col-form-label">unit</label>
                         <div className="col-10">
-                            <input className="form-control" type="text" value={ingredient.measurement ? ingredient.measurement.unit : ""} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"unit")} />
+                            <input className="form-control" type="text" value={ingredient.amount_unit} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"amount_unit")} />
                         </div>
                     </div>
 
                     <div className="form-group row">
                         <label htmlFor="example-text-input" className="col-2 col-form-label">amount</label>
                         <div className="col-10">
-                            <input className="form-control" type="number" value={ingredient.measurement ? ingredient.measurement.amount : ""} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"amount")} />
+                            <input className="form-control" type="number" value={ingredient.amount} onChange={this.editIngredient.bind(this,sectionNum,ingredientNum,"amount")} />
                         </div>
                     </div>
 
@@ -162,7 +159,6 @@ class About extends Component {
                 <hr/>
             </div>);
           })}
-          <pre>{YAML.stringify(recipe,10,2)}</pre>
               <hr/>
           <pre>{JSON.stringify(recipe,null, 2)}</pre>
           </div>
