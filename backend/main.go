@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	config := config.GetConfig()
+	globalConfig := config.GetConfig()
 
-	app := &app.App{}
-	app.Initialize(config)
-	app.Run(":4000")
+	mainApp := &app.App{}
+	mainApp.Initialize(globalConfig)
+	mainApp.Run(":4000")
 }

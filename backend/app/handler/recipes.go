@@ -14,7 +14,7 @@ func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
 	for _, r := range recipes {
 		slugs = append(slugs, r.Slug)
 	}
-	respondJSON(w, http.StatusOK, slugs)
+	respondSuccess(w, slugs)
 	return nil
 }
 func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {
@@ -27,6 +27,6 @@ func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
-	respondJSON(w, http.StatusOK, recipe)
+	respondSuccess(w, recipe)
 	return nil
 }
