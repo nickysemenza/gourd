@@ -1,14 +1,13 @@
 package app
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/nickysemenza/food/backend/config"
+	"log"
+	"net/http"
 	"os"
 )
 
@@ -33,8 +32,7 @@ func (a *App) Initialize(config *config.Config) {
 
 	pwd, _ := os.Getwd()
 	pwd += "/recipes/"
-	//model.LegacyImport(db, pwd)
-	//model.Export(db, pwd)
+	//utils.Utils{env}.Export(pwd)
 }
 
 // setRouters sets the all required routers
