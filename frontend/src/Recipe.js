@@ -139,7 +139,7 @@ export default class Recipe extends Component {
             <div className="col col-sm-6">
               <div className="card">
                 <p className="card-text">
-                  { recipe.image ? <img src={recipe.image} style={{"maxHeight":"350px","maxWidth":"350px","height":"auto","width":"auto"}}/> : null }
+                  { recipe.image ? <img src={recipe.image} alt="" style={{"maxHeight":"350px","maxWidth":"350px","height":"auto","width":"auto"}}/> : null }
                 </p>
               </div>
             </div>

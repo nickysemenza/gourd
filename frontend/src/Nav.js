@@ -18,7 +18,7 @@ export default class Nav extends Component {
   render() {
     return (
       <nav className="navbar navbar-toggleable-md navbar-light bg-faded">
-        <a className="navbar-brand" href="#">
+        <a className="navbar-brand">
           Recipes <NavbarToggler right onClick={this.toggle} />
         </a>
 

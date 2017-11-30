@@ -11,34 +11,49 @@ import (
 	"time"
 )
 
-func Export(db *gorm.DB) {
+func Export(db *gorm.DB, path string) {
 	recipes := []Recipe{}
 	db.Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Find(&recipes)
 
-	pwd, _ := os.Getwd()
-	pwd += "/recipes2/"
-
 	for _, r := range recipes {
 		jsonData, _ := json.Marshal(r)
-		err := ioutil.WriteFile(pwd+r.Slug+".json", jsonData, 0644)
+		err := ioutil.WriteFile(path+r.Slug+".json", jsonData, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 }
 
-func LegacyImport(db *gorm.DB) {
-	pwd, _ := os.Getwd()
-	pwd += "/recipes/"
+func Import(db *gorm.DB, path string) {
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), ".json") {
+			raw, err := ioutil.ReadFile(path + f.Name())
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
 
-	files, err := ioutil.ReadDir(pwd)
+			var c Recipe
+			json.Unmarshal(raw, &c)
+			db.Create(&c)
+		}
+	}
+}
+
+func LegacyImport(db *gorm.DB, path string) {
+
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".json") {
-			raw, err := ioutil.ReadFile(pwd + f.Name())
+			raw, err := ioutil.ReadFile(path + f.Name())
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
@@ -51,7 +66,6 @@ func LegacyImport(db *gorm.DB) {
 func legacyImport(db *gorm.DB, bytes []byte, slug string) {
 	var c LegacyData
 	json.Unmarshal(bytes, &c)
-	//fmt.Println(c)
 
 	toImport := Recipe{}
 	toImport.Slug = slug

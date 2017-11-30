@@ -10,6 +10,7 @@ import (
 	"github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/nickysemenza/food/backend/config"
+	"os"
 )
 
 // App has router and db instances
@@ -35,8 +36,10 @@ func (a *App) Initialize(config *config.Config) {
 	a.Router = mux.NewRouter()
 	a.setRouters()
 
-	//model.LegacyImport(db)
-	//model.Export(db)
+	pwd, _ := os.Getwd()
+	pwd += "/recipes/"
+	//model.LegacyImport(db, pwd)
+	//model.Export(db, pwd)
 
 }
 

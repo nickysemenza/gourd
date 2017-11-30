@@ -32,17 +32,18 @@ export default class Home extends Component {
               height="600"
               frameBorder="no"
               scrolling="no"
+              title="smugmug gallery"
             />
           </div>
         </div>
         <hr />
         View this project on github:
         {" "}
-        <a href="https://github.com/nickysemenza/food" target="_blank">
+        <a href="https://github.com/nickysemenza/food" target="_blank" rel="noopener noreferrer">
           github.com/nickysemenza/food
         </a>
         <br />
-        <a href="http://www.nicky.photos/Food/My-Food/" target="_blank">
+        <a href="http://www.nicky.photos/Food/My-Food/" target="_blank" rel="noopener noreferrer">
           View all photos
         </a>
       </div>
