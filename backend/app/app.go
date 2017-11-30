@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -16,48 +15,34 @@ import (
 // App has router and db instances
 type App struct {
 	Router *mux.Router
-	db     *gorm.DB
 }
 
 // Initialize initializes the app with predefined configuration
 func (a *App) Initialize(config *config.Config) {
-	dbURI := fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
-		config.DB.Username,
-		config.DB.Password,
-		config.DB.Name,
-		config.DB.Charset)
-
-	db, err := gorm.Open(config.DB.Dialect, dbURI)
+	db, err := gorm.Open(config.DB.Dialect, config.DB.URI)
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}
+	db = model.DBMigrate(db)
 
-	a.db = model.DBMigrate(db)
+	env := &handler.Env{}
+	env.DB = db
+
 	a.Router = mux.NewRouter()
-	a.setRouters()
+	a.setRouters(env)
 
 	pwd, _ := os.Getwd()
 	pwd += "/recipes/"
 	//model.LegacyImport(db, pwd)
 	//model.Export(db, pwd)
-
 }
 
 // setRouters sets the all required routers
-func (a *App) setRouters() {
-	a.Router.HandleFunc("/api/recipes", a.GetAllRecipes).Methods("GET")
-	a.Router.HandleFunc("/api/recipes/{slug}", a.GetRecipe).Methods("GET")
+func (a *App) setRouters(env *handler.Env) {
+	a.Router.Handle("/api", handler.Handler{env, handler.ErrorTest}).Methods("GET")
+	a.Router.Handle("/api/recipes", handler.Handler{env, handler.GetAllRecipes}).Methods("GET")
+	a.Router.Handle("/api/recipes/{slug}", handler.Handler{env, handler.GetRecipe}).Methods("GET")
 
-}
-
-/*
-** Recipe Handlers
- */
-func (a *App) GetAllRecipes(w http.ResponseWriter, r *http.Request) {
-	handler.GetAllRecipes(a.db, w, r)
-}
-func (a *App) GetRecipe(w http.ResponseWriter, r *http.Request) {
-	handler.GetRecipe(a.db, w, r)
 }
 
 // Run the app on it's router

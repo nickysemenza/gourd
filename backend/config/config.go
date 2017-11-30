@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -16,6 +17,7 @@ type DBConfig struct {
 	Password string
 	Name     string
 	Charset  string
+	URI      string
 }
 
 func GetConfig() *Config {
@@ -24,7 +26,7 @@ func GetConfig() *Config {
 		log.Fatal("Error loading .env file")
 	}
 
-	return &Config{
+	config := Config{
 		DB: &DBConfig{
 			Dialect:  "mysql",
 			Username: os.Getenv("DB_USERNAME"),
@@ -33,4 +35,11 @@ func GetConfig() *Config {
 			Charset:  "utf8",
 		},
 	}
+	config.DB.URI = fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
+		config.DB.Username,
+		config.DB.Password,
+		config.DB.Name,
+		config.DB.Charset)
+
+	return &config
 }
