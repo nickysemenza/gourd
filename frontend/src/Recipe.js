@@ -28,7 +28,7 @@ export default class Recipe extends Component {
       totalMinutes += minutes;
       let ingredients = recipeSection.ingredients ? recipeSection.ingredients : [];
       ingredients.forEach((i, n) => {
-        let ingredientName = `${i.name}${i.modifier ? `, ${i.modifier}` : ""}`;
+        let ingredientName = `${i.item.name}${i.modifier ? `, ${i.modifier}` : ""}`;
         ingredientList.push(
           <div className="ingredientCellItem" key={n}>{ingredientName}</div>
         );
@@ -41,7 +41,7 @@ export default class Recipe extends Component {
         volumeList.push(
           <div className="ingredientCellItem" key={n}>
             <VolumeMeasurement
-              measurement={i.measurement}
+              i={i}
               scale={this.state.scale}
             />
           </div>

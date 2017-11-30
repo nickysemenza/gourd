@@ -6,10 +6,10 @@ export const GramMeasurement = ({ grams, scale = 1 }) => {
 
   return scale === 1 ? <div>{str}</div> : <b>{str}</b>;
 };
-export const VolumeMeasurement = ({ measurement, scale = 1 }) => {
-  const str = measurement === undefined
+export const VolumeMeasurement = ({ i, scale = 1 }) => {
+  const str = i.amount === 0
     ? "\u00a0"
-    : `${parseFloat((measurement.amount * scale).toFixed(2))} ${measurement.unit}`;
+    : `${parseFloat((i.amount * scale).toFixed(2))} ${i.amount_unit}`;
 
   return scale === 1 ? <div>{str}</div> : <b>{str}</b>;
 };

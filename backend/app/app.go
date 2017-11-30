@@ -35,30 +35,9 @@ func (a *App) Initialize(config *config.Config) {
 	a.Router = mux.NewRouter()
 	a.setRouters()
 
-	i := model.Ingredient{}
-	db.FirstOrCreate(&i, model.Ingredient{Name: "flour"})
+	//model.LegacyImport(db)
+	//model.Export(db)
 
-	test := model.Recipe{
-		Title: "test",
-		Slug:  "derp",
-		Sections: []model.Section{
-			{
-				Ingredients: []model.SectionIngredient{
-					{Grams: 4, Unit: "cups", Item: i},
-				},
-				Instructions: []model.SectionInstruction{
-					{Name: "thing1"},
-					{Name: "thing2"},
-				},
-			},
-			{
-				Instructions: []model.SectionInstruction{
-					{Name: "thing3"},
-					{Name: "thing4"},
-				},
-			}},
-	}
-	db.Create(&test)
 }
 
 // setRouters sets the all required routers

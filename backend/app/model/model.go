@@ -17,7 +17,7 @@ type Model struct {
 type Recipe struct {
 	Model
 	Slug         string    `json:"slug" gorm:"unique"`
-	Title        string    `json:"total_minutes"`
+	Title        string    `json:"title"`
 	TotalMinutes uint      `json:"total_minutes"`
 	Equipment    string    `json:"equipment"`
 	Source       string    `json:"source"`
@@ -32,6 +32,7 @@ type Section struct {
 	Ingredients  []SectionIngredient  `json:"ingredients"`
 	Instructions []SectionInstruction `json:"instructions"`
 	RecipeID     uint                 `json:"recipe_id"`
+	Minutes      uint                 `json:"minutes"`
 }
 type SectionInstruction struct {
 	Model
@@ -44,7 +45,7 @@ type SectionIngredient struct {
 	ItemID     uint       `json:"item_id"`
 	Grams      float32    `json:"grams"`
 	Amount     float32    `json:"amount"`
-	Unit       string     `json:"unit"`
+	Unit       string     `json:"amount_unit"`
 	Substitute string     `json:"substitute"`
 	Modifier   string     `json:"modifier"`
 	Optional   bool       `json:"optional"`
