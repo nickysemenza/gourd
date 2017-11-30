@@ -3,39 +3,54 @@ package app
 import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/nickysemenza/food/backend/app/handler"
+	h "github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	"log"
 	"net/http"
 )
 
 type App struct {
-	Router *mux.Router
+	R *mux.Router
+}
+type Route struct {
+	Method      string
+	Pattern     string
+	HandlerFunc func(e *h.Env, w http.ResponseWriter, r *http.Request) error
 }
 
-func (a *App) Initialize(config *Config) *handler.Env {
+type Routes []Route
+
+func (a *App) Initialize(config *Config) *h.Env {
 	db, err := gorm.Open(config.DB.Dialect, config.DB.URI)
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}
 	//set up the env
-	env := &handler.Env{
+	env := &h.Env{
 		DB:   model.DBMigrate(db),
 		Port: config.Port,
 	}
-
-	a.Router = mux.NewRouter()
-	a.setRouters(env)
+	a.buildRoutes(env)
 	return env
 }
 
-func (a *App) setRouters(env *handler.Env) {
-	a.Router.Handle("/api", handler.Handler{env, handler.ErrorTest}).Methods("GET")
-	a.Router.Handle("/api/recipes", handler.Handler{env, handler.GetAllRecipes}).Methods("GET")
-	a.Router.Handle("/api/recipes/{slug}", handler.Handler{env, handler.GetRecipe}).Methods("GET")
+func (a *App) buildRoutes(env *h.Env) {
 
+	var routes = Routes{
+		{"GET", "/api", h.ErrorTest},
+		{"GET", "/api/recipes", h.GetAllRecipes},
+		{"GET", "/api/recipes/{slug}", h.GetRecipe},
+	}
+
+	//add them all
+	a.R = mux.NewRouter()
+	for _, route := range routes {
+		a.R.Handle(route.Pattern, h.Handler{env, route.HandlerFunc}).Methods(route.Method)
+	}
+	a.R.NotFoundHandler = h.Handler{env, h.NotFoundRoute}
 }
 
-func (a *App) Run(host string) {
-	log.Fatal(http.ListenAndServe(host, a.Router))
+func (a *App) RunServer(host string) {
+	log.Println("Running API server on", host)
+	log.Fatal(http.ListenAndServe(host, a.R))
 }

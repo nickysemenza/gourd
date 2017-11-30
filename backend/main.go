@@ -14,20 +14,20 @@ func main() {
 	appEnv := mainApp.Initialize(globalConfig)
 
 	cliApp := cli.NewApp()
-	cliApp.Name = "Food Backend"
+	cliApp.Version = "1.0.0"
+	cliApp.Name = "Recipe Hub Backend API"
 	cliApp.Authors = []cli.Author{
 		{Name: "Nicky", Email: "nicky@nickysemenza.com"},
 	}
 	cliApp.Action = func(c *cli.Context) error {
-		fmt.Println("Hello! Running API server on port", globalConfig.Port)
-		mainApp.Run(fmt.Sprintf(":%d", globalConfig.Port))
+		mainApp.RunServer(fmt.Sprintf(":%d", globalConfig.Port))
 		return nil
 	}
 	cliApp.Commands = []cli.Command{
 		{
 			Name:    "export",
 			Aliases: []string{"e"},
-			Usage:   "export the recipes to JSON",
+			Usage:   "Export the recipes to JSON",
 			Action: func(c *cli.Context) error {
 				pwd, _ := os.Getwd()
 				pwd += "/recipes/"
@@ -35,8 +35,18 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:    "import",
+			Aliases: []string{"i", "ingest"},
+			Usage:   "Import a folder recipes from JSON",
+			Action: func(c *cli.Context) error {
+				pwd, _ := os.Getwd()
+				pwd += "/recipes/"
+				app.Utils{appEnv}.Import(pwd)
+				return nil
+			},
+		},
 	}
-
 	cliApp.Run(os.Args)
 
 }

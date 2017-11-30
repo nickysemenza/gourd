@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
 	"log"
 	"net/http"
 )
@@ -26,6 +27,10 @@ func respondSuccess(w http.ResponseWriter, payload interface{}) {
 // respondError makes the error response with payload as json format
 func respondError(w http.ResponseWriter, code int, message string) {
 	respondJSON(w, code, map[string]string{"error": message})
+}
+
+func NotFoundRoute(e *Env, w http.ResponseWriter, r *http.Request) error {
+	return StatusError{Code: 404, Err: errors.New("route not found: " + r.RequestURI)}
 }
 
 // Error represents a handler error. It provides methods for a HTTP status
