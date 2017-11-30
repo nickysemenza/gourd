@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Recipe from './Recipe';
-import YAML from 'yamljs';
 class About extends Component {
   constructor(props) {
     super(props);
