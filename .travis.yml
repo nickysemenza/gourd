@@ -13,10 +13,10 @@ before_install:
 - chmod +x $GOPATH/bin/dep
 install:
 - npm install -g yarn
-before_script:
 - cd backend/
 - dep ensure
 - cd ..
+before_script:
 - cd frontend/
 - yarn install
 # - cp src/config.example.js src/config.js
