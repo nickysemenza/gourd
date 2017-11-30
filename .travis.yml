@@ -1,12 +1,30 @@
-language: node_js
-cache: yarn
-node_js:
-  - 6
-cache:
-  directories:
-    - node_modules
+language: go
+go:
+  - 1.6
+node_js: '7'
+before_install:
+- nvm install 6.9
+- nvm use 6.9
+install:
+- npm install -g yarn
+before_script:
+- cd backend/
+- cd ..
+- cd frontend/
+- yarn install
+# - cp src/config.example.js src/config.js
+- cd ..
 script:
-  - npm test -- --coverage
-  - npm run build
+- cd backend/
+# - vendor/bin/phpunit --verbose --coverage-text --coverage-clover=coverage.xml
+- cd ..
+- cd frontend/
+- npm test -- --coverage
+- cd ..
 after_success:
-  - npm run codecov
+- cd backend/
+- bash <(curl -s https://codecov.io/bash)
+- cd ..
+- cd frontend/
+- bash <(curl -s https://codecov.io/bash)
+- cd ..
