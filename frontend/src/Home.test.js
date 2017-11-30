@@ -4,6 +4,10 @@ import Home from "./Home";
 import { shallow, mount } from "enzyme";
 import { MemoryRouter } from "react-router-dom";
 
+import Adapter from 'enzyme-adapter-react-16';
+import { configure } from 'enzyme';
+configure({ adapter: new Adapter() });
+
 beforeEach(function() {
   window.fetch = jest.fn().mockImplementation(() =>
     Promise.resolve({
