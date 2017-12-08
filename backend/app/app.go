@@ -27,9 +27,9 @@ func (a *App) Initialize(config *Config) *h.Env {
 	}
 	//set up the env
 	env := &h.Env{
-		DB:   model.DBMigrate(db),
-		Port: config.Port,
-		App:  a,
+		DB:     model.DBMigrate(db),
+		Port:   config.Port,
+		Router: &a.R,
 	}
 	a.buildRoutes(env)
 	return env

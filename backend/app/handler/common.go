@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"github.com/nickysemenza/food/backend/app"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
@@ -58,10 +58,10 @@ func (se StatusError) Status() int {
 }
 
 type Env struct {
-	DB   *gorm.DB
-	Port string
-	Host string
-	App  *app.App
+	DB     *gorm.DB
+	Port   string
+	Host   string
+	Router **mux.Router
 }
 
 // The Handler struct that takes a configured Env and a function matching

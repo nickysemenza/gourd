@@ -34,13 +34,6 @@ func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 }
 
 func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
-	recipe := model.Recipe{}
-	vars := mux.Vars(r)
-	slug := vars["slug"]
-	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").First(&recipe).Error; err != nil {
-		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
-	}
-
 	decoder := json.NewDecoder(r.Body)
 	var updatedRecipe model.Recipe
 	err := decoder.Decode(&updatedRecipe)
@@ -48,6 +41,7 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 		panic(err)
 	}
 
+	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
 	for x := range updatedRecipe.Sections {
 		eachSection := &updatedRecipe.Sections[x]
 		for y := range eachSection.Ingredients {

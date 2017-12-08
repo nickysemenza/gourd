@@ -83,3 +83,12 @@ func DBMigrate(db *gorm.DB) *gorm.DB {
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
 	return db
 }
+func DBReset(db *gorm.DB) *gorm.DB {
+	db.DropTable(&SectionIngredient{})
+	db.DropTable(&SectionInstruction{})
+	db.DropTable(&Section{})
+	db.DropTable(&Ingredient{})
+	db.DropTable(&Recipe{})
+
+	return db
+}
