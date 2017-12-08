@@ -1,5 +1,6 @@
 set -e
 echo "" > coverage.txt
+export TESTMODE=true
 
 for d in $(go list ./... | grep -v vendor); do
     go test -race -coverprofile=profile.out -covermode=atomic $d

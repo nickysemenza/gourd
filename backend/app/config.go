@@ -30,7 +30,16 @@ func getEnv(key, fallback string) string {
 func GetConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Print("Error loading .env file")
+	}
+
+	dbName := ""
+	if _, ok := os.LookupEnv("TESTMODE"); ok {
+		dbName = os.Getenv("DB_DATABASE_TEST")
+		log.Printf("TESTMODE! using db: %s", dbName)
+	} else {
+		dbName = os.Getenv("DB_DATABASE")
+		log.Printf("using db: %s", dbName)
 	}
 
 	config := Config{
@@ -38,7 +47,7 @@ func GetConfig() *Config {
 			Dialect:  "mysql",
 			Username: os.Getenv("DB_USERNAME"),
 			Password: os.Getenv("DB_PASSWORD"),
-			Name:     os.Getenv("DB_DATABASE"),
+			Name:     dbName,
 			Charset:  "utf8",
 		},
 		Port: getEnv("PORT", "4000"),
