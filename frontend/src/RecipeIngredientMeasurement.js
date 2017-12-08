@@ -1,6 +1,6 @@
 import React from "react";
 export const GramMeasurement = ({ grams, scale = 1 }) => {
-  const str = grams === undefined
+  const str = grams === 0
     ? "\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0"
     : parseFloat((grams * scale).toFixed(2));
 

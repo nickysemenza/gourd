@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"github.com/jinzhu/gorm"
+	"github.com/nickysemenza/food/backend/app"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
@@ -60,6 +61,7 @@ type Env struct {
 	DB   *gorm.DB
 	Port string
 	Host string
+	App  *app.App
 }
 
 // The Handler struct that takes a configured Env and a function matching

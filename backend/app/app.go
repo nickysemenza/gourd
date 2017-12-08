@@ -21,7 +21,7 @@ type Route struct {
 type Routes []Route
 
 func (a *App) Initialize(config *Config) *h.Env {
-	db, err := gorm.Open(config.DB.Dialect, config.DB.URI)
+	db, err := gorm.Open(config.DB.Dialect, config.getDBURI())
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}
@@ -29,6 +29,7 @@ func (a *App) Initialize(config *Config) *h.Env {
 	env := &h.Env{
 		DB:   model.DBMigrate(db),
 		Port: config.Port,
+		App:  a,
 	}
 	a.buildRoutes(env)
 	return env
@@ -40,6 +41,7 @@ func (a *App) buildRoutes(env *h.Env) {
 		{"GET", "/api", h.ErrorTest},
 		{"GET", "/api/recipes", h.GetAllRecipes},
 		{"GET", "/api/recipes/{slug}", h.GetRecipe},
+		{"PUT", "/api/recipes/{slug}", h.PutRecipe},
 	}
 
 	//add them all

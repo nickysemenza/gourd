@@ -18,7 +18,6 @@ type DBConfig struct {
 	Password string
 	Name     string
 	Charset  string
-	URI      string
 }
 
 func getEnv(key, fallback string) string {
@@ -44,11 +43,13 @@ func GetConfig() *Config {
 		},
 		Port: getEnv("PORT", "4000"),
 	}
-	config.DB.URI = fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
+	return &config
+}
+
+func (config *Config) getDBURI() string {
+	return fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
 		config.DB.Password,
 		config.DB.Name,
 		config.DB.Charset)
-
-	return &config
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"log"
 )
 
 type Model struct {
@@ -54,6 +55,24 @@ type SectionIngredient struct {
 type Ingredient struct {
 	Model
 	Name string `json:"name"`
+}
+
+//func GetIngredientByName(db *gorm.DB, name string) Ingredient {
+//	ingredient := Ingredient{}
+//	db.FirstOrCreate(&ingredient, Ingredient{Name: name})
+//	return ingredient
+//}
+
+func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
+	db.FirstOrCreate(&ingredient, Ingredient{Name: ingredient.Name})
+}
+func (ingredient *Ingredient) GetFresh(db *gorm.DB) {
+	db.First(&ingredient, ingredient.ID)
+}
+
+func (ingredient *Ingredient) AfterCreate() (err error) {
+	log.Printf("[ingredient] created: %s, %d", ingredient.Name, ingredient.ID)
+	return
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
