@@ -9,7 +9,7 @@ env:
   - DEP_VERSION="0.3.2"
   - DB_USERNAME=root
   - DB_PASSWORD=root
-  - DB_DATABASE=food_test
+  - DB_DATABASE_TEST=food_test
 before_install:
 - nvm install 6.9
 - nvm use 6.9

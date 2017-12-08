@@ -37,16 +37,10 @@ func TestMain(m *testing.M) {
 		log.Print("Error loading .env file")
 	}
 
-	globalConfig := app.Config{DB: &app.DBConfig{
-		Dialect:  "mysql",
-		Username: os.Getenv("DB_USERNAME"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Name:     "food2",
-		Charset:  "utf8",
-	}, Port: "4001"}
-
+	globalConfig := app.GetConfig()
 	mainApp := &app.App{}
-	env = mainApp.Initialize(&globalConfig)
+	env = mainApp.Initialize(globalConfig)
+
 	env.DB = model.DBReset(env.DB)
 	env.DB = model.DBMigrate(env.DB)
 	os.Exit(m.Run())
