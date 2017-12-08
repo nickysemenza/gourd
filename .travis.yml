@@ -5,6 +5,7 @@ node_js: '7'
 services:
   - mysql
 env:
+  global:
   - DEP_VERSION="0.3.2"
   - DB_USERNAME=root
   - DB_PASSWORD=root
