@@ -21,7 +21,7 @@ before_script:
 - cd ..
 script:
 - cd backend/
-- go test -v ./...
+- ./test.sh
 - cd ..
 - cd frontend/
 - npm test -- --coverage

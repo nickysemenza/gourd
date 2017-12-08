@@ -5,6 +5,7 @@ frontend/node_modules
 
 # testing
 /coverage
+coverage.txt
 
 # production
 frontend/build
