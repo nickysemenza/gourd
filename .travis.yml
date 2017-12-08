@@ -13,7 +13,6 @@ env:
 before_install:
 - nvm install 6.9
 - nvm use 6.9
-- mysql -e 'CREATE DATABASE food_test;'
 install:
 - npm install -g yarn
 - go get -u github.com/golang/dep/...
@@ -21,6 +20,7 @@ install:
 - dep ensure
 - cd ..
 before_script:
+- mysql -e 'CREATE DATABASE food_test;'
 - cd frontend/
 - yarn install
 # - cp src/config.example.js src/config.js
