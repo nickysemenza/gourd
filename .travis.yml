@@ -2,12 +2,17 @@ language: go
 go:
   - 1.9
 node_js: '7'
+services:
+  - mysql
 env:
   - DEP_VERSION="0.3.2"
+  - DB_USERNAME=root
+  - DB_PASSWORD=root
+  - DB_DATABASE=food_test
 before_install:
 - nvm install 6.9
 - nvm use 6.9
-# Download the binary to bin folder in $GOPATH
+- mysql -e 'CREATE DATABASE food_test;'
 install:
 - npm install -g yarn
 - go get -u github.com/golang/dep/...

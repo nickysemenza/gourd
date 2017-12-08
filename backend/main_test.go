@@ -34,7 +34,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 func TestMain(m *testing.M) {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Print("Error loading .env file")
 	}
 
 	globalConfig := app.Config{DB: &app.DBConfig{
