@@ -58,7 +58,7 @@ func (se StatusError) Status() int {
 
 type Env struct {
 	DB   *gorm.DB
-	Port int
+	Port string
 	Host string
 }
 

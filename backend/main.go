@@ -20,7 +20,7 @@ func main() {
 		{Name: "Nicky", Email: "nicky@nickysemenza.com"},
 	}
 	cliApp.Action = func(c *cli.Context) error {
-		mainApp.RunServer(fmt.Sprintf(":%d", globalConfig.Port))
+		mainApp.RunServer(fmt.Sprintf(":%s", globalConfig.Port))
 		return nil
 	}
 	cliApp.Commands = []cli.Command{

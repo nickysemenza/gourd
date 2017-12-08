@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	DB   *DBConfig
-	Port int
+	Port string
 }
 
 type DBConfig struct {
@@ -19,6 +19,13 @@ type DBConfig struct {
 	Name     string
 	Charset  string
 	URI      string
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
 
 func GetConfig() *Config {
@@ -35,7 +42,7 @@ func GetConfig() *Config {
 			Name:     os.Getenv("DB_DATABASE"),
 			Charset:  "utf8",
 		},
-		Port: 4000,
+		Port: getEnv("PORT", "4000"),
 	}
 	config.DB.URI = fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
