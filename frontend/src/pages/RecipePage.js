@@ -1,10 +1,18 @@
 import React, { Component } from "react";
 import Recipe from "../components/Recipe";
-export default class RecipePage extends Component {
+import {API_BASE_URL} from "../config";
+
+import {
+    fetchRecipeDetail
+} from '../actions/recipe';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux'
+
+
+class RecipePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      recipe: null,
       slug: props.match.params.recipe_id
     };
   }
@@ -12,22 +20,33 @@ export default class RecipePage extends Component {
     console.log(nextProps, this.props);
     if (nextProps.match !== this.props.match) {
       this.setState({ slug: nextProps.match.params.recipe_id });
-      this.fetchData(nextProps.match.params.recipe_id);
+        this.props.fetchRecipeDetail(nextProps.match.params.recipe_id);
     }
   }
   componentDidMount() {
-    this.fetchData(this.state.slug);
-  }
-  fetchData(r) {
-    fetch(`/api/recipes/${r}`, { accept: "application/json" })
-      .then(response => response.json())
-      .then(json => this.setState({ recipe: json }));
+      this.props.fetchRecipeDetail(this.state.slug);
   }
   render() {
+      let {slug} = this.state;
     return (
       <div className="container">
-        <Recipe recipe={this.state.recipe} slug={this.state.slug} />
+        <Recipe recipe={this.props.recipe_detail[slug]} slug={slug} />
       </div>
     );
   }
 }
+
+
+function mapStateToProps (state) {
+    return {
+        recipe_detail: state.recipe.recipe_detail,
+    };
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        fetchRecipeDetail
+    }, dispatch)
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(RecipePage);
