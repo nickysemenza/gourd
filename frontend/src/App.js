@@ -1,11 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import Home from "./Home";
-import About from "./About";
-import Nav from "./Nav";
-import RecipePage from "./RecipePage";
-import EditorPage from "./Editor";
+import Home from "./pages/static/Home";
+import About from "./pages/static/About";
+import Nav from "./components/Nav";
+import RecipePage from "./pages/RecipePage";
+import EditorPage from "./pages/RecipeEditorPage";
 
 const App = () => (
   <Router>

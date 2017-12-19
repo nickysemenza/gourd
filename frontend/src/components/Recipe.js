@@ -3,6 +3,7 @@ import {
   GramMeasurement,
   VolumeMeasurement
 } from "./RecipeIngredientMeasurement";
+import {Link} from "react-router-dom";
 export default class Recipe extends Component {
   constructor(props) {
     super(props);
@@ -114,6 +115,7 @@ export default class Recipe extends Component {
                   <h4 className="card-title">Scaling</h4>
                   <p className="card-text">
                     approx weight:&nbsp; <b>{parseFloat((totalWeight * this.state.scale).toFixed(1))}g</b>
+                    <Link to={`/editor/${this.props.slug}`}><button>edit</button></Link>
                   </p>
                   <hr/>
                   <div className="form-group row">

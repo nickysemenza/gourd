@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Recipe from "./Recipe";
+import Recipe from "../components/Recipe";
 export default class RecipePage extends Component {
   constructor(props) {
     super(props);

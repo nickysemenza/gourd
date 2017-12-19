@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Recipe from './Recipe';
+import Recipe from '../components/Recipe';
 class EditorPage extends Component {
   constructor(props) {
     super(props);
