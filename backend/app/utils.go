@@ -26,13 +26,15 @@ func (u Utils) Import(path string) {
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
+			} else {
+				var eachRecipe model.Recipe
+				json.Unmarshal(raw, &eachRecipe)
+				log.Printf("importing: %s (%s)\n", eachRecipe.Title, eachRecipe.Slug)
+				eachRecipe.CreateOrUpdate(u.Env.DB, true)
 			}
-
-			var eachRecipe model.Recipe
-			json.Unmarshal(raw, &eachRecipe)
-			u.Env.DB.Create(&eachRecipe)
 		}
 	}
+	log.Printf("Exported %d recipes from %s", len(files), path)
 }
 
 func (u Utils) Export(path string) {
@@ -43,7 +45,9 @@ func (u Utils) Export(path string) {
 		err := ioutil.WriteFile(path+r.Slug+".json", jsonData, 0644)
 		if err != nil {
 			log.Fatal(err)
+		} else {
+			log.Printf("exporting: %s (%s)\n", r.Title, r.Slug)
 		}
 	}
-	log.Printf("Exported %d recipes to "+path, len(recipes))
+	log.Printf("Exported %d recipes to %s", len(recipes), path)
 }

@@ -75,6 +75,59 @@ func (ingredient *Ingredient) AfterCreate() (err error) {
 	return
 }
 
+func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
+	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
+	for x := range updatedRecipe.Sections {
+		eachSection := &updatedRecipe.Sections[x]
+		if recursivelyStripIDs {
+			eachSection.ID = 0
+		}
+		for y := range eachSection.Ingredients {
+			eachSectionIngredient := &eachSection.Ingredients[y]
+			eachItem := &eachSectionIngredient.Item
+			if recursivelyStripIDs {
+				eachSectionIngredient.ID = 0
+				eachItem.ID = 0
+			}
+			if eachItem.ID == 0 {
+				//	new ingredient!
+				//	find by name, to see if we have existing
+				eachItem.FindOrCreateUsingName(db)
+				//eachItem = model.GetIngredientByName(e.DB, eachItem.Name)
+				log.Printf("[ingredient] %s does not have an ID, giving it %d: ", eachItem.Name, eachItem.ID)
+			} else {
+				//	get fresh obj via eachIngredient.ID
+				fresh := *eachItem
+				fresh.GetFresh(db)
+				//	if eachIngredient.Name != fresh.Name IT WAS MUTATED AAH!
+				if eachItem.Name != fresh.Name {
+					log.Printf("[ingredient] name of %d was mutateded! (%s->%s)", eachItem.ID, eachItem.Name, fresh.Name)
+					//we want to preserve the original eachItem; create new w/ eachItem.Name
+
+					// find by name, or create new
+					newItem := Ingredient{Name: eachItem.Name}
+					newItem.FindOrCreateUsingName(db)
+					eachSectionIngredient.Item = newItem
+				}
+			}
+
+		}
+		for y := range eachSection.Instructions {
+			eachSectionInstruction := &eachSection.Instructions[y]
+			if recursivelyStripIDs {
+				eachSectionInstruction.ID = 0
+			}
+		}
+	}
+	if recursivelyStripIDs {
+		updatedRecipe.ID = 0
+	}
+
+	if err := db.Save(&updatedRecipe).Error; err != nil {
+		log.Println(err)
+	}
+}
+
 func DBMigrate(db *gorm.DB) *gorm.DB {
 	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")

@@ -5,14 +5,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/pkg/errors"
-	"log"
 	"net/http"
 )
 
 func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
 	e.DB.Select([]string{"slug"}).Find(&recipes)
-	var slugs []string
+	slugs := []string{}
 	for _, r := range recipes {
 		slugs = append(slugs, r.Slug)
 	}
@@ -41,38 +40,8 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 		panic(err)
 	}
 
-	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
-	for x := range updatedRecipe.Sections {
-		eachSection := &updatedRecipe.Sections[x]
-		for y := range eachSection.Ingredients {
-			eachSectionIngredient := &eachSection.Ingredients[y]
-			eachItem := &eachSectionIngredient.Item
-			if eachItem.ID == 0 {
-				//	new ingredient!
-				//	find by name, to see if we have existing
-				eachItem.FindOrCreateUsingName(e.DB)
-				//eachItem = model.GetIngredientByName(e.DB, eachItem.Name)
-				log.Printf("[ingredient] %s does not have an ID, giving it %d: ", eachItem.Name, eachItem.ID)
-			} else {
-				//	get fresh obj via eachIngredient.ID
-				fresh := *eachItem
-				fresh.GetFresh(e.DB)
-				//	if eachIngredient.Name != fresh.Name IT WAS MUTATED AAH!
-				if eachItem.Name != fresh.Name {
-					log.Printf("[ingredient] name of %d was muted! %s->%s", eachItem.ID, eachItem.Name, fresh.Name)
-					//we want to preserve the original eachItem; create new w/ eachItem.Name
+	updatedRecipe.CreateOrUpdate(e.DB, false)
 
-					// find by name, or create new
-					newItem := model.Ingredient{Name: eachItem.Name}
-					newItem.FindOrCreateUsingName(e.DB)
-					eachSectionIngredient.Item = newItem
-				}
-			}
-
-		}
-	}
-
-	e.DB.Save(&updatedRecipe)
 	respondSuccess(w, updatedRecipe)
 	return nil
 }
