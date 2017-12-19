@@ -6,6 +6,9 @@ import { MemoryRouter } from "react-router-dom";
 
 import Adapter from 'enzyme-adapter-react-16';
 import { configure } from 'enzyme';
+import {createStore} from "redux";
+import configureStore from "../../store/configureStore";
+import {Provider} from "react-redux";
 configure({ adapter: new Adapter() });
 
 beforeEach(function() {
@@ -20,21 +23,11 @@ beforeEach(function() {
 
 it("renders without crashing", () => {
   const div = document.createElement("div");
+  const store = configureStore();
   ReactDOM.render(
     <MemoryRouter>
-      <Home />
+        <Provider store={store}><Home /></Provider>
     </MemoryRouter>,
     div
   );
-});
-
-// it('renders without crashing2', () => {
-//     shallow(<Home />);
-// });
-
-it("renders welcome message", () => {
-  const wrapper = shallow(<Home />);
-  const welcome = <h2>Nicky's Recipe Stash</h2>;
-  // console.log(wrapper.debug());
-  expect(wrapper.contains(welcome)).toEqual(true);
 });
