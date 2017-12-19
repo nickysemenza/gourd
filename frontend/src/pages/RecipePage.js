@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Recipe from "../components/Recipe";
+import {API_BASE_URL} from "../config";
 export default class RecipePage extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +20,7 @@ export default class RecipePage extends Component {
     this.fetchData(this.state.slug);
   }
   fetchData(r) {
-    fetch(`/api/recipes/${r}`, { accept: "application/json" })
+    fetch(`${API_BASE_URL}/recipes/${r}`, { accept: "application/json" })
       .then(response => response.json())
       .then(json => this.setState({ recipe: json }));
   }

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from '../../config'
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -8,7 +9,7 @@ export default class Home extends Component {
     };
   }
   componentDidMount() {
-    fetch(`/api/recipes`, { accept: "application/json" })
+    fetch(`${API_BASE_URL}/recipes`, { accept: "application/json" })
       .then(response => response.json())
       .then(json => this.setState({ recipeList: json }));
   }
