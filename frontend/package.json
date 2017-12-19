@@ -5,6 +5,9 @@
   "proxy": "http://localhost:4000/",
   "dependencies": {
     "bootstrap": "4.0.0-alpha.6",
+    "husky": "^0.14.3",
+    "lint-staged": "^6.0.0",
+    "prettier": "^1.9.2",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
@@ -16,11 +19,18 @@
     "redux-thunk": "^2.2.0"
   },
   "scripts": {
+    "precommit": "lint-staged",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
+  "lint-staged": {
+       "src/**/*.{js,jsx,json,css}": [
+       "prettier --single-quote --write",
+       "git add"
+     ]
+   },
   "devDependencies": {
     "enzyme": "^3.2.0",
     "enzyme-adapter-react-16": "^1.1.0"
