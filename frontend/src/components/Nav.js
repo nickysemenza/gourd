@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { NavLink } from "react-router-dom";
-import { NavbarToggler, Collapse } from "reactstrap";
+import React, { Component } from 'react';
+import { NavLink } from 'react-router-dom';
+import { NavbarToggler, Collapse } from 'reactstrap';
 export default class Nav extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +29,8 @@ export default class Nav extends Component {
                 exact
                 to="/"
                 className="nav-link"
-                activeClassName="active">
+                activeClassName="active"
+              >
                 Home
               </NavLink>
             </li>
@@ -38,16 +39,17 @@ export default class Nav extends Component {
               <NavLink
                 to="/about"
                 className="nav-link"
-                activeClassName="active">
+                activeClassName="active"
+              >
                 About
               </NavLink>
-
             </li>
             <li className="nav-item">
               <NavLink
                 to="/chocolate-chunk-cookies"
                 className="nav-link"
-                activeClassName="active">
+                activeClassName="active"
+              >
                 Chocolate
               </NavLink>
             </li>
@@ -60,7 +62,8 @@ export default class Nav extends Component {
             />
             <button
               className="btn btn-outline-success my-2 my-sm-0"
-              type="submit">
+              type="submit"
+            >
               Search
             </button>
           </form>
