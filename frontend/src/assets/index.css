@@ -4,10 +4,14 @@ body {
   font-family: sans-serif;
 }
 
-
-.borderless td, .borderless th {
+.borderless td,
+.borderless th {
   border: none !important;
 }
 .borderheavy td {
   border-bottom: solid 1px black;
+}
+
+.recipeTable {
+  border-spacing: 0;
 }
