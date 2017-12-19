@@ -53,3 +53,88 @@ function receiveRecipeDetail (json, recipeSlug) {
     };
 }
 
+
+
+
+export const EDIT_TOP_LEVEL_ITEM = 'EDIT_TOP_LEVEL_ITEM';
+export function editTopLevelItem(slug, fieldName,value) {
+    return {
+        type: EDIT_TOP_LEVEL_ITEM,
+        slug,
+        fieldName,
+        value
+    }
+}
+export const DELETE_SECTION = 'DELETE_SECTION';
+export function deleteSectionByIndex(slug, index) {
+    return {
+        type: DELETE_SECTION,
+        slug,
+        index
+    }
+}
+export const ADD_SECTION = 'ADD_SECTION';
+export function addSection(slug, index) {
+    return {
+        type: ADD_SECTION,
+        slug,
+        index
+    }
+}
+export const DELETE_INSTRUCTION = 'DELETE_INSTRUCTION';
+export function deleteInstruction(slug, sectionNum,instructionNum) {
+    return {
+        type: DELETE_INSTRUCTION,
+        slug,
+        sectionNum,
+        instructionNum
+    }
+}
+export const ADD_INSTRUCTION = 'ADD_INSTRUCTION';
+export function addInstruction(slug, sectionNum,instructionNum) {
+    return {
+        type: ADD_INSTRUCTION,
+        slug,
+        sectionNum,
+        instructionNum
+    }
+}
+export const EDIT_INSTRUCTION = 'EDIT_INSTRUCTION';
+export function editInstruction(slug, sectionNum,instructionNum,value) {
+    return {
+        type: EDIT_INSTRUCTION,
+        slug,
+        sectionNum,
+        instructionNum,
+        value
+    }
+}
+export const DELETE_INGREDIENT = 'DELETE_INGREDIENT';
+export function deleteIngredient(slug, sectionNum,ingredientNum) {
+    return {
+        type: DELETE_INGREDIENT,
+        slug,
+        sectionNum,
+        ingredientNum
+    }
+}
+export const ADD_INGREDIENT = 'ADD_INGREDIENT';
+export function addIngredient(slug, sectionNum,ingredientNum) {
+    return {
+        type: ADD_INGREDIENT,
+        slug,
+        sectionNum,
+        ingredientNum
+    }
+}
+export const EDIT_INGREDIENT = 'EDIT_INGREDIENT';
+export function editIngredient(slug, sectionNum,ingredientNum,field,value) {
+    return {
+        type: EDIT_INGREDIENT,
+        slug,
+        sectionNum,
+        ingredientNum,
+        field,
+        value
+    }
+}

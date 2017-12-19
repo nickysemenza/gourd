@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Recipe from "../components/Recipe";
-import {API_BASE_URL} from "../config";
 
 import {
     fetchRecipeDetail
