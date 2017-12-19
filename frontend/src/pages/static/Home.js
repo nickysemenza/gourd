@@ -1,20 +1,20 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE_URL } from '../../config'
-export default class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      recipeList: []
-    };
-  }
+
+import {
+    fetchRecipes
+} from '../../actions/recipe';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux'
+
+//TODO: make RecipeList component
+
+class Home extends Component {
   componentDidMount() {
-    fetch(`${API_BASE_URL}/recipes`, { accept: "application/json" })
-      .then(response => response.json())
-      .then(json => this.setState({ recipeList: json }));
+      this.props.fetchRecipes();
   }
   render() {
-    let a = this.state.recipeList.map(a => (
+    let a = this.props.recipe_list.map(a => (
       <div key={a}><Link to={`/${a}`}>{a}</Link></div>
     ));
     return (
@@ -51,3 +51,18 @@ export default class Home extends Component {
     );
   }
 }
+
+
+function mapStateToProps (state) {
+    return {
+        recipe_list: state.recipe.recipe_list,
+    };
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({
+        fetchRecipes
+    }, dispatch)
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
