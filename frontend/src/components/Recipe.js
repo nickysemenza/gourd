@@ -19,6 +19,7 @@ export default class Recipe extends Component {
   render() {
     let recipe = this.props.recipe;
     if (!recipe) return <div>loading...</div>;
+    if (recipe.error !== undefined) return <div>error! {recipe.error}</div>;
     let totalWeight = 0;
     let totalMinutes = 0;
     let instructionNum = 1;
