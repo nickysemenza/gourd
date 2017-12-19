@@ -6,19 +6,20 @@ import About from './pages/static/About';
 import Nav from './components/Nav';
 import RecipePage from './pages/RecipePage';
 import EditorPage from './pages/RecipeEditorPage';
+import { Container } from 'semantic-ui-react';
 
 const App = () => (
   <Router>
     <div>
       <Nav />
-      <div className="container-fluid">
+      <Container style={{ marginTop: '7em' }}>
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />
           <Route path="/editor/:recipe_id" component={EditorPage} />
           <Route path="/:recipe_id" component={RecipePage} />
         </Switch>
-      </div>
+      </Container>
     </div>
   </Router>
 );
