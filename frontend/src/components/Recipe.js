@@ -1,8 +1,4 @@
 import React, { Component } from 'react';
-import {
-  GramMeasurement,
-  VolumeMeasurement
-} from './RecipeIngredientMeasurement';
 import { Link } from 'react-router-dom';
 import RecipeTable from './RecipeTable';
 export default class Recipe extends Component {

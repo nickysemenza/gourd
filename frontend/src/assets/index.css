@@ -14,4 +14,10 @@ body {
 
 .recipeTable {
   border-spacing: 0;
+  width: 100%;
+}
+
+.tableHeadTH {
+  min-width: 50px;
+  /*border-left: solid 1px black;*/
 }

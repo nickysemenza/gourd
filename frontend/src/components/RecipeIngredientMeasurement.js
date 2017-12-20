@@ -15,3 +15,7 @@ export const VolumeMeasurement = ({ i, scale = 1 }) => {
 
   return scale === 1 ? <div>{str}</div> : <b>{str}</b>;
 };
+
+//todo: markup `modifier` display with italics/small/etc
+export const IngredientNameDisplay = ({ i }) =>
+  `${i.item.name}${i.modifier ? `, ${i.modifier}` : ''}`;
