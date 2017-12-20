@@ -12,7 +12,7 @@ const App = () => (
   <Router>
     <div>
       <Nav />
-      <Container fluid style={{ marginTop: '7em' }}>
+      <Container fluid style={{ marginTop: '7em', width: '80%' }}>
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />

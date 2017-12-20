@@ -74,54 +74,60 @@ class EditorPage extends Component {
           <div ref={this.handleContextRef}>
             {/*EDITOR*/}
             <Form>
-              <Form.Field width={4}>
-                <label>Title</label>
-                <input
-                  type="text"
-                  value={recipe.title}
-                  onChange={this.editTopLevelItem.bind(this, 'title')}
-                />
-              </Form.Field>
-              <Form.Field width={4}>
-                <label>Source</label>
-                <input
-                  type="text"
-                  value={recipe.source}
-                  onChange={this.editTopLevelItem.bind(this, 'source')}
-                />
-              </Form.Field>
-              <Form.Field width={4}>
-                <label>Quantity</label>
-                <input
-                  type="number"
-                  value={recipe.quantity}
-                  onChange={this.editTopLevelItem.bind(this, 'quantity')}
-                />
-              </Form.Field>
-              <Form.Field width={4}>
-                <label>Quantity Unit</label>
-                <input
-                  type="text"
-                  value={recipe.unit}
-                  onChange={this.editTopLevelItem.bind(this, 'unit')}
-                />
-              </Form.Field>
-              <Form.Field width={4}>
-                <label>Servings</label>
-                <input
-                  type="number"
-                  value={recipe.servings}
-                  onChange={this.editTopLevelItem.bind(this, 'servings')}
-                />
-              </Form.Field>
-              <Form.Field width={4}>
-                <label>Total Minutes</label>
-                <input
-                  type="number"
-                  value={recipe.total_minutes}
-                  onChange={this.editTopLevelItem.bind(this, 'total_minutes')}
-                />
-              </Form.Field>
+              <Form.Group>
+                <Form.Field width={8}>
+                  <label>Title</label>
+                  <input
+                    type="text"
+                    value={recipe.title}
+                    onChange={this.editTopLevelItem.bind(this, 'title')}
+                  />
+                </Form.Field>
+                <Form.Field width={8}>
+                  <label>Source</label>
+                  <input
+                    type="text"
+                    value={recipe.source}
+                    onChange={this.editTopLevelItem.bind(this, 'source')}
+                  />
+                </Form.Field>
+              </Form.Group>
+              <Form.Group>
+                <Form.Field width={8}>
+                  <label>Quantity</label>
+                  <input
+                    type="number"
+                    value={recipe.quantity}
+                    onChange={this.editTopLevelItem.bind(this, 'quantity')}
+                  />
+                </Form.Field>
+                <Form.Field width={8}>
+                  <label>Quantity Unit</label>
+                  <input
+                    type="text"
+                    value={recipe.unit}
+                    onChange={this.editTopLevelItem.bind(this, 'unit')}
+                  />
+                </Form.Field>
+              </Form.Group>
+              <Form.Group>
+                <Form.Field width={8}>
+                  <label>Servings</label>
+                  <input
+                    type="number"
+                    value={recipe.servings}
+                    onChange={this.editTopLevelItem.bind(this, 'servings')}
+                  />
+                </Form.Field>
+                <Form.Field width={8}>
+                  <label>Total Minutes</label>
+                  <input
+                    type="number"
+                    value={recipe.total_minutes}
+                    onChange={this.editTopLevelItem.bind(this, 'total_minutes')}
+                  />
+                </Form.Field>
+              </Form.Group>
             </Form>
             {recipe.sections.map((section, sectionNum) => {
               return (
@@ -130,17 +136,16 @@ class EditorPage extends Component {
                     <Button
                       icon="arrow up"
                       onClick={this.addSection.bind(this, sectionNum)}
-                      content="Add New Section Before"
+                      content="New Section"
                     />
                     <Button
                       icon="arrow down"
                       onClick={this.addSection.bind(this, sectionNum + 1)}
-                      content="Add New Section After"
+                      content="New Section"
                     />
                     <Button
                       icon="trash"
                       onClick={this.deleteSection.bind(this, sectionNum)}
-                      content="Delete Section"
                     />
                   </Button.Group>
                   <h2>Instructions</h2>
@@ -169,7 +174,7 @@ class EditorPage extends Component {
                               sectionNum,
                               instructionNum
                             )}
-                            content="Add Before"
+                            content="New"
                           />
                           <Button
                             icon="arrow down"
@@ -178,7 +183,7 @@ class EditorPage extends Component {
                               sectionNum,
                               instructionNum + 1
                             )}
-                            content="Add After"
+                            content="New"
                           />
                           <Button
                             icon="trash"
@@ -187,7 +192,6 @@ class EditorPage extends Component {
                               sectionNum,
                               instructionNum
                             )}
-                            content="Delete"
                           />
                         </Button.Group>
                       </Grid.Column>
@@ -261,7 +265,7 @@ class EditorPage extends Component {
                               sectionNum,
                               ingredientNum
                             )}
-                            content="Add Before"
+                            content="New"
                           />
                           <Button
                             icon="arrow down"
@@ -270,7 +274,7 @@ class EditorPage extends Component {
                               sectionNum,
                               ingredientNum + 1
                             )}
-                            content="Add After"
+                            content="New"
                           />
                           <Button
                             icon="trash"
@@ -279,7 +283,6 @@ class EditorPage extends Component {
                               sectionNum,
                               ingredientNum
                             )}
-                            content="Delete"
                           />
                         </Button.Group>
                       </Form>
