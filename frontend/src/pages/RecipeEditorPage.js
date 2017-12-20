@@ -4,6 +4,8 @@ import Recipe from '../components/Recipe';
 import * as RecipeActionCreators from '../actions/recipe';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Grid, Form, Segment, Button, Input, Sticky } from 'semantic-ui-react';
+import RecipeTable from '../components/RecipeTable';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -12,6 +14,7 @@ class EditorPage extends Component {
       slug: props.match.params.recipe_id
     };
   }
+  handleContextRef = contextRef => this.setState({ contextRef });
   componentWillReceiveProps(nextProps) {
     console.log(nextProps, this.props);
     if (nextProps.match !== this.props.match) {
@@ -61,287 +64,242 @@ class EditorPage extends Component {
     );
   }
   render() {
+    const { contextRef } = this.state;
     const recipe = this.props.recipe_detail[this.state.slug];
     if (!recipe) return <div>loading...</div>;
     if (recipe.error !== undefined) return <div>error! {recipe.error}</div>;
     return (
-      <div className="row">
-        <div className="col-md-6">
-          {/*EDITOR*/}
-          <div className="form-group row">
-            <label
-              htmlFor="example-text-input"
-              className="col-2 col-form-label"
-            >
-              Title
-            </label>
-            <div className="col-10">
-              <input
-                className="form-control"
-                type="text"
-                value={recipe.title}
-                onChange={this.editTopLevelItem.bind(this, 'title')}
-              />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label
-              htmlFor="example-text-input"
-              className="col-2 col-form-label"
-            >
-              source
-            </label>
-            <div className="col-10">
-              <input
-                className="form-control"
-                type="text"
-                value={recipe.source}
-                onChange={this.editTopLevelItem.bind(this, 'source')}
-              />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label
-              htmlFor="example-text-input"
-              className="col-2 col-form-label"
-            >
-              quantity
-            </label>
-            <div className="col-10">
-              <input
-                className="form-control"
-                type="number"
-                value={recipe.quantity}
-                onChange={this.editTopLevelItem.bind(this, 'quantity')}
-              />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label
-              htmlFor="example-text-input"
-              className="col-2 col-form-label"
-            >
-              servings
-            </label>
-            <div className="col-10">
-              <input
-                className="form-control"
-                type="number"
-                value={recipe.servings}
-                onChange={this.editTopLevelItem.bind(this, 'servings')}
-              />
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <label
-              htmlFor="example-text-input"
-              className="col-2 col-form-label"
-            >
-              total_minutes
-            </label>
-            <div className="col-10">
-              <input
-                className="form-control"
-                type="number"
-                value={recipe.total_minutes}
-                onChange={this.editTopLevelItem.bind(this, 'total_minutes')}
-              />
-            </div>
-          </div>
-          {recipe.sections.map((section, sectionNum) => {
-            return (
-              <div key={sectionNum}>
-                <button onClick={this.addSection.bind(this, sectionNum)}>
-                  Add New Section Before
-                </button>
-                <button onClick={this.addSection.bind(this, sectionNum + 1)}>
-                  Add New Section After
-                </button>
-                <button onClick={this.deleteSection.bind(this, sectionNum)}>
-                  Delete Section
-                </button>
-                <h2>Instructions</h2>
-                {section.instructions.map((instruction, instructionNum) => (
-                  <div
-                    key={`section-${sectionNum}-instruction-${instructionNum}`}
-                  >
-                    <input
-                      type="text"
-                      value={instruction.name}
-                      onChange={this.editInstruction.bind(
-                        this,
-                        sectionNum,
-                        instructionNum
-                      )}
+      <Grid columns={2}>
+        <Grid.Column>
+          <div ref={this.handleContextRef}>
+            {/*EDITOR*/}
+            <Form>
+              <Form.Field width={4}>
+                <label>Title</label>
+                <input
+                  type="text"
+                  value={recipe.title}
+                  onChange={this.editTopLevelItem.bind(this, 'title')}
+                />
+              </Form.Field>
+              <Form.Field width={4}>
+                <label>Source</label>
+                <input
+                  type="text"
+                  value={recipe.source}
+                  onChange={this.editTopLevelItem.bind(this, 'source')}
+                />
+              </Form.Field>
+              <Form.Field width={4}>
+                <label>Quantity</label>
+                <input
+                  type="number"
+                  value={recipe.quantity}
+                  onChange={this.editTopLevelItem.bind(this, 'quantity')}
+                />
+              </Form.Field>
+              <Form.Field width={4}>
+                <label>Quantity Unit</label>
+                <input
+                  type="text"
+                  value={recipe.unit}
+                  onChange={this.editTopLevelItem.bind(this, 'unit')}
+                />
+              </Form.Field>
+              <Form.Field width={4}>
+                <label>Servings</label>
+                <input
+                  type="number"
+                  value={recipe.servings}
+                  onChange={this.editTopLevelItem.bind(this, 'servings')}
+                />
+              </Form.Field>
+              <Form.Field width={4}>
+                <label>Total Minutes</label>
+                <input
+                  type="number"
+                  value={recipe.total_minutes}
+                  onChange={this.editTopLevelItem.bind(this, 'total_minutes')}
+                />
+              </Form.Field>
+            </Form>
+            {recipe.sections.map((section, sectionNum) => {
+              return (
+                <Segment key={sectionNum}>
+                  <Button.Group>
+                    <Button
+                      icon="arrow up"
+                      onClick={this.addSection.bind(this, sectionNum)}
+                      content="Add New Section Before"
                     />
-                    <a
-                      onClick={this.deleteInstruction.bind(
-                        this,
-                        sectionNum,
-                        instructionNum
-                      )}
+                    <Button
+                      icon="arrow down"
+                      onClick={this.addSection.bind(this, sectionNum + 1)}
+                      content="Add New Section After"
+                    />
+                    <Button
+                      icon="trash"
+                      onClick={this.deleteSection.bind(this, sectionNum)}
+                      content="Delete Section"
+                    />
+                  </Button.Group>
+                  <h2>Instructions</h2>
+                  {section.instructions.map((instruction, instructionNum) => (
+                    <Grid
+                      key={`section-${sectionNum}-instruction-${instructionNum}`}
                     >
-                      delete
-                    </a>
-                    &nbsp; | &nbsp;
-                    <a
-                      onClick={this.addInstruction.bind(
-                        this,
-                        sectionNum,
-                        instructionNum
-                      )}
-                    >
-                      add before
-                    </a>
-                    &nbsp; | &nbsp;
-                    <a
-                      onClick={this.addInstruction.bind(
-                        this,
-                        sectionNum,
-                        instructionNum + 1
-                      )}
-                    >
-                      add after
-                    </a>
-                  </div>
-                ))}
-                <h2>Ingredients</h2>
-                {section.ingredients.map((ingredient, ingredientNum) => (
-                  <div
-                    key={`section-${sectionNum}-ingredient-${ingredientNum}`}
-                  >
-                    <div className="form-group row">
-                      <label
-                        htmlFor="example-text-input"
-                        className="col-2 col-form-label"
-                      >
-                        name
-                      </label>
-                      <div className="col-10">
-                        <input
-                          className="form-control"
+                      <Grid.Column width={8}>
+                        <Input
+                          fluid
                           type="text"
-                          value={ingredient.item.name}
-                          onChange={this.editIngredient.bind(
+                          value={instruction.name}
+                          onChange={this.editInstruction.bind(
                             this,
                             sectionNum,
-                            ingredientNum,
-                            'item'
+                            instructionNum
                           )}
                         />
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label
-                        htmlFor="example-text-input"
-                        className="col-2 col-form-label"
-                      >
-                        Grams
-                      </label>
-                      <div className="col-10">
-                        <input
-                          className="form-control"
-                          type="number"
-                          value={ingredient.grams}
-                          onChange={this.editIngredient.bind(
-                            this,
-                            sectionNum,
-                            ingredientNum,
-                            'grams'
-                          )}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label
-                        htmlFor="example-text-input"
-                        className="col-2 col-form-label"
-                      >
-                        unit
-                      </label>
-                      <div className="col-10">
-                        <input
-                          className="form-control"
-                          type="text"
-                          value={ingredient.amount_unit}
-                          onChange={this.editIngredient.bind(
-                            this,
-                            sectionNum,
-                            ingredientNum,
-                            'amount_unit'
-                          )}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label
-                        htmlFor="example-text-input"
-                        className="col-2 col-form-label"
-                      >
-                        amount
-                      </label>
-                      <div className="col-10">
-                        <input
-                          className="form-control"
-                          type="number"
-                          value={ingredient.amount}
-                          onChange={this.editIngredient.bind(
-                            this,
-                            sectionNum,
-                            ingredientNum,
-                            'amount'
-                          )}
-                        />
-                      </div>
-                    </div>
-                    {/*<pre>{JSON.stringify(ingredient,null, 2)} {ingredientNum}</pre>*/}
-                    <a
-                      onClick={this.deleteIngredient.bind(
-                        this,
-                        sectionNum,
-                        ingredientNum
-                      )}
+                      </Grid.Column>
+                      <Grid.Column>
+                        <Button.Group>
+                          <Button
+                            icon="arrow up"
+                            onClick={this.addInstruction.bind(
+                              this,
+                              sectionNum,
+                              instructionNum
+                            )}
+                            content="Add Before"
+                          />
+                          <Button
+                            icon="arrow down"
+                            onClick={this.addInstruction.bind(
+                              this,
+                              sectionNum,
+                              instructionNum + 1
+                            )}
+                            content="Add After"
+                          />
+                          <Button
+                            icon="trash"
+                            onClick={this.deleteInstruction.bind(
+                              this,
+                              sectionNum,
+                              instructionNum
+                            )}
+                            content="Delete"
+                          />
+                        </Button.Group>
+                      </Grid.Column>
+                    </Grid>
+                  ))}
+                  <h2>Ingredients</h2>
+                  {section.ingredients.map((ingredient, ingredientNum) => (
+                    <Segment
+                      key={`section-${sectionNum}-ingredient-${ingredientNum}`}
                     >
-                      delete
-                    </a>
-                    &nbsp; | &nbsp;
-                    <a
-                      onClick={this.addIngredient.bind(
-                        this,
-                        sectionNum,
-                        ingredientNum
-                      )}
-                    >
-                      add before
-                    </a>
-                    &nbsp; | &nbsp;
-                    <a
-                      onClick={this.addIngredient.bind(
-                        this,
-                        sectionNum,
-                        ingredientNum + 1
-                      )}
-                    >
-                      add after
-                    </a>
-                  </div>
-                ))}
-
-                <hr />
-              </div>
-            );
-          })}
-          <hr />
-          {/*<pre>{JSON.stringify(recipe,null, 2)}</pre>*/}
-        </div>
-        <div className="col-md-6" style={{ position: 'fixed', left: '50%' }}>
-          <Recipe recipe={recipe} />
-        </div>
-      </div>
+                      <Form>
+                        <Form.Field width={4}>
+                          <label>Name</label>
+                          <input
+                            type="text"
+                            value={ingredient.item.name}
+                            onChange={this.editIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum,
+                              'item'
+                            )}
+                          />
+                        </Form.Field>
+                        <Form.Field width={4}>
+                          <label>Grams</label>
+                          <Input
+                            label={{ basic: true, content: 'g' }}
+                            labelPosition="right"
+                            type="number"
+                            value={ingredient.grams}
+                            onChange={this.editIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum,
+                              'grams'
+                            )}
+                          />
+                        </Form.Field>
+                        <Form.Field width={4}>
+                          <label>Amount</label>
+                          <input
+                            type="number"
+                            value={ingredient.amount}
+                            onChange={this.editIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum,
+                              'amount'
+                            )}
+                          />
+                        </Form.Field>
+                        <Form.Field width={4}>
+                          <label>Amount Unit</label>
+                          <input
+                            type="text"
+                            value={ingredient.amount_unit}
+                            onChange={this.editIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum,
+                              'amount_unit'
+                            )}
+                          />
+                        </Form.Field>
+                        <Button.Group>
+                          <Button
+                            icon="arrow up"
+                            onClick={this.addIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum
+                            )}
+                            content="Add Before"
+                          />
+                          <Button
+                            icon="arrow down"
+                            onClick={this.addIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum + 1
+                            )}
+                            content="Add After"
+                          />
+                          <Button
+                            icon="trash"
+                            onClick={this.deleteIngredient.bind(
+                              this,
+                              sectionNum,
+                              ingredientNum
+                            )}
+                            content="Delete"
+                          />
+                        </Button.Group>
+                      </Form>
+                    </Segment>
+                  ))}
+                </Segment>
+              );
+            })}
+            {/*<pre>{JSON.stringify(recipe,null, 2)}</pre>*/}
+          </div>
+        </Grid.Column>
+        <Grid.Column>
+          {/*<RecipeTable recipe={recipe} scale={1} />*/}
+          <Sticky context={contextRef}>
+            <div style={{ marginTop: '8em' }}>
+              <Recipe recipe={recipe} />
+            </div>
+          </Sticky>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
