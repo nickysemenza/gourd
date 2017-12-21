@@ -7,12 +7,16 @@ import Nav from './components/Nav';
 import RecipePage from './pages/RecipePage';
 import EditorPage from './pages/RecipeEditorPage';
 import { Container } from 'semantic-ui-react';
+import Footer from './components/Footer';
 
 const App = () => (
   <Router>
     <div>
       <Nav />
-      <Container fluid style={{ marginTop: '7em', width: '80%' }}>
+      <Container
+        fluid
+        style={{ marginTop: '7em', width: '80%', minHeight: '100vh' }}
+      >
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />
@@ -20,6 +24,7 @@ const App = () => (
           <Route path="/:recipe_id" component={RecipePage} />
         </Switch>
       </Container>
+      <Footer />
     </div>
   </Router>
 );

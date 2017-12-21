@@ -68,7 +68,7 @@ export default class Recipe extends Component {
         <Divider />
         <Header as="h3">Misc</Header>
         <Button
-          as="Link"
+          as={Link}
           to={`/editor/${this.props.slug}`}
           content="edit recipe"
           icon="edit"
