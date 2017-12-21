@@ -10,12 +10,8 @@ import (
 
 func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
-	e.DB.Select([]string{"slug"}).Find(&recipes)
-	slugs := []string{}
-	for _, r := range recipes {
-		slugs = append(slugs, r.Slug)
-	}
-	respondSuccess(w, slugs)
+	e.DB.Find(&recipes)
+	respondSuccess(w, recipes)
 	return nil
 }
 func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {

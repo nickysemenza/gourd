@@ -11,24 +11,26 @@ class RecipeList extends Component {
     this.props.fetchRecipes();
   }
   render() {
-    const extra = (
-      <a>
-        <Icon name="clock" />
-        16 Minutes
-      </a>
+    return (
+      <Card.Group>
+        {this.props.recipe_list.map(eachRecipe => (
+          <Card
+            as={Link}
+            to={`/${eachRecipe.slug}`}
+            image="http://via.placeholder.com/2000x1200"
+            header={eachRecipe.title}
+            meta="todo::categories"
+            description="todo::description"
+            extra={
+              <a>
+                <Icon name="clock" />
+                {eachRecipe.total_minutes} Minutes
+              </a>
+            }
+          />
+        ))}
+      </Card.Group>
     );
-    let a = this.props.recipe_list.map(eachSlug => (
-      <Card
-        as={Link}
-        to={`/${eachSlug}`}
-        image="http://via.placeholder.com/2000x1200"
-        header="Elliot Baker"
-        meta="Friend"
-        description="Elliot is a sound engineer living in Nashville who enjoys playing guitar and hanging with his cat."
-        extra={extra}
-      />
-    ));
-    return <Card.Group>{a}</Card.Group>;
   }
 }
 
