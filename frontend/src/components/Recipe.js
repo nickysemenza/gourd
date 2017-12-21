@@ -11,6 +11,8 @@ import {
   Image,
   Segment
 } from 'semantic-ui-react';
+import Moment from 'react-moment';
+import 'moment-timezone';
 export default class Recipe extends Component {
   constructor(props) {
     super(props);
@@ -87,10 +89,15 @@ export default class Recipe extends Component {
             <Header as="h1">Notes</Header>
             {recipe.notes.map(eachNote => (
               <Card>
-                <Card.Content
-                  meta={eachNote.created_at}
-                  description={eachNote.body}
-                />
+                <Card.Content description={eachNote.body} />
+                <Card.Content extra>
+                  <Moment
+                    tz="America/Los_Angeles"
+                    format="ddd MMM Do YYYY, h:mm a"
+                  >
+                    {eachNote.created_at}
+                  </Moment>
+                </Card.Content>
               </Card>
             ))}
           </Grid.Column>

@@ -20,8 +20,7 @@ func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 }
 func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
-	vars := mux.Vars(r)
-	slug := vars["slug"]
+	slug := mux.Vars(r)["slug"]
 	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
@@ -46,8 +45,7 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 	//find the recipe we are adding a note to
 	recipe := model.Recipe{}
-	vars := mux.Vars(r)
-	slug := vars["slug"]
+	slug := mux.Vars(r)["slug"]
 	if err := e.DB.Where("slug = ?", slug).First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}

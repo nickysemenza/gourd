@@ -6,10 +6,13 @@
   "dependencies": {
     "husky": "^0.14.3",
     "lint-staged": "^6.0.0",
+    "moment": "^2.20.1",
+    "moment-timezone": "^0.5.14",
     "prettier": "^1.9.2",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-moment": "^0.6.8",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",

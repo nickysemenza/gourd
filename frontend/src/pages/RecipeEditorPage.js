@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Recipe from '../components/Recipe';
 
 import * as RecipeActionCreators from '../actions/recipe';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
   Grid,
@@ -14,6 +13,7 @@ import {
   Header
 } from 'semantic-ui-react';
 import AddRecipeNote from '../components/AddRecipeNote';
+import { Link } from 'react-router-dom';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -77,272 +77,283 @@ class EditorPage extends Component {
     if (!recipe) return <div>loading...</div>;
     if (recipe.error !== undefined) return <div>error! {recipe.error}</div>;
     return (
-      <Grid columns={2}>
-        <Grid.Column>
-          <div ref={this.handleContextRef}>
-            {/*EDITOR*/}
-            <Form>
-              <Form.Group>
-                <Form.Field width={8}>
-                  <label>Title</label>
-                  <input
-                    type="text"
-                    value={recipe.title}
-                    onChange={this.editTopLevelItem.bind(this, 'title')}
-                  />
-                </Form.Field>
-                <Form.Field width={8}>
-                  <label>Source</label>
-                  <input
-                    type="text"
-                    value={recipe.source}
-                    onChange={this.editTopLevelItem.bind(this, 'source')}
-                  />
-                </Form.Field>
-              </Form.Group>
-              <Form.Group>
-                <Form.Field width={8}>
-                  <label>Quantity</label>
-                  <input
-                    type="number"
-                    value={recipe.quantity}
-                    onChange={this.editTopLevelItem.bind(this, 'quantity')}
-                  />
-                </Form.Field>
-                <Form.Field width={8}>
-                  <label>Quantity Unit</label>
-                  <input
-                    type="text"
-                    value={recipe.unit}
-                    onChange={this.editTopLevelItem.bind(this, 'unit')}
-                  />
-                </Form.Field>
-              </Form.Group>
-              <Form.Group>
-                <Form.Field width={8}>
-                  <label>Servings</label>
-                  <input
-                    type="number"
-                    value={recipe.servings}
-                    onChange={this.editTopLevelItem.bind(this, 'servings')}
-                  />
-                </Form.Field>
-                <Form.Field width={8}>
-                  <label>Total Minutes</label>
-                  <input
-                    type="number"
-                    value={recipe.total_minutes}
-                    onChange={this.editTopLevelItem.bind(this, 'total_minutes')}
-                  />
-                </Form.Field>
-              </Form.Group>
-            </Form>
-            {recipe.sections.map((section, sectionNum) => {
-              return (
-                <Segment key={sectionNum}>
-                  <Button.Group>
-                    <Button
-                      icon="arrow up"
-                      onClick={this.addSection.bind(this, sectionNum)}
-                      content="New Section"
+      <div>
+        <Header as="h2" dividing>
+          EDITING: {recipe.title}
+          <Header.Subheader>
+            <Link to={`/${recipe.slug}`}>Go to recipe</Link>
+          </Header.Subheader>
+        </Header>
+        <Grid columns={2}>
+          <Grid.Column>
+            <div ref={this.handleContextRef}>
+              {/*EDITOR*/}
+              <Form>
+                <Form.Group>
+                  <Form.Field width={8}>
+                    <label>Title</label>
+                    <input
+                      type="text"
+                      value={recipe.title}
+                      onChange={this.editTopLevelItem.bind(this, 'title')}
                     />
-                    <Button
-                      icon="arrow down"
-                      onClick={this.addSection.bind(this, sectionNum + 1)}
-                      content="New Section"
+                  </Form.Field>
+                  <Form.Field width={8}>
+                    <label>Source</label>
+                    <input
+                      type="text"
+                      value={recipe.source}
+                      onChange={this.editTopLevelItem.bind(this, 'source')}
                     />
-                    <Button
-                      icon="trash"
-                      onClick={this.deleteSection.bind(this, sectionNum)}
+                  </Form.Field>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Field width={8}>
+                    <label>Quantity</label>
+                    <input
+                      type="number"
+                      value={recipe.quantity}
+                      onChange={this.editTopLevelItem.bind(this, 'quantity')}
                     />
-                  </Button.Group>
-                  <h2>Instructions</h2>
-                  {section.instructions.map((instruction, instructionNum) => (
-                    <Grid
-                      key={`section-${sectionNum}-instruction-${instructionNum}`}
-                    >
-                      <Grid.Column width={8}>
-                        <Input
-                          fluid
-                          type="text"
-                          value={instruction.name}
-                          onChange={this.editInstruction.bind(
-                            this,
-                            sectionNum,
-                            instructionNum
-                          )}
-                        />
-                      </Grid.Column>
-                      <Grid.Column>
-                        <Button.Group>
-                          <Button
-                            icon="arrow up"
-                            onClick={this.addInstruction.bind(
-                              this,
-                              sectionNum,
-                              instructionNum
-                            )}
-                            content="New"
-                          />
-                          <Button
-                            icon="arrow down"
-                            onClick={this.addInstruction.bind(
-                              this,
-                              sectionNum,
-                              instructionNum + 1
-                            )}
-                            content="New"
-                          />
-                          <Button
-                            icon="trash"
-                            onClick={this.deleteInstruction.bind(
+                  </Form.Field>
+                  <Form.Field width={8}>
+                    <label>Quantity Unit</label>
+                    <input
+                      type="text"
+                      value={recipe.unit}
+                      onChange={this.editTopLevelItem.bind(this, 'unit')}
+                    />
+                  </Form.Field>
+                </Form.Group>
+                <Form.Group>
+                  <Form.Field width={8}>
+                    <label>Servings</label>
+                    <input
+                      type="number"
+                      value={recipe.servings}
+                      onChange={this.editTopLevelItem.bind(this, 'servings')}
+                    />
+                  </Form.Field>
+                  <Form.Field width={8}>
+                    <label>Total Minutes</label>
+                    <input
+                      type="number"
+                      value={recipe.total_minutes}
+                      onChange={this.editTopLevelItem.bind(
+                        this,
+                        'total_minutes'
+                      )}
+                    />
+                  </Form.Field>
+                </Form.Group>
+              </Form>
+              {recipe.sections.map((section, sectionNum) => {
+                return (
+                  <Segment key={sectionNum}>
+                    <Button.Group>
+                      <Button
+                        icon="arrow up"
+                        onClick={this.addSection.bind(this, sectionNum)}
+                        content="New Section"
+                      />
+                      <Button
+                        icon="arrow down"
+                        onClick={this.addSection.bind(this, sectionNum + 1)}
+                        content="New Section"
+                      />
+                      <Button
+                        icon="trash"
+                        onClick={this.deleteSection.bind(this, sectionNum)}
+                      />
+                    </Button.Group>
+                    <h2>Instructions</h2>
+                    {section.instructions.map((instruction, instructionNum) => (
+                      <Grid
+                        key={`section-${sectionNum}-instruction-${instructionNum}`}
+                      >
+                        <Grid.Column width={8}>
+                          <Input
+                            fluid
+                            type="text"
+                            value={instruction.name}
+                            onChange={this.editInstruction.bind(
                               this,
                               sectionNum,
                               instructionNum
                             )}
                           />
-                        </Button.Group>
-                      </Grid.Column>
-                    </Grid>
-                  ))}
-                  <h2>Ingredients</h2>
-                  {section.ingredients.map((ingredient, ingredientNum) => (
-                    <Segment
-                      key={`section-${sectionNum}-ingredient-${ingredientNum}`}
-                    >
-                      <Form>
-                        <Form.Group>
-                          <Form.Field width={8}>
-                            <label>Name</label>
-                            <input
-                              type="text"
-                              value={ingredient.item.name}
-                              onChange={this.editIngredient.bind(
+                        </Grid.Column>
+                        <Grid.Column>
+                          <Button.Group>
+                            <Button
+                              icon="arrow up"
+                              onClick={this.addInstruction.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'item'
+                                instructionNum
                               )}
+                              content="New"
                             />
-                          </Form.Field>
-                          <Form.Field width={8}>
-                            <label>Grams</label>
-                            <Input
-                              label={{ basic: true, content: 'g' }}
-                              labelPosition="right"
-                              type="number"
-                              value={ingredient.grams}
-                              onChange={this.editIngredient.bind(
+                            <Button
+                              icon="arrow down"
+                              onClick={this.addInstruction.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'grams'
+                                instructionNum + 1
                               )}
+                              content="New"
                             />
-                          </Form.Field>
-                        </Form.Group>
-                        <Form.Group>
-                          <Form.Field width={8}>
-                            <label>Amount</label>
-                            <input
-                              type="number"
-                              value={ingredient.amount}
-                              onChange={this.editIngredient.bind(
+                            <Button
+                              icon="trash"
+                              onClick={this.deleteInstruction.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'amount'
+                                instructionNum
                               )}
                             />
-                          </Form.Field>
-                          <Form.Field width={8}>
-                            <label>Amount Unit</label>
-                            <input
-                              type="text"
-                              value={ingredient.amount_unit}
-                              onChange={this.editIngredient.bind(
+                          </Button.Group>
+                        </Grid.Column>
+                      </Grid>
+                    ))}
+                    <h2>Ingredients</h2>
+                    {section.ingredients.map((ingredient, ingredientNum) => (
+                      <Segment
+                        key={`section-${sectionNum}-ingredient-${ingredientNum}`}
+                      >
+                        <Form>
+                          <Form.Group>
+                            <Form.Field width={8}>
+                              <label>Name</label>
+                              <input
+                                type="text"
+                                value={ingredient.item.name}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'item'
+                                )}
+                              />
+                            </Form.Field>
+                            <Form.Field width={8}>
+                              <label>Grams</label>
+                              <Input
+                                label={{ basic: true, content: 'g' }}
+                                labelPosition="right"
+                                type="number"
+                                value={ingredient.grams}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'grams'
+                                )}
+                              />
+                            </Form.Field>
+                          </Form.Group>
+                          <Form.Group>
+                            <Form.Field width={8}>
+                              <label>Amount</label>
+                              <input
+                                type="number"
+                                value={ingredient.amount}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'amount'
+                                )}
+                              />
+                            </Form.Field>
+                            <Form.Field width={8}>
+                              <label>Amount Unit</label>
+                              <input
+                                type="text"
+                                value={ingredient.amount_unit}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'amount_unit'
+                                )}
+                              />
+                            </Form.Field>
+                          </Form.Group>
+                          <Form.Group>
+                            <Form.Field width={8}>
+                              <label>Modifier</label>
+                              <input
+                                type="text"
+                                value={ingredient.modifier}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'modifier'
+                                )}
+                              />
+                            </Form.Field>
+                            <Form.Field width={8}>
+                              <label>Substitute</label>
+                              <input
+                                type="text"
+                                value={ingredient.substitute}
+                                onChange={this.editIngredient.bind(
+                                  this,
+                                  sectionNum,
+                                  ingredientNum,
+                                  'substitute'
+                                )}
+                              />
+                            </Form.Field>
+                          </Form.Group>
+                          <Button.Group>
+                            <Button
+                              icon="arrow up"
+                              onClick={this.addIngredient.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'amount_unit'
+                                ingredientNum
                               )}
+                              content="New"
                             />
-                          </Form.Field>
-                        </Form.Group>
-                        <Form.Group>
-                          <Form.Field width={8}>
-                            <label>Modifier</label>
-                            <input
-                              type="text"
-                              value={ingredient.modifier}
-                              onChange={this.editIngredient.bind(
+                            <Button
+                              icon="arrow down"
+                              onClick={this.addIngredient.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'modifier'
+                                ingredientNum + 1
                               )}
+                              content="New"
                             />
-                          </Form.Field>
-                          <Form.Field width={8}>
-                            <label>Substitute</label>
-                            <input
-                              type="text"
-                              value={ingredient.substitute}
-                              onChange={this.editIngredient.bind(
+                            <Button
+                              icon="trash"
+                              onClick={this.deleteIngredient.bind(
                                 this,
                                 sectionNum,
-                                ingredientNum,
-                                'substitute'
+                                ingredientNum
                               )}
                             />
-                          </Form.Field>
-                        </Form.Group>
-                        <Button.Group>
-                          <Button
-                            icon="arrow up"
-                            onClick={this.addIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum
-                            )}
-                            content="New"
-                          />
-                          <Button
-                            icon="arrow down"
-                            onClick={this.addIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum + 1
-                            )}
-                            content="New"
-                          />
-                          <Button
-                            icon="trash"
-                            onClick={this.deleteIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum
-                            )}
-                          />
-                        </Button.Group>
-                      </Form>
-                    </Segment>
-                  ))}
-                </Segment>
-              );
-            })}
-          </div>
-        </Grid.Column>
-        <Grid.Column>
-          <Sticky context={contextRef}>
-            <div style={{ marginTop: '8em' }}>
-              <Recipe recipe={recipe} />
-              <Header as="h2" dividing content="Add Note" />
-              <AddRecipeNote slug={this.state.slug} />
+                          </Button.Group>
+                        </Form>
+                      </Segment>
+                    ))}
+                  </Segment>
+                );
+              })}
             </div>
-          </Sticky>
-        </Grid.Column>
-      </Grid>
+          </Grid.Column>
+          <Grid.Column>
+            <Sticky context={contextRef}>
+              <div style={{ marginTop: '8em' }}>
+                <Recipe recipe={recipe} />
+                <Header as="h2" dividing content="Add Note" />
+                <AddRecipeNote slug={this.state.slug} />
+              </div>
+            </Sticky>
+          </Grid.Column>
+        </Grid>
+      </div>
     );
   }
 }
@@ -352,9 +363,4 @@ function mapStateToProps(state) {
     recipe_detail: state.recipe.recipe_detail
   };
 }
-
-const mapDispatchToProps = dispatch => {
-  return bindActionCreators(RecipeActionCreators, dispatch);
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(EditorPage);
+export default connect(mapStateToProps, RecipeActionCreators)(EditorPage);
