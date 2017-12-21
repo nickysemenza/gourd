@@ -135,3 +135,15 @@ export function editIngredient(slug, sectionNum, ingredientNum, field, value) {
     value
   };
 }
+export function addRecipeNote(slug, note) {
+  return dispatch => {
+    return apiFetch(`recipes/${slug}/notes`, {
+      method: 'POST',
+      body: JSON.stringify({ note })
+    })
+      .then(response => response.json())
+      .then(() => {
+        dispatch(fetchRecipeDetail(slug));
+      });
+  };
+}

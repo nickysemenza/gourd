@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import RecipeTable from './RecipeTable';
 import {
   Button,
+  Card,
   Divider,
   Form,
   Grid,
@@ -84,7 +85,14 @@ export default class Recipe extends Component {
           <Grid.Column width={12}>
             <RecipeTable recipe={recipe} scale={this.state.scale} />
             <Header as="h1">Notes</Header>
-            <p>TODO</p>
+            {recipe.notes.map(eachNote => (
+              <Card>
+                <Card.Content
+                  meta={eachNote.created_at}
+                  description={eachNote.body}
+                />
+              </Card>
+            ))}
           </Grid.Column>
           <Grid.Column width={4}>{rightSidebar}</Grid.Column>
         </Grid>

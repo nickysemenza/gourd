@@ -17,15 +17,16 @@ type Model struct {
 
 type Recipe struct {
 	Model
-	Slug         string    `json:"slug" gorm:"unique"`
-	Title        string    `json:"title"`
-	TotalMinutes uint      `json:"total_minutes"`
-	Equipment    string    `json:"equipment"`
-	Source       string    `json:"source"`
-	Servings     uint      `json:"servings"`
-	Unit         string    `json:"unit"`
-	Quantity     uint      `json:"quantity"`
-	Sections     []Section `json:"sections"`
+	Slug         string       `json:"slug" gorm:"unique"`
+	Title        string       `json:"title"`
+	TotalMinutes uint         `json:"total_minutes"`
+	Equipment    string       `json:"equipment"`
+	Source       string       `json:"source"`
+	Servings     uint         `json:"servings"`
+	Unit         string       `json:"unit"`
+	Quantity     uint         `json:"quantity"`
+	Sections     []Section    `json:"sections"`
+	Notes        []RecipeNote `json:"notes"`
 }
 type Section struct {
 	Model
@@ -55,6 +56,11 @@ type SectionIngredient struct {
 type Ingredient struct {
 	Model
 	Name string `json:"name"`
+}
+type RecipeNote struct {
+	Model
+	Body     string `json:"body" sql:"type:text"`
+	RecipeID uint   `json:"recipe_id"`
 }
 
 //func GetIngredientByName(db *gorm.DB, name string) Ingredient {
@@ -129,8 +135,9 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{})
+	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
@@ -141,7 +148,7 @@ func DBReset(db *gorm.DB) *gorm.DB {
 	db.DropTable(&SectionInstruction{})
 	db.DropTable(&Section{})
 	db.DropTable(&Ingredient{})
+	db.DropTable(&RecipeNote{})
 	db.DropTable(&Recipe{})
-
 	return db
 }

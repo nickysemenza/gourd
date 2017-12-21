@@ -4,8 +4,16 @@ import Recipe from '../components/Recipe';
 import * as RecipeActionCreators from '../actions/recipe';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Grid, Form, Segment, Button, Input, Sticky } from 'semantic-ui-react';
-import RecipeTable from '../components/RecipeTable';
+import {
+  Grid,
+  Form,
+  Segment,
+  Button,
+  Input,
+  Sticky,
+  Header
+} from 'semantic-ui-react';
+import AddRecipeNote from '../components/AddRecipeNote';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -323,14 +331,14 @@ class EditorPage extends Component {
                 </Segment>
               );
             })}
-            {/*<pre>{JSON.stringify(recipe,null, 2)}</pre>*/}
           </div>
         </Grid.Column>
         <Grid.Column>
-          {/*<RecipeTable recipe={recipe} scale={1} />*/}
           <Sticky context={contextRef}>
             <div style={{ marginTop: '8em' }}>
               <Recipe recipe={recipe} />
+              <Header as="h2" dividing content="Add Note" />
+              <AddRecipeNote slug={this.state.slug} />
             </div>
           </Sticky>
         </Grid.Column>
