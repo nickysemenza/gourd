@@ -203,60 +203,92 @@ class EditorPage extends Component {
                       key={`section-${sectionNum}-ingredient-${ingredientNum}`}
                     >
                       <Form>
-                        <Form.Field width={4}>
-                          <label>Name</label>
-                          <input
-                            type="text"
-                            value={ingredient.item.name}
-                            onChange={this.editIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum,
-                              'item'
-                            )}
-                          />
-                        </Form.Field>
-                        <Form.Field width={4}>
-                          <label>Grams</label>
-                          <Input
-                            label={{ basic: true, content: 'g' }}
-                            labelPosition="right"
-                            type="number"
-                            value={ingredient.grams}
-                            onChange={this.editIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum,
-                              'grams'
-                            )}
-                          />
-                        </Form.Field>
-                        <Form.Field width={4}>
-                          <label>Amount</label>
-                          <input
-                            type="number"
-                            value={ingredient.amount}
-                            onChange={this.editIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum,
-                              'amount'
-                            )}
-                          />
-                        </Form.Field>
-                        <Form.Field width={4}>
-                          <label>Amount Unit</label>
-                          <input
-                            type="text"
-                            value={ingredient.amount_unit}
-                            onChange={this.editIngredient.bind(
-                              this,
-                              sectionNum,
-                              ingredientNum,
-                              'amount_unit'
-                            )}
-                          />
-                        </Form.Field>
+                        <Form.Group>
+                          <Form.Field width={8}>
+                            <label>Name</label>
+                            <input
+                              type="text"
+                              value={ingredient.item.name}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'item'
+                              )}
+                            />
+                          </Form.Field>
+                          <Form.Field width={8}>
+                            <label>Grams</label>
+                            <Input
+                              label={{ basic: true, content: 'g' }}
+                              labelPosition="right"
+                              type="number"
+                              value={ingredient.grams}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'grams'
+                              )}
+                            />
+                          </Form.Field>
+                        </Form.Group>
+                        <Form.Group>
+                          <Form.Field width={8}>
+                            <label>Amount</label>
+                            <input
+                              type="number"
+                              value={ingredient.amount}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'amount'
+                              )}
+                            />
+                          </Form.Field>
+                          <Form.Field width={8}>
+                            <label>Amount Unit</label>
+                            <input
+                              type="text"
+                              value={ingredient.amount_unit}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'amount_unit'
+                              )}
+                            />
+                          </Form.Field>
+                        </Form.Group>
+                        <Form.Group>
+                          <Form.Field width={8}>
+                            <label>Modifier</label>
+                            <input
+                              type="text"
+                              value={ingredient.modifier}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'modifier'
+                              )}
+                            />
+                          </Form.Field>
+                          <Form.Field width={8}>
+                            <label>Substitute</label>
+                            <input
+                              type="text"
+                              value={ingredient.substitute}
+                              onChange={this.editIngredient.bind(
+                                this,
+                                sectionNum,
+                                ingredientNum,
+                                'substitute'
+                              )}
+                            />
+                          </Form.Field>
+                        </Form.Group>
                         <Button.Group>
                           <Button
                             icon="arrow up"
