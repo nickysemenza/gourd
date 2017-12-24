@@ -39,6 +39,7 @@ func (a *App) buildRoutes(env *h.Env) {
 
 	var routes = Routes{
 		{"GET", "/api", h.ErrorTest},
+		{"PUT", "/api/imageupload", h.ImageUploadTest},
 		{"GET", "/api/recipes", h.GetAllRecipes},
 		{"GET", "/api/recipes/{slug}", h.GetRecipe},
 		{"PUT", "/api/recipes/{slug}", h.PutRecipe},
@@ -50,6 +51,8 @@ func (a *App) buildRoutes(env *h.Env) {
 	for _, route := range routes {
 		a.R.Handle(route.Pattern, h.Handler{env, route.HandlerFunc}).Methods(route.Method)
 	}
+	a.R.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
+
 	a.R.NotFoundHandler = h.Handler{env, h.NotFoundRoute}
 }
 

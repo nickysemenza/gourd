@@ -3,9 +3,11 @@ package model
 import (
 	"time"
 
+	"encoding/json"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
+	"os"
 )
 
 type Model struct {
@@ -62,12 +64,29 @@ type RecipeNote struct {
 	Body     string `json:"body" sql:"type:text"`
 	RecipeID uint   `json:"recipe_id"`
 }
+type Image struct {
+	Model
+	Path             string `json:"path"`
+	OriginalFileName string `json:"original_name"`
+	IsInS3           bool   `json:"in_s3"`
+}
 
-//func GetIngredientByName(db *gorm.DB, name string) Ingredient {
-//	ingredient := Ingredient{}
-//	db.FirstOrCreate(&ingredient, Ingredient{Name: name})
-//	return ingredient
-//}
+func (i *Image) MarshalJSON() ([]byte, error) {
+	type Alias Image
+	var url string
+	if i.IsInS3 {
+		url = "https://" + os.Getenv("S3_BUCKET") + ".s3.amazonaws.com/" + i.Path
+	} else {
+		url = "http://localhost:4000/public/" + i.Path
+	}
+	return json.Marshal(&struct {
+		FullURL string `json:"url"`
+		*Alias
+	}{
+		FullURL: url,
+		Alias:   (*Alias)(i),
+	})
+}
 
 func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
 	db.FirstOrCreate(&ingredient, Ingredient{Name: ingredient.Name})
@@ -135,7 +154,7 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{})
+	db.AutoMigrate(&Image{}, &Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
@@ -144,6 +163,7 @@ func DBMigrate(db *gorm.DB) *gorm.DB {
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
+	db.DropTable(&Image{})
 	db.DropTable(&SectionIngredient{})
 	db.DropTable(&SectionInstruction{})
 	db.DropTable(&Section{})

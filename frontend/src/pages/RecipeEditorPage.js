@@ -14,6 +14,7 @@ import {
 } from 'semantic-ui-react';
 import AddRecipeNote from '../components/AddRecipeNote';
 import { Link } from 'react-router-dom';
+import ImageUploader from '../components/ImageUploader';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -347,6 +348,8 @@ class EditorPage extends Component {
             <Sticky context={contextRef}>
               <div style={{ marginTop: '8em' }}>
                 <Recipe recipe={recipe} />
+                <Header as="h2" dividing content="Add Images" />
+                <ImageUploader slug={this.state.slug} />
                 <Header as="h2" dividing content="Add Note" />
                 <AddRecipeNote slug={this.state.slug} />
               </div>
