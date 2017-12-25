@@ -147,3 +147,20 @@ export function addRecipeNote(slug, note) {
       });
   };
 }
+
+export const RECEIVE_IMAGES = 'RECEIVE_IMAGES';
+
+export function fetchImages() {
+  return dispatch => {
+    return apiFetch('images')
+      .then(response => response.json())
+      .then(json => dispatch(receiveImages(json)));
+  };
+}
+
+function receiveImages(json) {
+  return {
+    type: RECEIVE_IMAGES,
+    json
+  };
+}

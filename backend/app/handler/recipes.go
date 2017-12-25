@@ -192,3 +192,10 @@ func addFileToS3(fileDir string, s3Path string) error {
 	})
 	return err
 }
+
+func GetAllImages(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var images []model.Image
+	e.DB.Preload("Recipes").Find(&images)
+	respondSuccess(w, images)
+	return nil
+}
