@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
-import { Button, Icon, Segment } from 'semantic-ui-react';
+import { Button, Segment } from 'semantic-ui-react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { fetchRecipes } from '../actions/recipe';
 import { API_BASE_URL } from '../config';
 class ImageUploader extends Component {
-  componentDidMount() {
-    this.props.fetchRecipes();
-  }
-
   onResumeDrop(accepted, rejected) {
     if (rejected.length > 0) {
       console.log('wrong filetype for one or more files?');
@@ -21,7 +17,7 @@ class ImageUploader extends Component {
     let xhr = new XMLHttpRequest();
 
     xhr.onload = () => {
-      let { status } = xhr;
+      // let { status } = xhr;
     };
 
     xhr.upload.addEventListener('progress', e => {
@@ -32,9 +28,8 @@ class ImageUploader extends Component {
     for (let x = 0; x < accepted.length; x++) {
       fd.append('file', accepted[x]);
     }
-    console.log(fd);
+    fd.append('slug', this.props.slug);
     xhr.open('PUT', API_BASE_URL + '/imageupload');
-    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.send(fd);
   }
   render() {

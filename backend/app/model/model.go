@@ -19,16 +19,17 @@ type Model struct {
 
 type Recipe struct {
 	Model
-	Slug         string       `json:"slug" gorm:"unique"`
-	Title        string       `json:"title"`
-	TotalMinutes uint         `json:"total_minutes"`
-	Equipment    string       `json:"equipment"`
-	Source       string       `json:"source"`
-	Servings     uint         `json:"servings"`
-	Unit         string       `json:"unit"`
-	Quantity     uint         `json:"quantity"`
-	Sections     []Section    `json:"sections"`
-	Notes        []RecipeNote `json:"notes"`
+	Slug         string        `json:"slug" gorm:"unique"`
+	Title        string        `json:"title"`
+	TotalMinutes uint          `json:"total_minutes"`
+	Equipment    string        `json:"equipment"`
+	Source       string        `json:"source"`
+	Servings     uint          `json:"servings"`
+	Unit         string        `json:"unit"`
+	Quantity     uint          `json:"quantity"`
+	Sections     []Section     `json:"sections"`
+	Notes        []RecipeNote  `json:"notes"`
+	Images       []RecipeImage `json:"images"`
 }
 type Section struct {
 	Model
@@ -64,20 +65,21 @@ type RecipeNote struct {
 	Body     string `json:"body" sql:"type:text"`
 	RecipeID uint   `json:"recipe_id"`
 }
-type Image struct {
+type RecipeImage struct {
 	Model
 	Path             string `json:"path"`
 	OriginalFileName string `json:"original_name"`
 	IsInS3           bool   `json:"in_s3"`
+	RecipeID         uint   `json:"recipe_id"`
 }
 
-func (i *Image) MarshalJSON() ([]byte, error) {
-	type Alias Image
+func (i *RecipeImage) MarshalJSON() ([]byte, error) {
+	type Alias RecipeImage
 	var url string
 	if i.IsInS3 {
 		url = "https://" + os.Getenv("S3_BUCKET") + ".s3.amazonaws.com/" + i.Path
 	} else {
-		url = "http://localhost:4000/public/" + i.Path
+		url = os.Getenv("API_PUBLIC_URL") + "/public/" + i.Path
 	}
 	return json.Marshal(&struct {
 		FullURL string `json:"url"`
@@ -98,6 +100,13 @@ func (ingredient *Ingredient) GetFresh(db *gorm.DB) {
 func (ingredient *Ingredient) AfterCreate() (err error) {
 	log.Printf("[ingredient] created: %s, %d", ingredient.Name, ingredient.ID)
 	return
+}
+func GetRecipeIDFromSlug(db *gorm.DB, slug string) (ID uint, err error) {
+	recipe := Recipe{}
+	if err := db.Where("slug = ?", slug).First(&recipe).Error; err != nil {
+		return 0, err
+	}
+	return recipe.ID, nil
 }
 
 func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
@@ -154,21 +163,22 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Image{}, &Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{})
+	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &RecipeImage{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Model(&RecipeImage{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
-	db.DropTable(&Image{})
 	db.DropTable(&SectionIngredient{})
 	db.DropTable(&SectionInstruction{})
 	db.DropTable(&Section{})
 	db.DropTable(&Ingredient{})
 	db.DropTable(&RecipeNote{})
+	db.DropTable(&RecipeImage{})
 	db.DropTable(&Recipe{})
 	return db
 }

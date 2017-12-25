@@ -15,17 +15,22 @@ class RecipeList extends Component {
       <Card.Group>
         {this.props.recipe_list.map(eachRecipe => (
           <Card
+            key={eachRecipe.id}
             as={Link}
             to={`/${eachRecipe.slug}`}
-            image="http://via.placeholder.com/2000x1200"
+            image={
+              eachRecipe.images === null
+                ? 'http://via.placeholder.com/2000x1200'
+                : eachRecipe.images[0].url
+            }
             header={eachRecipe.title}
             meta="todo::categories"
             description="todo::description"
             extra={
-              <a>
+              <p>
                 <Icon name="clock" />
                 {eachRecipe.total_minutes} Minutes
-              </a>
+              </p>
             }
           />
         ))}

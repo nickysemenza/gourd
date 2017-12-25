@@ -88,7 +88,7 @@ export default class Recipe extends Component {
             <RecipeTable recipe={recipe} scale={this.state.scale} />
             <Header as="h1">Notes</Header>
             {recipe.notes.map(eachNote => (
-              <Card>
+              <Card key={eachNote.id}>
                 <Card.Content description={eachNote.body} />
                 <Card.Content extra>
                   <Moment

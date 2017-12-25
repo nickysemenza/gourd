@@ -1,6 +1,6 @@
 import React from 'react';
 import RecipeList from '../../components/RecipeList';
-import MainPhotoGallery from '../../components/MainPhotoGallery';
+// import MainPhotoGallery from '../../components/MainPhotoGallery';
 import { Divider, Header } from 'semantic-ui-react';
 
 const Home = () => (
@@ -10,7 +10,7 @@ const Home = () => (
     </Header>
     <RecipeList />
     <Divider />
-    <MainPhotoGallery />
+    {/*<MainPhotoGallery />*/}
   </div>
 );
 export default Home;

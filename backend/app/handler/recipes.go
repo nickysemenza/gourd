@@ -19,7 +19,7 @@ import (
 
 func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
-	e.DB.Find(&recipes)
+	e.DB.Preload("Images").Find(&recipes)
 	respondSuccess(w, recipes)
 	return nil
 }
@@ -29,7 +29,7 @@ func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
-	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").First(&recipe).Error; err != nil {
+	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 	respondSuccess(w, recipe)
@@ -80,7 +80,7 @@ func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 
-	var finishedImages []model.Image
+	var finishedImages []model.RecipeImage
 	err := r.ParseMultipartForm(100000)
 	if err != nil {
 		return StatusError{Code: 500, Err: err}
@@ -89,9 +89,14 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 	//get a ref to the parsed multipart form
 	m := r.MultipartForm
 
-	//get the *fileheaders
+	slug := m.Value["slug"][0]
+	recipeID, err := model.GetRecipeIDFromSlug(e.DB, slug)
+	if err != nil {
+		return StatusError{Code: 404, Err: err}
+	}
+
 	files := m.File["file"]
-	log.Printf("recieving %d images via upload", len(files))
+	log.Printf("recieving %d images via upload for recipe %s", len(files), slug)
 	for i := range files {
 		//for each fileheader, get a handle to the actual file
 		file, err := files[i].Open()
@@ -102,7 +107,8 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		originalFileName := files[i].Filename
 
 		//persist an image obj to DB so we get an PK for s3 path
-		imageObj := model.Image{}
+		imageObj := model.RecipeImage{}
+		imageObj.RecipeID = recipeID
 		e.DB.Create(&imageObj)
 		//form s3 path
 		imagePath := fmt.Sprintf("images/%d%s", imageObj.ID, path.Ext(originalFileName))
