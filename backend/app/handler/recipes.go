@@ -80,7 +80,7 @@ func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 
-	var finishedImages []model.RecipeImage
+	var finishedImages []model.Image
 	err := r.ParseMultipartForm(100000)
 	if err != nil {
 		return StatusError{Code: 500, Err: err}
@@ -90,7 +90,11 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 	m := r.MultipartForm
 
 	slug := m.Value["slug"][0]
-	recipeID, err := model.GetRecipeIDFromSlug(e.DB, slug)
+	recipe := model.Recipe{}
+	if err := e.DB.Where("slug = ?", slug).First(&recipe).Error; err != nil {
+		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	}
+
 	if err != nil {
 		return StatusError{Code: 404, Err: err}
 	}
@@ -107,9 +111,10 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		originalFileName := files[i].Filename
 
 		//persist an image obj to DB so we get an PK for s3 path
-		imageObj := model.RecipeImage{}
-		imageObj.RecipeID = recipeID
+		imageObj := model.Image{}
 		e.DB.Create(&imageObj)
+		e.DB.Model(&recipe).Association("Images").Append(&imageObj)
+
 		//form s3 path
 		imagePath := fmt.Sprintf("images/%d%s", imageObj.ID, path.Ext(originalFileName))
 
@@ -128,8 +133,7 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		}
 
 		shouldUploadToS3 := os.Getenv("S3_IMAGES") == "true"
-
-		//save s3 path to image db
+		//save path to image db
 		imageObj.OriginalFileName = originalFileName
 		imageObj.Path = imagePath
 		imageObj.IsInS3 = shouldUploadToS3

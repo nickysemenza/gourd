@@ -102,7 +102,7 @@ export default class Recipe extends Component {
             ))}
 
             <Header as="h1">Images</Header>
-            {recipe.images.map(eachImage => (
+            {(recipe.images === null ? [] : recipe.images).map(eachImage => (
               <Card
                 key={eachImage.id}
                 image={eachImage.url}

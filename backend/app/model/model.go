@@ -19,18 +19,18 @@ type Model struct {
 
 type Recipe struct {
 	Model
-	Slug         string        `json:"slug" gorm:"unique"`
-	Title        string        `json:"title"`
-	TotalMinutes uint          `json:"total_minutes"`
-	Equipment    string        `json:"equipment"`
-	Source       string        `json:"source"`
-	Servings     uint          `json:"servings"`
-	Unit         string        `json:"unit"`
-	Quantity     uint          `json:"quantity"`
-	Sections     []Section     `json:"sections"`
-	Notes        []RecipeNote  `json:"notes"`
-	Images       []RecipeImage `json:"images"`
-	Categories   []Category    `json:"categories" gorm:"many2many:recipe_categories;"`
+	Slug         string       `json:"slug" gorm:"unique"`
+	Title        string       `json:"title"`
+	TotalMinutes uint         `json:"total_minutes"`
+	Equipment    string       `json:"equipment"`
+	Source       string       `json:"source"`
+	Servings     uint         `json:"servings"`
+	Unit         string       `json:"unit"`
+	Quantity     uint         `json:"quantity"`
+	Sections     []Section    `json:"sections"`
+	Notes        []RecipeNote `json:"notes"`
+	Images       []Image      `json:"images" gorm:"many2many:recipe_images;"`
+	Categories   []Category   `json:"categories" gorm:"many2many:recipe_categories;"`
 }
 type Section struct {
 	Model
@@ -66,12 +66,12 @@ type RecipeNote struct {
 	Body     string `json:"body" sql:"type:text"`
 	RecipeID uint   `json:"recipe_id"`
 }
-type RecipeImage struct {
+type Image struct {
 	Model
-	Path             string `json:"path"`
-	OriginalFileName string `json:"original_name"`
-	IsInS3           bool   `json:"in_s3"`
-	RecipeID         uint   `json:"recipe_id"`
+	Path             string   `json:"path"`
+	OriginalFileName string   `json:"original_name"`
+	IsInS3           bool     `json:"in_s3"`
+	Recipes          []Recipe `json:"recipes" gorm:"many2many:recipe_images;"`
 }
 type Category struct {
 	Model
@@ -79,8 +79,8 @@ type Category struct {
 	Recipes []Recipe `json:"recipes" gorm:"many2many:recipe_categories;"`
 }
 
-func (i *RecipeImage) MarshalJSON() ([]byte, error) {
-	type Alias RecipeImage
+func (i *Image) MarshalJSON() ([]byte, error) {
+	type Alias Image
 	var url string
 	if i.IsInS3 {
 		url = "https://" + os.Getenv("S3_BUCKET") + ".s3.amazonaws.com/" + i.Path
@@ -169,15 +169,16 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &RecipeImage{}, &Category{})
+	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &Image{}, &Category{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
-	db.Model(&RecipeImage{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
 	db.Table("recipe_categories").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
-	db.Table("recipe_categories").AddForeignKey("category_id", "categories(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_categories").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_images").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_images").AddForeignKey("image_id", "images(id)", "RESTRICT", "RESTRICT")
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
@@ -186,7 +187,7 @@ func DBReset(db *gorm.DB) *gorm.DB {
 	db.DropTable(&Section{})
 	db.DropTable(&Ingredient{})
 	db.DropTable(&RecipeNote{})
-	db.DropTable(&RecipeImage{})
+	db.DropTable(&Image{})
 	db.DropTable(&Recipe{})
 	return db
 }
