@@ -32,6 +32,7 @@ func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
+
 	respondSuccess(w, recipe)
 	return nil
 }
@@ -197,5 +198,12 @@ func GetAllImages(e *Env, w http.ResponseWriter, r *http.Request) error {
 	var images []model.Image
 	e.DB.Preload("Recipes").Find(&images)
 	respondSuccess(w, images)
+	return nil
+}
+
+func GetAllMeals(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var meals []model.Meal
+	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
+	respondSuccess(w, meals)
 	return nil
 }

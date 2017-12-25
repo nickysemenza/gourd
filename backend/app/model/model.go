@@ -31,6 +31,7 @@ type Recipe struct {
 	Notes        []RecipeNote `json:"notes"`
 	Images       []Image      `json:"images" gorm:"many2many:recipe_images;"`
 	Categories   []Category   `json:"categories" gorm:"many2many:recipe_categories;"`
+	RecipeMeal   []RecipeMeal `json:"recipe_meals"`
 }
 type Section struct {
 	Model
@@ -78,6 +79,24 @@ type Category struct {
 	Name    string   `json:"name"`
 	Recipes []Recipe `json:"recipes" gorm:"many2many:recipe_categories;"`
 }
+type Meal struct {
+	Model
+	Type        string       `json:"name"`
+	Description string       `json:"description"`
+	RecipeMeal  []RecipeMeal `json:"recipe_meals"`
+	Time        time.Time    `json:"time"`
+}
+type RecipeMeal struct {
+	Recipe     Recipe `json:"recipe"`
+	RecipeID   uint
+	Meal       Meal `json:"meal"`
+	MealID     uint
+	Multiplier uint `json:"multiplier" gorm:"default:1"`
+}
+
+//func (*RecipeMeal) TableName() string {
+//	return "group_user"
+//}
 
 func (i *Image) MarshalJSON() ([]byte, error) {
 	type Alias Image
@@ -96,6 +115,14 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 	})
 }
 
+//add the recipe to a Meal, with specified multiplier
+func (recipe *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
+	recipemeal := RecipeMeal{}
+	recipemeal.Multiplier = multiplier
+	recipemeal.RecipeID = recipe.ID
+	recipemeal.MealID = meal.ID
+	db.Create(&recipemeal)
+}
 func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
 	db.FirstOrCreate(&ingredient, Ingredient{Name: ingredient.Name})
 }
@@ -169,16 +196,21 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &Image{}, &Category{})
+	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &Image{}, &Category{}, &Meal{}, &RecipeMeal{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
+
 	db.Table("recipe_categories").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Table("recipe_categories").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+
 	db.Table("recipe_images").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Table("recipe_images").AddForeignKey("image_id", "images(id)", "RESTRICT", "RESTRICT")
+
+	db.Table("recipe_meals").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_meals").AddForeignKey("meal_id", "meals(id)", "RESTRICT", "RESTRICT")
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
@@ -188,6 +220,8 @@ func DBReset(db *gorm.DB) *gorm.DB {
 	db.DropTable(&Ingredient{})
 	db.DropTable(&RecipeNote{})
 	db.DropTable(&Image{})
+	db.DropTable(&Category{})
+	db.DropTable(&Meal{})
 	db.DropTable(&Recipe{})
 	return db
 }

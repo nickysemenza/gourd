@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Header, Image, List, Table } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
+import Moment from 'react-moment';
+import 'moment-timezone';
 
 class MealList extends Component {
   componentDidMount() {
@@ -30,21 +32,27 @@ class MealList extends Component {
                   <Header as="h3" content={meal.name} />
                   {meal.description}
                 </Table.Cell>
-                <Table.Cell>date</Table.Cell>
+                <Table.Cell>
+                  <Moment tz="America/Los_Angeles" format="ddd MMM Do YYYY">
+                    {meal.time}
+                  </Moment>
+                </Table.Cell>
                 <Table.Cell>
                   <List link>
-                    {meal.recipe_meals.map(eachRM => {
-                      let { recipe } = eachRM;
-                      return (
-                        <List.Item
-                          key={recipe.id}
-                          as={Link}
-                          to={`/${recipe.slug}`}
-                        >
-                          {recipe.title} @ {eachRM.multiplier}x
-                        </List.Item>
-                      );
-                    })}
+                    {(meal.recipe_meals === null ? [] : meal.recipe_meals).map(
+                      eachRM => {
+                        let { recipe } = eachRM;
+                        return (
+                          <List.Item
+                            key={recipe.id}
+                            as={Link}
+                            to={`/${recipe.slug}`}
+                          >
+                            {recipe.title} @ {eachRM.multiplier}x
+                          </List.Item>
+                        );
+                      }
+                    )}
                   </List>
                 </Table.Cell>
               </Table.Row>
