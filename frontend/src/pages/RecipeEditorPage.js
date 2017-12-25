@@ -86,6 +86,12 @@ class EditorPage extends Component {
           EDITING: {recipe.title}
           <Header.Subheader>
             <Link to={`/${recipe.slug}`}>Go to recipe</Link>
+            <p>
+              TODO::edit categories,{' '}
+              {recipe.categories === null
+                ? 'no categories'
+                : recipe.categories.map(x => x.name).join(', ')}
+            </p>
           </Header.Subheader>
         </Header>
         <Grid columns={2}>

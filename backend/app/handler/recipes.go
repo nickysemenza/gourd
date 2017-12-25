@@ -19,7 +19,7 @@ import (
 
 func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
-	e.DB.Preload("Images").Find(&recipes)
+	e.DB.Preload("Images").Preload("Categories").Find(&recipes)
 	respondSuccess(w, recipes)
 	return nil
 }
@@ -29,7 +29,7 @@ func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
-	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").First(&recipe).Error; err != nil {
+	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 	respondSuccess(w, recipe)

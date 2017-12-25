@@ -24,7 +24,11 @@ class RecipeList extends Component {
                 : eachRecipe.images[0].url
             }
             header={eachRecipe.title}
-            meta="todo::categories"
+            meta={
+              eachRecipe.categories === null
+                ? 'no categories'
+                : eachRecipe.categories.map(x => x.name).join(', ')
+            }
             description="todo::description"
             extra={
               <p>

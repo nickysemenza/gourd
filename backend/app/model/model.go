@@ -30,6 +30,7 @@ type Recipe struct {
 	Sections     []Section     `json:"sections"`
 	Notes        []RecipeNote  `json:"notes"`
 	Images       []RecipeImage `json:"images"`
+	Categories   []Category    `json:"categories" gorm:"many2many:recipe_categories;"`
 }
 type Section struct {
 	Model
@@ -71,6 +72,11 @@ type RecipeImage struct {
 	OriginalFileName string `json:"original_name"`
 	IsInS3           bool   `json:"in_s3"`
 	RecipeID         uint   `json:"recipe_id"`
+}
+type Category struct {
+	Model
+	Name    string   `json:"name"`
+	Recipes []Recipe `json:"recipes" gorm:"many2many:recipe_categories;"`
 }
 
 func (i *RecipeImage) MarshalJSON() ([]byte, error) {
@@ -163,13 +169,15 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &RecipeImage{})
+	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &RecipeImage{}, &Category{})
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeImage{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionIngredient{}).AddForeignKey("item_id", "ingredients(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_categories").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
+	db.Table("recipe_categories").AddForeignKey("category_id", "categories(id)", "RESTRICT", "RESTRICT")
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
