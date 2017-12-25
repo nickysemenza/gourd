@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	h "github.com/nickysemenza/food/backend/app/handler"
@@ -38,12 +39,12 @@ func (a *App) Initialize(config *Config) *h.Env {
 func (a *App) buildRoutes(env *h.Env) {
 
 	var routes = Routes{
-		{"GET", "/api", h.ErrorTest},
-		{"PUT", "/api/imageupload", h.ImageUploadTest},
-		{"GET", "/api/recipes", h.GetAllRecipes},
-		{"GET", "/api/recipes/{slug}", h.GetRecipe},
-		{"PUT", "/api/recipes/{slug}", h.PutRecipe},
-		{"POST", "/api/recipes/{slug}/notes", h.AddNote},
+		{"GET", "/", h.ErrorTest},
+		{"PUT", "/imageupload", h.ImageUploadTest},
+		{"GET", "/recipes", h.GetAllRecipes},
+		{"GET", "/recipes/{slug}", h.GetRecipe},
+		{"PUT", "/recipes/{slug}", h.PutRecipe},
+		{"POST", "/recipes/{slug}/notes", h.AddNote},
 	}
 
 	//add them all
@@ -58,5 +59,9 @@ func (a *App) buildRoutes(env *h.Env) {
 
 func (a *App) RunServer(host string) {
 	log.Println("Running API server on", host)
-	log.Fatal(http.ListenAndServe(host, a.R))
+	headersOk := handlers.AllowedHeaders([]string{"*"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
+	log.Fatal(http.ListenAndServe(host, handlers.CORS(originsOk, headersOk, methodsOk)(a.R)))
 }
