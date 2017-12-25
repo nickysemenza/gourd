@@ -164,3 +164,20 @@ function receiveImages(json) {
     json
   };
 }
+
+export const RECEIVE_MEAL_LIST = 'RECEIVE_MEAL_LIST';
+
+export function fetchMealList() {
+  return dispatch => {
+    return apiFetch('meals')
+      .then(response => response.json())
+      .then(json => dispatch(receiveMealList(json)));
+  };
+}
+
+function receiveMealList(json) {
+  return {
+    type: RECEIVE_MEAL_LIST,
+    json
+  };
+}

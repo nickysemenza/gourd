@@ -12,7 +12,8 @@ import {
   DELETE_INGREDIENT,
   ADD_INGREDIENT,
   EDIT_INGREDIENT,
-  RECEIVE_IMAGES
+  RECEIVE_IMAGES,
+  RECEIVE_MEAL_LIST
 } from '../actions/recipe';
 
 const INITIAL_STATE = {
@@ -22,7 +23,9 @@ const INITIAL_STATE = {
   recipe_detail: {},
   recipe_detail_loading: false,
 
-  image_list: []
+  image_list: [],
+
+  meal_list: []
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -54,6 +57,11 @@ export default function(state = INITIAL_STATE, action) {
       return {
         ...state,
         image_list: action.json
+      };
+    case RECEIVE_MEAL_LIST:
+      return {
+        ...state,
+        meal_list: action.json
       };
     //recipe editing stuff
     case EDIT_TOP_LEVEL_ITEM:

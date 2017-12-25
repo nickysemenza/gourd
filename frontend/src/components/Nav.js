@@ -14,6 +14,9 @@ const Nav = () => (
       <Menu.Item as={NavLink} to="images">
         Images
       </Menu.Item>
+      <Menu.Item as={NavLink} to="meals">
+        Meals
+      </Menu.Item>
     </Container>
   </Menu>
 );
