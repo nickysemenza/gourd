@@ -8,10 +8,20 @@ import RecipePage from './pages/RecipePage';
 import EditorPage from './pages/RecipeEditorPage';
 import { Container } from 'semantic-ui-react';
 import Footer from './components/Footer';
+import ReduxToastr from 'react-redux-toastr';
 
 const App = () => (
   <Router>
     <div>
+      <ReduxToastr
+        timeOut={4000}
+        newestOnTop={false}
+        preventDuplicates
+        position="top-left"
+        transitionIn="fadeIn"
+        transitionOut="fadeOut"
+        progressBar
+      />
       <Nav />
       <Container
         fluid

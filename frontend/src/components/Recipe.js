@@ -100,6 +100,22 @@ export default class Recipe extends Component {
                 </Card.Content>
               </Card>
             ))}
+
+            <Header as="h1">Images</Header>
+            {recipe.images.map(eachImage => (
+              <Card
+                key={eachImage.id}
+                image={eachImage.url}
+                extra={
+                  <Moment
+                    tz="America/Los_Angeles"
+                    format="ddd MMM Do YYYY, h:mm a"
+                  >
+                    {eachImage.created_at}
+                  </Moment>
+                }
+              />
+            ))}
           </Grid.Column>
           <Grid.Column width={4}>{rightSidebar}</Grid.Column>
         </Grid>

@@ -32,6 +32,9 @@ class EditorPage extends Component {
     }
   }
   componentDidMount() {
+    this.fetchData();
+  }
+  fetchData() {
     this.props.fetchRecipeDetail(this.state.slug);
   }
   editTopLevelItem(fieldName, e) {
@@ -349,7 +352,10 @@ class EditorPage extends Component {
               <div style={{ marginTop: '8em' }}>
                 <Recipe recipe={recipe} />
                 <Header as="h2" dividing content="Add Images" />
-                <ImageUploader slug={this.state.slug} />
+                <ImageUploader
+                  slug={this.state.slug}
+                  onSuccessfulUpload={this.fetchData.bind(this)}
+                />
                 <Header as="h2" dividing content="Add Note" />
                 <AddRecipeNote slug={this.state.slug} />
               </div>

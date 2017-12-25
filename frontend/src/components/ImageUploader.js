@@ -1,27 +1,40 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Dropzone from 'react-dropzone';
-import { Button, Segment } from 'semantic-ui-react';
+import { Button, Progress, Segment } from 'semantic-ui-react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { fetchRecipes } from '../actions/recipe';
 import { API_BASE_URL } from '../config';
+import { toastr } from 'react-redux-toastr';
+
 class ImageUploader extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isUploading: false,
+      uploadProgress: 0
+    };
+  }
   onResumeDrop(accepted, rejected) {
     if (rejected.length > 0) {
       console.log('wrong filetype for one or more files?');
       return;
     }
     console.log(accepted);
-
+    this.setState({ isUploading: true, uploadProgress: 0 });
     let xhr = new XMLHttpRequest();
 
     xhr.onload = () => {
-      // let { status } = xhr;
+      if (xhr.status === 200) {
+        toastr.success('Success!', `${accepted.length} uploaded.`);
+        this.props.onSuccessfulUpload();
+      }
+      setTimeout(() => this.setState({ isUploading: false }), 500);
     };
 
-    xhr.upload.addEventListener('progress', e => {
-      console.log(e);
+    xhr.upload.addEventListener('progress', event => {
+      this.setState({ uploadProgress: event.loaded / event.total * 100 });
     });
 
     let fd = new FormData();
@@ -54,6 +67,9 @@ class ImageUploader extends Component {
           >
             Drop or click to upload
           </Button>
+          {this.state.isUploading ? (
+            <Progress percent={this.state.uploadProgress} />
+          ) : null}
         </Dropzone>
       </Segment>
     );
@@ -75,6 +91,7 @@ const mapDispatchToProps = dispatch => {
   );
 };
 ImageUploader.propTypes = {
-  slug: PropTypes.string.isRequired
+  slug: PropTypes.string.isRequired,
+  onSuccessfulUpload: PropTypes.func
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ImageUploader);
