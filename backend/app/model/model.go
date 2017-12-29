@@ -81,7 +81,8 @@ type Category struct {
 }
 type Meal struct {
 	Model
-	Type        string       `json:"name"`
+	Name        string       `json:"name"`
+	Type        string       `json:"type"`
 	Description string       `json:"description"`
 	RecipeMeal  []RecipeMeal `json:"recipe_meals"`
 	Time        time.Time    `json:"time"`

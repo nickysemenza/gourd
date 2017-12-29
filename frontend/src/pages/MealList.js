@@ -3,15 +3,26 @@ import React, { Component } from 'react';
 import { fetchMealList } from '../actions/recipe';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Header, Image, List, Table } from 'semantic-ui-react';
+import { Header, List, Table } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import Moment from 'react-moment';
 import 'moment-timezone';
+import MealCalendar from '../components/MealCalendar';
 
 class MealList extends Component {
   componentDidMount() {
     this.props.fetchMealList();
   }
+  buildRecipeWithMultiplierListForMeal = meal =>
+    (meal.recipe_meals === null ? [] : meal.recipe_meals).map(eachRM => {
+      let { recipe } = eachRM;
+      return (
+        <List.Item key={recipe.id} as={Link} to={`/${recipe.slug}`}>
+          {recipe.title} @ {eachRM.multiplier}x
+        </List.Item>
+      );
+    });
+
   render() {
     return (
       <div className="container">
@@ -39,26 +50,20 @@ class MealList extends Component {
                 </Table.Cell>
                 <Table.Cell>
                   <List link>
-                    {(meal.recipe_meals === null ? [] : meal.recipe_meals).map(
-                      eachRM => {
-                        let { recipe } = eachRM;
-                        return (
-                          <List.Item
-                            key={recipe.id}
-                            as={Link}
-                            to={`/${recipe.slug}`}
-                          >
-                            {recipe.title} @ {eachRM.multiplier}x
-                          </List.Item>
-                        );
-                      }
-                    )}
+                    {this.buildRecipeWithMultiplierListForMeal(meal)}
                   </List>
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
+        <Header dividing content="Calendar" />
+        <MealCalendar
+          meal_list={this.props.meal_list}
+          buildRecipeWithMultiplierListForMeal={
+            this.buildRecipeWithMultiplierListForMeal
+          }
+        />
       </div>
     );
   }
