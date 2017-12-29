@@ -8,14 +8,17 @@ const Nav = () => (
       <Menu.Item as={NavLink} to="/" exact header>
         Nicky's Recipes
       </Menu.Item>
-      <Menu.Item as={NavLink} to="about">
+      <Menu.Item as={NavLink} to="/about">
         About
       </Menu.Item>
-      <Menu.Item as={NavLink} to="images">
+      <Menu.Item as={NavLink} to="/images">
         Images
       </Menu.Item>
-      <Menu.Item as={NavLink} to="meals">
+      <Menu.Item as={NavLink} to="/meals">
         Meals
+      </Menu.Item>
+      <Menu.Item as={NavLink} to="/settings">
+        Settings
       </Menu.Item>
     </Container>
   </Menu>
