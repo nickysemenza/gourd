@@ -47,7 +47,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestGetRecipes(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/api/recipes", nil)
+	req, _ := http.NewRequest("GET", "/recipes", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
 	log.Print(response.Body)
@@ -59,13 +59,13 @@ func TestGetRecipes(t *testing.T) {
 		Title: "title1",
 	}
 	jsonValue, _ := json.Marshal(values)
-	req2, _ := http.NewRequest("PUT", "/api/recipes/"+testRecipeSlug, bytes.NewBuffer(jsonValue))
+	req2, _ := http.NewRequest("PUT", "/recipes/"+testRecipeSlug, bytes.NewBuffer(jsonValue))
 	response2 := executeRequest(req2)
 	checkResponseCode(t, http.StatusOK, response2.Code)
 	log.Print(response2.Body)
 
 	//ensure that entry was persisted
-	req3, _ := http.NewRequest("GET", "/api/recipes", nil)
+	req3, _ := http.NewRequest("GET", "/recipes", nil)
 	response3 := executeRequest(req3)
 	checkResponseCode(t, http.StatusOK, response3.Code)
 	if !strings.Contains(response3.Body.String(), testRecipeSlug) {
