@@ -42,6 +42,7 @@ func (a *App) buildRoutes(env *h.Env) {
 		{"GET", "/", h.ErrorTest},
 		{"PUT", "/imageupload", h.ImageUploadTest},
 		{"GET", "/recipes", h.GetAllRecipes},
+		{"POST", "/recipes", h.CreateRecipe},
 		{"GET", "/recipes/{slug}", h.GetRecipe},
 		{"PUT", "/recipes/{slug}", h.PutRecipe},
 		{"POST", "/recipes/{slug}/notes", h.AddNote},

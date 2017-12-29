@@ -7,6 +7,7 @@ import Nav from './components/Nav';
 import RecipePage from './pages/RecipePage';
 import ImageList from './pages/ImageList';
 import MealList from './pages/MealList';
+import Settings from './pages/Settings';
 import EditorPage from './pages/RecipeEditorPage';
 import { Container } from 'semantic-ui-react';
 import Footer from './components/Footer';
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/about" component={About} />
           <Route path="/images" component={ImageList} />
           <Route path="/meals" component={MealList} />
+          <Route path="/settings" component={Settings} />
           <Route path="/editor/:recipe_id" component={EditorPage} />
           <Route path="/:recipe_id" component={RecipePage} />
         </Switch>

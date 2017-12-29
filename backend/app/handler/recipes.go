@@ -52,6 +52,31 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func CreateRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
+	//decode the data from JSON encoded request body
+	decoder := json.NewDecoder(r.Body)
+	var parsed struct {
+		Slug  string `json:"slug"`
+		Title string `json:"title"`
+	}
+	err := decoder.Decode(&parsed)
+	if err != nil {
+		log.Println(err)
+	}
+
+	//see if one exists
+	recipe := model.Recipe{}
+	if SlugNotFound := e.DB.Where("slug = ?", parsed.Slug).First(&recipe).RecordNotFound(); SlugNotFound == false {
+		respondError(w, 500, "slug exists already")
+		return nil
+	}
+	recipe.Slug = parsed.Slug
+	recipe.Title = parsed.Title
+	e.DB.Save(&recipe)
+	respondSuccess(w, "added!")
+	return nil
+}
+
 func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 	//find the recipe we are adding a note to
 	recipe := model.Recipe{}

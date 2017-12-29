@@ -1,4 +1,5 @@
 import apiFetch from './index';
+import { toastr } from 'react-redux-toastr';
 
 export const REQUEST_RECIPES = 'REQUEST_RECIPES';
 export const RECEIVE_RECIPES = 'RECEIVE_RECIPES';
@@ -179,5 +180,20 @@ function receiveMealList(json) {
   return {
     type: RECEIVE_MEAL_LIST,
     json
+  };
+}
+
+export function createRecipe(slug, title) {
+  return dispatch => {
+    return apiFetch('recipes', {
+      method: 'POST',
+      body: JSON.stringify({ slug, title })
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (json.error) toastr.error('Oops!', `slug ${slug} already exists!`);
+        else toastr.success('Success!', `${title} (${slug}) created!`);
+        dispatch(fetchRecipeDetail(slug));
+      });
   };
 }
