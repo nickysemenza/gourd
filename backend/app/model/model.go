@@ -73,6 +73,7 @@ type Image struct {
 	OriginalFileName string   `json:"original_name"`
 	IsInS3           bool     `json:"in_s3"`
 	Recipes          []Recipe `json:"recipes" gorm:"many2many:recipe_images;"`
+	MD5Hash          string   `json:"md5"`
 }
 type Category struct {
 	Model

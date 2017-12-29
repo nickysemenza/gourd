@@ -2,6 +2,7 @@ package handler
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -111,8 +112,17 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		}
 		originalFileName := files[i].Filename
 
+		h := md5.New()
+		if _, err := io.Copy(h, file); err != nil {
+			log.Fatal(err)
+		}
+
+		md5Hash := fmt.Sprintf("%x", h.Sum(nil))
+		//todo: dedup using md5Hash
+
 		//persist an image obj to DB so we get an PK for s3 path
 		imageObj := model.Image{}
+		imageObj.MD5Hash = md5Hash
 		e.DB.Create(&imageObj)
 		e.DB.Model(&recipe).Association("Images").Append(&imageObj)
 
