@@ -73,7 +73,7 @@ type Image struct {
 	OriginalFileName string   `json:"original_name"`
 	IsInS3           bool     `json:"in_s3"`
 	Recipes          []Recipe `json:"recipes" gorm:"many2many:recipe_images;"`
-	MD5Hash          string   `json:"md5"`
+	Md5Hash          string   `json:"md5"`
 }
 type Category struct {
 	Model
@@ -95,10 +95,6 @@ type RecipeMeal struct {
 	MealID     uint
 	Multiplier uint `json:"multiplier" gorm:"default:1"`
 }
-
-//func (*RecipeMeal) TableName() string {
-//	return "group_user"
-//}
 
 func (i *Image) MarshalJSON() ([]byte, error) {
 	type Alias Image
@@ -170,7 +166,7 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 				fresh.GetFresh(db)
 				//	if eachIngredient.Name != fresh.Name IT WAS MUTATED AAH!
 				if eachItem.Name != fresh.Name {
-					log.Printf("[ingredient] name of %d was mutateded! (%s->%s)", eachItem.ID, eachItem.Name, fresh.Name)
+					log.Printf("[ingredient] name of #%d was mutated! (%s->%s)", eachItem.ID, eachItem.Name, fresh.Name)
 					//we want to preserve the original eachItem; create new w/ eachItem.Name
 
 					// find by name, or create new
@@ -229,6 +225,7 @@ func DBReset(db *gorm.DB) *gorm.DB {
 	db.DropTable(&RecipeNote{})
 	db.DropTable(&Image{})
 	db.DropTable(&Category{})
+	db.DropTable(&RecipeMeal{})
 	db.DropTable(&Meal{})
 	db.DropTable(&Recipe{})
 	return db

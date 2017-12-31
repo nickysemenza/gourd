@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -48,7 +47,13 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	updatedRecipe.CreateOrUpdate(e.DB, false)
 
-	respondSuccess(w, updatedRecipe)
+	slug := updatedRecipe.Slug
+	recipe := model.Recipe{}
+	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
+		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	}
+
+	respondSuccess(w, recipe)
 	return nil
 }
 
@@ -66,7 +71,7 @@ func CreateRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	//see if one exists
 	recipe := model.Recipe{}
-	if SlugNotFound := e.DB.Where("slug = ?", parsed.Slug).First(&recipe).RecordNotFound(); SlugNotFound == false {
+	if !e.DB.Where("slug = ?", parsed.Slug).First(&recipe).RecordNotFound() {
 		respondError(w, 500, "slug exists already")
 		return nil
 	}
@@ -137,17 +142,16 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		}
 		originalFileName := files[i].Filename
 
-		h := md5.New()
-		if _, err := io.Copy(h, file); err != nil {
-			log.Fatal(err)
-		}
-
-		md5Hash := fmt.Sprintf("%x", h.Sum(nil))
+		//h := md5.New()
+		//if _, err := io.Copy(h, file); err != nil {
+		//	log.Fatal(err)
+		//}
+		//md5Hash := fmt.Sprintf("%x", h.Sum(nil))
 		//todo: dedup using md5Hash
 
 		//persist an image obj to DB so we get an PK for s3 path
 		imageObj := model.Image{}
-		imageObj.MD5Hash = md5Hash
+		//imageObj.Md5Hash = md5Hash
 		e.DB.Create(&imageObj)
 		e.DB.Model(&recipe).Association("Images").Append(&imageObj)
 
