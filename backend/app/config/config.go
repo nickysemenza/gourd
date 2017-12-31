@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"log"
@@ -23,10 +22,10 @@ type DBConfig struct {
 }
 
 type Env struct {
-	DB     *gorm.DB
-	Port   string
-	Host   string
-	Router **mux.Router
+	DB   *gorm.DB
+	Port string
+	Host string
+	//Router **mux.Router
 }
 
 func getEnv(key, fallback string) string {

@@ -20,8 +20,6 @@ type Route struct {
 	HandlerFunc func(e *config.Env, w http.ResponseWriter, r *http.Request) error
 }
 
-type Routes []Route
-
 func (a *App) Initialize(c *config.Config) *config.Env {
 	db, err := gorm.Open(c.DB.Dialect, c.GetDBURI())
 	if err != nil {
@@ -29,13 +27,15 @@ func (a *App) Initialize(c *config.Config) *config.Env {
 	}
 	//set up the env
 	env := &config.Env{
-		DB:     model.DBMigrate(db),
-		Port:   c.Port,
-		Router: &a.R,
+		DB:   model.DBMigrate(db),
+		Port: c.Port,
+		//Router: &a.R,
 	}
 	a.buildRoutes(env)
 	return env
 }
+
+type Routes []Route
 
 func (a *App) buildRoutes(env *config.Env) {
 
@@ -59,7 +59,7 @@ func (a *App) buildRoutes(env *config.Env) {
 	}
 	a.R.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
 
-	a.R.NotFoundHandler = h.Handler{env, h.NotFoundRoute}
+	a.R.NotFoundHandler = h.Handler{Env: env, H: h.NotFoundRoute}
 }
 
 func (a *App) RunServer(host string) {
