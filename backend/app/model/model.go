@@ -199,8 +199,23 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 	}
 }
 
+var ModelsInOrder = []interface{}{
+	&Recipe{},
+	&Ingredient{},
+	&Image{},
+	&RecipeNote{},
+	&Meal{},
+	&RecipeMeal{},
+	&Section{},
+	&SectionIngredient{},
+	&SectionInstruction{},
+	&Category{},
+}
+
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&Section{}, &SectionInstruction{}, &SectionIngredient{}, &Recipe{}, &Ingredient{}, &RecipeNote{}, &Image{}, &Category{}, &Meal{}, &RecipeMeal{})
+	for y := range ModelsInOrder {
+		db.AutoMigrate(ModelsInOrder[y])
+	}
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&SectionInstruction{}).AddForeignKey("section_id", "sections(id)", "RESTRICT", "RESTRICT")
@@ -218,15 +233,10 @@ func DBMigrate(db *gorm.DB) *gorm.DB {
 	return db
 }
 func DBReset(db *gorm.DB) *gorm.DB {
-	db.DropTable(&SectionIngredient{})
-	db.DropTable(&SectionInstruction{})
-	db.DropTable(&Section{})
-	db.DropTable(&Ingredient{})
-	db.DropTable(&RecipeNote{})
-	db.DropTable(&Image{})
-	db.DropTable(&Category{})
-	db.DropTable(&RecipeMeal{})
-	db.DropTable(&Meal{})
-	db.DropTable(&Recipe{})
+	db.Exec("SET foreign_key_checks = 0;")
+	for i := len(ModelsInOrder) - 1; i >= 0; i-- {
+		db.DropTable(ModelsInOrder[i])
+	}
+	db.Exec("SET foreign_key_checks = 1;")
 	return db
 }

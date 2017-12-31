@@ -7,7 +7,6 @@ import (
 	"github.com/nickysemenza/food/backend/app"
 	"github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -21,7 +20,6 @@ func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	r := *env.Router
 	r.ServeHTTP(rr, req)
-
 	return rr
 }
 
@@ -32,11 +30,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 }
 
 func TestMain(m *testing.M) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Print("Error loading .env file")
-	}
-
+	godotenv.Load()
 	globalConfig := app.GetConfig()
 	mainApp := &app.App{}
 	env = mainApp.Initialize(globalConfig)
@@ -45,31 +39,77 @@ func TestMain(m *testing.M) {
 	env.DB = model.DBMigrate(env.DB)
 	os.Exit(m.Run())
 }
-
-func TestGetRecipes(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/recipes", nil)
-	response := executeRequest(req)
-	checkResponseCode(t, http.StatusOK, response.Code)
-	log.Print(response.Body)
-
-	//create a new entry
-	testRecipeSlug := "test-slug-1"
-	values := model.Recipe{
-		Slug:  testRecipeSlug,
-		Title: "title1",
+func makeRecipe(t *testing.T, slug string) *httptest.ResponseRecorder {
+	newData := struct {
+		Slug  string `json:"slug"`
+		Title string `json:"title"`
+	}{
+		Slug: slug,
 	}
-	jsonValue, _ := json.Marshal(values)
-	req2, _ := http.NewRequest("PUT", "/recipes/"+testRecipeSlug, bytes.NewBuffer(jsonValue))
-	response2 := executeRequest(req2)
-	checkResponseCode(t, http.StatusOK, response2.Code)
-	log.Print(response2.Body)
+	return doRequest(t, "POST", "/recipes", newData)
+}
+func getRecipe(t *testing.T, slug string) model.Recipe {
+	response := doRequest(t, "GET", "/recipes/"+slug, nil)
+	checkResponseCode(t, http.StatusOK, response.Code)
 
-	//ensure that entry was persisted
-	req3, _ := http.NewRequest("GET", "/recipes", nil)
-	response3 := executeRequest(req3)
-	checkResponseCode(t, http.StatusOK, response3.Code)
-	if !strings.Contains(response3.Body.String(), testRecipeSlug) {
+	decoder := json.NewDecoder(response.Body)
+	var testRecipe model.Recipe
+	decoder.Decode(&testRecipe)
+	return testRecipe
+}
+
+func doRequest(t *testing.T, method string, url string, objToMarshall interface{}) *httptest.ResponseRecorder {
+	if objToMarshall == nil {
+		req, _ := http.NewRequest(method, url, nil)
+		return executeRequest(req)
+	} else {
+		jsonValue, _ := json.Marshal(objToMarshall)
+		req, _ := http.NewRequest(method, url, bytes.NewBuffer(jsonValue))
+		return executeRequest(req)
+	}
+}
+func TestAddRecipe(t *testing.T) {
+	testRecipeSlug := "test-slug-TestAddRecipe"
+	makeRecipe(t, testRecipeSlug)
+
+	//make sure this recipe is in the list
+	response := doRequest(t, "GET", "/recipes", nil)
+	checkResponseCode(t, http.StatusOK, response.Code)
+	if !strings.Contains(response.Body.String(), testRecipeSlug) {
 		t.Error("did not find " + testRecipeSlug + " in recipe list!")
 	}
+}
 
+func TestAddDeleteCategories(t *testing.T) {
+	testRecipeSlug := "test-slug-1"
+	makeRecipe(t, testRecipeSlug)
+
+	//grab the recipe from detail
+	testRecipe := getRecipe(t, testRecipeSlug)
+
+	//add some categories
+	testRecipe.Categories = []model.Category{
+		{Name: "cat1"},
+		{Name: "cat2"},
+	}
+	response := doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	//ensure the categories were added
+	testRecipe2 := getRecipe(t, testRecipeSlug)
+	if numCategories := len(testRecipe2.Categories); numCategories != 2 {
+		t.Errorf("found %d categories instead of 2", numCategories)
+	}
+
+	//now delete a category
+	testRecipe.Categories = []model.Category{
+		{Name: "cat2"},
+	}
+	doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe)
+
+	//make sure it was really deleted
+	testRecipe3 := getRecipe(t, testRecipeSlug)
+	if numCategories := len(testRecipe3.Categories); numCategories != 1 {
+		t.Errorf("found %d categories instead of 1", numCategories)
+	}
 }
