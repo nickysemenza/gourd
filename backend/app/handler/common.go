@@ -2,8 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
+	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/pkg/errors"
 	"log"
 	"net/http"
@@ -30,7 +29,7 @@ func respondError(w http.ResponseWriter, code int, message string) {
 	respondJSON(w, code, map[string]string{"error": message})
 }
 
-func NotFoundRoute(e *Env, w http.ResponseWriter, r *http.Request) error {
+func NotFoundRoute(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return StatusError{Code: 404, Err: errors.New("route not found: " + r.RequestURI)}
 }
 
@@ -57,18 +56,11 @@ func (se StatusError) Status() int {
 	return se.Code
 }
 
-type Env struct {
-	DB     *gorm.DB
-	Port   string
-	Host   string
-	Router **mux.Router
-}
-
 // The Handler struct that takes a configured Env and a function matching
 // our useful signature.
 type Handler struct {
-	*Env
-	H func(e *Env, w http.ResponseWriter, r *http.Request) error
+	*config.Env
+	H func(e *config.Env, w http.ResponseWriter, r *http.Request) error
 }
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.

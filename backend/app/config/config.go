@@ -1,7 +1,9 @@
-package app
+package config
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -18,6 +20,13 @@ type DBConfig struct {
 	Password string
 	Name     string
 	Charset  string
+}
+
+type Env struct {
+	DB     *gorm.DB
+	Port   string
+	Host   string
+	Router **mux.Router
 }
 
 func getEnv(key, fallback string) string {
@@ -55,7 +64,7 @@ func GetConfig() *Config {
 	return &config
 }
 
-func (config *Config) getDBURI() string {
+func (config *Config) GetDBURI() string {
 	return fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
 		config.DB.Password,

@@ -1,16 +1,13 @@
 package handler
 
 import (
-	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+
 	"github.com/gorilla/mux"
+	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/backend/app/utils"
 	"github.com/pkg/errors"
 	"io"
 	"log"
@@ -19,16 +16,16 @@ import (
 	"path"
 )
 
-func GetAllRecipes(e *Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllRecipes(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
 	e.DB.Preload("Images").Preload("Categories").Find(&recipes)
 	respondSuccess(w, recipes)
 	return nil
 }
-func ErrorTest(e *Env, w http.ResponseWriter, r *http.Request) error {
+func ErrorTest(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return StatusError{Code: 201, Err: errors.New("sad..")}
 }
-func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
+func GetRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
 	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
@@ -39,7 +36,7 @@ func GetRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
+func PutRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	var updatedRecipe model.Recipe
 	err := decoder.Decode(&updatedRecipe)
@@ -59,7 +56,7 @@ func PutRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func CreateRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
+func CreateRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	//decode the data from JSON encoded request body
 	decoder := json.NewDecoder(r.Body)
 	var parsed struct {
@@ -84,7 +81,7 @@ func CreateRecipe(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
+func AddNote(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	//find the recipe we are adding a note to
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
@@ -112,19 +109,7 @@ func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func readAndHash(a io.Reader) (io.Reader, string, error) {
-	var b bytes.Buffer
-
-	hash := md5.New()
-	_, err := io.Copy(&b, io.TeeReader(a, hash))
-
-	if err != nil {
-		return nil, "", err
-	}
-
-	return &b, hex.EncodeToString(hash.Sum(nil)), nil
-}
-func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
+func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 
 	var finishedImages []model.Image
 	err := r.ParseMultipartForm(100000)
@@ -151,7 +136,7 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		}
 		originalFileName := files[i].Filename
 
-		fileData, md5Hash, err := readAndHash(file)
+		fileData, md5Hash, err := utils.ReadAndHash(file)
 		if err != nil {
 			return StatusError{Code: 500, Err: err}
 		}
@@ -181,7 +166,7 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 		if os.Getenv("S3_IMAGES") == "true" {
 
-			if err := addFileToS3(localImageFile.Name(), imagePath); err != nil {
+			if err := utils.AddFileToS3(localImageFile.Name(), imagePath); err != nil {
 				imageObj.IsInS3 = false
 				log.Println(err)
 			} else {
@@ -199,61 +184,22 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func GetAllImages(e *Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllImages(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var images []model.Image
 	e.DB.Preload("Recipes").Find(&images)
 	respondSuccess(w, images)
 	return nil
 }
 
-func GetAllMeals(e *Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllMeals(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var meals []model.Meal
 	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
 	respondSuccess(w, meals)
 	return nil
 }
-func GetAllCategories(e *Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllCategories(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var categories []model.Category
 	e.DB.Find(&categories)
 	respondSuccess(w, categories)
 	return nil
-}
-
-func getAWSSession() (*session.Session, error) {
-	return session.NewSession(&aws.Config{
-		Region: aws.String("us-east-1"),
-		//LogLevel: aws.LogLevel(aws.LogDebugWithHTTPBody),
-	})
-}
-
-func addFileToS3(fileDir string, s3Path string) error {
-
-	s, err := getAWSSession()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Open the file for use
-	file, err := os.Open(fileDir)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Get file size and read the file content into a buffer
-	fileInfo, _ := file.Stat()
-	var size = fileInfo.Size()
-	buffer := make([]byte, size)
-	file.Read(buffer)
-
-	log.Printf("saving file to S3 at %s", s3Path)
-	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
-		Bucket:        aws.String(os.Getenv("S3_BUCKET")),
-		Key:           aws.String(s3Path),
-		Body:          bytes.NewReader(buffer),
-		ContentLength: aws.Int64(size),
-		ACL:           aws.String("public-read"),
-		ContentType:   aws.String(http.DetectContentType(buffer)),
-	})
-	return err
 }

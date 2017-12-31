@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/joho/godotenv"
 	"github.com/nickysemenza/food/backend/app"
-	"github.com/nickysemenza/food/backend/app/handler"
+	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
 	"net/http"
 	"net/http/httptest"
@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-var env *handler.Env
+var env *config.Env
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
@@ -31,7 +31,7 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 
 func TestMain(m *testing.M) {
 	godotenv.Load()
-	globalConfig := app.GetConfig()
+	globalConfig := config.GetConfig()
 	mainApp := &app.App{}
 	env = mainApp.Initialize(globalConfig)
 

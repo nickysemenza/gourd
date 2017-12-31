@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"github.com/nickysemenza/food/backend/app/config"
 	h "github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	"log"
@@ -16,31 +17,31 @@ type App struct {
 type Route struct {
 	Method      string
 	Pattern     string
-	HandlerFunc func(e *h.Env, w http.ResponseWriter, r *http.Request) error
+	HandlerFunc func(e *config.Env, w http.ResponseWriter, r *http.Request) error
 }
 
 type Routes []Route
 
-func (a *App) Initialize(config *Config) *h.Env {
-	db, err := gorm.Open(config.DB.Dialect, config.getDBURI())
+func (a *App) Initialize(c *config.Config) *config.Env {
+	db, err := gorm.Open(c.DB.Dialect, c.GetDBURI())
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}
 	//set up the env
-	env := &h.Env{
+	env := &config.Env{
 		DB:     model.DBMigrate(db),
-		Port:   config.Port,
+		Port:   c.Port,
 		Router: &a.R,
 	}
 	a.buildRoutes(env)
 	return env
 }
 
-func (a *App) buildRoutes(env *h.Env) {
+func (a *App) buildRoutes(env *config.Env) {
 
 	var routes = Routes{
 		{"GET", "/", h.ErrorTest},
-		{"PUT", "/imageupload", h.ImageUploadTest},
+		{"PUT", "/imageupload", h.PutImageUpload},
 		{"GET", "/recipes", h.GetAllRecipes},
 		{"POST", "/recipes", h.CreateRecipe},
 		{"GET", "/recipes/{slug}", h.GetRecipe},

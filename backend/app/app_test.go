@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/gorilla/mux"
-	h "github.com/nickysemenza/food/backend/app/handler"
+	"github.com/nickysemenza/food/backend/app/config"
 )
 
 func TestApp_Initialize(t *testing.T) {
@@ -13,13 +13,13 @@ func TestApp_Initialize(t *testing.T) {
 		R *mux.Router
 	}
 	type args struct {
-		config *Config
+		c *config.Config
 	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
-		want   *h.Env
+		want   *config.Env
 	}{
 	// TODO: Add test cases.
 	}
@@ -28,7 +28,7 @@ func TestApp_Initialize(t *testing.T) {
 			a := &App{
 				R: tt.fields.R,
 			}
-			if got := a.Initialize(tt.args.config); !reflect.DeepEqual(got, tt.want) {
+			if got := a.Initialize(tt.args.c); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("App.Initialize() = %v, want %v", got, tt.want)
 			}
 		})
@@ -40,7 +40,7 @@ func TestApp_buildRoutes(t *testing.T) {
 		R *mux.Router
 	}
 	type args struct {
-		env *h.Env
+		env *config.Env
 	}
 	tests := []struct {
 		name   string

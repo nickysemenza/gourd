@@ -3,13 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/nickysemenza/food/backend/app"
+	"github.com/nickysemenza/food/backend/app/config"
+	"github.com/nickysemenza/food/backend/app/utils"
 	"github.com/urfave/cli"
 	"os"
 )
 
 func main() {
 
-	globalConfig := app.GetConfig()
+	globalConfig := config.GetConfig()
 	mainApp := &app.App{}
 	appEnv := mainApp.Initialize(globalConfig)
 
@@ -31,7 +33,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				pwd, _ := os.Getwd()
 				pwd += "/recipes/"
-				app.Utils{appEnv}.Export(pwd)
+				utils.Utils{appEnv}.Export(pwd)
 				return nil
 			},
 		},
@@ -42,7 +44,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				pwd, _ := os.Getwd()
 				pwd += "/recipes/"
-				app.Utils{appEnv}.Import(pwd)
+				utils.Utils{appEnv}.Import(pwd)
 				return nil
 			},
 		},
