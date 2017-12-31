@@ -15,6 +15,7 @@ import {
 import AddRecipeNote from '../components/AddRecipeNote';
 import { Link } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
+import RecipeCategoryEditor from '../components/RecipeCategoryEditor';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -38,7 +39,12 @@ class EditorPage extends Component {
     this.props.fetchRecipeDetail(this.state.slug);
   }
   editTopLevelItem(fieldName, e) {
-    this.props.editTopLevelItem(this.state.slug, fieldName, e.target.value);
+    let { value } = e.target;
+    if (['quantity', 'servings', 'total_minutes'].includes(fieldName)) {
+      value = parseFloat(value);
+      if (isNaN(value)) value = 0;
+    }
+    this.props.editTopLevelItem(this.state.slug, fieldName, value);
   }
   deleteSection(index) {
     this.props.deleteSectionByIndex(this.state.slug, index);
@@ -67,13 +73,21 @@ class EditorPage extends Component {
     this.props.addIngredient(this.state.slug, sectionNum, ingredientNum);
   }
   editIngredient(sectionNum, ingredientNum, field, e) {
+    let { value } = e.target;
+    if (field === 'grams' || field === 'amount') {
+      value = parseFloat(value);
+      if (isNaN(value)) value = 0;
+    }
     this.props.editIngredient(
       this.state.slug,
       sectionNum,
       ingredientNum,
       field,
-      e.target.value
+      value
     );
+  }
+  saveRecipe() {
+    this.props.saveRecipe(this.state.slug);
   }
   render() {
     const { contextRef } = this.state;
@@ -94,6 +108,18 @@ class EditorPage extends Component {
             </p>
           </Header.Subheader>
         </Header>
+        {recipe.sections.length === 0 ? (
+          <Button
+            icon="star"
+            onClick={this.addSection.bind(this, 0)}
+            content="initialize recipe"
+          />
+        ) : null}
+        <Button
+          icon="star"
+          onClick={this.saveRecipe.bind(this)}
+          content="save recipe"
+        />
         <Grid columns={2}>
           <Grid.Column>
             <div ref={this.handleContextRef}>
@@ -364,6 +390,8 @@ class EditorPage extends Component {
                 />
                 <Header as="h2" dividing content="Add Note" />
                 <AddRecipeNote slug={this.state.slug} />
+                <Header as="h2" dividing content="Categories" />
+                <RecipeCategoryEditor slug={this.state.slug} />
               </div>
             </Sticky>
           </Grid.Column>

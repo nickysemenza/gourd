@@ -13,7 +13,10 @@ import {
   ADD_INGREDIENT,
   EDIT_INGREDIENT,
   RECEIVE_IMAGES,
-  RECEIVE_MEAL_LIST
+  RECEIVE_MEAL_LIST,
+  RECEIVE_CATEGORIES,
+  REMOVE_CATEGORY_FROM_RECIPE,
+  ADD_CATEGORY_TO_RECIPE
 } from '../actions/recipe';
 
 const INITIAL_STATE = {
@@ -25,7 +28,20 @@ const INITIAL_STATE = {
 
   image_list: [],
 
-  meal_list: []
+  meal_list: [],
+  category_list: []
+};
+
+const BLANK_INGREDIENT = {
+  item: {
+    name: 'name'
+  },
+  grams: 0,
+  amount_unit: 'cup',
+  amount: 1,
+  substitute: '',
+  modifier: '',
+  optional: false
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -62,6 +78,11 @@ export default function(state = INITIAL_STATE, action) {
       return {
         ...state,
         meal_list: action.json
+      };
+    case RECEIVE_CATEGORIES:
+      return {
+        ...state,
+        category_list: action.json
       };
     //recipe editing stuff
     case EDIT_TOP_LEVEL_ITEM:
@@ -106,7 +127,7 @@ export default function(state = INITIAL_STATE, action) {
                 0,
                 action.index
               ),
-              { ingredients: [], instructions: [] },
+              { ingredients: [BLANK_INGREDIENT], instructions: [{ name: '' }] },
               ...state.recipe_detail[action.slug].sections.slice(action.index)
             ]
           }
@@ -244,17 +265,7 @@ export default function(state = INITIAL_STATE, action) {
                     0,
                     action.ingredientNum
                   ),
-                  {
-                    item: {
-                      name: 'name'
-                    },
-                    grams: 0,
-                    amount_unit: 'cup',
-                    amount: 1,
-                    substitute: '',
-                    modifier: '',
-                    optional: false
-                  },
+                  BLANK_INGREDIENT,
                   ...r.sections[action.sectionNum].ingredients.slice(
                     action.ingredientNum
                   )
@@ -303,6 +314,33 @@ export default function(state = INITIAL_STATE, action) {
               },
               ...r.sections.slice(action.sectionNum + 1)
             ]
+          }
+        }
+      };
+    case REMOVE_CATEGORY_FROM_RECIPE:
+      r = state.recipe_detail[action.slug];
+      return {
+        ...state,
+        recipe_detail: {
+          ...state.recipe_detail,
+          [action.slug]: {
+            ...r,
+            categories: r.categories.filter(x => x.id !== action.categoryId)
+          }
+        }
+      };
+    case ADD_CATEGORY_TO_RECIPE:
+      r = state.recipe_detail[action.slug];
+      let categoryToAdd = state.category_list.filter(
+        x => x.id === action.categoryId
+      );
+      return {
+        ...state,
+        recipe_detail: {
+          ...state.recipe_detail,
+          [action.slug]: {
+            ...r,
+            categories: [...r.categories, ...categoryToAdd]
           }
         }
       };

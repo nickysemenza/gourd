@@ -242,3 +242,9 @@ func GetAllMeals(e *Env, w http.ResponseWriter, r *http.Request) error {
 	respondSuccess(w, meals)
 	return nil
 }
+func GetAllCategories(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var categories []model.Category
+	e.DB.Find(&categories)
+	respondSuccess(w, categories)
+	return nil
+}

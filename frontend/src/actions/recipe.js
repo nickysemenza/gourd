@@ -197,3 +197,53 @@ export function createRecipe(slug, title) {
       });
   };
 }
+
+export function saveRecipe(slug) {
+  return (dispatch, getState) => {
+    let recipe = getState().recipe.recipe_detail[slug];
+    return apiFetch(`recipes/${slug}`, {
+      method: 'PUT',
+      body: JSON.stringify(recipe)
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (json.error) toastr.error('Oops!', json.error);
+        else toastr.success('Success!', `${recipe.title} (${slug}) updated!`);
+        dispatch(fetchRecipeDetail(slug));
+      });
+  };
+}
+
+export const RECEIVE_CATEGORIES = 'RECEIVE_CATEGORIES';
+
+export function fetchCategories() {
+  return dispatch => {
+    return apiFetch('categories')
+      .then(response => response.json())
+      .then(json => dispatch(receiveCategories(json)));
+  };
+}
+
+function receiveCategories(json) {
+  return {
+    type: RECEIVE_CATEGORIES,
+    json
+  };
+}
+export const REMOVE_CATEGORY_FROM_RECIPE = 'REMOVE_CATEGORY_FROM_RECIPE';
+export function removeCategoryFromRecipe(slug, categoryId) {
+  return {
+    type: REMOVE_CATEGORY_FROM_RECIPE,
+    slug,
+    categoryId
+  };
+}
+
+export const ADD_CATEGORY_TO_RECIPE = 'ADD_CATEGORY_TO_RECIPE';
+export function addCategoryToRecipe(slug, categoryId) {
+  return {
+    type: ADD_CATEGORY_TO_RECIPE,
+    slug,
+    categoryId
+  };
+}

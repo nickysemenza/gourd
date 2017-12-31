@@ -187,10 +187,16 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 				eachSectionInstruction.ID = 0
 			}
 		}
+		//update Ingredients and Instructions relations
+		db.Model(&eachSection).Association("Ingredients").Replace(eachSection.Ingredients)
+		db.Model(&eachSection).Association("Instructions").Replace(eachSection.Instructions)
 	}
 	if recursivelyStripIDs {
 		updatedRecipe.ID = 0
 	}
+	//update Categories and Sections relations
+	db.Model(&updatedRecipe).Association("Categories").Replace(updatedRecipe.Categories)
+	db.Model(&updatedRecipe).Association("Sections").Replace(updatedRecipe.Sections)
 
 	if err := db.Save(&updatedRecipe).Error; err != nil {
 		log.Println(err)
