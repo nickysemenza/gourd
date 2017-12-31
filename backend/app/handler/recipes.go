@@ -2,6 +2,8 @@ package handler
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
@@ -110,6 +112,18 @@ func AddNote(e *Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func readAndHash(a io.Reader) (io.Reader, string, error) {
+	var b bytes.Buffer
+
+	hash := md5.New()
+	_, err := io.Copy(&b, io.TeeReader(a, hash))
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	return &b, hex.EncodeToString(hash.Sum(nil)), nil
+}
 func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	var finishedImages []model.Image
@@ -120,15 +134,10 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 
 	//get a ref to the parsed multipart form
 	m := r.MultipartForm
-
 	slug := m.Value["slug"][0]
 	recipe := model.Recipe{}
 	if err := e.DB.Where("slug = ?", slug).First(&recipe).Error; err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
-	}
-
-	if err != nil {
-		return StatusError{Code: 404, Err: err}
 	}
 
 	files := m.File["file"]
@@ -142,55 +151,71 @@ func ImageUploadTest(e *Env, w http.ResponseWriter, r *http.Request) error {
 		}
 		originalFileName := files[i].Filename
 
-		//h := md5.New()
-		//if _, err := io.Copy(h, file); err != nil {
-		//	log.Fatal(err)
-		//}
-		//md5Hash := fmt.Sprintf("%x", h.Sum(nil))
+		fileData, md5Hash, err := readAndHash(file)
+		if err != nil {
+			return StatusError{Code: 500, Err: err}
+		}
 		//todo: dedup using md5Hash
 
 		//persist an image obj to DB so we get an PK for s3 path
 		imageObj := model.Image{}
-		//imageObj.Md5Hash = md5Hash
+		imageObj.Md5Hash = md5Hash
 		e.DB.Create(&imageObj)
 		e.DB.Model(&recipe).Association("Images").Append(&imageObj)
 
-		//form s3 path
+		//form filesystem / s3 path
 		imagePath := fmt.Sprintf("images/%d%s", imageObj.ID, path.Ext(originalFileName))
 
-		//tmpFile, err := ioutil.TempFile("", "food")
 		os.MkdirAll("public/images", 0777)
-		tmpFile, err := os.Create("public/" + imagePath)
-		log.Printf("file: %s -> %s", originalFileName, tmpFile.Name())
+		localImageFile, err := os.Create("public/" + imagePath)
+		log.Printf("file: %s -> %s", originalFileName, localImageFile.Name())
 
-		defer tmpFile.Close()
+		defer localImageFile.Close()
 		if err != nil {
 			return StatusError{Code: 500, Err: err}
 		}
 		//copy the uploaded file to the destination file
-		if _, err := io.Copy(tmpFile, file); err != nil {
+		if _, err := io.Copy(localImageFile, fileData); err != nil {
 			return StatusError{Code: 500, Err: err}
 		}
 
-		shouldUploadToS3 := os.Getenv("S3_IMAGES") == "true"
-		//save path to image db
-		imageObj.OriginalFileName = originalFileName
-		imageObj.Path = imagePath
-		imageObj.IsInS3 = shouldUploadToS3
-		e.DB.Save(&imageObj)
+		if os.Getenv("S3_IMAGES") == "true" {
 
-		if shouldUploadToS3 {
-			if err := addFileToS3(tmpFile.Name(), imagePath); err != nil {
+			if err := addFileToS3(localImageFile.Name(), imagePath); err != nil {
+				imageObj.IsInS3 = false
 				log.Println(err)
 			} else {
+				imageObj.IsInS3 = true
 				finishedImages = append(finishedImages, imageObj)
 			}
 		} else {
 			finishedImages = append(finishedImages, imageObj)
 		}
-
+		imageObj.OriginalFileName = originalFileName
+		imageObj.Path = imagePath
+		e.DB.Save(&imageObj)
 	}
 	respondSuccess(w, finishedImages)
+	return nil
+}
+
+func GetAllImages(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var images []model.Image
+	e.DB.Preload("Recipes").Find(&images)
+	respondSuccess(w, images)
+	return nil
+}
+
+func GetAllMeals(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var meals []model.Meal
+	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
+	respondSuccess(w, meals)
+	return nil
+}
+func GetAllCategories(e *Env, w http.ResponseWriter, r *http.Request) error {
+	var categories []model.Category
+	e.DB.Find(&categories)
+	respondSuccess(w, categories)
 	return nil
 }
 
@@ -231,24 +256,4 @@ func addFileToS3(fileDir string, s3Path string) error {
 		ContentType:   aws.String(http.DetectContentType(buffer)),
 	})
 	return err
-}
-
-func GetAllImages(e *Env, w http.ResponseWriter, r *http.Request) error {
-	var images []model.Image
-	e.DB.Preload("Recipes").Find(&images)
-	respondSuccess(w, images)
-	return nil
-}
-
-func GetAllMeals(e *Env, w http.ResponseWriter, r *http.Request) error {
-	var meals []model.Meal
-	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
-	respondSuccess(w, meals)
-	return nil
-}
-func GetAllCategories(e *Env, w http.ResponseWriter, r *http.Request) error {
-	var categories []model.Category
-	e.DB.Find(&categories)
-	respondSuccess(w, categories)
-	return nil
 }

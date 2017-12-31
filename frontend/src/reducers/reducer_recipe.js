@@ -65,7 +65,11 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail_loading: false,
         recipe_detail: {
           ...state.recipe_detail,
-          [action.recipeSlug]: action.json
+          [action.recipeSlug]: {
+            ...action.json,
+            categories:
+              action.json.categories === null ? [] : action.json.categories
+          }
         }
       };
 
