@@ -28,7 +28,7 @@ const App = () => (
       <Nav />
       <Container
         fluid
-        style={{ marginTop: '7em', width: '80%', minHeight: '100vh' }}
+        style={{ marginTop: '7em', width: '95%', minHeight: '100vh' }}
       >
         <Switch>
           <Route exact path="/" component={Home} />

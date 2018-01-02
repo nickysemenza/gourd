@@ -11,12 +11,14 @@ import {
   Input,
   Sticky,
   Label,
-  Header
+  Header,
+  Divider
 } from 'semantic-ui-react';
 import AddRecipeNote from '../components/AddRecipeNote';
 import { Link } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import RecipeCategoryEditor from '../components/RecipeCategoryEditor';
+import RecipeEditorBasicInfo from '../components/RecipeEditorBasicInfo';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class EditorPage extends Component {
     this.state = {
       slug: props.match.params.recipe_id
     };
+    this.editTopLevelItem = this.editTopLevelItem.bind(this);
   }
   handleContextRef = contextRef => this.setState({ contextRef });
   componentWillReceiveProps(nextProps) {
@@ -130,69 +133,15 @@ class EditorPage extends Component {
           onClick={this.saveRecipe.bind(this)}
           content="save recipe"
         />
+        <RecipeEditorBasicInfo
+          recipe={recipe}
+          editTopLevelItem={this.editTopLevelItem}
+        />
+        <Divider />
         <Grid columns={2}>
           <Grid.Column>
             <div ref={this.handleContextRef}>
               {/*EDITOR*/}
-              <Form>
-                <Form.Group>
-                  <Form.Field width={8}>
-                    <label>Title</label>
-                    <input
-                      type="text"
-                      value={recipe.title}
-                      onChange={this.editTopLevelItem.bind(this, 'title')}
-                    />
-                  </Form.Field>
-                  <Form.Field width={8}>
-                    <label>Source</label>
-                    <input
-                      type="text"
-                      value={recipe.source}
-                      onChange={this.editTopLevelItem.bind(this, 'source')}
-                    />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Field width={8}>
-                    <label>Quantity</label>
-                    <input
-                      type="number"
-                      value={recipe.quantity}
-                      onChange={this.editTopLevelItem.bind(this, 'quantity')}
-                    />
-                  </Form.Field>
-                  <Form.Field width={8}>
-                    <label>Quantity Unit</label>
-                    <input
-                      type="text"
-                      value={recipe.unit}
-                      onChange={this.editTopLevelItem.bind(this, 'unit')}
-                    />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Field width={8}>
-                    <label>Servings</label>
-                    <input
-                      type="number"
-                      value={recipe.servings}
-                      onChange={this.editTopLevelItem.bind(this, 'servings')}
-                    />
-                  </Form.Field>
-                  <Form.Field width={8}>
-                    <label>Total Minutes</label>
-                    <input
-                      type="number"
-                      value={recipe.total_minutes}
-                      onChange={this.editTopLevelItem.bind(
-                        this,
-                        'total_minutes'
-                      )}
-                    />
-                  </Form.Field>
-                </Form.Group>
-              </Form>
               {recipe.sections.map((section, sectionNum) => {
                 return (
                   <Segment key={sectionNum}>
