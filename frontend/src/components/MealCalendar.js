@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import 'moment-timezone';
 import BigCalendar from 'react-big-calendar';
-import { Link } from 'react-router-dom';
 import { List } from 'semantic-ui-react';
 
 class MealCalendar extends Component {

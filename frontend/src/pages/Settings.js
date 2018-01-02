@@ -17,7 +17,7 @@ class Settings extends Component {
     value
       .toLowerCase()
       .replace(/\s+/g, '-')
-      .replace(/[^0-9a-z\-]/g, '');
+      .replace(/[^0-9a-z-]/g, '');
 
   editNewRecipeTitle = e => {
     let { value } = e.target;

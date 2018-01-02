@@ -24,7 +24,7 @@ class RecipeCategoryEditor extends Component {
       <div>
         <List divided verticalAlign="middle">
           {this.props.category_list.map((c, categoryListIndex) => (
-            <List.Item>
+            <List.Item key={c.id} m>
               <List.Content floated="right">
                 <Button
                   disabled={!this.doesRecipeHaveCategoryID(c.id)}
