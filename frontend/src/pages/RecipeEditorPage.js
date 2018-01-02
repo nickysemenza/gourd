@@ -10,6 +10,7 @@ import {
   Button,
   Input,
   Sticky,
+  Label,
   Header
 } from 'semantic-ui-react';
 import AddRecipeNote from '../components/AddRecipeNote';
@@ -85,6 +86,15 @@ class EditorPage extends Component {
       field,
       value
     );
+  }
+  getCumulativeInstructionNum(sectionNum, instructionNum) {
+    let r;
+    r = this.props.recipe_detail[this.state.slug];
+    if (!r) r = [];
+    let num = 1;
+    for (let x = 0; x < sectionNum; x++)
+      num += r.sections[x].instructions.length;
+    return num + instructionNum;
   }
   saveRecipe() {
     this.props.saveRecipe(this.state.slug);
@@ -186,6 +196,9 @@ class EditorPage extends Component {
               {recipe.sections.map((section, sectionNum) => {
                 return (
                   <Segment key={sectionNum}>
+                    <Label as="a" color="red" ribbon>
+                      {String.fromCharCode(sectionNum + 65)}
+                    </Label>
                     <Button.Group>
                       <Button
                         icon="arrow up"
@@ -205,9 +218,18 @@ class EditorPage extends Component {
                     <h2>Instructions</h2>
                     {section.instructions.map((instruction, instructionNum) => (
                       <Grid
+                        padded={false}
                         key={`section-${sectionNum}-instruction-${instructionNum}`}
                       >
-                        <Grid.Column width={8}>
+                        <Grid.Column width={2} className="shortGridColumn">
+                          <Label horizontal>
+                            {this.getCumulativeInstructionNum(
+                              sectionNum,
+                              instructionNum
+                            )}
+                          </Label>
+                        </Grid.Column>
+                        <Grid.Column width={8} className="shortGridColumn">
                           <Input
                             fluid
                             type="text"
@@ -219,7 +241,7 @@ class EditorPage extends Component {
                             )}
                           />
                         </Grid.Column>
-                        <Grid.Column>
+                        <Grid.Column className="shortGridColumn">
                           <Button.Group>
                             <Button
                               icon="arrow up"
@@ -256,6 +278,9 @@ class EditorPage extends Component {
                       <Segment
                         key={`section-${sectionNum}-ingredient-${ingredientNum}`}
                       >
+                        <Label as="a" color="purple" ribbon>
+                          {ingredient.item.name}
+                        </Label>
                         <Form>
                           <Form.Group>
                             <Form.Field width={8}>

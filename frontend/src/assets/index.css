@@ -21,3 +21,8 @@ body {
   min-width: 50px;
   /*border-left: solid 1px black;*/
 }
+
+.shortGridColumn {
+  padding-top: 0.1rem !important;
+  padding-bottom: 0.1rem !important;
+}
