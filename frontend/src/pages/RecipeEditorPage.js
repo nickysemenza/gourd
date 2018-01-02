@@ -19,6 +19,8 @@ import { Link } from 'react-router-dom';
 import ImageUploader from '../components/ImageUploader';
 import RecipeCategoryEditor from '../components/RecipeCategoryEditor';
 import RecipeEditorBasicInfo from '../components/RecipeEditorBasicInfo';
+import RecipeEditorIngredientItem from '../components/RecipeEditorIngredientItem';
+import RecipeEditorInstructionItem from '../components/RecipeEditorInstructionItem';
 
 class EditorPage extends Component {
   constructor(props) {
@@ -27,6 +29,15 @@ class EditorPage extends Component {
       slug: props.match.params.recipe_id
     };
     this.editTopLevelItem = this.editTopLevelItem.bind(this);
+    this.editIngredient = this.editIngredient.bind(this);
+    this.addIngredient = this.addIngredient.bind(this);
+    this.deleteIngredient = this.deleteIngredient.bind(this);
+    this.editInstruction = this.editInstruction.bind(this);
+    this.addInstruction = this.addInstruction.bind(this);
+    this.deleteInstruction = this.deleteInstruction.bind(this);
+    this.getCumulativeInstructionNum = this.getCumulativeInstructionNum.bind(
+      this
+    );
   }
   handleContextRef = contextRef => this.setState({ contextRef });
   componentWillReceiveProps(nextProps) {
@@ -166,187 +177,30 @@ class EditorPage extends Component {
                     </Button.Group>
                     <h2>Instructions</h2>
                     {section.instructions.map((instruction, instructionNum) => (
-                      <Grid
-                        padded={false}
+                      <RecipeEditorInstructionItem
                         key={`section-${sectionNum}-instruction-${instructionNum}`}
-                      >
-                        <Grid.Column width={2} className="shortGridColumn">
-                          <Label horizontal>
-                            {this.getCumulativeInstructionNum(
-                              sectionNum,
-                              instructionNum
-                            )}
-                          </Label>
-                        </Grid.Column>
-                        <Grid.Column width={8} className="shortGridColumn">
-                          <Input
-                            fluid
-                            type="text"
-                            value={instruction.name}
-                            onChange={this.editInstruction.bind(
-                              this,
-                              sectionNum,
-                              instructionNum
-                            )}
-                          />
-                        </Grid.Column>
-                        <Grid.Column className="shortGridColumn">
-                          <Button.Group>
-                            <Button
-                              icon="arrow up"
-                              onClick={this.addInstruction.bind(
-                                this,
-                                sectionNum,
-                                instructionNum
-                              )}
-                              content="New"
-                            />
-                            <Button
-                              icon="arrow down"
-                              onClick={this.addInstruction.bind(
-                                this,
-                                sectionNum,
-                                instructionNum + 1
-                              )}
-                              content="New"
-                            />
-                            <Button
-                              icon="trash"
-                              onClick={this.deleteInstruction.bind(
-                                this,
-                                sectionNum,
-                                instructionNum
-                              )}
-                            />
-                          </Button.Group>
-                        </Grid.Column>
-                      </Grid>
+                        sectionNum={sectionNum}
+                        instructionNum={instructionNum}
+                        instruction={instruction}
+                        editInstruction={this.editInstruction}
+                        addInstruction={this.addInstruction}
+                        deleteInstruction={this.deleteInstruction}
+                        getCumulativeInstructionNum={
+                          this.getCumulativeInstructionNum
+                        }
+                      />
                     ))}
                     <h2>Ingredients</h2>
                     {section.ingredients.map((ingredient, ingredientNum) => (
-                      <Segment
+                      <RecipeEditorIngredientItem
                         key={`section-${sectionNum}-ingredient-${ingredientNum}`}
-                      >
-                        <Label as="a" color="purple" ribbon>
-                          {ingredient.item.name}
-                        </Label>
-                        <Form>
-                          <Form.Group>
-                            <Form.Field width={8}>
-                              <label>Name</label>
-                              <input
-                                type="text"
-                                value={ingredient.item.name}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'item'
-                                )}
-                              />
-                            </Form.Field>
-                            <Form.Field width={8}>
-                              <label>Grams</label>
-                              <Input
-                                label={{ basic: true, content: 'g' }}
-                                labelPosition="right"
-                                type="number"
-                                value={ingredient.grams}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'grams'
-                                )}
-                              />
-                            </Form.Field>
-                          </Form.Group>
-                          <Form.Group>
-                            <Form.Field width={8}>
-                              <label>Amount</label>
-                              <input
-                                type="number"
-                                value={ingredient.amount}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'amount'
-                                )}
-                              />
-                            </Form.Field>
-                            <Form.Field width={8}>
-                              <label>Amount Unit</label>
-                              <input
-                                type="text"
-                                value={ingredient.amount_unit}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'amount_unit'
-                                )}
-                              />
-                            </Form.Field>
-                          </Form.Group>
-                          <Form.Group>
-                            <Form.Field width={8}>
-                              <label>Modifier</label>
-                              <input
-                                type="text"
-                                value={ingredient.modifier}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'modifier'
-                                )}
-                              />
-                            </Form.Field>
-                            <Form.Field width={8}>
-                              <label>Substitute</label>
-                              <input
-                                type="text"
-                                value={ingredient.substitute}
-                                onChange={this.editIngredient.bind(
-                                  this,
-                                  sectionNum,
-                                  ingredientNum,
-                                  'substitute'
-                                )}
-                              />
-                            </Form.Field>
-                          </Form.Group>
-                          <Button.Group>
-                            <Button
-                              icon="arrow up"
-                              onClick={this.addIngredient.bind(
-                                this,
-                                sectionNum,
-                                ingredientNum
-                              )}
-                              content="New"
-                            />
-                            <Button
-                              icon="arrow down"
-                              onClick={this.addIngredient.bind(
-                                this,
-                                sectionNum,
-                                ingredientNum + 1
-                              )}
-                              content="New"
-                            />
-                            <Button
-                              icon="trash"
-                              onClick={this.deleteIngredient.bind(
-                                this,
-                                sectionNum,
-                                ingredientNum
-                              )}
-                            />
-                          </Button.Group>
-                        </Form>
-                      </Segment>
+                        sectionNum={sectionNum}
+                        ingredientNum={ingredientNum}
+                        ingredient={ingredient}
+                        editIngredient={this.editIngredient}
+                        addIngredient={this.addIngredient}
+                        deleteIngredient={this.deleteIngredient}
+                      />
                     ))}
                   </Segment>
                 );
