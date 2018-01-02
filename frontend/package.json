@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "husky": "^0.14.3",
+    "immutability-helper": "^2.6.2",
     "lint-staged": "^6.0.0",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",

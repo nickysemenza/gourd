@@ -9,6 +9,7 @@ import {
   DELETE_INSTRUCTION,
   ADD_INSTRUCTION,
   EDIT_INSTRUCTION,
+  MOVE_INSTRUCTION,
   DELETE_INGREDIENT,
   ADD_INGREDIENT,
   EDIT_INGREDIENT,
@@ -19,6 +20,7 @@ import {
   ADD_CATEGORY_TO_RECIPE
 } from '../actions/recipe';
 
+import update from 'immutability-helper';
 const INITIAL_STATE = {
   recipe_list: [],
   recipe_list_loading: false,
@@ -42,6 +44,12 @@ const BLANK_INGREDIENT = {
   substitute: '',
   modifier: '',
   optional: false
+};
+
+const BLANK_INSTRUCTION = { name: '' };
+const BLANK_SECTION = {
+  ingredients: [BLANK_INGREDIENT],
+  instructions: [BLANK_INSTRUCTION]
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -101,253 +109,139 @@ export default function(state = INITIAL_STATE, action) {
         }
       };
     case DELETE_SECTION:
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
-          [action.slug]: {
-            ...state.recipe_detail[action.slug],
-            sections: [
-              ...state.recipe_detail[action.slug].sections.slice(
-                0,
-                action.index
-              ),
-              ...state.recipe_detail[action.slug].sections.slice(
-                action.index + 1
-              )
-            ]
-          }
+          [action.slug]: { sections: { $splice: [[action.index, 1]] } }
         }
-      };
+      });
     case ADD_SECTION:
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...state.recipe_detail[action.slug],
-            sections: [
-              ...state.recipe_detail[action.slug].sections.slice(
-                0,
-                action.index
-              ),
-              { ingredients: [BLANK_INGREDIENT], instructions: [{ name: '' }] },
-              ...state.recipe_detail[action.slug].sections.slice(action.index)
-            ]
+            sections: { $splice: [[action.index, 0, BLANK_SECTION]] }
           }
         }
-      };
+      });
     case DELETE_INSTRUCTION:
-      r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                instructions: [
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    0,
-                    action.instructionNum
-                  ),
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    action.instructionNum + 1
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                instructions: { $splice: [[action.instructionNum, 1]] }
+              }
+            }
           }
         }
-      };
+      });
     case ADD_INSTRUCTION:
-      r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                instructions: [
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    0,
-                    action.instructionNum
-                  ),
-                  { name: '' },
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    action.instructionNum
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                instructions: {
+                  $splice: [[action.instructionNum, 0, BLANK_INSTRUCTION]]
+                }
+              }
+            }
           }
         }
-      };
+      });
     case EDIT_INSTRUCTION:
-      r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                instructions: [
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    0,
-                    action.instructionNum
-                  ),
-                  {
-                    ...r.sections[action.sectionNum].instructions[
-                      action.instructionNum
-                    ],
-                    name: action.value
-                  },
-                  ...r.sections[action.sectionNum].instructions.slice(
-                    action.instructionNum + 1
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                instructions: {
+                  [action.instructionNum]: { name: { $set: action.value } }
+                }
+              }
+            }
           }
         }
-      };
+      });
+    case MOVE_INSTRUCTION:
+      //TODO
+      return state;
     case DELETE_INGREDIENT:
-      r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                ingredients: [
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    0,
-                    action.ingredientNum
-                  ),
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    action.ingredientNum + 1
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                ingredients: { $splice: [[action.ingredientNum, 1]] }
+              }
+            }
           }
         }
-      };
+      });
     case ADD_INGREDIENT:
       r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                ingredients: [
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    0,
-                    action.ingredientNum
-                  ),
-                  BLANK_INGREDIENT,
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    action.ingredientNum
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                ingredients: {
+                  $splice: [[action.ingredientNum, 0, BLANK_INGREDIENT]]
+                }
+              }
+            }
           }
         }
-      };
+      });
     case EDIT_INGREDIENT:
+      //TODO: cleanup
       r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      let thisSectionIngredient = {
+        ...r.sections[action.sectionNum].ingredients[action.ingredientNum],
+        [action.field]:
+          action.field === 'item'
+            ? {
+                ...r.sections[action.sectionNum].ingredients[
+                  action.ingredientNum
+                ].item,
+                name: action.value
+              }
+            : action.value
+      };
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            sections: [
-              ...r.sections.slice(0, action.sectionNum),
-              {
-                ...r.sections[action.sectionNum],
-                ingredients: [
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    0,
-                    action.ingredientNum
-                  ),
-                  {
-                    ...r.sections[action.sectionNum].ingredients[
-                      action.ingredientNum
-                    ],
-                    [action.field]:
-                      action.field === 'item'
-                        ? {
-                            ...r.sections[action.sectionNum].ingredients[
-                              action.ingredientNum
-                            ].item,
-                            name: action.value
-                          }
-                        : action.value
-                  },
-                  ...r.sections[action.sectionNum].ingredients.slice(
-                    action.ingredientNum + 1
-                  )
-                ]
-              },
-              ...r.sections.slice(action.sectionNum + 1)
-            ]
+            sections: {
+              [action.sectionNum]: {
+                ingredients: {
+                  [action.ingredientNum]: { $set: thisSectionIngredient }
+                }
+              }
+            }
           }
         }
-      };
+      });
     case REMOVE_CATEGORY_FROM_RECIPE:
-      r = state.recipe_detail[action.slug];
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            categories: r.categories.filter(x => x.id !== action.categoryId)
+            categories: {
+              $set: state.recipe_detail[action.slug].categories.filter(
+                x => x.id !== action.categoryId
+              )
+            }
           }
         }
-      };
+      });
     case ADD_CATEGORY_TO_RECIPE:
-      r = state.recipe_detail[action.slug];
-      let categoryToAdd = state.category_list.filter(
-        x => x.id === action.categoryId
-      );
-      return {
-        ...state,
+      return update(state, {
         recipe_detail: {
-          ...state.recipe_detail,
           [action.slug]: {
-            ...r,
-            categories: [...r.categories, ...categoryToAdd]
+            categories: {
+              $push: state.category_list.filter(x => x.id === action.categoryId)
+            }
           }
         }
-      };
+      });
     default:
       return state;
   }

@@ -5,10 +5,8 @@ import * as RecipeActionCreators from '../actions/recipe';
 import { connect } from 'react-redux';
 import {
   Grid,
-  Form,
   Segment,
   Button,
-  Input,
   Sticky,
   Label,
   Header,
@@ -35,6 +33,7 @@ class EditorPage extends Component {
     this.editInstruction = this.editInstruction.bind(this);
     this.addInstruction = this.addInstruction.bind(this);
     this.deleteInstruction = this.deleteInstruction.bind(this);
+    this.moveInstruction = this.moveInstruction.bind(this);
     this.getCumulativeInstructionNum = this.getCumulativeInstructionNum.bind(
       this
     );
@@ -79,6 +78,14 @@ class EditorPage extends Component {
       sectionNum,
       instructionNum,
       e.target.value
+    );
+  }
+  moveInstruction(sectionNum, instructionNum, hoverIndex) {
+    this.props.moveInstruction(
+      this.state.slug,
+      sectionNum,
+      instructionNum,
+      hoverIndex
     );
   }
   deleteIngredient(sectionNum, ingredientNum) {
@@ -176,20 +183,23 @@ class EditorPage extends Component {
                       />
                     </Button.Group>
                     <h2>Instructions</h2>
-                    {section.instructions.map((instruction, instructionNum) => (
-                      <RecipeEditorInstructionItem
-                        key={`section-${sectionNum}-instruction-${instructionNum}`}
-                        sectionNum={sectionNum}
-                        instructionNum={instructionNum}
-                        instruction={instruction}
-                        editInstruction={this.editInstruction}
-                        addInstruction={this.addInstruction}
-                        deleteInstruction={this.deleteInstruction}
-                        getCumulativeInstructionNum={
-                          this.getCumulativeInstructionNum
-                        }
-                      />
-                    ))}
+                    {section.instructions.map(
+                      (instruction, instructionIndex) => (
+                        <RecipeEditorInstructionItem
+                          key={`section-${sectionNum}-instruction-${instructionIndex}`}
+                          sectionNum={sectionNum}
+                          instructionIndex={instructionIndex}
+                          instruction={instruction}
+                          editInstruction={this.editInstruction}
+                          addInstruction={this.addInstruction}
+                          deleteInstruction={this.deleteInstruction}
+                          moveInstruction={this.moveInstruction}
+                          getCumulativeInstructionNum={
+                            this.getCumulativeInstructionNum
+                          }
+                        />
+                      )
+                    )}
                     <h2>Ingredients</h2>
                     {section.ingredients.map((ingredient, ingredientNum) => (
                       <RecipeEditorIngredientItem

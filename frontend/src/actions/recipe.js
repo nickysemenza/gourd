@@ -107,6 +107,21 @@ export function editInstruction(slug, sectionNum, instructionNum, value) {
     value
   };
 }
+export const MOVE_INSTRUCTION = 'MOVE_INSTRUCTION';
+export function moveInstruction(
+  slug,
+  sectionNum,
+  instructionIndex,
+  targetIndex
+) {
+  return {
+    type: MOVE_INSTRUCTION,
+    slug,
+    sectionNum,
+    instructionIndex,
+    targetIndex
+  };
+}
 export const DELETE_INGREDIENT = 'DELETE_INGREDIENT';
 export function deleteIngredient(slug, sectionNum, ingredientNum) {
   return {

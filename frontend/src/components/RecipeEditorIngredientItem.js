@@ -16,17 +16,17 @@ const RecipeEditorIngredientItem = ({
     <Button.Group>
       <Button
         icon="arrow up"
-        onClick={() => this.addIngredient(sectionNum, ingredientNum)}
+        onClick={() => addIngredient(sectionNum, ingredientNum)}
         content="New"
       />
       <Button
         icon="arrow down"
-        onClick={() => this.addIngredient(sectionNum, ingredientNum + 1)}
+        onClick={() => addIngredient(sectionNum, ingredientNum + 1)}
         content="New"
       />
       <Button
         icon="trash"
-        onClick={() => this.deleteIngredient(sectionNum, ingredientNum)}
+        onClick={() => deleteIngredient(sectionNum, ingredientNum)}
       />
     </Button.Group>
     <Form>
