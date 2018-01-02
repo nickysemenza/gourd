@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/nickysemenza/food/backend/app/utils"
@@ -28,7 +29,23 @@ func ErrorTest(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 func GetRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
-	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
+
+	err := e.DB.Where("slug = ?", slug).
+		Preload("Sections", func(db *gorm.DB) *gorm.DB {
+			return db.Order("sections.sort_order ASC")
+		}).
+		Preload("Sections.Instructions", func(db *gorm.DB) *gorm.DB {
+			return db.Order("section_instructions.sort_order ASC")
+		}).
+		Preload("Sections.Ingredients", func(db *gorm.DB) *gorm.DB {
+			return db.Order("section_ingredients.sort_order ASC")
+		}).
+		Preload("Sections.Ingredients.Item").
+		Preload("Notes").
+		Preload("Images").
+		Preload("Categories").
+		First(&recipe).Error
+	if err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 
@@ -183,7 +200,6 @@ func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error
 	respondSuccess(w, finishedImages)
 	return nil
 }
-
 func GetAllImages(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var images []model.Image
 	e.DB.Preload("Recipes").Find(&images)

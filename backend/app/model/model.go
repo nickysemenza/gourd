@@ -44,11 +44,13 @@ type Section struct {
 type SectionInstruction struct {
 	Model
 	Name      string `json:"name"`
+	SortOrder uint   `json:"sort_order"`
 	SectionID uint   `json:"section_id"`
 }
 type SectionIngredient struct {
 	Model
 	Item       Ingredient `json:"item"`
+	SortOrder  uint       `json:"sort_order"`
 	ItemID     uint       `json:"item_id"`
 	Grams      float32    `json:"grams"`
 	Amount     float32    `json:"amount"`
@@ -58,6 +60,21 @@ type SectionIngredient struct {
 	Optional   bool       `json:"optional"`
 	SectionID  uint       `json:"section_id"`
 }
+
+func (r *Recipe) reIndexSectionSortOrder() {
+	for x := range r.Sections {
+		r.Sections[x].SortOrder = uint(x)
+	}
+}
+func (s *Section) reIndexSectionContentsSortOrder() {
+	for x := range s.Ingredients {
+		s.Ingredients[x].SortOrder = uint(x)
+	}
+	for x := range s.Instructions {
+		s.Instructions[x].SortOrder = uint(x)
+	}
+}
+
 type Ingredient struct {
 	Model
 	Name string `json:"name"`
@@ -183,9 +200,10 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 				eachSectionInstruction.ID = 0
 			}
 		}
-		//update Ingredients and Instructions relations
 		db.Model(&eachSection).Association("Ingredients").Replace(eachSection.Ingredients)
 		db.Model(&eachSection).Association("Instructions").Replace(eachSection.Instructions)
+
+		eachSection.reIndexSectionContentsSortOrder()
 	}
 	if recursivelyStripIDs {
 		updatedRecipe.ID = 0
@@ -193,6 +211,8 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 	//update Categories and Sections relations
 	db.Model(&updatedRecipe).Association("Categories").Replace(updatedRecipe.Categories)
 	db.Model(&updatedRecipe).Association("Sections").Replace(updatedRecipe.Sections)
+
+	updatedRecipe.reIndexSectionSortOrder()
 
 	if err := db.Save(&updatedRecipe).Error; err != nil {
 		log.Println(err)
