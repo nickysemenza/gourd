@@ -5,7 +5,7 @@ import {
   VolumeMeasurement
 } from './RecipeIngredientMeasurement';
 const RecipeTable = ({ recipe, scale }) => {
-  let instructionNum = 1;
+  let instructionIndex = 1;
   let tableRows = recipe.sections.map((recipeSection, num) => {
     let ingredientList = [],
       weightList = [],
@@ -55,7 +55,7 @@ const RecipeTable = ({ recipe, scale }) => {
         <td>
           {recipeSection.instructions.map((i, n) => (
             <div key={n}>
-              <b>{`${instructionNum++}`}. </b> {i.name}
+              <b>{`${instructionIndex++}`}. </b> {i.name}
             </div>
           ))}
         </td>

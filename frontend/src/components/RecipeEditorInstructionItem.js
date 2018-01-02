@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Grid, Input, Label } from 'semantic-ui-react';
 
 const RecipeEditorInstructionItem = ({
-  sectionNum,
+  sectionIndex,
   instructionIndex,
   instruction,
   editInstruction,
@@ -14,7 +14,7 @@ const RecipeEditorInstructionItem = ({
   <Grid padded={false}>
     <Grid.Column width={2} className="shortGridColumn">
       <Label horizontal>
-        {getCumulativeInstructionNum(sectionNum, instructionIndex)}
+        {getCumulativeInstructionNum(sectionIndex, instructionIndex)}
       </Label>
     </Grid.Column>
     <Grid.Column width={8} className="shortGridColumn">
@@ -22,35 +22,39 @@ const RecipeEditorInstructionItem = ({
         fluid
         type="text"
         value={instruction.name}
-        onChange={e => editInstruction(sectionNum, instructionIndex, e)}
+        onChange={e => editInstruction(sectionIndex, instructionIndex, e)}
       />
     </Grid.Column>
     <Grid.Column className="shortGridColumn">
       <Button.Group>
         <Button
           icon="arrow up"
-          onClick={() => addInstruction(sectionNum, instructionIndex)}
+          onClick={() => addInstruction(sectionIndex, instructionIndex)}
           content="New"
         />
         <Button
           icon="arrow down"
-          onClick={() => addInstruction(sectionNum, instructionIndex + 1)}
+          onClick={() => addInstruction(sectionIndex, instructionIndex + 1)}
           content="New"
         />
         <Button
           icon="trash"
-          onClick={() => deleteInstruction(sectionNum, instructionIndex)}
+          onClick={() => deleteInstruction(sectionIndex, instructionIndex)}
         />
         <Button
           icon="arrow up"
           onClick={() =>
-            moveInstruction(sectionNum, instructionIndex, instructionIndex)
+            moveInstruction(sectionIndex, instructionIndex, instructionIndex)
           }
         />
         <Button
           icon="arrow down"
           onClick={() =>
-            moveInstruction(sectionNum, instructionIndex, instructionIndex + 11)
+            moveInstruction(
+              sectionIndex,
+              instructionIndex,
+              instructionIndex + 11
+            )
           }
         />
       </Button.Group>

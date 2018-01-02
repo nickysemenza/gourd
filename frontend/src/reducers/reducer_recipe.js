@@ -127,8 +127,8 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
-                instructions: { $splice: [[action.instructionNum, 1]] }
+              [action.sectionIndex]: {
+                instructions: { $splice: [[action.instructionIndex, 1]] }
               }
             }
           }
@@ -139,9 +139,9 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
+              [action.sectionIndex]: {
                 instructions: {
-                  $splice: [[action.instructionNum, 0, BLANK_INSTRUCTION]]
+                  $splice: [[action.instructionIndex, 0, BLANK_INSTRUCTION]]
                 }
               }
             }
@@ -153,9 +153,9 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
+              [action.sectionIndex]: {
                 instructions: {
-                  [action.instructionNum]: { name: { $set: action.value } }
+                  [action.instructionIndex]: { name: { $set: action.value } }
                 }
               }
             }
@@ -163,15 +163,32 @@ export default function(state = INITIAL_STATE, action) {
         }
       });
     case MOVE_INSTRUCTION:
-      //TODO
-      return state;
+      let movingInstruction =
+        state.recipe_detail[action.slug].sections[action.sectionIndex]
+          .instructions[action.instructionIndex];
+      return update(state, {
+        recipe_detail: {
+          [action.slug]: {
+            sections: {
+              [action.sectionIndex]: {
+                instructions: {
+                  $splice: [
+                    [action.instructionIndex, 1],
+                    [action.targetIndex, 0, movingInstruction]
+                  ]
+                }
+              }
+            }
+          }
+        }
+      });
     case DELETE_INGREDIENT:
       return update(state, {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
-                ingredients: { $splice: [[action.ingredientNum, 1]] }
+              [action.sectionIndex]: {
+                ingredients: { $splice: [[action.ingredientIndex, 1]] }
               }
             }
           }
@@ -183,9 +200,9 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
+              [action.sectionIndex]: {
                 ingredients: {
-                  $splice: [[action.ingredientNum, 0, BLANK_INGREDIENT]]
+                  $splice: [[action.ingredientIndex, 0, BLANK_INGREDIENT]]
                 }
               }
             }
@@ -196,12 +213,12 @@ export default function(state = INITIAL_STATE, action) {
       //TODO: cleanup
       r = state.recipe_detail[action.slug];
       let thisSectionIngredient = {
-        ...r.sections[action.sectionNum].ingredients[action.ingredientNum],
+        ...r.sections[action.sectionIndex].ingredients[action.ingredientIndex],
         [action.field]:
           action.field === 'item'
             ? {
-                ...r.sections[action.sectionNum].ingredients[
-                  action.ingredientNum
+                ...r.sections[action.sectionIndex].ingredients[
+                  action.ingredientIndex
                 ].item,
                 name: action.value
               }
@@ -211,9 +228,9 @@ export default function(state = INITIAL_STATE, action) {
         recipe_detail: {
           [action.slug]: {
             sections: {
-              [action.sectionNum]: {
+              [action.sectionIndex]: {
                 ingredients: {
-                  [action.ingredientNum]: { $set: thisSectionIngredient }
+                  [action.ingredientIndex]: { $set: thisSectionIngredient }
                 }
               }
             }

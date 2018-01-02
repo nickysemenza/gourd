@@ -80,73 +80,79 @@ export function addSection(slug, index) {
   };
 }
 export const DELETE_INSTRUCTION = 'DELETE_INSTRUCTION';
-export function deleteInstruction(slug, sectionNum, instructionNum) {
+export function deleteInstruction(slug, sectionIndex, instructionIndex) {
   return {
     type: DELETE_INSTRUCTION,
     slug,
-    sectionNum,
-    instructionNum
+    sectionIndex,
+    instructionIndex
   };
 }
 export const ADD_INSTRUCTION = 'ADD_INSTRUCTION';
-export function addInstruction(slug, sectionNum, instructionNum) {
+export function addInstruction(slug, sectionIndex, instructionIndex) {
   return {
     type: ADD_INSTRUCTION,
     slug,
-    sectionNum,
-    instructionNum
+    sectionIndex,
+    instructionIndex
   };
 }
 export const EDIT_INSTRUCTION = 'EDIT_INSTRUCTION';
-export function editInstruction(slug, sectionNum, instructionNum, value) {
+export function editInstruction(slug, sectionIndex, instructionIndex, value) {
   return {
     type: EDIT_INSTRUCTION,
     slug,
-    sectionNum,
-    instructionNum,
+    sectionIndex,
+    instructionIndex,
     value
   };
 }
 export const MOVE_INSTRUCTION = 'MOVE_INSTRUCTION';
 export function moveInstruction(
   slug,
-  sectionNum,
+  sectionIndex,
   instructionIndex,
   targetIndex
 ) {
   return {
     type: MOVE_INSTRUCTION,
     slug,
-    sectionNum,
+    sectionIndex,
     instructionIndex,
     targetIndex
   };
 }
 export const DELETE_INGREDIENT = 'DELETE_INGREDIENT';
-export function deleteIngredient(slug, sectionNum, ingredientNum) {
+export function deleteIngredient(slug, sectionIndex, ingredientIndex) {
   return {
     type: DELETE_INGREDIENT,
     slug,
-    sectionNum,
-    ingredientNum
+    sectionIndex,
+    ingredientIndex
   };
 }
 export const ADD_INGREDIENT = 'ADD_INGREDIENT';
-export function addIngredient(slug, sectionNum, ingredientNum) {
+export function addIngredient(slug, sectionIndex, ingredientIndex) {
   return {
     type: ADD_INGREDIENT,
     slug,
-    sectionNum,
-    ingredientNum
+    sectionIndex,
+    ingredientIndex
   };
 }
 export const EDIT_INGREDIENT = 'EDIT_INGREDIENT';
-export function editIngredient(slug, sectionNum, ingredientNum, field, value) {
+export function editIngredient(
+  slug,
+  sectionIndex,
+  ingredientIndex,
+  field,
+  value
+) {
   return {
     type: EDIT_INGREDIENT,
     slug,
-    sectionNum,
-    ingredientNum,
+    sectionIndex,
+    ingredientIndex,
     field,
     value
   };

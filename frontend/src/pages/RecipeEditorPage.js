@@ -66,35 +66,39 @@ class EditorPage extends Component {
   addSection(index) {
     this.props.addSection(this.state.slug, index);
   }
-  deleteInstruction(sectionNum, instructionNum) {
-    this.props.deleteInstruction(this.state.slug, sectionNum, instructionNum);
+  deleteInstruction(sectionIndex, instructionIndex) {
+    this.props.deleteInstruction(
+      this.state.slug,
+      sectionIndex,
+      instructionIndex
+    );
   }
-  addInstruction(sectionNum, instructionNum) {
-    this.props.addInstruction(this.state.slug, sectionNum, instructionNum);
+  addInstruction(sectionIndex, instructionIndex) {
+    this.props.addInstruction(this.state.slug, sectionIndex, instructionIndex);
   }
-  editInstruction(sectionNum, instructionNum, e) {
+  editInstruction(sectionIndex, instructionIndex, e) {
     this.props.editInstruction(
       this.state.slug,
-      sectionNum,
-      instructionNum,
+      sectionIndex,
+      instructionIndex,
       e.target.value
     );
   }
-  moveInstruction(sectionNum, instructionNum, hoverIndex) {
+  moveInstruction(sectionIndex, instructionIndex, hoverIndex) {
     this.props.moveInstruction(
       this.state.slug,
-      sectionNum,
-      instructionNum,
+      sectionIndex,
+      instructionIndex,
       hoverIndex
     );
   }
-  deleteIngredient(sectionNum, ingredientNum) {
-    this.props.deleteIngredient(this.state.slug, sectionNum, ingredientNum);
+  deleteIngredient(sectionIndex, ingredientIndex) {
+    this.props.deleteIngredient(this.state.slug, sectionIndex, ingredientIndex);
   }
-  addIngredient(sectionNum, ingredientNum) {
-    this.props.addIngredient(this.state.slug, sectionNum, ingredientNum);
+  addIngredient(sectionIndex, ingredientIndex) {
+    this.props.addIngredient(this.state.slug, sectionIndex, ingredientIndex);
   }
-  editIngredient(sectionNum, ingredientNum, field, e) {
+  editIngredient(sectionIndex, ingredientIndex, field, e) {
     let { value } = e.target;
     if (field === 'grams' || field === 'amount') {
       value = parseFloat(value);
@@ -102,20 +106,20 @@ class EditorPage extends Component {
     }
     this.props.editIngredient(
       this.state.slug,
-      sectionNum,
-      ingredientNum,
+      sectionIndex,
+      ingredientIndex,
       field,
       value
     );
   }
-  getCumulativeInstructionNum(sectionNum, instructionNum) {
+  getCumulativeInstructionNum(sectionIndex, instructionIndex) {
     let r;
     r = this.props.recipe_detail[this.state.slug];
     if (!r) r = [];
     let num = 1;
-    for (let x = 0; x < sectionNum; x++)
+    for (let x = 0; x < sectionIndex; x++)
       num += r.sections[x].instructions.length;
-    return num + instructionNum;
+    return num + instructionIndex;
   }
   saveRecipe() {
     this.props.saveRecipe(this.state.slug);
@@ -160,34 +164,34 @@ class EditorPage extends Component {
           <Grid.Column>
             <div ref={this.handleContextRef}>
               {/*EDITOR*/}
-              {recipe.sections.map((section, sectionNum) => {
+              {recipe.sections.map((section, sectionIndex) => {
                 return (
-                  <Segment key={sectionNum}>
+                  <Segment key={sectionIndex}>
                     <Label as="a" color="red" ribbon>
-                      {String.fromCharCode(sectionNum + 65)}
+                      {String.fromCharCode(sectionIndex + 65)}
                     </Label>
                     <Button.Group>
                       <Button
                         icon="arrow up"
-                        onClick={this.addSection.bind(this, sectionNum)}
+                        onClick={this.addSection.bind(this, sectionIndex)}
                         content="New Section"
                       />
                       <Button
                         icon="arrow down"
-                        onClick={this.addSection.bind(this, sectionNum + 1)}
+                        onClick={this.addSection.bind(this, sectionIndex + 1)}
                         content="New Section"
                       />
                       <Button
                         icon="trash"
-                        onClick={this.deleteSection.bind(this, sectionNum)}
+                        onClick={this.deleteSection.bind(this, sectionIndex)}
                       />
                     </Button.Group>
                     <h2>Instructions</h2>
                     {section.instructions.map(
                       (instruction, instructionIndex) => (
                         <RecipeEditorInstructionItem
-                          key={`section-${sectionNum}-instruction-${instructionIndex}`}
-                          sectionNum={sectionNum}
+                          key={`section-${sectionIndex}-instruction-${instructionIndex}`}
+                          sectionIndex={sectionIndex}
                           instructionIndex={instructionIndex}
                           instruction={instruction}
                           editInstruction={this.editInstruction}
@@ -201,11 +205,11 @@ class EditorPage extends Component {
                       )
                     )}
                     <h2>Ingredients</h2>
-                    {section.ingredients.map((ingredient, ingredientNum) => (
+                    {section.ingredients.map((ingredient, ingredientIndex) => (
                       <RecipeEditorIngredientItem
-                        key={`section-${sectionNum}-ingredient-${ingredientNum}`}
-                        sectionNum={sectionNum}
-                        ingredientNum={ingredientNum}
+                        key={`section-${sectionIndex}-ingredient-${ingredientIndex}`}
+                        sectionIndex={sectionIndex}
+                        ingredientIndex={ingredientIndex}
                         ingredient={ingredient}
                         editIngredient={this.editIngredient}
                         addIngredient={this.addIngredient}

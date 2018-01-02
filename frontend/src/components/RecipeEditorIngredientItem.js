@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Form, Input, Label, Segment } from 'semantic-ui-react';
 
 const RecipeEditorIngredientItem = ({
-  sectionNum,
-  ingredientNum,
+  sectionIndex,
+  ingredientIndex,
   ingredient,
   editIngredient,
   addIngredient,
@@ -16,17 +16,17 @@ const RecipeEditorIngredientItem = ({
     <Button.Group>
       <Button
         icon="arrow up"
-        onClick={() => addIngredient(sectionNum, ingredientNum)}
+        onClick={() => addIngredient(sectionIndex, ingredientIndex)}
         content="New"
       />
       <Button
         icon="arrow down"
-        onClick={() => addIngredient(sectionNum, ingredientNum + 1)}
+        onClick={() => addIngredient(sectionIndex, ingredientIndex + 1)}
         content="New"
       />
       <Button
         icon="trash"
-        onClick={() => deleteIngredient(sectionNum, ingredientNum)}
+        onClick={() => deleteIngredient(sectionIndex, ingredientIndex)}
       />
     </Button.Group>
     <Form>
@@ -36,7 +36,9 @@ const RecipeEditorIngredientItem = ({
             type="text"
             placeholder="Name"
             value={ingredient.item.name}
-            onChange={e => editIngredient(sectionNum, ingredientNum, 'item', e)}
+            onChange={e =>
+              editIngredient(sectionIndex, ingredientIndex, 'item', e)
+            }
           />
         </Form.Field>
         <Form.Field width={8}>
@@ -47,7 +49,7 @@ const RecipeEditorIngredientItem = ({
             type="number"
             value={ingredient.grams}
             onChange={e =>
-              editIngredient(sectionNum, ingredientNum, 'grams', e)
+              editIngredient(sectionIndex, ingredientIndex, 'grams', e)
             }
           />
         </Form.Field>
@@ -59,7 +61,7 @@ const RecipeEditorIngredientItem = ({
             placeholder="Amount"
             value={ingredient.amount}
             onChange={e =>
-              editIngredient(sectionNum, ingredientNum, 'amount', e)
+              editIngredient(sectionIndex, ingredientIndex, 'amount', e)
             }
           />
         </Form.Field>
@@ -69,7 +71,7 @@ const RecipeEditorIngredientItem = ({
             placeholder="Amount Unit"
             value={ingredient.amount_unit}
             onChange={e =>
-              editIngredient(sectionNum, ingredientNum, 'amount_unit', e)
+              editIngredient(sectionIndex, ingredientIndex, 'amount_unit', e)
             }
           />
         </Form.Field>
@@ -81,7 +83,7 @@ const RecipeEditorIngredientItem = ({
             placeholder="Modifier"
             value={ingredient.modifier}
             onChange={e =>
-              editIngredient(sectionNum, ingredientNum, 'modifier', e)
+              editIngredient(sectionIndex, ingredientIndex, 'modifier', e)
             }
           />
         </Form.Field>
@@ -91,7 +93,7 @@ const RecipeEditorIngredientItem = ({
             placeholder="Substitute"
             value={ingredient.substitute}
             onChange={e =>
-              editIngredient(sectionNum, ingredientNum, 'substitute', e)
+              editIngredient(sectionIndex, ingredientIndex, 'substitute', e)
             }
           />
         </Form.Field>
