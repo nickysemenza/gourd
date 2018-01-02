@@ -55,7 +55,7 @@ func (a *App) buildRoutes(env *config.Env) {
 	//add them all
 	a.R = mux.NewRouter()
 	for _, route := range routes {
-		a.R.Handle(route.Pattern, h.Handler{env, route.HandlerFunc}).Methods(route.Method)
+		a.R.Handle(route.Pattern, h.Handler{Env: env, H: route.HandlerFunc}).Methods(route.Method)
 	}
 	a.R.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
 
