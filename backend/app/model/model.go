@@ -131,10 +131,10 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 }
 
 //add the recipe to a Meal, with specified multiplier
-func (recipe *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
+func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
 	recipemeal := RecipeMeal{}
 	recipemeal.Multiplier = multiplier
-	recipemeal.RecipeID = recipe.ID
+	recipemeal.RecipeID = r.ID
 	recipemeal.MealID = meal.ID
 	db.Create(&recipemeal)
 }
@@ -157,10 +157,10 @@ func GetRecipeIDFromSlug(db *gorm.DB, slug string) (ID uint, err error) {
 	return recipe.ID, nil
 }
 
-func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
+func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
-	for x := range updatedRecipe.Sections {
-		eachSection := &updatedRecipe.Sections[x]
+	for x := range r.Sections {
+		eachSection := &r.Sections[x]
 		if recursivelyStripIDs {
 			eachSection.ID = 0
 		}
@@ -206,15 +206,15 @@ func (updatedRecipe Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool
 		eachSection.reIndexSectionContentsSortOrder()
 	}
 	if recursivelyStripIDs {
-		updatedRecipe.ID = 0
+		r.ID = 0
 	}
 	//update Categories and Sections relations
-	db.Model(&updatedRecipe).Association("Categories").Replace(updatedRecipe.Categories)
-	db.Model(&updatedRecipe).Association("Sections").Replace(updatedRecipe.Sections)
+	db.Model(&r).Association("Categories").Replace(r.Categories)
+	db.Model(&r).Association("Sections").Replace(r.Sections)
 
-	updatedRecipe.reIndexSectionSortOrder()
+	r.reIndexSectionSortOrder()
 
-	if err := db.Save(&updatedRecipe).Error; err != nil {
+	if err := db.Save(&r).Error; err != nil {
 		log.Println(err)
 	}
 }
