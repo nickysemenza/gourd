@@ -61,11 +61,30 @@ func (se StatusError) Status() int {
 type Handler struct {
 	*config.Env
 	H func(e *config.Env, w http.ResponseWriter, r *http.Request) error
+	P bool
 }
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s %s", r.Method, r.RequestURI)
+
+	if h.P == true {
+		authorized := false
+		tokFromHeader := r.Header.Get("X-Jwt")
+		log.Printf("got token: %s", tokFromHeader)
+		if tokFromHeader != "" {
+			u, _ := getUserFromToken(h.Env, tokFromHeader)
+			if u != nil && u.Admin == true {
+				authorized = true
+				h.Env.CurrentUser = u
+			}
+		}
+
+		if !authorized {
+			respondError(w, http.StatusUnauthorized, "not authorized")
+			return
+		}
+	}
 	err := h.H(h.Env, w, r)
 	if err != nil {
 		switch e := err.(type) {

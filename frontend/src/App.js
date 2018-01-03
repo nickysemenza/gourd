@@ -9,6 +9,7 @@ import ImageList from './pages/ImageList';
 import MealList from './pages/MealList';
 import Settings from './pages/Settings';
 import EditorPage from './pages/RecipeEditorPage';
+import Auth from './pages/Auth';
 import { Container } from 'semantic-ui-react';
 import Footer from './components/Footer';
 import ReduxToastr from 'react-redux-toastr';
@@ -33,6 +34,7 @@ const App = () => (
         <Switch>
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />
+          <Route path="/auth/:jwt" component={Auth} />
           <Route path="/images" component={ImageList} />
           <Route path="/meals" component={MealList} />
           <Route path="/settings" component={Settings} />

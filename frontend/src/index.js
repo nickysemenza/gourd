@@ -6,8 +6,14 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import configureStore from './store/configureStore';
 import { Provider } from 'react-redux';
+import { loginFromJWT } from './actions/users';
+import cookie from 'react-cookie';
 
 const store = configureStore();
+
+const token = cookie.load('token');
+if (token) store.dispatch(loginFromJWT(token)); //log us in from cookie
+
 ReactDOM.render(
   <Provider store={store}>
     <App />

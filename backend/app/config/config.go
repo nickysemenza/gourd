@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
+	"github.com/nickysemenza/food/backend/app/model"
 	"log"
 	"os"
 )
@@ -22,9 +23,10 @@ type DBConfig struct {
 }
 
 type Env struct {
-	DB   *gorm.DB
-	Port string
-	Host string
+	DB          *gorm.DB
+	Port        string
+	Host        string
+	CurrentUser *model.User
 	//Router **mux.Router
 }
 

@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"encoding/json"
+	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
@@ -15,6 +17,35 @@ type Model struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
+}
+
+type User struct {
+	Model
+	Email      string `json:"email" gorm:"unique"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	FacebookID string `json:"fb_id"`
+	Admin      bool   `json:"admin"`
+}
+
+func (u *User) GetJWTToken(db *gorm.DB) string {
+
+	mySigningKey := []byte("AllYourBase")
+
+	// Create the Claims
+	claims := &jwt.StandardClaims{
+		//ExpiresAt: 15000,
+		Issuer: "test",
+		Id:     fmt.Sprint(u.ID),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	ss, err := token.SignedString(mySigningKey)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return ss
 }
 
 type Recipe struct {
@@ -230,6 +261,7 @@ var ModelsInOrder = []interface{}{
 	&SectionIngredient{},
 	&SectionInstruction{},
 	&Category{},
+	&User{},
 }
 
 func DBMigrate(db *gorm.DB) *gorm.DB {

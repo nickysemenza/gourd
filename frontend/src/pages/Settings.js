@@ -61,14 +61,15 @@ class Settings extends Component {
             Add new Recipe
           </Button>
         </Form>
+        <Header dividing content="Me" />
+        <pre>{JSON.stringify(this.props.me, true, 2)}</pre>
       </div>
     );
   }
 }
 
 function mapStateToProps(state) {
-  let { meal_list } = state.recipe;
-  return { meal_list };
+  return { me: state.user.me };
 }
 
 const mapDispatchToProps = dispatch => {
