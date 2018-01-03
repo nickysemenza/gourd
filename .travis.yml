@@ -39,3 +39,18 @@ after_success:
 - cd frontend/
 - bash <(curl -s https://codecov.io/bash)
 - cd ..
+
+
+deploy:
+  # Deploy master to s3
+  on:
+    branch: master
+  provider: s3
+  # You can refer to environment variables from Travis repo settings!
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: recipehub-frontend
+  # Prevent Travis from deleting your built site so it can be uploaded.
+  skip_cleanup: true
+  local_dir: frontend/build
+  cache_control: "max-age=180"
