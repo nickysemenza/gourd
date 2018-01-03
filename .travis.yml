@@ -40,7 +40,7 @@ after_success:
 - bash <(curl -s https://codecov.io/bash)
 - cd ..
 
-
+before_deploy: "cd frontend"
 deploy:
   # Deploy master to s3
   on:
@@ -52,5 +52,5 @@ deploy:
   bucket: recipehub-frontend
   # Prevent Travis from deleting your built site so it can be uploaded.
   skip_cleanup: true
-  local_dir: frontend/build
+  local_dir: build
   cache_control: "max-age=180"
