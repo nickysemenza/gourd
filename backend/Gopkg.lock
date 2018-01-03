@@ -8,6 +8,18 @@
   version = "v1.12.53"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/corpix/uarand"
+  packages = ["."]
+  revision = "2b8494104d86337cdd41d0a49cbed8e4583c0ab4"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
+  version = "v3.1.0"
+
+[[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
   revision = "32e4c1e6bc4e7d0d8451aa6b75200d19e37a536a"
@@ -18,6 +30,12 @@
   packages = ["."]
   revision = "a0583e0143b1624142adab07e0e97fe106d99561"
   version = "v1.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/golang/protobuf"
+  packages = ["proto"]
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -36,6 +54,12 @@
   packages = ["."]
   revision = "7f08801859139f86dfafd1c296e2cba9a80d292e"
   version = "v1.6.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/icrowley/fake"
+  packages = ["."]
+  revision = "e64cc2cf92049a299f359734c6ea76073f2a8b2c"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -72,9 +96,27 @@
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context","context/ctxhttp"]
+  revision = "d866cfc389cec985d6fda2859936a575a55a3ab6"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = [".","facebook","internal"]
+  revision = "ee2bad97a97122079f2a3d0dce09330f085b36a0"
+
+[[projects]]
+  name = "google.golang.org/appengine"
+  packages = ["internal","internal/base","internal/datastore","internal/log","internal/remote_api","internal/urlfetch","urlfetch"]
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ad7c6d10feaeec3b8a8c25fa591dc15fa758ad3d76ff26cd292611bf1982903a"
+  inputs-digest = "3f6b8aad216c4307b27ebc63803e31304c7d079ea2885140ea55eacd72272d2e"
   solver-name = "gps-cdcl"
   solver-version = 1
