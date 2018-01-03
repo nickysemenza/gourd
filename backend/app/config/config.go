@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"github.com/nickysemenza/food/backend/app/model"
@@ -27,7 +28,7 @@ type Env struct {
 	Port        string
 	Host        string
 	CurrentUser *model.User
-	//Router **mux.Router
+	Router      **mux.Router
 }
 
 func getEnv(key, fallback string) string {
