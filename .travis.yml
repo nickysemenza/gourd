@@ -31,6 +31,7 @@ script:
 - cd ..
 - cd frontend/
 - npm test -- --coverage
+- npm run build
 - cd ..
 after_success:
 - cd backend/
