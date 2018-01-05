@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/pkg/errors"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -66,7 +66,10 @@ type Handler struct {
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("%s %s", r.Method, r.RequestURI)
+	log.WithFields(log.Fields{
+		"method": r.Method,
+		"URI":    r.RequestURI,
+	}).Info("http_request")
 
 	if h.P == true {
 		authorized := false

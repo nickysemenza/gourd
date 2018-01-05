@@ -7,7 +7,7 @@ import (
 	"github.com/nickysemenza/food/backend/app/config"
 	h "github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
