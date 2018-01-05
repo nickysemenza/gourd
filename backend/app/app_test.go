@@ -47,7 +47,7 @@ func TestApp_buildRoutes(t *testing.T) {
 		fields fields
 		args   args
 	}{
-	// TODO: Add test cases.
+		{name: "thing1", fields: fields{R: &mux.Router{}}, args: args{env: &config.Env{}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -55,30 +55,6 @@ func TestApp_buildRoutes(t *testing.T) {
 				R: tt.fields.R,
 			}
 			a.buildRoutes(tt.args.env)
-		})
-	}
-}
-
-func TestApp_RunServer(t *testing.T) {
-	type fields struct {
-		R *mux.Router
-	}
-	type args struct {
-		host string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := &App{
-				R: tt.fields.R,
-			}
-			a.RunServer(tt.args.host)
 		})
 	}
 }
