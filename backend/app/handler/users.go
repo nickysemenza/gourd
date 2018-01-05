@@ -29,12 +29,15 @@ var (
 	oauthStateString = "thisshouldberandom"
 )
 
+//GetMe gives the current User as a JSON response to GET /me
 func GetMe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	respondSuccess(w, e.CurrentUser)
 	return nil
 }
+
+//HandleFacebookLogin initiates the facebook auth process
 func HandleFacebookLogin(e *config.Env, w http.ResponseWriter, r *http.Request) error {
-	Url, err := url.Parse(oauthConf.Endpoint.AuthURL)
+	URL, err := url.Parse(oauthConf.Endpoint.AuthURL)
 	if err != nil {
 		log.Fatal("Parse: ", err)
 	}
@@ -44,12 +47,13 @@ func HandleFacebookLogin(e *config.Env, w http.ResponseWriter, r *http.Request) 
 	parameters.Add("redirect_uri", oauthConf.RedirectURL)
 	parameters.Add("response_type", "code")
 	parameters.Add("state", oauthStateString)
-	Url.RawQuery = parameters.Encode()
-	url := Url.String()
+	URL.RawQuery = parameters.Encode()
+	url := URL.String()
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	return nil
 }
 
+//HandleFacebookCallback is the callback for the facebook auth process
 func HandleFacebookCallback(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	state := r.FormValue("state")
 	if state != oauthStateString {
@@ -83,7 +87,7 @@ func HandleFacebookCallback(e *config.Env, w http.ResponseWriter, r *http.Reques
 		return err
 	}
 
-	var fbr FacebookUserData
+	var fbr facebookUserData
 	err = json.Unmarshal(response, &fbr)
 	if err != nil {
 		return err
@@ -96,11 +100,6 @@ func HandleFacebookCallback(e *config.Env, w http.ResponseWriter, r *http.Reques
 	tok := user.GetJWTToken(e.DB)
 
 	log.Printf("TOKEN for user %d: %s\n", user.ID, tok)
-	//respondSuccess(w, &AuthResponse{
-	//	User: *user,
-	//	JWT:  tok,
-	//	Err:  "",
-	//})
 
 	http.Redirect(w, r, os.Getenv("FRONTEND_URL")+"/auth/"+tok, http.StatusTemporaryRedirect)
 
@@ -108,18 +107,13 @@ func HandleFacebookCallback(e *config.Env, w http.ResponseWriter, r *http.Reques
 	return nil
 }
 
-type AuthResponse struct {
-	User model.User `json:"user"`
-	JWT  string     `json:"jwt"`
-	Err  string     `json:"error"`
-}
-type FacebookUserData struct {
+type facebookUserData struct {
 	FBID  string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
-func (d FacebookUserData) getUser(e *config.Env) *model.User {
+func (d facebookUserData) getUser(e *config.Env) *model.User {
 	u := model.User{}
 
 	if e.DB.Where("email = ?", d.Email).First(&u).RecordNotFound() {

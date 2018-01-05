@@ -12,6 +12,7 @@ import (
 	"os"
 )
 
+//Model is what all the models are based off of
 type Model struct {
 	ID        uint       `gorm:"primary_key" json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
@@ -19,6 +20,7 @@ type Model struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
+//User is the `user` table
 type User struct {
 	Model
 	Email      string `json:"email" gorm:"unique"`
@@ -28,6 +30,7 @@ type User struct {
 	Admin      bool   `json:"admin"`
 }
 
+//GetJWTToken returns a JWT token for a User
 func (u *User) GetJWTToken(db *gorm.DB) string {
 
 	mySigningKey := []byte("AllYourBase")
@@ -48,6 +51,7 @@ func (u *User) GetJWTToken(db *gorm.DB) string {
 	return ss
 }
 
+//Recipe is the main Recipe object. `recipes` in SQL
 type Recipe struct {
 	Model
 	Slug         string       `json:"slug" gorm:"unique"`
@@ -64,6 +68,8 @@ type Recipe struct {
 	Categories   []Category   `json:"categories" gorm:"many2many:recipe_categories;"`
 	RecipeMeal   []RecipeMeal `json:"recipe_meals"`
 }
+
+//Section is `sections`
 type Section struct {
 	Model
 	SortOrder    uint                 `json:"sort_order"`
@@ -72,12 +78,16 @@ type Section struct {
 	RecipeID     uint                 `json:"recipe_id"`
 	Minutes      uint                 `json:"minutes"`
 }
+
+//SectionInstruction is `section_instructions`
 type SectionInstruction struct {
 	Model
 	Name      string `json:"name"`
 	SortOrder uint   `json:"sort_order"`
 	SectionID uint   `json:"section_id"`
 }
+
+//SectionIngredient is `section_ingredients`
 type SectionIngredient struct {
 	Model
 	Item       Ingredient `json:"item"`
@@ -106,15 +116,20 @@ func (s *Section) reIndexSectionContentsSortOrder() {
 	}
 }
 
+//Ingredient is `ingredients`
 type Ingredient struct {
 	Model
 	Name string `json:"name"`
 }
+
+//RecipeNote is `recipe_note`
 type RecipeNote struct {
 	Model
 	Body     string `json:"body" sql:"type:text"`
 	RecipeID uint   `json:"recipe_id"`
 }
+
+//Image is `images`
 type Image struct {
 	Model
 	Path             string   `json:"path"`
@@ -123,11 +138,15 @@ type Image struct {
 	Recipes          []Recipe `json:"recipes" gorm:"many2many:recipe_images;"`
 	Md5Hash          string   `json:"md5"`
 }
+
+//Category is `categories`
 type Category struct {
 	Model
 	Name    string   `json:"name"`
 	Recipes []Recipe `json:"recipes" gorm:"many2many:recipe_categories;"`
 }
+
+//Meal is `meals`
 type Meal struct {
 	Model
 	Name        string       `json:"name"`
@@ -136,6 +155,8 @@ type Meal struct {
 	RecipeMeal  []RecipeMeal `json:"recipe_meals"`
 	Time        time.Time    `json:"time"`
 }
+
+//RecipeMeal is `recipe_meal`
 type RecipeMeal struct {
 	Recipe     Recipe `json:"recipe"`
 	RecipeID   uint
@@ -144,6 +165,9 @@ type RecipeMeal struct {
 	Multiplier uint `json:"multiplier" gorm:"default:1"`
 }
 
+//MarshalJSON is a helper to marshal an Image.
+//It returns s3 or local url depending on if the image exists in s3
+//useful for local dev with large images!
 func (i *Image) MarshalJSON() ([]byte, error) {
 	type Alias Image
 	var url string
@@ -161,7 +185,7 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 	})
 }
 
-//add the recipe to a Meal, with specified multiplier
+//AddToMeal adds the recipe to a Meal, with specified multiplier
 func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
 	recipemeal := RecipeMeal{}
 	recipemeal.Multiplier = multiplier
@@ -169,25 +193,25 @@ func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
 	recipemeal.MealID = meal.ID
 	db.Create(&recipemeal)
 }
+
+//FindOrCreateUsingName finds an ingredient by name, otherwise it creates it
 func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
 	db.FirstOrCreate(&ingredient, Ingredient{Name: ingredient.Name})
 }
+
+//GetFresh gets a fresh DB instance of an Ingredient
 func (ingredient *Ingredient) GetFresh(db *gorm.DB) {
 	db.First(&ingredient, ingredient.ID)
 }
 
+//AfterCreate is a hook on Ingredient's gorm saving
 func (ingredient *Ingredient) AfterCreate() (err error) {
 	log.Printf("[ingredient] created: %s, %d", ingredient.Name, ingredient.ID)
 	return
 }
-func GetRecipeIDFromSlug(db *gorm.DB, slug string) (ID uint, err error) {
-	recipe := Recipe{}
-	if err := db.Where("slug = ?", slug).First(&recipe).Error; err != nil {
-		return 0, err
-	}
-	return recipe.ID, nil
-}
 
+//CreateOrUpdate updates or creates a Recipe with its children.
+//	recursivelyStripIDs is useful for importing, when you want to ignore the primary keys of a json obj
 func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
 	//update Categories and Sections relations
@@ -250,7 +274,26 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	}
 }
 
-var ModelsInOrder = []interface{}{
+//GetFromSlug will populate a Recipe obj based on slug
+func (r *Recipe) GetFromSlug(db *gorm.DB, slug string) error {
+	return db.Where("slug = ?", slug).
+		Preload("Sections", func(db *gorm.DB) *gorm.DB {
+			return db.Order("sections.sort_order ASC")
+		}).
+		Preload("Sections.Instructions", func(db *gorm.DB) *gorm.DB {
+			return db.Order("section_instructions.sort_order ASC")
+		}).
+		Preload("Sections.Ingredients", func(db *gorm.DB) *gorm.DB {
+			return db.Order("section_ingredients.sort_order ASC")
+		}).
+		Preload("Sections.Ingredients.Item").
+		Preload("Notes").
+		Preload("Images").
+		Preload("Categories").
+		First(&r).Error
+}
+
+var modelsInOrder = []interface{}{
 	&Recipe{},
 	&Ingredient{},
 	&Image{},
@@ -264,9 +307,10 @@ var ModelsInOrder = []interface{}{
 	&User{},
 }
 
+//DBMigrate migrates the DB
 func DBMigrate(db *gorm.DB) *gorm.DB {
-	for y := range ModelsInOrder {
-		db.AutoMigrate(ModelsInOrder[y])
+	for y := range modelsInOrder {
+		db.AutoMigrate(modelsInOrder[y])
 	}
 	db.Model(&Section{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Model(&RecipeNote{}).AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
@@ -284,10 +328,12 @@ func DBMigrate(db *gorm.DB) *gorm.DB {
 	db.Table("recipe_meals").AddForeignKey("meal_id", "meals(id)", "RESTRICT", "RESTRICT")
 	return db
 }
+
+//DBReset resets the DB.
 func DBReset(db *gorm.DB) *gorm.DB {
 	db.Exec("SET foreign_key_checks = 0;")
-	for i := len(ModelsInOrder) - 1; i >= 0; i-- {
-		db.DropTable(ModelsInOrder[i])
+	for i := len(modelsInOrder) - 1; i >= 0; i-- {
+		db.DropTable(modelsInOrder[i])
 	}
 	db.Exec("SET foreign_key_checks = 1;")
 	return db

@@ -23,6 +23,7 @@ type Utils struct {
 	*config.Env
 }
 
+//Import imports a folder of recipes in json format
 func (u Utils) Import(path string) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -45,6 +46,7 @@ func (u Utils) Import(path string) {
 	log.Printf("Exported %d recipes from %s", len(files), path)
 }
 
+//Export exports a folder of recipes in json format
 func (u Utils) Export(path string) {
 	recipes := []model.Recipe{}
 	u.Env.DB.Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Find(&recipes)
@@ -67,6 +69,8 @@ func getAWSSession() (*session.Session, error) {
 	})
 }
 
+//AddFileToS3 puts a local file into s3 at a given path.
+//Files are public with WRT their ACL.
 func AddFileToS3(fileDir string, s3Path string) error {
 
 	s, err := getAWSSession()

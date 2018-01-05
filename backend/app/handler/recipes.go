@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/nickysemenza/food/backend/app/utils"
@@ -17,35 +16,25 @@ import (
 	"path"
 )
 
+//GetAllRecipes gets all recipes: GET /recipes
 func GetAllRecipes(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
 	e.DB.Preload("Images").Preload("Categories").Find(&recipes)
 	respondSuccess(w, recipes)
 	return nil
 }
+
+//ErrorTest test todo: remove
 func ErrorTest(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return StatusError{Code: 201, Err: errors.New("sad..")}
 }
+
+//GetRecipe gets a recipe by its slug: GET /recipes/{slug}
 func GetRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	recipe := model.Recipe{}
 	slug := mux.Vars(r)["slug"]
 
-	err := e.DB.Where("slug = ?", slug).
-		Preload("Sections", func(db *gorm.DB) *gorm.DB {
-			return db.Order("sections.sort_order ASC")
-		}).
-		Preload("Sections.Instructions", func(db *gorm.DB) *gorm.DB {
-			return db.Order("section_instructions.sort_order ASC")
-		}).
-		Preload("Sections.Ingredients", func(db *gorm.DB) *gorm.DB {
-			return db.Order("section_ingredients.sort_order ASC")
-		}).
-		Preload("Sections.Ingredients.Item").
-		Preload("Notes").
-		Preload("Images").
-		Preload("Categories").
-		First(&recipe).Error
-	if err != nil {
+	if err := recipe.GetFromSlug(e.DB, slug); err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 
@@ -53,6 +42,7 @@ func GetRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//PutRecipe updates or creates: PUT /recipes/{slug}
 func PutRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 	var updatedRecipe model.Recipe
@@ -65,7 +55,8 @@ func PutRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 
 	slug := updatedRecipe.Slug
 	recipe := model.Recipe{}
-	if err := e.DB.Where("slug = ?", slug).Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Preload("Notes").Preload("Images").Preload("Categories").First(&recipe).Error; err != nil {
+
+	if err := recipe.GetFromSlug(e.DB, slug); err != nil {
 		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 
@@ -73,6 +64,7 @@ func PutRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//CreateRecipe Creates a new recipe from a Slug and Title
 func CreateRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	//decode the data from JSON encoded request body
 	decoder := json.NewDecoder(r.Body)
@@ -98,6 +90,7 @@ func CreateRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//AddNote adds a Note to a Recipe based on Slug, and Note Body
 func AddNote(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	//find the recipe we are adding a note to
 	recipe := model.Recipe{}
@@ -126,6 +119,7 @@ func AddNote(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//PutImageUpload uploads images to a recipe based on its Slug
 func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 
 	var finishedImages []model.Image
@@ -200,6 +194,8 @@ func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error
 	respondSuccess(w, finishedImages)
 	return nil
 }
+
+//GetAllImages gets all images, with their related recipes
 func GetAllImages(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var images []model.Image
 	e.DB.Preload("Recipes").Find(&images)
@@ -207,12 +203,15 @@ func GetAllImages(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//GetAllMeals gets all meals, with their related recipes
 func GetAllMeals(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var meals []model.Meal
 	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
 	respondSuccess(w, meals)
 	return nil
 }
+
+//GetAllCategories gets all categories that exist
 func GetAllCategories(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var categories []model.Category
 	e.DB.Find(&categories)

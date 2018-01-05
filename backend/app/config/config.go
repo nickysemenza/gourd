@@ -10,11 +10,13 @@ import (
 	"os"
 )
 
+//Config holds the top level config
 type Config struct {
 	DB   *DBConfig
 	Port string
 }
 
+//DBConfig holds DB connection config
 type DBConfig struct {
 	Dialect  string
 	Username string
@@ -23,6 +25,7 @@ type DBConfig struct {
 	Charset  string
 }
 
+//Env holds misc env stuff like the DB connection object.
 type Env struct {
 	DB          *gorm.DB
 	Port        string
@@ -38,6 +41,7 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
+//GetConfig returns a fresh Config, including connecting to the DB
 func GetConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {
@@ -66,6 +70,7 @@ func GetConfig() *Config {
 	return &config
 }
 
+//GetDBURI builds a DB connection string
 func (config *Config) GetDBURI() string {
 	return fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
 		config.DB.Username,
