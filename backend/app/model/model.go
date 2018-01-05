@@ -190,6 +190,9 @@ func GetRecipeIDFromSlug(db *gorm.DB, slug string) (ID uint, err error) {
 
 func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
+	//update Categories and Sections relations
+	db.Model(&r).Association("Categories").Replace(r.Categories)
+	db.Model(&r).Association("Sections").Replace(r.Sections)
 	for x := range r.Sections {
 		eachSection := &r.Sections[x]
 		if recursivelyStripIDs {
@@ -239,9 +242,6 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	if recursivelyStripIDs {
 		r.ID = 0
 	}
-	//update Categories and Sections relations
-	db.Model(&r).Association("Categories").Replace(r.Categories)
-	db.Model(&r).Association("Sections").Replace(r.Sections)
 
 	r.reIndexSectionSortOrder()
 
