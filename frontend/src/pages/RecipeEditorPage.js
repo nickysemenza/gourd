@@ -24,7 +24,7 @@ class EditorPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      slug: props.match.params.recipe_id
+      slug: props.match.params.recipe_slug
     };
     this.editTopLevelItem = this.editTopLevelItem.bind(this);
     this.editIngredient = this.editIngredient.bind(this);
@@ -42,8 +42,8 @@ class EditorPage extends Component {
   componentWillReceiveProps(nextProps) {
     console.log(nextProps, this.props);
     if (nextProps.match !== this.props.match) {
-      this.setState({ slug: nextProps.match.params.recipe_id });
-      this.props.fetchRecipeDetail(nextProps.match.params.recipe_id);
+      this.setState({ slug: nextProps.match.params.recipe_slug });
+      this.props.fetchRecipeDetail(nextProps.match.params.recipe_slug);
     }
   }
   componentDidMount() {

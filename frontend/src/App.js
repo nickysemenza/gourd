@@ -38,8 +38,8 @@ const App = () => (
           <Route path="/images" component={ImageList} />
           <Route path="/meals" component={MealList} />
           <Route path="/settings" component={Settings} />
-          <Route path="/editor/:recipe_id" component={EditorPage} />
-          <Route path="/:recipe_id" component={RecipePage} />
+          <Route path="/editor/:recipe_slug" component={EditorPage} />
+          <Route path="/:recipe_slug" component={RecipePage} />
         </Switch>
       </Container>
       <Footer />
