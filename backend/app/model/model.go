@@ -158,11 +158,12 @@ type Meal struct {
 
 //RecipeMeal is `recipe_meal`
 type RecipeMeal struct {
+	Model
 	Recipe     Recipe `json:"recipe"`
 	RecipeID   uint
 	Meal       Meal `json:"meal"`
 	MealID     uint
-	Multiplier uint `json:"multiplier" gorm:"default:1"`
+	Multiplier float32 `json:"multiplier" gorm:"default:1"`
 }
 
 //MarshalJSON is a helper to marshal an Image.
@@ -186,7 +187,7 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 }
 
 //AddToMeal adds the recipe to a Meal, with specified multiplier
-func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier uint) {
+func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier float32) {
 	recipemeal := RecipeMeal{}
 	recipemeal.Multiplier = multiplier
 	recipemeal.RecipeID = r.ID
@@ -270,6 +271,15 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	r.reIndexSectionSortOrder()
 
 	if err := db.Save(&r).Error; err != nil {
+		log.Println(err)
+	}
+}
+
+//CreateOrUpdate updates or creates a Meal with its children.
+func (m Meal) CreateOrUpdate(db *gorm.DB) {
+	db.Model(&m).Association("RecipeMeal").Replace(m.RecipeMeal)
+
+	if err := db.Save(&m).Error; err != nil {
 		log.Println(err)
 	}
 }

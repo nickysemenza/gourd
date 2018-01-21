@@ -40,8 +40,12 @@ class MealList extends Component {
             {this.props.meal_list.map(meal => (
               <Table.Row key={meal.id}>
                 <Table.Cell>
-                  <Header as="h3" content={meal.name} />
-                  {meal.description}
+                  <Header
+                    as={Link}
+                    to={`/meal/${meal.id}`}
+                    content={meal.name}
+                  />
+                  <pre>{meal.description}</pre>
                 </Table.Cell>
                 <Table.Cell>
                   <Moment tz="America/Los_Angeles" format="ddd MMM Do YYYY">

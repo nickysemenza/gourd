@@ -17,7 +17,12 @@ import {
   RECEIVE_MEAL_LIST,
   RECEIVE_CATEGORIES,
   REMOVE_CATEGORY_FROM_RECIPE,
-  ADD_CATEGORY_TO_RECIPE
+  ADD_CATEGORY_TO_RECIPE,
+  RECEIVE_MEAL_DETAIL,
+  EDIT_MEAL_RECIPE_MULTIPLIER,
+  EDIT_MEAL_RECIPE,
+  ADD_MEAL_RECIPE,
+  DELETE_MEAL_RECIPE
 } from '../actions/recipe';
 
 import update from 'immutability-helper';
@@ -31,6 +36,7 @@ const INITIAL_STATE = {
   image_list: [],
 
   meal_list: [],
+  meal_detail: {},
   category_list: []
 };
 
@@ -52,6 +58,14 @@ const BLANK_SECTION = {
   instructions: [BLANK_INSTRUCTION]
 };
 
+const BLANK_RECIPEMEAL = {
+  multiplier: 1,
+  recipe: {
+    id: 0,
+    slug: null,
+    title: null
+  }
+};
 export default function(state = INITIAL_STATE, action) {
   let r;
   switch (action.type) {
@@ -91,6 +105,57 @@ export default function(state = INITIAL_STATE, action) {
         ...state,
         meal_list: action.json
       };
+    case RECEIVE_MEAL_DETAIL:
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: { $set: action.json }
+        }
+      });
+    case EDIT_MEAL_RECIPE_MULTIPLIER:
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: {
+            recipe_meals: {
+              [action.recipeIndex]: { multiplier: { $set: action.value } }
+            }
+          }
+        }
+      });
+    case EDIT_MEAL_RECIPE:
+      //action.value is the new slug
+      let test1 = state.recipe_list.filter(x => x.slug === action.value)[0];
+      console.log(test1);
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: {
+            recipe_meals: {
+              [action.recipeIndex]: {
+                recipe: { $set: test1 }
+              }
+            }
+          }
+        }
+      });
+    case ADD_MEAL_RECIPE:
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: {
+            recipe_meals: {
+              $push: [BLANK_RECIPEMEAL]
+            }
+          }
+        }
+      });
+    case DELETE_MEAL_RECIPE:
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: {
+            recipe_meals: {
+              $splice: [[action.index, 1]]
+            }
+          }
+        }
+      });
     case RECEIVE_CATEGORIES:
       return {
         ...state,

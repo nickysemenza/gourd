@@ -204,6 +204,75 @@ function receiveMealList(json) {
   };
 }
 
+export const RECEIVE_MEAL_DETAIL = 'RECEIVE_MEAL_DETAIL';
+
+export function fetchMealDetail(meal_id) {
+  return dispatch => {
+    return apiFetch('meals/' + meal_id)
+      .then(response => response.json())
+      .then(json => dispatch(receiveMealDetail(meal_id, json)));
+  };
+}
+
+function receiveMealDetail(meal_id, json) {
+  return {
+    type: RECEIVE_MEAL_DETAIL,
+    json,
+    meal_id
+  };
+}
+export const EDIT_MEAL_RECIPE_MULTIPLIER = 'EDIT_MEAL_RECIPE_MULTIPLIER';
+export function editMealMultiplier(meal_id, recipeIndex, event) {
+  return {
+    type: EDIT_MEAL_RECIPE_MULTIPLIER,
+    meal_id,
+    recipeIndex,
+    value: parseFloat(event.target.value)
+  };
+}
+
+export const EDIT_MEAL_RECIPE = 'EDIT_MEAL_RECIPE';
+export function editMealRecipe(meal_id, recipeIndex, value) {
+  return {
+    type: EDIT_MEAL_RECIPE,
+    meal_id,
+    recipeIndex,
+    value
+  };
+}
+
+export const ADD_MEAL_RECIPE = 'ADD_MEAL_RECIPE';
+export function addMealRecipe(meal_id) {
+  return {
+    type: ADD_MEAL_RECIPE,
+    meal_id
+  };
+}
+
+export const DELETE_MEAL_RECIPE = 'DELETE_MEAL_RECIPE';
+export function deleteMealRecipe(meal_id, index) {
+  return {
+    type: DELETE_MEAL_RECIPE,
+    meal_id,
+    index
+  };
+}
+export function saveMeal(meal_id) {
+  return (dispatch, getState) => {
+    let meal = getState().recipe.meal_detail[meal_id];
+    return apiFetch(`meals/${meal_id}`, {
+      method: 'PUT',
+      body: JSON.stringify(meal)
+    })
+      .then(response => response.json())
+      .then(json => {
+        if (json.error) toastr.error('Oops!', json.error);
+        else toastr.success('Success!', ` meal #${meal_id} updated!`);
+        dispatch(fetchMealDetail(meal_id));
+      });
+  };
+}
+
 export function createRecipe(slug, title) {
   return dispatch => {
     return apiFetch('recipes', {

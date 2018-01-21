@@ -55,6 +55,8 @@ func (a *App) buildRoutes(env *config.Env) {
 
 		{Method: "GET", Pattern: "/categories", HandlerFunc: h.GetAllCategories, Protected: false},
 		{Method: "GET", Pattern: "/meals", HandlerFunc: h.GetAllMeals, Protected: false},
+		{Method: "GET", Pattern: "/meals/{id}", HandlerFunc: h.GetMealByID, Protected: false},
+		{Method: "PUT", Pattern: "/meals/{id}", HandlerFunc: h.UpdateMealByID, Protected: true},
 
 		{Method: "GET", Pattern: "/auth/facebook/login", HandlerFunc: h.HandleFacebookLogin, Protected: false},
 		{Method: "GET", Pattern: "/auth/facebook/callback", HandlerFunc: h.HandleFacebookCallback, Protected: false},

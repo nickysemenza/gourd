@@ -211,6 +211,32 @@ func GetAllMeals(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+//GetMealByID retrieves a meal
+func GetMealByID(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+	id := mux.Vars(r)["id"]
+	var meal model.Meal
+	e.DB.Preload("RecipeMeal.Recipe").First(&meal, id)
+	respondSuccess(w, meal)
+	return nil
+}
+
+func UpdateMealByID(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+	id := mux.Vars(r)["id"]
+
+	decoder := json.NewDecoder(r.Body)
+	var updatedMeal model.Meal
+	err := decoder.Decode(&updatedMeal)
+	if err != nil {
+		log.Println(err)
+	}
+
+	updatedMeal.CreateOrUpdate(e.DB)
+
+	e.DB.Preload("RecipeMeal.Recipe").First(&updatedMeal, id)
+	respondSuccess(w, updatedMeal)
+	return nil
+}
+
 //GetAllCategories gets all categories that exist
 func GetAllCategories(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var categories []model.Category

@@ -7,6 +7,7 @@ import Nav from './components/Nav';
 import RecipePage from './pages/RecipePage';
 import ImageList from './pages/ImageList';
 import MealList from './pages/MealList';
+import MealDetailPage from './pages/MealDetailPage';
 import Settings from './pages/Settings';
 import EditorPage from './pages/RecipeEditorPage';
 import Auth from './pages/Auth';
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/auth/:jwt" component={Auth} />
           <Route path="/images" component={ImageList} />
           <Route path="/meals" component={MealList} />
+          <Route path="/meal/:meal_id" component={MealDetailPage} />
           <Route path="/settings" component={Settings} />
           <Route path="/editor/:recipe_slug" component={EditorPage} />
           <Route path="/:recipe_slug" component={RecipePage} />
