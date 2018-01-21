@@ -17,7 +17,8 @@ export default class Recipe extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scale: 1.0
+      scale: 1.0,
+      showRaw: false
     };
     this.handleScaleChange = this.handleScaleChange.bind(this);
   }
@@ -25,6 +26,7 @@ export default class Recipe extends Component {
   handleScaleChange(event) {
     this.setState({ scale: parseFloat(event.target.value) });
   }
+  handleToggleShowRaw = () => this.setState({ showRaw: !this.state.showRaw });
   render() {
     let recipe = this.props.recipe;
     if (!recipe) return <div>loading...</div>;
@@ -76,6 +78,10 @@ export default class Recipe extends Component {
           content="edit recipe"
           icon="edit"
         />
+        <Button
+          content="show raw"
+          onClick={this.handleToggleShowRaw.bind(this)}
+        />
         <Divider />
         <Image src="http://via.placeholder.com/2000x1200" />
       </Segment>
@@ -116,6 +122,14 @@ export default class Recipe extends Component {
                 }
               />
             ))}
+            {this.state.showRaw ? (
+              <div>
+                <Header as="h1">raw JSON</Header>
+                <Card fluid>
+                  <pre>{JSON.stringify(recipe, true, 2)}</pre>
+                </Card>
+              </div>
+            ) : null}
           </Grid.Column>
           <Grid.Column width={4}>{rightSidebar}</Grid.Column>
         </Grid>
