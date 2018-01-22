@@ -206,7 +206,7 @@ func GetAllImages(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 //GetAllMeals gets all meals, with their related recipes
 func GetAllMeals(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var meals []model.Meal
-	e.DB.Preload("RecipeMeal.Recipe").Find(&meals)
+	e.DB.Order("time DESC").Preload("RecipeMeal.Recipe").Find(&meals)
 	respondSuccess(w, meals)
 	return nil
 }

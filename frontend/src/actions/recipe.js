@@ -257,6 +257,16 @@ export function deleteMealRecipe(meal_id, index) {
     index
   };
 }
+export const EDIT_MEAL_FIELD = 'EDIT_MEAL_FIELD';
+
+export function editMealField(meal_id, field, value) {
+  return {
+    type: EDIT_MEAL_FIELD,
+    meal_id,
+    field,
+    value
+  };
+}
 export function saveMeal(meal_id) {
   return (dispatch, getState) => {
     let meal = getState().recipe.meal_detail[meal_id];

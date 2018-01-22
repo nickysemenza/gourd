@@ -22,7 +22,8 @@ import {
   EDIT_MEAL_RECIPE_MULTIPLIER,
   EDIT_MEAL_RECIPE,
   ADD_MEAL_RECIPE,
-  DELETE_MEAL_RECIPE
+  DELETE_MEAL_RECIPE,
+  EDIT_MEAL_FIELD
 } from '../actions/recipe';
 
 import update from 'immutability-helper';
@@ -153,6 +154,14 @@ export default function(state = INITIAL_STATE, action) {
             recipe_meals: {
               $splice: [[action.index, 1]]
             }
+          }
+        }
+      });
+    case EDIT_MEAL_FIELD:
+      return update(state, {
+        meal_detail: {
+          [action.meal_id]: {
+            [action.field]: { $set: action.value }
           }
         }
       });

@@ -6,14 +6,27 @@ import {
   editMealRecipe,
   saveMeal,
   addMealRecipe,
-  deleteMealRecipe
+  deleteMealRecipe,
+  editMealField
 } from '../actions/recipe';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Breadcrumb, Header, Table, Input, Button } from 'semantic-ui-react';
+import {
+  Breadcrumb,
+  Header,
+  Table,
+  Input,
+  Button,
+  Form
+} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import 'moment-timezone';
 import RecipePicker from '../components/RecipePicker';
+
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 class MealDetailPage extends Component {
   constructor(props) {
@@ -36,6 +49,11 @@ class MealDetailPage extends Component {
     let thisMeal = this.props.meal_detail[this.state.mealId] || {
       recipe_meals: []
     };
+    const options = [
+      { key: 'l', text: 'Lunch', value: 'lunch' },
+      { key: 'd', text: 'Dinner', value: 'dinner' },
+      { key: 's', text: 'Snack', value: 'snack' }
+    ];
     return (
       <div className="container">
         <Breadcrumb>
@@ -67,12 +85,6 @@ class MealDetailPage extends Component {
             {thisMeal.recipe_meals.map((eachMealRecipe, x) => (
               <Table.Row key={x}>
                 <Table.Cell>
-                  <Link
-                    key={eachMealRecipe.recipe.id}
-                    to={`/${eachMealRecipe.recipe.slug}`}
-                  >
-                    {eachMealRecipe.recipe.title}{' '}
-                  </Link>
                   <RecipePicker
                     value={eachMealRecipe.recipe.slug}
                     onChange={(e, { value }) => {
@@ -98,21 +110,73 @@ class MealDetailPage extends Component {
                     }
                     content="delete"
                   />
+                  <Button
+                    icon="info circle"
+                    as={Link}
+                    to={`/${eachMealRecipe.recipe.slug}`}
+                    content={eachMealRecipe.recipe.title}
+                  />
                 </Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
-        <Button
-          icon="plus"
-          onClick={() => this.props.addMealRecipe(this.state.mealId)}
-          content="add item"
-        />
-        <Button
-          icon="star"
-          onClick={() => this.props.saveMeal(this.state.mealId)}
-          content="save meal"
-        />
+        <Form>
+          <Form.Input
+            fluid
+            label="Name"
+            placeholder="Name"
+            value={thisMeal.name}
+            onChange={e =>
+              this.props.editMealField(
+                this.state.mealId,
+                'name',
+                e.target.value
+              )
+            }
+          />
+          <Form.Select
+            options={options}
+            fluid
+            label="Type"
+            placeholder="Type"
+            value={thisMeal.type}
+            onChange={(e, { value }) =>
+              this.props.editMealField(this.state.mealId, 'type', value)
+            }
+          />
+          <Form.Input
+            fluid
+            label="Description"
+            placeholder="Description"
+            value={thisMeal.description}
+            onChange={e =>
+              this.props.editMealField(
+                this.state.mealId,
+                'description',
+                e.target.value
+              )
+            }
+          />
+          {/*<Form.Select fluid label='Gender' options={options} placeholder='Gender' />*/}
+          <DatePicker
+            selected={moment(thisMeal.time)}
+            onChange={date => {
+              this.props.editMealField(this.state.mealId, 'time', date);
+            }}
+          />
+          <br />
+          <Button
+            icon="plus"
+            onClick={() => this.props.addMealRecipe(this.state.mealId)}
+            content="add item"
+          />
+          <Button
+            icon="star"
+            onClick={() => this.props.saveMeal(this.state.mealId)}
+            content="save meal"
+          />
+        </Form>
       </div>
     );
   }
@@ -131,7 +195,8 @@ const mapDispatchToProps = dispatch => {
       editMealRecipe,
       saveMeal,
       addMealRecipe,
-      deleteMealRecipe
+      deleteMealRecipe,
+      editMealField
     },
     dispatch
   );
