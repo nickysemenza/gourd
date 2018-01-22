@@ -41,7 +41,6 @@ type Routes []Route
 func (a *App) buildRoutes(env *config.Env) {
 
 	var routes = Routes{
-		{Method: "GET", Pattern: "/", HandlerFunc: h.ErrorTest, Protected: false},
 		{Method: "GET", Pattern: "/me", HandlerFunc: h.GetMe, Protected: true},
 
 		{Method: "GET", Pattern: "/recipes", HandlerFunc: h.GetAllRecipes, Protected: false},
