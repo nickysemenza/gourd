@@ -53,24 +53,28 @@ func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error
 		e.DB.Create(&imageObj)
 		e.DB.Model(&recipe).Association("Images").Append(&imageObj)
 
+		originalImageSize := model.ImageSize{}
+		originalImageSize.IsOriginal = true
+		originalImageSize.ImageID = imageObj.ID
+		e.DB.Create(&originalImageSize)
+
 		//form filesystem / s3 path
 		imagePath := fmt.Sprintf("images/%d%s", imageObj.ID, path.Ext(originalFileName))
 
 		os.MkdirAll("public/images", 0777)
 		localImageFile, err := os.Create("public/" + imagePath)
-		log.Printf("file: %s -> %s", originalFileName, localImageFile.Name())
-
 		defer localImageFile.Close()
 		if err != nil {
 			return StatusError{Code: 500, Err: err}
 		}
+
+		log.Printf("file: %s -> %s", originalFileName, localImageFile.Name())
 		//copy the uploaded file to the destination file
 		if _, err := io.Copy(localImageFile, fileData); err != nil {
 			return StatusError{Code: 500, Err: err}
 		}
 
 		if os.Getenv("S3_IMAGES") == "true" {
-
 			if err := utils.AddFileToS3(localImageFile.Name(), imagePath); err != nil {
 				imageObj.IsInS3 = false
 				log.Println(err)
@@ -84,6 +88,7 @@ func PutImageUpload(e *config.Env, w http.ResponseWriter, r *http.Request) error
 		imageObj.OriginalFileName = originalFileName
 		imageObj.Path = imagePath
 		e.DB.Save(&imageObj)
+		//imageObj.MakeSizes()
 	}
 	respondSuccess(w, finishedImages)
 	return nil

@@ -132,11 +132,22 @@ type RecipeNote struct {
 //Image is `images`
 type Image struct {
 	Model
-	Path             string   `json:"path"`
-	OriginalFileName string   `json:"original_name"`
-	IsInS3           bool     `json:"in_s3"`
-	Recipes          []Recipe `json:"recipes" gorm:"many2many:recipe_images;"`
-	Md5Hash          string   `json:"md5"`
+	Path             string      `json:"path"`
+	OriginalFileName string      `json:"original_name"`
+	IsInS3           bool        `json:"in_s3"`
+	Recipes          []Recipe    `json:"recipes" gorm:"many2many:recipe_images;"`
+	Md5Hash          string      `json:"md5"`
+	Sizes            []ImageSize `json:"sizes"`
+}
+
+type ImageSize struct {
+	Model
+	Width      int  `json:"w"`
+	Height     int  `json:"h"`
+	IsOriginal bool `json:"original"`
+	Image      Image
+	ImageID    uint
+	Path       string `json:"path"`
 }
 
 //Category is `categories`
@@ -185,6 +196,14 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 		Alias:   (*Alias)(i),
 	})
 }
+
+//func (i *Image) MakeSizes(db *gorm.DB) {
+//	log.Print(utils.GetImageDimension(i.Path))
+//	x := ImageSize{}
+//	x.Width, x.Height = utils.GetImageDimension(i.Path)
+//	db.Create(&x)
+//
+//}
 
 //AddToMeal adds the recipe to a Meal, with specified multiplier
 func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier float32) {
@@ -298,7 +317,7 @@ func (r *Recipe) GetFromSlug(db *gorm.DB, slug string) error {
 		}).
 		Preload("Sections.Ingredients.Item").
 		Preload("Notes").
-		Preload("Images").
+		Preload("Images.Sizes").
 		Preload("Categories").
 		First(&r).Error
 }
@@ -307,6 +326,7 @@ var modelsInOrder = []interface{}{
 	&Recipe{},
 	&Ingredient{},
 	&Image{},
+	&ImageSize{},
 	&RecipeNote{},
 	&Meal{},
 	&RecipeMeal{},
@@ -333,6 +353,8 @@ func DBMigrate(db *gorm.DB) *gorm.DB {
 
 	db.Table("recipe_images").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Table("recipe_images").AddForeignKey("image_id", "images(id)", "RESTRICT", "RESTRICT")
+
+	db.Table("image_sizes").AddForeignKey("image_id", "images(id)", "RESTRICT", "RESTRICT")
 
 	db.Table("recipe_meals").AddForeignKey("recipe_id", "recipes(id)", "RESTRICT", "RESTRICT")
 	db.Table("recipe_meals").AddForeignKey("meal_id", "meals(id)", "RESTRICT", "RESTRICT")

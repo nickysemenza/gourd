@@ -13,7 +13,7 @@ import (
 //GetAllRecipes gets all recipes: GET /recipes
 func GetAllRecipes(e *config.Env, w http.ResponseWriter, r *http.Request) error {
 	var recipes []model.Recipe
-	e.DB.Preload("Images").Preload("Categories").Find(&recipes)
+	e.DB.Preload("Images.Sizes").Preload("Categories").Find(&recipes)
 	respondSuccess(w, recipes)
 	return nil
 }

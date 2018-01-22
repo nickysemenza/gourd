@@ -11,6 +11,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"io/ioutil"
 	"log"
@@ -114,4 +117,17 @@ func ReadAndHash(r io.Reader) (io.Reader, string, error) {
 	}
 
 	return &b, hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+func GetImageDimension(imagePath string) (int, int) {
+	file, err := os.Open(imagePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+	}
+
+	image, _, err := image.DecodeConfig(file)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v\n", imagePath, err)
+	}
+	return image.Width, image.Height
 }
