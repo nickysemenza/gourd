@@ -43,6 +43,7 @@ class ImageUploader extends Component {
     }
     fd.append('slug', this.props.slug);
     xhr.open('PUT', API_BASE_URL + '/imageupload');
+    xhr.setRequestHeader('X-JWT', this.props.jwt);
     xhr.send(fd);
   }
   render() {
@@ -78,7 +79,8 @@ class ImageUploader extends Component {
 
 function mapStateToProps(state) {
   return {
-    recipe_list: state.recipe.recipe_list
+    recipe_list: state.recipe.recipe_list,
+    jwt: state.user.token
   };
 }
 
