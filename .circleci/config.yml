@@ -37,7 +37,7 @@ jobs:
 
   build_frontend:
     docker: 
-      - image: node:7.4.0
+      - image: node:9.3.0
     working_directory: ~/food
     steps:
       - checkout
@@ -45,7 +45,7 @@ jobs:
       - run: cd frontend && yarn test
 workflows:
   version: 2
-  build:
+  build_fullstack:
     jobs:
       - build_frontend
       - build_backend
