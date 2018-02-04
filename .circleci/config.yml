@@ -3,7 +3,7 @@
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2
 jobs:
-  build:
+  build-backend:
     docker:
       # specify the version
       - image: circleci/golang:1.9
@@ -33,3 +33,13 @@ jobs:
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: cd backend && dep ensure
       - run: cd backend && ./test.sh
+
+
+  build-frontend:
+    docker: 
+      - image: node:7.4.0
+    working_directory: ~/food
+    steps:
+      - checkout
+      - run: cd frontend && yarn install
+      - run: cd frontend && yarn test
