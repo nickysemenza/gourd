@@ -7,7 +7,15 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.9
-      
+        environment:
+        - DEP_VERSION: "0.3.2"
+        - DB_USERNAME: root
+        - DB_PASSWORD: root
+        - DB_DATABASE_TEST: food_test
+      - image: circleci/mysql:5.7
+        environment:
+        - MYSQL_ROOT_PASSWORD: root
+        - MYSQL_DATABASE: food_test
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
