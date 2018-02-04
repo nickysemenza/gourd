@@ -17,11 +17,12 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}/backend
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}/
+    build_dir: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}/backend
     steps:
       - checkout
 
       # specify any bash command here prefixed with `run: `
       - run: go get -u github.com/golang/dep/cmd/dep
-      - run: dep ensure
-      - run: ./test.sh
+      - run: cd backend && dep ensure
+      - run: cd backend && ./test.sh
