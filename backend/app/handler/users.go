@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"github.com/nickysemenza/food/backend/app/config"
 	"github.com/nickysemenza/food/backend/app/model"
 	"golang.org/x/oauth2"
@@ -30,9 +31,9 @@ var (
 )
 
 //GetMe gives the current User as a JSON response to GET /me
-func GetMe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
-	respondSuccess(w, e.CurrentUser)
-	return nil
+func GetMe(c *gin.Context) {
+	//TODO: aah respondSuccess(w, e.CurrentUser)
+	c.JSON(http.StatusOK, "todo")
 }
 
 //HandleFacebookLogin initiates the facebook auth process

@@ -1,7 +1,8 @@
 package app
 
 import (
-	"github.com/gorilla/handlers"
+	//"github.com/gorilla/handlers"
+	"github.com/gin-contrib/cors"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/config"
@@ -10,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
+import "github.com/gin-gonic/gin"
 
 type App struct {
 	R *mux.Router
@@ -40,42 +42,45 @@ type Routes []Route
 
 func (a *App) buildRoutes(env *config.Env) {
 
-	var routes = Routes{
-		{Method: "GET", Pattern: "/me", HandlerFunc: h.GetMe, Protected: true},
+}
+func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
 
-		{Method: "GET", Pattern: "/recipes", HandlerFunc: h.GetAllRecipes, Protected: false},
-		{Method: "POST", Pattern: "/recipes", HandlerFunc: h.CreateRecipe, Protected: true},
-		{Method: "GET", Pattern: "/recipes/{slug}", HandlerFunc: h.GetRecipe, Protected: false},
-		{Method: "PUT", Pattern: "/recipes/{slug}", HandlerFunc: h.PutRecipe, Protected: true},
-		{Method: "POST", Pattern: "/recipes/{slug}/notes", HandlerFunc: h.AddNote, Protected: true},
-
-		{Method: "GET", Pattern: "/images", HandlerFunc: h.GetAllImages, Protected: false},
-		{Method: "PUT", Pattern: "/imageupload", HandlerFunc: h.PutImageUpload, Protected: true},
-
-		{Method: "GET", Pattern: "/categories", HandlerFunc: h.GetAllCategories, Protected: false},
-		{Method: "GET", Pattern: "/meals", HandlerFunc: h.GetAllMeals, Protected: false},
-		{Method: "GET", Pattern: "/meals/{id}", HandlerFunc: h.GetMealByID, Protected: false},
-		{Method: "PUT", Pattern: "/meals/{id}", HandlerFunc: h.UpdateMealByID, Protected: true},
-
-		{Method: "GET", Pattern: "/auth/facebook/login", HandlerFunc: h.HandleFacebookLogin, Protected: false},
-		{Method: "GET", Pattern: "/auth/facebook/callback", HandlerFunc: h.HandleFacebookCallback, Protected: false},
+	return func(c *gin.Context) {
+		c.Set("DB", db)
+		c.Next()
 	}
-
-	//add them all
-	a.R = mux.NewRouter()
-	for _, route := range routes {
-		a.R.Handle(route.Pattern, h.Handler{Env: env, H: route.HandlerFunc, P: route.Protected}).Methods(route.Method)
-	}
-	a.R.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
-
-	a.R.NotFoundHandler = h.Handler{Env: env, H: h.NotFoundRoute}
 }
 
-func (a *App) RunServer(host string) {
+func (a *App) RunServer(host string, db *gorm.DB) {
 	log.Println("Running API server on", host)
-	headersOk := handlers.AllowedHeaders([]string{"x-jwt"})
-	originsOk := handlers.AllowedOrigins([]string{"*"})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+	//headersOk := handlers.AllowedHeaders([]string{"x-jwt"})
+	//originsOk := handlers.AllowedOrigins([]string{"*"})
+	//methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+	//
+	//log.Fatal(http.ListenAndServe(host, handlers.CORS(originsOk, headersOk, methodsOk)(a.R)))
+	router := gin.Default()
+	router.Use(DatabaseInjector(db))
 
-	log.Fatal(http.ListenAndServe(host, handlers.CORS(originsOk, headersOk, methodsOk)(a.R)))
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "X-JWT"}
+	router.Use(cors.New(config))
+
+	router.GET("/recipes", h.GetAllRecipes)
+
+	router.Handle("GET", "/me", h.GetMe)                     //todo: protect
+	router.Handle("PUT", "/imageupload", h.PutImageUpload)   //todo: protect
+	router.Handle("POST", "/recipes", h.CreateRecipe)        //todo: protect
+	router.Handle("PUT", "/recipes/:slug", h.PutRecipe)      //todo: protect
+	router.Handle("POST", "/recipes/:slug/notes", h.AddNote) //todo: protect
+	router.Handle("PUT", "/meals/:id", h.UpdateMealByID)     //todo: protect
+	router.Handle("GET", "/recipes/:slug", h.GetRecipe)
+	router.Handle("GET", "/images", h.GetAllImages)
+	router.Handle("GET", "/categories", h.GetAllCategories)
+	router.Handle("GET", "/meals", h.GetAllMeals)
+	router.Handle("GET", "/meals/:id", h.GetMealByID)
+	//router.Handle("GET", "/auth/facebook/login", h.HandleFacebookLogin)
+	//router.Handle("GET", "/auth/facebook/callback", h.HandleFacebookCallback)
+
+	router.Run()
 }
