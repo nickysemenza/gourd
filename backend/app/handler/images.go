@@ -31,7 +31,7 @@ func PutImageUpload(c *gin.Context) {
 		return
 	}
 
-	files := form.File["files"]
+	files := form.File["file"]
 	log.Printf("recieving %d images via upload for recipe %s", len(files), slug)
 	for i := range files {
 		//for each fileheader, get a handle to the actual file
