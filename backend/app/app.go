@@ -34,20 +34,17 @@ func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func (a *App) RunServer(host string, db *gorm.DB) {
-	log.Println("Running API server on", host)
+func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
-	router.Use(DatabaseInjector(db))
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "X-JWT"}
 	router.Use(cors.New(corsConfig))
-
-	router.GET("/recipes", h.GetAllRecipes)
+	router.Use(DatabaseInjector(db))
 
 	router.Static("/public", "./public")
-
+	router.Handle("GET", "/recipes", h.GetAllRecipes)
 	router.Handle("GET", "/me", h.GetMe)                     //todo: protect
 	router.Handle("PUT", "/imageupload", h.PutImageUpload)   //todo: protect
 	router.Handle("POST", "/recipes", h.CreateRecipe)        //todo: protect
@@ -61,6 +58,13 @@ func (a *App) RunServer(host string, db *gorm.DB) {
 	router.Handle("GET", "/meals/:id", h.GetMealByID)
 	router.Handle("GET", "/auth/facebook/login", h.HandleFacebookLogin)
 	router.Handle("GET", "/auth/facebook/callback", h.HandleFacebookCallback)
+
+	return router
+}
+func (a *App) RunServer(host string, db *gorm.DB) {
+	log.Println("Running API server on", host)
+
+	router := SetupRouter(db)
 
 	router.Run()
 }
