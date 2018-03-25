@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"github.com/nickysemenza/food/backend/app/model"
