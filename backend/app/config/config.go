@@ -31,7 +31,6 @@ type Env struct {
 	Port        string
 	Host        string
 	CurrentUser *model.User
-	Router      **mux.Router
 }
 
 func getEnv(key, fallback string) string {
