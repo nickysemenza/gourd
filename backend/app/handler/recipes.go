@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
-	"github.com/gorilla/mux"
-	"github.com/nickysemenza/food/backend/app/config"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/pkg/errors"
 	"log"
@@ -11,107 +10,109 @@ import (
 )
 
 //GetAllRecipes gets all recipes: GET /recipes
-func GetAllRecipes(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllRecipes(c *gin.Context) {
 	var recipes []model.Recipe
-	e.DB.Preload("Images.Sizes").Preload("Categories").Find(&recipes)
-	respondSuccess(w, recipes)
-	return nil
+	db := c.MustGet("DB").(*gorm.DB)
+	db.Preload("Images.Sizes").Preload("Categories").Find(&recipes)
+	c.JSON(http.StatusOK, recipes)
 }
 
 //GetRecipe gets a recipe by its slug: GET /recipes/{slug}
-func GetRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+func GetRecipe(c *gin.Context) {
+	db := c.MustGet("DB").(*gorm.DB)
 	recipe := model.Recipe{}
-	slug := mux.Vars(r)["slug"]
+	slug := c.Params.ByName("slug")
 
-	if err := recipe.GetFromSlug(e.DB, slug); err != nil {
-		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	if err := recipe.GetFromSlug(db, slug); err != nil {
+		//return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
 	}
 
-	respondSuccess(w, recipe)
-	return nil
+	c.JSON(http.StatusOK, recipe)
+
 }
 
 //PutRecipe updates or creates: PUT /recipes/{slug}
-func PutRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
-	decoder := json.NewDecoder(r.Body)
+func PutRecipe(c *gin.Context) {
+	db := c.MustGet("DB").(*gorm.DB)
 	var updatedRecipe model.Recipe
-	err := decoder.Decode(&updatedRecipe)
-	if err != nil {
+
+	if err := c.BindJSON(&updatedRecipe); err != nil {
 		log.Println(err)
 	}
 
-	updatedRecipe.CreateOrUpdate(e.DB, false)
+	updatedRecipe.CreateOrUpdate(db, false)
 
 	slug := updatedRecipe.Slug
 	recipe := model.Recipe{}
 
-	if err := recipe.GetFromSlug(e.DB, slug); err != nil {
-		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	if err := recipe.GetFromSlug(db, slug); err != nil {
+		c.JSON(404, errors.New("recipe "+slug+" not found"))
 	}
 
-	respondSuccess(w, recipe)
-	return nil
+	c.JSON(http.StatusOK, recipe)
+
 }
 
 //CreateRecipe Creates a new recipe from a Slug and Title
-func CreateRecipe(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+func CreateRecipe(c *gin.Context) {
+	db := c.MustGet("DB").(*gorm.DB)
 	//decode the data from JSON encoded request body
-	decoder := json.NewDecoder(r.Body)
 	var parsed struct {
 		Slug  string `json:"slug"`
 		Title string `json:"title"`
 	}
-	err := decoder.Decode(&parsed)
-	if err != nil {
+	if err := c.BindJSON(&parsed); err != nil {
 		log.Println(err)
 	}
 
 	//see if one exists
 	recipe := model.Recipe{}
-	if !e.DB.Where("slug = ?", parsed.Slug).First(&recipe).RecordNotFound() {
-		respondError(w, 500, "slug exists already")
-		return nil
+	if !db.Where("slug = ?", parsed.Slug).First(&recipe).RecordNotFound() {
+		c.JSON(500, "slug exists already")
+
 	}
 	recipe.Slug = parsed.Slug
 	recipe.Title = parsed.Title
-	e.DB.Save(&recipe)
-	respondSuccess(w, "added!")
-	return nil
+	db.Save(&recipe)
+	c.JSON(http.StatusOK, "added!")
+
 }
 
 //AddNote adds a Note to a Recipe based on Slug, and Note Body
-func AddNote(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+func AddNote(c *gin.Context) {
+	db := c.MustGet("DB").(*gorm.DB)
 	//find the recipe we are adding a note to
 	recipe := model.Recipe{}
-	slug := mux.Vars(r)["slug"]
-	if err := e.DB.Where("slug = ?", slug).First(&recipe).Error; err != nil {
-		return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	slug := c.Params.ByName("slug")
+	if err := db.Where("slug = ?", slug).First(&recipe).Error; err != nil {
+		c.JSON(404, errors.New("recipe "+slug+" not found"))
 	}
 
 	//decode the note from JSON encoded request body
-	decoder := json.NewDecoder(r.Body)
 	var parsed struct {
 		Note string `json:"note"`
 	}
-	err := decoder.Decode(&parsed)
-	if err != nil {
+
+	if err := c.BindJSON(&parsed); err != nil {
 		log.Println(err)
 	}
+
 	//add a new RecipeNote Model, save it
 	note := model.RecipeNote{
 		Body:     parsed.Note,
 		RecipeID: recipe.ID,
 	}
-	e.DB.Save(&note)
+	db.Save(&note)
 
-	respondSuccess(w, note)
-	return nil
+	c.JSON(http.StatusOK, note)
+
 }
 
 //GetAllCategories gets all categories that exist
-func GetAllCategories(e *config.Env, w http.ResponseWriter, r *http.Request) error {
+func GetAllCategories(c *gin.Context) {
+	db := c.MustGet("DB").(*gorm.DB)
 	var categories []model.Category
-	e.DB.Find(&categories)
-	respondSuccess(w, categories)
-	return nil
+	db.Find(&categories)
+	c.JSON(http.StatusOK, categories)
+
 }

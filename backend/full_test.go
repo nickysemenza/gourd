@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/icrowley/fake"
+	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"github.com/nickysemenza/food/backend/app"
 	"github.com/nickysemenza/food/backend/app/config"
@@ -15,11 +17,14 @@ import (
 	"testing"
 )
 
-var env *config.Env
+var db *gorm.DB
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	r := *env.Router
+	r := app.SetupRouter(db)
+
+	fmt.Println(db)
+
 	r.ServeHTTP(rr, req)
 	return rr
 }
@@ -33,7 +38,7 @@ func getAdminUser() *model.User {
 	u := model.User{}
 	u.Admin = true
 	u.Email = fake.EmailAddress()
-	env.DB.Save(&u)
+	db.Save(&u)
 	return &u
 }
 
@@ -41,7 +46,7 @@ func getGuestUser() *model.User {
 	u := model.User{}
 	u.Admin = false
 	u.Email = fake.EmailAddress()
-	env.DB.Save(&u)
+	db.Save(&u)
 	return &u
 }
 
@@ -49,10 +54,12 @@ func TestMain(m *testing.M) {
 	godotenv.Load()
 	globalConfig := config.GetConfig()
 	mainApp := &app.App{}
-	env = mainApp.Initialize(globalConfig)
+	env := mainApp.Initialize(globalConfig)
 
-	env.DB = model.DBReset(env.DB)
-	env.DB = model.DBMigrate(env.DB)
+	db = env.DB
+	db = model.DBReset(db)
+	db = model.DBMigrate(db)
+
 	os.Exit(m.Run())
 }
 func makeRecipe(t *testing.T, slug string) *httptest.ResponseRecorder {
@@ -86,7 +93,7 @@ func doRequest(t *testing.T, method string, url string, objToMarshall interface{
 
 	//add the JWT token as a header
 	if user != nil {
-		req.Header.Set("X-Jwt", user.GetJWTToken(env.DB))
+		req.Header.Set("X-Jwt", user.GetJWTToken(db))
 	}
 	return executeRequest(req)
 
@@ -103,6 +110,7 @@ func TestAddRecipe(t *testing.T) {
 	}
 }
 
+//TODO: fix auth and add this
 func TestCannotModifyRecipeWithoutPermissions(t *testing.T) {
 	testRecipeSlug := "test-slug-TestCannotAddRecipeWithoutPermissions"
 	makeRecipe(t, testRecipeSlug)

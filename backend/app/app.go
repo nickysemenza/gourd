@@ -1,24 +1,19 @@
 package app
 
 import (
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
+	"github.com/gin-contrib/cors"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/config"
 	h "github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	log "github.com/sirupsen/logrus"
+)
+import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type App struct {
-	R *mux.Router
-}
-type Route struct {
-	Method      string
-	Pattern     string
-	Protected   bool
-	HandlerFunc func(e *config.Env, w http.ResponseWriter, r *http.Request) error
 }
 
 func (a *App) Initialize(c *config.Config) *config.Env {
@@ -28,54 +23,80 @@ func (a *App) Initialize(c *config.Config) *config.Env {
 	}
 	//set up the env
 	env := &config.Env{
-		DB:     model.DBMigrate(db),
-		Port:   c.Port,
-		Router: &a.R,
+		DB:   model.DBMigrate(db),
+		Port: c.Port,
+		//Router: &a.R,
 	}
-	a.buildRoutes(env)
 	return env
 }
 
-type Routes []Route
-
-func (a *App) buildRoutes(env *config.Env) {
-
-	var routes = Routes{
-		{Method: "GET", Pattern: "/me", HandlerFunc: h.GetMe, Protected: true},
-
-		{Method: "GET", Pattern: "/recipes", HandlerFunc: h.GetAllRecipes, Protected: false},
-		{Method: "POST", Pattern: "/recipes", HandlerFunc: h.CreateRecipe, Protected: true},
-		{Method: "GET", Pattern: "/recipes/{slug}", HandlerFunc: h.GetRecipe, Protected: false},
-		{Method: "PUT", Pattern: "/recipes/{slug}", HandlerFunc: h.PutRecipe, Protected: true},
-		{Method: "POST", Pattern: "/recipes/{slug}/notes", HandlerFunc: h.AddNote, Protected: true},
-
-		{Method: "GET", Pattern: "/images", HandlerFunc: h.GetAllImages, Protected: false},
-		{Method: "PUT", Pattern: "/imageupload", HandlerFunc: h.PutImageUpload, Protected: true},
-
-		{Method: "GET", Pattern: "/categories", HandlerFunc: h.GetAllCategories, Protected: false},
-		{Method: "GET", Pattern: "/meals", HandlerFunc: h.GetAllMeals, Protected: false},
-		{Method: "GET", Pattern: "/meals/{id}", HandlerFunc: h.GetMealByID, Protected: false},
-		{Method: "PUT", Pattern: "/meals/{id}", HandlerFunc: h.UpdateMealByID, Protected: true},
-
-		{Method: "GET", Pattern: "/auth/facebook/login", HandlerFunc: h.HandleFacebookLogin, Protected: false},
-		{Method: "GET", Pattern: "/auth/facebook/callback", HandlerFunc: h.HandleFacebookCallback, Protected: false},
+func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("DB", db)
+		c.Next()
 	}
-
-	//add them all
-	a.R = mux.NewRouter()
-	for _, route := range routes {
-		a.R.Handle(route.Pattern, h.Handler{Env: env, H: route.HandlerFunc, P: route.Protected}).Methods(route.Method)
-	}
-	a.R.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public/"))))
-
-	a.R.NotFoundHandler = h.Handler{Env: env, H: h.NotFoundRoute}
 }
 
-func (a *App) RunServer(host string) {
-	log.Println("Running API server on", host)
-	headersOk := handlers.AllowedHeaders([]string{"x-jwt"})
-	originsOk := handlers.AllowedOrigins([]string{"*"})
-	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+func Authorized() gin.HandlerFunc {
+	return func(c *gin.Context) {
 
-	log.Fatal(http.ListenAndServe(host, handlers.CORS(originsOk, headersOk, methodsOk)(a.R)))
+		//check if token is present in header
+		if jwt := c.GetHeader("X-Jwt"); jwt == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, "no token")
+		} else {
+			//retrieve from DB
+			db := c.MustGet("DB").(*gorm.DB)
+			u, _ := h.GetUserFromToken(db, jwt)
+
+			//check if they have admin role
+			if u != nil && u.Admin == true {
+				c.Set("user", u)
+				c.Next()
+			} else {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, "not authorized!")
+			}
+
+		}
+	}
+}
+
+func SetupRouter(db *gorm.DB) *gin.Engine {
+	router := gin.Default()
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "X-JWT"}
+	router.Use(cors.New(corsConfig))
+	router.Use(DatabaseInjector(db))
+
+	router.Static("/public", "./public")
+
+	router.GET("/me", Authorized(), h.GetMe)
+
+	router.GET("/recipes", h.GetAllRecipes)
+	router.POST("/recipes", Authorized(), h.CreateRecipe)
+	router.GET("/recipes/:slug", h.GetRecipe)
+	router.PUT("/recipes/:slug", Authorized(), h.PutRecipe)
+	router.POST("/recipes/:slug/notes", Authorized(), h.AddNote)
+
+	router.GET("/images", h.GetAllImages)
+	router.PUT("/imageupload", Authorized(), h.PutImageUpload)
+
+	router.GET("/categories", h.GetAllCategories)
+
+	router.GET("/meals", h.GetAllMeals)
+	router.GET("/meals/:id", h.GetMealByID)
+	router.PUT("/meals/:id", Authorized(), h.UpdateMealByID)
+
+	router.GET("/auth/facebook/login", h.HandleFacebookLogin)
+	router.GET("/auth/facebook/callback", h.HandleFacebookCallback)
+
+	return router
+}
+func (a *App) RunServer(host string, db *gorm.DB) {
+	log.Println("Running API server on", host)
+
+	router := SetupRouter(db)
+
+	router.Run()
 }
