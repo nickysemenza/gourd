@@ -26,7 +26,8 @@ var (
 //GetMe gives the current User as a JSON response to GET /me
 func GetMe(c *gin.Context) {
 	//TODO: aah respondSuccess(w, e.CurrentUser)
-	c.JSON(http.StatusOK, "todo")
+	me := c.MustGet("user").(*model.User)
+	c.JSON(http.StatusOK, me)
 }
 
 func getOauthConf() *oauth2.Config {
@@ -140,7 +141,7 @@ func (d facebookUserData) getUser(db *gorm.DB) *model.User {
 	return &u
 }
 
-func getUserFromToken(db *gorm.DB, tokenString string) (*model.User, error) {
+func GetUserFromToken(db *gorm.DB, tokenString string) (*model.User, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("AllYourBase"), nil

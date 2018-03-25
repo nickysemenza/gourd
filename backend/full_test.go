@@ -111,20 +111,20 @@ func TestAddRecipe(t *testing.T) {
 }
 
 //TODO: fix auth and add this
-//func TestCannotModifyRecipeWithoutPermissions(t *testing.T) {
-//	testRecipeSlug := "test-slug-TestCannotAddRecipeWithoutPermissions"
-//	makeRecipe(t, testRecipeSlug)
-//
-//	//grab the recipe from detail
-//	testRecipe := getRecipe(t, testRecipeSlug)
-//
-//	//but we shouldn't be able to update it!
-//	response := doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe, nil)
-//	checkResponseCode(t, http.StatusUnauthorized, response.Code)
-//
-//	response2 := doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe, getGuestUser())
-//	checkResponseCode(t, http.StatusUnauthorized, response2.Code)
-//}
+func TestCannotModifyRecipeWithoutPermissions(t *testing.T) {
+	testRecipeSlug := "test-slug-TestCannotAddRecipeWithoutPermissions"
+	makeRecipe(t, testRecipeSlug)
+
+	//grab the recipe from detail
+	testRecipe := getRecipe(t, testRecipeSlug)
+
+	//but we shouldn't be able to update it!
+	response := doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe, nil)
+	checkResponseCode(t, http.StatusUnauthorized, response.Code)
+
+	response2 := doRequest(t, "PUT", "/recipes/"+testRecipeSlug, testRecipe, getGuestUser())
+	checkResponseCode(t, http.StatusUnauthorized, response2.Code)
+}
 
 func TestAddDeleteCategories(t *testing.T) {
 	testRecipeSlug := "test-slug-1"

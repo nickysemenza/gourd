@@ -8,7 +8,10 @@ import (
 	"github.com/nickysemenza/food/backend/app/model"
 	log "github.com/sirupsen/logrus"
 )
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 type App struct {
 }
@@ -34,6 +37,29 @@ func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
+func Authorized() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		//check if token is present in header
+		if jwt := c.GetHeader("X-Jwt"); jwt == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, "no token")
+		} else {
+			//retrieve from DB
+			db := c.MustGet("DB").(*gorm.DB)
+			u, _ := h.GetUserFromToken(db, jwt)
+
+			//check if they have admin role
+			if u != nil && u.Admin == true {
+				c.Set("user", u)
+				c.Next()
+			} else {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, "not authorized!")
+			}
+
+		}
+	}
+}
+
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 
@@ -44,20 +70,26 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	router.Use(DatabaseInjector(db))
 
 	router.Static("/public", "./public")
-	router.Handle("GET", "/recipes", h.GetAllRecipes)
-	router.Handle("GET", "/me", h.GetMe)                     //todo: protect
-	router.Handle("PUT", "/imageupload", h.PutImageUpload)   //todo: protect
-	router.Handle("POST", "/recipes", h.CreateRecipe)        //todo: protect
-	router.Handle("PUT", "/recipes/:slug", h.PutRecipe)      //todo: protect
-	router.Handle("POST", "/recipes/:slug/notes", h.AddNote) //todo: protect
-	router.Handle("PUT", "/meals/:id", h.UpdateMealByID)     //todo: protect
-	router.Handle("GET", "/recipes/:slug", h.GetRecipe)
-	router.Handle("GET", "/images", h.GetAllImages)
-	router.Handle("GET", "/categories", h.GetAllCategories)
-	router.Handle("GET", "/meals", h.GetAllMeals)
-	router.Handle("GET", "/meals/:id", h.GetMealByID)
-	router.Handle("GET", "/auth/facebook/login", h.HandleFacebookLogin)
-	router.Handle("GET", "/auth/facebook/callback", h.HandleFacebookCallback)
+
+	router.GET("/me", Authorized(), h.GetMe)
+
+	router.GET("/recipes", h.GetAllRecipes)
+	router.POST("/recipes", Authorized(), h.CreateRecipe)
+	router.GET("/recipes/:slug", h.GetRecipe)
+	router.PUT("/recipes/:slug", Authorized(), h.PutRecipe)
+	router.POST("/recipes/:slug/notes", Authorized(), h.AddNote)
+
+	router.GET("/images", h.GetAllImages)
+	router.PUT("/imageupload", Authorized(), h.PutImageUpload)
+
+	router.GET("/categories", h.GetAllCategories)
+
+	router.GET("/meals", h.GetAllMeals)
+	router.GET("/meals/:id", h.GetMealByID)
+	router.PUT("/meals/:id", Authorized(), h.UpdateMealByID)
+
+	router.GET("/auth/facebook/login", h.HandleFacebookLogin)
+	router.GET("/auth/facebook/callback", h.HandleFacebookCallback)
 
 	return router
 }
