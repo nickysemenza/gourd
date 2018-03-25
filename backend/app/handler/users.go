@@ -20,13 +20,6 @@ import (
 )
 
 var (
-	oauthConf = &oauth2.Config{
-		ClientID:     os.Getenv("FACEBOOK_APP_ID"),
-		ClientSecret: os.Getenv("FACEBOOK_APP_SECRET"),
-		RedirectURL:  os.Getenv("API_PUBLIC_URL") + "/auth/facebook/callback",
-		Scopes:       []string{"public_profile", "email"},
-		Endpoint:     facebook.Endpoint,
-	}
 	oauthStateString = "thisshouldberandom"
 )
 
@@ -36,8 +29,19 @@ func GetMe(c *gin.Context) {
 	c.JSON(http.StatusOK, "todo")
 }
 
+func getOauthConf() *oauth2.Config {
+	return &oauth2.Config{
+		ClientID:     os.Getenv("FACEBOOK_APP_ID"),
+		ClientSecret: os.Getenv("FACEBOOK_APP_SECRET"),
+		RedirectURL:  os.Getenv("API_PUBLIC_URL") + "/auth/facebook/callback",
+		Scopes:       []string{"public_profile", "email"},
+		Endpoint:     facebook.Endpoint,
+	}
+}
+
 //HandleFacebookLogin initiates the facebook auth process
 func HandleFacebookLogin(c *gin.Context) {
+	oauthConf := getOauthConf()
 	URL, err := url.Parse(oauthConf.Endpoint.AuthURL)
 	if err != nil {
 		log.Fatal("Parse: ", err)
@@ -49,19 +53,23 @@ func HandleFacebookLogin(c *gin.Context) {
 	parameters.Add("response_type", "code")
 	parameters.Add("state", oauthStateString)
 	URL.RawQuery = parameters.Encode()
+	log.Println(URL.String())
 	c.Redirect(http.StatusTemporaryRedirect, URL.String())
+
 }
 
 //HandleFacebookCallback is the callback for the facebook auth process
 func HandleFacebookCallback(c *gin.Context) {
+	oauthConf := getOauthConf()
 	db := c.MustGet("DB").(*gorm.DB)
-	state := c.PostForm("state")
+	state := c.Query("state")
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
+		return
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 
-	code := c.PostForm("code")
+	code := c.Query("code")
 
 	token, err := oauthConf.Exchange(context.Background(), code)
 	if err != nil {
