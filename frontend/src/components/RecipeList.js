@@ -11,21 +11,24 @@ class RecipeList extends Component {
     this.props.fetchRecipes();
   }
   render() {
+    let { recipe_list } = this.props;
+    if (!recipe_list) return <h1>loading...</h1>;
     return (
       <Card.Group>
-        {this.props.recipe_list.map(eachRecipe => (
+        {recipe_list.map(eachRecipe => (
           <Card
             key={eachRecipe.id}
             as={Link}
             to={`/${eachRecipe.slug}`}
             image={
-              eachRecipe.images === null
+              !eachRecipe.images || eachRecipe.images.length === 0
                 ? 'http://via.placeholder.com/2000x1200'
                 : eachRecipe.images[0].url
             }
             header={eachRecipe.title}
             meta={
-              eachRecipe.categories === null
+              eachRecipe.categories === null ||
+              eachRecipe.categories === undefined
                 ? 'no categories'
                 : eachRecipe.categories.map(x => x.name).join(', ')
             }

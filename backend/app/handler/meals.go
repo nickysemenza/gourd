@@ -21,7 +21,7 @@ func GetMealByID(c *gin.Context) {
 	db := c.MustGet("DB").(*gorm.DB)
 	id := c.Params.ByName("id")
 	var meal model.Meal
-	db.Preload("RecipeMeal.Recipe").First(&meal, id)
+	db.Preload("RecipeMeal.Recipe.Sections.Ingredients.Item").Preload("RecipeMeal.Recipe.Sections.Instructions").First(&meal, id)
 	c.JSON(http.StatusOK, meal)
 }
 

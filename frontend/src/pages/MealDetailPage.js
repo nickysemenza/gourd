@@ -22,7 +22,7 @@ import {
 import { Link } from 'react-router-dom';
 import 'moment-timezone';
 import RecipePicker from '../components/RecipePicker';
-
+import { getScaledMeasurementString } from '../components/RecipeIngredientMeasurement';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 
@@ -54,6 +54,24 @@ class MealDetailPage extends Component {
       { key: 'd', text: 'Dinner', value: 'dinner' },
       { key: 's', text: 'Snack', value: 'snack' }
     ];
+    let a = {};
+
+    thisMeal.recipe_meals.forEach(r => {
+      let { sections, title } = r.recipe;
+      let scale = r.multiplier;
+      if (sections)
+        sections.forEach(s => {
+          s.ingredients.forEach(i => {
+            let { name } = i.item;
+            let x = `${getScaledMeasurementString(i, scale)} [${title}]`;
+            if (a[name]) a[name].push(x);
+            else {
+              a[name] = [x];
+            }
+            console.log({ i });
+          });
+        });
+    });
     return (
       <div className="container">
         <Breadcrumb>
@@ -69,7 +87,7 @@ class MealDetailPage extends Component {
             Meal # {this.state.mealId}
           </Breadcrumb.Section>
         </Breadcrumb>
-
+        <pre>{JSON.stringify(a, true, 2)}</pre>
         <Header dividing content="Meal Detail" />
 
         <Table celled>
