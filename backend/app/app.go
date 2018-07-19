@@ -18,6 +18,7 @@ type App struct {
 
 func (a *App) Initialize(c *config.Config) *config.Env {
 	db, err := gorm.Open(c.DB.Dialect, c.GetDBURI())
+	db.LogMode(true)
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}

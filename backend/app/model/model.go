@@ -216,7 +216,7 @@ func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier float32) {
 
 //FindOrCreateUsingName finds an ingredient by name, otherwise it creates it
 func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
-	db.FirstOrCreate(&ingredient, Ingredient{Name: ingredient.Name})
+	db.Where(Ingredient{Name: ingredient.Name}).FirstOrCreate(&ingredient)
 }
 
 //GetFresh gets a fresh DB instance of an Ingredient
@@ -246,6 +246,7 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 			eachSectionIngredient := &eachSection.Ingredients[y]
 			eachItem := &eachSectionIngredient.Item
 			if recursivelyStripIDs {
+				//this means we are probably importing from json file
 				eachSectionIngredient.ID = 0
 				eachItem.ID = 0
 			}
@@ -278,6 +279,7 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 				eachSectionInstruction.ID = 0
 			}
 		}
+		db.Save(&eachSection)
 		db.Model(&eachSection).Association("Ingredients").Replace(eachSection.Ingredients)
 		db.Model(&eachSection).Association("Instructions").Replace(eachSection.Instructions)
 
