@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/joho/godotenv"
-	"github.com/nickysemenza/food/backend/app/model"
 	"log"
 	"os"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/nickysemenza/food/backend/app/model"
 )
 
 //Config holds the top level config
@@ -20,6 +21,8 @@ type DBConfig struct {
 	Dialect  string
 	Username string
 	Password string
+	Host     string
+	Port     string
 	Name     string
 	Charset  string
 }
@@ -41,10 +44,6 @@ func getEnv(key, fallback string) string {
 
 //GetConfig returns a fresh Config, including connecting to the DB
 func GetConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Print("Error loading .env file")
-	}
 
 	dbName := ""
 	if _, ok := os.LookupEnv("TESTMODE"); ok {
@@ -60,19 +59,23 @@ func GetConfig() *Config {
 			Dialect:  "mysql",
 			Username: os.Getenv("DB_USERNAME"),
 			Password: os.Getenv("DB_PASSWORD"),
+			Host:     os.Getenv("DB_HOST"),
+			Port:     getEnv("DB_PORT", "3306"),
 			Name:     dbName,
 			Charset:  "utf8",
 		},
-		Port: getEnv("PORT", "4000"),
+		Port: getEnv("PORT", "8080"),
 	}
 	return &config
 }
 
 //GetDBURI builds a DB connection string
 func (config *Config) GetDBURI() string {
-	return fmt.Sprintf("%s:%s@/%s?charset=%s&parseTime=True",
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True",
 		config.DB.Username,
 		config.DB.Password,
+		config.DB.Host,
+		config.DB.Port,
 		config.DB.Name,
 		config.DB.Charset)
 }

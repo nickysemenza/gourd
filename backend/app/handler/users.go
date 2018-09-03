@@ -10,13 +10,14 @@ import (
 
 	"context"
 	"encoding/json"
+	"os"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
-	"os"
 )
 
 var (
@@ -66,8 +67,8 @@ func HandleFacebookCallback(c *gin.Context) {
 	state := c.Query("state")
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
-		return
 		c.Redirect(http.StatusTemporaryRedirect, "/")
+		return
 	}
 
 	code := c.Query("code")

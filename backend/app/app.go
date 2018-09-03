@@ -9,8 +9,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type App struct {
@@ -20,7 +21,7 @@ func (a *App) Initialize(c *config.Config) *config.Env {
 	db, err := gorm.Open(c.DB.Dialect, c.GetDBURI())
 	db.LogMode(true)
 	if err != nil {
-		log.Fatal("Could not connect database")
+		log.Fatal("Could not connect database: ", c.GetDBURI())
 	}
 	//set up the env
 	env := &config.Env{
