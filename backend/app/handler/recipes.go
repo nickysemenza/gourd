@@ -1,12 +1,13 @@
 package handler
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
 	"github.com/pkg/errors"
-	"log"
-	"net/http"
 )
 
 //GetAllRecipes gets all recipes: GET /recipes
@@ -20,14 +21,13 @@ func GetAllRecipes(c *gin.Context) {
 //GetRecipe gets a recipe by its slug: GET /recipes/{slug}
 func GetRecipe(c *gin.Context) {
 	db := c.MustGet("DB").(*gorm.DB)
-	recipe := model.Recipe{}
 	slug := c.Params.ByName("slug")
 
-	if err := recipe.GetFromSlug(db, slug); err != nil {
-		//return StatusError{Code: 404, Err: errors.New("recipe " + slug + " not found")}
+	if recipe, err := model.GetRecipeFromSlug(db, slug); err != nil {
+		c.JSON(http.StatusNotFound, errors.New("recipe "+slug+" not found"))
+	} else {
+		c.JSON(http.StatusOK, recipe)
 	}
-
-	c.JSON(http.StatusOK, recipe)
 
 }
 
@@ -43,13 +43,12 @@ func PutRecipe(c *gin.Context) {
 	updatedRecipe.CreateOrUpdate(db, false)
 
 	slug := updatedRecipe.Slug
-	recipe := model.Recipe{}
 
-	if err := recipe.GetFromSlug(db, slug); err != nil {
+	if recipe, err := model.GetRecipeFromSlug(db, slug); err != nil {
 		c.JSON(404, errors.New("recipe "+slug+" not found"))
+	} else {
+		c.JSON(http.StatusOK, recipe)
 	}
-
-	c.JSON(http.StatusOK, recipe)
 
 }
 

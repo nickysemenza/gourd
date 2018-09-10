@@ -1,11 +1,12 @@
 package handler
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
-	"log"
-	"net/http"
 )
 
 //GetAllMeals gets all meals, with their related recipes

@@ -5,11 +5,12 @@ import (
 
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 //Model is what all the models are based off of
@@ -232,7 +233,7 @@ func (ingredient *Ingredient) AfterCreate() (err error) {
 
 //CreateOrUpdate updates or creates a Recipe with its children.
 //	recursivelyStripIDs is useful for importing, when you want to ignore the primary keys of a json obj
-func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
+func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) error {
 	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
 	//update Categories and Sections relations
 	db.Model(&r).Association("Categories").Replace(r.Categories)
@@ -292,8 +293,9 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) {
 	r.reIndexSectionSortOrder()
 
 	if err := db.Save(&r).Error; err != nil {
-		log.Println(err)
+		return err
 	}
+	return nil
 }
 
 //CreateOrUpdate updates or creates a Meal with its children.
@@ -305,9 +307,10 @@ func (m Meal) CreateOrUpdate(db *gorm.DB) {
 	}
 }
 
-//GetFromSlug will populate a Recipe obj based on slug
-func (r *Recipe) GetFromSlug(db *gorm.DB, slug string) error {
-	return db.Where("slug = ?", slug).
+//GetRecipeFromSlug will populate a Recipe obj based on slug
+func GetRecipeFromSlug(db *gorm.DB, slug string) (Recipe, error) {
+	r := Recipe{}
+	err := db.Where("slug = ?", slug).
 		Preload("Sections", func(db *gorm.DB) *gorm.DB {
 			return db.Order("sections.sort_order ASC")
 		}).
@@ -322,6 +325,7 @@ func (r *Recipe) GetFromSlug(db *gorm.DB, slug string) error {
 		Preload("Images.Sizes").
 		Preload("Categories").
 		First(&r).Error
+	return r, err
 }
 
 var modelsInOrder = []interface{}{

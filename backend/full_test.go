@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/icrowley/fake"
-	"github.com/jinzhu/gorm"
-	"github.com/joho/godotenv"
-	"github.com/nickysemenza/food/backend/app"
-	"github.com/nickysemenza/food/backend/app/config"
-	"github.com/nickysemenza/food/backend/app/model"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/icrowley/fake"
+	"github.com/jinzhu/gorm"
+	"github.com/nickysemenza/food/backend/app"
+	"github.com/nickysemenza/food/backend/app/config"
+	"github.com/nickysemenza/food/backend/app/model"
 )
 
 var db *gorm.DB
@@ -51,7 +51,6 @@ func getGuestUser() *model.User {
 }
 
 func TestMain(m *testing.M) {
-	godotenv.Load()
 	globalConfig := config.GetConfig()
 	mainApp := &app.App{}
 	env := mainApp.Initialize(globalConfig)
