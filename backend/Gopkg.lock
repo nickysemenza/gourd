@@ -43,6 +43,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:c0bec5f9b98d0bc872ff5e834fac186b807b656683bd29cb82fb207a1513fabb"
+  name = "github.com/beorn7/perks"
+  packages = ["quantile"]
+  pruneopts = ""
+  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
+
+[[projects]]
+  branch = "master"
   digest = "1:6b95ea5a928720ac348743d956d1e44a00800f1ab9ce0ecd6ed1833ba44c3413"
   name = "github.com/corpix/uarand"
   packages = ["."]
@@ -147,7 +155,10 @@
 [[projects]]
   digest = "1:442baaf193e432b3432e26465fb36aed31484866ddb0ee11f68caceb130e317e"
   name = "github.com/joho/godotenv"
-  packages = ["."]
+  packages = [
+    ".",
+    "autoload",
+  ]
   pruneopts = ""
   revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
   version = "v1.2.0"
@@ -167,6 +178,14 @@
   pruneopts = ""
   revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
   version = "v0.0.4"
+
+[[projects]]
+  digest = "1:63722a4b1e1717be7b98fc686e0b30d5e7f734b9e93d7dee86293b6deab7ea28"
+  name = "github.com/matttproud/golang_protobuf_extensions"
+  packages = ["pbutil"]
+  pruneopts = ""
+  revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:0c0ff2a89c1bb0d01887e1dac043ad7efbf3ec77482ef058ac423d13497e16fd"
@@ -193,6 +212,50 @@
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:4142d94383572e74b42352273652c62afec5b23f325222ed09198f46009022d1"
+  name = "github.com/prometheus/client_golang"
+  packages = [
+    "prometheus",
+    "prometheus/promhttp",
+  ]
+  pruneopts = ""
+  revision = "c5b7fccd204277076155f10851dad72b76a49317"
+  version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:185cf55b1f44a1bf243558901c3f06efa5c64ba62cfdcbb1bf7bbe8c3fb68561"
+  name = "github.com/prometheus/client_model"
+  packages = ["go"]
+  pruneopts = ""
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f477ef7b65d94fb17574fc6548cef0c99a69c1634ea3b6da248b63a61ebe0498"
+  name = "github.com/prometheus/common"
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model",
+  ]
+  pruneopts = ""
+  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
+
+[[projects]]
+  branch = "master"
+  digest = "1:e04aaa0e8f8da0ed3d6c0700bd77eda52a47f38510063209d72d62f0ef807d5e"
+  name = "github.com/prometheus/procfs"
+  packages = [
+    ".",
+    "internal/util",
+    "nfs",
+    "xfs",
+  ]
+  pruneopts = ""
+  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+
+[[projects]]
   digest = "1:3fcbf733a8d810a21265a7f2fe08a3353db2407da052b233f8b204b5afc03d9b"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
@@ -215,6 +278,14 @@
   pruneopts = ""
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:da595d65ebc090b8aa42d49987efd2ba30ae043dcbb7de32b0fd8f0cf5e97605"
+  name = "github.com/zsais/go-gin-prometheus"
+  packages = ["."]
+  pruneopts = ""
+  revision = "f09dfa9cedec6f3e4ed39e49cceeda09cbed464f"
 
 [[projects]]
   branch = "master"
@@ -305,9 +376,11 @@
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
     "github.com/joho/godotenv",
+    "github.com/joho/godotenv/autoload",
     "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "github.com/urfave/cli",
+    "github.com/zsais/go-gin-prometheus",
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/facebook",
   ]

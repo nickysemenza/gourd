@@ -1,17 +1,17 @@
 package app
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/config"
 	h "github.com/nickysemenza/food/backend/app/handler"
 	"github.com/nickysemenza/food/backend/app/model"
 	log "github.com/sirupsen/logrus"
-)
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"github.com/zsais/go-gin-prometheus"
 )
 
 type App struct {
@@ -71,6 +71,24 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	router.Use(cors.New(corsConfig))
 	router.Use(DatabaseInjector(db))
 
+	// prometheus setup
+	p := ginprometheus.NewPrometheus("gin")
+	p.ReqCntURLLabelMappingFn = func(c *gin.Context) string {
+		url := c.Request.URL.String()
+		for _, p := range c.Params {
+			if p.Key == "slug" {
+				url = strings.Replace(url, p.Value, ":slug", 1)
+				break
+			} else if p.Key == "id" {
+				url = strings.Replace(url, p.Value, ":id", 1)
+				break
+			}
+		}
+		return url
+	}
+	p.Use(router)
+
+	// routes
 	router.Static("/public", "./public")
 
 	router.GET("/me", Authorized(), h.GetMe)
