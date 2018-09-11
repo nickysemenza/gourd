@@ -106,7 +106,7 @@ func HandleFacebookCallback(c *gin.Context) {
 	tok := user.GetJWTToken(db)
 
 	log.Printf("TOKEN for user %d: %s\n", user.ID, tok)
-	c.Redirect(http.StatusTemporaryRedirect, os.Getenv("FRONTEND_URL")+"/auth/"+tok)
+	c.Redirect(http.StatusTemporaryRedirect, os.Getenv("UI_URL")+"/auth/"+tok)
 
 }
 

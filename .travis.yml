@@ -22,7 +22,7 @@ install:
 - cd ..
 before_script:
 - mysql -e 'CREATE DATABASE food_test;'
-- cd frontend/
+- cd ui/
 - yarn install
 # - cp src/config.example.js src/config.js
 - cd ..
@@ -30,7 +30,7 @@ script:
 - cd backend/
 - ./test_cov.sh
 - cd ..
-- cd frontend/
+- cd ui/
 - npm test -- --coverage
 - npm run build
 - cd ..
@@ -38,7 +38,7 @@ after_success:
 - cd backend/
 - bash <(curl -s https://codecov.io/bash)
 - cd ..
-- cd frontend/
+- cd ui/
 - bash <(curl -s https://codecov.io/bash)
 - cd ..
 
@@ -53,7 +53,7 @@ deploy:
   bucket: recipehub-frontend
   # Prevent Travis from deleting your built site so it can be uploaded.
   skip_cleanup: true
-  local_dir: frontend/build
+  local_dir: ui/build
   cache_control: "max-age=180"
 after_deploy:
   # Allow `awscli` to make requests to CloudFront.

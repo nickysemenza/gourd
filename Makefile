@@ -1,7 +1,7 @@
 dev-backend:
 	cd backend && go run main.go
-dev-frontend:
-	cd frontend && yarn start
+dev-ui:
+	cd ui && yarn start
 
 IMAGE=nicky/food-backend
 
