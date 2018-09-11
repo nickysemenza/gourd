@@ -1,19 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"os"
+
 	"github.com/nickysemenza/food/backend/app"
 	"github.com/nickysemenza/food/backend/app/config"
-	"github.com/nickysemenza/food/backend/app/utils"
 	"github.com/urfave/cli"
-	"os"
 )
 
 func main() {
 
 	globalConfig := config.GetConfig()
-	mainApp := &app.App{}
-	appEnv := mainApp.Initialize(globalConfig)
+	mainApp := app.NewApp(globalConfig)
 
 	cliApp := cli.NewApp()
 	cliApp.Version = "1.0.0"
@@ -22,7 +20,7 @@ func main() {
 		{Name: "Nicky", Email: "nicky@nickysemenza.com"},
 	}
 	cliApp.Action = func(c *cli.Context) error {
-		mainApp.RunServer(fmt.Sprintf(":%s", globalConfig.Port), appEnv.DB)
+		mainApp.RunServer()
 		return nil
 	}
 	cliApp.Commands = []cli.Command{
@@ -33,7 +31,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				pwd, _ := os.Getwd()
 				pwd += "/recipes/"
-				utils.Utils{appEnv}.Export(pwd)
+				mainApp.Export(pwd)
 				return nil
 			},
 		},
@@ -44,7 +42,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				pwd, _ := os.Getwd()
 				pwd += "/recipes/"
-				utils.Utils{appEnv}.Import(pwd)
+				mainApp.Import(pwd)
 				return nil
 			},
 		},

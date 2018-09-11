@@ -3,14 +3,14 @@ package handler
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
-	"github.com/nickysemenza/food/backend/app/model"
-	"github.com/nickysemenza/food/backend/app/utils"
 	"io"
 	"log"
 	"os"
 	"path"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	"github.com/nickysemenza/food/backend/app/model"
 )
 
 //PutImageUpload uploads images to a recipe based on its Slug
@@ -43,7 +43,7 @@ func PutImageUpload(c *gin.Context) {
 		}
 		originalFileName := files[i].Filename
 
-		fileData, md5Hash, err := utils.ReadAndHash(file)
+		fileData, md5Hash, err := ReadAndHash(file)
 		if err != nil {
 			c.JSON(500, err)
 			return
@@ -80,7 +80,7 @@ func PutImageUpload(c *gin.Context) {
 		}
 
 		if os.Getenv("S3_IMAGES") == "true" {
-			if err := utils.AddFileToS3(localImageFile.Name(), imagePath); err != nil {
+			if err := AddFileToS3(localImageFile.Name(), imagePath); err != nil {
 				imageObj.IsInS3 = false
 				log.Println(err)
 			} else {

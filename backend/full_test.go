@@ -51,12 +51,16 @@ func getGuestUser() *model.User {
 }
 
 func TestMain(m *testing.M) {
-	globalConfig := config.GetConfig()
-	mainApp := &app.App{}
-	env := mainApp.Initialize(globalConfig)
+	c := &config.Config{
+		DB: &config.DB{
+			Dialect: "sqlite3",
+			Name:    "/tmp/foo.sql",
+		},
+		Port: "7070",
+	}
+	a := app.NewApp(c)
 
-	db = env.DB
-	db = model.DBReset(db)
+	db = model.DBReset(a.Env.DB)
 	db = model.DBMigrate(db)
 
 	os.Exit(m.Run())

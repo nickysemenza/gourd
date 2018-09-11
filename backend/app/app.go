@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -14,22 +15,33 @@ import (
 	"github.com/zsais/go-gin-prometheus"
 )
 
+//App is the app server
 type App struct {
+	Env  *Env
+	Port string
+	Host string
 }
 
-func (a *App) Initialize(c *config.Config) *config.Env {
-	db, err := gorm.Open(c.DB.Dialect, c.GetDBURI())
-	db.LogMode(true)
+//Env holds misc env stuff like the DB connection object.
+type Env struct {
+	DB          *gorm.DB
+	CurrentUser *model.User
+}
+
+func NewApp(c *config.Config) *App {
+	db, err := gorm.Open(c.DB.Dialect, c.DB.GetURI())
 	if err != nil {
-		log.Fatal("Could not connect database: ", c.GetDBURI())
+		log.Fatal("Could not connect database: ", err)
 	}
+	db.LogMode(true)
 	//set up the env
-	env := &config.Env{
-		DB:   model.DBMigrate(db),
-		Port: c.Port,
-		//Router: &a.R,
+	env := &Env{
+		DB: model.DBMigrate(db),
 	}
-	return env
+	return &App{
+		Env:  env,
+		Port: c.Port,
+	}
 }
 
 func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
@@ -113,10 +125,14 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	return router
 }
-func (a *App) RunServer(host string, db *gorm.DB) {
+func (a *App) RunServer() error {
+	host := fmt.Sprintf("%s:%s", a.Host, a.Port)
 	log.Println("Running API server on", host)
 
-	router := SetupRouter(db)
+	router := SetupRouter(a.Env.DB)
 
-	router.Run()
+	if err := router.Run(); err != nil {
+		return err
+	}
+	return nil
 }
