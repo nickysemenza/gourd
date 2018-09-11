@@ -28,6 +28,7 @@ type Env struct {
 	CurrentUser *model.User
 }
 
+//NewApp creates a new app
 func NewApp(c *config.Config) *App {
 	db, err := gorm.Open(c.DB.Dialect, c.DB.GetURI())
 	if err != nil {
@@ -44,14 +45,14 @@ func NewApp(c *config.Config) *App {
 	}
 }
 
-func DatabaseInjector(db *gorm.DB) gin.HandlerFunc {
+func databaseInjector(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("DB", db)
 		c.Next()
 	}
 }
 
-func Authorized() gin.HandlerFunc {
+func mustAuthorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		//check if token is present in header
@@ -74,14 +75,18 @@ func Authorized() gin.HandlerFunc {
 	}
 }
 
+//SetupRouter builds the router
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
 
+	//proper cors
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "X-JWT"}
 	router.Use(cors.New(corsConfig))
-	router.Use(DatabaseInjector(db))
+
+	//inject DB into ctx
+	router.Use(databaseInjector(db))
 
 	// prometheus setup
 	p := ginprometheus.NewPrometheus("gin")
@@ -103,28 +108,30 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	// routes
 	router.Static("/public", "./public")
 
-	router.GET("/me", Authorized(), h.GetMe)
+	router.GET("/me", mustAuthorize(), h.GetMe)
 
 	router.GET("/recipes", h.GetAllRecipes)
-	router.POST("/recipes", Authorized(), h.CreateRecipe)
+	router.POST("/recipes", mustAuthorize(), h.CreateRecipe)
 	router.GET("/recipes/:slug", h.GetRecipe)
-	router.PUT("/recipes/:slug", Authorized(), h.PutRecipe)
-	router.POST("/recipes/:slug/notes", Authorized(), h.AddNote)
+	router.PUT("/recipes/:slug", mustAuthorize(), h.PutRecipe)
+	router.POST("/recipes/:slug/notes", mustAuthorize(), h.AddNote)
 
 	router.GET("/images", h.GetAllImages)
-	router.PUT("/imageupload", Authorized(), h.PutImageUpload)
+	router.PUT("/imageupload", mustAuthorize(), h.PutImageUpload)
 
 	router.GET("/categories", h.GetAllCategories)
 
 	router.GET("/meals", h.GetAllMeals)
 	router.GET("/meals/:id", h.GetMealByID)
-	router.PUT("/meals/:id", Authorized(), h.UpdateMealByID)
+	router.PUT("/meals/:id", mustAuthorize(), h.UpdateMealByID)
 
 	router.GET("/auth/facebook/login", h.HandleFacebookLogin)
 	router.GET("/auth/facebook/callback", h.HandleFacebookCallback)
 
 	return router
 }
+
+//RunServer starts up the server on host:port
 func (a *App) RunServer() error {
 	host := fmt.Sprintf("%s:%s", a.Host, a.Port)
 	log.Println("Running API server on", host)

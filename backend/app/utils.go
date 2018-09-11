@@ -3,6 +3,8 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+
+	//load jpeg and png for processing
 	_ "image/jpeg"
 	_ "image/png"
 	"io/ioutil"
