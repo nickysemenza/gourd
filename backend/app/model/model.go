@@ -1,7 +1,10 @@
 package model
 
 import (
+	"context"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"encoding/json"
 	"fmt"
@@ -14,6 +17,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	log "github.com/sirupsen/logrus"
+	otgorm "github.com/smacker/opentracing-gorm"
 )
 
 //Model is what all the models are based off of
@@ -37,7 +41,7 @@ type User struct {
 //GetJWTToken returns a JWT token for a User
 func (u *User) GetJWTToken(db *gorm.DB) string {
 
-	mySigningKey := []byte("AllYourBase")
+	mySigningKey := []byte("AllYourBase") //TODO: move to env
 
 	// Create the Claims
 	claims := &jwt.StandardClaims{
@@ -144,6 +148,7 @@ type Image struct {
 	Sizes            []ImageSize `json:"sizes"`
 }
 
+//ImageSize holds diff images
 type ImageSize struct {
 	Model
 	Width      int  `json:"w"`
@@ -210,7 +215,8 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 //}
 
 //AddToMeal adds the recipe to a Meal, with specified multiplier
-func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier float32) {
+func (r *Recipe) AddToMeal(ctx context.Context, meal *Meal, multiplier float32) {
+	db := GetDBFromContext(ctx)
 	recipemeal := RecipeMeal{}
 	recipemeal.Multiplier = multiplier
 	recipemeal.RecipeID = r.ID
@@ -219,12 +225,14 @@ func (r *Recipe) AddToMeal(db *gorm.DB, meal *Meal, multiplier float32) {
 }
 
 //FindOrCreateUsingName finds an ingredient by name, otherwise it creates it
-func (ingredient *Ingredient) FindOrCreateUsingName(db *gorm.DB) {
+func (ingredient *Ingredient) FindOrCreateUsingName(ctx context.Context) {
+	db := GetDBFromContext(ctx)
 	db.Where(Ingredient{Name: ingredient.Name}).FirstOrCreate(&ingredient)
 }
 
 //GetFresh gets a fresh DB instance of an Ingredient
-func (ingredient *Ingredient) GetFresh(db *gorm.DB) {
+func (ingredient *Ingredient) GetFresh(ctx context.Context) {
+	db := GetDBFromContext(ctx)
 	db.First(&ingredient, ingredient.ID)
 }
 
@@ -236,7 +244,8 @@ func (ingredient *Ingredient) AfterCreate() (err error) {
 
 //CreateOrUpdate updates or creates a Recipe with its children.
 //	recursivelyStripIDs is useful for importing, when you want to ignore the primary keys of a json obj
-func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) error {
+func (r Recipe) CreateOrUpdate(ctx context.Context, recursivelyStripIDs bool) error {
+	db := GetDBFromContext(ctx)
 	//todo: ensure that we aren't overwriting something with same slug, by checking for presence of ID
 	//update Categories and Sections relations
 	db.Model(&r).Association("Categories").Replace(r.Categories)
@@ -257,13 +266,13 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) error {
 			if eachItem.ID == 0 {
 				//	new ingredient!
 				//	find by name, to see if we have existing
-				eachItem.FindOrCreateUsingName(db)
+				eachItem.FindOrCreateUsingName(ctx)
 				//eachItem = model.GetIngredientByName(e.DB, eachItem.Name)
 				log.Printf("[ingredient] %s does not have an ID, giving it %d: ", eachItem.Name, eachItem.ID)
 			} else {
 				//	get fresh obj via eachIngredient.ID
 				fresh := *eachItem
-				fresh.GetFresh(db)
+				fresh.GetFresh(ctx)
 				//	if eachIngredient.Name != fresh.Name IT WAS MUTATED AAH!
 				if eachItem.Name != fresh.Name {
 					log.Printf("[ingredient] name of #%d was mutated! (%s->%s)", eachItem.ID, eachItem.Name, fresh.Name)
@@ -271,7 +280,7 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) error {
 
 					// find by name, or create new
 					newItem := Ingredient{Name: eachItem.Name}
-					newItem.FindOrCreateUsingName(db)
+					newItem.FindOrCreateUsingName(ctx)
 					eachSectionIngredient.Item = newItem
 				}
 			}
@@ -302,7 +311,8 @@ func (r Recipe) CreateOrUpdate(db *gorm.DB, recursivelyStripIDs bool) error {
 }
 
 //CreateOrUpdate updates or creates a Meal with its children.
-func (m Meal) CreateOrUpdate(db *gorm.DB) {
+func (m Meal) CreateOrUpdate(ctx context.Context) {
+	db := GetDBFromContext(ctx)
 	db.Model(&m).Association("RecipeMeal").Replace(m.RecipeMeal)
 
 	if err := db.Save(&m).Error; err != nil {
@@ -311,7 +321,13 @@ func (m Meal) CreateOrUpdate(db *gorm.DB) {
 }
 
 //GetRecipeFromSlug will populate a Recipe obj based on slug
-func GetRecipeFromSlug(db *gorm.DB, slug string) (Recipe, error) {
+func GetRecipeFromSlug(ctx context.Context, slug string) (Recipe, error) {
+	// span, ctx := opentracing.StartSpanFromContext(ctx, "handler")
+	// defer span.Finish()
+
+	// clone db with proper context
+	db := GetDBFromContext(ctx)
+
 	r := Recipe{}
 	err := db.Where("slug = ?", slug).
 		Preload("Sections", func(db *gorm.DB) *gorm.DB {
@@ -378,4 +394,19 @@ func DBReset(db *gorm.DB) *gorm.DB {
 	}
 	db.Exec("SET foreign_key_checks = 1;")
 	return db
+}
+
+type contextKey string
+
+//DBKey is the contexthey for *gorm.DB
+var DBKey = contextKey("db-context")
+
+//GetDBFromContext extracts db conn from context
+func GetDBFromContext(ctx context.Context) *gorm.DB {
+	db, ok := ctx.Value(DBKey).(*gorm.DB)
+	if !ok {
+		spew.Dump(ctx)
+		log.Fatalf("could not find db in context!")
+	}
+	return otgorm.SetSpanToGorm(ctx, db)
 }

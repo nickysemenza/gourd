@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -18,9 +19,10 @@ func TestRecipe_CreateOrUpdate(t *testing.T) {
 	db = DBReset(db)
 	db = DBMigrate(db)
 	require.NotNil(db)
+	ctx := context.WithValue(context.Background(), DBKey, db)
 
 	//getting nonexistant should fail
-	_, err = GetRecipeFromSlug(db, "foo")
+	_, err = GetRecipeFromSlug(ctx, "foo")
 	require.Error(err)
 
 	r := Recipe{
@@ -43,9 +45,9 @@ func TestRecipe_CreateOrUpdate(t *testing.T) {
 		},
 	}
 	//basil insert-and-retrieve smoke test
-	err = r.CreateOrUpdate(db, false)
+	err = r.CreateOrUpdate(ctx, false)
 	require.NoError(err)
-	r2, err := GetRecipeFromSlug(db, "test-1")
+	r2, err := GetRecipeFromSlug(ctx, "test-1")
 	require.NoError(err)
 	require.Equal("test-1", r2.Slug, "slug should match")
 	flourID := r2.Sections[0].Ingredients[0].Item.ID
@@ -64,9 +66,9 @@ func TestRecipe_CreateOrUpdate(t *testing.T) {
 
 	r2.Sections[0].Ingredients[0].Item.Name = "bread flour"
 	//test something
-	err = r2.CreateOrUpdate(db, false)
+	err = r2.CreateOrUpdate(ctx, false)
 	require.NoError(err)
-	r2, err = GetRecipeFromSlug(db, "test-1")
+	r2, err = GetRecipeFromSlug(ctx, "test-1")
 
 	require.NotEqual(flourID, r2.Sections[0].Ingredients[0].Item.ID)
 	require.Equal("bread flour", r2.Sections[0].Ingredients[0].Item.Name)

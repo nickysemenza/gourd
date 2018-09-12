@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -9,14 +10,19 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
+	opentracing "github.com/opentracing/opentracing-go"
 )
 
 //PutImageUpload uploads images to a recipe based on its Slug
 func PutImageUpload(c *gin.Context) {
+	ctx := c.MustGet("ctx").(context.Context)
+	db := model.GetDBFromContext(ctx)
 
-	db := c.MustGet("DB").(*gorm.DB)
+	span, ctx := opentracing.StartSpanFromContext(ctx, "image upload handler")
+	defer span.Finish()
+	span.LogEvent("begin")
+
 	var finishedImages []model.Image
 
 	//get a ref to the parsed multipart form
@@ -25,15 +31,26 @@ func PutImageUpload(c *gin.Context) {
 		c.JSON(500, err)
 	}
 	slug := c.PostForm("slug")
+	span.SetTag("recipe-slug", slug)
+
 	recipe := model.Recipe{}
 	if err := db.Where("slug = ?", slug).First(&recipe).Error; err != nil {
 		c.JSON(500, errors.New("recipe "+slug+" not found"))
+		span.LogEvent("slug not found")
 		return
 	}
 
 	files := form.File["file"]
 	log.Printf("recieving %d images via upload for recipe %s", len(files), slug)
+	span.SetTag("image-count", len(files))
+	span.SetTag("recipe-id", recipe.ID)
+
 	for i := range files {
+		fSpan, ctx := opentracing.StartSpanFromContext(ctx, "image upload process")
+		db := model.GetDBFromContext(ctx)
+		originalFileName := files[i].Filename
+		fSpan.LogEvent("begin")
+		fSpan.SetTag("filename", originalFileName)
 		//for each fileheader, get a handle to the actual file
 		file, err := files[i].Open()
 		defer file.Close()
@@ -41,7 +58,6 @@ func PutImageUpload(c *gin.Context) {
 			c.JSON(500, err)
 			return
 		}
-		originalFileName := files[i].Filename
 
 		fileData, md5Hash, err := ReadAndHash(file)
 		if err != nil {
@@ -55,6 +71,9 @@ func PutImageUpload(c *gin.Context) {
 		imageObj.Md5Hash = md5Hash
 		db.Create(&imageObj)
 		db.Model(&recipe).Association("Images").Append(&imageObj)
+
+		fSpan.LogEvent("assigned image-id")
+		fSpan.SetTag("image-id", imageObj.ID)
 
 		originalImageSize := model.ImageSize{}
 		originalImageSize.IsOriginal = true
@@ -79,11 +98,16 @@ func PutImageUpload(c *gin.Context) {
 			return
 		}
 
-		if os.Getenv("S3_IMAGES") == "true" {
-			if err := AddFileToS3(localImageFile.Name(), imagePath); err != nil {
+		uploadToS3 := os.Getenv("S3_IMAGES") == "true"
+
+		fSpan.SetTag("use-s3", uploadToS3)
+		if uploadToS3 {
+			if err := AddFileToS3(ctx, localImageFile.Name(), imagePath); err != nil {
+				fSpan.LogEvent("s3 upload error")
 				imageObj.IsInS3 = false
 				log.Println(err)
 			} else {
+				fSpan.LogEventWithPayload("uploaded to s3", imagePath)
 				imageObj.IsInS3 = true
 				finishedImages = append(finishedImages, imageObj)
 			}
@@ -93,6 +117,8 @@ func PutImageUpload(c *gin.Context) {
 		imageObj.OriginalFileName = originalFileName
 		imageObj.Path = imagePath
 		db.Save(&imageObj)
+		fSpan.LogEvent("finished")
+		fSpan.Finish()
 		//imageObj.MakeSizes()
 	}
 	c.JSON(200, finishedImages)
@@ -100,7 +126,7 @@ func PutImageUpload(c *gin.Context) {
 
 //GetAllImages gets all images, with their related recipes
 func GetAllImages(c *gin.Context) {
-	db := c.MustGet("DB").(*gorm.DB)
+	db := model.GetDBFromContext(c.MustGet("ctx").(context.Context))
 	var images []model.Image
 	db.Preload("Recipes").Find(&images)
 	c.JSON(200, images)

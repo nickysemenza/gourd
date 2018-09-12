@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -16,7 +17,8 @@ import (
 )
 
 //Import imports a folder of recipes in json format
-func (a App) Import(path string) {
+//TODO: move Import/Export to not be App methods
+func (a App) Import(ctx context.Context, path string) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatal(err)
@@ -29,9 +31,10 @@ func (a App) Import(path string) {
 				os.Exit(1)
 			} else {
 				var eachRecipe model.Recipe
+
 				json.Unmarshal(raw, &eachRecipe)
 				log.Printf("importing: %s (%s)\n", eachRecipe.Title, eachRecipe.Slug)
-				eachRecipe.CreateOrUpdate(a.Env.DB, true)
+				eachRecipe.CreateOrUpdate(ctx, true)
 			}
 		}
 	}
@@ -39,9 +42,10 @@ func (a App) Import(path string) {
 }
 
 //Export exports a folder of recipes in json format
-func (a App) Export(path string) {
+func (a App) Export(ctx context.Context, path string) {
 	recipes := []model.Recipe{}
-	a.Env.DB.Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Find(&recipes)
+	db := model.GetDBFromContext(ctx)
+	db.Preload("Sections.Instructions").Preload("Sections.Ingredients.Item").Find(&recipes)
 	for _, r := range recipes {
 		jsonData, _ := json.Marshal(r)
 		err := ioutil.WriteFile(path+r.Slug+".json", jsonData, 0644)
