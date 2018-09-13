@@ -13,3 +13,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/zsais/go-gin-prometheus"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/smacker/opentracing-gorm"

@@ -63,7 +63,7 @@ func HandleFacebookLogin(c *gin.Context) {
 //HandleFacebookCallback is the callback for the facebook auth process
 func HandleFacebookCallback(c *gin.Context) {
 	oauthConf := getOauthConf()
-	db := c.MustGet("DB").(*gorm.DB)
+	db := model.GetDBFromContext(c.MustGet("ctx").(context.Context))
 	state := c.Query("state")
 	if state != oauthStateString {
 		fmt.Printf("invalid oauth state, expected '%s', got '%s'\n", oauthStateString, state)
@@ -142,6 +142,7 @@ func (d facebookUserData) getUser(db *gorm.DB) *model.User {
 	return &u
 }
 
+//GetUserFromToken extracts a user from the JWT
 func GetUserFromToken(db *gorm.DB, tokenString string) (*model.User, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -173,8 +174,7 @@ func GetUserFromToken(db *gorm.DB, tokenString string) (*model.User, error) {
 		u := model.User{}
 		db.First(&u, claims.Id)
 		return &u, nil
-	} else {
-		fmt.Println(err)
-		return nil, err
 	}
+	fmt.Println(err)
+	return nil, err
 }

@@ -1,17 +1,17 @@
 package handler
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/nickysemenza/food/backend/app/model"
 )
 
 //GetAllMeals gets all meals, with their related recipes
 func GetAllMeals(c *gin.Context) {
-	db := c.MustGet("DB").(*gorm.DB)
+	db := model.GetDBFromContext(c.MustGet("ctx").(context.Context))
 	var meals []model.Meal
 	db.Order("time DESC").Preload("RecipeMeal.Recipe").Find(&meals)
 	c.JSON(http.StatusOK, meals)
@@ -19,7 +19,7 @@ func GetAllMeals(c *gin.Context) {
 
 //GetMealByID retrieves a meal
 func GetMealByID(c *gin.Context) {
-	db := c.MustGet("DB").(*gorm.DB)
+	db := model.GetDBFromContext(c.MustGet("ctx").(context.Context))
 	id := c.Params.ByName("id")
 	var meal model.Meal
 	db.Preload("RecipeMeal.Recipe.Sections.Ingredients.Item").Preload("RecipeMeal.Recipe.Sections.Instructions").First(&meal, id)
@@ -27,7 +27,7 @@ func GetMealByID(c *gin.Context) {
 }
 
 func UpdateMealByID(c *gin.Context) {
-	db := c.MustGet("DB").(*gorm.DB)
+	ctx := c.MustGet("ctx").(context.Context)
 	id := c.Params.ByName("id")
 
 	var updatedMeal model.Meal
@@ -36,8 +36,9 @@ func UpdateMealByID(c *gin.Context) {
 		log.Println(err)
 	}
 
-	updatedMeal.CreateOrUpdate(db)
+	updatedMeal.CreateOrUpdate(ctx)
 
-	db.Preload("RecipeMeal.Recipe").First(&updatedMeal, id)
+	db := model.GetDBFromContext(ctx)
+	db.Preload("RecipeMeal.Recipe").First(&updatedMeal, id) //TODO: move this into model
 	c.JSON(http.StatusOK, updatedMeal)
 }
