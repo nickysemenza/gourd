@@ -109,6 +109,10 @@ func tracingMiddleware() gin.HandlerFunc {
 		defer span.Finish()
 		c.Set("tracing-context", span)
 		c.Set("ctx", ctx)
+		if sc, ok := span.Context().(jaeger.SpanContext); ok {
+			c.Writer.Header().Set("x-trace-id", sc.TraceID().String())
+		}
+
 		c.Next()
 	}
 }
