@@ -1,12 +1,11 @@
 language: go
 go:
-  - 1.9
+  - 1.11
 node_js: "7"
 services:
   - mysql
 env:
   global:
-    - DEP_VERSION="0.3.2"
     - DB_USERNAME=root
     - DB_PASSWORD=
     - DB_DATABASE_TEST=food_test
@@ -16,28 +15,21 @@ before_install:
 install:
   - pip install --user awscli
   - npm install -g yarn
-  - go get -u github.com/golang/dep/...
-  - cd backend/
-  - dep ensure
-  - cd ..
 before_script:
   - mysql -e 'CREATE DATABASE food_test;'
+  - env GO111MODULE=on go build ./...
   - cd ui/
   - yarn install
   # - cp src/config.example.js src/config.js
   - cd ..
 script:
-  - cd backend/
-  - ./test_cov.sh
-  - cd ..
+  - env GO111MODULE=on ./test_cov.sh
   - cd ui/
   - npm test -- --coverage
   - npm run build
   - cd ..
 after_success:
-  - cd backend/
   - bash <(curl -s https://codecov.io/bash)
-  - cd ..
   - cd ui/
   - bash <(curl -s https://codecov.io/bash)
   - cd ..

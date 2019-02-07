@@ -6,16 +6,15 @@ jobs:
   build_backend:
     docker:
       # specify the version
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.11
         environment:
-        - DEP_VERSION: "0.3.2"
-        - DB_USERNAME: root
-        - DB_PASSWORD: root
-        - DB_DATABASE_TEST: food_test
+          - DB_USERNAME: root
+          - DB_PASSWORD: root
+          - DB_DATABASE_TEST: food_test
       - image: circleci/mysql:5.7
         environment:
-        - MYSQL_ROOT_PASSWORD: root
-        - MYSQL_DATABASE: food_test
+          - MYSQL_ROOT_PASSWORD: root
+          - MYSQL_DATABASE: food_test
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -25,18 +24,14 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/nickysemenza/food/
+    working_directory: ~/food/
     steps:
       - checkout
-
-      # specify any bash command here prefixed with `run: `
-      - run: go get -u github.com/golang/dep/cmd/dep
-      - run: cd backend && dep ensure
-      - run: cd backend && ./test.sh
-
+      - run: go build ./...
+      - run: ./test.sh
 
   build_ui:
-    docker: 
+    docker:
       - image: node:9.3.0
     working_directory: ~/food
     steps:
