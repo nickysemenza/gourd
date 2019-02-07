@@ -304,10 +304,9 @@ func (r Recipe) CreateOrUpdate(ctx context.Context, recursivelyStripIDs bool) er
 
 	r.reIndexSectionSortOrder()
 
-	if err := db.Save(&r).Error; err != nil {
-		return err
-	}
-	return nil
+	
+	err := db.Save(&r).Error
+	return err
 }
 
 //CreateOrUpdate updates or creates a Meal with its children.
@@ -410,3 +409,4 @@ func GetDBFromContext(ctx context.Context) *gorm.DB {
 	}
 	return otgorm.SetSpanToGorm(ctx, db)
 }
+

@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app/model"
 )
 
 //Import imports a folder of recipes in json format

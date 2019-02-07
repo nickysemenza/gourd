@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/nickysemenza/food/backend/app"
-	"github.com/nickysemenza/food/backend/app/config"
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app"
+	"github.com/nickysemenza/food/app/config"
+	"github.com/nickysemenza/food/app/model"
 	"github.com/urfave/cli"
 )
 

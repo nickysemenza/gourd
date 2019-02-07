@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app/model"
 )
 
 //GetAllMeals gets all meals, with their related recipes

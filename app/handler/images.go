@@ -10,7 +10,7 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app/model"
 	opentracing "github.com/opentracing/opentracing-go"
 )
 

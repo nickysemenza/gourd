@@ -15,7 +15,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app/model"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/facebook"
 )

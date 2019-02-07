@@ -12,9 +12,9 @@ import (
 
 	"github.com/icrowley/fake"
 	"github.com/jinzhu/gorm"
-	"github.com/nickysemenza/food/backend/app"
-	"github.com/nickysemenza/food/backend/app/config"
-	"github.com/nickysemenza/food/backend/app/model"
+	"github.com/nickysemenza/food/app"
+	"github.com/nickysemenza/food/app/config"
+	"github.com/nickysemenza/food/app/model"
 )
 
 var db *gorm.DB
