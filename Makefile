@@ -1,15 +1,39 @@
-dev-backend:
-	go run main.go
-dev-ui:
-	cd ui && yarn start
+VERSION          := $(shell git describe --tags --always --dirty="-dev")
+DATE             := $(shell date '+%Y-%m-%d-%H%M UTC')
+VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(DATE)"'
 
-IMAGE=nicky/food-backend
+.PHONY: all
+all: bin/food
 
+bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
+	@mkdir -p $(dir $@)
+	go build $(VERSION_FLAGS) -o $@ ./cmd/$(@F)
+
+test: unit-test lint
+
+bin/revive:
+	@mkdir -p $(dir $@)
+	go build -o $@ ./vendor/github.com/mgechev/revive
+bin/migrate:
+	@mkdir -p $(dir $@)
+	go build -tags 'postgres' -o $@ ./vendor/github.com/golang-migrate/migrate/v4/cmd/migrate
+unit-test: 
+	go test -race -cover ./...
+lint: bin/revive
+	bin/revive -config revive.toml -formatter=friendly -exclude=vendor/... ./... || (echo "lint failed"; exit 1)	
+
+IMAGE := nicky/food-backend
 docker-build:
 	docker build -t $(IMAGE) .
-docker-run:
-	docker run -p 8080:8080 -e "DB_USERNAME=root" -e "DB_PASSWORD=6NzuCvnlO3cwOFvs" -e "DB_DATABASE=food" -e "DB_DATABASE_TEST=food2" -e "DB_HOST=35.230.30.35" -e "PORT=8080" $(IMAGE) 
-docker-dev: docker-build docker-run
+docker-dev: docker-build
 
 docker-push: docker-build
 	docker push $(IMAGE):latest
+
+dev-db:
+	PGPASSWORD=food pgcli -h localhost -p 5555 -U food food
+new-migrate/%: bin/migrate
+	mkdir -p migrations
+	./bin/migrate create -dir migrations -ext sql $(@F)
+migrate: bin/migrate
+	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable up

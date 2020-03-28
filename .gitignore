@@ -1,7 +1,2 @@
-.env
-
-recipes
-gin-bin
+bin/
 vendor/
-images/
-coverage/

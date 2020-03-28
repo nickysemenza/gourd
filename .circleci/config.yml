@@ -6,38 +6,25 @@ jobs:
   build_backend:
     docker:
       # specify the version
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.13
+      - image: circleci/postgres:9.6-alpine
         environment:
-          - DB_USERNAME: root
-          - DB_PASSWORD: root
-          - DB_DATABASE_TEST: food_test
-      - image: circleci/mysql:5.7
-        environment:
-          - MYSQL_ROOT_PASSWORD: root
-          - MYSQL_DATABASE: food_test
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    #### TEMPLATE_NOTE: go expects specific checkout path representing url
-    #### expecting it in the form of
-    ####   /go/src/github.com/circleci/go-tool
-    ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: ~/food/
+          POSTGRES_USER: circleci-demo-go
+          POSTGRES_DB: circle_test
+    working_directory: ~/work/
     steps:
       - checkout
-      - run: go build ./...
-      - run: ./test.sh
+      - run: make test
 
   build_ui:
     docker:
       - image: node:9.3.0
-    working_directory: ~/food
+    working_directory: ~/work
     steps:
       - checkout
-      - run: cd ui && yarn install
-      - run: cd ui && yarn test
+      - run: echo "todo"
+      # - run: cd ui && yarn install
+      # - run: cd ui && yarn test
 workflows:
   version: 2
   build_fullstack:
