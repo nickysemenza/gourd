@@ -1,44 +1,44 @@
 CREATE TABLE IF NOT EXISTS "ingredients" (
-  "uuid" TEXT NOT NULL,
+  "uuid" TEXT NOT NULL UNIQUE,
   "name" TEXT NOT NULL UNIQUE,
   PRIMARY KEY ("uuid")
 );
 CREATE TABLE IF NOT EXISTS "recipes" (
-  "uuid" TEXT NOT NULL,
+  "uuid" TEXT NOT NULL UNIQUE,
   "name" TEXT NOT NULL UNIQUE,
-  "total_minutes" serial,
-  "equipment" text,
-  "source" text,
-  "servings" serial,
-  "quantity" serial,
+  "total_minutes" INTEGER,
+  "equipment" TEXT,
+  "source" TEXT,
+  "servings" INTEGER,
+  "quantity" INTEGER,
   "unit" TEXT,
   PRIMARY KEY ("uuid")
 );
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
-  "uuid" TEXT NOT NULL,
-  "recipe" text references recipes(uuid) NOT NULL,
-  "sort" serial,
-  "minutes" serial,
+  "uuid" TEXT NOT NULL UNIQUE,
+  "recipe" TEXT references recipes(uuid) NOT NULL,
+  "sort" INTEGER,
+  "minutes" INTEGER,
   PRIMARY KEY ("uuid")
 );
 CREATE TABLE IF NOT EXISTS "recipe_section_instructions" (
-  "uuid" TEXT NOT NULL,
-  "section" text references recipe_sections(uuid) NOT NULL,
-  "sort" serial,
-  "instruction" text,
+  "uuid" TEXT NOT NULL UNIQUE,
+  "section" TEXT references recipe_sections(uuid) NOT NULL,
+  "sort" INTEGER,
+  "instruction" TEXT,
   PRIMARY KEY ("uuid")
 );
 CREATE TABLE IF NOT EXISTS "recipe_section_ingredients" (
-  "uuid" TEXT NOT NULL,
-  "section" text references recipe_sections(uuid) NOT NULL,
-  "sort" serial,
+  "uuid" TEXT NOT NULL UNIQUE,
+  "section" TEXT references recipe_sections(uuid) NOT NULL,
+  "sort" INTEGER,
   --   ingredient can be an `ingredient` or a `recipe`
-  "ingredient" text references ingredients(uuid),
-  "recipe" text references recipes(uuid),
+  "ingredient" TEXT references ingredients(uuid),
+  "recipe" TEXT references recipes(uuid),
   "grams" numeric(10, 2),
   "amount" numeric(10, 2),
-  "unit" text,
-  "adjective" text,
+  "unit" TEXT,
+  "adjective" TEXT,
   "optional" boolean default false,
   PRIMARY KEY ("uuid"),
   constraint check_ingredient check (

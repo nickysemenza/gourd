@@ -9,12 +9,41 @@ jobs:
       - image: circleci/golang:1.13
       - image: circleci/postgres:9.6-alpine
         environment:
-          POSTGRES_USER: circleci-demo-go
-          POSTGRES_DB: circle_test
+          POSTGRES_USER: food
+          POSTGRES_DB: food
     working_directory: ~/work/
+    environment: # environment variables for the build itself
+      TEST_RESULTS: /tmp/test-results # path to where test results will be saved
     steps:
       - checkout
-      - run: make test
+      - run: mkdir -p $TEST_RESULTS # create the test results directory
+      - run: go get github.com/jstemmer/go-junit-report
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run:
+          command: go mod vendor
+      - run:
+          command: make bin/migrate && ./bin/migrate -source file://migrations -database postgres://food@localhost:5432/food?sslmode=disable up
+      - run:
+          command: |
+            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
+          environment:
+            DB_PORT: 5432
+      - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: /tmp/test-results
+          destination: raw-test-output
+
+      - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: /tmp/test-results
 
   build_ui:
     docker:

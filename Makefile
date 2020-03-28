@@ -2,6 +2,10 @@ VERSION          := $(shell git describe --tags --always --dirty="-dev")
 DATE             := $(shell date '+%Y-%m-%d-%H%M UTC')
 VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(DATE)"'
 
+
+dev: bin/food
+	./bin/food
+
 .PHONY: all
 all: bin/food
 
@@ -18,7 +22,7 @@ bin/migrate:
 	@mkdir -p $(dir $@)
 	go build -tags 'postgres' -o $@ ./vendor/github.com/golang-migrate/migrate/v4/cmd/migrate
 unit-test: 
-	go test -race -cover ./...
+	go test -v -race -cover ./...
 lint: bin/revive
 	bin/revive -config revive.toml -formatter=friendly -exclude=vendor/... ./... || (echo "lint failed"; exit 1)	
 

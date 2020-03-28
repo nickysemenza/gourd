@@ -118,14 +118,15 @@ func (m *Manager) AssignUUIDs(ctx context.Context, r *Recipe) error {
 	}
 	return nil
 }
-func (m *Manager) GetRecipe(ctx context.Context, name, uuid string) (*Recipe, error) {
-	r := &Recipe{}
-	err := m.db.Get(r, "SELECT * FROM recipes WHERE name=$1 OR uuid = $2", name, uuid)
-	if err != nil {
-		return nil, err
-	}
 
-}
+// func (m *Manager) GetRecipe(ctx context.Context, name, uuid string) (*Recipe, error) {
+// 	r := &Recipe{}
+// 	err := m.db.Get(r, "SELECT * FROM recipes WHERE name=$1 OR uuid = $2", name, uuid)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// SaveRecipe saves a recipe
 func (m *Manager) SaveRecipe(ctx context.Context, r *Recipe) error {
 	sectionUUIDs := make([]string, len(r.Sections))
 	for x, section := range r.Sections {

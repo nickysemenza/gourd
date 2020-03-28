@@ -2,47 +2,54 @@ package main
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/nickysemenza/food/manager"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"github.com/nickysemenza/food/db"
+	"github.com/spf13/viper"
 )
 
-const (
-	host     = "localhost"
-	port     = 5555
-	user     = "food"
-	password = "food"
-	dbname   = "food"
-)
+const ()
 
 func main() {
-	fmt.Println("hello")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sqlx.Open("postgres", psqlInfo)
+	viper.SetDefault("DB_HOST", "localhost")
+	viper.SetDefault("DB_PORT", 5555)
+	viper.SetDefault("DB_USER", "food")
+	viper.SetDefault("DB_PASSWORD", "food")
+	viper.SetDefault("DB_DBNAME", "food")
+	viper.AutomaticEnv()
+
+	dbConn, err := sqlx.Open("postgres", db.ConnnectionString(
+		viper.GetString("DB_HOST"),
+		viper.GetString("DB_USER"),
+		viper.GetString("DB_PASSWORD"),
+		viper.GetString("DB_DBNAME"),
+		viper.GetInt64("DB_PORT")))
 
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-	err = db.Ping()
+	defer dbConn.Close()
+	err = dbConn.Ping()
 	if err != nil {
 		panic(err)
 	}
 
 	ctx := context.Background()
-	m := manager.New(db)
-	res, err := m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")
-	// m.AssignUUIDs(res)
+	c := db.New(dbConn)
+	res, err := c.GetRecipeByUUID(ctx, "hi")
 	spew.Dump(res, err)
 
-	err = m.SaveRecipe(ctx, res)
-	spew.Dump(err)
+	spew.Dump(c.InsertRecipe(ctx, db.Recipe{UUID: "cz", Name: "azz"}))
+
+	// m := manager.New(db)
+	// res, err := m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")
+	// // m.AssignUUIDs(res)
+	// spew.Dump(res, err)
+
+	// err = m.SaveRecipe(ctx, res)
+	// spew.Dump(err)
 
 }
