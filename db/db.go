@@ -13,6 +13,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
+const (
+	sIngredientsTable  = "recipe_section_ingredients"
+	sInstructionsTable = "recipe_section_instructions"
+	sectionsTable      = "recipe_sections"
+	recipesTable       = "recipes"
+	ingredientsTable   = "ingredients"
+)
+
 // Client is a database client
 type Client struct {
 	db *sqlx.DB
@@ -113,7 +121,7 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 // GetRecipeByUUID asdasd
 func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, error) {
 
-	query, args, err := psql.Select("*").From("recipes").Where(sq.Eq{"uuid": uuid}).ToSql()
+	query, args, err := psql.Select("*").From(recipesTable).Where(sq.Eq{"uuid": uuid}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -139,9 +147,16 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
-	// for _, s := range *sections {
-	// 	r.Sections = append(r.Sections, s)
-	// }
+	for x, s := range r.Sections {
+		query, args, err = psql.Select("*").From("recipe_section_instructions").Where(sq.Eq{"section": s.UUID}).ToSql()
+		if err != nil {
+			return nil, err
+		}
+		err = c.db.SelectContext(ctx, &r.Sections[x].Instructions, query, args...)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return r, nil
 
@@ -149,7 +164,7 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error {
 	query, args, err := psql.
-		Update("recipes").Where(sq.Eq{"uuid": r.UUID}).Set("name", r.Name).
+		Update(recipesTable).Where(sq.Eq{"uuid": r.UUID}).Set("name", r.Name).
 		Set("total_minutes", r.TotalMinutes).
 		Set("unit", r.Unit).
 		ToSql()
@@ -161,33 +176,52 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		return err
 	}
 	c.AssignUUIDs(ctx, r)
+	spew.Dump(r)
 	//update recipe_section_instructions
 	//update recipe_section_ingredients
 	//update recipe_sections
 
-	_, err = c.db.ExecContext(ctx, `DELETE FROM recipe_sections WHERE recipe = $1`, r.UUID)
-	if err != nil {
-		return err
+	// psql.Delete(sectionInstructionsTable).Where(sq.Eq{""})
+
+	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_section_instructions WHERE section IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
+		return fmt.Errorf("failed to delete instructions: %w", err)
+	}
+	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_section_ingredients WHERE section IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
+		return fmt.Errorf("failed to delete ingredients: %w", err)
+	}
+	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_sections WHERE recipe = $1`, r.UUID); err != nil {
+		return fmt.Errorf("failed to delete sections: %w", err)
 	}
 
 	if len(r.Sections) == 0 {
 		return nil
 	}
 
-	sectionInsert := psql.Insert("recipe_sections").Columns("uuid", "recipe", "minutes")
+	sectionInsert := psql.Insert(sectionsTable).Columns("uuid", "recipe", "minutes")
 
 	for _, s := range r.Sections {
 		sectionInsert = sectionInsert.Values(s.UUID, s.RecipeUUID, s.Minutes)
 	}
 	query, args, err = sectionInsert.ToSql()
 
-	spew.Dump(sectionInsert)
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
+	}
+
+	for _, s := range r.Sections {
+		if len(s.Instructions) > 0 {
+			instructionsInsert := psql.Insert(sInstructionsTable).Columns("uuid", "section", "instruction")
+			for _, i := range s.Instructions {
+				instructionsInsert = instructionsInsert.Values(i.UUID, i.SectionUUID, i.Instruction)
+			}
+			if _, err = instructionsInsert.RunWith(tx).Exec(); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 
@@ -210,7 +244,7 @@ func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 // InsertRecipe inserts a recipe
 func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) error {
 	query, args, err := psql.
-		Insert("recipes").Columns("uuid", "name").Values(r.UUID, r.Name).
+		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
 		ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)

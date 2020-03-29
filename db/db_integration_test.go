@@ -26,7 +26,10 @@ func TestInsertGet(t *testing.T) {
 	require.NoError(err)
 	r.TotalMinutes = sql.NullInt64{Valid: true, Int64: 3}
 	r.Unit = sql.NullString{Valid: true, String: "items"}
-	r.Sections = []Section{{Minutes: sql.NullInt64{Valid: true, Int64: 88}}}
+	r.Sections = []Section{{
+		Minutes:      sql.NullInt64{Valid: true, Int64: 88},
+		Instructions: []SectionInstruction{{Instruction: "a"}},
+	}}
 
 	err = db.UpdateRecipe(ctx, r)
 	require.NoError(err)
@@ -34,5 +37,6 @@ func TestInsertGet(t *testing.T) {
 	require.NoError(err)
 	require.EqualValues(3, r2.TotalMinutes.Int64)
 	require.EqualValues("items", r2.Unit.String)
+	require.EqualValues("a", r2.Sections[0].Instructions[0].Instruction)
 
 }
