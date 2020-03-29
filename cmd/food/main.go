@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/nickysemenza/food/db"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 const ()
@@ -39,10 +41,12 @@ func main() {
 
 	ctx := context.Background()
 	c := db.New(dbConn)
-	res, err := c.GetRecipeByUUID(ctx, "hi")
+	res, err := c.GetRecipeByUUID(ctx, "fb1d53ef-47e0-4de2-bc68-9773f5353089")
 	spew.Dump(res, err)
+	y, _ := yaml.Marshal(res)
+	fmt.Printf("%s", y)
 
-	spew.Dump(c.InsertRecipe(ctx, &db.Recipe{UUID: "cz", Name: "azz"}))
+	// spew.Dump(c.InsertRecipe(ctx, &db.Recipe{UUID: "cz", Name: "azz"}))
 
 	// m := manager.New(db)
 	// res, err := m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")

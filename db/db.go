@@ -62,8 +62,8 @@ type SectionIngredient struct {
 	Optional    bool            `db:"optional"`
 
 	// one of the following:
-	RecipeUUID     string `db:"recipe"`
-	IngredientUUID string `db:"ingredient"`
+	RecipeUUID     sql.NullString `db:"recipe"`
+	IngredientUUID sql.NullString `db:"ingredient"`
 }
 
 // SectionInstruction represents a SectionInstruction
@@ -72,6 +72,12 @@ type SectionInstruction struct {
 	Sort        sql.NullInt64 `db:"sort"`
 	Instruction string        `db:"instruction"`
 	SectionUUID string        `db:"section"`
+}
+
+// Ingredient is a globally-scoped ingredient
+type Ingredient struct {
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
 }
 
 var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
@@ -104,11 +110,11 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 		for y := range r.Sections[x].Ingredients {
 			r.Sections[x].Ingredients[y].UUID = setUUID(r.Sections[x].Ingredients[y].UUID)
 			r.Sections[x].Ingredients[y].SectionUUID = r.Sections[x].UUID
-			// ing, err := m.IngredientByName(ctx, r.Sections[x].Ingredients[y].Name)
-			// if err != nil {
-			// return err
-			// }
-			// r.Sections[x].Ingredients[y].IngredientUUID = ing.UUID
+			ing, err := c.IngredientByName(ctx, r.Sections[x].Ingredients[y].Name)
+			if err != nil {
+				return err
+			}
+			r.Sections[x].Ingredients[y].IngredientUUID = sql.NullString{Valid: true, String: ing.UUID}
 		}
 		for y := range r.Sections[x].Instructions {
 			r.Sections[x].Instructions[y].UUID = setUUID(r.Sections[x].Instructions[y].UUID)
@@ -116,6 +122,22 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 		}
 	}
 	return nil
+}
+
+// IngredientByName retrieves an ingredient by name, creating it if it does not exist
+func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient, error) {
+	ingredient := &Ingredient{}
+	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
+	WHERE name = $1 LIMIT 1`, name)
+	if err == sql.ErrNoRows {
+		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (uuid, name) VALUES ($1, $2)`, setUUID(""), name)
+		if err != nil {
+			return nil, err
+		}
+		return c.IngredientByName(ctx, name)
+	}
+	return ingredient, err
+
 }
 
 // GetRecipeByUUID asdasd
@@ -148,11 +170,20 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
 	for x, s := range r.Sections {
-		query, args, err = psql.Select("*").From("recipe_section_instructions").Where(sq.Eq{"section": s.UUID}).ToSql()
+		query, args, err = psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": s.UUID}).ToSql()
 		if err != nil {
 			return nil, err
 		}
 		err = c.db.SelectContext(ctx, &r.Sections[x].Instructions, query, args...)
+		if err != nil {
+			return nil, err
+		}
+
+		query, args, err = psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": s.UUID}).ToSql()
+		if err != nil {
+			return nil, err
+		}
+		err = c.db.SelectContext(ctx, &r.Sections[x].Ingredients, query, args...)
 		if err != nil {
 			return nil, err
 		}
@@ -222,6 +253,18 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 				return err
 			}
 		}
+
+		if len(s.Ingredients) > 0 {
+			ingredientsInsert := psql.Insert(sIngredientsTable).Columns("uuid", "section", "ingredient", "recipe",
+				"grams", "amount", "unit", "adjective", "optional")
+			for _, i := range s.Ingredients {
+				ingredientsInsert = ingredientsInsert.Values(i.UUID, i.SectionUUID, i.IngredientUUID, i.RecipeUUID,
+					i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional)
+			}
+			if _, err = ingredientsInsert.RunWith(tx).Exec(); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 
@@ -243,6 +286,7 @@ func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 
 // InsertRecipe inserts a recipe
 func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) error {
+	r.UUID = setUUID(r.UUID)
 	query, args, err := psql.
 		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
 		ToSql()

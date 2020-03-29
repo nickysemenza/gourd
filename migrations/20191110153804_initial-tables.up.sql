@@ -40,9 +40,9 @@ CREATE TABLE IF NOT EXISTS "recipe_section_ingredients" (
   "unit" TEXT,
   "adjective" TEXT,
   "optional" boolean default false,
-  PRIMARY KEY ("uuid"),
-  constraint check_ingredient check (
-    ingredient is not null
-    or recipe is not null
-  )
+  PRIMARY KEY ("uuid")
+  -- constraint check_ingredient check (
+  --   ingredient is not null
+  --   or recipe is not null
+  -- )
 );
