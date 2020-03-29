@@ -42,7 +42,7 @@ func main() {
 	res, err := c.GetRecipeByUUID(ctx, "hi")
 	spew.Dump(res, err)
 
-	spew.Dump(c.InsertRecipe(ctx, db.Recipe{UUID: "cz", Name: "azz"}))
+	spew.Dump(c.InsertRecipe(ctx, &db.Recipe{UUID: "cz", Name: "azz"}))
 
 	// m := manager.New(db)
 	// res, err := m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")

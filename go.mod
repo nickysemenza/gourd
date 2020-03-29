@@ -8,6 +8,7 @@ require (
 	github.com/bxcodec/faker/v3 v3.3.0
 	github.com/cznic/ql v1.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1
+	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.10.0
 	github.com/jackc/fake v0.0.0-20150926172116-812a484cc733 // indirect
 	github.com/jackc/pgx v3.2.0+incompatible // indirect
