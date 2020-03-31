@@ -9,6 +9,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
 )
@@ -28,50 +29,50 @@ type Client struct {
 
 // Recipe represents a recipe
 type Recipe struct {
-	UUID         string         `db:"uuid"`
-	Name         string         `db:"name"`
-	TotalMinutes sql.NullInt64  `db:"total_minutes"`
-	Equipment    sql.NullString `db:"equipment"`
-	Source       sql.NullString `db:"source"`
-	Servings     sql.NullInt64  `db:"servings"`
-	Quantity     sql.NullString `db:"quantity"`
-	Unit         sql.NullString `db:"unit"`
+	UUID         string      `db:"uuid"`
+	Name         string      `db:"name"`
+	TotalMinutes zero.Int    `db:"total_minutes"`
+	Equipment    zero.String `db:"equipment"`
+	Source       zero.String `db:"source"`
+	Servings     zero.Int    `db:"servings"`
+	Quantity     zero.Int    `db:"quantity"`
+	Unit         zero.String `db:"unit"`
 	Sections     []Section
 }
 
 // Section represents a Section
 type Section struct {
-	UUID         string        `db:"uuid"`
-	RecipeUUID   string        `db:"recipe"`
-	Minutes      sql.NullInt64 `db:"minutes"`
-	Sort         sql.NullInt64 `db:"sort"`
+	UUID         string   `db:"uuid"`
+	RecipeUUID   string   `db:"recipe"`
+	Minutes      zero.Int `db:"minutes"`
+	Sort         zero.Int `db:"sort"`
 	Ingredients  []SectionIngredient
 	Instructions []SectionInstruction
 }
 
 // SectionIngredient is a foo
 type SectionIngredient struct {
-	UUID        string          `db:"uuid"`
-	Sort        sql.NullInt64   `db:"sort"`
-	Name        string          // todo: use this to load an Ingredient
-	Grams       sql.NullFloat64 `db:"grams"`
-	SectionUUID string          `db:"section"`
-	Amount      sql.NullFloat64 `db:"amount"`
-	Unit        sql.NullString  `db:"unit"`
-	Adjective   sql.NullString  `db:"adjective"`
-	Optional    bool            `db:"optional"`
+	UUID        string      `db:"uuid"`
+	SectionUUID string      `db:"section"`
+	Sort        zero.Int    `db:"sort"`
+	Name        string      // todo: use this to load an Ingredient
+	Grams       zero.Float  `db:"grams"`
+	Amount      zero.Float  `db:"amount"`
+	Unit        zero.String `db:"unit"`
+	Adjective   zero.String `db:"adjective"`
+	Optional    zero.Bool   `db:"optional"`
 
 	// one of the following:
-	RecipeUUID     sql.NullString `db:"recipe"`
-	IngredientUUID sql.NullString `db:"ingredient"`
+	RecipeUUID     zero.String `db:"recipe"`
+	IngredientUUID zero.String `db:"ingredient"`
 }
 
 // SectionInstruction represents a SectionInstruction
 type SectionInstruction struct {
-	UUID        string        `db:"uuid"`
-	Sort        sql.NullInt64 `db:"sort"`
-	Instruction string        `db:"instruction"`
-	SectionUUID string        `db:"section"`
+	UUID        string   `db:"uuid"`
+	Sort        zero.Int `db:"sort"`
+	Instruction string   `db:"instruction"`
+	SectionUUID string   `db:"section"`
 }
 
 // Ingredient is a globally-scoped ingredient
@@ -114,7 +115,7 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 			if err != nil {
 				return err
 			}
-			r.Sections[x].Ingredients[y].IngredientUUID = sql.NullString{Valid: true, String: ing.UUID}
+			r.Sections[x].Ingredients[y].IngredientUUID = zero.StringFrom(ing.UUID)
 		}
 		for y := range r.Sections[x].Instructions {
 			r.Sections[x].Instructions[y].UUID = setUUID(r.Sections[x].Instructions[y].UUID)
@@ -186,6 +187,17 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 		err = c.db.SelectContext(ctx, &r.Sections[x].Ingredients, query, args...)
 		if err != nil {
 			return nil, err
+		}
+
+		for y, i := range r.Sections[x].Ingredients {
+			query, args, err = psql.Select("name").From(ingredientsTable).Where(sq.Eq{"uuid": i.IngredientUUID}).ToSql()
+			if err != nil {
+				return nil, err
+			}
+			err = c.db.GetContext(ctx, &r.Sections[x].Ingredients[y].Name, query, args...)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -285,26 +297,26 @@ func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 }
 
 // InsertRecipe inserts a recipe
-func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) error {
+func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 	r.UUID = setUUID(r.UUID)
 	query, args, err := psql.
 		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
 		ToSql()
 	if err != nil {
-		return fmt.Errorf("failed to build query: %w", err)
+		return "", fmt.Errorf("failed to build query: %w", err)
 	}
 	tx, err := c.db.Begin()
 	if err != nil {
-		return err
+		return "", err
 	}
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return err
+		return "", err
 	}
 	err = c.updateRecipe(ctx, tx, r)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return tx.Commit()
+	return r.UUID, tx.Commit()
 
 }

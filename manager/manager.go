@@ -5,17 +5,16 @@ import (
 	"io/ioutil"
 
 	"github.com/nickysemenza/food/db"
-	uuid "github.com/satori/go.uuid"
 	"gopkg.in/yaml.v1"
 )
 
 // Manager manages recipes
 type Manager struct {
-	db db.Client
+	db *db.Client
 }
 
 // New creates a new Manager
-func New(db db.Client) *Manager {
+func New(db *db.Client) *Manager {
 	return &Manager{db: db}
 }
 
@@ -32,10 +31,4 @@ func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*db.Recipe
 	}
 
 	return r, nil
-}
-func setUUID(val string) string {
-	if val != "" {
-		return val
-	}
-	return uuid.NewV4().String()
 }

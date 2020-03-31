@@ -8,8 +8,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/food/manager"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v2"
 )
 
 const ()
@@ -34,8 +34,8 @@ func main() {
 		panic(err)
 	}
 	defer dbConn.Close()
-	err = dbConn.Ping()
-	if err != nil {
+
+	if err = dbConn.Ping(); err != nil {
 		panic(err)
 	}
 
@@ -43,15 +43,17 @@ func main() {
 	c := db.New(dbConn)
 	res, err := c.GetRecipeByUUID(ctx, "fb1d53ef-47e0-4de2-bc68-9773f5353089")
 	spew.Dump(res, err)
-	y, _ := yaml.Marshal(res)
-	fmt.Printf("%s", y)
+	fmt.Println("==============================")
+	spew.Dump(manager.FromRecipe(res))
+	// y, _ := yaml.Marshal(res)
+	// fmt.Printf("%s", y)
 
 	// spew.Dump(c.InsertRecipe(ctx, &db.Recipe{UUID: "cz", Name: "azz"}))
 
-	// m := manager.New(db)
-	// res, err := m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")
+	m := manager.New(c)
+	res, err = m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")
 	// // m.AssignUUIDs(res)
-	// spew.Dump(res, err)
+	spew.Dump(res, err)
 
 	// err = m.SaveRecipe(ctx, res)
 	// spew.Dump(err)
