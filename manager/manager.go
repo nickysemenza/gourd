@@ -19,16 +19,24 @@ func New(db *db.Client) *Manager {
 }
 
 // LoadFromFile loads a recipe from a file
-func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*db.Recipe, error) {
+func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*Recipe, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	r := &db.Recipe{}
+	r := &Recipe{}
 	err = yaml.Unmarshal(data, r)
 	if err != nil {
 		return nil, err
 	}
 
 	return r, nil
+}
+
+func (m *Manager) GetRecipe(ctx context.Context, uuid string) (*Recipe, error) {
+	r, err := m.db.GetRecipeByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+	return FromRecipe(r), nil
 }

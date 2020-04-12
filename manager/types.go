@@ -7,37 +7,37 @@ import (
 
 // Recipe is the presentation for a Recipe
 type Recipe struct {
-	UUID         string    `json:"uuid"`
-	Name         string    `json:"name"`
-	TotalMinutes int64     `json:"total_minutes"`
-	Equipment    string    `json:"equipment"`
-	Source       string    `json:"source"`
-	Quantity     int64     `json:"quantity"`
-	Servings     int64     `json:"servings"`
-	Unit         string    `json:"unit"`
-	Sections     []Section `json:"sections"`
+	UUID         string    `json:"uuid,omitempty" yaml:"uuid,omitempty"`
+	Name         string    `json:"name,omitempty" yaml:"name,omitempty"`
+	TotalMinutes int64     `json:"total_minutes,omitempty" yaml:"total_minutes,omitempty"`
+	Equipment    string    `json:"equipment,omitempty" yaml:"equipment,omitempty"`
+	Source       string    `json:"source,omitempty" yaml:"source,omitempty"`
+	Quantity     int64     `json:"quantity,omitempty" yaml:"quantity,omitempty"`
+	Servings     int64     `json:"servings,omitempty" yaml:"servings,omitempty"`
+	Unit         string    `json:"unit,omitempty" yaml:"unit,omitempty"`
+	Sections     []Section `json:"sections,omitempty" yaml:"sections,omitempty"`
 }
 
 // Section is the presentation for a Sections
 type Section struct {
-	Minutes      int64               `json:"minutes"`
-	Ingredients  []SectionIngredient `json:"ingredients"`
-	Instructions []Instruction       `json:"instructions"`
+	Minutes      int64               `json:"minutes,omitempty" yaml:"minutes,omitempty"`
+	Ingredients  []SectionIngredient `json:"ingredients,omitempty" yaml:"ingredients,omitempty"`
+	Instructions []Instruction       `json:"instructions,omitempty" yaml:"instructions,omitempty"`
 }
 
 // SectionIngredient is the presentation for a Ingredient
 type SectionIngredient struct {
-	Name      string  `json:"name"`
-	Grams     float64 `json:"grams"`
-	Amount    float64
-	Unit      string
-	Adjective string
-	Optional  bool
+	Name      string  `json:"name,omitempty" yaml:"name,omitempty"`
+	Grams     float64 `json:"grams,omitempty" yaml:"grams,omitempty"`
+	Amount    float64 `json:"amount,omitempty" yaml:"amount,omitempty"`
+	Unit      string  `json:"unit,omitempty" yaml:"unit,omitempty"`
+	Adjective string  `json:"adjective,omitempty" yaml:"adjective,omitempty"`
+	Optional  bool    `json:"optional,omitempty" yaml:"optional,omitempty"`
 }
 
 // Instruction is the presentation for a Instruction
 type Instruction struct {
-	Instruction string `json:"instruction"`
+	Instruction string `json:"instruction,omitempty" yaml:"instruction,omitempty"`
 }
 
 func (r *Recipe) toDB() *db.Recipe {

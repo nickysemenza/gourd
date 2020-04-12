@@ -3,7 +3,7 @@ name: Tartine Chocolate Chip Cookies
 total_minutes: 30
 equipment: oven, stand mixer, sheet tray
 source: tartine
-quantity: "36"
+quantity: 36
 unit: cookies
 uuid: 60534527-2295-4657-8b74-e4bcbfabffdb
 sections:

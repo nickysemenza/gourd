@@ -20,6 +20,7 @@ func TestInsertGet(t *testing.T) {
 	})
 
 	require.NoError(err)
+
 	r, err := db.GetRecipeByUUID(ctx, uuid)
 	require.NoError(err)
 	r.TotalMinutes = zero.IntFrom(3)

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/davecgh/go-spew/spew"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/nickysemenza/food/db"
 	"github.com/nickysemenza/food/manager"
+	"github.com/nickysemenza/food/server"
 	"github.com/spf13/viper"
 )
 
@@ -21,6 +19,7 @@ func main() {
 	viper.SetDefault("DB_USER", "food")
 	viper.SetDefault("DB_PASSWORD", "food")
 	viper.SetDefault("DB_DBNAME", "food")
+
 	viper.AutomaticEnv()
 
 	dbConn, err := sqlx.Open("postgres", db.ConnnectionString(
@@ -38,24 +37,9 @@ func main() {
 	if err = dbConn.Ping(); err != nil {
 		panic(err)
 	}
+	m := manager.New(db.New(dbConn))
+	s := server.Server{Manager: m, HTTPPort: 4242}
 
-	ctx := context.Background()
-	c := db.New(dbConn)
-	res, err := c.GetRecipeByUUID(ctx, "fb1d53ef-47e0-4de2-bc68-9773f5353089")
-	spew.Dump(res, err)
-	fmt.Println("==============================")
-	spew.Dump(manager.FromRecipe(res))
-	// y, _ := yaml.Marshal(res)
-	// fmt.Printf("%s", y)
-
-	// spew.Dump(c.InsertRecipe(ctx, &db.Recipe{UUID: "cz", Name: "azz"}))
-
-	m := manager.New(c)
-	res, err = m.LoadFromFile(ctx, "recipes/chocolate-chip-cookies.yaml")
-	// // m.AssignUUIDs(res)
-	spew.Dump(res, err)
-
-	// err = m.SaveRecipe(ctx, res)
-	// spew.Dump(err)
+	spew.Dump(s.Run())
 
 }
