@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/nickysemenza/food/graph"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/manager"
@@ -29,6 +30,7 @@ func (s *Server) Run() error {
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
+	r.Use(cors.Handler(cors.Options{}))
 
 	r.Get("/_metrics", promhttp.Handler().ServeHTTP)
 	r.Mount("/debug", middleware.Profiler())
