@@ -3,8 +3,8 @@
 package model
 
 type Ingredient struct {
-	Name  string `json:"name"`
-	Grams int    `json:"grams"`
+	Name  string  `json:"name"`
+	Grams float64 `json:"grams"`
 }
 
 type Instruction struct {

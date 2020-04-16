@@ -27,7 +27,8 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 	if res == nil {
 		return nil, nil
 	}
-	return &model.Recipe{UUID: res.UUID, Name: res.Name, TotalMinutes: int(res.TotalMinutes), Unit: res.Unit}, nil
+	mr := fromRecipe(res)
+	return mr, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
