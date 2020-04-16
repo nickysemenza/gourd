@@ -41,3 +41,11 @@ new-migrate/%: bin/migrate
 	./bin/migrate create -dir migrations -ext sql $(@F)
 migrate: bin/migrate
 	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable up
+
+.PHONY: generate-graphql-go
+generate-graphql-go: 
+	go generate ./graph
+generate-graphql-react:
+	cd ui && yarn run generate
+
+graphql: generate-graphql-go generate-graphql-react

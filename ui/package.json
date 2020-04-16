@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/react-components": "^3.1.5",
+    "@apollo/react-hoc": "^3.1.5",
     "@apollo/react-hooks": "^3.1.5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -22,7 +24,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -40,6 +43,12 @@
     ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.13.2"
+    "@graphql-codegen/cli": "^1.13.2",
+    "@graphql-codegen/introspection": "1.13.2",
+    "@graphql-codegen/typescript": "1.13.2",
+    "@graphql-codegen/typescript-document-nodes": "1.13.2",
+    "@graphql-codegen/typescript-graphql-files-modules": "1.13.2",
+    "@graphql-codegen/typescript-operations": "1.13.2",
+    "@graphql-codegen/typescript-react-apollo": "1.13.2"
   }
 }

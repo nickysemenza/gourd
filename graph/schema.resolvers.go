@@ -16,7 +16,7 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input *model.NewRec
 }
 
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
-	return []*model.Recipe{&model.Recipe{}, &model.Recipe{}}, nil
+	return []*model.Recipe{{}, {}}, nil
 }
 
 func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe, error) {

@@ -41,6 +41,9 @@ type Instruction struct {
 }
 
 func (r *Recipe) toDB() *db.Recipe {
+	if r == nil {
+		return nil
+	}
 	dbr := db.Recipe{
 		UUID:         r.UUID,
 		Name:         r.Name,
@@ -79,6 +82,9 @@ func (r *Recipe) toDB() *db.Recipe {
 
 // FromRecipe transforms a db record
 func FromRecipe(dbr *db.Recipe) *Recipe {
+	if dbr == nil {
+		return nil
+	}
 	r := Recipe{
 		UUID:         dbr.UUID,
 		Name:         dbr.Name,
