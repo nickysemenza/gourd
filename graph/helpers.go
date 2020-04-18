@@ -20,7 +20,7 @@ func fromRecipe(res *manager.Recipe) *model.Recipe {
 			})
 		}
 		for _, i := range x.Ingredients {
-			s.Ingredients = append(s.Ingredients, &model.Ingredient{
+			s.Ingredients = append(s.Ingredients, &model.SectionIngredient{
 				Grams: i.Grams,
 				Name:  i.Name,
 				// Amount:    i.Amount.Float64,

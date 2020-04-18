@@ -17,20 +17,29 @@ export type Scalars = {
 
 export type Instruction = {
    __typename?: 'Instruction';
+  uuid: Scalars['String'];
   instruction: Scalars['String'];
 };
 
 export type Ingredient = {
    __typename?: 'Ingredient';
+  uuid: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type SectionIngredient = {
+   __typename?: 'SectionIngredient';
+  uuid: Scalars['String'];
   name: Scalars['String'];
   grams: Scalars['Float'];
 };
 
 export type Section = {
    __typename?: 'Section';
+  uuid: Scalars['String'];
   minutes: Scalars['Int'];
   instructions: Array<Instruction>;
-  ingredients: Array<Ingredient>;
+  ingredients: Array<SectionIngredient>;
 };
 
 export type Recipe = {
@@ -81,8 +90,8 @@ export type GetRecipeByUuidQuery = (
       { __typename?: 'Section' }
       & Pick<Section, 'minutes'>
       & { ingredients: Array<(
-        { __typename?: 'Ingredient' }
-        & Pick<Ingredient, 'name' | 'grams'>
+        { __typename?: 'SectionIngredient' }
+        & Pick<SectionIngredient, 'name' | 'grams'>
       )>, instructions: Array<(
         { __typename?: 'Instruction' }
         & Pick<Instruction, 'instruction'>

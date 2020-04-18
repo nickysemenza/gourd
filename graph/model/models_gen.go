@@ -3,11 +3,12 @@
 package model
 
 type Ingredient struct {
-	Name  string  `json:"name"`
-	Grams float64 `json:"grams"`
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
 }
 
 type Instruction struct {
+	UUID        string `json:"uuid"`
 	Instruction string `json:"instruction"`
 }
 
@@ -24,7 +25,14 @@ type Recipe struct {
 }
 
 type Section struct {
-	Minutes      int            `json:"minutes"`
-	Instructions []*Instruction `json:"instructions"`
-	Ingredients  []*Ingredient  `json:"ingredients"`
+	UUID         string               `json:"uuid"`
+	Minutes      int                  `json:"minutes"`
+	Instructions []*Instruction       `json:"instructions"`
+	Ingredients  []*SectionIngredient `json:"ingredients"`
+}
+
+type SectionIngredient struct {
+	UUID  string  `json:"uuid"`
+	Name  string  `json:"name"`
+	Grams float64 `json:"grams"`
 }
