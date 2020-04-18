@@ -7,8 +7,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/graph/model"
+	"github.com/vektah/gqlparser/gqlerror"
 )
 
 func (r *mutationResolver) CreateRecipe(ctx context.Context, input *model.NewRecipe) (*model.Recipe, error) {
@@ -25,6 +27,7 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 		return nil, err
 	}
 	if res == nil {
+		graphql.AddError(ctx, gqlerror.Errorf("no recipe found with uuid %s", uuid))
 		return nil, nil
 	}
 	mr := fromRecipe(res)
