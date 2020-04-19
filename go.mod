@@ -19,6 +19,8 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.0.1
+	go.opentelemetry.io/otel v0.4.2
+	go.opentelemetry.io/otel/exporters/trace/jaeger v0.4.2
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 )

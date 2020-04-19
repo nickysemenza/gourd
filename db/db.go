@@ -9,6 +9,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"go.opentelemetry.io/otel/api/global"
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
@@ -185,6 +186,10 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 
 // GetIngredientByUUID finds an ingredient
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
+	tr := global.Tracer("db")
+	ctx, span := tr.Start(ctx, "GetIngredientByUUID")
+	defer span.End()
+
 	query, args, err := psql.Select("*").From(ingredientsTable).Where(sq.Eq{"uuid": uuid}).ToSql()
 	if err != nil {
 		return nil, err

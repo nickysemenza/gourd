@@ -8,10 +8,11 @@ import (
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/graph/model"
 	"github.com/vektah/gqlparser/gqlerror"
+	"go.opentelemetry.io/otel/api/core"
+	"go.opentelemetry.io/otel/api/global"
 )
 
 func (r *mutationResolver) CreateRecipe(ctx context.Context, input *model.NewRecipe) (*model.Recipe, error) {
@@ -22,15 +23,19 @@ func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	dbr, err := r.DB.GetRecipes(ctx)
 	if err != nil {
 		return nil, err
-	} 
+	}
 	recipes := []*model.Recipe{}
 	for _, x := range dbr {
-		recipes = append(recipes,fromRecipe(&x))
+		recipes = append(recipes, fromRecipe(&x))
 	}
 	return recipes, nil
 }
 
 func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe, error) {
+	tr := global.Tracer("graph")
+	ctx, span := tr.Start(ctx, "Recipe")
+	defer span.End()
+	span.SetAttributes(core.KeyValue{Key: "uuid", Value: core.String(uuid)})
 	res, err := r.Resolver.DB.GetRecipeByUUID(ctx, uuid)
 	if err != nil {
 		return nil, err
@@ -80,7 +85,9 @@ func (r *sectionResolver) Ingredients(ctx context.Context, obj *model.Section) (
 }
 
 func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.SectionIngredient) (*model.Ingredient, error) {
-	spew.Dump(obj)
+	tr := global.Tracer("graph")
+	ctx, span := tr.Start(ctx, "Info")
+	defer span.End()
 	ing, err := r.DB.GetIngredientByUUID(ctx, obj.IngredientID)
 	if err != nil {
 		return nil, err

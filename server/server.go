@@ -17,6 +17,7 @@ import (
 	"github.com/nickysemenza/food/manager"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/plugin/othttp"
 )
 
 // Server represents a server
@@ -37,21 +38,32 @@ func (s *Server) Run() error {
 	r.Get("/_metrics", promhttp.Handler().ServeHTTP)
 	r.Mount("/debug", middleware.Profiler())
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Manager: s.Manager, DB: s.DB}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers: &graph.Resolver{
+			Manager: s.Manager,
+			DB:      s.DB,
+		}},
+	))
+	srv.Use(graph.Observability{})
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	r.Handle("/query", srv)
+	r.Handle("/query", othttp.WithRouteTag("/query", srv))
 
 	r.Get("/h", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("hi"))
 	})
 	r.Get("/recipes/{uuid}", s.GetRecipe)
 
-	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", s.HTTPPort),
-		Handler: http.TimeoutHandler(r, time.Second*30, "timeout"),
-	}
+	// server := &http.Server{
+	// 	Addr:    fmt.Sprintf(":%d", s.HTTPPort),
+	// 	Handler: http.TimeoutHandler(r, time.Second*30, "timeout"),
+	// }
 	log.Printf("connect to http://localhost:%d/ for GraphQL playground", s.HTTPPort)
-	return server.ListenAndServe()
+	// return server.ListenAndServe()
+	return http.ListenAndServe(fmt.Sprintf(":%d", s.HTTPPort),
+		othttp.NewHandler(http.TimeoutHandler(r, time.Second*30, "timeout"), "server",
+			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
+		),
+	)
 }
 
 func (s *Server) GetRecipe(w http.ResponseWriter, req *http.Request) {
