@@ -19,7 +19,15 @@ func (r *mutationResolver) CreateRecipe(ctx context.Context, input *model.NewRec
 }
 
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
-	return []*model.Recipe{{}, {}}, nil
+	dbr, err := r.DB.GetRecipes(ctx)
+	if err != nil {
+		return nil, err
+	} 
+	recipes := []*model.Recipe{}
+	for _, x := range dbr {
+		recipes = append(recipes,fromRecipe(&x))
+	}
+	return recipes, nil
 }
 
 func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe, error) {
@@ -31,13 +39,8 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 		graphql.AddError(ctx, gqlerror.Errorf("no recipe found with uuid %s", uuid))
 		return nil, nil
 	}
-	mr := &model.Recipe{
-		UUID:         res.UUID,
-		Name:         res.Name,
-		TotalMinutes: int(res.TotalMinutes.Int64),
-		Unit:         res.Unit.String,
-	}
-	return mr, nil
+
+	return fromRecipe(res), nil
 }
 
 func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error) {

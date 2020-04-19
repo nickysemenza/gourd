@@ -217,6 +217,24 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 	return r, nil
 }
 
+// GetRecipes returns all recipes, shallowly
+func (c *Client) GetRecipes(ctx context.Context) ([]Recipe, error) {
+	query, args, err := psql.Select("*").From(recipesTable).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	r := []Recipe{}
+	err = c.db.SelectContext(ctx, &r, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return r, nil
+}
+
 // GetRecipeByUUIDFull gets a recipe by UUID, with all dependencies
 func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe, error) {
 

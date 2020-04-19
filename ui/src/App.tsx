@@ -1,5 +1,4 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 
 import ApolloClient from "apollo-boost";
@@ -12,9 +11,7 @@ function App() {
   });
   return (
     <ApolloProvider client={client}>
-      <div>
-        <Test />
-      </div>
+      <Test />
     </ApolloProvider>
   );
 }
