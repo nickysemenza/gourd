@@ -14,13 +14,20 @@ func TestInsertGet(t *testing.T) {
 	ctx := context.Background()
 	require := require.New(t)
 	db := newDB(t)
+
+	all1, err := db.GetRecipes(ctx)
+	require.NoError(err)
+
 	uuid, err := db.InsertRecipe(ctx, &Recipe{
 		Name:     fmt.Sprintf("r-%d", time.Now().Unix()),
 		Sections: []Section{{Minutes: zero.IntFrom(33)}},
 	})
 
 	require.NoError(err)
+	all2, err := db.GetRecipes(ctx)
+	require.NoError(err)
 
+	require.Equal(1, len(all2)-len(all1), "inserting 1 recipe should increase length of getAll by 1")
 	r, err := db.GetRecipeByUUIDFull(ctx, uuid)
 	require.NoError(err)
 	r.TotalMinutes = zero.IntFrom(3)

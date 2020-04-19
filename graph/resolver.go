@@ -11,6 +11,7 @@ import (
 //
 // It serves as dependency injection for your app, add any dependencies you require here.
 
+// Resolver holds dependencies for GQL
 type Resolver struct {
 	Manager *manager.Manager
 	DB      *db.Client

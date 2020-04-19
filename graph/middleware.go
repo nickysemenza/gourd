@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+// Observability is a Middleware for tracing graphql queries
 type Observability struct{}
 
 var _ interface {
@@ -19,14 +20,17 @@ var _ interface {
 	graphql.OperationInterceptor
 } = Observability{}
 
+// ExtensionName returns the extension name
 func (c Observability) ExtensionName() string {
 	return "Observability"
 }
 
+// Validate is a noop to conform to HandlerExtension
 func (c Observability) Validate(schema graphql.ExecutableSchema) error {
 	return nil
 }
 
+// InterceptField makes a span for each field
 func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
 	fc := graphql.GetFieldContext(ctx)
 
@@ -69,15 +73,11 @@ func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver
 func (c Observability) InterceptOperation(ctx context.Context, next graphql.OperationHandler) graphql.ResponseHandler {
 	oc := graphql.GetOperationContext(ctx)
 
-	// tr := global.Tracer("graph")
-	// ctx, span := tr.Start(ctx, operationName(ctx))
-	// defer span.End()
 	span := trace.SpanFromContext(ctx)
 	span.SetName(operationName(ctx))
 
 	span.SetAttributes(
 		core.KeyValue{Key: "request.query", Value: core.String(oc.RawQuery)},
-		// core.KeyValue{Key: "operation_name", Value: core.String(request.OperationName)},
 	)
 	for k, v := range oc.Variables {
 		span.SetAttributes(core.Key(fmt.Sprintf("request.variables.%s", k)).String(fmt.Sprintf("%+v", v)))
@@ -85,7 +85,6 @@ func (c Observability) InterceptOperation(ctx context.Context, next graphql.Oper
 	span.AddEvent(ctx, "graphql: processing begin")
 	span.AddEventWithTimestamp(ctx, oc.Stats.Read.Start, "graphql read: start")
 	span.AddEventWithTimestamp(ctx, oc.Stats.Read.Start, "graphql read: end")
-	// spew.Dump(oc)
 	return next(ctx)
 }
 

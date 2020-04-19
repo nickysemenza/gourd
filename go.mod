@@ -12,6 +12,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.10.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.3.0
+	github.com/luna-duclos/instrumentedsql v1.1.2
 	github.com/mgechev/revive v1.0.2
 	github.com/prometheus/client_golang v1.5.1
 	github.com/sirupsen/logrus v1.4.2
@@ -21,6 +22,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.opentelemetry.io/otel v0.4.2
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.4.2
+	google.golang.org/grpc v1.27.1
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/yaml.v1 v1.0.0-20140924161607-9f9df34309c0
 )
