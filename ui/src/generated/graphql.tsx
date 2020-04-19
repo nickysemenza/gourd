@@ -15,22 +15,22 @@ export type Scalars = {
   Float: number;
 };
 
-export type Instruction = {
-   __typename?: 'Instruction';
-  uuid: Scalars['String'];
-  instruction: Scalars['String'];
-};
-
 export type Ingredient = {
    __typename?: 'Ingredient';
   uuid: Scalars['String'];
   name: Scalars['String'];
 };
 
+export type SectionInstruction = {
+   __typename?: 'SectionInstruction';
+  uuid: Scalars['String'];
+  instruction: Scalars['String'];
+};
+
 export type SectionIngredient = {
    __typename?: 'SectionIngredient';
   uuid: Scalars['String'];
-  name: Scalars['String'];
+  info: Ingredient;
   grams: Scalars['Float'];
 };
 
@@ -38,8 +38,8 @@ export type Section = {
    __typename?: 'Section';
   uuid: Scalars['String'];
   minutes: Scalars['Int'];
-  instructions: Array<Instruction>;
-  ingredients: Array<SectionIngredient>;
+  instructions: Array<Maybe<SectionInstruction>>;
+  ingredients: Array<Maybe<SectionIngredient>>;
 };
 
 export type Recipe = {
@@ -48,7 +48,7 @@ export type Recipe = {
   name: Scalars['String'];
   total_minutes: Scalars['Int'];
   unit: Scalars['String'];
-  sections: Array<Section>;
+  sections: Array<Maybe<Section>>;
 };
 
 export type NewRecipe = {
@@ -86,17 +86,21 @@ export type GetRecipeByUuidQuery = (
   & { recipe?: Maybe<(
     { __typename?: 'Recipe' }
     & Pick<Recipe, 'uuid' | 'name' | 'total_minutes' | 'unit'>
-    & { sections: Array<(
+    & { sections: Array<Maybe<(
       { __typename?: 'Section' }
       & Pick<Section, 'minutes'>
-      & { ingredients: Array<(
+      & { ingredients: Array<Maybe<(
         { __typename?: 'SectionIngredient' }
-        & Pick<SectionIngredient, 'name' | 'grams'>
-      )>, instructions: Array<(
-        { __typename?: 'Instruction' }
-        & Pick<Instruction, 'instruction'>
-      )> }
-    )> }
+        & Pick<SectionIngredient, 'uuid' | 'grams'>
+        & { info: (
+          { __typename?: 'Ingredient' }
+          & Pick<Ingredient, 'name'>
+        ) }
+      )>>, instructions: Array<Maybe<(
+        { __typename?: 'SectionInstruction' }
+        & Pick<SectionInstruction, 'instruction' | 'uuid'>
+      )>> }
+    )>> }
   )> }
 );
 
@@ -111,11 +115,15 @@ export const GetRecipeByUuidDocument = gql`
     sections {
       minutes
       ingredients {
-        name
+        uuid
+        info {
+          name
+        }
         grams
       }
       instructions {
         instruction
+        uuid
       }
     }
   }

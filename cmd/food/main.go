@@ -37,8 +37,9 @@ func main() {
 	if err = dbConn.Ping(); err != nil {
 		panic(err)
 	}
-	m := manager.New(db.New(dbConn))
-	s := server.Server{Manager: m, HTTPPort: 4242}
+	dbClient := db.New(dbConn)
+	m := manager.New(dbClient)
+	s := server.Server{Manager: m, HTTPPort: 4242, DB: dbClient}
 
 	spew.Dump(s.Run())
 

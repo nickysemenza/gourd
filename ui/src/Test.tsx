@@ -12,11 +12,15 @@ const RecipeByUUID = gql`
       sections {
         minutes
         ingredients {
-          name
+          uuid
+          info {
+            name
+          }
           grams
         }
         instructions {
           instruction
+          uuid
         }
       }
     }

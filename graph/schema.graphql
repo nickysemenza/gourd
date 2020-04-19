@@ -1,0 +1,42 @@
+type Ingredient {
+  uuid: String!
+  name: String!
+}
+
+type SectionInstruction {
+  uuid: String!
+  instruction: String!
+}
+
+type SectionIngredient {
+  uuid: String!
+  info: Ingredient!
+  grams: Float!
+}
+
+type Section {
+  uuid: String!
+  minutes: Int!
+  instructions: [SectionInstruction]!
+  ingredients: [SectionIngredient]!
+}
+
+type Recipe {
+  uuid: String!
+  name: String!
+  total_minutes: Int!
+  unit: String!
+  sections: [Section]!
+}
+
+input NewRecipe {
+  name: String!
+}
+
+type Mutation {
+  createRecipe(input: NewRecipe): Recipe!
+}
+type Query {
+  recipes: [Recipe!]!
+  recipe(uuid: String!): Recipe
+}

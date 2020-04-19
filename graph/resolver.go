@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/nickysemenza/food/manager"
+import (
+	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/food/manager"
+)
 
 //go:generate go run github.com/99designs/gqlgen
 
@@ -10,4 +13,5 @@ import "github.com/nickysemenza/food/manager"
 
 type Resolver struct {
 	Manager *manager.Manager
+	DB      *db.Client
 }

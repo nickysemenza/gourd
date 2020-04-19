@@ -34,7 +34,7 @@ func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*Recipe, e
 }
 
 func (m *Manager) GetRecipe(ctx context.Context, uuid string) (*Recipe, error) {
-	r, err := m.db.GetRecipeByUUID(ctx, uuid)
+	r, err := m.db.GetRecipeByUUIDFull(ctx, uuid)
 	if err != nil {
 		return nil, err
 	}

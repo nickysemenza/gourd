@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/nickysemenza/food/db"
 	"github.com/nickysemenza/food/graph"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/manager"
@@ -21,6 +22,7 @@ import (
 // Server represents a server
 type Server struct {
 	Manager  *manager.Manager
+	DB       *db.Client
 	HTTPPort uint
 }
 
@@ -35,7 +37,7 @@ func (s *Server) Run() error {
 	r.Get("/_metrics", promhttp.Handler().ServeHTTP)
 	r.Mount("/debug", middleware.Profiler())
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Manager: s.Manager}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{Manager: s.Manager, DB: s.DB}}))
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", srv)
 

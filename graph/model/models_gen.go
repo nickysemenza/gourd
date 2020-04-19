@@ -7,32 +7,11 @@ type Ingredient struct {
 	Name string `json:"name"`
 }
 
-type Instruction struct {
-	UUID        string `json:"uuid"`
-	Instruction string `json:"instruction"`
-}
-
 type NewRecipe struct {
 	Name string `json:"name"`
 }
 
-type Recipe struct {
-	UUID         string     `json:"uuid"`
-	Name         string     `json:"name"`
-	TotalMinutes int        `json:"total_minutes"`
-	Unit         string     `json:"unit"`
-	Sections     []*Section `json:"sections"`
-}
-
-type Section struct {
-	UUID         string               `json:"uuid"`
-	Minutes      int                  `json:"minutes"`
-	Instructions []*Instruction       `json:"instructions"`
-	Ingredients  []*SectionIngredient `json:"ingredients"`
-}
-
-type SectionIngredient struct {
-	UUID  string  `json:"uuid"`
-	Name  string  `json:"name"`
-	Grams float64 `json:"grams"`
+type SectionInstruction struct {
+	UUID        string `json:"uuid"`
+	Instruction string `json:"instruction"`
 }

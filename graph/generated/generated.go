@@ -37,6 +37,9 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Recipe() RecipeResolver
+	Section() SectionResolver
+	SectionIngredient() SectionIngredientResolver
 }
 
 type DirectiveRoot struct {
@@ -46,11 +49,6 @@ type ComplexityRoot struct {
 	Ingredient struct {
 		Name func(childComplexity int) int
 		UUID func(childComplexity int) int
-	}
-
-	Instruction struct {
-		Instruction func(childComplexity int) int
-		UUID        func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -79,8 +77,13 @@ type ComplexityRoot struct {
 
 	SectionIngredient struct {
 		Grams func(childComplexity int) int
-		Name  func(childComplexity int) int
+		Info  func(childComplexity int) int
 		UUID  func(childComplexity int) int
+	}
+
+	SectionInstruction struct {
+		Instruction func(childComplexity int) int
+		UUID        func(childComplexity int) int
 	}
 }
 
@@ -90,6 +93,16 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
 	Recipe(ctx context.Context, uuid string) (*model.Recipe, error)
+}
+type RecipeResolver interface {
+	Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error)
+}
+type SectionResolver interface {
+	Instructions(ctx context.Context, obj *model.Section) ([]*model.SectionInstruction, error)
+	Ingredients(ctx context.Context, obj *model.Section) ([]*model.SectionIngredient, error)
+}
+type SectionIngredientResolver interface {
+	Info(ctx context.Context, obj *model.SectionIngredient) (*model.Ingredient, error)
 }
 
 type executableSchema struct {
@@ -120,20 +133,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Ingredient.UUID(childComplexity), true
-
-	case "Instruction.instruction":
-		if e.complexity.Instruction.Instruction == nil {
-			break
-		}
-
-		return e.complexity.Instruction.Instruction(childComplexity), true
-
-	case "Instruction.uuid":
-		if e.complexity.Instruction.UUID == nil {
-			break
-		}
-
-		return e.complexity.Instruction.UUID(childComplexity), true
 
 	case "Mutation.createRecipe":
 		if e.complexity.Mutation.CreateRecipe == nil {
@@ -236,12 +235,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SectionIngredient.Grams(childComplexity), true
 
-	case "SectionIngredient.name":
-		if e.complexity.SectionIngredient.Name == nil {
+	case "SectionIngredient.info":
+		if e.complexity.SectionIngredient.Info == nil {
 			break
 		}
 
-		return e.complexity.SectionIngredient.Name(childComplexity), true
+		return e.complexity.SectionIngredient.Info(childComplexity), true
 
 	case "SectionIngredient.uuid":
 		if e.complexity.SectionIngredient.UUID == nil {
@@ -249,6 +248,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SectionIngredient.UUID(childComplexity), true
+
+	case "SectionInstruction.instruction":
+		if e.complexity.SectionInstruction.Instruction == nil {
+			break
+		}
+
+		return e.complexity.SectionInstruction.Instruction(childComplexity), true
+
+	case "SectionInstruction.uuid":
+		if e.complexity.SectionInstruction.UUID == nil {
+			break
+		}
+
+		return e.complexity.SectionInstruction.UUID(childComplexity), true
 
 	}
 	return 0, false
@@ -314,26 +327,27 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "graph/schema.graphql", Input: `type Instruction {
-  uuid: String!
-  instruction: String!
-}
-type Ingredient {
+	&ast.Source{Name: "graph/schema.graphql", Input: `type Ingredient {
   uuid: String!
   name: String!
 }
 
+type SectionInstruction {
+  uuid: String!
+  instruction: String!
+}
+
 type SectionIngredient {
   uuid: String!
-  name: String!
+  info: Ingredient!
   grams: Float!
 }
 
 type Section {
   uuid: String!
   minutes: Int!
-  instructions: [Instruction!]!
-  ingredients: [SectionIngredient!]!
+  instructions: [SectionInstruction]!
+  ingredients: [SectionIngredient]!
 }
 
 type Recipe {
@@ -341,7 +355,7 @@ type Recipe {
   name: String!
   total_minutes: Int!
   unit: String!
-  sections: [Section!]!
+  sections: [Section]!
 }
 
 input NewRecipe {
@@ -493,74 +507,6 @@ func (ec *executionContext) _Ingredient_name(ctx context.Context, field graphql.
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Instruction_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Instruction) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Instruction",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.UUID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Instruction_instruction(ctx context.Context, field graphql.CollectedField, obj *model.Instruction) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Instruction",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Instruction, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -906,13 +852,13 @@ func (ec *executionContext) _Recipe_sections(ctx context.Context, field graphql.
 		Object:   "Recipe",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Sections, nil
+		return ec.resolvers.Recipe().Sections(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -926,7 +872,7 @@ func (ec *executionContext) _Recipe_sections(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Section)
 	fc.Result = res
-	return ec.marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionᚄ(ctx, field.Selections, res)
+	return ec.marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Section_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Section) (ret graphql.Marshaler) {
@@ -1008,13 +954,13 @@ func (ec *executionContext) _Section_instructions(ctx context.Context, field gra
 		Object:   "Section",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Instructions, nil
+		return ec.resolvers.Section().Instructions(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1026,9 +972,9 @@ func (ec *executionContext) _Section_instructions(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Instruction)
+	res := resTmp.([]*model.SectionInstruction)
 	fc.Result = res
-	return ec.marshalNInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐInstructionᚄ(ctx, field.Selections, res)
+	return ec.marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Section_ingredients(ctx context.Context, field graphql.CollectedField, obj *model.Section) (ret graphql.Marshaler) {
@@ -1042,13 +988,13 @@ func (ec *executionContext) _Section_ingredients(ctx context.Context, field grap
 		Object:   "Section",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Ingredients, nil
+		return ec.resolvers.Section().Ingredients(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1062,7 +1008,7 @@ func (ec *executionContext) _Section_ingredients(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.SectionIngredient)
 	fc.Result = res
-	return ec.marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientᚄ(ctx, field.Selections, res)
+	return ec.marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionIngredient_uuid(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
@@ -1099,7 +1045,7 @@ func (ec *executionContext) _SectionIngredient_uuid(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _SectionIngredient_name(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+func (ec *executionContext) _SectionIngredient_info(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1110,13 +1056,13 @@ func (ec *executionContext) _SectionIngredient_name(ctx context.Context, field g
 		Object:   "SectionIngredient",
 		Field:    field,
 		Args:     nil,
-		IsMethod: false,
+		IsMethod: true,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
+		return ec.resolvers.SectionIngredient().Info(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1128,9 +1074,9 @@ func (ec *executionContext) _SectionIngredient_name(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Ingredient)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionIngredient_grams(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
@@ -1165,6 +1111,74 @@ func (ec *executionContext) _SectionIngredient_grams(ctx context.Context, field 
 	res := resTmp.(float64)
 	fc.Result = res
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionInstruction_uuid(ctx context.Context, field graphql.CollectedField, obj *model.SectionInstruction) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionInstruction",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UUID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionInstruction_instruction(ctx context.Context, field graphql.CollectedField, obj *model.SectionInstruction) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionInstruction",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Instruction, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -2280,38 +2294,6 @@ func (ec *executionContext) _Ingredient(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
-var instructionImplementors = []string{"Instruction"}
-
-func (ec *executionContext) _Instruction(ctx context.Context, sel ast.SelectionSet, obj *model.Instruction) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, instructionImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Instruction")
-		case "uuid":
-			out.Values[i] = ec._Instruction_uuid(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "instruction":
-			out.Values[i] = ec._Instruction_instruction(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2412,28 +2394,37 @@ func (ec *executionContext) _Recipe(ctx context.Context, sel ast.SelectionSet, o
 		case "uuid":
 			out.Values[i] = ec._Recipe_uuid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 			out.Values[i] = ec._Recipe_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "total_minutes":
 			out.Values[i] = ec._Recipe_total_minutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "unit":
 			out.Values[i] = ec._Recipe_unit(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "sections":
-			out.Values[i] = ec._Recipe_sections(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Recipe_sections(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2459,23 +2450,41 @@ func (ec *executionContext) _Section(ctx context.Context, sel ast.SelectionSet, 
 		case "uuid":
 			out.Values[i] = ec._Section_uuid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "minutes":
 			out.Values[i] = ec._Section_minutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "instructions":
-			out.Values[i] = ec._Section_instructions(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Section_instructions(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "ingredients":
-			out.Values[i] = ec._Section_ingredients(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Section_ingredients(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2501,15 +2510,56 @@ func (ec *executionContext) _SectionIngredient(ctx context.Context, sel ast.Sele
 		case "uuid":
 			out.Values[i] = ec._SectionIngredient_uuid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
-		case "name":
-			out.Values[i] = ec._SectionIngredient_name(ctx, field, obj)
+		case "info":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SectionIngredient_info(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "grams":
+			out.Values[i] = ec._SectionIngredient_grams(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var sectionInstructionImplementors = []string{"SectionInstruction"}
+
+func (ec *executionContext) _SectionInstruction(ctx context.Context, sel ast.SelectionSet, obj *model.SectionInstruction) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, sectionInstructionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SectionInstruction")
+		case "uuid":
+			out.Values[i] = ec._SectionInstruction_uuid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "grams":
-			out.Values[i] = ec._SectionIngredient_grams(ctx, field, obj)
+		case "instruction":
+			out.Values[i] = ec._SectionInstruction_instruction(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2797,55 +2847,18 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNInstruction2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐInstruction(ctx context.Context, sel ast.SelectionSet, v model.Instruction) graphql.Marshaler {
-	return ec._Instruction(ctx, sel, &v)
+func (ec *executionContext) marshalNIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v model.Ingredient) graphql.Marshaler {
+	return ec._Ingredient(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐInstructionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Instruction) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐInstruction(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐInstruction(ctx context.Context, sel ast.SelectionSet, v *model.Instruction) graphql.Marshaler {
+func (ec *executionContext) marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v *model.Ingredient) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._Instruction(ctx, sel, v)
+	return ec._Ingredient(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -2913,11 +2926,7 @@ func (ec *executionContext) marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfood
 	return ec._Recipe(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNSection2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v model.Section) graphql.Marshaler {
-	return ec._Section(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Section) graphql.Marshaler {
+func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v []*model.Section) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2941,7 +2950,7 @@ func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, sel, v[i])
+			ret[i] = ec.marshalOSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2954,21 +2963,7 @@ func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v *model.Section) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Section(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSectionIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v model.SectionIngredient) graphql.Marshaler {
-	return ec._SectionIngredient(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SectionIngredient) graphql.Marshaler {
+func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v []*model.SectionIngredient) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2992,7 +2987,7 @@ func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnicky
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, sel, v[i])
+			ret[i] = ec.marshalOSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3005,14 +3000,41 @@ func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnicky
 	return ret
 }
 
-func (ec *executionContext) marshalNSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v *model.SectionIngredient) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
+func (ec *executionContext) marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v []*model.SectionInstruction) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
 	}
-	return ec._SectionIngredient(ctx, sel, v)
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3299,6 +3321,39 @@ func (ec *executionContext) marshalORecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfood
 		return graphql.Null
 	}
 	return ec._Recipe(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSection2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v model.Section) graphql.Marshaler {
+	return ec._Section(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v *model.Section) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Section(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSectionIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v model.SectionIngredient) graphql.Marshaler {
+	return ec._SectionIngredient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v *model.SectionIngredient) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SectionIngredient(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSectionInstruction2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v model.SectionInstruction) graphql.Marshaler {
+	return ec._SectionInstruction(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v *model.SectionInstruction) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SectionInstruction(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
