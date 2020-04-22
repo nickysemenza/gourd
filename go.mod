@@ -14,13 +14,14 @@ require (
 	github.com/lib/pq v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.2
 	github.com/mgechev/revive v1.0.2
-	github.com/prometheus/client_golang v1.5.1
+	github.com/prometheus/client_golang v1.5.1 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.0.1
 	go.opentelemetry.io/otel v0.4.2
+	go.opentelemetry.io/otel/exporters/metric/prometheus v0.4.2
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.4.2
 	google.golang.org/grpc v1.27.1
 	gopkg.in/guregu/null.v3 v3.4.0

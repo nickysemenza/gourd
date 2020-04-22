@@ -15,8 +15,11 @@ import (
 	"github.com/nickysemenza/food/graph"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/manager"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/api/key"
+	"go.opentelemetry.io/otel/api/metric"
+	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/plugin/othttp"
 )
 
@@ -27,6 +30,20 @@ type Server struct {
 	HTTPPort uint
 }
 
+var httpRequestsDurationMetric = metric.Must(global.Meter("ex.com/basic")).
+	NewFloat64Measure("http.requests.duration", metric.WithKeys(key.New("method")))
+
+func timing(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		t := time.Now()
+		next.ServeHTTP(w, r)
+		d := time.Since(t).Seconds()
+		httpRequestsDurationMetric.Record(r.Context(), d, key.String("method", r.Method))
+
+	}
+	return http.HandlerFunc(fn)
+}
+
 // Run runs http
 func (s *Server) Run() error {
 	r := chi.NewRouter()
@@ -34,8 +51,14 @@ func (s *Server) Run() error {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{}))
+	r.Use(timing)
 
-	r.Get("/_metrics", promhttp.Handler().ServeHTTP)
+	_, hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
+	if err != nil {
+		return nil
+	}
+
+	r.Get("/metrics", hf)
 	r.Mount("/debug", middleware.Profiler())
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{

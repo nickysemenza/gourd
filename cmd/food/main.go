@@ -7,16 +7,14 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
+	"github.com/luna-duclos/instrumentedsql"
 	"github.com/nickysemenza/food/db"
 	"github.com/nickysemenza/food/manager"
 	"github.com/nickysemenza/food/server"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/key"
-
-	"github.com/luna-duclos/instrumentedsql"
-	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -38,6 +36,7 @@ func initTracer(endpoint string) error {
 }
 
 func main() {
+	ctx := context.Background()
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
 	viper.SetDefault("DB_USER", "food")
@@ -73,7 +72,7 @@ func main() {
 	defer dbConn.Close()
 
 	dbx := sqlx.NewDb(dbConn, "postgres")
-	if err = dbx.Ping(); err != nil {
+	if err = dbx.PingContext(ctx); err != nil {
 		log.Fatal(err)
 	}
 	dbClient := db.New(dbx)
