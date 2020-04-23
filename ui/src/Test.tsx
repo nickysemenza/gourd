@@ -1,43 +1,67 @@
 import React, { useState } from "react";
 import { gql } from "apollo-boost";
-import { useGetRecipeByUuidQuery } from "./generated/graphql";
 
-const RecipeByUUID = gql`
-  query getRecipeByUUID($uuid: String!) {
-    recipe(uuid: $uuid) {
-      uuid
-      name
-      total_minutes
-      unit
-      sections {
-        minutes
-        ingredients {
-          uuid
-          info {
-            name
-          }
-          grams
-        }
-        instructions {
-          instruction
-          uuid
-        }
-      }
-    }
-  }
+import styled from "styled-components";
+import {
+  color,
+  SpaceProps,
+  ColorProps,
+  space,
+  BordersProps,
+  border,
+} from "styled-system";
+import { Box, Card, Heading, Text, Button } from "rebass";
+import { Input } from "theme-ui";
+
+const Box2 = styled.div<SpaceProps & ColorProps & BordersProps>`
+  ${color}
+  ${space}
+${border}
+`;
+
+const Table = styled.table<SpaceProps & ColorProps & BordersProps>`
+  ${color}
+  ${space}
+${border}
+`;
+
+const Td = styled.td<SpaceProps & ColorProps & BordersProps>`
+  ${color}
+  ${space}
+${border}
+`;
+
+const Tr = styled.tr<SpaceProps & ColorProps & BordersProps>`
+  ${color}
+  ${space}
+${border}
 `;
 
 const Test: React.FC = () => {
-  const [uuid, setUUID] = useState("9f089d13-ac16-41f2-a490-66352d181e7f");
-  const { loading, error, data } = useGetRecipeByUuidQuery({
-    variables: { uuid: uuid },
-  });
-
-  const foo = data?.recipe?.name;
   return (
     <div>
-      <input value={uuid} onChange={(e) => setUUID(e.target.value)} />
-      <pre>{JSON.stringify({ loading, error, data, foo }, null, 2)}</pre>
+      <Box2 color="red" mx={3} bg="navy" py={4}>
+        asd
+      </Box2>
+      <Box width={256}>
+        <Card
+          sx={{
+            p: 1,
+            borderRadius: 2,
+            boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
+          }}
+        >
+          <Box px={2}>
+            <Heading as="h3">Card Demo</Heading>
+            <Text fontSize={0}>You can edit this code</Text>
+          </Box>
+        </Card>
+      </Box>
+
+      <Button variant="primary" mr={2}>
+        Beep
+      </Button>
+      <Button variant="secondary">Boop</Button>
     </div>
   );
 };

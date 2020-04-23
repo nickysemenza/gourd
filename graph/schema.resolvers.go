@@ -96,7 +96,6 @@ func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.Section
 		return nil, nil
 	}
 	return &model.Ingredient{Name: ing.Name, UUID: ing.UUID}, nil
-
 }
 
 // Mutation returns generated.MutationResolver implementation.
