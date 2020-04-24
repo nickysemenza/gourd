@@ -45,6 +45,13 @@ func TestInsertGet(t *testing.T) {
 		Ingredients: []SectionIngredient{{
 			Grams: zero.FloatFrom(1),
 			Name:  "flour",
+		}, {
+			Grams: zero.FloatFrom(178),
+			Name:  "water",
+		}, {
+
+			Grams: zero.FloatFrom(36),
+			Name:  "egg",
 		}},
 	}}
 

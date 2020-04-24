@@ -1,5 +1,4 @@
 import React from "react";
-import { gql } from "apollo-boost";
 import { useGetRecipesQuery } from "./generated/graphql";
 import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
@@ -9,18 +8,6 @@ interface TableProps<T extends object> {
   columns: Column<T>[];
   data: T[];
 }
-
-const _ = gql`
-  query getRecipes {
-    recipes {
-      uuid
-      name
-      total_minutes
-      unit
-      __typename
-    }
-  }
-`;
 
 const Table = <T extends object>({ columns, data }: TableProps<T>) => {
   // Use the state and functions returned from useTable to build your UI

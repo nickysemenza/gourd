@@ -1,48 +1,19 @@
-import React, { useState } from "react";
-import { gql } from "apollo-boost";
+import React from "react";
 
-import styled from "styled-components";
-import {
-  color,
-  SpaceProps,
-  ColorProps,
-  space,
-  BordersProps,
-  border,
-} from "styled-system";
 import { Box, Card, Heading, Text, Button } from "rebass";
-import { Input } from "theme-ui";
-
-const Box2 = styled.div<SpaceProps & ColorProps & BordersProps>`
-  ${color}
-  ${space}
-${border}
-`;
-
-const Table = styled.table<SpaceProps & ColorProps & BordersProps>`
-  ${color}
-  ${space}
-${border}
-`;
-
-const Td = styled.td<SpaceProps & ColorProps & BordersProps>`
-  ${color}
-  ${space}
-${border}
-`;
-
-const Tr = styled.tr<SpaceProps & ColorProps & BordersProps>`
-  ${color}
-  ${space}
-${border}
-`;
+import { useColorMode } from "theme-ui";
 
 const Test: React.FC = () => {
+  const [colorMode, setColorMode] = useColorMode();
   return (
     <div>
-      <Box2 color="red" mx={3} bg="navy" py={4}>
-        asd
-      </Box2>
+      <button
+        onClick={(e) => {
+          setColorMode(colorMode === "default" ? "dark" : "default");
+        }}
+      >
+        Toggle {colorMode === "default" ? "Dark" : "Light"}
+      </button>
       <Box width={256}>
         <Card
           sx={{
