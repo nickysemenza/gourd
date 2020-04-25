@@ -1,11 +1,16 @@
-import React, { useState } from "react";
-import { useGetRecipeByUuidQuery } from "../generated/graphql";
+import React, { useState, useEffect } from "react";
+import {
+  useGetRecipeByUuidQuery,
+  useUpdateRecipeMutation,
+  RecipeInput,
+} from "../generated/graphql";
 
 import { Box, Button } from "rebass";
 import { useParams } from "react-router-dom";
 import RecipeTable from "../components/RecipeTable";
 import Debug from "../components/Debug";
 import RecipeCard from "../components/RecipeCard";
+import { recipeToRecipeInput } from "../util";
 
 type override = {
   sectionID: number;
@@ -14,25 +19,52 @@ type override = {
 };
 const RecipeDetail: React.FC = () => {
   let { uuid } = useParams();
-  const { loading, error, data } = useGetRecipeByUuidQuery({
+  const { loading, error, data, refetch } = useGetRecipeByUuidQuery({
     variables: { uuid: uuid || "" },
   });
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<override>();
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data?.recipe);
-  if (error) {
-    console.error({ error });
+
+  const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>();
+  const [
+    updateRecipeMutation,
+    { loading: saveLoading, error: saveError },
+  ] = useUpdateRecipeMutation({
+    variables: {
+      recipe: recipeUpdate || { name: "p", uuid: "p" },
+    },
+  });
+
+  useEffect(() => {
+    if (data?.recipe) {
+      setRecipe(data.recipe);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (recipe) {
+      setRecipeUpdate(recipeToRecipeInput(recipe));
+    }
+  }, [recipe]);
+
+  const e = error || saveError;
+  if (e) {
+    console.error({ e });
     return (
       <Box color="primary" fontSize={4}>
-        {error.message}
+        {e.message}
       </Box>
     );
   }
-  if (!recipe && !!data?.recipe) {
-    setRecipe(data.recipe);
-  }
+
   if (!recipe) return null;
+
+  const saveUpdate = async () => {
+    await updateRecipeMutation();
+    await refetch();
+  };
 
   const updateIngredient = (
     sectionID: number,
@@ -41,7 +73,6 @@ const RecipeDetail: React.FC = () => {
     attr: "grams" | "name"
   ) => {
     const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-    // console.log(newValue);
     attr === "grams" &&
       !edit &&
       setOverride({
@@ -157,6 +188,7 @@ const RecipeDetail: React.FC = () => {
   return (
     <div>
       <Button onClick={() => setMultiplier(1)}>Reset</Button>
+      <Button onClick={() => saveUpdate()}>save</Button>
       <Button
         onClick={() => {
           setMultiplier(1);

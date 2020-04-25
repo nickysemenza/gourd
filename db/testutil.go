@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newDB(t *testing.T) *Client {
+func NewDB(t *testing.T) *Client {
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
 	viper.SetDefault("DB_USER", "food")

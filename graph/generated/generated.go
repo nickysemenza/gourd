@@ -52,7 +52,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateRecipe func(childComplexity int, input *model.NewRecipe) int
+		CreateRecipe func(childComplexity int, recipe *model.NewRecipe) int
+		UpdateRecipe func(childComplexity int, recipe *model.RecipeInput) int
 	}
 
 	Query struct {
@@ -88,7 +89,8 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateRecipe(ctx context.Context, input *model.NewRecipe) (*model.Recipe, error)
+	CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error)
+	UpdateRecipe(ctx context.Context, recipe *model.RecipeInput) (*model.Recipe, error)
 }
 type QueryResolver interface {
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
@@ -144,7 +146,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateRecipe(childComplexity, args["input"].(*model.NewRecipe)), true
+		return e.complexity.Mutation.CreateRecipe(childComplexity, args["recipe"].(*model.NewRecipe)), true
+
+	case "Mutation.updateRecipe":
+		if e.complexity.Mutation.UpdateRecipe == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRecipe_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRecipe(childComplexity, args["recipe"].(*model.RecipeInput)), true
 
 	case "Query.recipe":
 		if e.complexity.Query.Recipe == nil {
@@ -358,12 +372,37 @@ type Recipe {
   sections: [Section!]!
 }
 
+input RecipeInput {
+  uuid: String!
+  name: String!
+  total_minutes: Int
+  unit: String
+  sections: [SectionInput!]
+}
+
+input SectionInstructionInput {
+  instruction: String!
+}
+
+input SectionIngredientInput {
+  name: String!
+  grams: Float!
+}
+
+input SectionInput {
+  uuid: String!
+  minutes: Int!
+  instructions: [SectionInstructionInput!]!
+  ingredients: [SectionIngredientInput!]!
+}
+
 input NewRecipe {
   name: String!
 }
 
 type Mutation {
-  createRecipe(input: NewRecipe): Recipe!
+  createRecipe(recipe: NewRecipe): Recipe!
+  updateRecipe(recipe: RecipeInput): Recipe!
 }
 type Query {
   recipes: [Recipe!]!
@@ -381,13 +420,27 @@ func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *model.NewRecipe
-	if tmp, ok := rawArgs["input"]; ok {
+	if tmp, ok := rawArgs["recipe"]; ok {
 		arg0, err = ec.unmarshalONewRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐNewRecipe(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["recipe"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.RecipeInput
+	if tmp, ok := rawArgs["recipe"]; ok {
+		arg0, err = ec.unmarshalORecipeInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipeInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["recipe"] = arg0
 	return args, nil
 }
 
@@ -547,7 +600,48 @@ func (ec *executionContext) _Mutation_createRecipe(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateRecipe(rctx, args["input"].(*model.NewRecipe))
+		return ec.resolvers.Mutation().CreateRecipe(rctx, args["recipe"].(*model.NewRecipe))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Recipe)
+	fc.Result = res
+	return ec.marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateRecipe_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateRecipe(rctx, args["recipe"].(*model.RecipeInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2254,6 +2348,126 @@ func (ec *executionContext) unmarshalInputNewRecipe(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputRecipeInput(ctx context.Context, obj interface{}) (model.RecipeInput, error) {
+	var it model.RecipeInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "uuid":
+			var err error
+			it.UUID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "total_minutes":
+			var err error
+			it.TotalMinutes, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit":
+			var err error
+			it.Unit, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sections":
+			var err error
+			it.Sections, err = ec.unmarshalOSectionInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSectionIngredientInput(ctx context.Context, obj interface{}) (model.SectionIngredientInput, error) {
+	var it model.SectionIngredientInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "grams":
+			var err error
+			it.Grams, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSectionInput(ctx context.Context, obj interface{}) (model.SectionInput, error) {
+	var it model.SectionInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "uuid":
+			var err error
+			it.UUID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "minutes":
+			var err error
+			it.Minutes, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "instructions":
+			var err error
+			it.Instructions, err = ec.unmarshalNSectionInstructionInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ingredients":
+			var err error
+			it.Ingredients, err = ec.unmarshalNSectionIngredientInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSectionInstructionInput(ctx context.Context, obj interface{}) (model.SectionInstructionInput, error) {
+	var it model.SectionInstructionInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "instruction":
+			var err error
+			it.Instruction, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2311,6 +2525,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createRecipe":
 			out.Values[i] = ec._Mutation_createRecipe(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateRecipe":
+			out.Values[i] = ec._Mutation_updateRecipe(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3028,6 +3247,50 @@ func (ec *executionContext) marshalNSectionIngredient2ᚖgithubᚗcomᚋnickysem
 	return ec._SectionIngredient(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNSectionIngredientInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInput(ctx context.Context, v interface{}) (model.SectionIngredientInput, error) {
+	return ec.unmarshalInputSectionIngredientInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNSectionIngredientInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInputᚄ(ctx context.Context, v interface{}) ([]*model.SectionIngredientInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.SectionIngredientInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNSectionIngredientInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNSectionIngredientInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInput(ctx context.Context, v interface{}) (*model.SectionIngredientInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNSectionIngredientInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientInput(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalNSectionInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInput(ctx context.Context, v interface{}) (model.SectionInput, error) {
+	return ec.unmarshalInputSectionInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNSectionInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInput(ctx context.Context, v interface{}) (*model.SectionInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNSectionInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInput(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) marshalNSectionInstruction2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v model.SectionInstruction) graphql.Marshaler {
 	return ec._SectionInstruction(ctx, sel, &v)
 }
@@ -3077,6 +3340,38 @@ func (ec *executionContext) marshalNSectionInstruction2ᚖgithubᚗcomᚋnickyse
 		return graphql.Null
 	}
 	return ec._SectionInstruction(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSectionInstructionInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInput(ctx context.Context, v interface{}) (model.SectionInstructionInput, error) {
+	return ec.unmarshalInputSectionInstructionInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNSectionInstructionInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInputᚄ(ctx context.Context, v interface{}) ([]*model.SectionInstructionInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.SectionInstructionInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNSectionInstructionInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNSectionInstructionInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInput(ctx context.Context, v interface{}) (*model.SectionInstructionInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNSectionInstructionInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionInput(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3342,6 +3637,29 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {
+	return graphql.UnmarshalInt(v)
+}
+
+func (ec *executionContext) marshalOInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	return graphql.MarshalInt(v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOInt2int(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOInt2int(ctx, sel, *v)
+}
+
 func (ec *executionContext) unmarshalONewRecipe2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐNewRecipe(ctx context.Context, v interface{}) (model.NewRecipe, error) {
 	return ec.unmarshalInputNewRecipe(ctx, v)
 }
@@ -3363,6 +3681,38 @@ func (ec *executionContext) marshalORecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfood
 		return graphql.Null
 	}
 	return ec._Recipe(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalORecipeInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipeInput(ctx context.Context, v interface{}) (model.RecipeInput, error) {
+	return ec.unmarshalInputRecipeInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalORecipeInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipeInput(ctx context.Context, v interface{}) (*model.RecipeInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalORecipeInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipeInput(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalOSectionInput2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInputᚄ(ctx context.Context, v interface{}) ([]*model.SectionInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.SectionInput, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNSectionInput2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

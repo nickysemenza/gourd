@@ -5,18 +5,49 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/nickysemenza/food/db"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/graph/model"
 	"github.com/vektah/gqlparser/gqlerror"
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
+	"gopkg.in/guregu/null.v3/zero"
 )
 
-func (r *mutationResolver) CreateRecipe(ctx context.Context, input *model.NewRecipe) (*model.Recipe, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error) {
+	uuid, err := r.DB.InsertRecipe(ctx, &db.Recipe{Name: recipe.Name})
+	if err != nil {
+		return nil, err
+	}
+	return r.Query().Recipe(ctx, uuid)
+}
+
+func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.RecipeInput) (*model.Recipe, error) {
+	uuid := recipe.UUID
+	res, err := r.Resolver.DB.GetRecipeByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+	if res == nil {
+		graphql.AddError(ctx, gqlerror.Errorf("no recipe found with uuid %s", uuid))
+		return nil, nil
+	}
+
+	dbr := &db.Recipe{
+		UUID: uuid,
+		Name: recipe.Name,
+	}
+	if recipe.TotalMinutes != nil {
+		dbr.TotalMinutes = zero.IntFrom(int64(*recipe.TotalMinutes))
+	}
+	// dbr.Sections
+
+	if err := r.DB.UpdateRecipe(ctx, dbr); err != nil {
+		return nil, err
+	}
+	return r.Query().Recipe(ctx, uuid)
 }
 
 func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {

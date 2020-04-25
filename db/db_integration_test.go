@@ -13,7 +13,7 @@ import (
 func TestInsertGet(t *testing.T) {
 	ctx := context.Background()
 	require := require.New(t)
-	db := newDB(t)
+	db := NewDB(t)
 
 	all1, err := db.GetRecipes(ctx)
 	require.NoError(err)

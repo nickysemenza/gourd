@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v3/zero"
@@ -154,7 +153,6 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		return err
 	}
 	c.AssignUUIDs(ctx, r)
-	spew.Dump(r)
 	//update recipe_section_instructions
 	//update recipe_section_ingredients
 	//update recipe_sections

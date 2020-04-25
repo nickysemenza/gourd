@@ -51,6 +51,30 @@ export type Recipe = {
   sections: Array<Section>;
 };
 
+export type RecipeInput = {
+  uuid: Scalars["String"];
+  name: Scalars["String"];
+  total_minutes?: Maybe<Scalars["Int"]>;
+  unit?: Maybe<Scalars["String"]>;
+  sections?: Maybe<Array<SectionInput>>;
+};
+
+export type SectionInstructionInput = {
+  instruction: Scalars["String"];
+};
+
+export type SectionIngredientInput = {
+  name: Scalars["String"];
+  grams: Scalars["Float"];
+};
+
+export type SectionInput = {
+  uuid: Scalars["String"];
+  minutes: Scalars["Int"];
+  instructions: Array<SectionInstructionInput>;
+  ingredients: Array<SectionIngredientInput>;
+};
+
 export type NewRecipe = {
   name: Scalars["String"];
 };
@@ -58,10 +82,15 @@ export type NewRecipe = {
 export type Mutation = {
   __typename?: "Mutation";
   createRecipe: Recipe;
+  updateRecipe: Recipe;
 };
 
 export type MutationCreateRecipeArgs = {
-  input?: Maybe<NewRecipe>;
+  recipe?: Maybe<NewRecipe>;
+};
+
+export type MutationUpdateRecipeArgs = {
+  recipe?: Maybe<RecipeInput>;
 };
 
 export type Query = {
@@ -118,6 +147,14 @@ export type GetRecipesQuery = { __typename?: "Query" } & {
       "uuid" | "name" | "total_minutes" | "unit"
     >
   >;
+};
+
+export type UpdateRecipeMutationVariables = {
+  recipe: RecipeInput;
+};
+
+export type UpdateRecipeMutation = { __typename?: "Mutation" } & {
+  updateRecipe: { __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">;
 };
 
 export const GetRecipeByUuidDocument = gql`
@@ -352,4 +389,105 @@ export type GetRecipesLazyQueryHookResult = ReturnType<
 export type GetRecipesQueryResult = ApolloReactCommon.QueryResult<
   GetRecipesQuery,
   GetRecipesQueryVariables
+>;
+export const UpdateRecipeDocument = gql`
+  mutation updateRecipe($recipe: RecipeInput!) {
+    updateRecipe(recipe: $recipe) {
+      uuid
+      name
+    }
+  }
+`;
+export type UpdateRecipeMutationFn = ApolloReactCommon.MutationFunction<
+  UpdateRecipeMutation,
+  UpdateRecipeMutationVariables
+>;
+export type UpdateRecipeComponentProps = Omit<
+  ApolloReactComponents.MutationComponentOptions<
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables
+  >,
+  "mutation"
+>;
+
+export const UpdateRecipeComponent = (props: UpdateRecipeComponentProps) => (
+  <ApolloReactComponents.Mutation<
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables
+  >
+    mutation={UpdateRecipeDocument}
+    {...props}
+  />
+);
+
+export type UpdateRecipeProps<
+  TChildProps = {},
+  TDataName extends string = "mutate"
+> = {
+  [key in TDataName]: ApolloReactCommon.MutationFunction<
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables
+  >;
+} &
+  TChildProps;
+export function withUpdateRecipe<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "mutate"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables,
+    UpdateRecipeProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withMutation<
+    TProps,
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables,
+    UpdateRecipeProps<TChildProps, TDataName>
+  >(UpdateRecipeDocument, {
+    alias: "updateRecipe",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useUpdateRecipeMutation__
+ *
+ * To run a mutation, you first call `useUpdateRecipeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRecipeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRecipeMutation, { data, loading, error }] = useUpdateRecipeMutation({
+ *   variables: {
+ *      recipe: // value for 'recipe'
+ *   },
+ * });
+ */
+export function useUpdateRecipeMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    UpdateRecipeMutation,
+    UpdateRecipeMutationVariables
+  >(UpdateRecipeDocument, baseOptions);
+}
+export type UpdateRecipeMutationHookResult = ReturnType<
+  typeof useUpdateRecipeMutation
+>;
+export type UpdateRecipeMutationResult = ApolloReactCommon.MutationResult<
+  UpdateRecipeMutation
+>;
+export type UpdateRecipeMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  UpdateRecipeMutation,
+  UpdateRecipeMutationVariables
 >;

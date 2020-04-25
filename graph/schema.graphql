@@ -29,12 +29,37 @@ type Recipe {
   sections: [Section!]!
 }
 
+input RecipeInput {
+  uuid: String!
+  name: String!
+  total_minutes: Int
+  unit: String
+  sections: [SectionInput!]
+}
+
+input SectionInstructionInput {
+  instruction: String!
+}
+
+input SectionIngredientInput {
+  name: String!
+  grams: Float!
+}
+
+input SectionInput {
+  uuid: String!
+  minutes: Int!
+  instructions: [SectionInstructionInput!]!
+  ingredients: [SectionIngredientInput!]!
+}
+
 input NewRecipe {
   name: String!
 }
 
 type Mutation {
-  createRecipe(input: NewRecipe): Recipe!
+  createRecipe(recipe: NewRecipe): Recipe!
+  updateRecipe(recipe: RecipeInput): Recipe!
 }
 type Query {
   recipes: [Recipe!]!

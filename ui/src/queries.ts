@@ -37,4 +37,12 @@ const _ = [
       }
     }
   `,
+  gql`
+    mutation updateRecipe($recipe: RecipeInput!) {
+      updateRecipe(recipe: $recipe) {
+        uuid
+        name
+      }
+    }
+  `,
 ];
