@@ -51,7 +51,7 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>Instructions</TableCell>
     </TableRow>
     {recipe.sections?.map((section, x) => (
-      <TableRow>
+      <TableRow key={x}>
         <TableCell>{section.minutes}</TableCell>
         <TableCell>
           {section.ingredients.map((ingredient, y) => (

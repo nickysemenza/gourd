@@ -42,7 +42,24 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 	if recipe.TotalMinutes != nil {
 		dbr.TotalMinutes = zero.IntFrom(int64(*recipe.TotalMinutes))
 	}
-	// dbr.Sections
+	for _, s := range recipe.Sections {
+		dbs := db.Section{
+			// RecipeUUID: uuid,
+			Minutes: zero.IntFrom(int64(s.Minutes)),
+		}
+		for _, i := range s.Instructions {
+			dbs.Instructions = append(dbs.Instructions, db.SectionInstruction{
+				Instruction: i.Instruction,
+			})
+		}
+		for _, i := range s.Ingredients {
+			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
+				Name:  i.Name,
+				Grams: zero.FloatFrom(i.Grams),
+			})
+		}
+		dbr.Sections = append(dbr.Sections, dbs)
+	}
 
 	if err := r.DB.UpdateRecipe(ctx, dbr); err != nil {
 		return nil, err
@@ -85,7 +102,7 @@ func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*mo
 	if err != nil {
 		return nil, err
 	}
-	s := []*model.Section{{}, {}}
+	s := []*model.Section{}
 	for _, dbs := range sections {
 		s = append(s, &model.Section{UUID: dbs.UUID, RecipeUUID: dbs.RecipeUUID, Minutes: int(dbs.Minutes.Int64)})
 	}

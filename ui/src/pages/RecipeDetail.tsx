@@ -27,13 +27,16 @@ const RecipeDetail: React.FC = () => {
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data?.recipe);
 
-  const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>();
+  const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>({
+    name: "tmp",
+    uuid: "tmp",
+  });
   const [
     updateRecipeMutation,
     { loading: saveLoading, error: saveError },
   ] = useUpdateRecipeMutation({
     variables: {
-      recipe: recipeUpdate || { name: "p", uuid: "p" },
+      recipe: recipeUpdate,
     },
   });
 

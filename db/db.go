@@ -202,7 +202,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 			for _, i := range s.Instructions {
 				instructionsInsert = instructionsInsert.Values(i.UUID, i.SectionUUID, i.Instruction)
 			}
-			if _, err = instructionsInsert.RunWith(tx).Exec(); err != nil {
+			if _, err = instructionsInsert.RunWith(tx).ExecContext(ctx); err != nil {
 				return err
 			}
 		}
@@ -214,7 +214,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 				ingredientsInsert = ingredientsInsert.Values(i.UUID, i.SectionUUID, i.IngredientUUID, i.RecipeUUID,
 					i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional)
 			}
-			if _, err = ingredientsInsert.RunWith(tx).Exec(); err != nil {
+			if _, err = ingredientsInsert.RunWith(tx).ExecContext(ctx); err != nil {
 				return err
 			}
 		}
@@ -224,7 +224,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 
 // UpdateRecipe updates a recipe.
 func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
-	tx, err := c.db.Begin()
+	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -244,7 +244,7 @@ func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to build query: %w", err)
 	}
-	tx, err := c.db.Begin()
+	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {
 		return "", err
 	}

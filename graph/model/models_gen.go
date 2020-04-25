@@ -25,7 +25,6 @@ type SectionIngredientInput struct {
 }
 
 type SectionInput struct {
-	UUID         string                     `json:"uuid"`
 	Minutes      int                        `json:"minutes"`
 	Instructions []*SectionInstructionInput `json:"instructions"`
 	Ingredients  []*SectionIngredientInput  `json:"ingredients"`

@@ -47,7 +47,6 @@ input SectionIngredientInput {
 }
 
 input SectionInput {
-  uuid: String!
   minutes: Int!
   instructions: [SectionInstructionInput!]!
   ingredients: [SectionIngredientInput!]!

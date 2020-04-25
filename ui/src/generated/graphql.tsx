@@ -69,7 +69,6 @@ export type SectionIngredientInput = {
 };
 
 export type SectionInput = {
-  uuid: Scalars["String"];
   minutes: Scalars["Int"];
   instructions: Array<SectionInstructionInput>;
   ingredients: Array<SectionIngredientInput>;

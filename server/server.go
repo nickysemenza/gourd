@@ -83,7 +83,7 @@ func (s *Server) Run() error {
 	log.Printf("connect to http://localhost:%d/ for GraphQL playground", s.HTTPPort)
 	// return server.ListenAndServe()
 	return http.ListenAndServe(fmt.Sprintf(":%d", s.HTTPPort),
-		othttp.NewHandler(http.TimeoutHandler(r, time.Second*s.HTTPTimeout, "timeout"), "server",
+		othttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
 			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
 		),
 	)

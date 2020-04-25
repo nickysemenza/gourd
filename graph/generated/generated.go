@@ -390,7 +390,6 @@ input SectionIngredientInput {
 }
 
 input SectionInput {
-  uuid: String!
   minutes: Int!
   instructions: [SectionInstructionInput!]!
   ingredients: [SectionIngredientInput!]!
@@ -2420,12 +2419,6 @@ func (ec *executionContext) unmarshalInputSectionInput(ctx context.Context, obj 
 
 	for k, v := range asMap {
 		switch k {
-		case "uuid":
-			var err error
-			it.UUID, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "minutes":
 			var err error
 			it.Minutes, err = ec.unmarshalNInt2int(ctx, v)
