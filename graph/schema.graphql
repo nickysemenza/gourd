@@ -1,6 +1,7 @@
 type Ingredient {
   uuid: String!
   name: String!
+  recipes: [Recipe!]
 }
 
 type SectionInstruction {

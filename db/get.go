@@ -108,6 +108,29 @@ func (c *Client) GetRecipes(ctx context.Context) ([]Recipe, error) {
 	return r, nil
 }
 
+// GetRecipesWithIngredient gets all recipes with an ingredeitn
+// todo: consolidate into getrecipes
+func (c *Client) GetRecipesWithIngredient(ctx context.Context, ingredient string) ([]Recipe, error) {
+	query, args, err := c.psql.Select(getRecipeColumns()...).From(recipesTable).
+		Join("recipe_sections on recipe_sections.recipe = recipes.uuid").
+		Join("recipe_section_ingredients on recipe_sections.uuid = recipe_section_ingredients.section").
+		Where(sq.Eq{"ingredient": ingredient}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	r := []Recipe{}
+	err = c.db.SelectContext(ctx, &r, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return r, nil
+}
+
 // GetRecipeByUUIDFull gets a recipe by UUID, with all dependencies.
 func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe, error) {
 	r, err := c.GetRecipeByUUID(ctx, uuid)

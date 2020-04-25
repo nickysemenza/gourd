@@ -24,3 +24,9 @@ type SectionIngredient struct {
 	IngredientID string  `json:"info"`
 	Grams        float64 `json:"grams"`
 }
+
+type Ingredient struct {
+	UUID       string   `json:"uuid"`
+	Name       string   `json:"name"`
+	RecipesIDs []string `json:"recipes"`
+}

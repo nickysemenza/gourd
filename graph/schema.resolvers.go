@@ -16,6 +16,19 @@ import (
 	"gopkg.in/guregu/null.v3/zero"
 )
 
+func (r *ingredientResolver) Recipes(ctx context.Context, obj *model.Ingredient) ([]*model.Recipe, error) {
+	dbr, err := r.DB.GetRecipesWithIngredient(ctx, obj.UUID)
+	if err != nil {
+		return nil, err
+	}
+	recipes := []*model.Recipe{}
+	for _, x := range dbr {
+		each := x
+		recipes = append(recipes, fromRecipe(&each))
+	}
+	return recipes, nil
+}
+
 func (r *mutationResolver) CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error) {
 	uuid, err := r.DB.InsertRecipe(ctx, &db.Recipe{Name: recipe.Name})
 	if err != nil {
@@ -164,6 +177,9 @@ func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.Section
 	return &model.Ingredient{Name: ing.Name, UUID: ing.UUID}, nil
 }
 
+// Ingredient returns generated.IngredientResolver implementation.
+func (r *Resolver) Ingredient() generated.IngredientResolver { return &ingredientResolver{r} }
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -181,6 +197,7 @@ func (r *Resolver) SectionIngredient() generated.SectionIngredientResolver {
 	return &sectionIngredientResolver{r}
 }
 
+type ingredientResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type recipeResolver struct{ *Resolver }

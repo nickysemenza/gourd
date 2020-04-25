@@ -1,12 +1,16 @@
 import React from "react";
-import { useGetIngredientsQuery } from "../generated/graphql";
+import {
+  useGetIngredientsQuery,
+  GetIngredientsQuery,
+} from "../generated/graphql";
 import styled from "styled-components";
-import { useTable, Column, CellProps } from "react-table";
+import { useTable, Column, CellProps, Cell } from "react-table";
 import { Link } from "react-router-dom";
 import Debug from "../components/Debug";
+import { Box } from "rebass";
 
 interface TableProps<T extends object> {
-  columns: Column<T>[];
+  columns: Array<Column<T>>;
   data: T[];
 }
 
@@ -18,7 +22,7 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({
+  } = useTable<T>({
     columns,
     data,
   });
@@ -83,11 +87,20 @@ const Styles = styled.div`
 const IngredientList: React.FC = () => {
   const { data } = useGetIngredientsQuery({});
 
-  const columns = React.useMemo(
+  const ingredients = data?.ingredients || [];
+  type i = Partial<typeof ingredients[0]>;
+
+  const columns: Array<Column<i>> = React.useMemo(
     () => [
       {
         Header: "UUID",
+        // accessor: ({ uuid }: CellProps<i>) => uuid,
         accessor: "uuid",
+        // Cell: ({
+        //   row: {
+        //     original: { uuid },
+        //   },
+        // }: CellProps<i>) => uuid,
       },
       {
         Header: "Name",
@@ -95,8 +108,19 @@ const IngredientList: React.FC = () => {
       },
       {
         Header: "test",
-        accessor: "test",
-        Cell: (cell: CellProps<any>) => <Debug data={cell.row.original} />,
+        id: "test",
+        Cell: ({ row: { original } }: CellProps<i>) => (
+          <Box>
+            <ul>
+              {(original.recipes || []).map((r) => (
+                <li>
+                  <Link to={`recipe/${r.uuid}`}>{r.name}</Link>
+                </li>
+              ))}
+            </ul>
+            {/* <Debug data={original} /> */}
+          </Box>
+        ),
       },
     ],
     []
@@ -104,7 +128,7 @@ const IngredientList: React.FC = () => {
 
   return (
     <Styles>
-      <Table columns={columns} data={data?.ingredients || []} />
+      <Table<i> columns={columns} data={ingredients} />
     </Styles>
   );
 };

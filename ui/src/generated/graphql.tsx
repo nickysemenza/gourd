@@ -19,6 +19,7 @@ export type Ingredient = {
   __typename?: "Ingredient";
   uuid: Scalars["String"];
   name: Scalars["String"];
+  recipes?: Maybe<Array<Recipe>>;
 };
 
 export type SectionInstruction = {
@@ -161,7 +162,11 @@ export type GetIngredientsQueryVariables = {};
 
 export type GetIngredientsQuery = { __typename?: "Query" } & {
   ingredients: Array<
-    { __typename?: "Ingredient" } & Pick<Ingredient, "uuid" | "name">
+    { __typename?: "Ingredient" } & Pick<Ingredient, "uuid" | "name"> & {
+        recipes?: Maybe<
+          Array<{ __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">>
+        >;
+      }
   >;
 };
 
@@ -503,6 +508,10 @@ export const GetIngredientsDocument = gql`
     ingredients {
       uuid
       name
+      recipes {
+        uuid
+        name
+      }
     }
   }
 `;

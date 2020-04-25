@@ -2,11 +2,6 @@
 
 package model
 
-type Ingredient struct {
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
-}
-
 type NewRecipe struct {
 	Name string `json:"name"`
 }

@@ -49,6 +49,10 @@ const _ = [
       ingredients {
         uuid
         name
+        recipes {
+          uuid
+          name
+        }
       }
     }
   `,

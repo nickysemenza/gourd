@@ -26,6 +26,10 @@ type Client struct {
 	psql sq.StatementBuilderType
 }
 
+func getRecipeColumns() []string {
+	return []string{"recipes.uuid", "name", "total_minutes", "equipment", "source", "servings", "quantity", "recipes.unit"}
+}
+
 // Recipe represents a recipe
 type Recipe struct {
 	UUID         string      `db:"uuid"`
