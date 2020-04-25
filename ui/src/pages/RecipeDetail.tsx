@@ -37,19 +37,49 @@ const RecipeDetail: React.FC = () => {
   const updateIngredient = (
     sectionID: number,
     ingredientID: number,
-    value: string
+    value: string,
+    attr: "grams" | "name"
   ) => {
     const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-    console.log(newValue);
-    setOverride({
-      sectionID,
-      ingredientID,
-      value: newValue,
-    });
-    const o = recipe.sections[sectionID]!.ingredients[ingredientID]!.grams;
-    if (o && value) {
-      setMultiplier(Math.round((newValue / o + Number.EPSILON) * 100) / 100);
-    }
+    // console.log(newValue);
+    attr === "grams" &&
+      !edit &&
+      setOverride({
+        sectionID,
+        ingredientID,
+        value: newValue,
+      });
+    const { grams } = recipe.sections[sectionID]!.ingredients[ingredientID];
+    edit
+      ? setRecipe({
+          ...recipe,
+          sections: recipe.sections.map((item, index) =>
+            index === sectionID
+              ? {
+                  ...item,
+                  ingredients: recipe.sections[sectionID].ingredients.map(
+                    (item2, index2) =>
+                      index2 === ingredientID
+                        ? {
+                            ...item2,
+                            grams:
+                              attr === "grams"
+                                ? parseFloat(value)
+                                : item2.grams,
+                            info: {
+                              ...item2.info,
+                              name: attr === "name" ? value : item2.info.name,
+                            },
+                          }
+                        : item2
+                  ),
+                }
+              : item
+          ),
+        })
+      : setMultiplier(
+          Math.round((newValue / grams + Number.EPSILON) * 100) / 100
+        );
   };
 
   const getIngredientValue = (
@@ -65,28 +95,76 @@ const RecipeDetail: React.FC = () => {
     return value * multiplier;
   };
 
+  const updateInstruction = (
+    sectionID: number,
+    instructionID: number,
+    value: string
+  ) => {
+    edit &&
+      setRecipe({
+        ...recipe,
+        sections: recipe.sections.map((item, index) =>
+          index === sectionID
+            ? {
+                ...item,
+                instructions: recipe.sections[
+                  sectionID
+                ].instructions.map((item2, index2) =>
+                  index2 === instructionID
+                    ? { ...item2, instruction: value }
+                    : item2
+                ),
+              }
+            : item
+        ),
+      });
+  };
+
   const addInstruction = (sectionID: number) => {
     setRecipe({
       ...recipe,
-      // sections: recipe.sections.map((item, index) =>
-      //   index === sectionID
-      //     ? {
-      //         ...item,
-      //         instructions: [
-      //           ...(recipe.sections[sectionID]?.instructions || []),
-      //         ],
-      //       }
-      //     : item
-      // ),
+      sections: recipe.sections.map((item, index) =>
+        index === sectionID
+          ? {
+              ...item,
+              instructions: [
+                ...(recipe.sections[sectionID]?.instructions || []),
+                { uuid: "x", instruction: "" },
+              ],
+            }
+          : item
+      ),
     });
   };
 
-  const addIngredient = (sectionID: number) => {};
+  const addIngredient = (sectionID: number) => {
+    setRecipe({
+      ...recipe,
+      sections: recipe.sections.map((item, index) =>
+        index === sectionID
+          ? {
+              ...item,
+              ingredients: [
+                ...(recipe.sections[sectionID].ingredients || []),
+                { uuid: "x", grams: 1, info: { name: "" } },
+              ],
+            }
+          : item
+      ),
+    });
+  };
 
   return (
     <div>
       <Button onClick={() => setMultiplier(1)}>Reset</Button>
-      <Button onClick={() => setEdit(!edit)}>{edit ? "edit" : "view"}</Button>
+      <Button
+        onClick={() => {
+          setMultiplier(1);
+          setEdit(!edit);
+        }}
+      >
+        {edit ? "edit" : "view"}
+      </Button>
       <RecipeCard recipe={recipe} />
       <RecipeTable
         updateIngredient={updateIngredient}
@@ -95,8 +173,9 @@ const RecipeDetail: React.FC = () => {
         edit={edit}
         addInstruction={addInstruction}
         addIngredient={addIngredient}
+        updateInstruction={updateInstruction}
       />
-      <Debug data={{ loading, error, data, multiplier, override }} />
+      <Debug data={{ recipe, loading, error, data, multiplier, override }} />
     </div>
   );
 };

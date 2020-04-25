@@ -38,8 +38,8 @@ export type Section = {
   __typename?: "Section";
   uuid: Scalars["String"];
   minutes: Scalars["Int"];
-  instructions: Array<Maybe<SectionInstruction>>;
-  ingredients: Array<Maybe<SectionIngredient>>;
+  instructions: Array<SectionInstruction>;
+  ingredients: Array<SectionIngredient>;
 };
 
 export type Recipe = {
@@ -48,7 +48,7 @@ export type Recipe = {
   name: Scalars["String"];
   total_minutes: Scalars["Int"];
   unit: Scalars["String"];
-  sections: Array<Maybe<Section>>;
+  sections: Array<Section>;
 };
 
 export type NewRecipe = {
@@ -85,31 +85,25 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
       "uuid" | "name" | "total_minutes" | "unit"
     > & {
         sections: Array<
-          Maybe<
-            { __typename?: "Section" } & Pick<Section, "minutes"> & {
-                ingredients: Array<
-                  Maybe<
-                    { __typename?: "SectionIngredient" } & Pick<
-                      SectionIngredient,
-                      "uuid" | "grams"
-                    > & {
-                        info: { __typename?: "Ingredient" } & Pick<
-                          Ingredient,
-                          "name"
-                        >;
-                      }
-                  >
-                >;
-                instructions: Array<
-                  Maybe<
-                    { __typename?: "SectionInstruction" } & Pick<
-                      SectionInstruction,
-                      "instruction" | "uuid"
-                    >
-                  >
-                >;
-              }
-          >
+          { __typename?: "Section" } & Pick<Section, "minutes"> & {
+              ingredients: Array<
+                { __typename?: "SectionIngredient" } & Pick<
+                  SectionIngredient,
+                  "uuid" | "grams"
+                > & {
+                    info: { __typename?: "Ingredient" } & Pick<
+                      Ingredient,
+                      "name"
+                    >;
+                  }
+              >;
+              instructions: Array<
+                { __typename?: "SectionInstruction" } & Pick<
+                  SectionInstruction,
+                  "instruction" | "uuid"
+                >
+              >;
+            }
         >;
       }
   >;

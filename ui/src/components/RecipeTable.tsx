@@ -2,14 +2,22 @@ import React from "react";
 import { Recipe } from "../generated/graphql";
 import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
+import { InputProps } from "theme-ui";
 
-export interface Props {
+export interface TableProps {
   recipe: Partial<Recipe>;
   updateIngredient: (
     sectionID: number,
     ingredientID: number,
+    value: string,
+    attr: "grams" | "name"
+  ) => void;
+  updateInstruction: (
+    sectionID: number,
+    instructionID: number,
     value: string
   ) => void;
+
   getIngredientValue: (
     sectionID: number,
     ingredientID: number,
@@ -19,9 +27,10 @@ export interface Props {
   addInstruction: (sectionID: number) => void;
   addIngredient: (sectionID: number) => void;
 }
-const RecipeTable: React.FC<Props> = ({
+const RecipeTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
+  updateInstruction,
   getIngredientValue,
   edit,
   addInstruction,
@@ -43,32 +52,30 @@ const RecipeTable: React.FC<Props> = ({
     </TableRow>
     {recipe.sections?.map((section, x) => (
       <TableRow>
-        <TableCell>{section?.minutes}</TableCell>
+        <TableCell>{section.minutes}</TableCell>
         <TableCell>
-          {section?.ingredients.map((ingredient, y) => (
+          {section.ingredients.map((ingredient, y) => (
             <Flex>
-              <Input
-                padding={0}
-                value={getIngredientValue(x, y, ingredient?.grams || 0)}
-                onChange={(e) => updateIngredient(x, y, e.target.value)}
-                width={"64px"}
-                sx={{
-                  textAlign: "end",
-                  ":not(:focus)": {
-                    borderColor: edit ? "text" : "transparent",
-                  },
-                  ":hover": {
-                    borderColor: "text",
-                    borderStyle: "dashed",
-                  },
-                  borderRadius: 0,
-                }}
+              <TableInput
+                edit={edit}
+                softEdit
+                value={getIngredientValue(x, y, ingredient.grams || 0)}
+                onChange={(e) =>
+                  updateIngredient(x, y, e.target.value, "grams")
+                }
               />{" "}
               <Flex pl={1} width={1 / 2}>
                 <Text pr={1} color="gray">
                   g
                 </Text>
-                {ingredient?.info.name}
+                <TableInput
+                  width={"128px"}
+                  edit={edit}
+                  value={ingredient.info.name}
+                  onChange={(e) =>
+                    updateIngredient(x, y, e.target.value, "name")
+                  }
+                />
               </Flex>
             </Flex>
           ))}
@@ -76,8 +83,15 @@ const RecipeTable: React.FC<Props> = ({
         </TableCell>
         <TableCell>
           <ol style={{ margin: 0 }}>
-            {section?.instructions.map((instruction) => (
-              <li>{instruction?.instruction} </li>
+            {section.instructions.map((instruction, y) => (
+              <li>
+                <TableInput
+                  width={"128px"}
+                  edit={edit}
+                  value={instruction.instruction}
+                  onChange={(e) => updateInstruction(x, y, e.target.value)}
+                />{" "}
+              </li>
             ))}
           </ol>
           {edit && <Text onClick={() => addInstruction(x)}>add</Text>}
@@ -111,4 +125,31 @@ const TableRow: typeof Box = ({ children }) => (
   >
     {children}
   </Box>
+);
+
+const TableInput: React.FC<{
+  edit: boolean;
+  softEdit?: boolean;
+  value: string | number;
+  width?: InputProps["width"];
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}> = ({ edit, softEdit = false, width = "64px", ...props }) => (
+  <Input
+    {...props}
+    padding={0}
+    // value={value}
+    // onChange={onChange}
+    width={width}
+    sx={{
+      textAlign: softEdit ? "end" : "begin",
+      ":not(:focus)": {
+        borderColor: edit ? "text" : "transparent",
+      },
+      ":hover": {
+        borderColor: softEdit ? "text" : "transparent",
+        borderStyle: "dashed",
+      },
+      borderRadius: 0,
+    }}
+  />
 );

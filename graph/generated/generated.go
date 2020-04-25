@@ -346,8 +346,8 @@ type SectionIngredient {
 type Section {
   uuid: String!
   minutes: Int!
-  instructions: [SectionInstruction]!
-  ingredients: [SectionIngredient]!
+  instructions: [SectionInstruction!]!
+  ingredients: [SectionIngredient!]!
 }
 
 type Recipe {
@@ -355,7 +355,7 @@ type Recipe {
   name: String!
   total_minutes: Int!
   unit: String!
-  sections: [Section]!
+  sections: [Section!]!
 }
 
 input NewRecipe {
@@ -872,7 +872,7 @@ func (ec *executionContext) _Recipe_sections(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*model.Section)
 	fc.Result = res
-	return ec.marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, field.Selections, res)
+	return ec.marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Section_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Section) (ret graphql.Marshaler) {
@@ -974,7 +974,7 @@ func (ec *executionContext) _Section_instructions(ctx context.Context, field gra
 	}
 	res := resTmp.([]*model.SectionInstruction)
 	fc.Result = res
-	return ec.marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx, field.Selections, res)
+	return ec.marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Section_ingredients(ctx context.Context, field graphql.CollectedField, obj *model.Section) (ret graphql.Marshaler) {
@@ -1008,7 +1008,7 @@ func (ec *executionContext) _Section_ingredients(ctx context.Context, field grap
 	}
 	res := resTmp.([]*model.SectionIngredient)
 	fc.Result = res
-	return ec.marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, field.Selections, res)
+	return ec.marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionIngredient_uuid(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
@@ -2926,7 +2926,11 @@ func (ec *executionContext) marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfood
 	return ec._Recipe(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v []*model.Section) graphql.Marshaler {
+func (ec *executionContext) marshalNSection2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v model.Section) graphql.Marshaler {
+	return ec._Section(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Section) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2950,7 +2954,7 @@ func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, sel, v[i])
+			ret[i] = ec.marshalNSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2963,7 +2967,21 @@ func (ec *executionContext) marshalNSection2ᚕᚖgithubᚗcomᚋnickysemenzaᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v []*model.SectionIngredient) graphql.Marshaler {
+func (ec *executionContext) marshalNSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v *model.Section) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Section(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSectionIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v model.SectionIngredient) graphql.Marshaler {
+	return ec._SectionIngredient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SectionIngredient) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2987,7 +3005,7 @@ func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnicky
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, sel, v[i])
+			ret[i] = ec.marshalNSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3000,7 +3018,21 @@ func (ec *executionContext) marshalNSectionIngredient2ᚕᚖgithubᚗcomᚋnicky
 	return ret
 }
 
-func (ec *executionContext) marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v []*model.SectionInstruction) graphql.Marshaler {
+func (ec *executionContext) marshalNSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v *model.SectionIngredient) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SectionIngredient(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSectionInstruction2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v model.SectionInstruction) graphql.Marshaler {
+	return ec._SectionInstruction(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstructionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.SectionInstruction) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3024,7 +3056,7 @@ func (ec *executionContext) marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnick
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx, sel, v[i])
+			ret[i] = ec.marshalNSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3035,6 +3067,16 @@ func (ec *executionContext) marshalNSectionInstruction2ᚕᚖgithubᚗcomᚋnick
 	}
 	wg.Wait()
 	return ret
+}
+
+func (ec *executionContext) marshalNSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v *model.SectionInstruction) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SectionInstruction(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3321,39 +3363,6 @@ func (ec *executionContext) marshalORecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfood
 		return graphql.Null
 	}
 	return ec._Recipe(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSection2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v model.Section) graphql.Marshaler {
-	return ec._Section(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalOSection2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSection(ctx context.Context, sel ast.SelectionSet, v *model.Section) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Section(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSectionIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v model.SectionIngredient) graphql.Marshaler {
-	return ec._SectionIngredient(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalOSectionIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredient(ctx context.Context, sel ast.SelectionSet, v *model.SectionIngredient) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SectionIngredient(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOSectionInstruction2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v model.SectionInstruction) graphql.Marshaler {
-	return ec._SectionInstruction(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalOSectionInstruction2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInstruction(ctx context.Context, sel ast.SelectionSet, v *model.SectionInstruction) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._SectionInstruction(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

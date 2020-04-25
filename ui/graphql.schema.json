@@ -232,9 +232,13 @@
                 "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "SectionInstruction",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SectionInstruction",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -252,9 +256,13 @@
                 "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "SectionIngredient",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "SectionIngredient",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -357,9 +365,13 @@
                 "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Section",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Section",
+                    "ofType": null
+                  }
                 }
               }
             },

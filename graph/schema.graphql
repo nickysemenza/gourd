@@ -17,8 +17,8 @@ type SectionIngredient {
 type Section {
   uuid: String!
   minutes: Int!
-  instructions: [SectionInstruction]!
-  ingredients: [SectionIngredient]!
+  instructions: [SectionInstruction!]!
+  ingredients: [SectionIngredient!]!
 }
 
 type Recipe {
@@ -26,7 +26,7 @@ type Recipe {
   name: String!
   total_minutes: Int!
   unit: String!
-  sections: [Section]!
+  sections: [Section!]!
 }
 
 input NewRecipe {
