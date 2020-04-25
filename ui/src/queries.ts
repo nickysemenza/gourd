@@ -33,13 +33,20 @@ const _ = [
         name
         total_minutes
         unit
-        __typename
       }
     }
   `,
   gql`
     mutation updateRecipe($recipe: RecipeInput!) {
       updateRecipe(recipe: $recipe) {
+        uuid
+        name
+      }
+    }
+  `,
+  gql`
+    query getIngredients {
+      ingredients {
         uuid
         name
       }

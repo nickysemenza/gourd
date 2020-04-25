@@ -146,3 +146,21 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 
 	return r, nil
 }
+
+// GetIngredients returns all ingredients.
+func (c *Client) GetIngredients(ctx context.Context) ([]Ingredient, error) {
+	query, args, err := c.psql.Select("*").From(ingredientsTable).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	i := []Ingredient{}
+	err = c.db.SelectContext(ctx, &i, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return i, nil
+}

@@ -96,6 +96,7 @@ export type Query = {
   __typename?: "Query";
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
+  ingredients: Array<Ingredient>;
 };
 
 export type QueryRecipeArgs = {
@@ -141,7 +142,7 @@ export type GetRecipesQueryVariables = {};
 
 export type GetRecipesQuery = { __typename?: "Query" } & {
   recipes: Array<
-    { __typename: "Recipe" } & Pick<
+    { __typename?: "Recipe" } & Pick<
       Recipe,
       "uuid" | "name" | "total_minutes" | "unit"
     >
@@ -154,6 +155,14 @@ export type UpdateRecipeMutationVariables = {
 
 export type UpdateRecipeMutation = { __typename?: "Mutation" } & {
   updateRecipe: { __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">;
+};
+
+export type GetIngredientsQueryVariables = {};
+
+export type GetIngredientsQuery = { __typename?: "Query" } & {
+  ingredients: Array<
+    { __typename?: "Ingredient" } & Pick<Ingredient, "uuid" | "name">
+  >;
 };
 
 export const GetRecipeByUuidDocument = gql`
@@ -292,7 +301,6 @@ export const GetRecipesDocument = gql`
       name
       total_minutes
       unit
-      __typename
     }
   }
 `;
@@ -489,4 +497,112 @@ export type UpdateRecipeMutationResult = ApolloReactCommon.MutationResult<
 export type UpdateRecipeMutationOptions = ApolloReactCommon.BaseMutationOptions<
   UpdateRecipeMutation,
   UpdateRecipeMutationVariables
+>;
+export const GetIngredientsDocument = gql`
+  query getIngredients {
+    ingredients {
+      uuid
+      name
+    }
+  }
+`;
+export type GetIngredientsComponentProps = Omit<
+  ApolloReactComponents.QueryComponentOptions<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >,
+  "query"
+>;
+
+export const GetIngredientsComponent = (
+  props: GetIngredientsComponentProps
+) => (
+  <ApolloReactComponents.Query<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >
+    query={GetIngredientsDocument}
+    {...props}
+  />
+);
+
+export type GetIngredientsProps<
+  TChildProps = {},
+  TDataName extends string = "data"
+> = {
+  [key in TDataName]: ApolloReactHoc.DataValue<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >;
+} &
+  TChildProps;
+export function withGetIngredients<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "data"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables,
+    GetIngredientsProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withQuery<
+    TProps,
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables,
+    GetIngredientsProps<TChildProps, TDataName>
+  >(GetIngredientsDocument, {
+    alias: "getIngredients",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useGetIngredientsQuery__
+ *
+ * To run a query within a React component, call `useGetIngredientsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIngredientsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIngredientsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetIngredientsQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >(GetIngredientsDocument, baseOptions);
+}
+export function useGetIngredientsLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<
+    GetIngredientsQuery,
+    GetIngredientsQueryVariables
+  >(GetIngredientsDocument, baseOptions);
+}
+export type GetIngredientsQueryHookResult = ReturnType<
+  typeof useGetIngredientsQuery
+>;
+export type GetIngredientsLazyQueryHookResult = ReturnType<
+  typeof useGetIngredientsLazyQuery
+>;
+export type GetIngredientsQueryResult = ApolloReactCommon.QueryResult<
+  GetIngredientsQuery,
+  GetIngredientsQueryVariables
 >;

@@ -21,6 +21,17 @@ const NavBar: React.FC = () => {
       >
         <a onClick={() => history.push("/recipes")}>Recipes</a>
       </Box>
+      <Box
+        sx={{
+          display: "inline-block",
+          fontWeight: "bold",
+          px: 2,
+          py: 1,
+          color: "inherit",
+        }}
+      >
+        <a onClick={() => history.push("/ingredients")}>Ingredients</a>
+      </Box>
     </Flex>
   );
 };

@@ -97,6 +97,19 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 	return fromRecipe(res), nil
 }
 
+func (r *queryResolver) Ingredients(ctx context.Context) ([]*model.Ingredient, error) {
+	dbr, err := r.DB.GetIngredients(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ingredients := []*model.Ingredient{}
+	for _, x := range dbr {
+		each := x
+		ingredients = append(ingredients, fromIngredient(&each))
+	}
+	return ingredients, nil
+}
+
 func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error) {
 	sections, err := r.DB.GetRecipeSections(ctx, obj.UUID)
 	if err != nil {

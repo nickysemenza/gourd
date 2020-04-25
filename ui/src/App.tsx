@@ -7,14 +7,10 @@ import { ThemeProvider } from "theme-ui";
 import { Box, Flex, Text, Link } from "rebass";
 import theme from "./theme";
 import RecipeList from "./pages/RecipeList";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link as RLink,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
+import IngredientList from "./pages/IngredientList";
 
 function App() {
   const client = new ApolloClient({
@@ -38,6 +34,9 @@ function App() {
               </Route>
               <Route path="/recipes">
                 <RecipeList />
+              </Route>
+              <Route path="/ingredients">
+                <IngredientList />
               </Route>
               <Route path="/">
                 <Test />

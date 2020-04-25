@@ -63,4 +63,5 @@ type Mutation {
 type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
+  ingredients: [Ingredient!]!
 }

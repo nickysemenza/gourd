@@ -16,3 +16,13 @@ func fromRecipe(res *db.Recipe) *model.Recipe {
 		Unit:         res.Unit.String,
 	}
 }
+
+func fromIngredient(res *db.Ingredient) *model.Ingredient {
+	if res == nil {
+		return nil
+	}
+	return &model.Ingredient{
+		UUID: res.UUID,
+		Name: res.Name,
+	}
+}

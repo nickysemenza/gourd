@@ -63,6 +63,7 @@
     "@graphql-codegen/typescript-document-nodes": "1.13.2",
     "@graphql-codegen/typescript-graphql-files-modules": "1.13.2",
     "@graphql-codegen/typescript-operations": "1.13.2",
-    "@graphql-codegen/typescript-react-apollo": "1.13.2"
+    "@graphql-codegen/typescript-react-apollo": "1.13.2",
+    "prettier": "^2.0.5"
   }
 }
