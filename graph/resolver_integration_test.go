@@ -13,24 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateUpdateList(t *testing.T) {
-	tdb := db.NewDB(t)
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-		Resolvers: &Resolver{
-			Manager: manager.New(tdb),
-			DB:      tdb,
-		}},
-	))
-	srv.Use(Observability{})
-
-	// create a recipe
+func createRecipe(t *testing.T, c *client.Client) string {
+	t.Helper()
 	var resp struct {
 		CreateRecipe struct {
 			UUID string
 		}
 	}
-	c := client.New(srv)
+
 	err := c.Post(`mutation{
 		createRecipe(recipe: {name: "`+fmt.Sprintf("rr-%d", time.Now().Unix())+`"}) {uuid}
 	  }`, &resp)
@@ -38,6 +28,22 @@ func TestCreateUpdateList(t *testing.T) {
 	require.NoError(t, err)
 	newUUID := resp.CreateRecipe.UUID
 	require.NotEmpty(t, newUUID)
+	return newUUID
+}
+
+//nolint: funlen
+func TestCreateUpdateList(t *testing.T) {
+	tdb := db.NewDB(t)
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers: &Resolver{
+			Manager: manager.New(tdb),
+			DB:      tdb,
+		}},
+	))
+	srv.Use(Observability{})
+	c := client.New(srv)
+	// create a recipe
+	newUUID := createRecipe(t, c)
 
 	// update recipe name
 	var resp2 struct {
@@ -46,7 +52,7 @@ func TestCreateUpdateList(t *testing.T) {
 		}
 	}
 	newName := fmt.Sprintf("name2-%d", time.Now().Unix())
-	err = c.Post(`mutation{
+	err := c.Post(`mutation{
 		updateRecipe(recipe: {uuid: "`+newUUID+`",name: "`+newName+`"}) {uuid}
 	  }`, &resp2)
 
@@ -95,7 +101,4 @@ func TestCreateUpdateList(t *testing.T) {
 		}
 	}
 	require.True(t, found)
-
-	// t.Fatal()
-
 }

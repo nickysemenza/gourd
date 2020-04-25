@@ -10,9 +10,9 @@ import (
 	"go.opentelemetry.io/otel/api/global"
 )
 
-// GetRecipeSections finds the sections
+// GetRecipeSections finds the sections.
 func (c *Client) GetRecipeSections(ctx context.Context, recipeUUID string) ([]Section, error) {
-	query, args, err := psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe": recipeUUID}).ToSql()
+	query, args, err := c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe": recipeUUID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -24,9 +24,9 @@ func (c *Client) GetRecipeSections(ctx context.Context, recipeUUID string) ([]Se
 	return sections, nil
 }
 
-// GetSectionInstructions finds the instructions for a section
+// GetSectionInstructions finds the instructions for a section.
 func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string) ([]SectionInstruction, error) {
-	query, args, err := psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
+	query, args, err := c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -38,9 +38,9 @@ func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string)
 	return res, nil
 }
 
-// GetSectionIngredients finds the ingredients for a section
+// GetSectionIngredients finds the ingredients for a section.
 func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) ([]SectionIngredient, error) {
-	query, args, err := psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
+	query, args, err := c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -52,13 +52,13 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 	return res, nil
 }
 
-// GetIngredientByUUID finds an ingredient
+// GetIngredientByUUID finds an ingredient.
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
 	tr := global.Tracer("db")
 	ctx, span := tr.Start(ctx, "GetIngredientByUUID")
 	defer span.End()
 
-	query, args, err := psql.Select("*").From(ingredientsTable).Where(sq.Eq{"uuid": uuid}).ToSql()
+	query, args, err := c.psql.Select("*").From(ingredientsTable).Where(sq.Eq{"uuid": uuid}).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -72,9 +72,9 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 	return ingredient, nil
 }
 
-// GetRecipeByUUID gets a recipe by UUID, shallowly
+// GetRecipeByUUID gets a recipe by UUID, shallowly.
 func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, error) {
-	query, args, err := psql.Select("*").From(recipesTable).Where(sq.Eq{"uuid": uuid}).ToSql()
+	query, args, err := c.psql.Select("*").From(recipesTable).Where(sq.Eq{"uuid": uuid}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -90,9 +90,9 @@ func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, err
 	return r, nil
 }
 
-// GetRecipes returns all recipes, shallowly
+// GetRecipes returns all recipes, shallowly.
 func (c *Client) GetRecipes(ctx context.Context) ([]Recipe, error) {
-	query, args, err := psql.Select("*").From(recipesTable).ToSql()
+	query, args, err := c.psql.Select("*").From(recipesTable).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -108,7 +108,7 @@ func (c *Client) GetRecipes(ctx context.Context) ([]Recipe, error) {
 	return r, nil
 }
 
-// GetRecipeByUUIDFull gets a recipe by UUID, with all dependencies
+// GetRecipeByUUIDFull gets a recipe by UUID, with all dependencies.
 func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe, error) {
 	r, err := c.GetRecipeByUUID(ctx, uuid)
 	if err != nil {
@@ -141,7 +141,6 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 			if ing != nil {
 				r.Sections[x].Ingredients[y].Name = ing.Name
 			}
-
 		}
 	}
 

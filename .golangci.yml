@@ -7,3 +7,12 @@ linters:
     - gosec
     - lll
     - golint
+  presets:
+    - complexity
+    - bugs
+    - format
+    - style
+  disable:
+    - wsl
+    - godox
+    - testpackage

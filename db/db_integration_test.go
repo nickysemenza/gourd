@@ -62,5 +62,4 @@ func TestInsertGet(t *testing.T) {
 	require.EqualValues(3, r2.TotalMinutes.Int64)
 	require.EqualValues("items", r2.Unit.String)
 	require.EqualValues("add flour", r2.Sections[0].Instructions[0].Instruction)
-
 }

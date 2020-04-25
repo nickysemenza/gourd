@@ -25,11 +25,13 @@ import (
 
 // Server represents a server
 type Server struct {
-	Manager  *manager.Manager
-	DB       *db.Client
-	HTTPPort uint
+	Manager     *manager.Manager
+	DB          *db.Client
+	HTTPPort    uint
+	HTTPTimeout time.Duration
 }
 
+// nolint:gochecknoglobals
 var httpRequestsDurationMetric = metric.Must(global.Meter("ex.com/basic")).
 	NewFloat64Measure("http.requests.duration", metric.WithKeys(key.New("method")))
 
@@ -39,12 +41,10 @@ func timing(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		d := time.Since(t).Seconds()
 		httpRequestsDurationMetric.Record(r.Context(), d, key.String("method", r.Method))
-
 	}
 	return http.HandlerFunc(fn)
 }
 
-// Run runs http
 func (s *Server) Run() error {
 	r := chi.NewRouter()
 
@@ -83,7 +83,7 @@ func (s *Server) Run() error {
 	log.Printf("connect to http://localhost:%d/ for GraphQL playground", s.HTTPPort)
 	// return server.ListenAndServe()
 	return http.ListenAndServe(fmt.Sprintf(":%d", s.HTTPPort),
-		othttp.NewHandler(http.TimeoutHandler(r, time.Second*30, "timeout"), "server",
+		othttp.NewHandler(http.TimeoutHandler(r, time.Second*s.HTTPTimeout, "timeout"), "server",
 			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
 		),
 	)
@@ -95,7 +95,6 @@ func (s *Server) GetRecipe(w http.ResponseWriter, req *http.Request) {
 	id := chi.URLParam(req, "uuid")
 	recipe, _ := s.Manager.GetRecipe(ctx, id)
 	writeJSON(w, http.StatusOK, recipe)
-
 }
 func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")

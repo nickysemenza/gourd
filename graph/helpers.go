@@ -15,5 +15,4 @@ func fromRecipe(res *db.Recipe) *model.Recipe {
 		TotalMinutes: int(res.TotalMinutes.Int64),
 		Unit:         res.Unit.String,
 	}
-
 }

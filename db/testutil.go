@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// NewDB makes a test DB.
 func NewDB(t *testing.T) *Client {
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
@@ -25,5 +26,4 @@ func NewDB(t *testing.T) *Client {
 		viper.GetInt64("DB_PORT")))
 	require.NoError(t, err)
 	return New(dbConn)
-
 }

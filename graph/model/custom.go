@@ -1,5 +1,6 @@
 package model
 
+// Recipe has section IDs
 type Recipe struct {
 	UUID         string   `json:"uuid"`
 	Name         string   `json:"name"`
@@ -8,6 +9,7 @@ type Recipe struct {
 	SectionIDs   []string `json:"sections"`
 }
 
+// SectionIngredient has ingredients  and instructions by ID
 type Section struct {
 	UUID            string   `json:"uuid"`
 	RecipeUUID      string   `json:"recipe_uuid"`
@@ -16,6 +18,7 @@ type Section struct {
 	IngredientsIDs  []string `json:"ingredients"`
 }
 
+// SectionIngredient has ingredients by ID
 type SectionIngredient struct {
 	UUID         string  `json:"uuid"`
 	IngredientID string  `json:"info"`

@@ -20,17 +20,14 @@ var _ interface {
 	graphql.OperationInterceptor
 } = Observability{}
 
-// ExtensionName returns the extension name
 func (c Observability) ExtensionName() string {
 	return "Observability"
 }
 
-// Validate is a noop to conform to HandlerExtension
 func (c Observability) Validate(schema graphql.ExecutableSchema) error {
 	return nil
 }
 
-// InterceptField makes a span for each field
 func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
 	fc := graphql.GetFieldContext(ctx)
 

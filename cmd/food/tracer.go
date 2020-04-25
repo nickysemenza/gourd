@@ -23,7 +23,6 @@ type span struct {
 // if traceOrphans is set to true, then spans with no parent will be traced anyway, if false, they will not be.
 func NewTracer(traceOrphans bool) instrumentedsql.Tracer { return tracer{traceOrphans: traceOrphans} }
 
-// GetSpan fetches a span from the context and wraps it
 func (t tracer) GetSpan(ctx context.Context) instrumentedsql.Span {
 	if ctx == nil {
 		return span{parent: nil, tracer: t}

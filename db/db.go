@@ -22,7 +22,8 @@ const (
 
 // Client is a database client
 type Client struct {
-	db *sqlx.DB
+	db   *sqlx.DB
+	psql sq.StatementBuilderType
 }
 
 // Recipe represents a recipe
@@ -79,14 +80,12 @@ type Ingredient struct {
 	Name string `json:"name"`
 }
 
-var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
-
-// New creates a new Client
+// New creates a new Client.
 func New(db *sqlx.DB) *Client {
-	return &Client{db: db}
+	return &Client{db: db, psql: sq.StatementBuilder.PlaceholderFormat(sq.Dollar)}
 }
 
-// ConnnectionString returns a DSN
+// ConnnectionString returns a DSN.
 func ConnnectionString(host, user, password, dbname string, port int64) string {
 	return fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -100,7 +99,7 @@ func setUUID(val string) string {
 	return u.String()
 }
 
-// AssignUUIDs adds uuids where missing
+// AssignUUIDs adds uuids where missing.
 func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 	r.UUID = setUUID(r.UUID)
 	for x := range r.Sections {
@@ -123,7 +122,7 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 	return nil
 }
 
-// IngredientByName retrieves an ingredient by name, creating it if it does not exist
+// IngredientByName retrieves an ingredient by name, creating it if it does not exist.
 func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient, error) {
 	ingredient := &Ingredient{}
 	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
@@ -136,11 +135,11 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 		return c.IngredientByName(ctx, name)
 	}
 	return ingredient, err
-
 }
 
+//nolint: funlen
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error {
-	query, args, err := psql.
+	query, args, err := c.psql.
 		Update(recipesTable).Where(sq.Eq{"uuid": r.UUID}).Set("name", r.Name).
 		Set("total_minutes", r.TotalMinutes).
 		Set("unit", r.Unit).
@@ -159,7 +158,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 	//update recipe_section_ingredients
 	//update recipe_sections
 
-	// psql.Delete(sectionInstructionsTable).Where(sq.Eq{""})
+	// c.psql.Delete(sectionInstructionsTable).Where(sq.Eq{""})
 
 	if _, err = tx.ExecContext(ctx,
 		`DELETE FROM recipe_section_instructions 
@@ -182,7 +181,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		return nil
 	}
 
-	sectionInsert := psql.Insert(sectionsTable).Columns("uuid", "recipe", "minutes")
+	sectionInsert := c.psql.Insert(sectionsTable).Columns("uuid", "recipe", "minutes")
 
 	for _, s := range r.Sections {
 		sectionInsert = sectionInsert.Values(s.UUID, s.RecipeUUID, s.Minutes)
@@ -199,7 +198,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 
 	for _, s := range r.Sections {
 		if len(s.Instructions) > 0 {
-			instructionsInsert := psql.Insert(sInstructionsTable).Columns("uuid", "section", "instruction")
+			instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("uuid", "section", "instruction")
 			for _, i := range s.Instructions {
 				instructionsInsert = instructionsInsert.Values(i.UUID, i.SectionUUID, i.Instruction)
 			}
@@ -209,7 +208,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		}
 
 		if len(s.Ingredients) > 0 {
-			ingredientsInsert := psql.Insert(sIngredientsTable).Columns("uuid", "section", "ingredient", "recipe",
+			ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("uuid", "section", "ingredient", "recipe",
 				"grams", "amount", "unit", "adjective", "optional")
 			for _, i := range s.Ingredients {
 				ingredientsInsert = ingredientsInsert.Values(i.UUID, i.SectionUUID, i.IngredientUUID, i.RecipeUUID,
@@ -221,10 +220,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		}
 	}
 	return nil
-
 }
 
-// UpdateRecipe updates a recipe
+// UpdateRecipe updates a recipe.
 func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 	tx, err := c.db.Begin()
 	if err != nil {
@@ -235,13 +233,12 @@ func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 		return err
 	}
 	return tx.Commit()
-
 }
 
-// InsertRecipe inserts a recipe
+// InsertRecipe inserts a recipe.
 func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 	r.UUID = setUUID(r.UUID)
-	query, args, err := psql.
+	query, args, err := c.psql.
 		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
 		ToSql()
 	if err != nil {
@@ -260,5 +257,4 @@ func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 		return "", err
 	}
 	return r.UUID, tx.Commit()
-
 }

@@ -9,7 +9,6 @@ import (
 )
 
 func TestFromRecipe(t *testing.T) {
-
 	dbr := db.Recipe{Name: "name", UUID: "123"}
 	dbr.TotalMinutes = zero.IntFrom(3)
 	dbr.Unit = zero.StringFrom("items")

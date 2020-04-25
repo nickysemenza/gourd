@@ -57,7 +57,8 @@ func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
 	}
 	recipes := []*model.Recipe{}
 	for _, x := range dbr {
-		recipes = append(recipes, fromRecipe(&x))
+		each := x
+		recipes = append(recipes, fromRecipe(&each))
 	}
 	return recipes, nil
 }

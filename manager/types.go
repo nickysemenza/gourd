@@ -62,7 +62,6 @@ func (r *Recipe) toDB() *db.Recipe {
 			dbs.Instructions = append(dbs.Instructions, db.SectionInstruction{
 				Instruction: i.Instruction,
 			})
-
 		}
 		for _, i := range s.Ingredients {
 			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
@@ -80,7 +79,6 @@ func (r *Recipe) toDB() *db.Recipe {
 	return &dbr
 }
 
-// FromRecipe transforms a db record
 func FromRecipe(dbr *db.Recipe) *Recipe {
 	if dbr == nil {
 		return nil
