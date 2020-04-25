@@ -24,7 +24,7 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 
   // Render the UI for your table
   return (
-    <table {...getTableProps()}>
+    <table {...getTableProps()} data-cy="recipe-table">
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>

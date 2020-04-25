@@ -57,6 +57,7 @@ const RecipeTable: React.FC<TableProps> = ({
           {section.ingredients.map((ingredient, y) => (
             <Flex>
               <TableInput
+                data-cy="grams-input"
                 edit={edit}
                 softEdit
                 value={getIngredientValue(x, y, ingredient.grams || 0)}
