@@ -1,7 +1,9 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   build_backend:
     docker:
@@ -14,6 +16,7 @@ jobs:
     working_directory: ~/work/
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+      DB_PORT: 5432
     steps:
       - checkout
       - run: mkdir -p $TEST_RESULTS # create the test results directory
@@ -36,15 +39,29 @@ jobs:
           command: |
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
-          environment:
-            DB_PORT: 5432
+          # environment:
+          # DB_PORT: 5432
       - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: /tmp/test-results
           destination: raw-test-output
-
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: /tmp/test-results
 
+      - run:
+          name: "Create a temp directory for artifacts"
+          command: |
+            mkdir -p /tmp/artifacts
+      - run:
+          command: |
+            go test ./... -coverprofile=c.out
+            go tool cover -html=c.out -o coverage.html
+            mv coverage.html /tmp/artifacts
+            mv c.out /tmp/artifacts
+
+      - codecov/upload:
+          file: /tmp/artifacts/c.out
+      - store_artifacts:
+          path: /tmp/artifacts
   build_ui:
     docker:
       - image: node:9.3.0
