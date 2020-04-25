@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/nickysemenza/food/db"
-	"gopkg.in/yaml.v1"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Manager manages recipes
@@ -33,6 +33,7 @@ func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*Recipe, e
 	return r, nil
 }
 
+// GetRecipe fetches an entire recipe
 func (m *Manager) GetRecipe(ctx context.Context, uuid string) (*Recipe, error) {
 	r, err := m.db.GetRecipeByUUIDFull(ctx, uuid)
 	if err != nil {

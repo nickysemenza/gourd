@@ -125,8 +125,13 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 
 	for x, s := range r.Sections {
 		r.Sections[x].Instructions, err = c.GetSectionInstructions(ctx, s.UUID)
-
+		if err != nil {
+			return nil, err
+		}
 		r.Sections[x].Ingredients, err = c.GetSectionIngredients(ctx, s.UUID)
+		if err != nil {
+			return nil, err
+		}
 
 		for y, i := range r.Sections[x].Ingredients {
 			ing, err := c.GetIngredientByUUID(ctx, i.IngredientUUID.String)

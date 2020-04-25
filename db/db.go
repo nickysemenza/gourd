@@ -152,20 +152,29 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 	if err != nil {
 		return err
 	}
-	c.AssignUUIDs(ctx, r)
+	if err := c.AssignUUIDs(ctx, r); err != nil {
+		return err
+	}
 	//update recipe_section_instructions
 	//update recipe_section_ingredients
 	//update recipe_sections
 
 	// psql.Delete(sectionInstructionsTable).Where(sq.Eq{""})
 
-	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_section_instructions WHERE section IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
+	if _, err = tx.ExecContext(ctx,
+		`DELETE FROM recipe_section_instructions 
+		WHERE section 
+		IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
 		return fmt.Errorf("failed to delete instructions: %w", err)
 	}
-	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_section_ingredients WHERE section IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
+	if _, err = tx.ExecContext(ctx,
+		`DELETE FROM recipe_section_ingredients 
+		WHERE section 
+		IN (SELECT uuid from recipe_sections WHERE recipe = $1)`, r.UUID); err != nil {
 		return fmt.Errorf("failed to delete ingredients: %w", err)
 	}
-	if _, err = tx.ExecContext(ctx, `DELETE FROM recipe_sections WHERE recipe = $1`, r.UUID); err != nil {
+	if _, err = tx.ExecContext(ctx,
+		`DELETE FROM recipe_sections WHERE recipe = $1`, r.UUID); err != nil {
 		return fmt.Errorf("failed to delete sections: %w", err)
 	}
 

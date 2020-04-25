@@ -110,7 +110,11 @@ func (r *sectionResolver) Ingredients(ctx context.Context, obj *model.Section) (
 	}
 	i := []*model.SectionIngredient{}
 	for _, item := range res {
-		i = append(i, &model.SectionIngredient{UUID: item.UUID, Grams: item.Grams.Float64, IngredientID: item.IngredientUUID.String})
+		i = append(i, &model.SectionIngredient{
+			UUID:         item.UUID,
+			Grams:        item.Grams.Float64,
+			IngredientID: item.IngredientUUID.String,
+		})
 	}
 	return i, nil
 }
