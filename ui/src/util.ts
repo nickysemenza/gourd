@@ -1,7 +1,7 @@
 import { Recipe, RecipeInput } from "./generated/graphql";
 
 export const recipeToRecipeInput = (recipe: Partial<Recipe>): RecipeInput => {
-  const { name, total_minutes, unit, uuid, sections } = recipe;
+  const { name, total_minutes, unit, uuid } = recipe;
   return {
     name: name + "a" || "",
     uuid: uuid || "",

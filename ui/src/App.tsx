@@ -29,7 +29,7 @@ function App() {
             sx={{
               maxWidth: "80%",
               mx: "auto",
-              px: 3,
+              sx: 3,
             }}
           >
             <Switch>

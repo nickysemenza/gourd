@@ -1,0 +1,4 @@
+- repo: https://github.com/prettier/prettier
+  rev: "" # Use the sha or tag you want to point at
+  hooks:
+    - id: prettier
