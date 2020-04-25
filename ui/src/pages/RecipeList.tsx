@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetRecipesQuery } from "./generated/graphql";
+import { useGetRecipesQuery } from "../generated/graphql";
 import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";

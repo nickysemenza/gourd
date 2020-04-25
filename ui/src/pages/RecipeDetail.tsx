@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useGetRecipeByUuidQuery } from "./generated/graphql";
+import { useGetRecipeByUuidQuery } from "../generated/graphql";
 
 import { Box, Flex, Button } from "rebass";
 import { useParams } from "react-router-dom";
@@ -19,6 +19,14 @@ const RecipeDetail: React.FC = () => {
   const [override, setOverride] = useState<override>();
   const [edit, setEdit] = useState(false);
   const recipe = data?.recipe;
+  if (error) {
+    console.error({ error });
+    return (
+      <Box color="primary" fontSize={4}>
+        {error.message}
+      </Box>
+    );
+  }
   if (!recipe) return null;
 
   const updateIngredient = (
@@ -45,12 +53,13 @@ const RecipeDetail: React.FC = () => {
     value: number
   ) => {
     if (
-      override?.ingredientID == ingredientID &&
-      override.sectionID == sectionID
+      override?.ingredientID === ingredientID &&
+      override.sectionID === sectionID
     )
       return override.value;
     return value * multiplier;
   };
+
   return (
     <div>
       <Button onClick={() => setMultiplier(1)}>Reset</Button>

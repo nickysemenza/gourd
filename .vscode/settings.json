@@ -1,3 +1,13 @@
 {
-    "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "colorInfo.languages": [
+    {
+      "selector": "css",
+      "colors": "css"
+    },
+    {
+      "selector": "typescript",
+      "colors": "css"
+    }
+  ]
 }

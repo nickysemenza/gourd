@@ -1,6 +1,7 @@
 import { Theme } from "theme-ui";
 
 const t: Theme = {
+  // https://github.com/system-ui/theme-ui/blob/master/packages/preset-swiss/src/index.ts
   colors: {
     text: "hsl(10, 20%, 20%)",
     background: "hsl(10, 10%, 98%)",

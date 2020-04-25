@@ -1,14 +1,20 @@
 import React from "react";
-import "./App.css";
 
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import Test from "./Test";
-import { ThemeProvider, Box } from "theme-ui";
+import { ThemeProvider } from "theme-ui";
+import { Box, Flex, Text, Link } from "rebass";
 import theme from "./theme";
-import RecipeList from "./RecipeList";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import RecipeDetail from "./RecipeDetail";
+import RecipeList from "./pages/RecipeList";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RLink,
+} from "react-router-dom";
+import RecipeDetail from "./pages/RecipeDetail";
+import NavBar from "./components/NavBar";
 
 function App() {
   const client = new ApolloClient({
@@ -18,7 +24,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <ApolloProvider client={client}>
         <Router>
-          {/* TODO: nav */}
+          <NavBar />
           <Box
             sx={{
               maxWidth: "80%",
