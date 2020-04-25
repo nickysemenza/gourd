@@ -6,6 +6,7 @@
     "@apollo/react-components": "^3.1.5",
     "@apollo/react-hoc": "^3.1.5",
     "@apollo/react-hooks": "^3.1.5",
+    "@cypress/instrument-cra": "^1.1.1",
     "@rebass/forms": "^4.0.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -35,7 +36,7 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts -r @cypress/instrument-cra start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -58,6 +59,7 @@
     ]
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.5.3",
     "@graphql-codegen/cli": "^1.13.2",
     "@graphql-codegen/introspection": "1.13.2",
     "@graphql-codegen/typescript": "1.13.2",
