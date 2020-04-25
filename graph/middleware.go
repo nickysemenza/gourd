@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/trace"
@@ -76,6 +77,12 @@ func (c Observability) InterceptOperation(ctx context.Context, next graphql.Oper
 	span.SetAttributes(
 		core.KeyValue{Key: "request.query", Value: core.String(oc.RawQuery)},
 	)
+
+	if stats := extension.GetComplexityStats(ctx); stats != nil {
+		span.SetAttributes(core.Key("request.complexity.actual").Int(stats.Complexity))
+		span.SetAttributes(core.Key("request.complexity.limit").Int(stats.ComplexityLimit))
+	}
+
 	for k, v := range oc.Variables {
 		span.SetAttributes(core.Key(fmt.Sprintf("request.variables.%s", k)).String(fmt.Sprintf("%+v", v)))
 	}

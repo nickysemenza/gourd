@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 )
 
@@ -54,9 +56,21 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 
 // GetIngredientByUUID finds an ingredient.
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
+	cacheKey := fmt.Sprintf("i:%s", uuid)
+
 	tr := global.Tracer("db")
 	ctx, span := tr.Start(ctx, "GetIngredientByUUID")
 	defer span.End()
+
+	cval, hit := c.cache.Get(cacheKey)
+	log.WithField("key", cacheKey).WithField("hit", hit).Debug("cache:ingredients")
+	fmt.Print(c.cache.Metrics.String())
+	if hit {
+		ing, ok := cval.(Ingredient)
+		if ok {
+			return &ing, nil
+		}
+	}
 
 	query, args, err := c.psql.Select("*").From(ingredientsTable).Where(sq.Eq{"uuid": uuid}).ToSql()
 	if err != nil {
@@ -68,7 +82,7 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
-
+	c.cache.SetWithTTL(cacheKey, *ingredient, 0, time.Second)
 	return ingredient, nil
 }
 

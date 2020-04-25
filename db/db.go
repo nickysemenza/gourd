@@ -5,11 +5,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -22,8 +24,9 @@ const (
 
 // Client is a database client
 type Client struct {
-	db   *sqlx.DB
-	psql sq.StatementBuilderType
+	db    *sqlx.DB
+	psql  sq.StatementBuilderType
+	cache *ristretto.Cache
 }
 
 func getRecipeColumns() []string {
@@ -86,7 +89,20 @@ type Ingredient struct {
 
 // New creates a new Client.
 func New(db *sqlx.DB) *Client {
-	return &Client{db: db, psql: sq.StatementBuilder.PlaceholderFormat(sq.Dollar)}
+	// nolint:gomnd
+	cache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: 1e7,     // number of keys to track frequency of (10M).
+		MaxCost:     1 << 30, // maximum cost of cache (1GB).
+		BufferItems: 64,      // number of keys per Get buffer.
+		Metrics:     true,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &Client{db: db,
+		psql:  sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		cache: cache,
+	}
 }
 
 // ConnnectionString returns a DSN.

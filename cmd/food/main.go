@@ -63,6 +63,7 @@ func main() {
 	viper.SetDefault("DB_USER", "food")
 	viper.SetDefault("DB_PASSWORD", "food")
 	viper.SetDefault("DB_DBNAME", "food")
+	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
 	viper.SetDefault("HTTP_PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "30s")
 
@@ -92,6 +93,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
 	defer dbConn.Close()
 
 	dbx := sqlx.NewDb(dbConn, "postgres")
