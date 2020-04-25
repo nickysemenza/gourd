@@ -20,7 +20,7 @@ const RecipeDetail: React.FC = () => {
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<override>();
   const [edit, setEdit] = useState(false);
-  const recipe = data?.recipe;
+  const [recipe, setRecipe] = useState(data?.recipe);
   if (error) {
     console.error({ error });
     return (
@@ -28,6 +28,9 @@ const RecipeDetail: React.FC = () => {
         {error.message}
       </Box>
     );
+  }
+  if (!recipe && !!data?.recipe) {
+    setRecipe(data.recipe);
   }
   if (!recipe) return null;
 
@@ -43,7 +46,7 @@ const RecipeDetail: React.FC = () => {
       ingredientID,
       value: newValue,
     });
-    const o = recipe!.sections[sectionID]!.ingredients[ingredientID]!.grams;
+    const o = recipe.sections[sectionID]!.ingredients[ingredientID]!.grams;
     if (o && value) {
       setMultiplier(Math.round((newValue / o + Number.EPSILON) * 100) / 100);
     }
@@ -62,6 +65,24 @@ const RecipeDetail: React.FC = () => {
     return value * multiplier;
   };
 
+  const addInstruction = (sectionID: number) => {
+    setRecipe({
+      ...recipe,
+      // sections: recipe.sections.map((item, index) =>
+      //   index === sectionID
+      //     ? {
+      //         ...item,
+      //         instructions: [
+      //           ...(recipe.sections[sectionID]?.instructions || []),
+      //         ],
+      //       }
+      //     : item
+      // ),
+    });
+  };
+
+  const addIngredient = (sectionID: number) => {};
+
   return (
     <div>
       <Button onClick={() => setMultiplier(1)}>Reset</Button>
@@ -72,6 +93,8 @@ const RecipeDetail: React.FC = () => {
         recipe={recipe}
         getIngredientValue={getIngredientValue}
         edit={edit}
+        addInstruction={addInstruction}
+        addIngredient={addIngredient}
       />
       <Debug data={{ loading, error, data, multiplier, override }} />
     </div>

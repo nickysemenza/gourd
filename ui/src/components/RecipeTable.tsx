@@ -16,12 +16,16 @@ export interface Props {
     value: number
   ) => number;
   edit: boolean;
+  addInstruction: (sectionID: number) => void;
+  addIngredient: (sectionID: number) => void;
 }
 const RecipeTable: React.FC<Props> = ({
   recipe,
   updateIngredient,
   getIngredientValue,
   edit,
+  addInstruction,
+  addIngredient,
 }) => (
   <Box
     sx={{
@@ -41,7 +45,6 @@ const RecipeTable: React.FC<Props> = ({
       <TableRow>
         <TableCell>{section?.minutes}</TableCell>
         <TableCell>
-          {/* <ul style={{ margin: 0 }}> */}
           {section?.ingredients.map((ingredient, y) => (
             <Flex>
               <Input
@@ -69,7 +72,7 @@ const RecipeTable: React.FC<Props> = ({
               </Flex>
             </Flex>
           ))}
-          {/* </ul> */}
+          {edit && <Text onClick={() => addIngredient(x)}>add</Text>}
         </TableCell>
         <TableCell>
           <ol style={{ margin: 0 }}>
@@ -77,6 +80,7 @@ const RecipeTable: React.FC<Props> = ({
               <li>{instruction?.instruction} </li>
             ))}
           </ol>
+          {edit && <Text onClick={() => addInstruction(x)}>add</Text>}
         </TableCell>
       </TableRow>
     ))}
