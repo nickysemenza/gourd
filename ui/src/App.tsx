@@ -11,10 +11,11 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
 import IngredientList from "./pages/IngredientList";
+import CreateRecipe from "./pages/CreateRecipe";
 
 function App() {
   const client = new ApolloClient({
-    uri: "http://localhost:4242/query",
+    uri: process.env.REACT_APP_GQL_URL,
   });
   return (
     <ThemeProvider theme={theme}>
@@ -37,6 +38,9 @@ function App() {
               </Route>
               <Route path="/ingredients">
                 <IngredientList />
+              </Route>
+              <Route path="/create">
+                <CreateRecipe />
               </Route>
               <Route path="/">
                 <Test />

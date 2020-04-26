@@ -24,3 +24,30 @@ services:
       - 14268:14268
       - 9411:9411
     image: "jaegertracing/all-in-one:1.15.1"
+  food:
+    build:
+      context: .
+    depends_on:
+      - db
+      - jaeger
+    restart: always
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    ports:
+      - "4242:4242"
+
+  ui:
+    build:
+      context: ui
+    stdin_open: true
+    depends_on:
+      - food
+    environment:
+      REACT_APP_GQL_URL: http://food:4242/query
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./ui/cypress:/work/cypress
+      - ./ui/coverage:/work/coverage

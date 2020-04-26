@@ -36,12 +36,17 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "start": "react-scripts -r @cypress/instrument-cra start",
+    "start": "REACT_APP_GQL_URL=http://localhost:4242/query react-scripts -r @cypress/instrument-cra start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate": "graphql-codegen --config codegen.yml",
-    "cypress:open": "cypress open"
+    "coverage:unit": "react-scripts test --watchAll=false --coverage --coverageDirectory=coverage/unit",
+    "cy:run": "cypress run",
+    "cy:open": "cypress open",
+    "start:integration": "BROWSER=none PORT=3001 react-scripts -r @cypress/instrument-cra start",
+    "cy:run:integration": "cypress run",
+    "test:integration": "start-server-and-test start:integration http://localhost:3001 cy:run:integration"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -68,6 +73,7 @@
     "@graphql-codegen/typescript-operations": "1.13.2",
     "@graphql-codegen/typescript-react-apollo": "1.13.2",
     "cypress": "^4.4.1",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "start-server-and-test": "^1.11.0"
   }
 }

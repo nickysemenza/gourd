@@ -6,6 +6,9 @@ import (
 	"os"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -56,8 +59,7 @@ func initTracer(endpoint string) error {
 	return err
 }
 
-func main() {
-	ctx := context.Background()
+func setupEnv() {
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
 	viper.SetDefault("DB_USER", "food")
@@ -68,14 +70,8 @@ func main() {
 	viper.SetDefault("HTTP_TIMEOUT", "30s")
 
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
-
-	viper.AutomaticEnv()
-
-	err := initTracer(viper.GetString("JAEGER_ENDPOINT"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+}
+func getDBConn() (*sql.DB, error) {
 	sql.Register("instrumented-postgres", instrumentedsql.WrapDriver(&pq.Driver{},
 		instrumentedsql.WithLogger(instrumentedsql.LoggerFunc(func(ctx context.Context, msg string, keyvals ...interface{}) {
 			log.WithContext(ctx).WithFields(log.Fields{"client": "db"}).Debugf("%s %v", msg, keyvals)
@@ -89,7 +85,19 @@ func main() {
 		viper.GetString("DB_PASSWORD"),
 		viper.GetString("DB_DBNAME"),
 		viper.GetInt64("DB_PORT")))
+	return dbConn, err
+}
+func main() {
+	ctx := context.Background()
+	setupEnv()
+	viper.AutomaticEnv()
 
+	err := initTracer(viper.GetString("JAEGER_ENDPOINT"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbConn, err := getDBConn()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,6 +109,23 @@ func main() {
 		log.Fatal(err)
 	}
 	dbClient := db.New(dbx)
+
+	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://./migrations",
+		"postgres", driver)
+	if err != nil {
+		log.Fatal("oops:", err)
+	}
+	if err := m.Up(); err != nil {
+		if err != migrate.ErrNoChange {
+			log.Fatal("failed to migrate", err)
+		}
+	}
+	log.Info("migrated")
 
 	s := server.Server{
 		Manager:     manager.New(dbClient),

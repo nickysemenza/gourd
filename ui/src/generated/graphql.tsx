@@ -158,6 +158,14 @@ export type UpdateRecipeMutation = { __typename?: "Mutation" } & {
   updateRecipe: { __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">;
 };
 
+export type CreateRecipeMutationVariables = {
+  recipe: NewRecipe;
+};
+
+export type CreateRecipeMutation = { __typename?: "Mutation" } & {
+  createRecipe: { __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">;
+};
+
 export type GetIngredientsQueryVariables = {};
 
 export type GetIngredientsQuery = { __typename?: "Query" } & {
@@ -502,6 +510,107 @@ export type UpdateRecipeMutationResult = ApolloReactCommon.MutationResult<
 export type UpdateRecipeMutationOptions = ApolloReactCommon.BaseMutationOptions<
   UpdateRecipeMutation,
   UpdateRecipeMutationVariables
+>;
+export const CreateRecipeDocument = gql`
+  mutation createRecipe($recipe: NewRecipe!) {
+    createRecipe(recipe: $recipe) {
+      uuid
+      name
+    }
+  }
+`;
+export type CreateRecipeMutationFn = ApolloReactCommon.MutationFunction<
+  CreateRecipeMutation,
+  CreateRecipeMutationVariables
+>;
+export type CreateRecipeComponentProps = Omit<
+  ApolloReactComponents.MutationComponentOptions<
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables
+  >,
+  "mutation"
+>;
+
+export const CreateRecipeComponent = (props: CreateRecipeComponentProps) => (
+  <ApolloReactComponents.Mutation<
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables
+  >
+    mutation={CreateRecipeDocument}
+    {...props}
+  />
+);
+
+export type CreateRecipeProps<
+  TChildProps = {},
+  TDataName extends string = "mutate"
+> = {
+  [key in TDataName]: ApolloReactCommon.MutationFunction<
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables
+  >;
+} &
+  TChildProps;
+export function withCreateRecipe<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "mutate"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables,
+    CreateRecipeProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withMutation<
+    TProps,
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables,
+    CreateRecipeProps<TChildProps, TDataName>
+  >(CreateRecipeDocument, {
+    alias: "createRecipe",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useCreateRecipeMutation__
+ *
+ * To run a mutation, you first call `useCreateRecipeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRecipeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createRecipeMutation, { data, loading, error }] = useCreateRecipeMutation({
+ *   variables: {
+ *      recipe: // value for 'recipe'
+ *   },
+ * });
+ */
+export function useCreateRecipeMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    CreateRecipeMutation,
+    CreateRecipeMutationVariables
+  >(CreateRecipeDocument, baseOptions);
+}
+export type CreateRecipeMutationHookResult = ReturnType<
+  typeof useCreateRecipeMutation
+>;
+export type CreateRecipeMutationResult = ApolloReactCommon.MutationResult<
+  CreateRecipeMutation
+>;
+export type CreateRecipeMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  CreateRecipeMutation,
+  CreateRecipeMutationVariables
 >;
 export const GetIngredientsDocument = gql`
   query getIngredients {

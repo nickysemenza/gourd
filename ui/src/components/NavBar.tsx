@@ -7,7 +7,7 @@ const NavBar: React.FC = () => {
   return (
     <Flex px={2} color="white" bg="black" alignItems="center">
       <Text p={2} fontWeight="bold" onClick={() => history.push("/")}>
-        Recipes
+        food
       </Text>
       <Box mx="auto" />
       <Box
@@ -31,6 +31,17 @@ const NavBar: React.FC = () => {
         }}
       >
         <a onClick={() => history.push("/ingredients")}>Ingredients</a>
+      </Box>
+      <Box
+        sx={{
+          display: "inline-block",
+          fontWeight: "bold",
+          px: 2,
+          py: 1,
+          color: "inherit",
+        }}
+      >
+        <a onClick={() => history.push("/create")}>Create</a>
       </Box>
     </Flex>
   );

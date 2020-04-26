@@ -26,6 +26,7 @@ export interface TableProps {
   edit: boolean;
   addInstruction: (sectionID: number) => void;
   addIngredient: (sectionID: number) => void;
+  addSection: () => void;
 }
 const RecipeTable: React.FC<TableProps> = ({
   recipe,
@@ -35,6 +36,7 @@ const RecipeTable: React.FC<TableProps> = ({
   edit,
   addInstruction,
   addIngredient,
+  addSection,
 }) => (
   <Box
     sx={{
@@ -70,6 +72,7 @@ const RecipeTable: React.FC<TableProps> = ({
                   g
                 </Text>
                 <TableInput
+                  data-cy="name-input"
                   width={"128px"}
                   edit={edit}
                   value={ingredient.info.name}
@@ -80,13 +83,14 @@ const RecipeTable: React.FC<TableProps> = ({
               </Flex>
             </Flex>
           ))}
-          {edit && <Text onClick={() => addIngredient(x)}>add</Text>}
+          {edit && <Text onClick={() => addIngredient(x)}>add ingredient</Text>}
         </TableCell>
         <TableCell>
           <ol style={{ margin: 0 }}>
             {section.instructions.map((instruction, y) => (
               <li>
                 <TableInput
+                  data-cy="instruction-input"
                   width={"128px"}
                   edit={edit}
                   value={instruction.instruction}
@@ -95,10 +99,13 @@ const RecipeTable: React.FC<TableProps> = ({
               </li>
             ))}
           </ol>
-          {edit && <Text onClick={() => addInstruction(x)}>add</Text>}
+          {edit && (
+            <Text onClick={() => addInstruction(x)}>add instruction</Text>
+          )}
         </TableCell>
       </TableRow>
     ))}
+    {edit && <Text onClick={() => addSection()}>add section</Text>}
   </Box>
 );
 export default RecipeTable;

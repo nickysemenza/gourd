@@ -45,6 +45,14 @@ const _ = [
     }
   `,
   gql`
+    mutation createRecipe($recipe: NewRecipe!) {
+      createRecipe(recipe: $recipe) {
+        uuid
+        name
+      }
+    }
+  `,
+  gql`
     query getIngredients {
       ingredients {
         uuid

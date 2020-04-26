@@ -20,7 +20,17 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p $TEST_RESULTS # create the test results directory
+
+      - restore_cache:
+          keys:
+            - go-mod-v2-{{ checksum "go.sum" }}
       - run: go get github.com/jstemmer/go-junit-report
+      - run:
+          command: go mod vendor
+      - save_cache:
+          key: go-mod-v2-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run:
           name: Waiting for Postgres to be ready
           command: |
@@ -31,8 +41,6 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
-      - run:
-          command: go mod vendor
       - run:
           command: make bin/migrate && ./bin/migrate -source file://migrations -database postgres://food@localhost:5432/food?sslmode=disable up
       - run:
@@ -62,18 +70,86 @@ jobs:
           file: /tmp/artifacts/c.out
       - store_artifacts:
           path: /tmp/artifacts
+      # - run:
+      #     name: "install node"
+      #     command: "curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -"
+      # - run:
+      #     name: "install node2"
+      #     command: "sudo apt-get install -y nodejs"
+      # - run:
+      #     name: "install yarn"
+      #     command: "sudo npm install -g yarn"
+      # - run:
+      #     name: "source bash"
+      #     command: "source /home/circleci/.bashrc"
+      # - restore_cache:
+      #     name: Restore Yarn Package Cache
+      #     keys:
+      #       - yarn-packages-{{ checksum "ui/yarn.lock" }}
+      # - run:
+      #     name: Install Dependencies
+      #     command: yarn install --frozen-lockfile
+      #     working_directory: ./ui
+      # - save_cache:
+      #     name: Save Yarn Package Cache
+      #     key: yarn-packages-{{ checksum "ui/yarn.lock" }}
+      #     paths:
+      #       - ~/.cache/yarn
+      # - run:
+      #     name: run it
+      #     command: CYPRESS_BASE_URL=http://localhost:3001 yarn run test:integration
+      #     working_directory: ./ui
   build_ui:
     docker:
-      - image: node:9.3.0
+      - image: node:13
     working_directory: ~/work
     steps:
       - checkout
-      - run: echo "todo"
-      # - run: cd ui && yarn install
-      # - run: cd ui && yarn test
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "ui/yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+          working_directory: ./ui
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "ui/yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+      - run:
+          name: test
+          command: yarn coverage:unit
+          working_directory: ./ui
+      - codecov/upload:
+          file: ui/coverage/unit/coverage-final.json
+      - store_artifacts:
+          path: ui/coverage
+          destination: raw-ui-unit-test-coverage
+  test_e2e:
+    machine:
+      docker_layer_caching: false
+    steps:
+      - checkout
+      - run:
+          command: docker-compose build
+          no_output_timeout: 3m
+      - run:
+          command: docker-compose run ui
+          no_output_timeout: 3m
+      - codecov/upload:
+          file: ui/coverage/coverage-final.json
+      - store_artifacts:
+          path: ui/coverage
+          destination: raw-ui-e2e-test-coverage
+      - store_artifacts:
+          path: ui/cypress
+          destination: raw-ui-e2e-test-cypress
 workflows:
   version: 2
   build_fullstack:
     jobs:
       - build_ui
       - build_backend
+      - test_e2e

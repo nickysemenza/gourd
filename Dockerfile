@@ -2,12 +2,19 @@ FROM golang:1.13 AS builder
 
 
 # Copy the code from the host and compile it
-WORKDIR /tmp
+WORKDIR /work
+COPY go.mod . 
+COPY go.sum .
+# Get dependancies - will also be cached if we won't change mod/sum
+RUN go mod download
 
-COPY ./ ./
-RUN make build
+COPY . .
+RUN make bin/food
 
-FROM scratch
-COPY --from=builder /app ./
-EXPOSE 8080 
-ENTRYPOINT ["./app"]
+FROM debian:buster
+WORKDIR /work
+COPY --from=builder /work/bin ./bin
+COPY --from=builder /work/migrations ./migrations
+RUN ls
+EXPOSE 4242
+ENTRYPOINT ["./bin/food"]
