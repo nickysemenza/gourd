@@ -15,6 +15,9 @@ bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 
 test: unit-test lint
 
+dev-env:
+	docker-compose up -d db jaeger
+
 bin/revive:
 	@mkdir -p $(dir $@)
 	go build -o $@ ./vendor/github.com/mgechev/revive

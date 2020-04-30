@@ -3,6 +3,7 @@ import { useGetRecipesQuery } from "../generated/graphql";
 import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
+import Debug from "../components/Debug";
 
 interface TableProps<T extends object> {
   columns: Column<T>[];
@@ -24,7 +25,7 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 
   // Render the UI for your table
   return (
-    <table {...getTableProps()}>
+    <table {...getTableProps()} data-cy="recipe-table">
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
@@ -80,7 +81,7 @@ const Styles = styled.div`
 `;
 
 const RecipeList: React.FC = () => {
-  const { data } = useGetRecipesQuery({});
+  const { data, error } = useGetRecipesQuery({});
 
   const columns = React.useMemo(
     () => [
@@ -106,6 +107,7 @@ const RecipeList: React.FC = () => {
   return (
     <Styles>
       <Table columns={columns} data={data?.recipes || []} />
+      <Debug data={{ error }} />
     </Styles>
   );
 };

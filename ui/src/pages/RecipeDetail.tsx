@@ -187,6 +187,15 @@ const RecipeDetail: React.FC = () => {
       ),
     });
   };
+  const addSection = () => {
+    setRecipe({
+      ...recipe,
+      sections: [
+        ...recipe.sections,
+        { minutes: 0, ingredients: [], instructions: [] },
+      ],
+    });
+  };
 
   return (
     <div>
@@ -198,7 +207,7 @@ const RecipeDetail: React.FC = () => {
           setEdit(!edit);
         }}
       >
-        {edit ? "edit" : "view"}
+        {edit ? "view" : "edit"}
       </Button>
       <RecipeCard recipe={recipe} />
       <RecipeTable
@@ -209,6 +218,7 @@ const RecipeDetail: React.FC = () => {
         addInstruction={addInstruction}
         addIngredient={addIngredient}
         updateInstruction={updateInstruction}
+        addSection={addSection}
       />
       <Debug data={{ recipe, loading, error, data, multiplier, override }} />
     </div>
