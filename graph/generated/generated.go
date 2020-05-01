@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -111,7 +112,7 @@ type SectionResolver interface {
 	Ingredients(ctx context.Context, obj *model.Section) ([]*model.SectionIngredient, error)
 }
 type SectionIngredientResolver interface {
-	Info(ctx context.Context, obj *model.SectionIngredient) (*model.Ingredient, error)
+	Info(ctx context.Context, obj *model.SectionIngredient) (model.IngredientInfo, error)
 }
 
 type executableSchema struct {
@@ -373,9 +374,11 @@ type SectionInstruction {
   instruction: String!
 }
 
+union IngredientInfo = Ingredient | Recipe
+
 type SectionIngredient {
   uuid: String!
-  info: Ingredient!
+  info: IngredientInfo!
   grams: Float!
 }
 
@@ -1255,9 +1258,9 @@ func (ec *executionContext) _SectionIngredient_info(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Ingredient)
+	res := resTmp.(model.IngredientInfo)
 	fc.Result = res
-	return ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
+	return ec.marshalNIngredientInfo2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredientInfo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionIngredient_grams(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
@@ -2553,11 +2556,34 @@ func (ec *executionContext) unmarshalInputSectionInstructionInput(ctx context.Co
 
 // region    ************************** interface.gotpl ***************************
 
+func (ec *executionContext) _IngredientInfo(ctx context.Context, sel ast.SelectionSet, obj model.IngredientInfo) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case model.Ingredient:
+		return ec._Ingredient(ctx, sel, &obj)
+	case *model.Ingredient:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Ingredient(ctx, sel, obj)
+	case model.Recipe:
+		return ec._Recipe(ctx, sel, &obj)
+	case *model.Recipe:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Recipe(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
 
-var ingredientImplementors = []string{"Ingredient"}
+var ingredientImplementors = []string{"Ingredient", "IngredientInfo"}
 
 func (ec *executionContext) _Ingredient(ctx context.Context, sel ast.SelectionSet, obj *model.Ingredient) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, ingredientImplementors)
@@ -2705,7 +2731,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var recipeImplementors = []string{"Recipe"}
+var recipeImplementors = []string{"Recipe", "IngredientInfo"}
 
 func (ec *executionContext) _Recipe(ctx context.Context, sel ast.SelectionSet, obj *model.Recipe) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, recipeImplementors)
@@ -3221,6 +3247,16 @@ func (ec *executionContext) marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋ
 		return graphql.Null
 	}
 	return ec._Ingredient(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNIngredientInfo2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredientInfo(ctx context.Context, sel ast.SelectionSet, v model.IngredientInfo) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._IngredientInfo(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {

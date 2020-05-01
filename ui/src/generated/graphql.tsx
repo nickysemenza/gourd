@@ -28,10 +28,12 @@ export type SectionInstruction = {
   instruction: Scalars["String"];
 };
 
+export type IngredientInfo = Ingredient | Recipe;
+
 export type SectionIngredient = {
   __typename?: "SectionIngredient";
   uuid: Scalars["String"];
-  info: Ingredient;
+  info: IngredientInfo;
   grams: Scalars["Float"];
 };
 
@@ -121,10 +123,12 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
                   SectionIngredient,
                   "uuid" | "grams"
                 > & {
-                    info: { __typename?: "Ingredient" } & Pick<
-                      Ingredient,
-                      "name"
-                    >;
+                    info:
+                      | ({ __typename: "Ingredient" } & Pick<
+                          Ingredient,
+                          "name"
+                        >)
+                      | ({ __typename: "Recipe" } & Pick<Recipe, "name">);
                   }
               >;
               instructions: Array<
@@ -190,7 +194,13 @@ export const GetRecipeByUuidDocument = gql`
         ingredients {
           uuid
           info {
-            name
+            __typename
+            ... on Ingredient {
+              name
+            }
+            ... on Recipe {
+              name
+            }
           }
           grams
         }

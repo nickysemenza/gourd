@@ -22,6 +22,7 @@ type Section struct {
 type SectionIngredient struct {
 	UUID         string  `json:"uuid"`
 	IngredientID string  `json:"info"`
+	RecipeID     string  `json:"info_recipe"`
 	Grams        float64 `json:"grams"`
 }
 
@@ -30,3 +31,6 @@ type Ingredient struct {
 	Name       string   `json:"name"`
 	RecipesIDs []string `json:"recipes"`
 }
+
+func (i Ingredient) IsIngredientInfo() {}
+func (r Recipe) IsIngredientInfo()     {}

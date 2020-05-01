@@ -88,7 +88,16 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 
 // GetRecipeByUUID gets a recipe by UUID, shallowly.
 func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, error) {
-	query, args, err := c.psql.Select("*").From(recipesTable).Where(sq.Eq{"uuid": uuid}).ToSql()
+	return c.getRecipe(ctx, c.psql.Select("*").From(recipesTable).Where(sq.Eq{"uuid": uuid}))
+}
+
+// GetRecipeByUUID gets a recipe by name, shallowly.
+func (c *Client) GetRecipeByName(ctx context.Context, name string) (*Recipe, error) {
+	return c.getRecipe(ctx, c.psql.Select("*").From(recipesTable).Where(sq.Eq{"name": name}))
+}
+
+func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, error) {
+	query, args, err := sb.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}

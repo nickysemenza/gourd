@@ -5,7 +5,6 @@ linters:
     - goconst
     - misspell
     - gosec
-    - lll
     - golint
   presets:
     - complexity
@@ -16,3 +15,4 @@ linters:
     - wsl
     - godox
     - testpackage
+    - lll

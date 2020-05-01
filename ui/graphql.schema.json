@@ -136,6 +136,27 @@
         "possibleTypes": null
       },
       {
+        "kind": "UNION",
+        "name": "IngredientInfo",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Ingredient",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "Recipe",
+            "ofType": null
+          }
+        ]
+      },
+      {
         "kind": "OBJECT",
         "name": "SectionIngredient",
         "description": null,
@@ -164,8 +185,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "Ingredient",
+                "kind": "UNION",
+                "name": "IngredientInfo",
                 "ofType": null
               }
             },

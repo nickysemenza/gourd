@@ -10,6 +10,7 @@ import (
 	"gopkg.in/guregu/null.v3/zero"
 )
 
+//nolint: funlen
 func TestInsertGet(t *testing.T) {
 	ctx := context.Background()
 	require := require.New(t)
@@ -62,4 +63,16 @@ func TestInsertGet(t *testing.T) {
 	require.EqualValues(3, r2.TotalMinutes.Int64)
 	require.EqualValues("items", r2.Unit.String)
 	require.EqualValues("add flour", r2.Sections[0].Instructions[0].Instruction)
+	rName := r2.Name
+
+	_, err = db.InsertRecipe(ctx, &Recipe{
+		Name: fmt.Sprintf("r2-%d", time.Now().Unix()),
+		Sections: []Section{{
+			Minutes: zero.IntFrom(33),
+			Ingredients: []SectionIngredient{{
+				Grams: zero.FloatFrom(52),
+				Name:  fmt.Sprintf("r:%s", rName),
+			}}}},
+	})
+	require.NoError(err)
 }

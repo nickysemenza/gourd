@@ -180,7 +180,11 @@ const RecipeDetail: React.FC = () => {
               ...item,
               ingredients: [
                 ...(recipe.sections[sectionID].ingredients || []),
-                { uuid: "x", grams: 1, info: { name: "" } },
+                {
+                  uuid: "x",
+                  grams: 1,
+                  info: { name: "", __typename: "Ingredient" },
+                },
               ],
             }
           : item

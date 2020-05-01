@@ -14,7 +14,13 @@ const _ = [
           ingredients {
             uuid
             info {
-              name
+              __typename
+              ... on Ingredient {
+                name
+              }
+              ... on Recipe {
+                name
+              }
             }
             grams
           }

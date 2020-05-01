@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
@@ -128,11 +129,25 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 		for y := range r.Sections[x].Ingredients {
 			r.Sections[x].Ingredients[y].UUID = setUUID(r.Sections[x].Ingredients[y].UUID)
 			r.Sections[x].Ingredients[y].SectionUUID = r.Sections[x].UUID
-			ing, err := c.IngredientByName(ctx, r.Sections[x].Ingredients[y].Name)
-			if err != nil {
-				return err
+
+			ingName := r.Sections[x].Ingredients[y].Name
+			if strings.HasPrefix(ingName, "r:") {
+				recipeName := strings.TrimPrefix(ingName, "r:")
+				recipe, err := c.GetRecipeByName(ctx, recipeName)
+				if err != nil {
+					return err
+				}
+				if recipe == nil {
+					return fmt.Errorf("no recipe with name %s", recipeName)
+				}
+				r.Sections[x].Ingredients[y].RecipeUUID = zero.StringFrom(recipe.UUID)
+			} else {
+				ing, err := c.IngredientByName(ctx, ingName)
+				if err != nil {
+					return err
+				}
+				r.Sections[x].Ingredients[y].IngredientUUID = zero.StringFrom(ing.UUID)
 			}
-			r.Sections[x].Ingredients[y].IngredientUUID = zero.StringFrom(ing.UUID)
 		}
 		for y := range r.Sections[x].Instructions {
 			r.Sections[x].Instructions[y].UUID = setUUID(r.Sections[x].Instructions[y].UUID)

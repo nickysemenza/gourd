@@ -9,9 +9,11 @@ type SectionInstruction {
   instruction: String!
 }
 
+union IngredientInfo = Ingredient | Recipe
+
 type SectionIngredient {
   uuid: String!
-  info: Ingredient!
+  info: IngredientInfo!
   grams: Float!
 }
 

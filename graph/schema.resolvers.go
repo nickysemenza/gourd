@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/nickysemenza/food/db"
@@ -158,23 +159,36 @@ func (r *sectionResolver) Ingredients(ctx context.Context, obj *model.Section) (
 			UUID:         item.UUID,
 			Grams:        item.Grams.Float64,
 			IngredientID: item.IngredientUUID.String,
+			RecipeID:     item.RecipeUUID.String,
 		})
 	}
 	return i, nil
 }
 
-func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.SectionIngredient) (*model.Ingredient, error) {
+func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.SectionIngredient) (model.IngredientInfo, error) {
 	tr := global.Tracer("graph")
 	ctx, span := tr.Start(ctx, "Info")
 	defer span.End()
-	ing, err := r.DB.GetIngredientByUUID(ctx, obj.IngredientID)
+	if obj.IngredientID != "" {
+		ing, err := r.DB.GetIngredientByUUID(ctx, obj.IngredientID)
+		if err != nil {
+			return nil, err
+		}
+		if ing == nil {
+			return nil, nil
+		}
+		return &model.Ingredient{Name: ing.Name, UUID: ing.UUID}, nil
+	}
+	recipe, err := r.DB.GetRecipeByUUID(ctx, obj.RecipeID)
 	if err != nil {
 		return nil, err
 	}
-	if ing == nil {
+	if recipe == nil {
 		return nil, nil
 	}
-	return &model.Ingredient{Name: ing.Name, UUID: ing.UUID}, nil
+	r2 := fromRecipe(recipe)
+	r2.Name = fmt.Sprintf("r:%s", r2.Name)
+	return r2, nil
 }
 
 // Ingredient returns generated.IngredientResolver implementation.

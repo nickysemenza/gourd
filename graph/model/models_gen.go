@@ -2,6 +2,10 @@
 
 package model
 
+type IngredientInfo interface {
+	IsIngredientInfo()
+}
+
 type NewRecipe struct {
 	Name string `json:"name"`
 }
