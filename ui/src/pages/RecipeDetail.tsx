@@ -11,6 +11,7 @@ import RecipeTable from "../components/RecipeTable";
 import Debug from "../components/Debug";
 import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
+import update from "immutability-helper";
 
 type override = {
   sectionID: number;
@@ -85,32 +86,26 @@ const RecipeDetail: React.FC = () => {
       });
     const { grams } = recipe.sections[sectionID]!.ingredients[ingredientID];
     edit
-      ? setRecipe({
-          ...recipe,
-          sections: recipe.sections.map((item, index) =>
-            index === sectionID
-              ? {
-                  ...item,
-                  ingredients: recipe.sections[sectionID].ingredients.map(
-                    (item2, index2) =>
-                      index2 === ingredientID
-                        ? {
-                            ...item2,
-                            grams:
-                              attr === "grams"
-                                ? parseFloat(value)
-                                : item2.grams,
-                            info: {
-                              ...item2.info,
-                              name: attr === "name" ? value : item2.info.name,
-                            },
-                          }
-                        : item2
-                  ),
-                }
-              : item
-          ),
-        })
+      ? setRecipe(
+          update(recipe, {
+            sections: {
+              [sectionID]: {
+                ingredients: {
+                  [ingredientID]: {
+                    info: {
+                      name: {
+                        $apply: (v) => (attr === "name" ? value : v),
+                      },
+                    },
+                    grams: {
+                      $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
+                    },
+                  },
+                },
+              },
+            },
+          })
+        )
       : setMultiplier(
           Math.round((newValue / grams + Number.EPSILON) * 100) / 100
         );
@@ -135,70 +130,60 @@ const RecipeDetail: React.FC = () => {
     value: string
   ) => {
     edit &&
-      setRecipe({
-        ...recipe,
-        sections: recipe.sections.map((item, index) =>
-          index === sectionID
-            ? {
-                ...item,
-                instructions: recipe.sections[
-                  sectionID
-                ].instructions.map((item2, index2) =>
-                  index2 === instructionID
-                    ? { ...item2, instruction: value }
-                    : item2
-                ),
-              }
-            : item
-        ),
-      });
+      setRecipe(
+        update(recipe, {
+          sections: {
+            [sectionID]: {
+              instructions: {
+                [instructionID]: { instruction: { $set: value } },
+              },
+            },
+          },
+        })
+      );
   };
 
   const addInstruction = (sectionID: number) => {
-    setRecipe({
-      ...recipe,
-      sections: recipe.sections.map((item, index) =>
-        index === sectionID
-          ? {
-              ...item,
-              instructions: [
-                ...(recipe.sections[sectionID]?.instructions || []),
-                { uuid: "x", instruction: "" },
-              ],
-            }
-          : item
-      ),
-    });
+    setRecipe(
+      update(recipe, {
+        sections: {
+          [sectionID]: {
+            instructions: {
+              $push: [{ uuid: "x", instruction: "" }],
+            },
+          },
+        },
+      })
+    );
   };
 
   const addIngredient = (sectionID: number) => {
-    setRecipe({
-      ...recipe,
-      sections: recipe.sections.map((item, index) =>
-        index === sectionID
-          ? {
-              ...item,
-              ingredients: [
-                ...(recipe.sections[sectionID].ingredients || []),
+    setRecipe(
+      update(recipe, {
+        sections: {
+          [sectionID]: {
+            ingredients: {
+              $push: [
                 {
                   uuid: "x",
                   grams: 1,
                   info: { name: "", __typename: "Ingredient" },
                 },
               ],
-            }
-          : item
-      ),
-    });
+            },
+          },
+        },
+      })
+    );
   };
   const addSection = () => {
-    setRecipe({
-      ...recipe,
-      sections: [
-        ...recipe.sections,
-        { minutes: 0, ingredients: [], instructions: [] },
-      ],
-    });
+    setRecipe(
+      update(recipe, {
+        sections: {
+          $push: [{ minutes: 0, ingredients: [], instructions: [] }],
+        },
+      })
+    );
   };
 
   return (
