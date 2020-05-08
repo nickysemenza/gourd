@@ -1,12 +1,8 @@
 import React from "react";
-import {
-  useGetIngredientsQuery,
-  GetIngredientsQuery,
-} from "../generated/graphql";
+import { useGetIngredientsQuery } from "../generated/graphql";
 import styled from "styled-components";
-import { useTable, Column, CellProps, Cell } from "react-table";
+import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
-import Debug from "../components/Debug";
 import { Box } from "rebass";
 
 interface TableProps<T extends object> {

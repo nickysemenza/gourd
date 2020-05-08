@@ -64,7 +64,6 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 
 	cval, hit := c.cache.Get(cacheKey)
 	log.WithField("key", cacheKey).WithField("hit", hit).Debug("cache:ingredients")
-	fmt.Print(c.cache.Metrics.String())
 	if hit {
 		ing, ok := cval.(Ingredient)
 		if ok {

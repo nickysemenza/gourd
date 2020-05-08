@@ -23,6 +23,10 @@ const _ = [
               }
             }
             grams
+            amount
+            unit
+            adjective
+            optional
           }
           instructions {
             instruction

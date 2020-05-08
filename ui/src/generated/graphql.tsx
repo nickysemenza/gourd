@@ -35,6 +35,10 @@ export type SectionIngredient = {
   uuid: Scalars["String"];
   info: IngredientInfo;
   grams: Scalars["Float"];
+  amount: Scalars["Float"];
+  unit: Scalars["String"];
+  adjective: Scalars["String"];
+  optional: Scalars["Boolean"];
 };
 
 export type Section = {
@@ -69,6 +73,10 @@ export type SectionInstructionInput = {
 export type SectionIngredientInput = {
   name: Scalars["String"];
   grams: Scalars["Float"];
+  amount: Scalars["Float"];
+  unit: Scalars["String"];
+  adjective: Scalars["String"];
+  optional: Scalars["Boolean"];
 };
 
 export type SectionInput = {
@@ -121,7 +129,12 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
               ingredients: Array<
                 { __typename?: "SectionIngredient" } & Pick<
                   SectionIngredient,
-                  "uuid" | "grams"
+                  | "uuid"
+                  | "grams"
+                  | "amount"
+                  | "unit"
+                  | "adjective"
+                  | "optional"
                 > & {
                     info:
                       | ({ __typename: "Ingredient" } & Pick<
@@ -203,6 +216,10 @@ export const GetRecipeByUuidDocument = gql`
             }
           }
           grams
+          amount
+          unit
+          adjective
+          optional
         }
         instructions {
           instruction

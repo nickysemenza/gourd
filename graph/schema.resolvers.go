@@ -68,8 +68,12 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 		}
 		for _, i := range s.Ingredients {
 			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
-				Name:  i.Name,
-				Grams: zero.FloatFrom(i.Grams),
+				Name:      i.Name,
+				Grams:     zero.FloatFrom(i.Grams),
+				Amount:    zero.FloatFrom(i.Amount),
+				Unit:      zero.StringFrom(i.Unit),
+				Adjective: zero.StringFrom(i.Adjective),
+				Optional:  zero.BoolFrom(i.Optional),
 			})
 		}
 		dbr.Sections = append(dbr.Sections, dbs)
@@ -158,6 +162,10 @@ func (r *sectionResolver) Ingredients(ctx context.Context, obj *model.Section) (
 		i = append(i, &model.SectionIngredient{
 			UUID:         item.UUID,
 			Grams:        item.Grams.Float64,
+			Amount:       item.Amount.Float64,
+			Unit:         item.Unit.String,
+			Adjective:    item.Adjective.String,
+			Optional:     item.Optional.Bool,
 			IngredientID: item.IngredientUUID.String,
 			RecipeID:     item.RecipeUUID.String,
 		})

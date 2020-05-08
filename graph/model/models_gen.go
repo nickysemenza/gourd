@@ -19,8 +19,12 @@ type RecipeInput struct {
 }
 
 type SectionIngredientInput struct {
-	Name  string  `json:"name"`
-	Grams float64 `json:"grams"`
+	Name      string  `json:"name"`
+	Grams     float64 `json:"grams"`
+	Amount    float64 `json:"amount"`
+	Unit      string  `json:"unit"`
+	Adjective string  `json:"adjective"`
+	Optional  bool    `json:"optional"`
 }
 
 type SectionInput struct {

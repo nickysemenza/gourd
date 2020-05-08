@@ -47,12 +47,16 @@ func TestInsertGet(t *testing.T) {
 			Grams: zero.FloatFrom(1),
 			Name:  "flour",
 		}, {
-			Grams: zero.FloatFrom(178),
-			Name:  "water",
+			Grams:  zero.FloatFrom(178),
+			Name:   "water",
+			Amount: zero.FloatFrom(.7),
+			Unit:   zero.StringFrom("c"),
 		}, {
 
-			Grams: zero.FloatFrom(36),
-			Name:  "egg",
+			Grams:  zero.FloatFrom(60),
+			Name:   "egg",
+			Amount: zero.FloatFrom(1),
+			Unit:   zero.StringFrom("large egg"),
 		}},
 	}}
 
@@ -63,6 +67,7 @@ func TestInsertGet(t *testing.T) {
 	require.EqualValues(3, r2.TotalMinutes.Int64)
 	require.EqualValues("items", r2.Unit.String)
 	require.EqualValues("add flour", r2.Sections[0].Instructions[0].Instruction)
+	require.EqualValues(.7, r2.Sections[1].Ingredients[1].Amount.Float64)
 	rName := r2.Name
 
 	_, err = db.InsertRecipe(ctx, &Recipe{

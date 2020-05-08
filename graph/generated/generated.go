@@ -81,9 +81,13 @@ type ComplexityRoot struct {
 	}
 
 	SectionIngredient struct {
-		Grams func(childComplexity int) int
-		Info  func(childComplexity int) int
-		UUID  func(childComplexity int) int
+		Adjective func(childComplexity int) int
+		Amount    func(childComplexity int) int
+		Grams     func(childComplexity int) int
+		Info      func(childComplexity int) int
+		Optional  func(childComplexity int) int
+		UUID      func(childComplexity int) int
+		Unit      func(childComplexity int) int
 	}
 
 	SectionInstruction struct {
@@ -264,6 +268,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Section.UUID(childComplexity), true
 
+	case "SectionIngredient.adjective":
+		if e.complexity.SectionIngredient.Adjective == nil {
+			break
+		}
+
+		return e.complexity.SectionIngredient.Adjective(childComplexity), true
+
+	case "SectionIngredient.amount":
+		if e.complexity.SectionIngredient.Amount == nil {
+			break
+		}
+
+		return e.complexity.SectionIngredient.Amount(childComplexity), true
+
 	case "SectionIngredient.grams":
 		if e.complexity.SectionIngredient.Grams == nil {
 			break
@@ -278,12 +296,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SectionIngredient.Info(childComplexity), true
 
+	case "SectionIngredient.optional":
+		if e.complexity.SectionIngredient.Optional == nil {
+			break
+		}
+
+		return e.complexity.SectionIngredient.Optional(childComplexity), true
+
 	case "SectionIngredient.uuid":
 		if e.complexity.SectionIngredient.UUID == nil {
 			break
 		}
 
 		return e.complexity.SectionIngredient.UUID(childComplexity), true
+
+	case "SectionIngredient.unit":
+		if e.complexity.SectionIngredient.Unit == nil {
+			break
+		}
+
+		return e.complexity.SectionIngredient.Unit(childComplexity), true
 
 	case "SectionInstruction.instruction":
 		if e.complexity.SectionInstruction.Instruction == nil {
@@ -380,6 +412,10 @@ type SectionIngredient {
   uuid: String!
   info: IngredientInfo!
   grams: Float!
+  amount: Float!
+  unit: String!
+  adjective: String!
+  optional: Boolean!
 }
 
 type Section {
@@ -412,6 +448,10 @@ input SectionInstructionInput {
 input SectionIngredientInput {
   name: String!
   grams: Float!
+  amount: Float!
+  unit: String!
+  adjective: String!
+  optional: Boolean!
 }
 
 input SectionInput {
@@ -1295,6 +1335,142 @@ func (ec *executionContext) _SectionIngredient_grams(ctx context.Context, field 
 	res := resTmp.(float64)
 	fc.Result = res
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionIngredient_amount(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionIngredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionIngredient_unit(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionIngredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionIngredient_adjective(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionIngredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Adjective, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionIngredient_optional(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionIngredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Optional, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionInstruction_uuid(ctx context.Context, field graphql.CollectedField, obj *model.SectionInstruction) (ret graphql.Marshaler) {
@@ -2498,6 +2674,30 @@ func (ec *executionContext) unmarshalInputSectionIngredientInput(ctx context.Con
 			if err != nil {
 				return it, err
 			}
+		case "amount":
+			var err error
+			it.Amount, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit":
+			var err error
+			it.Unit, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "adjective":
+			var err error
+			it.Adjective, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "optional":
+			var err error
+			it.Optional, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2879,6 +3079,26 @@ func (ec *executionContext) _SectionIngredient(ctx context.Context, sel ast.Sele
 			})
 		case "grams":
 			out.Values[i] = ec._SectionIngredient_grams(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "amount":
+			out.Values[i] = ec._SectionIngredient_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "unit":
+			out.Values[i] = ec._SectionIngredient_unit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "adjective":
+			out.Values[i] = ec._SectionIngredient_adjective(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "optional":
+			out.Values[i] = ec._SectionIngredient_optional(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

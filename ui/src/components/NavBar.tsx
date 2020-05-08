@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Flex, Text } from "rebass";
 import { useHistory } from "react-router-dom";
 
@@ -19,7 +19,7 @@ const NavBar: React.FC = () => {
           color: "inherit",
         }}
       >
-        <a onClick={() => history.push("/recipes")}>Recipes</a>
+        <Box onClick={() => history.push("/recipes")}>Recipes</Box>
       </Box>
       <Box
         sx={{
@@ -30,7 +30,7 @@ const NavBar: React.FC = () => {
           color: "inherit",
         }}
       >
-        <a onClick={() => history.push("/ingredients")}>Ingredients</a>
+        <Box onClick={() => history.push("/ingredients")}>Ingredients</Box>
       </Box>
       <Box
         sx={{
@@ -41,7 +41,7 @@ const NavBar: React.FC = () => {
           color: "inherit",
         }}
       >
-        <a onClick={() => history.push("/create")}>Create</a>
+        <Box onClick={() => history.push("/create")}>Create</Box>
       </Box>
     </Flex>
   );

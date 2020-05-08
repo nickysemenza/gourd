@@ -11,10 +11,16 @@ export const recipeToRecipeInput = (recipe: Partial<Recipe>): RecipeInput => {
       ({ minutes, instructions, ingredients }) => ({
         minutes,
         instructions: instructions.map(({ instruction }) => ({ instruction })),
-        ingredients: ingredients.map(({ info, grams }) => ({
-          name: info.name,
-          grams,
-        })),
+        ingredients: ingredients.map(
+          ({ info, grams, amount, unit, adjective, optional }) => ({
+            name: info.name,
+            grams,
+            amount,
+            unit,
+            adjective,
+            optional,
+          })
+        ),
       })
     ),
   };

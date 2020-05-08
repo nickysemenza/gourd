@@ -32,10 +32,7 @@ const RecipeDetail: React.FC = () => {
     name: "tmp",
     uuid: "tmp",
   });
-  const [
-    updateRecipeMutation,
-    { loading: saveLoading, error: saveError },
-  ] = useUpdateRecipeMutation({
+  const [updateRecipeMutation, { error: saveError }] = useUpdateRecipeMutation({
     variables: {
       recipe: recipeUpdate,
     },
@@ -74,7 +71,7 @@ const RecipeDetail: React.FC = () => {
     sectionID: number,
     ingredientID: number,
     value: string,
-    attr: "grams" | "name"
+    attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional"
   ) => {
     const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
     attr === "grams" &&
@@ -97,8 +94,23 @@ const RecipeDetail: React.FC = () => {
                         $apply: (v) => (attr === "name" ? value : v),
                       },
                     },
+                    // yikes
                     grams: {
                       $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
+                    },
+                    amount: {
+                      $apply: (v) =>
+                        attr === "amount" ? parseFloat(value) : v,
+                    },
+                    unit: {
+                      $apply: (v) => (attr === "unit" ? value : v),
+                    },
+                    adjective: {
+                      $apply: (v) => (attr === "adjective" ? value : v),
+                    },
+                    optional: {
+                      $apply: (v) =>
+                        attr === "optional" ? value === "true" : v,
                     },
                   },
                 },
@@ -168,6 +180,10 @@ const RecipeDetail: React.FC = () => {
                   uuid: "x",
                   grams: 1,
                   info: { name: "", __typename: "Ingredient" },
+                  amount: 0,
+                  unit: "",
+                  adjective: "",
+                  optional: false,
                 },
               ],
             },

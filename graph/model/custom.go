@@ -24,6 +24,10 @@ type SectionIngredient struct {
 	IngredientID string  `json:"info"`
 	RecipeID     string  `json:"info_recipe"`
 	Grams        float64 `json:"grams"`
+	Amount       float64 `json:"amount"`
+	Unit         string  `json:"unit"`
+	Adjective    string  `json:"adjective"`
+	Optional     bool    `json:"optional"`
 }
 
 type Ingredient struct {

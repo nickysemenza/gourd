@@ -4,7 +4,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import Test from "./Test";
 import { ThemeProvider } from "theme-ui";
-import { Box, Flex, Text, Link } from "rebass";
+import { Box } from "rebass";
 import theme from "./theme";
 import RecipeList from "./pages/RecipeList";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";

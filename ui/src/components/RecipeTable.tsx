@@ -10,7 +10,7 @@ export interface TableProps {
     sectionID: number,
     ingredientID: number,
     value: string,
-    attr: "grams" | "name"
+    attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional"
   ) => void;
   updateInstruction: (
     sectionID: number,
@@ -58,27 +58,60 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>{section.minutes}</TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => (
-          <Flex>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "1fr 20px 2fr 1fr 4fr 4fr",
+              borderBottomWidth: "1px",
+              borderBottomStyle: "solid",
+              borderBottomColor: "green",
+            }}
+          >
             <TableInput
               data-cy="grams-input"
               edit={edit}
               softEdit
               value={getIngredientValue(x, y, ingredient.grams || 0)}
               onChange={(e) => updateIngredient(x, y, e.target.value, "grams")}
-            />{" "}
-            <Flex pl={1} width={1 / 2}>
-              <Text pr={1} color="gray">
-                g
-              </Text>
-              <TableInput
-                data-cy="name-input"
-                width={"128px"}
-                edit={edit}
-                value={ingredient.info.name}
-                onChange={(e) => updateIngredient(x, y, e.target.value, "name")}
-              />
-            </Flex>
-          </Flex>
+            />
+            {/* <Flex pl={1} width={1 / 2}> */}
+            <Text pr={1} color="gray">
+              g
+            </Text>
+            <TableInput
+              data-cy="name-input"
+              width={"128px"}
+              edit={edit}
+              value={ingredient.info.name}
+              onChange={(e) => updateIngredient(x, y, e.target.value, "name")}
+            />
+            <TableInput
+              data-cy="amount-input"
+              width={"128px"}
+              edit={edit}
+              softEdit
+              value={getIngredientValue(x, y, ingredient.amount || 0)}
+              onChange={(e) => updateIngredient(x, y, e.target.value, "amount")}
+            />
+            <TableInput
+              data-cy="unit-input"
+              width={"64px"}
+              edit={edit}
+              value={ingredient.unit}
+              onChange={(e) => updateIngredient(x, y, e.target.value, "unit")}
+            />
+            <TableInput
+              data-cy="adjective-input"
+              width={"128px"}
+              edit={edit}
+              value={ingredient.adjective}
+              onChange={(e) =>
+                updateIngredient(x, y, e.target.value, "adjective")
+              }
+            />
+            {/* TODO: optional toggle */}
+            {/* </Flex> */}
+          </Box>
         ))}
         {edit && <Text onClick={() => addIngredient(x)}>add ingredient</Text>}
       </TableCell>
@@ -159,7 +192,7 @@ const TableInput: React.FC<{
     <Input
       {...props}
       padding={0}
-      width={width}
+      // width={width}
       sx={{
         textAlign: softEdit ? "end" : "begin",
         ":not(:focus)": {

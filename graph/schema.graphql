@@ -15,6 +15,10 @@ type SectionIngredient {
   uuid: String!
   info: IngredientInfo!
   grams: Float!
+  amount: Float!
+  unit: String!
+  adjective: String!
+  optional: Boolean!
 }
 
 type Section {
@@ -47,6 +51,10 @@ input SectionInstructionInput {
 input SectionIngredientInput {
   name: String!
   grams: Float!
+  amount: Float!
+  unit: String!
+  adjective: String!
+  optional: Boolean!
 }
 
 input SectionInput {
