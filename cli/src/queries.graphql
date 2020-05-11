@@ -1,0 +1,38 @@
+query getRecipeByUUID($uuid: String!) {
+  recipe(uuid: $uuid) {
+    uuid
+    name
+    total_minutes
+    unit
+    sections {
+      minutes
+      ingredients {
+        uuid
+        info {
+          __typename
+          ... on Ingredient {
+            name
+            uuid
+            __typename
+          }
+          ... on Recipe {
+            name
+            uuid
+            __typename
+          }
+        }
+        grams
+        unit
+        amount
+        __typename
+      }
+      instructions {
+        instruction
+        uuid
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
