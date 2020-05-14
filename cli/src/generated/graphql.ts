@@ -143,6 +143,14 @@ export type GetRecipeByUuidQuery = {
   >;
 };
 
+export type UpdateRecipeMutationVariables = {
+  recipe: RecipeInput;
+};
+
+export type UpdateRecipeMutation = {
+  updateRecipe: Pick<Recipe, "uuid" | "name">;
+};
+
 export const GetRecipeByUuidDocument = gql`
   query getRecipeByUUID($uuid: String!) {
     recipe(uuid: $uuid) {
@@ -183,6 +191,14 @@ export const GetRecipeByUuidDocument = gql`
     }
   }
 `;
+export const UpdateRecipeDocument = gql`
+  mutation updateRecipe($recipe: RecipeInput!) {
+    updateRecipe(recipe: $recipe) {
+      uuid
+      name
+    }
+  }
+`;
 
 export type SdkFunctionWrapper = <T>(action: () => Promise<T>) => Promise<T>;
 
@@ -198,6 +214,16 @@ export function getSdk(
       return withWrapper(() =>
         client.request<GetRecipeByUuidQuery>(
           print(GetRecipeByUuidDocument),
+          variables
+        )
+      );
+    },
+    updateRecipe(
+      variables: UpdateRecipeMutationVariables
+    ): Promise<UpdateRecipeMutation> {
+      return withWrapper(() =>
+        client.request<UpdateRecipeMutation>(
+          print(UpdateRecipeDocument),
           variables
         )
       );
@@ -243,6 +269,14 @@ export const GetRecipeByUuid = gql`
         __typename
       }
       __typename
+    }
+  }
+`;
+export const UpdateRecipe = gql`
+  mutation updateRecipe($recipe: RecipeInput!) {
+    updateRecipe(recipe: $recipe) {
+      uuid
+      name
     }
   }
 `;

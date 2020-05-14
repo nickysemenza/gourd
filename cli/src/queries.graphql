@@ -36,3 +36,10 @@ query getRecipeByUUID($uuid: String!) {
     __typename
   }
 }
+
+mutation updateRecipe($recipe: RecipeInput!) {
+  updateRecipe(recipe: $recipe) {
+    uuid
+    name
+  }
+}
