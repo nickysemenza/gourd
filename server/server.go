@@ -49,7 +49,7 @@ func (s *Server) Run() error {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
+	r.Use(NewStructuredLogger(log.New()))
 	r.Use(cors.Handler(cors.Options{}))
 	r.Use(timing)
 

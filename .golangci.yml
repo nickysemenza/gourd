@@ -16,3 +16,4 @@ linters:
     - godox
     - testpackage
     - lll
+    - gomnd
