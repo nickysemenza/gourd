@@ -51,10 +51,10 @@ input SectionInstructionInput {
 input SectionIngredientInput {
   name: String!
   grams: Float!
-  amount: Float!
-  unit: String!
-  adjective: String!
-  optional: Boolean!
+  amount: Float
+  unit: String
+  adjective: String
+  optional: Boolean
 }
 
 input SectionInput {

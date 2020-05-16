@@ -73,10 +73,10 @@ export type SectionInstructionInput = {
 export type SectionIngredientInput = {
   name: Scalars["String"];
   grams: Scalars["Float"];
-  amount: Scalars["Float"];
-  unit: Scalars["String"];
-  adjective: Scalars["String"];
-  optional: Scalars["Boolean"];
+  amount?: Maybe<Scalars["Float"]>;
+  unit?: Maybe<Scalars["String"]>;
+  adjective?: Maybe<Scalars["String"]>;
+  optional?: Maybe<Scalars["Boolean"]>;
 };
 
 export type SectionInput = {

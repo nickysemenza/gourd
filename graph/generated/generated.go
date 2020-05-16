@@ -448,10 +448,10 @@ input SectionInstructionInput {
 input SectionIngredientInput {
   name: String!
   grams: Float!
-  amount: Float!
-  unit: String!
-  adjective: String!
-  optional: Boolean!
+  amount: Float
+  unit: String
+  adjective: String
+  optional: Boolean
 }
 
 input SectionInput {
@@ -2676,25 +2676,25 @@ func (ec *executionContext) unmarshalInputSectionIngredientInput(ctx context.Con
 			}
 		case "amount":
 			var err error
-			it.Amount, err = ec.unmarshalNFloat2float64(ctx, v)
+			it.Amount, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "unit":
 			var err error
-			it.Unit, err = ec.unmarshalNString2string(ctx, v)
+			it.Unit, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "adjective":
 			var err error
-			it.Adjective, err = ec.unmarshalNString2string(ctx, v)
+			it.Adjective, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 		case "optional":
 			var err error
-			it.Optional, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.Optional, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4034,6 +4034,29 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalOFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	return graphql.MarshalFloat(v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOFloat2float64(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOFloat2float64(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {

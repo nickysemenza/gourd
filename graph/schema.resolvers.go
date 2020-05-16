@@ -70,10 +70,10 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
 				Name:      i.Name,
 				Grams:     zero.FloatFrom(i.Grams),
-				Amount:    zero.FloatFrom(i.Amount),
-				Unit:      zero.StringFrom(i.Unit),
-				Adjective: zero.StringFrom(i.Adjective),
-				Optional:  zero.BoolFrom(i.Optional),
+				Amount:    zero.FloatFromPtr(i.Amount),
+				Unit:      zero.StringFromPtr(i.Unit),
+				Adjective: zero.StringFromPtr(i.Adjective),
+				Optional:  zero.BoolFromPtr(i.Optional),
 			})
 		}
 		dbr.Sections = append(dbr.Sections, dbs)
