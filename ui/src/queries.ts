@@ -78,6 +78,7 @@ const _ = [
     query getFood($fdc_id: Int!) {
       food(fdc_id: $fdc_id) {
         description
+        data_type
         category {
           code
           description
