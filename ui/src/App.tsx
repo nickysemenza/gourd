@@ -12,6 +12,7 @@ import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
 import IngredientList from "./pages/IngredientList";
 import CreateRecipe from "./pages/CreateRecipe";
+import Food from "./pages/Food";
 
 function App() {
   const client = new ApolloClient({
@@ -41,6 +42,9 @@ function App() {
               </Route>
               <Route path="/create">
                 <CreateRecipe />
+              </Route>
+              <Route path="/food">
+                <Food />
               </Route>
               <Route path="/">
                 <Test />

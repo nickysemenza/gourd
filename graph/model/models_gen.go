@@ -6,6 +6,11 @@ type IngredientInfo interface {
 	IsIngredientInfo()
 }
 
+type FoodNutrientDerivation struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
 type NewRecipe struct {
 	Name string `json:"name"`
 }

@@ -1,5 +1,7 @@
 package model
 
+import "gopkg.in/guregu/null.v3/zero"
+
 // Recipe has section IDs
 type Recipe struct {
 	UUID         string   `json:"uuid"`
@@ -38,3 +40,28 @@ type Ingredient struct {
 
 func (i Ingredient) IsIngredientInfo() {}
 func (r Recipe) IsIngredientInfo()     {}
+
+type FoodNutrient struct {
+	NutrientID int      `json:"nutrient" db:"nutrient_id"`
+	Amount     float64  `json:"amount" db:"amount"`
+	DataPoints zero.Int `json:"data_points" db:"data_points"`
+}
+
+type Nutrient struct {
+	ID       int    `json:"id" db:"id"`
+	Name     string `json:"name" db:"name"`
+	UnitName string `json:"unit_name" db:"unit_name"`
+}
+
+type Food struct {
+	FdcID       int      `json:"fdc_id" db:"fdc_id"`
+	Description string   `json:"description" db:"description"`
+	DataType    string   `json:"data_type" db:"data_type"`
+	CategoryID  zero.Int `json:"category" db:"food_category_id"`
+	NutrientIDs []int    `json:"nutrients"`
+}
+
+type FoodCategory struct {
+	Code        string `json:"code" db:"code"`
+	Description string `json:"description" db:"description"`
+}

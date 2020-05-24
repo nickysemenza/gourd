@@ -38,7 +38,7 @@ docker-push: docker-build
 	docker push $(IMAGE):latest
 
 dev-db:
-	PGPASSWORD=food pgcli -h localhost -p 5555 -U food food
+	pgcli postgres://food:food@localhost:5555/food
 new-migrate/%: bin/migrate
 	mkdir -p migrations
 	./bin/migrate create -dir migrations -ext sql $(@F)

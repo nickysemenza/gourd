@@ -67,6 +67,36 @@ input NewRecipe {
   name: String!
 }
 
+type Nutrient {
+  id: Int!
+  name: String!
+  unit_name: String!
+}
+
+type FoodNutrientDerivation {
+  code: String!
+  description: String!
+}
+
+type FoodNutrient {
+  nutrient: Nutrient!
+  amount: Float!
+  data_points: Int!
+}
+
+type FoodCategory {
+  code: String!
+  description: String!
+}
+
+type Food {
+  fdc_id: Int!
+  description: String!
+  data_type: String!
+  category: FoodCategory
+  nutrients: [FoodNutrient!]!
+}
+
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
@@ -75,4 +105,5 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
+  food(fdc_id: Int!): Food
 }

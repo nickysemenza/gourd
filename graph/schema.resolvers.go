@@ -17,6 +17,25 @@ import (
 	"gopkg.in/guregu/null.v3/zero"
 )
 
+func (r *foodResolver) Category(ctx context.Context, obj *model.Food) (*model.FoodCategory, error) {
+	if !obj.CategoryID.Valid {
+		return nil, nil
+	}
+	return r.DB.GetCategory(ctx, obj.CategoryID.Int64)
+}
+
+func (r *foodResolver) Nutrients(ctx context.Context, obj *model.Food) ([]*model.FoodNutrient, error) {
+	return r.DB.GetFoodNutrients(ctx, obj.FdcID)
+}
+
+func (r *foodNutrientResolver) Nutrient(ctx context.Context, obj *model.FoodNutrient) (*model.Nutrient, error) {
+	return r.DB.GetNutrient(ctx, obj.NutrientID)
+}
+
+func (r *foodNutrientResolver) DataPoints(ctx context.Context, obj *model.FoodNutrient) (int, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *ingredientResolver) Recipes(ctx context.Context, obj *model.Ingredient) ([]*model.Recipe, error) {
 	dbr, err := r.DB.GetRecipesWithIngredient(ctx, obj.UUID)
 	if err != nil {
@@ -128,6 +147,10 @@ func (r *queryResolver) Ingredients(ctx context.Context) ([]*model.Ingredient, e
 	return ingredients, nil
 }
 
+func (r *queryResolver) Food(ctx context.Context, fdcID int) (*model.Food, error) {
+	return r.DB.GetFood(ctx, fdcID)
+}
+
 func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error) {
 	sections, err := r.DB.GetRecipeSections(ctx, obj.UUID)
 	if err != nil {
@@ -199,6 +222,12 @@ func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.Section
 	return r2, nil
 }
 
+// Food returns generated.FoodResolver implementation.
+func (r *Resolver) Food() generated.FoodResolver { return &foodResolver{r} }
+
+// FoodNutrient returns generated.FoodNutrientResolver implementation.
+func (r *Resolver) FoodNutrient() generated.FoodNutrientResolver { return &foodNutrientResolver{r} }
+
 // Ingredient returns generated.IngredientResolver implementation.
 func (r *Resolver) Ingredient() generated.IngredientResolver { return &ingredientResolver{r} }
 
@@ -219,6 +248,8 @@ func (r *Resolver) SectionIngredient() generated.SectionIngredientResolver {
 	return &sectionIngredientResolver{r}
 }
 
+type foodResolver struct{ *Resolver }
+type foodNutrientResolver struct{ *Resolver }
 type ingredientResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
