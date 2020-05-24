@@ -241,7 +241,7 @@ export type GetFoodQueryVariables = {
 
 export type GetFoodQuery = { __typename?: "Query" } & {
   food?: Maybe<
-    { __typename?: "Food" } & Pick<Food, "description"> & {
+    { __typename?: "Food" } & Pick<Food, "description" | "data_type"> & {
         category?: Maybe<
           { __typename?: "FoodCategory" } & Pick<
             FoodCategory,
@@ -820,6 +820,7 @@ export const GetFoodDocument = gql`
   query getFood($fdc_id: Int!) {
     food(fdc_id: $fdc_id) {
       description
+      data_type
       category {
         code
         description
