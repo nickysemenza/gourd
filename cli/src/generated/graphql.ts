@@ -80,6 +80,36 @@ export type NewRecipe = {
   name: Scalars["String"];
 };
 
+export type Nutrient = {
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  unit_name: Scalars["String"];
+};
+
+export type FoodNutrientDerivation = {
+  code: Scalars["String"];
+  description: Scalars["String"];
+};
+
+export type FoodNutrient = {
+  nutrient: Nutrient;
+  amount: Scalars["Float"];
+  data_points: Scalars["Int"];
+};
+
+export type FoodCategory = {
+  code: Scalars["String"];
+  description: Scalars["String"];
+};
+
+export type Food = {
+  fdc_id: Scalars["Int"];
+  description: Scalars["String"];
+  data_type: Scalars["String"];
+  category?: Maybe<FoodCategory>;
+  nutrients: Array<FoodNutrient>;
+};
+
 export type Mutation = {
   createRecipe: Recipe;
   updateRecipe: Recipe;
@@ -97,10 +127,15 @@ export type Query = {
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
   ingredients: Array<Ingredient>;
+  food?: Maybe<Food>;
 };
 
 export type QueryRecipeArgs = {
   uuid: Scalars["String"];
+};
+
+export type QueryFoodArgs = {
+  fdc_id: Scalars["Int"];
 };
 
 export type GetRecipeByUuidQueryVariables = {

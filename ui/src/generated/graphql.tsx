@@ -89,6 +89,41 @@ export type NewRecipe = {
   name: Scalars["String"];
 };
 
+export type Nutrient = {
+  __typename?: "Nutrient";
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  unit_name: Scalars["String"];
+};
+
+export type FoodNutrientDerivation = {
+  __typename?: "FoodNutrientDerivation";
+  code: Scalars["String"];
+  description: Scalars["String"];
+};
+
+export type FoodNutrient = {
+  __typename?: "FoodNutrient";
+  nutrient: Nutrient;
+  amount: Scalars["Float"];
+  data_points: Scalars["Int"];
+};
+
+export type FoodCategory = {
+  __typename?: "FoodCategory";
+  code: Scalars["String"];
+  description: Scalars["String"];
+};
+
+export type Food = {
+  __typename?: "Food";
+  fdc_id: Scalars["Int"];
+  description: Scalars["String"];
+  data_type: Scalars["String"];
+  category?: Maybe<FoodCategory>;
+  nutrients: Array<FoodNutrient>;
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   createRecipe: Recipe;
@@ -108,10 +143,15 @@ export type Query = {
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
   ingredients: Array<Ingredient>;
+  food?: Maybe<Food>;
 };
 
 export type QueryRecipeArgs = {
   uuid: Scalars["String"];
+};
+
+export type QueryFoodArgs = {
+  fdc_id: Scalars["Int"];
 };
 
 export type GetRecipeByUuidQueryVariables = {
@@ -190,6 +230,31 @@ export type GetIngredientsQuery = { __typename?: "Query" } & {
     { __typename?: "Ingredient" } & Pick<Ingredient, "uuid" | "name"> & {
         recipes?: Maybe<
           Array<{ __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">>
+        >;
+      }
+  >;
+};
+
+export type GetFoodQueryVariables = {
+  fdc_id: Scalars["Int"];
+};
+
+export type GetFoodQuery = { __typename?: "Query" } & {
+  food?: Maybe<
+    { __typename?: "Food" } & Pick<Food, "description"> & {
+        category?: Maybe<
+          { __typename?: "FoodCategory" } & Pick<
+            FoodCategory,
+            "code" | "description"
+          >
+        >;
+        nutrients: Array<
+          { __typename?: "FoodNutrient" } & Pick<FoodNutrient, "amount"> & {
+              nutrient: { __typename?: "Nutrient" } & Pick<
+                Nutrient,
+                "name" | "unit_name"
+              >;
+            }
         >;
       }
   >;
@@ -750,4 +815,115 @@ export type GetIngredientsLazyQueryHookResult = ReturnType<
 export type GetIngredientsQueryResult = ApolloReactCommon.QueryResult<
   GetIngredientsQuery,
   GetIngredientsQueryVariables
+>;
+export const GetFoodDocument = gql`
+  query getFood($fdc_id: Int!) {
+    food(fdc_id: $fdc_id) {
+      description
+      category {
+        code
+        description
+      }
+      nutrients {
+        nutrient {
+          name
+          unit_name
+        }
+        amount
+      }
+    }
+  }
+`;
+export type GetFoodComponentProps = Omit<
+  ApolloReactComponents.QueryComponentOptions<
+    GetFoodQuery,
+    GetFoodQueryVariables
+  >,
+  "query"
+> &
+  ({ variables: GetFoodQueryVariables; skip?: boolean } | { skip: boolean });
+
+export const GetFoodComponent = (props: GetFoodComponentProps) => (
+  <ApolloReactComponents.Query<GetFoodQuery, GetFoodQueryVariables>
+    query={GetFoodDocument}
+    {...props}
+  />
+);
+
+export type GetFoodProps<
+  TChildProps = {},
+  TDataName extends string = "data"
+> = {
+  [key in TDataName]: ApolloReactHoc.DataValue<
+    GetFoodQuery,
+    GetFoodQueryVariables
+  >;
+} &
+  TChildProps;
+export function withGetFood<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "data"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    GetFoodQuery,
+    GetFoodQueryVariables,
+    GetFoodProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withQuery<
+    TProps,
+    GetFoodQuery,
+    GetFoodQueryVariables,
+    GetFoodProps<TChildProps, TDataName>
+  >(GetFoodDocument, {
+    alias: "getFood",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useGetFoodQuery__
+ *
+ * To run a query within a React component, call `useGetFoodQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFoodQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFoodQuery({
+ *   variables: {
+ *      fdc_id: // value for 'fdc_id'
+ *   },
+ * });
+ */
+export function useGetFoodQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    GetFoodQuery,
+    GetFoodQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<GetFoodQuery, GetFoodQueryVariables>(
+    GetFoodDocument,
+    baseOptions
+  );
+}
+export function useGetFoodLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    GetFoodQuery,
+    GetFoodQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<GetFoodQuery, GetFoodQueryVariables>(
+    GetFoodDocument,
+    baseOptions
+  );
+}
+export type GetFoodQueryHookResult = ReturnType<typeof useGetFoodQuery>;
+export type GetFoodLazyQueryHookResult = ReturnType<typeof useGetFoodLazyQuery>;
+export type GetFoodQueryResult = ApolloReactCommon.QueryResult<
+  GetFoodQuery,
+  GetFoodQueryVariables
 >;

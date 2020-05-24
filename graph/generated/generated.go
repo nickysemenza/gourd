@@ -36,6 +36,8 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Food() FoodResolver
+	FoodNutrient() FoodNutrientResolver
 	Ingredient() IngredientResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
@@ -48,6 +50,30 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Food struct {
+		Category    func(childComplexity int) int
+		DataType    func(childComplexity int) int
+		Description func(childComplexity int) int
+		FdcID       func(childComplexity int) int
+		Nutrients   func(childComplexity int) int
+	}
+
+	FoodCategory struct {
+		Code        func(childComplexity int) int
+		Description func(childComplexity int) int
+	}
+
+	FoodNutrient struct {
+		Amount     func(childComplexity int) int
+		DataPoints func(childComplexity int) int
+		Nutrient   func(childComplexity int) int
+	}
+
+	FoodNutrientDerivation struct {
+		Code        func(childComplexity int) int
+		Description func(childComplexity int) int
+	}
+
 	Ingredient struct {
 		Name    func(childComplexity int) int
 		Recipes func(childComplexity int) int
@@ -59,7 +85,14 @@ type ComplexityRoot struct {
 		UpdateRecipe func(childComplexity int, recipe *model.RecipeInput) int
 	}
 
+	Nutrient struct {
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		UnitName func(childComplexity int) int
+	}
+
 	Query struct {
+		Food        func(childComplexity int, fdcID int) int
 		Ingredients func(childComplexity int) int
 		Recipe      func(childComplexity int, uuid string) int
 		Recipes     func(childComplexity int) int
@@ -96,6 +129,15 @@ type ComplexityRoot struct {
 	}
 }
 
+type FoodResolver interface {
+	Category(ctx context.Context, obj *model.Food) (*model.FoodCategory, error)
+	Nutrients(ctx context.Context, obj *model.Food) ([]*model.FoodNutrient, error)
+}
+type FoodNutrientResolver interface {
+	Nutrient(ctx context.Context, obj *model.FoodNutrient) (*model.Nutrient, error)
+
+	DataPoints(ctx context.Context, obj *model.FoodNutrient) (int, error)
+}
 type IngredientResolver interface {
 	Recipes(ctx context.Context, obj *model.Ingredient) ([]*model.Recipe, error)
 }
@@ -107,6 +149,7 @@ type QueryResolver interface {
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
 	Recipe(ctx context.Context, uuid string) (*model.Recipe, error)
 	Ingredients(ctx context.Context) ([]*model.Ingredient, error)
+	Food(ctx context.Context, fdcID int) (*model.Food, error)
 }
 type RecipeResolver interface {
 	Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error)
@@ -133,6 +176,90 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Food.category":
+		if e.complexity.Food.Category == nil {
+			break
+		}
+
+		return e.complexity.Food.Category(childComplexity), true
+
+	case "Food.data_type":
+		if e.complexity.Food.DataType == nil {
+			break
+		}
+
+		return e.complexity.Food.DataType(childComplexity), true
+
+	case "Food.description":
+		if e.complexity.Food.Description == nil {
+			break
+		}
+
+		return e.complexity.Food.Description(childComplexity), true
+
+	case "Food.fdc_id":
+		if e.complexity.Food.FdcID == nil {
+			break
+		}
+
+		return e.complexity.Food.FdcID(childComplexity), true
+
+	case "Food.nutrients":
+		if e.complexity.Food.Nutrients == nil {
+			break
+		}
+
+		return e.complexity.Food.Nutrients(childComplexity), true
+
+	case "FoodCategory.code":
+		if e.complexity.FoodCategory.Code == nil {
+			break
+		}
+
+		return e.complexity.FoodCategory.Code(childComplexity), true
+
+	case "FoodCategory.description":
+		if e.complexity.FoodCategory.Description == nil {
+			break
+		}
+
+		return e.complexity.FoodCategory.Description(childComplexity), true
+
+	case "FoodNutrient.amount":
+		if e.complexity.FoodNutrient.Amount == nil {
+			break
+		}
+
+		return e.complexity.FoodNutrient.Amount(childComplexity), true
+
+	case "FoodNutrient.data_points":
+		if e.complexity.FoodNutrient.DataPoints == nil {
+			break
+		}
+
+		return e.complexity.FoodNutrient.DataPoints(childComplexity), true
+
+	case "FoodNutrient.nutrient":
+		if e.complexity.FoodNutrient.Nutrient == nil {
+			break
+		}
+
+		return e.complexity.FoodNutrient.Nutrient(childComplexity), true
+
+	case "FoodNutrientDerivation.code":
+		if e.complexity.FoodNutrientDerivation.Code == nil {
+			break
+		}
+
+		return e.complexity.FoodNutrientDerivation.Code(childComplexity), true
+
+	case "FoodNutrientDerivation.description":
+		if e.complexity.FoodNutrientDerivation.Description == nil {
+			break
+		}
+
+		return e.complexity.FoodNutrientDerivation.Description(childComplexity), true
 
 	case "Ingredient.name":
 		if e.complexity.Ingredient.Name == nil {
@@ -178,6 +305,39 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateRecipe(childComplexity, args["recipe"].(*model.RecipeInput)), true
+
+	case "Nutrient.id":
+		if e.complexity.Nutrient.ID == nil {
+			break
+		}
+
+		return e.complexity.Nutrient.ID(childComplexity), true
+
+	case "Nutrient.name":
+		if e.complexity.Nutrient.Name == nil {
+			break
+		}
+
+		return e.complexity.Nutrient.Name(childComplexity), true
+
+	case "Nutrient.unit_name":
+		if e.complexity.Nutrient.UnitName == nil {
+			break
+		}
+
+		return e.complexity.Nutrient.UnitName(childComplexity), true
+
+	case "Query.food":
+		if e.complexity.Query.Food == nil {
+			break
+		}
+
+		args, err := ec.field_Query_food_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Food(childComplexity, args["fdc_id"].(int)), true
 
 	case "Query.ingredients":
 		if e.complexity.Query.Ingredients == nil {
@@ -464,6 +624,36 @@ input NewRecipe {
   name: String!
 }
 
+type Nutrient {
+  id: Int!
+  name: String!
+  unit_name: String!
+}
+
+type FoodNutrientDerivation {
+  code: String!
+  description: String!
+}
+
+type FoodNutrient {
+  nutrient: Nutrient!
+  amount: Float!
+  data_points: Int!
+}
+
+type FoodCategory {
+  code: String!
+  description: String!
+}
+
+type Food {
+  fdc_id: Int!
+  description: String!
+  data_type: String!
+  category: FoodCategory
+  nutrients: [FoodNutrient!]!
+}
+
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
@@ -472,6 +662,7 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
+  food(fdc_id: Int!): Food
 }
 `, BuiltIn: false},
 }
@@ -520,6 +711,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_food_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["fdc_id"]; ok {
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["fdc_id"] = arg0
 	return args, nil
 }
 
@@ -572,6 +777,411 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Food_fdc_id(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Food",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FdcID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Food_description(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Food",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Food_data_type(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Food",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DataType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Food_category(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Food",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Food().Category(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.FoodCategory)
+	fc.Result = res
+	return ec.marshalOFoodCategory2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodCategory(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Food_nutrients(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Food",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Food().Nutrients(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.FoodNutrient)
+	fc.Result = res
+	return ec.marshalNFoodNutrient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrientᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodCategory_code(ctx context.Context, field graphql.CollectedField, obj *model.FoodCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodCategory",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodCategory_description(ctx context.Context, field graphql.CollectedField, obj *model.FoodCategory) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodCategory",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodNutrient_nutrient(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodNutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.FoodNutrient().Nutrient(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Nutrient)
+	fc.Result = res
+	return ec.marshalNNutrient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐNutrient(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodNutrient_amount(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodNutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodNutrient_data_points(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodNutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.FoodNutrient().DataPoints(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodNutrientDerivation_code(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrientDerivation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodNutrientDerivation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Code, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FoodNutrientDerivation_description(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrientDerivation) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "FoodNutrientDerivation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Ingredient_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Ingredient) (ret graphql.Marshaler) {
 	defer func() {
@@ -754,6 +1364,108 @@ func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field gr
 	return ec.marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Nutrient_id(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Nutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Nutrient_name(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Nutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Nutrient_unit_name(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Nutrient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnitName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_recipes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -858,6 +1570,44 @@ func (ec *executionContext) _Query_ingredients(ctx context.Context, field graphq
 	res := resTmp.([]*model.Ingredient)
 	fc.Result = res
 	return ec.marshalNIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredientᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_food(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_food_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Food(rctx, args["fdc_id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Food)
+	fc.Result = res
+	return ec.marshalOFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2783,6 +3533,187 @@ func (ec *executionContext) _IngredientInfo(ctx context.Context, sel ast.Selecti
 
 // region    **************************** object.gotpl ****************************
 
+var foodImplementors = []string{"Food"}
+
+func (ec *executionContext) _Food(ctx context.Context, sel ast.SelectionSet, obj *model.Food) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, foodImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Food")
+		case "fdc_id":
+			out.Values[i] = ec._Food_fdc_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "description":
+			out.Values[i] = ec._Food_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "data_type":
+			out.Values[i] = ec._Food_data_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "category":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Food_category(ctx, field, obj)
+				return res
+			})
+		case "nutrients":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Food_nutrients(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var foodCategoryImplementors = []string{"FoodCategory"}
+
+func (ec *executionContext) _FoodCategory(ctx context.Context, sel ast.SelectionSet, obj *model.FoodCategory) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, foodCategoryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FoodCategory")
+		case "code":
+			out.Values[i] = ec._FoodCategory_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._FoodCategory_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var foodNutrientImplementors = []string{"FoodNutrient"}
+
+func (ec *executionContext) _FoodNutrient(ctx context.Context, sel ast.SelectionSet, obj *model.FoodNutrient) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, foodNutrientImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FoodNutrient")
+		case "nutrient":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._FoodNutrient_nutrient(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "amount":
+			out.Values[i] = ec._FoodNutrient_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "data_points":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._FoodNutrient_data_points(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var foodNutrientDerivationImplementors = []string{"FoodNutrientDerivation"}
+
+func (ec *executionContext) _FoodNutrientDerivation(ctx context.Context, sel ast.SelectionSet, obj *model.FoodNutrientDerivation) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, foodNutrientDerivationImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FoodNutrientDerivation")
+		case "code":
+			out.Values[i] = ec._FoodNutrientDerivation_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._FoodNutrientDerivation_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var ingredientImplementors = []string{"Ingredient", "IngredientInfo"}
 
 func (ec *executionContext) _Ingredient(ctx context.Context, sel ast.SelectionSet, obj *model.Ingredient) graphql.Marshaler {
@@ -2862,6 +3793,43 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var nutrientImplementors = []string{"Nutrient"}
+
+func (ec *executionContext) _Nutrient(ctx context.Context, sel ast.SelectionSet, obj *model.Nutrient) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, nutrientImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Nutrient")
+		case "id":
+			out.Values[i] = ec._Nutrient_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Nutrient_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unit_name":
+			out.Values[i] = ec._Nutrient_unit_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2914,6 +3882,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "food":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_food(ctx, field)
 				return res
 			})
 		case "__type":
@@ -3418,6 +4397,57 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) marshalNFoodNutrient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrient(ctx context.Context, sel ast.SelectionSet, v model.FoodNutrient) graphql.Marshaler {
+	return ec._FoodNutrient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFoodNutrient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.FoodNutrient) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFoodNutrient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrient(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNFoodNutrient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrient(ctx context.Context, sel ast.SelectionSet, v *model.FoodNutrient) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._FoodNutrient(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v model.Ingredient) graphql.Marshaler {
 	return ec._Ingredient(ctx, sel, &v)
 }
@@ -3491,6 +4521,20 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNNutrient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐNutrient(ctx context.Context, sel ast.SelectionSet, v model.Nutrient) graphql.Marshaler {
+	return ec._Nutrient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNNutrient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐNutrient(ctx context.Context, sel ast.SelectionSet, v *model.Nutrient) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Nutrient(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNRecipe2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipe(ctx context.Context, sel ast.SelectionSet, v model.Recipe) graphql.Marshaler {
@@ -4057,6 +5101,28 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOFloat2float64(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOFood2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx context.Context, sel ast.SelectionSet, v model.Food) graphql.Marshaler {
+	return ec._Food(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx context.Context, sel ast.SelectionSet, v *model.Food) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Food(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOFoodCategory2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodCategory(ctx context.Context, sel ast.SelectionSet, v model.FoodCategory) graphql.Marshaler {
+	return ec._FoodCategory(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOFoodCategory2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodCategory(ctx context.Context, sel ast.SelectionSet, v *model.FoodCategory) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._FoodCategory(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {

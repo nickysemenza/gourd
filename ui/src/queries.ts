@@ -74,4 +74,22 @@ const _ = [
       }
     }
   `,
+  gql`
+    query getFood($fdc_id: Int!) {
+      food(fdc_id: $fdc_id) {
+        description
+        category {
+          code
+          description
+        }
+        nutrients {
+          nutrient {
+            name
+            unit_name
+          }
+          amount
+        }
+      }
+    }
+  `,
 ];
