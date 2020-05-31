@@ -101,9 +101,26 @@ type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
 }
+
+enum FoodDataType {
+  foundation_food
+  sample_food
+  market_acquisition
+  survey_fndds_food
+  sub_sample_food
+  agricultural_acquisition
+  sr_legacy_food
+  branded_food
+}
+
 type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
   food(fdc_id: Int!): Food
+  foods(
+    search_query: String!
+    data_type: FoodDataType
+    food_category_id: Int
+  ): [Food!]
 }

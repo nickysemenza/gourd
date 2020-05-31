@@ -2,6 +2,12 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type IngredientInfo interface {
 	IsIngredientInfo()
 }
@@ -45,4 +51,57 @@ type SectionInstruction struct {
 
 type SectionInstructionInput struct {
 	Instruction string `json:"instruction"`
+}
+
+type FoodDataType string
+
+const (
+	FoodDataTypeFoundationFood          FoodDataType = "foundation_food"
+	FoodDataTypeSampleFood              FoodDataType = "sample_food"
+	FoodDataTypeMarketAcquisition       FoodDataType = "market_acquisition"
+	FoodDataTypeSurveyFnddsFood         FoodDataType = "survey_fndds_food"
+	FoodDataTypeSubSampleFood           FoodDataType = "sub_sample_food"
+	FoodDataTypeAgriculturalAcquisition FoodDataType = "agricultural_acquisition"
+	FoodDataTypeSrLegacyFood            FoodDataType = "sr_legacy_food"
+	FoodDataTypeBrandedFood             FoodDataType = "branded_food"
+)
+
+var AllFoodDataType = []FoodDataType{
+	FoodDataTypeFoundationFood,
+	FoodDataTypeSampleFood,
+	FoodDataTypeMarketAcquisition,
+	FoodDataTypeSurveyFnddsFood,
+	FoodDataTypeSubSampleFood,
+	FoodDataTypeAgriculturalAcquisition,
+	FoodDataTypeSrLegacyFood,
+	FoodDataTypeBrandedFood,
+}
+
+func (e FoodDataType) IsValid() bool {
+	switch e {
+	case FoodDataTypeFoundationFood, FoodDataTypeSampleFood, FoodDataTypeMarketAcquisition, FoodDataTypeSurveyFnddsFood, FoodDataTypeSubSampleFood, FoodDataTypeAgriculturalAcquisition, FoodDataTypeSrLegacyFood, FoodDataTypeBrandedFood:
+		return true
+	}
+	return false
+}
+
+func (e FoodDataType) String() string {
+	return string(e)
+}
+
+func (e *FoodDataType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FoodDataType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FoodDataType", str)
+	}
+	return nil
+}
+
+func (e FoodDataType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }

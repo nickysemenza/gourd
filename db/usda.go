@@ -61,6 +61,33 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*model.Food, error) {
 	return f, nil
 }
 
+//nolint: interfacer
+func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error) {
+	q := c.psql.Select(
+		"food_category_id",
+		"data_type",
+		"description",
+		"fdc_id",
+	).From("food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	if foodCategoryID != nil {
+		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
+	}
+	if dataType != nil {
+		q = q.Where(sq.Eq{"data_type": dataType.String()})
+	}
+	query, args, err := q.ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	res := []*model.Food{}
+	err = c.db.SelectContext(ctx, &res, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (c *Client) GetFoodNutrients(ctx context.Context, fdcID int) ([]*model.FoodNutrient, error) {
 	query, args, err := c.psql.Select(
 		"nutrient_id",

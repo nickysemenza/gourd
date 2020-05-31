@@ -93,6 +93,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Food        func(childComplexity int, fdcID int) int
+		Foods       func(childComplexity int, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) int
 		Ingredients func(childComplexity int) int
 		Recipe      func(childComplexity int, uuid string) int
 		Recipes     func(childComplexity int) int
@@ -150,6 +151,7 @@ type QueryResolver interface {
 	Recipe(ctx context.Context, uuid string) (*model.Recipe, error)
 	Ingredients(ctx context.Context) ([]*model.Ingredient, error)
 	Food(ctx context.Context, fdcID int) (*model.Food, error)
+	Foods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error)
 }
 type RecipeResolver interface {
 	Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error)
@@ -338,6 +340,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Food(childComplexity, args["fdc_id"].(int)), true
+
+	case "Query.foods":
+		if e.complexity.Query.Foods == nil {
+			break
+		}
+
+		args, err := ec.field_Query_foods_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Foods(childComplexity, args["search_query"].(string), args["data_type"].(*model.FoodDataType), args["food_category_id"].(*int)), true
 
 	case "Query.ingredients":
 		if e.complexity.Query.Ingredients == nil {
@@ -658,11 +672,28 @@ type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
 }
+
+enum FoodDataType {
+  foundation_food
+  sample_food
+  market_acquisition
+  survey_fndds_food
+  sub_sample_food
+  agricultural_acquisition
+  sr_legacy_food
+  branded_food
+}
+
 type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
   food(fdc_id: Int!): Food
+  foods(
+    search_query: String!
+    data_type: FoodDataType
+    food_category_id: Int
+  ): [Food!]
 }
 `, BuiltIn: false},
 }
@@ -725,6 +756,36 @@ func (ec *executionContext) field_Query_food_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["fdc_id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_foods_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["search_query"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["search_query"] = arg0
+	var arg1 *model.FoodDataType
+	if tmp, ok := rawArgs["data_type"]; ok {
+		arg1, err = ec.unmarshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["data_type"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["food_category_id"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["food_category_id"] = arg2
 	return args, nil
 }
 
@@ -1608,6 +1669,44 @@ func (ec *executionContext) _Query_food(ctx context.Context, field graphql.Colle
 	res := resTmp.(*model.Food)
 	fc.Result = res
 	return ec.marshalOFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_foods(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_foods_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Foods(rctx, args["search_query"].(string), args["data_type"].(*model.FoodDataType), args["food_category_id"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Food)
+	fc.Result = res
+	return ec.marshalOFood2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3895,6 +3994,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				res = ec._Query_food(ctx, field)
 				return res
 			})
+		case "foods":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_foods(ctx, field)
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -4395,6 +4505,20 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNFood2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx context.Context, sel ast.SelectionSet, v model.Food) graphql.Marshaler {
+	return ec._Food(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx context.Context, sel ast.SelectionSet, v *model.Food) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Food(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFoodNutrient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrient(ctx context.Context, sel ast.SelectionSet, v model.FoodNutrient) graphql.Marshaler {
@@ -5107,6 +5231,46 @@ func (ec *executionContext) marshalOFood2githubᚗcomᚋnickysemenzaᚋfoodᚋgr
 	return ec._Food(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalOFood2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Food) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalOFood2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFood(ctx context.Context, sel ast.SelectionSet, v *model.Food) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5123,6 +5287,30 @@ func (ec *executionContext) marshalOFoodCategory2ᚖgithubᚗcomᚋnickysemenza�
 		return graphql.Null
 	}
 	return ec._FoodCategory(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, v interface{}) (model.FoodDataType, error) {
+	var res model.FoodDataType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalOFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, sel ast.SelectionSet, v model.FoodDataType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, v interface{}) (*model.FoodDataType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, sel ast.SelectionSet, v *model.FoodDataType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {

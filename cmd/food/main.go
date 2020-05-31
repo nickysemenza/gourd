@@ -66,7 +66,7 @@ func setupEnv() {
 	viper.SetDefault("DB_PASSWORD", "food")
 	viper.SetDefault("DB_DBNAME", "food")
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
-	viper.SetDefault("HTTP_PORT", 4242)
+	viper.SetDefault("PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "30s")
 
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
@@ -129,7 +129,7 @@ func main() {
 
 	s := server.Server{
 		Manager:     manager.New(dbClient),
-		HTTPPort:    viper.GetUint("HTTP_PORT"),
+		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 	}
