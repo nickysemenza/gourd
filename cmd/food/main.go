@@ -118,11 +118,11 @@ func main() {
 		"file://./migrations",
 		"postgres", driver)
 	if err != nil {
-		log.Fatal("oops:", err)
+		log.Fatalf("failed to initialize migrator: %v", err)
 	}
 	if err := m.Up(); err != nil {
 		if err != migrate.ErrNoChange {
-			log.Fatal("failed to migrate", err)
+			log.Fatalf("failed to migrate: %v", err)
 		}
 	}
 	log.Info("migrated")

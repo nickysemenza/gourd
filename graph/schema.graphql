@@ -92,7 +92,7 @@ type FoodCategory {
 type Food {
   fdc_id: Int!
   description: String!
-  data_type: String!
+  data_type: FoodDataType!
   category: FoodCategory
   nutrients: [FoodNutrient!]!
 }
