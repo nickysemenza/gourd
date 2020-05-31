@@ -36,6 +36,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
     <Box>
       <Heading>{food?.description}</Heading>
       <Text>{food?.data_type}</Text>
+      <Text>{fdc_id}</Text>
       <Debug data={food?.category} />
 
       <table>
@@ -43,7 +44,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
           .filter((n) => n.amount > 0.1)
           .map((n) => (
             <tr>
-              <td>{n.amount} </td>
+              <td>{n.amount.toFixed(2)} </td>
               <td>{n.nutrient.unit_name} </td>
               <td>{n.nutrient.name} </td>
             </tr>

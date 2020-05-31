@@ -123,11 +123,23 @@ export type MutationUpdateRecipeArgs = {
   recipe?: Maybe<RecipeInput>;
 };
 
+export enum FoodDataType {
+  FoundationFood = "foundation_food",
+  SampleFood = "sample_food",
+  MarketAcquisition = "market_acquisition",
+  SurveyFnddsFood = "survey_fndds_food",
+  SubSampleFood = "sub_sample_food",
+  AgriculturalAcquisition = "agricultural_acquisition",
+  SrLegacyFood = "sr_legacy_food",
+  BrandedFood = "branded_food",
+}
+
 export type Query = {
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
   ingredients: Array<Ingredient>;
   food?: Maybe<Food>;
+  foods?: Maybe<Array<Food>>;
 };
 
 export type QueryRecipeArgs = {
@@ -136,6 +148,12 @@ export type QueryRecipeArgs = {
 
 export type QueryFoodArgs = {
   fdc_id: Scalars["Int"];
+};
+
+export type QueryFoodsArgs = {
+  search_query: Scalars["String"];
+  data_type?: Maybe<FoodDataType>;
+  food_category_id?: Maybe<Scalars["Int"]>;
 };
 
 export type GetRecipeByUuidQueryVariables = {

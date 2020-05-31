@@ -151,6 +151,10 @@ func (r *queryResolver) Food(ctx context.Context, fdcID int) (*model.Food, error
 	return r.DB.GetFood(ctx, fdcID)
 }
 
+func (r *queryResolver) Foods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error) {
+	return r.DB.SearchFoods(ctx, searchQuery, dataType, foodCategoryID)
+}
+
 func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*model.Section, error) {
 	sections, err := r.DB.GetRecipeSections(ctx, obj.UUID)
 	if err != nil {
