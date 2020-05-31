@@ -663,7 +663,7 @@ type FoodCategory {
 type Food {
   fdc_id: Int!
   description: String!
-  data_type: String!
+  data_type: FoodDataType!
   category: FoodCategory
   nutrients: [FoodNutrient!]!
 }
@@ -936,9 +936,9 @@ func (ec *executionContext) _Food_data_type(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(model.FoodDataType)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Food_category(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
@@ -4519,6 +4519,15 @@ func (ec *executionContext) marshalNFood2ᚖgithubᚗcomᚋnickysemenzaᚋfood�
 		return graphql.Null
 	}
 	return ec._Food(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, v interface{}) (model.FoodDataType, error) {
+	var res model.FoodDataType
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNFoodDataType2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx context.Context, sel ast.SelectionSet, v model.FoodDataType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNFoodNutrient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodNutrient(ctx context.Context, sel ast.SelectionSet, v model.FoodNutrient) graphql.Marshaler {

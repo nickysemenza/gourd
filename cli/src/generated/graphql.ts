@@ -105,7 +105,7 @@ export type FoodCategory = {
 export type Food = {
   fdc_id: Scalars["Int"];
   description: Scalars["String"];
-  data_type: Scalars["String"];
+  data_type: FoodDataType;
   category?: Maybe<FoodCategory>;
   nutrients: Array<FoodNutrient>;
 };

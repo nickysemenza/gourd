@@ -54,11 +54,11 @@ type Nutrient struct {
 }
 
 type Food struct {
-	FdcID       int      `json:"fdc_id" db:"fdc_id"`
-	Description string   `json:"description" db:"description"`
-	DataType    string   `json:"data_type" db:"data_type"`
-	CategoryID  zero.Int `json:"category" db:"food_category_id"`
-	NutrientIDs []int    `json:"nutrients"`
+	FdcID       int          `json:"fdc_id" db:"fdc_id"`
+	Description string       `json:"description" db:"description"`
+	DataType    FoodDataType `json:"data_type" db:"data_type"`
+	CategoryID  zero.Int     `json:"category" db:"food_category_id"`
+	NutrientIDs []int        `json:"nutrients"`
 }
 
 type FoodCategory struct {
