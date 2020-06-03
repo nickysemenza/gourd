@@ -10,7 +10,7 @@ const RecipeCard: React.FC<Props> = ({ recipe }) => (
     <Heading fontSize={[4, 5, 6]} color="secondary" data-cy="recipe-name">
       {recipe.name}
     </Heading>
-    Makes x {recipe.unit}. {recipe.total_minutes} minutes.
+    Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
   </Box>
 );
 export default RecipeCard;

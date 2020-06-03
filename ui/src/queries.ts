@@ -7,7 +7,7 @@ const _ = [
       recipe(uuid: $uuid) {
         uuid
         name
-        total_minutes
+        totalMinutes
         unit
         sections {
           minutes
@@ -41,7 +41,7 @@ const _ = [
       recipes {
         uuid
         name
-        total_minutes
+        totalMinutes
         unit
       }
     }
@@ -76,9 +76,9 @@ const _ = [
   `,
   gql`
     query getFood($fdc_id: Int!) {
-      food(fdc_id: $fdc_id) {
+      food(fdcId: $fdc_id) {
         description
-        data_type
+        dataType
         category {
           code
           description
@@ -86,7 +86,7 @@ const _ = [
         nutrients {
           nutrient {
             name
-            unit_name
+            unitName
           }
           amount
         }

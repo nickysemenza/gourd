@@ -2,7 +2,7 @@ query getRecipeByUUID($uuid: String!) {
   recipe(uuid: $uuid) {
     uuid
     name
-    total_minutes
+    totalMinutes
     unit
     sections {
       minutes

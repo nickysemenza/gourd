@@ -428,7 +428,7 @@
             "deprecationReason": null
           },
           {
-            "name": "total_minutes",
+            "name": "totalMinutes",
             "description": null,
             "args": [],
             "type": {
@@ -524,7 +524,7 @@
             "defaultValue": null
           },
           {
-            "name": "total_minutes",
+            "name": "totalMinutes",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -802,7 +802,7 @@
             "deprecationReason": null
           },
           {
-            "name": "unit_name",
+            "name": "unitName",
             "description": null,
             "args": [],
             "type": {
@@ -904,7 +904,7 @@
             "deprecationReason": null
           },
           {
-            "name": "data_points",
+            "name": "dataPoints",
             "description": null,
             "args": [],
             "type": {
@@ -974,7 +974,7 @@
         "description": null,
         "fields": [
           {
-            "name": "fdc_id",
+            "name": "fdcId",
             "description": null,
             "args": [],
             "type": {
@@ -1006,7 +1006,7 @@
             "deprecationReason": null
           },
           {
-            "name": "data_type",
+            "name": "dataType",
             "description": null,
             "args": [],
             "type": {
@@ -1272,7 +1272,7 @@
             "description": null,
             "args": [
               {
-                "name": "fdc_id",
+                "name": "fdcId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -1299,7 +1299,7 @@
             "description": null,
             "args": [
               {
-                "name": "search_query",
+                "name": "searchQuery",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -1313,7 +1313,7 @@
                 "defaultValue": null
               },
               {
-                "name": "data_type",
+                "name": "dataType",
                 "description": null,
                 "type": {
                   "kind": "ENUM",
@@ -1323,7 +1323,7 @@
                 "defaultValue": null
               },
               {
-                "name": "food_category_id",
+                "name": "foodCategoryID",
                 "description": null,
                 "type": {
                   "kind": "SCALAR",

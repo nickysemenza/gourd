@@ -186,7 +186,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Food.Category(childComplexity), true
 
-	case "Food.data_type":
+	case "Food.dataType":
 		if e.complexity.Food.DataType == nil {
 			break
 		}
@@ -200,7 +200,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Food.Description(childComplexity), true
 
-	case "Food.fdc_id":
+	case "Food.fdcId":
 		if e.complexity.Food.FdcID == nil {
 			break
 		}
@@ -235,7 +235,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.FoodNutrient.Amount(childComplexity), true
 
-	case "FoodNutrient.data_points":
+	case "FoodNutrient.dataPoints":
 		if e.complexity.FoodNutrient.DataPoints == nil {
 			break
 		}
@@ -322,7 +322,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Nutrient.Name(childComplexity), true
 
-	case "Nutrient.unit_name":
+	case "Nutrient.unitName":
 		if e.complexity.Nutrient.UnitName == nil {
 			break
 		}
@@ -339,7 +339,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Food(childComplexity, args["fdc_id"].(int)), true
+		return e.complexity.Query.Food(childComplexity, args["fdcId"].(int)), true
 
 	case "Query.foods":
 		if e.complexity.Query.Foods == nil {
@@ -351,7 +351,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Foods(childComplexity, args["search_query"].(string), args["data_type"].(*model.FoodDataType), args["food_category_id"].(*int)), true
+		return e.complexity.Query.Foods(childComplexity, args["searchQuery"].(string), args["dataType"].(*model.FoodDataType), args["foodCategoryID"].(*int)), true
 
 	case "Query.ingredients":
 		if e.complexity.Query.Ingredients == nil {
@@ -393,7 +393,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Recipe.Sections(childComplexity), true
 
-	case "Recipe.total_minutes":
+	case "Recipe.totalMinutes":
 		if e.complexity.Recipe.TotalMinutes == nil {
 			break
 		}
@@ -602,7 +602,7 @@ type Section {
 type Recipe {
   uuid: String!
   name: String!
-  total_minutes: Int!
+  totalMinutes: Int!
   unit: String!
   sections: [Section!]!
 }
@@ -610,7 +610,7 @@ type Recipe {
 input RecipeInput {
   uuid: String!
   name: String!
-  total_minutes: Int
+  totalMinutes: Int
   unit: String
   sections: [SectionInput!]
 }
@@ -641,7 +641,7 @@ input NewRecipe {
 type Nutrient {
   id: Int!
   name: String!
-  unit_name: String!
+  unitName: String!
 }
 
 type FoodNutrientDerivation {
@@ -652,7 +652,7 @@ type FoodNutrientDerivation {
 type FoodNutrient {
   nutrient: Nutrient!
   amount: Float!
-  data_points: Int!
+  dataPoints: Int!
 }
 
 type FoodCategory {
@@ -661,9 +661,9 @@ type FoodCategory {
 }
 
 type Food {
-  fdc_id: Int!
+  fdcId: Int!
   description: String!
-  data_type: FoodDataType!
+  dataType: FoodDataType!
   category: FoodCategory
   nutrients: [FoodNutrient!]!
 }
@@ -688,11 +688,11 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
-  food(fdc_id: Int!): Food
+  food(fdcId: Int!): Food
   foods(
-    search_query: String!
-    data_type: FoodDataType
-    food_category_id: Int
+    searchQuery: String!
+    dataType: FoodDataType
+    foodCategoryID: Int
   ): [Food!]
 }
 `, BuiltIn: false},
@@ -749,13 +749,13 @@ func (ec *executionContext) field_Query_food_args(ctx context.Context, rawArgs m
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["fdc_id"]; ok {
+	if tmp, ok := rawArgs["fdcId"]; ok {
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["fdc_id"] = arg0
+	args["fdcId"] = arg0
 	return args, nil
 }
 
@@ -763,29 +763,29 @@ func (ec *executionContext) field_Query_foods_args(ctx context.Context, rawArgs 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["search_query"]; ok {
+	if tmp, ok := rawArgs["searchQuery"]; ok {
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["search_query"] = arg0
+	args["searchQuery"] = arg0
 	var arg1 *model.FoodDataType
-	if tmp, ok := rawArgs["data_type"]; ok {
+	if tmp, ok := rawArgs["dataType"]; ok {
 		arg1, err = ec.unmarshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐFoodDataType(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["data_type"] = arg1
+	args["dataType"] = arg1
 	var arg2 *int
-	if tmp, ok := rawArgs["food_category_id"]; ok {
+	if tmp, ok := rawArgs["foodCategoryID"]; ok {
 		arg2, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["food_category_id"] = arg2
+	args["foodCategoryID"] = arg2
 	return args, nil
 }
 
@@ -839,7 +839,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Food_fdc_id(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+func (ec *executionContext) _Food_fdcId(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -907,7 +907,7 @@ func (ec *executionContext) _Food_description(ctx context.Context, field graphql
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Food_data_type(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
+func (ec *executionContext) _Food_dataType(ctx context.Context, field graphql.CollectedField, obj *model.Food) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1142,7 +1142,7 @@ func (ec *executionContext) _FoodNutrient_amount(ctx context.Context, field grap
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _FoodNutrient_data_points(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrient) (ret graphql.Marshaler) {
+func (ec *executionContext) _FoodNutrient_dataPoints(ctx context.Context, field graphql.CollectedField, obj *model.FoodNutrient) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1493,7 +1493,7 @@ func (ec *executionContext) _Nutrient_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Nutrient_unit_name(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
+func (ec *executionContext) _Nutrient_unitName(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1657,7 +1657,7 @@ func (ec *executionContext) _Query_food(ctx context.Context, field graphql.Colle
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Food(rctx, args["fdc_id"].(int))
+		return ec.resolvers.Query().Food(rctx, args["fdcId"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1695,7 +1695,7 @@ func (ec *executionContext) _Query_foods(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Foods(rctx, args["search_query"].(string), args["data_type"].(*model.FoodDataType), args["food_category_id"].(*int))
+		return ec.resolvers.Query().Foods(rctx, args["searchQuery"].(string), args["dataType"].(*model.FoodDataType), args["foodCategoryID"].(*int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1846,7 +1846,7 @@ func (ec *executionContext) _Recipe_name(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Recipe_total_minutes(ctx context.Context, field graphql.CollectedField, obj *model.Recipe) (ret graphql.Marshaler) {
+func (ec *executionContext) _Recipe_totalMinutes(ctx context.Context, field graphql.CollectedField, obj *model.Recipe) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3481,7 +3481,7 @@ func (ec *executionContext) unmarshalInputRecipeInput(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "total_minutes":
+		case "totalMinutes":
 			var err error
 			it.TotalMinutes, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
@@ -3643,8 +3643,8 @@ func (ec *executionContext) _Food(ctx context.Context, sel ast.SelectionSet, obj
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Food")
-		case "fdc_id":
-			out.Values[i] = ec._Food_fdc_id(ctx, field, obj)
+		case "fdcId":
+			out.Values[i] = ec._Food_fdcId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -3653,8 +3653,8 @@ func (ec *executionContext) _Food(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "data_type":
-			out.Values[i] = ec._Food_data_type(ctx, field, obj)
+		case "dataType":
+			out.Values[i] = ec._Food_dataType(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -3756,7 +3756,7 @@ func (ec *executionContext) _FoodNutrient(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "data_points":
+		case "dataPoints":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3764,7 +3764,7 @@ func (ec *executionContext) _FoodNutrient(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._FoodNutrient_data_points(ctx, field, obj)
+				res = ec._FoodNutrient_dataPoints(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3913,8 +3913,8 @@ func (ec *executionContext) _Nutrient(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "unit_name":
-			out.Values[i] = ec._Nutrient_unit_name(ctx, field, obj)
+		case "unitName":
+			out.Values[i] = ec._Nutrient_unitName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4041,8 +4041,8 @@ func (ec *executionContext) _Recipe(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "total_minutes":
-			out.Values[i] = ec._Recipe_total_minutes(ctx, field, obj)
+		case "totalMinutes":
+			out.Values[i] = ec._Recipe_totalMinutes(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}

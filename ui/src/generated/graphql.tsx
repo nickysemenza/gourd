@@ -53,7 +53,7 @@ export type Recipe = {
   __typename?: "Recipe";
   uuid: Scalars["String"];
   name: Scalars["String"];
-  total_minutes: Scalars["Int"];
+  totalMinutes: Scalars["Int"];
   unit: Scalars["String"];
   sections: Array<Section>;
 };
@@ -61,7 +61,7 @@ export type Recipe = {
 export type RecipeInput = {
   uuid: Scalars["String"];
   name: Scalars["String"];
-  total_minutes?: Maybe<Scalars["Int"]>;
+  totalMinutes?: Maybe<Scalars["Int"]>;
   unit?: Maybe<Scalars["String"]>;
   sections?: Maybe<Array<SectionInput>>;
 };
@@ -93,7 +93,7 @@ export type Nutrient = {
   __typename?: "Nutrient";
   id: Scalars["Int"];
   name: Scalars["String"];
-  unit_name: Scalars["String"];
+  unitName: Scalars["String"];
 };
 
 export type FoodNutrientDerivation = {
@@ -106,7 +106,7 @@ export type FoodNutrient = {
   __typename?: "FoodNutrient";
   nutrient: Nutrient;
   amount: Scalars["Float"];
-  data_points: Scalars["Int"];
+  dataPoints: Scalars["Int"];
 };
 
 export type FoodCategory = {
@@ -117,9 +117,9 @@ export type FoodCategory = {
 
 export type Food = {
   __typename?: "Food";
-  fdc_id: Scalars["Int"];
+  fdcId: Scalars["Int"];
   description: Scalars["String"];
-  data_type: FoodDataType;
+  dataType: FoodDataType;
   category?: Maybe<FoodCategory>;
   nutrients: Array<FoodNutrient>;
 };
@@ -163,13 +163,13 @@ export type QueryRecipeArgs = {
 };
 
 export type QueryFoodArgs = {
-  fdc_id: Scalars["Int"];
+  fdcId: Scalars["Int"];
 };
 
 export type QueryFoodsArgs = {
-  search_query: Scalars["String"];
-  data_type?: Maybe<FoodDataType>;
-  food_category_id?: Maybe<Scalars["Int"]>;
+  searchQuery: Scalars["String"];
+  dataType?: Maybe<FoodDataType>;
+  foodCategoryID?: Maybe<Scalars["Int"]>;
 };
 
 export type GetRecipeByUuidQueryVariables = {
@@ -180,7 +180,7 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
   recipe?: Maybe<
     { __typename?: "Recipe" } & Pick<
       Recipe,
-      "uuid" | "name" | "total_minutes" | "unit"
+      "uuid" | "name" | "totalMinutes" | "unit"
     > & {
         sections: Array<
           { __typename?: "Section" } & Pick<Section, "minutes"> & {
@@ -220,7 +220,7 @@ export type GetRecipesQuery = { __typename?: "Query" } & {
   recipes: Array<
     { __typename?: "Recipe" } & Pick<
       Recipe,
-      "uuid" | "name" | "total_minutes" | "unit"
+      "uuid" | "name" | "totalMinutes" | "unit"
     >
   >;
 };
@@ -259,7 +259,7 @@ export type GetFoodQueryVariables = {
 
 export type GetFoodQuery = { __typename?: "Query" } & {
   food?: Maybe<
-    { __typename?: "Food" } & Pick<Food, "description" | "data_type"> & {
+    { __typename?: "Food" } & Pick<Food, "description" | "dataType"> & {
         category?: Maybe<
           { __typename?: "FoodCategory" } & Pick<
             FoodCategory,
@@ -270,7 +270,7 @@ export type GetFoodQuery = { __typename?: "Query" } & {
           { __typename?: "FoodNutrient" } & Pick<FoodNutrient, "amount"> & {
               nutrient: { __typename?: "Nutrient" } & Pick<
                 Nutrient,
-                "name" | "unit_name"
+                "name" | "unitName"
               >;
             }
         >;
@@ -283,7 +283,7 @@ export const GetRecipeByUuidDocument = gql`
     recipe(uuid: $uuid) {
       uuid
       name
-      total_minutes
+      totalMinutes
       unit
       sections {
         minutes
@@ -422,7 +422,7 @@ export const GetRecipesDocument = gql`
     recipes {
       uuid
       name
-      total_minutes
+      totalMinutes
       unit
     }
   }
@@ -836,9 +836,9 @@ export type GetIngredientsQueryResult = ApolloReactCommon.QueryResult<
 >;
 export const GetFoodDocument = gql`
   query getFood($fdc_id: Int!) {
-    food(fdc_id: $fdc_id) {
+    food(fdcId: $fdc_id) {
       description
-      data_type
+      dataType
       category {
         code
         description
@@ -846,7 +846,7 @@ export const GetFoodDocument = gql`
       nutrients {
         nutrient {
           name
-          unit_name
+          unitName
         }
         amount
       }

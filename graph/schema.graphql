@@ -31,7 +31,7 @@ type Section {
 type Recipe {
   uuid: String!
   name: String!
-  total_minutes: Int!
+  totalMinutes: Int!
   unit: String!
   sections: [Section!]!
 }
@@ -39,7 +39,7 @@ type Recipe {
 input RecipeInput {
   uuid: String!
   name: String!
-  total_minutes: Int
+  totalMinutes: Int
   unit: String
   sections: [SectionInput!]
 }
@@ -70,7 +70,7 @@ input NewRecipe {
 type Nutrient {
   id: Int!
   name: String!
-  unit_name: String!
+  unitName: String!
 }
 
 type FoodNutrientDerivation {
@@ -81,7 +81,7 @@ type FoodNutrientDerivation {
 type FoodNutrient {
   nutrient: Nutrient!
   amount: Float!
-  data_points: Int!
+  dataPoints: Int!
 }
 
 type FoodCategory {
@@ -90,9 +90,9 @@ type FoodCategory {
 }
 
 type Food {
-  fdc_id: Int!
+  fdcId: Int!
   description: String!
-  data_type: FoodDataType!
+  dataType: FoodDataType!
   category: FoodCategory
   nutrients: [FoodNutrient!]!
 }
@@ -117,10 +117,10 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
-  food(fdc_id: Int!): Food
+  food(fdcId: Int!): Food
   foods(
-    search_query: String!
-    data_type: FoodDataType
-    food_category_id: Int
+    searchQuery: String!
+    dataType: FoodDataType
+    foodCategoryID: Int
   ): [Food!]
 }
