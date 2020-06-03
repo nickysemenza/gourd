@@ -64,7 +64,7 @@ func TestCreateUpdateList(t *testing.T) {
 			UUID         string
 			Name         string
 			Sections     interface{}
-			TotalMinutes interface{} `json:"total_minutes"`
+			TotalMinutes interface{}
 			Unit         interface{}
 		}
 	}
@@ -72,7 +72,7 @@ func TestCreateUpdateList(t *testing.T) {
 		recipes {
 		  uuid
 		  name
-		  total_minutes
+		  totalMinutes
 		  unit
 		  sections {
 			minutes

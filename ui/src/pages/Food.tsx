@@ -35,7 +35,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
   return (
     <Box>
       <Heading>{food?.description}</Heading>
-      <Text>{food?.data_type}</Text>
+      <Text>{food?.dataType}</Text>
       <Text>{fdc_id}</Text>
       <Debug data={food?.category} />
 
@@ -45,7 +45,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
           .map((n) => (
             <tr>
               <td>{n.amount.toFixed(2)} </td>
-              <td>{n.nutrient.unit_name} </td>
+              <td>{n.nutrient.unitName} </td>
               <td>{n.nutrient.name} </td>
             </tr>
           ))}

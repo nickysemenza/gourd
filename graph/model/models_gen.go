@@ -24,7 +24,7 @@ type NewRecipe struct {
 type RecipeInput struct {
 	UUID         string          `json:"uuid"`
 	Name         string          `json:"name"`
-	TotalMinutes *int            `json:"total_minutes"`
+	TotalMinutes *int            `json:"totalMinutes"`
 	Unit         *string         `json:"unit"`
 	Sections     []*SectionInput `json:"sections"`
 }
