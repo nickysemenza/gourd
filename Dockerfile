@@ -16,5 +16,4 @@ WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/migrations ./migrations
 RUN ls
-EXPOSE 4242
 ENTRYPOINT ["./bin/food"]
