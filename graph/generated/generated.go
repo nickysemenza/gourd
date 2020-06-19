@@ -569,7 +569,8 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "graph/schema.graphql", Input: `type Ingredient {
+	&ast.Source{Name: "graph/schema.graphql", Input: `# Recipe api outputs
+type Ingredient {
   uuid: String!
   name: String!
   recipes: [Recipe!]
@@ -607,6 +608,8 @@ type Recipe {
   sections: [Section!]!
 }
 
+# Recipe api inputs
+
 input RecipeInput {
   uuid: String!
   name: String!
@@ -638,6 +641,8 @@ input NewRecipe {
   name: String!
 }
 
+# USDA types
+
 type Nutrient {
   id: Int!
   name: String!
@@ -668,11 +673,6 @@ type Food {
   nutrients: [FoodNutrient!]!
 }
 
-type Mutation {
-  createRecipe(recipe: NewRecipe): Recipe!
-  updateRecipe(recipe: RecipeInput): Recipe!
-}
-
 enum FoodDataType {
   foundation_food
   sample_food
@@ -682,6 +682,13 @@ enum FoodDataType {
   agricultural_acquisition
   sr_legacy_food
   branded_food
+}
+
+# MUTATIONS AND QUERIES
+
+type Mutation {
+  createRecipe(recipe: NewRecipe): Recipe!
+  updateRecipe(recipe: RecipeInput): Recipe!
 }
 
 type Query {
