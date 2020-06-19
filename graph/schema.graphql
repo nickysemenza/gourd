@@ -1,3 +1,4 @@
+# Recipe api outputs
 type Ingredient {
   uuid: String!
   name: String!
@@ -36,6 +37,8 @@ type Recipe {
   sections: [Section!]!
 }
 
+# Recipe api inputs
+
 input RecipeInput {
   uuid: String!
   name: String!
@@ -67,6 +70,8 @@ input NewRecipe {
   name: String!
 }
 
+# USDA types
+
 type Nutrient {
   id: Int!
   name: String!
@@ -97,11 +102,6 @@ type Food {
   nutrients: [FoodNutrient!]!
 }
 
-type Mutation {
-  createRecipe(recipe: NewRecipe): Recipe!
-  updateRecipe(recipe: RecipeInput): Recipe!
-}
-
 enum FoodDataType {
   foundation_food
   sample_food
@@ -111,6 +111,13 @@ enum FoodDataType {
   agricultural_acquisition
   sr_legacy_food
   branded_food
+}
+
+# MUTATIONS AND QUERIES
+
+type Mutation {
+  createRecipe(recipe: NewRecipe): Recipe!
+  updateRecipe(recipe: RecipeInput): Recipe!
 }
 
 type Query {

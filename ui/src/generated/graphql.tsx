@@ -124,6 +124,17 @@ export type Food = {
   nutrients: Array<FoodNutrient>;
 };
 
+export enum FoodDataType {
+  FoundationFood = "foundation_food",
+  SampleFood = "sample_food",
+  MarketAcquisition = "market_acquisition",
+  SurveyFnddsFood = "survey_fndds_food",
+  SubSampleFood = "sub_sample_food",
+  AgriculturalAcquisition = "agricultural_acquisition",
+  SrLegacyFood = "sr_legacy_food",
+  BrandedFood = "branded_food",
+}
+
 export type Mutation = {
   __typename?: "Mutation";
   createRecipe: Recipe;
@@ -137,17 +148,6 @@ export type MutationCreateRecipeArgs = {
 export type MutationUpdateRecipeArgs = {
   recipe?: Maybe<RecipeInput>;
 };
-
-export enum FoodDataType {
-  FoundationFood = "foundation_food",
-  SampleFood = "sample_food",
-  MarketAcquisition = "market_acquisition",
-  SurveyFnddsFood = "survey_fndds_food",
-  SubSampleFood = "sub_sample_food",
-  AgriculturalAcquisition = "agricultural_acquisition",
-  SrLegacyFood = "sr_legacy_food",
-  BrandedFood = "branded_food",
-}
 
 export type Query = {
   __typename?: "Query";
