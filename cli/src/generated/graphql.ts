@@ -24,9 +24,15 @@ export type SectionInstruction = {
 
 export type IngredientInfo = Ingredient | Recipe;
 
+export enum SectionIngredientKind {
+  Recipe = "recipe",
+  Ingredient = "ingredient",
+}
+
 export type SectionIngredient = {
   uuid: Scalars["String"];
   info: IngredientInfo;
+  kind: SectionIngredientKind;
   grams: Scalars["Float"];
   amount: Scalars["Float"];
   unit: Scalars["String"];
@@ -62,7 +68,8 @@ export type SectionInstructionInput = {
 };
 
 export type SectionIngredientInput = {
-  name: Scalars["String"];
+  infoUUID: Scalars["String"];
+  kind: SectionIngredientKind;
   grams: Scalars["Float"];
   amount?: Maybe<Scalars["Float"]>;
   unit?: Maybe<Scalars["String"]>;
@@ -138,11 +145,16 @@ export type Query = {
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
   ingredients: Array<Ingredient>;
+  ingredient?: Maybe<Ingredient>;
   food?: Maybe<Food>;
   foods?: Maybe<Array<Food>>;
 };
 
 export type QueryRecipeArgs = {
+  uuid: Scalars["String"];
+};
+
+export type QueryIngredientArgs = {
   uuid: Scalars["String"];
 };
 

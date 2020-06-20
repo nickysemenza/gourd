@@ -30,10 +30,16 @@ export type SectionInstruction = {
 
 export type IngredientInfo = Ingredient | Recipe;
 
+export enum SectionIngredientKind {
+  Recipe = "recipe",
+  Ingredient = "ingredient",
+}
+
 export type SectionIngredient = {
   __typename?: "SectionIngredient";
   uuid: Scalars["String"];
   info: IngredientInfo;
+  kind: SectionIngredientKind;
   grams: Scalars["Float"];
   amount: Scalars["Float"];
   unit: Scalars["String"];
@@ -71,7 +77,8 @@ export type SectionInstructionInput = {
 };
 
 export type SectionIngredientInput = {
-  name: Scalars["String"];
+  infoUUID: Scalars["String"];
+  kind: SectionIngredientKind;
   grams: Scalars["Float"];
   amount?: Maybe<Scalars["Float"]>;
   unit?: Maybe<Scalars["String"]>;
@@ -154,11 +161,16 @@ export type Query = {
   recipes: Array<Recipe>;
   recipe?: Maybe<Recipe>;
   ingredients: Array<Ingredient>;
+  ingredient?: Maybe<Ingredient>;
   food?: Maybe<Food>;
   foods?: Maybe<Array<Food>>;
 };
 
 export type QueryRecipeArgs = {
+  uuid: Scalars["String"];
+};
+
+export type QueryIngredientArgs = {
   uuid: Scalars["String"];
 };
 
@@ -183,11 +195,12 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
       "uuid" | "name" | "totalMinutes" | "unit"
     > & {
         sections: Array<
-          { __typename?: "Section" } & Pick<Section, "minutes"> & {
+          { __typename?: "Section" } & Pick<Section, "minutes" | "uuid"> & {
               ingredients: Array<
                 { __typename?: "SectionIngredient" } & Pick<
                   SectionIngredient,
                   | "uuid"
+                  | "kind"
                   | "grams"
                   | "amount"
                   | "unit"
@@ -197,9 +210,12 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
                     info:
                       | ({ __typename: "Ingredient" } & Pick<
                           Ingredient,
-                          "name"
+                          "uuid" | "name"
                         >)
-                      | ({ __typename: "Recipe" } & Pick<Recipe, "name">);
+                      | ({ __typename: "Recipe" } & Pick<
+                          Recipe,
+                          "uuid" | "name"
+                        >);
                   }
               >;
               instructions: Array<
@@ -287,14 +303,18 @@ export const GetRecipeByUuidDocument = gql`
       unit
       sections {
         minutes
+        uuid
         ingredients {
           uuid
+          kind
           info {
             __typename
             ... on Ingredient {
+              uuid
               name
             }
             ... on Recipe {
+              uuid
               name
             }
           }

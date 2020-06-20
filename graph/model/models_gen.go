@@ -29,13 +29,25 @@ type RecipeInput struct {
 	Sections     []*SectionInput `json:"sections"`
 }
 
+type SectionIngredient struct {
+	UUID      string                `json:"uuid"`
+	Info      IngredientInfo        `json:"info"`
+	Kind      SectionIngredientKind `json:"kind"`
+	Grams     float64               `json:"grams"`
+	Amount    float64               `json:"amount"`
+	Unit      string                `json:"unit"`
+	Adjective string                `json:"adjective"`
+	Optional  bool                  `json:"optional"`
+}
+
 type SectionIngredientInput struct {
-	Name      string   `json:"name"`
-	Grams     float64  `json:"grams"`
-	Amount    *float64 `json:"amount"`
-	Unit      *string  `json:"unit"`
-	Adjective *string  `json:"adjective"`
-	Optional  *bool    `json:"optional"`
+	InfoUUID  string                `json:"infoUUID"`
+	Kind      SectionIngredientKind `json:"kind"`
+	Grams     float64               `json:"grams"`
+	Amount    *float64              `json:"amount"`
+	Unit      *string               `json:"unit"`
+	Adjective *string               `json:"adjective"`
+	Optional  *bool                 `json:"optional"`
 }
 
 type SectionInput struct {
@@ -103,5 +115,46 @@ func (e *FoodDataType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e FoodDataType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SectionIngredientKind string
+
+const (
+	SectionIngredientKindRecipe     SectionIngredientKind = "recipe"
+	SectionIngredientKindIngredient SectionIngredientKind = "ingredient"
+)
+
+var AllSectionIngredientKind = []SectionIngredientKind{
+	SectionIngredientKindRecipe,
+	SectionIngredientKindIngredient,
+}
+
+func (e SectionIngredientKind) IsValid() bool {
+	switch e {
+	case SectionIngredientKindRecipe, SectionIngredientKindIngredient:
+		return true
+	}
+	return false
+}
+
+func (e SectionIngredientKind) String() string {
+	return string(e)
+}
+
+func (e *SectionIngredientKind) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SectionIngredientKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SectionIngredientKind", str)
+	}
+	return nil
+}
+
+func (e SectionIngredientKind) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

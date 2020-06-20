@@ -43,7 +43,6 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Recipe() RecipeResolver
 	Section() SectionResolver
-	SectionIngredient() SectionIngredientResolver
 }
 
 type DirectiveRoot struct {
@@ -94,6 +93,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Food        func(childComplexity int, fdcID int) int
 		Foods       func(childComplexity int, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) int
+		Ingredient  func(childComplexity int, uuid string) int
 		Ingredients func(childComplexity int) int
 		Recipe      func(childComplexity int, uuid string) int
 		Recipes     func(childComplexity int) int
@@ -119,6 +119,7 @@ type ComplexityRoot struct {
 		Amount    func(childComplexity int) int
 		Grams     func(childComplexity int) int
 		Info      func(childComplexity int) int
+		Kind      func(childComplexity int) int
 		Optional  func(childComplexity int) int
 		UUID      func(childComplexity int) int
 		Unit      func(childComplexity int) int
@@ -150,6 +151,7 @@ type QueryResolver interface {
 	Recipes(ctx context.Context) ([]*model.Recipe, error)
 	Recipe(ctx context.Context, uuid string) (*model.Recipe, error)
 	Ingredients(ctx context.Context) ([]*model.Ingredient, error)
+	Ingredient(ctx context.Context, uuid string) (*model.Ingredient, error)
 	Food(ctx context.Context, fdcID int) (*model.Food, error)
 	Foods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error)
 }
@@ -159,9 +161,6 @@ type RecipeResolver interface {
 type SectionResolver interface {
 	Instructions(ctx context.Context, obj *model.Section) ([]*model.SectionInstruction, error)
 	Ingredients(ctx context.Context, obj *model.Section) ([]*model.SectionIngredient, error)
-}
-type SectionIngredientResolver interface {
-	Info(ctx context.Context, obj *model.SectionIngredient) (model.IngredientInfo, error)
 }
 
 type executableSchema struct {
@@ -353,6 +352,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Foods(childComplexity, args["searchQuery"].(string), args["dataType"].(*model.FoodDataType), args["foodCategoryID"].(*int)), true
 
+	case "Query.ingredient":
+		if e.complexity.Query.Ingredient == nil {
+			break
+		}
+
+		args, err := ec.field_Query_ingredient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Ingredient(childComplexity, args["uuid"].(string)), true
+
 	case "Query.ingredients":
 		if e.complexity.Query.Ingredients == nil {
 			break
@@ -470,6 +481,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SectionIngredient.Info(childComplexity), true
 
+	case "SectionIngredient.kind":
+		if e.complexity.SectionIngredient.Kind == nil {
+			break
+		}
+
+		return e.complexity.SectionIngredient.Kind(childComplexity), true
+
 	case "SectionIngredient.optional":
 		if e.complexity.SectionIngredient.Optional == nil {
 			break
@@ -583,9 +601,15 @@ type SectionInstruction {
 
 union IngredientInfo = Ingredient | Recipe
 
+enum SectionIngredientKind {
+  recipe
+  ingredient
+}
+
 type SectionIngredient {
   uuid: String!
   info: IngredientInfo!
+  kind: SectionIngredientKind!
   grams: Float!
   amount: Float!
   unit: String!
@@ -623,7 +647,9 @@ input SectionInstructionInput {
 }
 
 input SectionIngredientInput {
-  name: String!
+  # name: String!
+  infoUUID: String!
+  kind: SectionIngredientKind!
   grams: Float!
   amount: Float
   unit: String
@@ -695,6 +721,7 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
+  ingredient(uuid: String!): Ingredient
   food(fdcId: Int!): Food
   foods(
     searchQuery: String!
@@ -793,6 +820,20 @@ func (ec *executionContext) field_Query_foods_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["foodCategoryID"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_ingredient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["uuid"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uuid"] = arg0
 	return args, nil
 }
 
@@ -1640,6 +1681,44 @@ func (ec *executionContext) _Query_ingredients(ctx context.Context, field graphq
 	return ec.marshalNIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredientᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_ingredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_ingredient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Ingredient(rctx, args["uuid"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Ingredient)
+	fc.Result = res
+	return ec.marshalOIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_food(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2136,13 +2215,13 @@ func (ec *executionContext) _SectionIngredient_info(ctx context.Context, field g
 		Object:   "SectionIngredient",
 		Field:    field,
 		Args:     nil,
-		IsMethod: true,
+		IsMethod: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SectionIngredient().Info(rctx, obj)
+		return obj.Info, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2157,6 +2236,40 @@ func (ec *executionContext) _SectionIngredient_info(ctx context.Context, field g
 	res := resTmp.(model.IngredientInfo)
 	fc.Result = res
 	return ec.marshalNIngredientInfo2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredientInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SectionIngredient_kind(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "SectionIngredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Kind, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.SectionIngredientKind)
+	fc.Result = res
+	return ec.marshalNSectionIngredientKind2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientKind(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _SectionIngredient_grams(ctx context.Context, field graphql.CollectedField, obj *model.SectionIngredient) (ret graphql.Marshaler) {
@@ -3518,9 +3631,15 @@ func (ec *executionContext) unmarshalInputSectionIngredientInput(ctx context.Con
 
 	for k, v := range asMap {
 		switch k {
-		case "name":
+		case "infoUUID":
 			var err error
-			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			it.InfoUUID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "kind":
+			var err error
+			it.Kind, err = ec.unmarshalNSectionIngredientKind2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientKind(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3990,6 +4109,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "ingredient":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_ingredient(ctx, field)
+				return res
+			})
 		case "food":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -4157,46 +4287,42 @@ func (ec *executionContext) _SectionIngredient(ctx context.Context, sel ast.Sele
 		case "uuid":
 			out.Values[i] = ec._SectionIngredient_uuid(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "info":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._SectionIngredient_info(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
+			out.Values[i] = ec._SectionIngredient_info(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "kind":
+			out.Values[i] = ec._SectionIngredient_kind(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "grams":
 			out.Values[i] = ec._SectionIngredient_grams(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "amount":
 			out.Values[i] = ec._SectionIngredient_amount(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "unit":
 			out.Values[i] = ec._SectionIngredient_unit(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "adjective":
 			out.Values[i] = ec._SectionIngredient_adjective(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		case "optional":
 			out.Values[i] = ec._SectionIngredient_optional(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+				invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -4862,6 +4988,15 @@ func (ec *executionContext) unmarshalNSectionIngredientInput2ᚖgithubᚗcomᚋn
 	return &res, err
 }
 
+func (ec *executionContext) unmarshalNSectionIngredientKind2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientKind(ctx context.Context, v interface{}) (model.SectionIngredientKind, error) {
+	var res model.SectionIngredientKind
+	return res, res.UnmarshalGQL(v)
+}
+
+func (ec *executionContext) marshalNSectionIngredientKind2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientKind(ctx context.Context, sel ast.SelectionSet, v model.SectionIngredientKind) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNSectionInput2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionInput(ctx context.Context, v interface{}) (model.SectionInput, error) {
 	return ec.unmarshalInputSectionInput(ctx, v)
 }
@@ -5327,6 +5462,17 @@ func (ec *executionContext) marshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenza�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalOIngredient2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v model.Ingredient) graphql.Marshaler {
+	return ec._Ingredient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v *model.Ingredient) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Ingredient(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOInt2int(ctx context.Context, v interface{}) (int, error) {

@@ -65,7 +65,7 @@ func (r *Recipe) toDB() *db.Recipe {
 		}
 		for _, i := range s.Ingredients {
 			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
-				Name:      i.Name,
+				// Name:      i.Name,
 				Grams:     zero.FloatFrom(i.Grams),
 				Amount:    zero.FloatFrom(i.Amount),
 				Unit:      zero.StringFrom(i.Unit),
@@ -104,8 +104,8 @@ func FromRecipe(dbr *db.Recipe) *Recipe {
 		}
 		for _, i := range dbs.Ingredients {
 			s.Ingredients = append(s.Ingredients, SectionIngredient{
-				Grams:     i.Grams.Float64,
-				Name:      i.Name,
+				Grams: i.Grams.Float64,
+				// Name:      i.Name,
 				Amount:    i.Amount.Float64,
 				Unit:      i.Unit.String,
 				Adjective: i.Adjective.String,

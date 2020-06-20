@@ -11,14 +11,18 @@ const _ = [
         unit
         sections {
           minutes
+          uuid
           ingredients {
             uuid
+            kind
             info {
               __typename
               ... on Ingredient {
+                uuid
                 name
               }
               ... on Recipe {
+                uuid
                 name
               }
             }

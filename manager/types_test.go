@@ -12,21 +12,22 @@ func TestFromRecipe(t *testing.T) {
 	dbr := db.Recipe{Name: "name", UUID: "123"}
 	dbr.TotalMinutes = zero.IntFrom(3)
 	dbr.Unit = zero.StringFrom("items")
+
 	dbr.Sections = []db.Section{{
 		Minutes:      zero.IntFrom(88),
 		Instructions: []db.SectionInstruction{{Instruction: "add flour"}},
 		Ingredients: []db.SectionIngredient{{
-			Grams: zero.FloatFrom(52),
-			Name:  "flour",
+			Grams:          zero.FloatFrom(52),
+			IngredientUUID: zero.StringFrom("a-b-c"),
 		}},
 	}, {
 		Minutes:      zero.IntFrom(1),
 		Instructions: []db.SectionInstruction{{Instruction: "add more flour"}, {Instruction: "mix"}},
 		Ingredients: []db.SectionIngredient{{
-			Grams:  zero.FloatFrom(120),
-			Name:   "flour",
-			Amount: zero.FloatFrom(2),
-			Unit:   zero.StringFrom("cup"),
+			Grams:          zero.FloatFrom(120),
+			IngredientUUID: zero.StringFrom("a-b-c"),
+			Amount:         zero.FloatFrom(2),
+			Unit:           zero.StringFrom("cup"),
 		}},
 	}}
 
