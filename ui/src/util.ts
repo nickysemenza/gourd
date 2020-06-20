@@ -12,8 +12,9 @@ export const recipeToRecipeInput = (recipe: Partial<Recipe>): RecipeInput => {
         minutes,
         instructions: instructions.map(({ instruction }) => ({ instruction })),
         ingredients: ingredients.map(
-          ({ info, grams, amount, unit, adjective, optional }) => ({
-            name: info.name,
+          ({ kind, info, grams, amount, unit, adjective, optional }) => ({
+            infoUUID: info.uuid,
+            kind,
             grams,
             amount,
             unit,

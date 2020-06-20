@@ -86,14 +86,24 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 			})
 		}
 		for _, i := range s.Ingredients {
-			dbs.Ingredients = append(dbs.Ingredients, db.SectionIngredient{
-				Name:      i.Name,
+			dbsi := db.SectionIngredient{
+				// Name:      i.Name,
 				Grams:     zero.FloatFrom(i.Grams),
 				Amount:    zero.FloatFromPtr(i.Amount),
 				Unit:      zero.StringFromPtr(i.Unit),
 				Adjective: zero.StringFromPtr(i.Adjective),
 				Optional:  zero.BoolFromPtr(i.Optional),
-			})
+				//TODO(nicky) kind:
+			}
+			switch i.Kind {
+			case model.SectionIngredientKindIngredient:
+				dbsi.IngredientUUID = zero.StringFrom(i.InfoUUID)
+			case model.SectionIngredientKindRecipe:
+				dbsi.RecipeUUID = zero.StringFrom(i.InfoUUID)
+			default:
+				return nil, fmt.Errorf("invalid kind: %s", i.Kind)
+			}
+			dbs.Ingredients = append(dbs.Ingredients, dbsi)
 		}
 		dbr.Sections = append(dbr.Sections, dbs)
 	}
@@ -147,6 +157,14 @@ func (r *queryResolver) Ingredients(ctx context.Context) ([]*model.Ingredient, e
 	return ingredients, nil
 }
 
+func (r *queryResolver) Ingredient(ctx context.Context, uuid string) (*model.Ingredient, error) {
+	ing, err := r.DB.GetIngredientByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+	return fromIngredient(ing), nil
+}
+
 func (r *queryResolver) Food(ctx context.Context, fdcID int) (*model.Food, error) {
 	return r.DB.GetFood(ctx, fdcID)
 }
@@ -186,44 +204,36 @@ func (r *sectionResolver) Ingredients(ctx context.Context, obj *model.Section) (
 	}
 	i := []*model.SectionIngredient{}
 	for _, item := range res {
+		var info model.IngredientInfo
+		var kind model.SectionIngredientKind
+		if item.RecipeUUID.Valid {
+			info, err = r.Resolver.Query().Recipe(ctx, item.RecipeUUID.String)
+			if err != nil {
+				return nil, err
+			}
+			kind = model.SectionIngredientKindRecipe
+		} else if item.IngredientUUID.Valid {
+			// info = model.Ingredient{Name: "todo"}
+			info, err = r.Resolver.Query().Ingredient(ctx, item.IngredientUUID.String)
+			if err != nil {
+				return nil, err
+			}
+			kind = model.SectionIngredientKindIngredient
+		}
 		i = append(i, &model.SectionIngredient{
-			UUID:         item.UUID,
-			Grams:        item.Grams.Float64,
-			Amount:       item.Amount.Float64,
-			Unit:         item.Unit.String,
-			Adjective:    item.Adjective.String,
-			Optional:     item.Optional.Bool,
-			IngredientID: item.IngredientUUID.String,
-			RecipeID:     item.RecipeUUID.String,
+			UUID:      item.UUID,
+			Grams:     item.Grams.Float64,
+			Amount:    item.Amount.Float64,
+			Unit:      item.Unit.String,
+			Adjective: item.Adjective.String,
+			Optional:  item.Optional.Bool,
+			Info:      info,
+			Kind:      kind,
+			// IngredientID: item.IngredientUUID.String,
+			// RecipeID:     item.RecipeUUID.String,
 		})
 	}
 	return i, nil
-}
-
-func (r *sectionIngredientResolver) Info(ctx context.Context, obj *model.SectionIngredient) (model.IngredientInfo, error) {
-	tr := global.Tracer("graph")
-	ctx, span := tr.Start(ctx, "Info")
-	defer span.End()
-	if obj.IngredientID != "" {
-		ing, err := r.DB.GetIngredientByUUID(ctx, obj.IngredientID)
-		if err != nil {
-			return nil, err
-		}
-		if ing == nil {
-			return nil, nil
-		}
-		return &model.Ingredient{Name: ing.Name, UUID: ing.UUID}, nil
-	}
-	recipe, err := r.DB.GetRecipeByUUID(ctx, obj.RecipeID)
-	if err != nil {
-		return nil, err
-	}
-	if recipe == nil {
-		return nil, nil
-	}
-	r2 := fromRecipe(recipe)
-	r2.Name = fmt.Sprintf("r:%s", r2.Name)
-	return r2, nil
 }
 
 // Food returns generated.FoodResolver implementation.
@@ -247,11 +257,6 @@ func (r *Resolver) Recipe() generated.RecipeResolver { return &recipeResolver{r}
 // Section returns generated.SectionResolver implementation.
 func (r *Resolver) Section() generated.SectionResolver { return &sectionResolver{r} }
 
-// SectionIngredient returns generated.SectionIngredientResolver implementation.
-func (r *Resolver) SectionIngredient() generated.SectionIngredientResolver {
-	return &sectionIngredientResolver{r}
-}
-
 type foodResolver struct{ *Resolver }
 type foodNutrientResolver struct{ *Resolver }
 type ingredientResolver struct{ *Resolver }
@@ -259,4 +264,3 @@ type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type recipeResolver struct{ *Resolver }
 type sectionResolver struct{ *Resolver }
-type sectionIngredientResolver struct{ *Resolver }

@@ -21,16 +21,16 @@ type Section struct {
 }
 
 // SectionIngredient has ingredients by ID
-type SectionIngredient struct {
-	UUID         string  `json:"uuid"`
-	IngredientID string  `json:"info"`
-	RecipeID     string  `json:"info_recipe"`
-	Grams        float64 `json:"grams"`
-	Amount       float64 `json:"amount"`
-	Unit         string  `json:"unit"`
-	Adjective    string  `json:"adjective"`
-	Optional     bool    `json:"optional"`
-}
+// type SectionIngredient struct {
+// 	UUID         string  `json:"uuid"`
+// 	IngredientID string  `json:"info"`
+// 	RecipeID     string  `json:"info_recipe"`
+// 	Grams        float64 `json:"grams"`
+// 	Amount       float64 `json:"amount"`
+// 	Unit         string  `json:"unit"`
+// 	Adjective    string  `json:"adjective"`
+// 	Optional     bool    `json:"optional"`
+// }
 
 type Ingredient struct {
 	UUID       string   `json:"uuid"`

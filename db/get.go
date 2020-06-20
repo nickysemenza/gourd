@@ -179,12 +179,19 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 		}
 
 		for y, i := range r.Sections[x].Ingredients {
-			ing, err := c.GetIngredientByUUID(ctx, i.IngredientUUID.String)
-			if err != nil {
-				return nil, err
+			if i.IngredientUUID.String != "" {
+				ing, err := c.GetIngredientByUUID(ctx, i.IngredientUUID.String)
+				if err != nil {
+					return nil, err
+				}
+				r.Sections[x].Ingredients[y].RawIngredient = ing
 			}
-			if ing != nil {
-				r.Sections[x].Ingredients[y].Name = ing.Name
+			if i.RecipeUUID.String != "" {
+				rec, err := c.GetRecipeByUUID(ctx, i.RecipeUUID.String)
+				if err != nil {
+					return nil, err
+				}
+				r.Sections[x].Ingredients[y].RawRecipe = rec
 			}
 		}
 	}

@@ -12,9 +12,15 @@ type SectionInstruction {
 
 union IngredientInfo = Ingredient | Recipe
 
+enum SectionIngredientKind {
+  recipe
+  ingredient
+}
+
 type SectionIngredient {
   uuid: String!
   info: IngredientInfo!
+  kind: SectionIngredientKind!
   grams: Float!
   amount: Float!
   unit: String!
@@ -52,7 +58,9 @@ input SectionInstructionInput {
 }
 
 input SectionIngredientInput {
-  name: String!
+  # name: String!
+  infoUUID: String!
+  kind: SectionIngredientKind!
   grams: Float!
   amount: Float
   unit: String
@@ -124,6 +132,7 @@ type Query {
   recipes: [Recipe!]!
   recipe(uuid: String!): Recipe
   ingredients: [Ingredient!]!
+  ingredient(uuid: String!): Ingredient
   food(fdcId: Int!): Food
   foods(
     searchQuery: String!

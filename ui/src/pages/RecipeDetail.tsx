@@ -3,6 +3,7 @@ import {
   useGetRecipeByUuidQuery,
   useUpdateRecipeMutation,
   RecipeInput,
+  SectionIngredientKind,
 } from "../generated/graphql";
 
 import { Box, Button } from "rebass";
@@ -89,11 +90,12 @@ const RecipeDetail: React.FC = () => {
               [sectionID]: {
                 ingredients: {
                   [ingredientID]: {
-                    info: {
-                      name: {
-                        $apply: (v) => (attr === "name" ? value : v),
-                      },
-                    },
+                    // info: {
+                    //   uuid: "",
+                    //   name: {
+                    //     $apply: (v) => (attr === "name" ? value : v),
+                    //   },
+                    // },
                     // yikes
                     grams: {
                       $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
@@ -179,7 +181,8 @@ const RecipeDetail: React.FC = () => {
                 {
                   uuid: "x",
                   grams: 1,
-                  info: { name: "", __typename: "Ingredient" },
+                  kind: SectionIngredientKind.Ingredient,
+                  info: { name: "", uuid: "", __typename: "Ingredient" },
                   amount: 0,
                   unit: "",
                   adjective: "",
@@ -196,7 +199,7 @@ const RecipeDetail: React.FC = () => {
     setRecipe(
       update(recipe, {
         sections: {
-          $push: [{ minutes: 0, ingredients: [], instructions: [] }],
+          $push: [{ uuid: "", minutes: 0, ingredients: [], instructions: [] }],
         },
       })
     );

@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
@@ -62,7 +61,6 @@ type SectionIngredient struct {
 	UUID        string      `db:"uuid"`
 	SectionUUID string      `db:"section"`
 	Sort        zero.Int    `db:"sort"`
-	Name        string      // todo: use this to load an Ingredient
 	Grams       zero.Float  `db:"grams"`
 	Amount      zero.Float  `db:"amount"`
 	Unit        zero.String `db:"unit"`
@@ -72,6 +70,12 @@ type SectionIngredient struct {
 	// one of the following:
 	RecipeUUID     zero.String `db:"recipe"`
 	IngredientUUID zero.String `db:"ingredient"`
+
+	RawRecipe     *Recipe
+	RawIngredient *Ingredient
+
+	// deprecated
+	// Name        string      // todo: use this to load an Ingredient
 }
 
 // SectionInstruction represents a SectionInstruction
@@ -130,24 +134,24 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 			r.Sections[x].Ingredients[y].UUID = setUUID(r.Sections[x].Ingredients[y].UUID)
 			r.Sections[x].Ingredients[y].SectionUUID = r.Sections[x].UUID
 
-			ingName := r.Sections[x].Ingredients[y].Name
-			if strings.HasPrefix(ingName, "r:") {
-				recipeName := strings.TrimPrefix(ingName, "r:")
-				recipe, err := c.GetRecipeByName(ctx, recipeName)
-				if err != nil {
-					return err
-				}
-				if recipe == nil {
-					return fmt.Errorf("no recipe with name %s", recipeName)
-				}
-				r.Sections[x].Ingredients[y].RecipeUUID = zero.StringFrom(recipe.UUID)
-			} else {
-				ing, err := c.IngredientByName(ctx, ingName)
-				if err != nil {
-					return err
-				}
-				r.Sections[x].Ingredients[y].IngredientUUID = zero.StringFrom(ing.UUID)
-			}
+			// ingName := r.Sections[x].Ingredients[y].Name
+			// if strings.HasPrefix(ingName, "r:") {
+			// 	recipeName := strings.TrimPrefix(ingName, "r:")
+			// 	recipe, err := c.GetRecipeByName(ctx, recipeName)
+			// 	if err != nil {
+			// 		return err
+			// 	}
+			// 	if recipe == nil {
+			// 		return fmt.Errorf("no recipe with name %s", recipeName)
+			// 	}
+			// 	r.Sections[x].Ingredients[y].RecipeUUID = zero.StringFrom(recipe.UUID)
+			// } else {
+			// 	ing, err := c.IngredientByName(ctx, ingName)
+			// 	if err != nil {
+			// 		return err
+			// 	}
+			// 	r.Sections[x].Ingredients[y].IngredientUUID = zero.StringFrom(ing.UUID)
+			// }
 		}
 		for y := range r.Sections[x].Instructions {
 			r.Sections[x].Instructions[y].UUID = setUUID(r.Sections[x].Instructions[y].UUID)
