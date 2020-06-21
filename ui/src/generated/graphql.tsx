@@ -146,6 +146,7 @@ export type Mutation = {
   __typename?: "Mutation";
   createRecipe: Recipe;
   updateRecipe: Recipe;
+  createIngredient: Ingredient;
 };
 
 export type MutationCreateRecipeArgs = {
@@ -154,6 +155,10 @@ export type MutationCreateRecipeArgs = {
 
 export type MutationUpdateRecipeArgs = {
   recipe?: Maybe<RecipeInput>;
+};
+
+export type MutationCreateIngredientArgs = {
+  name: Scalars["String"];
 };
 
 export type Query = {
@@ -166,8 +171,16 @@ export type Query = {
   foods?: Maybe<Array<Food>>;
 };
 
+export type QueryRecipesArgs = {
+  searchQuery?: Scalars["String"];
+};
+
 export type QueryRecipeArgs = {
   uuid: Scalars["String"];
+};
+
+export type QueryIngredientsArgs = {
+  searchQuery?: Scalars["String"];
 };
 
 export type QueryIngredientArgs = {
@@ -291,6 +304,28 @@ export type GetFoodQuery = { __typename?: "Query" } & {
             }
         >;
       }
+  >;
+};
+
+export type SearchIngredientsAndRecipesQueryVariables = {
+  searchQuery: Scalars["String"];
+};
+
+export type SearchIngredientsAndRecipesQuery = { __typename?: "Query" } & {
+  ingredients: Array<
+    { __typename?: "Ingredient" } & Pick<Ingredient, "uuid" | "name">
+  >;
+  recipes: Array<{ __typename?: "Recipe" } & Pick<Recipe, "uuid" | "name">>;
+};
+
+export type CreateIngredientMutationVariables = {
+  name: Scalars["String"];
+};
+
+export type CreateIngredientMutation = { __typename?: "Mutation" } & {
+  createIngredient: { __typename?: "Ingredient" } & Pick<
+    Ingredient,
+    "uuid" | "name"
   >;
 };
 
@@ -965,4 +1000,224 @@ export type GetFoodLazyQueryHookResult = ReturnType<typeof useGetFoodLazyQuery>;
 export type GetFoodQueryResult = ApolloReactCommon.QueryResult<
   GetFoodQuery,
   GetFoodQueryVariables
+>;
+export const SearchIngredientsAndRecipesDocument = gql`
+  query searchIngredientsAndRecipes($searchQuery: String!) {
+    ingredients(searchQuery: $searchQuery) {
+      uuid
+      name
+    }
+    recipes(searchQuery: $searchQuery) {
+      uuid
+      name
+    }
+  }
+`;
+export type SearchIngredientsAndRecipesComponentProps = Omit<
+  ApolloReactComponents.QueryComponentOptions<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >,
+  "query"
+> &
+  (
+    | { variables: SearchIngredientsAndRecipesQueryVariables; skip?: boolean }
+    | { skip: boolean }
+  );
+
+export const SearchIngredientsAndRecipesComponent = (
+  props: SearchIngredientsAndRecipesComponentProps
+) => (
+  <ApolloReactComponents.Query<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >
+    query={SearchIngredientsAndRecipesDocument}
+    {...props}
+  />
+);
+
+export type SearchIngredientsAndRecipesProps<
+  TChildProps = {},
+  TDataName extends string = "data"
+> = {
+  [key in TDataName]: ApolloReactHoc.DataValue<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >;
+} &
+  TChildProps;
+export function withSearchIngredientsAndRecipes<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "data"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables,
+    SearchIngredientsAndRecipesProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withQuery<
+    TProps,
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables,
+    SearchIngredientsAndRecipesProps<TChildProps, TDataName>
+  >(SearchIngredientsAndRecipesDocument, {
+    alias: "searchIngredientsAndRecipes",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useSearchIngredientsAndRecipesQuery__
+ *
+ * To run a query within a React component, call `useSearchIngredientsAndRecipesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchIngredientsAndRecipesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchIngredientsAndRecipesQuery({
+ *   variables: {
+ *      searchQuery: // value for 'searchQuery'
+ *   },
+ * });
+ */
+export function useSearchIngredientsAndRecipesQuery(
+  baseOptions?: ApolloReactHooks.QueryHookOptions<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >
+) {
+  return ApolloReactHooks.useQuery<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >(SearchIngredientsAndRecipesDocument, baseOptions);
+}
+export function useSearchIngredientsAndRecipesLazyQuery(
+  baseOptions?: ApolloReactHooks.LazyQueryHookOptions<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >
+) {
+  return ApolloReactHooks.useLazyQuery<
+    SearchIngredientsAndRecipesQuery,
+    SearchIngredientsAndRecipesQueryVariables
+  >(SearchIngredientsAndRecipesDocument, baseOptions);
+}
+export type SearchIngredientsAndRecipesQueryHookResult = ReturnType<
+  typeof useSearchIngredientsAndRecipesQuery
+>;
+export type SearchIngredientsAndRecipesLazyQueryHookResult = ReturnType<
+  typeof useSearchIngredientsAndRecipesLazyQuery
+>;
+export type SearchIngredientsAndRecipesQueryResult = ApolloReactCommon.QueryResult<
+  SearchIngredientsAndRecipesQuery,
+  SearchIngredientsAndRecipesQueryVariables
+>;
+export const CreateIngredientDocument = gql`
+  mutation createIngredient($name: String!) {
+    createIngredient(name: $name) {
+      uuid
+      name
+    }
+  }
+`;
+export type CreateIngredientMutationFn = ApolloReactCommon.MutationFunction<
+  CreateIngredientMutation,
+  CreateIngredientMutationVariables
+>;
+export type CreateIngredientComponentProps = Omit<
+  ApolloReactComponents.MutationComponentOptions<
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables
+  >,
+  "mutation"
+>;
+
+export const CreateIngredientComponent = (
+  props: CreateIngredientComponentProps
+) => (
+  <ApolloReactComponents.Mutation<
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables
+  >
+    mutation={CreateIngredientDocument}
+    {...props}
+  />
+);
+
+export type CreateIngredientProps<
+  TChildProps = {},
+  TDataName extends string = "mutate"
+> = {
+  [key in TDataName]: ApolloReactCommon.MutationFunction<
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables
+  >;
+} &
+  TChildProps;
+export function withCreateIngredient<
+  TProps,
+  TChildProps = {},
+  TDataName extends string = "mutate"
+>(
+  operationOptions?: ApolloReactHoc.OperationOption<
+    TProps,
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables,
+    CreateIngredientProps<TChildProps, TDataName>
+  >
+) {
+  return ApolloReactHoc.withMutation<
+    TProps,
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables,
+    CreateIngredientProps<TChildProps, TDataName>
+  >(CreateIngredientDocument, {
+    alias: "createIngredient",
+    ...operationOptions,
+  });
+}
+
+/**
+ * __useCreateIngredientMutation__
+ *
+ * To run a mutation, you first call `useCreateIngredientMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateIngredientMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createIngredientMutation, { data, loading, error }] = useCreateIngredientMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateIngredientMutation(
+  baseOptions?: ApolloReactHooks.MutationHookOptions<
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables
+  >
+) {
+  return ApolloReactHooks.useMutation<
+    CreateIngredientMutation,
+    CreateIngredientMutationVariables
+  >(CreateIngredientDocument, baseOptions);
+}
+export type CreateIngredientMutationHookResult = ReturnType<
+  typeof useCreateIngredientMutation
+>;
+export type CreateIngredientMutationResult = ApolloReactCommon.MutationResult<
+  CreateIngredientMutation
+>;
+export type CreateIngredientMutationOptions = ApolloReactCommon.BaseMutationOptions<
+  CreateIngredientMutation,
+  CreateIngredientMutationVariables
 >;

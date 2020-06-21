@@ -8,7 +8,7 @@ import {
 
 import { Box, Button } from "rebass";
 import { useParams } from "react-router-dom";
-import RecipeTable from "../components/RecipeTable";
+import RecipeTable, { UpdateIngredientProps } from "../components/RecipeTable";
 import Debug from "../components/Debug";
 import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
@@ -68,12 +68,12 @@ const RecipeDetail: React.FC = () => {
     await refetch();
   };
 
-  const updateIngredient = (
-    sectionID: number,
-    ingredientID: number,
-    value: string,
-    attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional"
-  ) => {
+  const updateIngredient = ({
+    sectionID,
+    ingredientID,
+    value,
+    attr,
+  }: UpdateIngredientProps) => {
     const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
     attr === "grams" &&
       !edit &&

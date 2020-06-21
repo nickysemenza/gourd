@@ -113,8 +113,12 @@ func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, e
 }
 
 // GetRecipes returns all recipes, shallowly.
-func (c *Client) GetRecipes(ctx context.Context) ([]Recipe, error) {
-	query, args, err := c.psql.Select("*").From(recipesTable).ToSql()
+func (c *Client) GetRecipes(ctx context.Context, searchQuery string) ([]Recipe, error) {
+	q := c.psql.Select("*").From(recipesTable)
+	if searchQuery != "" {
+		q = q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+	}
+	query, args, err := q.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -200,8 +204,12 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 }
 
 // GetIngredients returns all ingredients.
-func (c *Client) GetIngredients(ctx context.Context) ([]Ingredient, error) {
-	query, args, err := c.psql.Select("*").From(ingredientsTable).ToSql()
+func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingredient, error) {
+	q := c.psql.Select("*").From(ingredientsTable)
+	if searchQuery != "" {
+		q = q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+	}
+	query, args, err := q.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}

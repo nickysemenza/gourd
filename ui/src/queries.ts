@@ -97,4 +97,24 @@ const _ = [
       }
     }
   `,
+  gql`
+    query searchIngredientsAndRecipes($searchQuery: String!) {
+      ingredients(searchQuery: $searchQuery) {
+        uuid
+        name
+      }
+      recipes(searchQuery: $searchQuery) {
+        uuid
+        name
+      }
+    }
+  `,
+  gql`
+    mutation createIngredient($name: String!) {
+      createIngredient(name: $name) {
+        uuid
+        name
+      }
+    }
+  `,
 ];

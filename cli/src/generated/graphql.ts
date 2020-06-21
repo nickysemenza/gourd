@@ -131,6 +131,7 @@ export enum FoodDataType {
 export type Mutation = {
   createRecipe: Recipe;
   updateRecipe: Recipe;
+  createIngredient: Ingredient;
 };
 
 export type MutationCreateRecipeArgs = {
@@ -139,6 +140,10 @@ export type MutationCreateRecipeArgs = {
 
 export type MutationUpdateRecipeArgs = {
   recipe?: Maybe<RecipeInput>;
+};
+
+export type MutationCreateIngredientArgs = {
+  name: Scalars["String"];
 };
 
 export type Query = {
@@ -150,8 +155,16 @@ export type Query = {
   foods?: Maybe<Array<Food>>;
 };
 
+export type QueryRecipesArgs = {
+  searchQuery?: Scalars["String"];
+};
+
 export type QueryRecipeArgs = {
   uuid: Scalars["String"];
+};
+
+export type QueryIngredientsArgs = {
+  searchQuery?: Scalars["String"];
 };
 
 export type QueryIngredientArgs = {
