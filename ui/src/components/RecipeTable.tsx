@@ -1,18 +1,31 @@
 import React from "react";
-import { Recipe, Section } from "../generated/graphql";
-import { Box, Flex, Text } from "rebass";
+import {
+  Recipe,
+  Section,
+  Ingredient,
+  SectionIngredientKind,
+} from "../generated/graphql";
+import { Box, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { InputProps } from "theme-ui";
 import IngredientSearch from "./IngredientSearch";
+import { Link } from "react-router-dom";
 export interface UpdateIngredientProps {
   sectionID: number;
   ingredientID: number;
   value: string;
   attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional";
 }
+
 export interface TableProps {
   recipe: Partial<Recipe>;
   updateIngredient: (i: UpdateIngredientProps) => void;
+  updateIngredientInfo: (
+    sectionID: number,
+    ingredientID: number,
+    ingredient: Pick<Ingredient, "uuid" | "name">,
+    kind: SectionIngredientKind
+  ) => void;
   updateInstruction: (
     sectionID: number,
     instructionID: number,
@@ -32,6 +45,7 @@ export interface TableProps {
 const RecipeTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
+  updateIngredientInfo,
   updateInstruction,
   getIngredientValue,
   edit,
@@ -83,7 +97,6 @@ const RecipeTable: React.FC<TableProps> = ({
                 })
               }
             />
-            {/* <Flex pl={1} width={1 / 2}> */}
             <Text pr={1} color="gray">
               g
             </Text>
@@ -104,11 +117,20 @@ const RecipeTable: React.FC<TableProps> = ({
             {edit ? (
               <IngredientSearch
                 initial={ingredient.info.name}
-                callback={(item, kind) => console.log({ item, kind })}
+                callback={(item, kind) =>
+                  // console.log({ item, kind })
+                  updateIngredientInfo(x, y, item, kind)
+                }
               />
             ) : (
               <Text pr={1} color="black">
-                {ingredient.info.name}
+                {ingredient.kind === SectionIngredientKind.Recipe ? (
+                  <Link to={`/recipe/${ingredient.info.uuid}`}>
+                    {ingredient.info.name}
+                  </Link>
+                ) : (
+                  ingredient.info.name
+                )}
               </Text>
             )}
             <TableInput
@@ -155,7 +177,6 @@ const RecipeTable: React.FC<TableProps> = ({
               }
             />
             {/* TODO: optional toggle */}
-            {/* </Flex> */}
           </Box>
         ))}
         {edit && <Text onClick={() => addIngredient(x)}>add ingredient</Text>}
@@ -163,9 +184,8 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>
         <ol style={{ margin: 0 }}>
           {section.instructions.map((instruction, y) => (
-            <li>
+            <li key={y}>
               <TableInput
-                key={y}
                 data-cy="instruction-input"
                 width={"128px"}
                 edit={edit}

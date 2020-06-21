@@ -24,7 +24,7 @@ const Food: React.FC = () => {
 export default Food;
 
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
-  const { data, loading, error } = useGetFoodQuery({
+  const { data } = useGetFoodQuery({
     variables: {
       fdc_id,
     },

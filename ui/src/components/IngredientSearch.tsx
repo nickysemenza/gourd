@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Search,
-  Grid,
-  Header,
-  Segment,
-  SearchProps,
-  SearchResultData,
-} from "semantic-ui-react";
+import { Search, SearchProps, SearchResultData } from "semantic-ui-react";
 import {
   useSearchIngredientsAndRecipesQuery,
   useCreateIngredientMutation,
@@ -37,16 +30,13 @@ const IngredientSearch: React.FC<{
   initial?: string;
 }> = ({ callback, initial }) => {
   const [value, setValue] = useState(initial || "");
-  const [
-    createIngredientMutation,
-    { data: data2 },
-  ] = useCreateIngredientMutation({
+  const [createIngredientMutation] = useCreateIngredientMutation({
     variables: {
       name: value,
     },
   });
 
-  const { data, loading, error } = useSearchIngredientsAndRecipesQuery({
+  const { data, loading } = useSearchIngredientsAndRecipesQuery({
     variables: {
       searchQuery: value, // value for 'searchQuery'
     },
@@ -89,13 +79,14 @@ const IngredientSearch: React.FC<{
     data: SearchResultData
   ) => {
     const selection = data.result as ResultItem;
-    if (selection.uuid == "") {
+    if (selection.uuid === "") {
       let res = (await createIngredientMutation()).data;
-      // console.log({ foo, data2 });
       if (res) {
+        setValue(res.createIngredient.name);
         callback(res.createIngredient, SectionIngredientKind.Ingredient);
       }
     } else {
+      setValue(selection.title);
       callback({ name: selection.title, uuid: selection.uuid }, selection.kind);
     }
   };

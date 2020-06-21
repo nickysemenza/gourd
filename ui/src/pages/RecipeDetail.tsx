@@ -4,6 +4,7 @@ import {
   useUpdateRecipeMutation,
   RecipeInput,
   SectionIngredientKind,
+  Ingredient,
 } from "../generated/graphql";
 
 import { Box, Button } from "rebass";
@@ -68,6 +69,41 @@ const RecipeDetail: React.FC = () => {
     await refetch();
   };
 
+  const updateIngredientInfo = (
+    sectionID: number,
+    ingredientID: number,
+    ingredient: Pick<Ingredient, "uuid" | "name">,
+    kind: SectionIngredientKind
+  ) => {
+    const { uuid, name } = ingredient;
+    setRecipe(
+      update(recipe, {
+        sections: {
+          [sectionID]: {
+            ingredients: {
+              [ingredientID]: {
+                info: {
+                  $set:
+                    kind === SectionIngredientKind.Recipe
+                      ? {
+                          uuid,
+                          name,
+                          __typename: "Recipe",
+                        }
+                      : {
+                          uuid,
+                          name,
+                          __typename: "Ingredient",
+                        },
+                },
+                kind: { $set: kind },
+              },
+            },
+          },
+        },
+      })
+    );
+  };
   const updateIngredient = ({
     sectionID,
     ingredientID,
@@ -220,6 +256,7 @@ const RecipeDetail: React.FC = () => {
       <RecipeCard recipe={recipe} />
       <RecipeTable
         updateIngredient={updateIngredient}
+        updateIngredientInfo={updateIngredientInfo}
         recipe={recipe}
         getIngredientValue={getIngredientValue}
         edit={edit}
