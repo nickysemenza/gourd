@@ -114,8 +114,16 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 	return r.Query().Recipe(ctx, uuid)
 }
 
-func (r *queryResolver) Recipes(ctx context.Context) ([]*model.Recipe, error) {
-	dbr, err := r.DB.GetRecipes(ctx)
+func (r *mutationResolver) CreateIngredient(ctx context.Context, name string) (*model.Ingredient, error) {
+	ing, err := r.DB.IngredientByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return fromIngredient(ing), nil
+}
+
+func (r *queryResolver) Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error) {
+	dbr, err := r.DB.GetRecipes(ctx, searchQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -144,8 +152,8 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 	return fromRecipe(res), nil
 }
 
-func (r *queryResolver) Ingredients(ctx context.Context) ([]*model.Ingredient, error) {
-	dbr, err := r.DB.GetIngredients(ctx)
+func (r *queryResolver) Ingredients(ctx context.Context, searchQuery string) ([]*model.Ingredient, error) {
+	dbr, err := r.DB.GetIngredients(ctx, searchQuery)
 	if err != nil {
 		return nil, err
 	}

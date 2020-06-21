@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import { Box } from "rebass";
+import IngredientSearch from "../components/IngredientSearch";
 
 interface TableProps<T extends object> {
   columns: Array<Column<T>>;
@@ -123,9 +124,15 @@ const IngredientList: React.FC = () => {
   );
 
   return (
-    <Styles>
-      <Table<i> columns={columns} data={ingredients} />
-    </Styles>
+    <>
+      <IngredientSearch
+        initial="eg"
+        callback={(item, kind) => console.log({ item, kind })}
+      />
+      <Styles>
+        <Table<i> columns={columns} data={ingredients} />
+      </Styles>
+    </>
   );
 };
 

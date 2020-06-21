@@ -126,12 +126,13 @@ enum FoodDataType {
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
+  createIngredient(name: String!): Ingredient!
 }
 
 type Query {
-  recipes: [Recipe!]!
+  recipes(searchQuery: String! = ""): [Recipe!]!
   recipe(uuid: String!): Recipe
-  ingredients: [Ingredient!]!
+  ingredients(searchQuery: String! = ""): [Ingredient!]!
   ingredient(uuid: String!): Ingredient
   food(fdcId: Int!): Food
   foods(

@@ -3,15 +3,16 @@ import { Recipe, Section } from "../generated/graphql";
 import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { InputProps } from "theme-ui";
-
+import IngredientSearch from "./IngredientSearch";
+export interface UpdateIngredientProps {
+  sectionID: number;
+  ingredientID: number;
+  value: string;
+  attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional";
+}
 export interface TableProps {
   recipe: Partial<Recipe>;
-  updateIngredient: (
-    sectionID: number,
-    ingredientID: number,
-    value: string,
-    attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional"
-  ) => void;
+  updateIngredient: (i: UpdateIngredientProps) => void;
   updateInstruction: (
     sectionID: number,
     instructionID: number,
@@ -59,6 +60,7 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>
         {section.ingredients.map((ingredient, y) => (
           <Box
+            key={y}
             sx={{
               display: "grid",
               gridTemplateColumns: "1fr 20px 2fr 1fr 4fr 4fr",
@@ -72,33 +74,71 @@ const RecipeTable: React.FC<TableProps> = ({
               edit={edit}
               softEdit
               value={getIngredientValue(x, y, ingredient.grams || 0)}
-              onChange={(e) => updateIngredient(x, y, e.target.value, "grams")}
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e.target.value,
+                  attr: "grams",
+                })
+              }
             />
             {/* <Flex pl={1} width={1 / 2}> */}
             <Text pr={1} color="gray">
               g
             </Text>
-            <TableInput
+            {/* <TableInput
               data-cy="name-input"
               width={"128px"}
               edit={edit}
               value={ingredient.info.name}
-              onChange={(e) => updateIngredient(x, y, e.target.value, "name")}
-            />
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e.target.value,
+                  attr: "name",
+                })
+              }
+            /> */}
+            {edit ? (
+              <IngredientSearch
+                initial={ingredient.info.name}
+                callback={(item, kind) => console.log({ item, kind })}
+              />
+            ) : (
+              <Text pr={1} color="black">
+                {ingredient.info.name}
+              </Text>
+            )}
             <TableInput
               data-cy="amount-input"
               width={"128px"}
               edit={edit}
               softEdit
               value={getIngredientValue(x, y, ingredient.amount || 0)}
-              onChange={(e) => updateIngredient(x, y, e.target.value, "amount")}
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e.target.value,
+                  attr: "amount",
+                })
+              }
             />
             <TableInput
               data-cy="unit-input"
               width={"64px"}
               edit={edit}
               value={ingredient.unit}
-              onChange={(e) => updateIngredient(x, y, e.target.value, "unit")}
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e.target.value,
+                  attr: "unit",
+                })
+              }
             />
             <TableInput
               data-cy="adjective-input"
@@ -106,7 +146,12 @@ const RecipeTable: React.FC<TableProps> = ({
               edit={edit}
               value={ingredient.adjective}
               onChange={(e) =>
-                updateIngredient(x, y, e.target.value, "adjective")
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e.target.value,
+                  attr: "adjective",
+                })
               }
             />
             {/* TODO: optional toggle */}
@@ -120,6 +165,7 @@ const RecipeTable: React.FC<TableProps> = ({
           {section.instructions.map((instruction, y) => (
             <li>
               <TableInput
+                key={y}
                 data-cy="instruction-input"
                 width={"128px"}
                 edit={edit}
@@ -146,7 +192,7 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableRow>
         <TableCell>Section</TableCell>
         <TableCell>Minutes</TableCell>
-        <TableCell>Ingredients</TableCell>
+        <TableCell>Ingredients: x grams of y (z units, modifier)</TableCell>
         <TableCell>Instructions</TableCell>
       </TableRow>
       {recipe.sections?.map((section, x) => renderRow(section, x))}

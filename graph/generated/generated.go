@@ -80,8 +80,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateRecipe func(childComplexity int, recipe *model.NewRecipe) int
-		UpdateRecipe func(childComplexity int, recipe *model.RecipeInput) int
+		CreateIngredient func(childComplexity int, name string) int
+		CreateRecipe     func(childComplexity int, recipe *model.NewRecipe) int
+		UpdateRecipe     func(childComplexity int, recipe *model.RecipeInput) int
 	}
 
 	Nutrient struct {
@@ -94,9 +95,9 @@ type ComplexityRoot struct {
 		Food        func(childComplexity int, fdcID int) int
 		Foods       func(childComplexity int, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) int
 		Ingredient  func(childComplexity int, uuid string) int
-		Ingredients func(childComplexity int) int
+		Ingredients func(childComplexity int, searchQuery string) int
 		Recipe      func(childComplexity int, uuid string) int
-		Recipes     func(childComplexity int) int
+		Recipes     func(childComplexity int, searchQuery string) int
 	}
 
 	Recipe struct {
@@ -146,11 +147,12 @@ type IngredientResolver interface {
 type MutationResolver interface {
 	CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error)
 	UpdateRecipe(ctx context.Context, recipe *model.RecipeInput) (*model.Recipe, error)
+	CreateIngredient(ctx context.Context, name string) (*model.Ingredient, error)
 }
 type QueryResolver interface {
-	Recipes(ctx context.Context) ([]*model.Recipe, error)
+	Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error)
 	Recipe(ctx context.Context, uuid string) (*model.Recipe, error)
-	Ingredients(ctx context.Context) ([]*model.Ingredient, error)
+	Ingredients(ctx context.Context, searchQuery string) ([]*model.Ingredient, error)
 	Ingredient(ctx context.Context, uuid string) (*model.Ingredient, error)
 	Food(ctx context.Context, fdcID int) (*model.Food, error)
 	Foods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error)
@@ -283,6 +285,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Ingredient.UUID(childComplexity), true
 
+	case "Mutation.createIngredient":
+		if e.complexity.Mutation.CreateIngredient == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createIngredient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateIngredient(childComplexity, args["name"].(string)), true
+
 	case "Mutation.createRecipe":
 		if e.complexity.Mutation.CreateRecipe == nil {
 			break
@@ -369,7 +383,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Ingredients(childComplexity), true
+		args, err := ec.field_Query_ingredients_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Ingredients(childComplexity, args["searchQuery"].(string)), true
 
 	case "Query.recipe":
 		if e.complexity.Query.Recipe == nil {
@@ -388,7 +407,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Recipes(childComplexity), true
+		args, err := ec.field_Query_recipes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Recipes(childComplexity, args["searchQuery"].(string)), true
 
 	case "Recipe.name":
 		if e.complexity.Recipe.Name == nil {
@@ -715,12 +739,13 @@ enum FoodDataType {
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
+  createIngredient(name: String!): Ingredient!
 }
 
 type Query {
-  recipes: [Recipe!]!
+  recipes(searchQuery: String! = ""): [Recipe!]!
   recipe(uuid: String!): Recipe
-  ingredients: [Ingredient!]!
+  ingredients(searchQuery: String! = ""): [Ingredient!]!
   ingredient(uuid: String!): Ingredient
   food(fdcId: Int!): Food
   foods(
@@ -736,6 +761,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createIngredient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["name"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -837,6 +876,20 @@ func (ec *executionContext) field_Query_ingredient_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_ingredients_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["searchQuery"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["searchQuery"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_recipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -848,6 +901,20 @@ func (ec *executionContext) field_Query_recipe_args(ctx context.Context, rawArgs
 		}
 	}
 	args["uuid"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_recipes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["searchQuery"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["searchQuery"] = arg0
 	return args, nil
 }
 
@@ -1473,6 +1540,47 @@ func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field gr
 	return ec.marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_createIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createIngredient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateIngredient(rctx, args["name"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Ingredient)
+	fc.Result = res
+	return ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Nutrient_id(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1590,9 +1698,16 @@ func (ec *executionContext) _Query_recipes(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_recipes_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Recipes(rctx)
+		return ec.resolvers.Query().Recipes(rctx, args["searchQuery"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1662,9 +1777,16 @@ func (ec *executionContext) _Query_ingredients(ctx context.Context, field graphq
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_ingredients_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Ingredients(rctx)
+		return ec.resolvers.Query().Ingredients(rctx, args["searchQuery"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4004,6 +4126,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateRecipe":
 			out.Values[i] = ec._Mutation_updateRecipe(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createIngredient":
+			out.Values[i] = ec._Mutation_createIngredient(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
