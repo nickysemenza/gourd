@@ -50,6 +50,8 @@ new-migrate/%: bin/migrate
 	./bin/migrate create -dir migrations -ext sql $(@F)
 migrate: bin/migrate
 	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable up
+migrate-down: bin/migrate
+	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable down
 
 .PHONY: generate-graphql-go
 generate-graphql-go: 

@@ -6,14 +6,14 @@ tables=(food_category food food_attribute_type acquisition_sample agricultural_a
 
 alias p='psql "postgresql://food:food@localhost:5555/food"'
 
-p -c "select count(*) from food";
-p -c "truncate table food_category cascade;"
+p -c "select count(*) from usda_food";
+p -c "truncate table usda_food_category cascade;"
 for f in ${tables[@]}; do
     echo $f
     headers=$(head -n1 $1$f.csv | tr -d '"')
     tmp="$f:tmp"
     sed 's/""/NULL/g' $1$f.csv > $tmp.csv
-    p -c "\copy $f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
+    p -c "\copy usda_$f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
 done
 
 rm *:tmp.csv
