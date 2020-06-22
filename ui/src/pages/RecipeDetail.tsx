@@ -14,7 +14,7 @@ import Debug from "../components/Debug";
 import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
-
+import { useHotkeys } from "react-hotkeys-hook";
 type override = {
   sectionID: number;
   ingredientID: number;
@@ -40,6 +40,26 @@ const RecipeDetail: React.FC = () => {
     },
   });
 
+  const resetMultiplier = () => setMultiplier(1);
+  const toggleEdit = () => {
+    resetMultiplier();
+    setEdit(!edit);
+  };
+  const saveUpdate = async () => {
+    await updateRecipeMutation();
+    await refetch();
+  };
+
+  useHotkeys("e", () => {
+    toggleEdit();
+  });
+  useHotkeys("r", () => {
+    resetMultiplier();
+  });
+  useHotkeys("s", () => {
+    saveUpdate();
+  });
+
   useEffect(() => {
     if (data?.recipe) {
       setRecipe(data.recipe);
@@ -63,11 +83,6 @@ const RecipeDetail: React.FC = () => {
   }
 
   if (!recipe) return null;
-
-  const saveUpdate = async () => {
-    await updateRecipeMutation();
-    await refetch();
-  };
 
   const updateIngredientInfo = (
     sectionID: number,
@@ -243,16 +258,9 @@ const RecipeDetail: React.FC = () => {
 
   return (
     <div>
-      <Button onClick={() => setMultiplier(1)}>Reset</Button>
-      <Button onClick={() => saveUpdate()}>save</Button>
-      <Button
-        onClick={() => {
-          setMultiplier(1);
-          setEdit(!edit);
-        }}
-      >
-        {edit ? "view" : "edit"}
-      </Button>
+      <Button onClick={resetMultiplier}>Reset</Button>
+      <Button onClick={saveUpdate}>save</Button>
+      <Button onClick={toggleEdit}>{edit ? "view" : "edit"}</Button>
       <RecipeCard recipe={recipe} />
       <RecipeTable
         updateIngredient={updateIngredient}
