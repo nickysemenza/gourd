@@ -17,17 +17,15 @@ func TestFromRecipe(t *testing.T) {
 		Minutes:      zero.IntFrom(88),
 		Instructions: []db.SectionInstruction{{Instruction: "add flour"}},
 		Ingredients: []db.SectionIngredient{{
-			Grams:          zero.FloatFrom(52),
-			IngredientUUID: zero.StringFrom("a-b-c"),
+			Grams: zero.FloatFrom(52),
 		}},
 	}, {
 		Minutes:      zero.IntFrom(1),
 		Instructions: []db.SectionInstruction{{Instruction: "add more flour"}, {Instruction: "mix"}},
 		Ingredients: []db.SectionIngredient{{
-			Grams:          zero.FloatFrom(120),
-			IngredientUUID: zero.StringFrom("a-b-c"),
-			Amount:         zero.FloatFrom(2),
-			Unit:           zero.StringFrom("cup"),
+			Grams:  zero.FloatFrom(120),
+			Amount: zero.FloatFrom(2),
+			Unit:   zero.StringFrom("cup"),
 		}},
 	}}
 
