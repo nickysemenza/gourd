@@ -92,6 +92,7 @@ const IngredientSearch: React.FC<{
   };
   return (
     <Search
+      data-cy="name-input"
       category
       loading={loading}
       onResultSelect={handleResultSelect}

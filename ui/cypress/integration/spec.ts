@@ -27,15 +27,20 @@ context("Basic Create, List, Edit test", () => {
     cy.get("input[data-cy=grams-input]")
       .first()
       .type("{selectall}4");
-    cy.get("input[data-cy=name-input]")
-      .first()
+    cy.get("div[data-cy=name-input]")
+      .eq(0)
       .type(`{selectall}${newIngredient}`);
+    //sometimes typeahead shows non-matches?
+    // cy.get(".result").eq(0).click();
+    cy.contains("(create)").click();
+    cy.wait(500);
     cy.contains("add instruction").click();
     cy.get("input[data-cy=instruction-input]")
       .first()
       .type("mix");
     cy.contains("save").click();
     cy.contains("Ingredients").click();
+    cy.reload();
     cy.contains(newIngredient);
   });
   // more examples
