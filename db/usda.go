@@ -27,7 +27,7 @@ func (e Foods) Len() int {
 }
 
 func (c *Client) GetFoods(ctx context.Context) (Foods, error) {
-	query, args, err := c.psql.Select("description, data_type, fdc_id").From("food").ToSql()
+	query, args, err := c.psql.Select("description, data_type, fdc_id").From("usda_food").ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*model.Food, error) {
 		"data_type",
 		"description",
 		"fdc_id",
-	).From("food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
+	).From("usda_food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -68,7 +68,7 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType *
 		"data_type",
 		"description",
 		"fdc_id",
-	).From("food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	).From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
 	if foodCategoryID != nil {
 		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
 	}
@@ -93,7 +93,7 @@ func (c *Client) GetFoodNutrients(ctx context.Context, fdcID int) ([]*model.Food
 		"nutrient_id",
 		"amount",
 		"data_points",
-	).From("food_nutrient").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
+	).From("usda_food_nutrient").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -118,7 +118,7 @@ func (c *Client) GetNutrient(ctx context.Context, nutrientID int) (*model.Nutrie
 		"id",
 		"name",
 		"unit_name",
-	).From("nutrient").Where(sq.Eq{"id": nutrientID}).ToSql()
+	).From("usda_nutrient").Where(sq.Eq{"id": nutrientID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -138,7 +138,7 @@ func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*model.Food
 	query, args, err := c.psql.Select(
 		"code",
 		"description",
-	).From("food_category").Where(sq.Eq{"id": categoryID}).ToSql()
+	).From("usda_food_category").Where(sq.Eq{"id": categoryID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
