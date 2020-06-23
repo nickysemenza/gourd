@@ -28,6 +28,10 @@ func (r *foodResolver) Nutrients(ctx context.Context, obj *model.Food) ([]*model
 	return r.DB.GetFoodNutrients(ctx, obj.FdcID)
 }
 
+func (r *foodResolver) BrandedInfo(ctx context.Context, obj *model.Food) (*model.BrandedFood, error) {
+	return r.DB.GetBrandInfo(ctx, obj.FdcID)
+}
+
 func (r *foodNutrientResolver) Nutrient(ctx context.Context, obj *model.FoodNutrient) (*model.Nutrient, error) {
 	return r.DB.GetNutrient(ctx, obj.NutrientID)
 }

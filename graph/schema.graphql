@@ -108,6 +108,16 @@ type Food {
   dataType: FoodDataType!
   category: FoodCategory
   nutrients: [FoodNutrient!]!
+  brandedInfo: BrandedFood
+}
+
+type BrandedFood {
+  brandOwner: String
+  ingredients: String
+  servingSize: Float!
+  servingSizeUnit: String!
+  householdServing: String
+  brandedFoodCategory: String
 }
 
 enum FoodDataType {

@@ -153,3 +153,21 @@ func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*model.Food
 	}
 	return x, nil
 }
+func (c *Client) GetBrandInfo(ctx context.Context, fdcID int) (*model.BrandedFood, error) {
+	query, args, err := c.psql.Select(
+		"brand_owner", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category",
+	).From("usda_branded_food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	x := &model.BrandedFood{}
+	err = c.db.GetContext(ctx, x, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return x, nil
+}

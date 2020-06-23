@@ -115,6 +115,16 @@ export type Food = {
   dataType: FoodDataType;
   category?: Maybe<FoodCategory>;
   nutrients: Array<FoodNutrient>;
+  brandedInfo?: Maybe<BrandedFood>;
+};
+
+export type BrandedFood = {
+  brandOwner?: Maybe<Scalars["String"]>;
+  ingredients?: Maybe<Scalars["String"]>;
+  servingSize: Scalars["Float"];
+  servingSizeUnit: Scalars["String"];
+  householdServing?: Maybe<Scalars["String"]>;
+  brandedFoodCategory?: Maybe<Scalars["String"]>;
 };
 
 export enum FoodDataType {
