@@ -65,3 +65,12 @@ type FoodCategory struct {
 	Code        string `json:"code" db:"code"`
 	Description string `json:"description" db:"description"`
 }
+
+type BrandedFood struct {
+	BrandOwner          *string `json:"brandOwner" db:"brand_owner"`
+	Ingredients         *string `json:"ingredients" db:"ingredients"`
+	ServingSize         float64 `json:"servingSize" db:"serving_size"`
+	ServingSizeUnit     string  `json:"servingSizeUnit" db:"serving_size_unit"`
+	HouseholdServing    *string `json:"householdServing" db:"household_serving_fulltext"`
+	BrandedFoodCategory *string `json:"brandedFoodCategory" db:"branded_food_category"`
+}
