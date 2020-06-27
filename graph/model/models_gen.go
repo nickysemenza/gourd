@@ -12,6 +12,20 @@ type IngredientInfo interface {
 	IsIngredientInfo()
 }
 
+type BrandedFood struct {
+	BrandOwner          *string `json:"brandOwner"`
+	Ingredients         *string `json:"ingredients"`
+	ServingSize         float64 `json:"servingSize"`
+	ServingSizeUnit     string  `json:"servingSizeUnit"`
+	HouseholdServing    *string `json:"householdServing"`
+	BrandedFoodCategory *string `json:"brandedFoodCategory"`
+}
+
+type FoodCategory struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}
+
 type FoodNutrientDerivation struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
@@ -26,6 +40,12 @@ type Meal struct {
 
 type NewRecipe struct {
 	Name string `json:"name"`
+}
+
+type Nutrient struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	UnitName string `json:"unitName"`
 }
 
 type RecipeInput struct {

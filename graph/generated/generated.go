@@ -877,6 +877,7 @@ type Query {
     dataType: FoodDataType
     foodCategoryID: Int
   ): [Food!]
+  # meal(uuid: String!): Meal
 }
 `, BuiltIn: false},
 }

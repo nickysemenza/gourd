@@ -7,6 +7,8 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/api/core"
+	"go.opentelemetry.io/otel/api/trace"
 )
 
 // StructuredLogger is adapted from https://github.com/go-chi/chi/blob/master/_examples/logging/main.go
@@ -25,7 +27,8 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 
 	logFields["ts"] = time.Now().UTC().Format(time.RFC1123)
 
-	if reqID := middleware.GetReqID(r.Context()); reqID != "" {
+	reqID := middleware.GetReqID(r.Context())
+	if reqID != "" {
 		logFields["req_id"] = reqID
 	}
 
@@ -41,6 +44,10 @@ func (l *StructuredLogger) NewLogEntry(r *http.Request) middleware.LogEntry {
 	logFields["user_agent"] = r.UserAgent()
 
 	logFields["uri"] = fmt.Sprintf("%s://%s%s", scheme, r.Host, r.RequestURI)
+
+	if span := trace.SpanFromContext(r.Context()); span != nil {
+		span.SetAttributes(core.Key("request_id").String(reqID))
+	}
 
 	entry.Logger = entry.Logger.WithFields(logFields)
 

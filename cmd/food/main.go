@@ -89,14 +89,18 @@ func getDBConn() (*sql.DB, error) {
 }
 func main() {
 	ctx := context.Background()
+
+	// env vars
 	setupEnv()
 	viper.AutomaticEnv()
 
+	// tracing
 	err := initTracer(viper.GetString("JAEGER_ENDPOINT"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// postgres database
 	dbConn, err := getDBConn()
 	if err != nil {
 		log.Fatal(err)
@@ -114,6 +118,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// postgres migrations
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://./migrations",
 		"postgres", driver)
@@ -127,6 +133,7 @@ func main() {
 	}
 	log.Info("migrated")
 
+	// server
 	s := server.Server{
 		Manager:     manager.New(dbClient),
 		HTTPPort:    viper.GetUint("PORT"),
@@ -135,5 +142,5 @@ func main() {
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 	}
 
-	log.Fatal(s.Run())
+	log.Fatal(s.Run(ctx))
 }

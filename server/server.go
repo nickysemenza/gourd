@@ -1,12 +1,14 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -46,7 +48,7 @@ func timing(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
-func (s *Server) Run() error {
+func (s *Server) Run(_ context.Context) error {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -68,6 +70,7 @@ func (s *Server) Run() error {
 			DB:      s.DB,
 		}},
 	))
+	srv.Use(extension.FixedComplexityLimit(100))
 	srv.Use(graph.Observability{})
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", othttp.WithRouteTag("/query", srv))

@@ -117,7 +117,7 @@ func (c *Client) GetNutrient(ctx context.Context, nutrientID int) (*model.Nutrie
 	query, args, err := c.psql.Select(
 		"id",
 		"name",
-		"unit_name",
+		"unit_name AS unitName",
 	).From("usda_nutrient").Where(sq.Eq{"id": nutrientID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
@@ -155,7 +155,12 @@ func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*model.Food
 }
 func (c *Client) GetBrandInfo(ctx context.Context, fdcID int) (*model.BrandedFood, error) {
 	query, args, err := c.psql.Select(
-		"brand_owner", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category",
+		"brand_owner AS brandOwner",
+		"ingredients AS ingredients",
+		"serving_size AS servingSize",
+		"serving_size_unit AS servingSizeUnit",
+		"household_serving_fulltext AS householdServing",
+		"branded_food_category AS brandedFoodCategory",
 	).From("usda_branded_food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)

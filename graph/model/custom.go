@@ -20,18 +20,6 @@ type Section struct {
 	IngredientsIDs  []string `json:"ingredients"`
 }
 
-// SectionIngredient has ingredients by ID
-// type SectionIngredient struct {
-// 	UUID         string  `json:"uuid"`
-// 	IngredientID string  `json:"info"`
-// 	RecipeID     string  `json:"info_recipe"`
-// 	Grams        float64 `json:"grams"`
-// 	Amount       float64 `json:"amount"`
-// 	Unit         string  `json:"unit"`
-// 	Adjective    string  `json:"adjective"`
-// 	Optional     bool    `json:"optional"`
-// }
-
 type Ingredient struct {
 	UUID       string   `json:"uuid"`
 	Name       string   `json:"name"`
@@ -47,30 +35,10 @@ type FoodNutrient struct {
 	DataPoints zero.Int `json:"data_points" db:"data_points"`
 }
 
-type Nutrient struct {
-	ID       int    `json:"id" db:"id"`
-	Name     string `json:"name" db:"name"`
-	UnitName string `json:"unit_name" db:"unit_name"`
-}
-
 type Food struct {
 	FdcID       int          `json:"fdc_id" db:"fdc_id"`
 	Description string       `json:"description" db:"description"`
 	DataType    FoodDataType `json:"data_type" db:"data_type"`
 	CategoryID  zero.Int     `json:"category" db:"food_category_id"`
 	NutrientIDs []int        `json:"nutrients"`
-}
-
-type FoodCategory struct {
-	Code        string `json:"code" db:"code"`
-	Description string `json:"description" db:"description"`
-}
-
-type BrandedFood struct {
-	BrandOwner          *string `json:"brandOwner" db:"brand_owner"`
-	Ingredients         *string `json:"ingredients" db:"ingredients"`
-	ServingSize         float64 `json:"servingSize" db:"serving_size"`
-	ServingSizeUnit     string  `json:"servingSizeUnit" db:"serving_size_unit"`
-	HouseholdServing    *string `json:"householdServing" db:"household_serving_fulltext"`
-	BrandedFoodCategory *string `json:"brandedFoodCategory" db:"branded_food_category"`
 }
