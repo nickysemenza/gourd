@@ -9,8 +9,7 @@ deploy:
 	gcloud builds submit --tag $(GCR_IMAGE)
 	terraform apply -var-file="prod.tfvars" -var="image_name=$(GCR_IMAGE)"
 
-dev: bin/food
-	./bin/food
+
 
 .PHONY: all
 all: bin/food
@@ -21,8 +20,17 @@ bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 
 test: unit-test lint
 
+dev: bin/food
+	./bin/food
+
 dev-env:
 	docker-compose up -d db jaeger
+dev-air: bin/air 
+	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
+
+bin/air:
+	@mkdir -p $(dir $@)
+	go build -o $@ ./vendor/github.com/cosmtrek/air
 
 bin/revive:
 	@mkdir -p $(dir $@)

@@ -132,6 +132,7 @@ func main() {
 		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
+		HTTPHost:    viper.GetString("HTTP_HOST"),
 	}
 
 	log.Fatal(s.Run())

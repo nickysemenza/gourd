@@ -27,6 +27,7 @@ import (
 type Server struct {
 	Manager     *manager.Manager
 	DB          *db.Client
+	HTTPHost    string
 	HTTPPort    uint
 	HTTPTimeout time.Duration
 }
@@ -80,9 +81,11 @@ func (s *Server) Run() error {
 	// 	Addr:    fmt.Sprintf(":%d", s.HTTPPort),
 	// 	Handler: http.TimeoutHandler(r, time.Second*30, "timeout"),
 	// }
+	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
 	log.Printf("connect to http://localhost:%d/ for GraphQL playground", s.HTTPPort)
+	log.Printf("running on: %s", addr)
 	// return server.ListenAndServe()
-	return http.ListenAndServe(fmt.Sprintf(":%d", s.HTTPPort),
+	return http.ListenAndServe(addr,
 		othttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
 			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
 		),
