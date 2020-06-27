@@ -17,6 +17,13 @@ type FoodNutrientDerivation struct {
 	Description string `json:"description"`
 }
 
+type Meal struct {
+	UUID      string   `json:"uuid"`
+	Name      string   `json:"name"`
+	NotionURL *string  `json:"notionURL"`
+	ImageURLs []string `json:"imageURLs"`
+}
+
 type NewRecipe struct {
 	Name string `json:"name"`
 }

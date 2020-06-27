@@ -11,6 +11,7 @@ import (
 	"github.com/nickysemenza/food/db"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/graph/model"
+	"github.com/nickysemenza/food/notion"
 	"github.com/vektah/gqlparser/gqlerror"
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
@@ -195,6 +196,24 @@ func (r *recipeResolver) Sections(ctx context.Context, obj *model.Recipe) ([]*mo
 		s = append(s, &model.Section{UUID: dbs.UUID, RecipeUUID: dbs.RecipeUUID, Minutes: int(dbs.Minutes.Int64)})
 	}
 	return s, nil
+}
+
+func (r *recipeResolver) Meals(ctx context.Context, obj *model.Recipe) ([]*model.Meal, error) {
+	res, err := r.DB.GetMeals(ctx, obj.UUID)
+	if err != nil {
+		return nil, err
+	}
+	for _, m := range res {
+		if m.NotionURL != nil {
+			page, err := notion.GetPage(ctx, *m.NotionURL)
+			if err != nil {
+				return nil, err
+			}
+			m.ImageURLs = page.ImageURLs
+		}
+	}
+
+	return res, err
 }
 
 func (r *sectionResolver) Instructions(ctx context.Context, obj *model.Section) ([]*model.SectionInstruction, error) {

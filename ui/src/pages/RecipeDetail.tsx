@@ -15,6 +15,8 @@ import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
+import { Divider, Image } from "semantic-ui-react";
+
 type override = {
   sectionID: number;
   ingredientID: number;
@@ -273,6 +275,15 @@ const RecipeDetail: React.FC = () => {
         updateInstruction={updateInstruction}
         addSection={addSection}
       />
+      <h2>meals</h2>
+      {recipe.meals.map((snippet) => (
+        <>
+          {snippet.name}
+          {snippet.imageURLs.map((u) => (
+            <Image src={u} size="small" />
+          ))}
+        </>
+      ))}
       <Debug data={{ recipe, loading, error, data, multiplier, override }} />
     </div>
   );

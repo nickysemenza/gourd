@@ -62,6 +62,15 @@ export type Recipe = {
   totalMinutes: Scalars["Int"];
   unit: Scalars["String"];
   sections: Array<Section>;
+  meals: Array<Meal>;
+};
+
+export type Meal = {
+  __typename?: "Meal";
+  uuid: Scalars["String"];
+  name: Scalars["String"];
+  notionURL?: Maybe<Scalars["String"]>;
+  imageURLs: Array<Scalars["String"]>;
 };
 
 export type RecipeInput = {
@@ -218,6 +227,9 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
       Recipe,
       "uuid" | "name" | "totalMinutes" | "unit"
     > & {
+        meals: Array<
+          { __typename?: "Meal" } & Pick<Meal, "uuid" | "name" | "imageURLs">
+        >;
         sections: Array<
           { __typename?: "Section" } & Pick<Section, "minutes" | "uuid"> & {
               ingredients: Array<
@@ -347,6 +359,11 @@ export const GetRecipeByUuidDocument = gql`
       name
       totalMinutes
       unit
+      meals {
+        uuid
+        name
+        imageURLs
+      }
       sections {
         minutes
         uuid

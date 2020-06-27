@@ -53,6 +53,14 @@ export type Recipe = {
   totalMinutes: Scalars["Int"];
   unit: Scalars["String"];
   sections: Array<Section>;
+  meals: Array<Meal>;
+};
+
+export type Meal = {
+  uuid: Scalars["String"];
+  name: Scalars["String"];
+  notionURL?: Maybe<Scalars["String"]>;
+  imageURLs: Array<Scalars["String"]>;
 };
 
 export type RecipeInput = {

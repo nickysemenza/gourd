@@ -41,6 +41,16 @@ type Recipe {
   totalMinutes: Int!
   unit: String!
   sections: [Section!]!
+  meals: [Meal!]!
+}
+
+# notion stuff
+type Meal {
+  uuid: String!
+  name: String!
+  notionURL: String
+  imageURLs: [String!]!
+  # recipes: [Recipe!]
 }
 
 # Recipe api inputs
@@ -150,4 +160,5 @@ type Query {
     dataType: FoodDataType
     foodCategoryID: Int
   ): [Food!]
+  # meal(uuid: String!): Meal
 }

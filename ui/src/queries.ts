@@ -9,6 +9,11 @@ const _ = [
         name
         totalMinutes
         unit
+        meals {
+          uuid
+          name
+          imageURLs
+        }
         sections {
           minutes
           uuid

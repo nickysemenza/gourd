@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/nickysemenza/food/graph/model"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 )
@@ -223,4 +224,19 @@ func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingr
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
 	return i, nil
+}
+
+func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {
+	query, args, err := c.psql.Select("meal_uuid AS uuid", "name", "notion_link AS notionURL").From("meals").
+		LeftJoin("meal_recipe on meals.uuid = meal_recipe.meal_uuid").
+		Where(sq.Eq{"recipe_uuid": recipe}).ToSql()
+	if err != nil {
+		return nil, err
+	}
+	var res []*model.Meal
+	err = c.db.SelectContext(ctx, &res, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
