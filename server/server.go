@@ -10,19 +10,21 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/graph"
-	"github.com/nickysemenza/food/graph/generated"
-	"github.com/nickysemenza/food/manager"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/api/metric"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/plugin/othttp"
+
+	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/food/graph"
+	"github.com/nickysemenza/food/graph/generated"
+	"github.com/nickysemenza/food/manager"
 )
 
 // Server represents a server
@@ -51,10 +53,16 @@ func timing(next http.Handler) http.Handler {
 func (s *Server) Run(_ context.Context) error {
 	r := chi.NewRouter()
 
+	sentryMiddleware := sentryhttp.New(sentryhttp.Options{
+		Repanic: true,
+	})
+
 	r.Use(middleware.RequestID)
 	r.Use(NewStructuredLogger(log.New()))
 	r.Use(cors.Handler(cors.Options{}))
 	r.Use(timing)
+	r.Use(middleware.Recoverer)
+	r.Use(sentryMiddleware.Handle)
 
 	_, hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
@@ -70,6 +78,7 @@ func (s *Server) Run(_ context.Context) error {
 			DB:      s.DB,
 		}},
 	))
+
 	srv.Use(extension.FixedComplexityLimit(100))
 	srv.Use(graph.Observability{})
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))

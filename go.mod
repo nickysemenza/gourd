@@ -8,6 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/cosmtrek/air v1.12.1
 	github.com/dgraph-io/ristretto v0.0.2
+	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible
 	github.com/go-chi/cors v1.1.1
 	github.com/gofrs/uuid v3.2.0+incompatible

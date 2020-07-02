@@ -6,6 +6,7 @@ import (
 	"os"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+	"github.com/getsentry/sentry-go"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -13,9 +14,6 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/luna-duclos/instrumentedsql"
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/manager"
-	"github.com/nickysemenza/food/server"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel/api/core"
@@ -23,6 +21,10 @@ import (
 	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+
+	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/food/manager"
+	"github.com/nickysemenza/food/server"
 )
 
 func initTracer(endpoint string) error {
@@ -68,6 +70,7 @@ func setupEnv() {
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
 	viper.SetDefault("PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "30s")
+	viper.SetDefault("SENTRY_DSN", "https://8220ab8a2b3d4c3c9cf7f636ec183c7a@o83311.ingest.sentry.io/5298706")
 
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
 }
@@ -98,6 +101,12 @@ func main() {
 	err := initTracer(viper.GetString("JAEGER_ENDPOINT"))
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if err := sentry.Init(sentry.ClientOptions{
+		Dsn: viper.GetString("SENTRY_DSN"),
+	}); err != nil {
+		log.Fatalf("sentry.Init: %s", err)
 	}
 
 	// postgres database
@@ -141,6 +150,5 @@ func main() {
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 	}
-
 	log.Fatal(s.Run(ctx))
 }
