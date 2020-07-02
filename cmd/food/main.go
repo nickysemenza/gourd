@@ -27,38 +27,39 @@ import (
 	"github.com/nickysemenza/food/server"
 )
 
-func initTracer(endpoint string) error {
+func initTracer() error {
+	endpoint := viper.GetString("JAEGER_ENDPOINT")
+	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	// Create and install Jaeger export pipeline
-	_, _, err := jaeger.NewExportPipeline(
-		jaeger.WithCollectorEndpoint(endpoint),
-		jaeger.WithProcess(jaeger.Process{
-			ServiceName: "food",
-			Tags: []core.KeyValue{
-				key.String("exporter", "jaeger"),
-			},
-		}),
-		jaeger.RegisterAsGlobal(),
-		jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
-	)
-
-	if false {
+	if projectID != "" {
 		// google cloud trace
 		// env: GOOGLE_CLOUD_PROJECT=xx GOOGLE_APPLICATION_CREDENTIALS=x.json
-
-		projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 		exporter, err := texporter.NewExporter(texporter.WithProjectID(projectID))
 		if err != nil {
-			log.Fatalf("texporter.NewExporter: %v", err)
+			return fmt.Errorf("texporter.NewExporter: %w", err)
 		}
 
 		tp, err := sdktrace.NewProvider(sdktrace.WithSyncer(exporter))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		global.SetTraceProvider(tp)
+	} else if endpoint != "" {
+		_, _, err := jaeger.NewExportPipeline(
+			jaeger.WithCollectorEndpoint(endpoint),
+			jaeger.WithProcess(jaeger.Process{
+				ServiceName: "food",
+				Tags: []core.KeyValue{
+					key.String("exporter", "jaeger"),
+				},
+			}),
+			jaeger.RegisterAsGlobal(),
+			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
+		)
+		return err
 	}
 
-	return err
+	return nil
 }
 
 func setupEnv() {
@@ -98,8 +99,7 @@ func main() {
 	viper.AutomaticEnv()
 
 	// tracing
-	err := initTracer(viper.GetString("JAEGER_ENDPOINT"))
-	if err != nil {
+	if err := initTracer(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -155,6 +155,6 @@ func autoMigrate(dbConn *sql.DB) error {
 			return fmt.Errorf("failed to migrate: %w", err)
 		}
 	}
-	log.Info("migrated")
+	log.Info("db: migrated")
 	return nil
 }

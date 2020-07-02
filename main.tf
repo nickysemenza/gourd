@@ -15,9 +15,13 @@ variable "image_name" {
   type = string
 }
 
+variable "project_id" {
+  type = string
+}
+
 
 provider "google" {
-  project = "cloudrun1-278204"
+  project = var.project_id
   region  = "us-west1"
 }
 
@@ -57,6 +61,10 @@ resource "google_cloud_run_service" "my-service" {
         env {
           name  = "DB_PASSWORD"
           value = var.db_password
+        }
+        env {
+          name  = "GOOGLE_CLOUD_PROJECT"
+          value = var.project_id
         }
       }
     }

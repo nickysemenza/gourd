@@ -11,7 +11,12 @@ RUN go mod download
 COPY . .
 RUN make bin/food
 
-FROM debian:buster
+# FROM debian:buster
+FROM alpine:3
+RUN apk add --no-cache ca-certificates
+# https://stackoverflow.com/a/35613430/1374045
+RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+
 WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/migrations ./migrations

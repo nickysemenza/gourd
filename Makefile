@@ -1,12 +1,14 @@
-VERSION          := $(shell git describe --tags --always --dirty="-dev")
+VERSION          := $(shell git describe --tags --always --dirty="-dev")a
 DATE             := $(shell date '+%Y-%m-%d-%H%M UTC')
 VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(DATE)"'
 
 GCP_PROJECT := cloudrun1-278204
 GCR_IMAGE := gcr.io/$(GCP_PROJECT)/food-backend:$(VERSION)
 
-deploy:
+deploy: deploy-image deploy-run
+deploy-image:
 	gcloud builds submit --tag $(GCR_IMAGE)
+deploy-run:
 	terraform apply -var-file="prod.tfvars" -var="image_name=$(GCR_IMAGE)"
 
 
