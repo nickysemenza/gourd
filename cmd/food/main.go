@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
@@ -10,7 +11,6 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/luna-duclos/instrumentedsql"
@@ -117,30 +117,15 @@ func main() {
 	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
 	defer dbConn.Close()
 
-	dbx := sqlx.NewDb(dbConn, "postgres")
-	if err = dbx.PingContext(ctx); err != nil {
-		log.Fatal(err)
-	}
-	dbClient := db.New(dbx)
-
-	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
+	dbClient, err := db.New(dbConn)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// postgres migrations
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://./migrations",
-		"postgres", driver)
-	if err != nil {
-		log.Fatalf("failed to initialize migrator: %v", err)
+	if err := autoMigrate(dbConn); err != nil {
+		log.Fatal(err)
 	}
-	if err := m.Up(); err != nil {
-		if err != migrate.ErrNoChange {
-			log.Fatalf("failed to migrate: %v", err)
-		}
-	}
-	log.Info("migrated")
 
 	// server
 	s := server.Server{
@@ -151,4 +136,25 @@ func main() {
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 	}
 	log.Fatal(s.Run(ctx))
+}
+
+func autoMigrate(dbConn *sql.DB) error {
+	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://./migrations",
+		"postgres", driver)
+	if err != nil {
+		return fmt.Errorf("failed to initialize migrator: %w", err)
+	}
+	if err := m.Up(); err != nil {
+		if err != migrate.ErrNoChange {
+			return fmt.Errorf("failed to migrate: %w", err)
+		}
+	}
+	log.Info("migrated")
+	return nil
 }

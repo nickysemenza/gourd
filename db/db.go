@@ -11,7 +11,6 @@ import (
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -93,7 +92,12 @@ type Ingredient struct {
 }
 
 // New creates a new Client.
-func New(db *sqlx.DB) *Client {
+func New(dbConn *sql.DB) (*Client, error) {
+	dbx := sqlx.NewDb(dbConn, "postgres")
+	if err := dbx.Ping(); err != nil {
+		return nil, err
+	}
+
 	// nolint:gomnd
 	cache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: 1e7,     // number of keys to track frequency of (10M).
@@ -102,12 +106,13 @@ func New(db *sqlx.DB) *Client {
 		Metrics:     true,
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &Client{db: db,
+	return &Client{
+		db:    dbx,
 		psql:  sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		cache: cache,
-	}
+	}, nil
 }
 
 // ConnnectionString returns a DSN.

@@ -3,3 +3,4 @@ vendor/
 terraform.*
 .terraform/
 prod.tfvars
+tmp/

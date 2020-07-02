@@ -1,9 +1,9 @@
 package db
 
 import (
+	"database/sql"
 	"testing"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // for pg
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
@@ -18,12 +18,14 @@ func NewDB(t *testing.T) *Client {
 	viper.SetDefault("DB_DBNAME", "food")
 	viper.AutomaticEnv()
 
-	dbConn, err := sqlx.Open("postgres", ConnnectionString(
+	dbConn, err := sql.Open("postgres", ConnnectionString(
 		viper.GetString("DB_HOST"),
 		viper.GetString("DB_USER"),
 		viper.GetString("DB_PASSWORD"),
 		viper.GetString("DB_DBNAME"),
 		viper.GetInt64("DB_PORT")))
 	require.NoError(t, err)
-	return New(dbConn)
+	d, err := New(dbConn)
+	require.NoError(t, err)
+	return d
 }
