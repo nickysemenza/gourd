@@ -53,6 +53,16 @@ const RecipeTable: React.FC<TableProps> = ({
   addIngredient,
   addSection,
 }) => {
+  // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
+  const flourMass = (recipe.sections || []).reduce(
+    (acc, section) =>
+      acc +
+      section.ingredients
+        .filter((item) => item.info.name.includes("flour"))
+        .reduce((acc, ingredient) => acc + ingredient.grams, 0),
+    0
+  );
+
   const renderRow = (section: Section, x: number) => (
     <TableRow key={x}>
       <TableCell>
@@ -77,7 +87,7 @@ const RecipeTable: React.FC<TableProps> = ({
             key={y}
             sx={{
               display: "grid",
-              gridTemplateColumns: "1fr 20px 2fr 1fr 4fr 4fr",
+              gridTemplateColumns: "1fr 70px 2fr 1fr 4fr 4fr",
               borderBottomWidth: "1px",
               borderBottomStyle: "solid",
               borderBottomColor: "green",
@@ -98,7 +108,10 @@ const RecipeTable: React.FC<TableProps> = ({
               }
             />
             <Text pr={1} color="gray">
-              g
+              g{" "}
+              {flourMass > 0 && (
+                <i>({Math.round((ingredient.grams / flourMass) * 100)}%)</i>
+              )}
             </Text>
             {/* <TableInput
               data-cy="name-input"
@@ -199,6 +212,7 @@ const RecipeTable: React.FC<TableProps> = ({
       </TableCell>
     </TableRow>
   );
+
   return (
     <Box
       sx={{
@@ -212,7 +226,9 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableRow>
         <TableCell>Section</TableCell>
         <TableCell>Minutes</TableCell>
-        <TableCell>Ingredients: x grams of y (z units, modifier)</TableCell>
+        <TableCell>
+          Ingredients: x grams (BP) of y (z units, modifier)
+        </TableCell>
         <TableCell>Instructions</TableCell>
       </TableRow>
       {recipe.sections?.map((section, x) => renderRow(section, x))}
