@@ -29,6 +29,8 @@ dev-env:
 	docker-compose up -d db jaeger
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
+dev-ui:
+	cd ui && yarn run start
 
 bin/air:
 	@mkdir -p $(dir $@)

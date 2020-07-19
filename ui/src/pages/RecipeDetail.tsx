@@ -16,6 +16,7 @@ import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Divider, Image } from "semantic-ui-react";
+import { encodeRecipe } from "../parser";
 
 type override = {
   sectionID: number;
@@ -275,6 +276,8 @@ const RecipeDetail: React.FC = () => {
         updateInstruction={updateInstruction}
         addSection={addSection}
       />
+      <h2>raw</h2>
+      <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
       {recipe.meals.map((snippet) => (
         <>
