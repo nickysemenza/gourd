@@ -69,8 +69,10 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 		return nil, err
 	}
 	if res == nil {
-		graphql.AddError(ctx, gqlerror.Errorf("no recipe found with uuid %s", uuid))
-		return nil, nil
+		uuid, err = r.DB.InsertRecipe(ctx, &db.Recipe{Name: recipe.Name})
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	dbr := &db.Recipe{
