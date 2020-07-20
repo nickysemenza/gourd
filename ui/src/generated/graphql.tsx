@@ -167,6 +167,7 @@ export type Mutation = {
   createRecipe: Recipe;
   updateRecipe: Recipe;
   createIngredient: Ingredient;
+  upsertIngredient: Scalars["String"];
 };
 
 export type MutationCreateRecipeArgs = {
@@ -179,6 +180,11 @@ export type MutationUpdateRecipeArgs = {
 
 export type MutationCreateIngredientArgs = {
   name: Scalars["String"];
+};
+
+export type MutationUpsertIngredientArgs = {
+  name: Scalars["String"];
+  kind: SectionIngredientKind;
 };
 
 export type Query = {

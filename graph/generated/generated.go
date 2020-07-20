@@ -100,6 +100,7 @@ type ComplexityRoot struct {
 		CreateIngredient func(childComplexity int, name string) int
 		CreateRecipe     func(childComplexity int, recipe *model.NewRecipe) int
 		UpdateRecipe     func(childComplexity int, recipe *model.RecipeInput) int
+		UpsertIngredient func(childComplexity int, name string, kind model.SectionIngredientKind) int
 	}
 
 	Nutrient struct {
@@ -167,6 +168,7 @@ type MutationResolver interface {
 	CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error)
 	UpdateRecipe(ctx context.Context, recipe *model.RecipeInput) (*model.Recipe, error)
 	CreateIngredient(ctx context.Context, name string) (*model.Ingredient, error)
+	UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error)
 }
 type QueryResolver interface {
 	Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error)
@@ -417,6 +419,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateRecipe(childComplexity, args["recipe"].(*model.RecipeInput)), true
+
+	case "Mutation.upsertIngredient":
+		if e.complexity.Mutation.UpsertIngredient == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_upsertIngredient_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpsertIngredient(childComplexity, args["name"].(string), args["kind"].(model.SectionIngredientKind)), true
 
 	case "Nutrient.id":
 		if e.complexity.Nutrient.ID == nil {
@@ -864,6 +878,7 @@ type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
   createIngredient(name: String!): Ingredient!
+  upsertIngredient(name: String!, kind: SectionIngredientKind!): String!
 }
 
 type Query {
@@ -926,6 +941,28 @@ func (ec *executionContext) field_Mutation_updateRecipe_args(ctx context.Context
 		}
 	}
 	args["recipe"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_upsertIngredient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["name"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg0
+	var arg1 model.SectionIngredientKind
+	if tmp, ok := rawArgs["kind"]; ok {
+		arg1, err = ec.unmarshalNSectionIngredientKind2githubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐSectionIngredientKind(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["kind"] = arg1
 	return args, nil
 }
 
@@ -2060,6 +2097,47 @@ func (ec *executionContext) _Mutation_createIngredient(ctx context.Context, fiel
 	res := resTmp.(*model.Ingredient)
 	fc.Result = res
 	return ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_upsertIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_upsertIngredient_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpsertIngredient(rctx, args["name"].(string), args["kind"].(model.SectionIngredientKind))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Nutrient_id(ctx context.Context, field graphql.CollectedField, obj *model.Nutrient) (ret graphql.Marshaler) {
@@ -4736,6 +4814,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createIngredient":
 			out.Values[i] = ec._Mutation_createIngredient(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "upsertIngredient":
+			out.Values[i] = ec._Mutation_upsertIngredient(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
