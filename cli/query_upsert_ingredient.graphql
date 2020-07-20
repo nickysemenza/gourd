@@ -1,0 +1,3 @@
+mutation UpsertIngredient($name: String!, $kind: SectionIngredientKind!) {
+  upsertIngredient(name: $name, kind: $kind)
+}
