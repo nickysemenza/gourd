@@ -147,6 +147,7 @@ type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
   createIngredient(name: String!): Ingredient!
+  upsertIngredient(name: String!, kind: SectionIngredientKind!): String!
 }
 
 type Query {

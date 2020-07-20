@@ -129,6 +129,31 @@ func (r *mutationResolver) CreateIngredient(ctx context.Context, name string) (*
 	return fromIngredient(ing), nil
 }
 
+func (r *mutationResolver) UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error) {
+	switch kind {
+	case model.SectionIngredientKindIngredient:
+		ing, err := r.CreateIngredient(ctx, name)
+		if err != nil {
+			return "", fmt.Errorf("failed to upsert ingredient: %w", err)
+		}
+		return ing.UUID, nil
+	case model.SectionIngredientKindRecipe:
+		dbRrecipe, err := r.DB.GetRecipeByName(ctx, name)
+		if err != nil {
+			return "", fmt.Errorf("failed to upsert recipe: %w", err)
+		}
+		if dbRrecipe == nil {
+			recipe, err := r.CreateRecipe(ctx, &model.NewRecipe{Name: name})
+			if err != nil {
+				return "", fmt.Errorf("failed to upsert recipe: %w", err)
+			}
+			return recipe.UUID, nil
+		}
+		return dbRrecipe.UUID, nil
+	}
+	return "", fmt.Errorf("unknown kind: %v", kind)
+}
+
 func (r *queryResolver) Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error) {
 	dbr, err := r.DB.GetRecipes(ctx, searchQuery)
 	if err != nil {
