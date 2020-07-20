@@ -70,6 +70,5 @@ generate-graphql-go:
 	go generate ./graph
 generate-graphql-ts:
 	cd ui && yarn run generate
-	cd cli && yarn run generate
 
 graphql: generate-graphql-go generate-graphql-ts
