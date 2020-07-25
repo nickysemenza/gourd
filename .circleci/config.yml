@@ -178,6 +178,18 @@ jobs:
           name: Run all tests
           command: cargo test --all
           working_directory: ./cli
+      # - run:
+      #     name: Coverage
+      #     working_directory: ./cli
+      #     command: |
+      #       # install kcov
+      #       cargo install cargo-kcov
+      #       cargo kcov --print-install-kcov-sh | bash
+      #       echo "Install kcov successfully"
+      #       # coverage
+      #       cargo kcov --all -v
+      #       bash <(curl -s https://codecov.io/bash)
+      #       echo "Upload code coverage successfully"
 workflows:
   version: 2
   build_fullstack:
