@@ -70,35 +70,6 @@ jobs:
           file: /tmp/artifacts/c.out
       - store_artifacts:
           path: /tmp/artifacts
-      # - run:
-      #     name: "install node"
-      #     command: "curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -"
-      # - run:
-      #     name: "install node2"
-      #     command: "sudo apt-get install -y nodejs"
-      # - run:
-      #     name: "install yarn"
-      #     command: "sudo npm install -g yarn"
-      # - run:
-      #     name: "source bash"
-      #     command: "source /home/circleci/.bashrc"
-      # - restore_cache:
-      #     name: Restore Yarn Package Cache
-      #     keys:
-      #       - yarn-packages-{{ checksum "ui/yarn.lock" }}
-      # - run:
-      #     name: Install Dependencies
-      #     command: yarn install --frozen-lockfile
-      #     working_directory: ./ui
-      # - save_cache:
-      #     name: Save Yarn Package Cache
-      #     key: yarn-packages-{{ checksum "ui/yarn.lock" }}
-      #     paths:
-      #       - ~/.cache/yarn
-      # - run:
-      #     name: run it
-      #     command: CYPRESS_BASE_URL=http://localhost:3001 yarn run test:integration
-      #     working_directory: ./ui
   build_ui:
     docker:
       - image: node:13
