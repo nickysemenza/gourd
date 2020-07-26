@@ -97,7 +97,6 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateIngredient func(childComplexity int, name string) int
 		CreateRecipe     func(childComplexity int, recipe *model.NewRecipe) int
 		UpdateRecipe     func(childComplexity int, recipe *model.RecipeInput) int
 		UpsertIngredient func(childComplexity int, name string, kind model.SectionIngredientKind) int
@@ -167,7 +166,6 @@ type IngredientResolver interface {
 type MutationResolver interface {
 	CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error)
 	UpdateRecipe(ctx context.Context, recipe *model.RecipeInput) (*model.Recipe, error)
-	CreateIngredient(ctx context.Context, name string) (*model.Ingredient, error)
 	UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error)
 }
 type QueryResolver interface {
@@ -383,18 +381,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Meal.UUID(childComplexity), true
-
-	case "Mutation.createIngredient":
-		if e.complexity.Mutation.CreateIngredient == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createIngredient_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateIngredient(childComplexity, args["name"].(string)), true
 
 	case "Mutation.createRecipe":
 		if e.complexity.Mutation.CreateRecipe == nil {
@@ -877,7 +863,6 @@ enum FoodDataType {
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
-  createIngredient(name: String!): Ingredient!
   upsertIngredient(name: String!, kind: SectionIngredientKind!): String!
 }
 
@@ -901,20 +886,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
-
-func (ec *executionContext) field_Mutation_createIngredient_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["name"] = arg0
-	return args, nil
-}
 
 func (ec *executionContext) field_Mutation_createRecipe_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -2056,47 +2027,6 @@ func (ec *executionContext) _Mutation_updateRecipe(ctx context.Context, field gr
 	res := resTmp.(*model.Recipe)
 	fc.Result = res
 	return ec.marshalNRecipe2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐRecipe(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_createIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_createIngredient_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateIngredient(rctx, args["name"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Ingredient)
-	fc.Result = res
-	return ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋfoodᚋgraphᚋmodelᚐIngredient(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_upsertIngredient(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -4809,11 +4739,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateRecipe":
 			out.Values[i] = ec._Mutation_updateRecipe(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "createIngredient":
-			out.Values[i] = ec._Mutation_createIngredient(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

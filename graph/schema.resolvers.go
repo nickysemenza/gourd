@@ -121,18 +121,14 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 	return r.Query().Recipe(ctx, uuid)
 }
 
-func (r *mutationResolver) CreateIngredient(ctx context.Context, name string) (*model.Ingredient, error) {
-	ing, err := r.DB.IngredientByName(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return fromIngredient(ing), nil
-}
-
 func (r *mutationResolver) UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error) {
 	switch kind {
 	case model.SectionIngredientKindIngredient:
-		ing, err := r.CreateIngredient(ctx, name)
+		ing, err := r.DB.IngredientByName(ctx, name)
+		if err != nil {
+			return "", err
+		}
+
 		if err != nil {
 			return "", fmt.Errorf("failed to upsert ingredient: %w", err)
 		}

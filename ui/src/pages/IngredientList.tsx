@@ -104,20 +104,23 @@ const IngredientList: React.FC = () => {
         accessor: "name",
       },
       {
-        Header: "test",
-        id: "test",
-        Cell: ({ row: { original } }: CellProps<i>) => (
-          <Box>
-            <ul>
-              {(original.recipes || []).map((r) => (
-                <li>
-                  <Link to={`recipe/${r.uuid}`}>{r.name}</Link>
-                </li>
-              ))}
-            </ul>
-            {/* <Debug data={original} /> */}
-          </Box>
-        ),
+        Header: "Recipes",
+        id: "recipes",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const recipes = original.recipes || [];
+          return (
+            <Box>
+              <ul>
+                {recipes.map((r) => (
+                  <li>
+                    <Link to={`recipe/${r.uuid}`}>{r.name}</Link>
+                  </li>
+                ))}
+              </ul>
+              {/* <Debug data={original} /> */}
+            </Box>
+          );
+        },
       },
     ],
     []

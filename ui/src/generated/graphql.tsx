@@ -166,7 +166,6 @@ export type Mutation = {
   __typename?: "Mutation";
   createRecipe: Recipe;
   updateRecipe: Recipe;
-  createIngredient: Ingredient;
   upsertIngredient: Scalars["String"];
 };
 
@@ -176,10 +175,6 @@ export type MutationCreateRecipeArgs = {
 
 export type MutationUpdateRecipeArgs = {
   recipe?: Maybe<RecipeInput>;
-};
-
-export type MutationCreateIngredientArgs = {
-  name: Scalars["String"];
 };
 
 export type MutationUpsertIngredientArgs = {
@@ -349,14 +344,13 @@ export type SearchIngredientsAndRecipesQuery = { __typename?: "Query" } & {
 
 export type CreateIngredientMutationVariables = {
   name: Scalars["String"];
+  kind: SectionIngredientKind;
 };
 
-export type CreateIngredientMutation = { __typename?: "Mutation" } & {
-  createIngredient: { __typename?: "Ingredient" } & Pick<
-    Ingredient,
-    "uuid" | "name"
-  >;
-};
+export type CreateIngredientMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "upsertIngredient"
+>;
 
 export const GetRecipeByUuidDocument = gql`
   query getRecipeByUUID($uuid: String!) {
@@ -1153,11 +1147,8 @@ export type SearchIngredientsAndRecipesQueryResult = ApolloReactCommon.QueryResu
   SearchIngredientsAndRecipesQueryVariables
 >;
 export const CreateIngredientDocument = gql`
-  mutation createIngredient($name: String!) {
-    createIngredient(name: $name) {
-      uuid
-      name
-    }
+  mutation createIngredient($name: String!, $kind: SectionIngredientKind!) {
+    upsertIngredient(name: $name, kind: $kind)
   }
 `;
 export type CreateIngredientMutationFn = ApolloReactCommon.MutationFunction<
@@ -1231,6 +1222,7 @@ export function withCreateIngredient<
  * const [createIngredientMutation, { data, loading, error }] = useCreateIngredientMutation({
  *   variables: {
  *      name: // value for 'name'
+ *      kind: // value for 'kind'
  *   },
  * });
  */

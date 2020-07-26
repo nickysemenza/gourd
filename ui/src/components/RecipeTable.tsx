@@ -87,7 +87,7 @@ const RecipeTable: React.FC<TableProps> = ({
             key={y}
             sx={{
               display: "grid",
-              gridTemplateColumns: "1fr 70px 2fr 1fr 4fr 4fr",
+              gridTemplateColumns: "1fr 70px 3fr 1fr 4fr 4fr",
               borderBottomWidth: "1px",
               borderBottomStyle: "solid",
               borderBottomColor: "green",
@@ -253,7 +253,7 @@ const TableRow: typeof Box = ({ children }) => (
   <Box
     sx={{
       display: "grid",
-      gridTemplateColumns: "1fr 1fr 2fr 2fr",
+      gridTemplateColumns: "1fr 1fr 4fr 2fr",
       borderBottomWidth: "1px",
       borderBottomStyle: "solid",
       borderBottomColor: "highlight",

@@ -115,11 +115,8 @@ const _ = [
     }
   `,
   gql`
-    mutation createIngredient($name: String!) {
-      createIngredient(name: $name) {
-        uuid
-        name
-      }
+    mutation createIngredient($name: String!, $kind: SectionIngredientKind!) {
+      upsertIngredient(name: $name, kind: $kind)
     }
   `,
 ];

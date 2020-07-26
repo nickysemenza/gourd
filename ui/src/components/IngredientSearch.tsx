@@ -33,6 +33,7 @@ const IngredientSearch: React.FC<{
   const [createIngredientMutation] = useCreateIngredientMutation({
     variables: {
       name: value,
+      kind: SectionIngredientKind.Ingredient,
     },
   });
 
@@ -82,8 +83,10 @@ const IngredientSearch: React.FC<{
     if (selection.uuid === "") {
       let res = (await createIngredientMutation()).data;
       if (res) {
-        setValue(res.createIngredient.name);
-        callback(res.createIngredient, SectionIngredientKind.Ingredient);
+        callback(
+          { uuid: res.upsertIngredient, name: value },
+          SectionIngredientKind.Ingredient
+        );
       }
     } else {
       setValue(selection.title);
