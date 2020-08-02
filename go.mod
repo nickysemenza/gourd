@@ -7,6 +7,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.1.0
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/cosmtrek/air v1.12.1
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dgraph-io/ristretto v0.0.2
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible
@@ -27,6 +28,7 @@ require (
 	go.opentelemetry.io/otel v0.4.2
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.4.2
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.4.2
+	golang.org/x/tools v0.0.0-20200731060945-b5fad4ed8dd6
 	google.golang.org/grpc v1.27.1
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/yaml.v2 v2.2.7
