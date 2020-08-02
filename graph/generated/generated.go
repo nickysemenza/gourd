@@ -863,7 +863,7 @@ enum FoodDataType {
 type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
-  upsertIngredient(name: String!, kind: SectionIngredientKind!): String!
+  upsertIngredient(name: String!, kind: SectionIngredientKind!): String! # returns UUID
 }
 
 type Query {
