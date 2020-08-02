@@ -34,7 +34,6 @@ func TestParse(t *testing.T) {
 			Volume:   Measurement{Value: 0.75, Unit: "cup"},
 			Modifier: "sifted",
 		}},
-		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -44,6 +43,25 @@ func TestParse(t *testing.T) {
 				// return
 			}
 			require.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestParseAndStringify(t *testing.T) {
+	tests := []struct {
+		in  string
+		out string
+	}{
+		{in: "3 tablespoons/43 grams unsalted butter, melted", out: "43 grams (3 tablespoons) unsalted butter, melted"},
+		{in: "1 ¼ teaspoons kosher salt", out: "1.25 teaspoons kosher salt"},
+		{in: "8 ounces (225g) semisweet chocolate, roughly chopped with a knife into 1/2- to 1/4-inch chunks", out: "225 g (8 ounces) semisweet chocolate, chunks"}, // TODO: it's dropping some
+	}
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			got, err := Parse(context.Background(), tt.in)
+			require.NoError(t, err)
+
+			require.Equal(t, tt.out, got.ToString())
 		})
 	}
 }
