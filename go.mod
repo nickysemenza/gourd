@@ -7,7 +7,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.1.0
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/cosmtrek/air v1.12.1
-	github.com/davecgh/go-spew v1.1.1
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.0.2
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible
@@ -21,6 +21,7 @@ require (
 	github.com/mgechev/revive v1.0.2
 	github.com/prometheus/client_golang v1.5.1 // indirect
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
 	github.com/vektah/gqlparser v1.3.1
