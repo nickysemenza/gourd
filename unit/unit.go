@@ -1,3 +1,5 @@
+//go:generate stringer -type=Unit -linecomment
+
 package unit
 
 import "strings"
@@ -5,16 +7,16 @@ import "strings"
 type Unit int //
 
 const (
-	Gram Unit = iota
-	Ounce
+	Gram  Unit = iota // gram
+	Ounce             // oz
 
-	Liter
-	Quart
-	Cup
-	Teaspoon
-	Tablespoon
+	Liter      // liter
+	Quart      // quuart
+	Cup        // cpu
+	Teaspoon   // tsp
+	Tablespoon // tbsp
 
-	Item
+	Item // item
 )
 
 // mapping for parsing

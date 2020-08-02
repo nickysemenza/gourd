@@ -4,24 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
-
-func Test_parse(t *testing.T) {
-	log.SetLevel(log.DebugLevel)
-	res, err := Parse(context.Background(), "1.2 c (37gr) all p-purpose flour")
-	require.NoError(t, err)
-	spew.Dump(res)
-	res, err = Parse(context.Background(), "1 ½ teaspoons/6 grams baking powder")
-	require.NoError(t, err)
-	spew.Dump(res)
-	res, err = Parse(context.Background(), "3 tablespoons/43.2 grams unsalted butter, melted")
-	require.NoError(t, err)
-	spew.Dump(res)
-	t.Fail()
-}
 
 func TestParse(t *testing.T) {
 	tests := []struct {
@@ -45,8 +29,8 @@ func TestParse(t *testing.T) {
 			Weight: Measurement{Value: 60, Unit: "grams"},
 			Volume: Measurement{Value: 0.5, Unit: "cup"},
 		}},
-		{name: "mass and vol, modifier", s: "¾ cup (90 grams) flour, sifted", want: &Ingredient{Name: "flour",
-			Weight:   Measurement{Value: 90, Unit: "grams"},
+		{name: "mass and vol, modifier", s: "¾ cup (90 g) flour, sifted", want: &Ingredient{Name: "flour",
+			Weight:   Measurement{Value: 90, Unit: "g"},
 			Volume:   Measurement{Value: 0.75, Unit: "cup"},
 			Modifier: "sifted",
 		}},

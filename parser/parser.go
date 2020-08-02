@@ -59,6 +59,20 @@ type Ingredient struct {
 	Modifier string
 }
 
+func (i *Ingredient) ToString() string {
+	var sb strings.Builder
+
+	sb.WriteString(i.Name)
+	sb.WriteString("\n")
+	if i.Weight.Value != 0 {
+		sb.WriteString(fmt.Sprintf("•%g %s\n", i.Weight.Value, i.Weight.Unit))
+	}
+	if i.Volume.Value != 0 {
+		sb.WriteString(fmt.Sprintf("•%g %s\n", i.Volume.Value, i.Volume.Unit))
+	}
+	return sb.String()
+}
+
 func Parse(ctx context.Context, s string) (*Ingredient, error) {
 	return (&parser{}).parse(ctx, s)
 }
