@@ -25,6 +25,7 @@ import (
 	"github.com/nickysemenza/food/graph"
 	"github.com/nickysemenza/food/graph/generated"
 	"github.com/nickysemenza/food/manager"
+	"github.com/nickysemenza/food/scraper"
 )
 
 // Server represents a server
@@ -83,6 +84,7 @@ func (s *Server) Run(_ context.Context) error {
 	srv.Use(graph.Observability{})
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", othttp.WithRouteTag("/query", srv))
+	r.Get("/scrape", s.Scrape)
 
 	r.Get("/h", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("hi"))
@@ -106,6 +108,17 @@ func (s *Server) GetRecipe(w http.ResponseWriter, req *http.Request) {
 	recipe, _ := s.Manager.GetRecipe(ctx, id)
 	writeJSON(w, http.StatusOK, recipe)
 }
+
+func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	recipe, err := scraper.GetIngredients(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html")
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, err)
+	}
+	writeJSON(w, http.StatusOK, recipe)
+}
+
 func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)

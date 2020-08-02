@@ -1,6 +1,7 @@
-//go:generate stringer -type=TokenKind
-
+// Package parser turns a human-readable ingredient line-item into a structed format.
 package parser
+
+// go:generate stringer -type=TokenKind
 
 import (
 	"context"
@@ -16,42 +17,44 @@ import (
 	"go.opentelemetry.io/otel/api/global"
 )
 
-type TokenKind int
+type tokenKind int
 
 // types of things we can parse
 const (
 	// strings
-	MeasureWeight TokenKind = iota
-	MeasureVolume
-	UnkString
-	KindIngredientName
-	Modifier
+	measureWeight tokenKind = iota
+	measureVolume
+	unkString
+	kindIngredientName
+	modifier
 
 	// floats
-	UnkFloat
-	WeightFloat
-	VolumeFloat
+	unkFloat
+	weightFloat
+	volumeFloat
 
-	None
+	none
 )
 
 type segment struct {
-	kind TokenKind
+	kind tokenKind
 	raw  string
 }
 
 type parser struct {
-	current        TokenKind
+	current        tokenKind
 	sb             strings.Builder
 	nextIsModifier bool
 	res            []segment
 }
 
+// Measurement represents a volume or weight measurement.
 type Measurement struct {
 	Unit  string
 	Value float64
-	// kind  TokenKind
 }
+
+// Ingredient is the structured version of an ingredient line-item.
 type Ingredient struct {
 	Name     string
 	Weight   Measurement
@@ -59,6 +62,7 @@ type Ingredient struct {
 	Modifier string
 }
 
+// ToString converts the structure back to a string. This will be a normalized version of what was parsed, if applicable.
 func (i *Ingredient) ToString() string {
 	var weight, volume string
 	if i.Weight.Value != 0 {
@@ -88,6 +92,7 @@ func (i *Ingredient) ToString() string {
 	return sb.String()
 }
 
+// Parse attempts to parse the line-item.
 func Parse(ctx context.Context, s string) (*Ingredient, error) {
 	return (&parser{}).parse(ctx, s)
 }
@@ -96,7 +101,7 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 	ctx, span := global.Tracer("parser").Start(ctx, "parser.Parse")
 	defer span.End()
 
-	segments, err := p.getsegments(s)
+	segments, err := p.getsegments(ctx, s)
 	span.AddEvent(ctx, "got segments")
 	span.SetAttributes(core.KeyValue{Key: "raw", Value: core.String(s)})
 	if err != nil {
@@ -107,16 +112,18 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 	}
 	// spew.Dump(segments)
 	log.Debugf("INPUT: %s\nOUTPUT:\n", s)
-	return p.handleSegments(segments)
+	return p.handleSegments(ctx, segments)
 }
 
 // nolint:gocognit,funlen
-func (p *parser) handleSegments(segments []segment) (*Ingredient, error) {
+func (p *parser) handleSegments(ctx context.Context, segments []segment) (*Ingredient, error) {
+	_, span := global.Tracer("parser").Start(ctx, "parser.handleSegments")
+	defer span.End()
 	ing := Ingredient{}
 	for i := 0; i < len(segments); i++ {
 		curr := segments[i]
 		switch curr.kind {
-		case VolumeFloat, WeightFloat:
+		case volumeFloat, weightFloat:
 			f, err := parseFloat(curr.raw)
 			if err != nil {
 				return nil, err
@@ -125,7 +132,7 @@ func (p *parser) handleSegments(segments []segment) (*Ingredient, error) {
 			// look back one and see if there is another float that needs to be summed with this one (e.g. `1`,`1/2`)
 			if i > 0 {
 				prev := segments[i-1]
-				if prev.kind == UnkFloat {
+				if prev.kind == unkFloat {
 					prevFloat, err := parseFloat(prev.raw)
 					if err != nil {
 						return nil, err
@@ -144,37 +151,39 @@ func (p *parser) handleSegments(segments []segment) (*Ingredient, error) {
 
 			m := Measurement{Unit: next.raw, Value: f}
 			switch next.kind {
-			case MeasureVolume:
+			case measureVolume:
 				ing.Volume = m
-			case MeasureWeight:
+			case measureWeight:
 				ing.Weight = m
 			default:
 				return nil, fmt.Errorf("failed to look ahead and find matching measurement unit for %v (%v), next was %s", curr, curr.kind, next.kind)
 			}
 
-		case Modifier:
+		case modifier:
 			log.Debugf("%s (%s)\n", curr.raw, curr.kind)
 			ing.Modifier = curr.raw
-		case KindIngredientName:
+		case kindIngredientName:
 			// join multiple parts of the ingredient name back together
 			var ings []string
 			for x := i; x < len(segments); x++ {
 				curr2 := segments[x]
-				if curr2.kind != KindIngredientName {
+				if curr2.kind != kindIngredientName {
 					break
 				}
 				ings = append(ings, curr2.raw)
 			}
 			name := strings.Join(ings, " ")
-			log.Debugf("%s (%s)\n", name, KindIngredientName)
+			log.Debugf("%s (%s)\n", name, kindIngredientName)
 			i += len(ings) - 1
 			ing.Name = name
 		}
 	}
 	return &ing, nil
 }
-func (p *parser) getsegments(s string) ([]segment, error) {
-	p.current = None
+func (p *parser) getsegments(ctx context.Context, s string) ([]segment, error) {
+	_, span := global.Tracer("parser").Start(ctx, "parser.getsegments")
+	defer span.End()
+	p.current = none
 	r := strings.NewReader(s)
 	p.sb.Reset()
 	p.res = []segment{}
@@ -190,17 +199,17 @@ func (p *parser) getsegments(s string) ([]segment, error) {
 			}
 		case unicode.IsDigit(ch):
 			log.Debug("found digit")
-			p.current = UnkFloat
+			p.current = unkFloat
 			p.sb.WriteRune(ch)
 
 		case unicode.IsNumber(ch):
 			log.Debug("found number")
-			p.current = UnkFloat
+			p.current = unkFloat
 			p.sb.WriteString(runeNumberToString(ch))
 
 		case unicode.IsPunct(ch):
 			log.Debug("found punct")
-			if p.current == UnkFloat {
+			if p.current == unkFloat {
 				p.sb.WriteRune(ch)
 				// period in middle of decimal
 			} else {
@@ -212,12 +221,12 @@ func (p *parser) getsegments(s string) ([]segment, error) {
 		case unicode.IsLetter(ch):
 			log.Debug("found letter")
 			switch p.current {
-			case None, UnkString:
-				p.current = UnkString
+			case none, unkString:
+				p.current = unkString
 				p.sb.WriteRune(ch)
-			case UnkFloat:
+			case unkFloat:
 				p.handleDone()
-				p.current = UnkString
+				p.current = unkString
 				p.sb.WriteRune(ch)
 				// 1.2g
 			}
@@ -229,32 +238,32 @@ func (p *parser) getsegments(s string) ([]segment, error) {
 }
 func (p *parser) handleDone() {
 	last := p.sb.String()
-	lastUnkFloatShouldBe := None
+	lastUnkFloatShouldBe := none
 
 	// if contains(weightUnits, last) {
 	if unit.IsWeight(last) {
-		p.current = MeasureWeight
-		lastUnkFloatShouldBe = WeightFloat
+		p.current = measureWeight
+		lastUnkFloatShouldBe = weightFloat
 	}
 	if unit.IsVolume(last) {
-		p.current = MeasureVolume
-		lastUnkFloatShouldBe = VolumeFloat
+		p.current = measureVolume
+		lastUnkFloatShouldBe = volumeFloat
 	}
-	if p.current == UnkString {
+	if p.current == unkString {
 		if p.nextIsModifier {
-			p.current = Modifier
+			p.current = modifier
 			// p.nextIsModifier = false
 		} else {
-			p.current = KindIngredientName
+			p.current = kindIngredientName
 		}
 	}
 
 	// fmt.Printf("last was: %s (%s)\n", last, p.current)
 	p.res = append(p.res, segment{p.current, last})
 
-	if lastUnkFloatShouldBe != None {
+	if lastUnkFloatShouldBe != none {
 		for i := len(p.res) - 1; i >= 0; i-- {
-			if p.res[i].kind == UnkFloat {
+			if p.res[i].kind == unkFloat {
 				p.res[i].kind = lastUnkFloatShouldBe
 				break
 			}
@@ -262,7 +271,7 @@ func (p *parser) handleDone() {
 	}
 
 	p.sb.Reset()
-	p.current = None
+	p.current = none
 }
 
 func runeNumberToString(r rune) string {

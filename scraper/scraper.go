@@ -1,3 +1,5 @@
+// Package scraper retrieves recipes from websites containing it in json+ld format.
+// Compatable website include cooking.nytimes.com, seriouseats.com
 package scraper
 
 import (
@@ -12,29 +14,40 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/food/parser"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/plugin/httptrace"
 )
 
-func ExampleScrape(ctx context.Context, url string) error {
+// GetIngredients returns ingredients before/after they have been run through the parser.
+func GetIngredients(ctx context.Context, url string) (interface{}, error) {
+	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
+	defer span.End()
 	html, err := getHTML(ctx, url)
 	if err != nil {
-		return fmt.Errorf("failed to scrape %s: %w", url, err)
+		return nil, fmt.Errorf("failed to scrape %s: %w", url, err)
 	}
 	recipe, err := extractRecipeJSONLD(ctx, html)
 	if err != nil {
-		return fmt.Errorf("failed to extract ld+json from %s: %w", url, err)
+		return nil, fmt.Errorf("failed to extract ld+json from %s: %w", url, err)
 	}
 	spew.Dump(recipe.RecipeIngredient, err)
+	output := []string{}
 	for _, item := range recipe.RecipeIngredient {
 		i, err := parser.Parse(ctx, item)
 		if err != nil {
-			log.Errorf("failed to parse: %s", err)
+			msg := fmt.Sprintf("failed to parse: %s", err)
+			log.Errorf(msg)
+			output = append(output, msg)
 			continue
 		}
+		output = append(output, i.ToString())
 		fmt.Println(i.ToString())
 	}
-	return nil
+	return map[string]interface{}{"input": recipe.RecipeIngredient, "output": output}, nil
 }
 func extractRecipeJSONLD(ctx context.Context, html string) (*Recipe, error) {
+	_, span := global.Tracer("scraper").Start(ctx, "scraper.extractRecipeJSONLD")
+	defer span.End()
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
 		return nil, fmt.Errorf("goquery parse: %w", err)
@@ -54,8 +67,18 @@ func extractRecipeJSONLD(ctx context.Context, html string) (*Recipe, error) {
 	return &recipe, err
 }
 func getHTML(ctx context.Context, url string) (string, error) {
+	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.getHTML")
+	defer span.End()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	ctx, req = httptrace.W3C(ctx, req)
+	httptrace.Inject(ctx, req)
+
 	// nolint:gosec
-	res, err := http.Get(url)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}

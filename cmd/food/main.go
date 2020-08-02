@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	setupMisc()
 	_ = rootCmd.Execute()
 }
 
@@ -64,7 +65,8 @@ func init() {
 			Short: "scrape a recipe",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				return scraper.ExampleScrape(context.Background(), strings.Join(args, " "))
+				_, err := scraper.GetIngredients(context.Background(), strings.Join(args, " "))
+				return err
 			},
 		},
 	)

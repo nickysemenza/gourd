@@ -8,6 +8,7 @@
 
 [![CircleCI](https://circleci.com/gh/nickysemenza/food.svg?style=svg)](https://circleci.com/gh/nickysemenza/food)
 
+[![GoDoc](https://godoc.org/github.com/nickysemenza/food?status.svg)](https://pkg.go.dev/github.com/nickysemenza/food)
 usda:
 
 - whole chicken: https://fdc.nal.usda.gov/fdc-app.html#/food-details/171047/nutrients (sr legacy)

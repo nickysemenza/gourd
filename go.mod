@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/cosmtrek/air v1.12.1
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dgraph-io/ristretto v0.0.2
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible

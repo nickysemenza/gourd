@@ -2,6 +2,7 @@ package parser
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -64,4 +65,11 @@ func TestParseAndStringify(t *testing.T) {
 			require.Equal(t, tt.out, got.ToString())
 		})
 	}
+}
+
+func ExampleParse() {
+	ctx := context.Background()
+	ingredient, _ := Parse(ctx, "1 1/2 cups flour / 195 g all-purpose flour, sifted")
+	fmt.Println(ingredient.ToString())
+	// Output: 195 g (1.5 cups) all purpose flour, sifted
 }
