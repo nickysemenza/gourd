@@ -6,6 +6,7 @@ require (
 	github.com/99designs/gqlgen v0.11.3
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.1.0
 	github.com/Masterminds/squirrel v1.2.0
+	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/cosmtrek/air v1.12.1
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgraph-io/ristretto v0.0.2

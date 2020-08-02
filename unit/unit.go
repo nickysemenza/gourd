@@ -9,8 +9,10 @@ type Unit int //
 const (
 	Gram  Unit = iota // gram
 	Ounce             // oz
+	Pound             // pound
 
 	Liter      // liter
+	Millileter // millileter
 	Quart      // quuart
 	Cup        // cpu
 	Teaspoon   // tsp
@@ -29,6 +31,9 @@ var (
 
 		"oz":    Ounce,
 		"ounce": Ounce,
+
+		"lb":    Pound,
+		"pound": Pound,
 	}
 	volumes = map[string]Unit{
 		"c":   Cup,
@@ -40,8 +45,10 @@ var (
 		"tbsp":       Tablespoon,
 		"tablespoon": Tablespoon,
 
-		"l":     Liter,
-		"liter": Liter,
+		"l":          Liter,
+		"liter":      Liter,
+		"millileter": Millileter,
+		"ml":         Millileter,
 
 		"q":     Quart,
 		"quart": Quart,
@@ -51,21 +58,25 @@ var (
 	}
 )
 
+func normalize(unit string) string {
+	return strings.TrimSuffix(strings.ToLower(unit), "s")
+}
+
 func IsWeight(unit string) bool {
-	_, ok := weights[strings.TrimSuffix(unit, "s")]
+	_, ok := weights[normalize(unit)]
 	return ok
 }
 func IsVolume(unit string) bool {
-	_, ok := volumes[strings.TrimSuffix(unit, "s")]
+	_, ok := volumes[normalize(unit)]
 	return ok
 }
 
 func Parse(unit string) Unit {
-	vol, isVol := volumes[strings.TrimSuffix(unit, "s")]
+	vol, isVol := volumes[normalize(unit)]
 	if isVol {
 		return vol
 	}
-	weight, isWeight := weights[strings.TrimSuffix(unit, "s")]
+	weight, isWeight := weights[normalize(unit)]
 	if isWeight {
 		return weight
 	}

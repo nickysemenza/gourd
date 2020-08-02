@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/nickysemenza/food/parser"
+	"github.com/nickysemenza/food/scraper"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +46,7 @@ func init() {
 			},
 		},
 		&cobra.Command{
-			Use:   "ingredient-parse [ingredient",
+			Use:   "ingredient-parse [ingredient]",
 			Short: "parse an ingredient",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
@@ -57,7 +58,16 @@ func init() {
 				fmt.Println(ingredient.ToString())
 				return nil
 			},
-		})
+		},
+		&cobra.Command{
+			Use:   "scrape [url]",
+			Short: "scrape a recipe",
+			Args:  cobra.MinimumNArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return scraper.ExampleScrape(context.Background(), strings.Join(args, " "))
+			},
+		},
+	)
 }
 
 func Execute() {

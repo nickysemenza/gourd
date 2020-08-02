@@ -10,17 +10,19 @@ func _() {
 	var x [1]struct{}
 	_ = x[Gram-0]
 	_ = x[Ounce-1]
-	_ = x[Liter-2]
-	_ = x[Quart-3]
-	_ = x[Cup-4]
-	_ = x[Teaspoon-5]
-	_ = x[Tablespoon-6]
-	_ = x[Item-7]
+	_ = x[Pound-2]
+	_ = x[Liter-3]
+	_ = x[Millileter-4]
+	_ = x[Quart-5]
+	_ = x[Cup-6]
+	_ = x[Teaspoon-7]
+	_ = x[Tablespoon-8]
+	_ = x[Item-9]
 }
 
-const _Unit_name = "gramozliterquuartcputsptbspitem"
+const _Unit_name = "gramozpoundlitermillileterquuartcputsptbspitem"
 
-var _Unit_index = [...]uint8{0, 4, 6, 11, 17, 20, 23, 27, 31}
+var _Unit_index = [...]uint8{0, 4, 6, 11, 16, 26, 32, 35, 38, 42, 46}
 
 func (i Unit) String() string {
 	if i < 0 || i >= Unit(len(_Unit_index)-1) {

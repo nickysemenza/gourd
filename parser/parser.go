@@ -76,6 +76,8 @@ func (i *Ingredient) ToString() string {
 		sb.WriteString(weight)
 	case volume != "":
 		sb.WriteString(volume)
+	default:
+		sb.WriteString("0 g")
 	}
 	sb.WriteString(" ")
 	sb.WriteString(i.Name)
@@ -147,7 +149,7 @@ func (p *parser) handleSegments(segments []segment) (*Ingredient, error) {
 			case MeasureWeight:
 				ing.Weight = m
 			default:
-				return nil, fmt.Errorf("failed to look ahead and find matching measurement unit for %v, next was %s", curr, next.kind)
+				return nil, fmt.Errorf("failed to look ahead and find matching measurement unit for %v (%v), next was %s", curr, curr.kind, next.kind)
 			}
 
 		case Modifier:
