@@ -45,6 +45,9 @@ var (
 
 		"q":     Quart,
 		"quart": Quart,
+
+		"oz":    Ounce,
+		"ounce": Ounce,
 	}
 )
 

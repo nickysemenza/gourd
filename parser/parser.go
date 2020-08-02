@@ -60,16 +60,29 @@ type Ingredient struct {
 }
 
 func (i *Ingredient) ToString() string {
-	var sb strings.Builder
-
-	sb.WriteString(i.Name)
-	sb.WriteString("\n")
+	var weight, volume string
 	if i.Weight.Value != 0 {
-		sb.WriteString(fmt.Sprintf("•%g %s\n", i.Weight.Value, i.Weight.Unit))
+		weight = fmt.Sprintf("%g %s", i.Weight.Value, i.Weight.Unit)
 	}
 	if i.Volume.Value != 0 {
-		sb.WriteString(fmt.Sprintf("•%g %s\n", i.Volume.Value, i.Volume.Unit))
+		volume = fmt.Sprintf("%g %s", i.Volume.Value, i.Volume.Unit)
 	}
+
+	var sb strings.Builder
+	switch {
+	case weight != "" && volume != "":
+		sb.WriteString(fmt.Sprintf("%s (%s)", weight, volume))
+	case weight != "":
+		sb.WriteString(weight)
+	case volume != "":
+		sb.WriteString(volume)
+	}
+	sb.WriteString(" ")
+	sb.WriteString(i.Name)
+	if i.Modifier != "" {
+		sb.WriteString(fmt.Sprintf(", %s", i.Modifier))
+	}
+
 	return sb.String()
 }
 
@@ -228,7 +241,7 @@ func (p *parser) handleDone() {
 	if p.current == UnkString {
 		if p.nextIsModifier {
 			p.current = Modifier
-			p.nextIsModifier = false
+			// p.nextIsModifier = false
 		} else {
 			p.current = KindIngredientName
 		}
@@ -252,6 +265,8 @@ func (p *parser) handleDone() {
 
 func runeNumberToString(r rune) string {
 	switch r {
+	case 188:
+		return "1/4"
 	case 189:
 		return "1/2"
 	case 190:

@@ -54,7 +54,7 @@ func init() {
 				if err != nil {
 					return err
 				}
-				fmt.Print(ingredient.ToString())
+				fmt.Println(ingredient.ToString())
 				return nil
 			},
 		})
