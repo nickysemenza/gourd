@@ -10,6 +10,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/nickysemenza/food/unit"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
@@ -32,18 +33,6 @@ const (
 	VolumeFloat
 
 	None
-)
-
-// nolint:gochecknoglobals
-// common units
-var (
-	volumeUnits = []string{
-		"c", "cup", "cups",
-		"tsp", "tsps", "teaspoon", "teaspoons", //TODO: only specify singular
-		"tbsp", "tbsps", "tablespoon", "tablespoons",
-		"l", "liter",
-		"quart", "quarts"}
-	weightUnits = []string{"gram", "grams", "gr", "oz", "ounce", "ounces"}
 )
 
 type segment struct {
@@ -213,11 +202,12 @@ func (p *parser) handleDone() {
 	last := p.sb.String()
 	lastUnkFloatShouldBe := None
 
-	if contains(weightUnits, last) {
+	// if contains(weightUnits, last) {
+	if unit.IsWeight(last) {
 		p.current = MeasureWeight
 		lastUnkFloatShouldBe = WeightFloat
 	}
-	if contains(volumeUnits, last) {
+	if unit.IsVolume(last) {
 		p.current = MeasureVolume
 		lastUnkFloatShouldBe = VolumeFloat
 	}

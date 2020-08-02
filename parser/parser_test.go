@@ -23,7 +23,6 @@ func Test_parse(t *testing.T) {
 	t.Fail()
 }
 
-// nolint:scopelint
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string
