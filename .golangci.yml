@@ -17,3 +17,4 @@ linters:
     - testpackage
     - lll
     - gomnd
+    - scopelint
