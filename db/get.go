@@ -8,7 +8,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/nickysemenza/food/graph/model"
+	"github.com/nickysemenza/gourd/graph/model"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 )

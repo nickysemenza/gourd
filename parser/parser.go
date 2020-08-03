@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/nickysemenza/food/unit"
+	"github.com/nickysemenza/gourd/unit"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"

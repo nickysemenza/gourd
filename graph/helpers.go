@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/graph/model"
+	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/graph/model"
 )
 
 func fromRecipe(res *db.Recipe) *model.Recipe {

@@ -1,7 +1,7 @@
 package manager
 
 import (
-	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/gourd/db"
 	"gopkg.in/guregu/null.v3/zero"
 )
 

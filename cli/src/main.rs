@@ -10,7 +10,7 @@ use std::{
 };
 
 fn main() {
-    let matches = App::new("food CLI")
+    let matches = App::new("gourd CLI")
         .version("1.0")
         .arg(
             Arg::with_name("url")

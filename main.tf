@@ -30,7 +30,7 @@ resource "google_project_service" "run" {
 }
 
 resource "google_cloud_run_service" "my-service" {
-  name     = "food-backend"
+  name     = "gourd-backend"
   location = "us-west1"
 
   template {

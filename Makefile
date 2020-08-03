@@ -3,7 +3,7 @@ DATE             := $(shell date '+%Y-%m-%d-%H%M UTC')
 VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(DATE)"'
 
 GCP_PROJECT := cloudrun1-278204
-GCR_IMAGE := gcr.io/$(GCP_PROJECT)/food-backend:$(VERSION)
+GCR_IMAGE := gcr.io/$(GCP_PROJECT)/gourd-backend:$(VERSION)
 
 deploy: deploy-image deploy-run
 deploy-image:
@@ -14,7 +14,7 @@ deploy-run:
 
 
 .PHONY: all
-all: bin/food
+all: bin/gourd
 
 bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 	@mkdir -p $(dir $@)
@@ -22,8 +22,8 @@ bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 
 test: unit-test lint
 
-dev: bin/food
-	./bin/food server
+dev: bin/gourd
+	./bin/gourd server
 
 dev-env:
 	docker-compose up -d db jaeger
@@ -47,7 +47,7 @@ unit-test:
 lint: bin/revive
 	bin/revive -config revive.toml -formatter=friendly -exclude=vendor/... ./... || (echo "lint failed"; exit 1)	
 
-IMAGE := nicky/food-backend
+IMAGE := nicky/gourd-backend
 docker-build:
 	docker build -t $(IMAGE) .
 docker-dev: docker-build
@@ -56,14 +56,14 @@ docker-push: docker-build
 	docker push $(IMAGE):latest
 
 dev-db:
-	pgcli postgres://food:food@localhost:5555/food
+	pgcli postgres://gourd:gourd@localhost:5555/food
 new-migrate/%: bin/migrate
 	mkdir -p migrations
 	./bin/migrate create -dir migrations -ext sql $(@F)
 migrate: bin/migrate
-	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable up
+	./bin/migrate -source file://migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable up
 migrate-down: bin/migrate
-	./bin/migrate -source file://migrations -database postgres://food:food@localhost:5555/food?sslmode=disable down
+	./bin/migrate -source file://migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
 
 .PHONY: generate-graphql-go
 generate-graphql-go: 

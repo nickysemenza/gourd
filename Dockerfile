@@ -9,7 +9,7 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN make bin/food
+RUN make bin/gourd
 
 # FROM debian:buster
 FROM alpine:3
@@ -21,4 +21,4 @@ WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/migrations ./migrations
 RUN ls
-ENTRYPOINT ["./bin/food","server"]
+ENTRYPOINT ["./bin/gourd","server"]

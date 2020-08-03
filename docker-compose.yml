@@ -8,8 +8,8 @@ services:
     ports:
       - "5555:5432"
     environment:
-      POSTGRES_USER: food
-      POSTGRES_PASSWORD: food
+      POSTGRES_USER: gourd
+      POSTGRES_PASSWORD: gourd
       POSTGRES_DB: food
   jaeger:
     container_name: food-jaeger
@@ -24,7 +24,7 @@ services:
       - 14268:14268
       - 9411:9411
     image: "jaegertracing/all-in-one:latest"
-  food:
+  gourd:
     build:
       context: .
     depends_on:
@@ -43,9 +43,9 @@ services:
       context: ui
     stdin_open: true
     depends_on:
-      - food
+      - gourd
     environment:
-      REACT_APP_GQL_URL: http://food:4242/query
+      REACT_APP_GQL_URL: http://gourd:4242/query
     ports:
       - "3001:3001"
     volumes:

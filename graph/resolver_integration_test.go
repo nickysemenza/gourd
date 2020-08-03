@@ -7,9 +7,9 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/graph/generated"
-	"github.com/nickysemenza/food/manager"
+	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/graph/generated"
+	"github.com/nickysemenza/gourd/manager"
 	"github.com/stretchr/testify/require"
 )
 
