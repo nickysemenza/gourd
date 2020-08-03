@@ -13,8 +13,8 @@ import (
 func NewDB(t *testing.T) *Client {
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
-	viper.SetDefault("DB_USER", "food")
-	viper.SetDefault("DB_PASSWORD", "food")
+	viper.SetDefault("DB_USER", "gourd")
+	viper.SetDefault("DB_PASSWORD", "gourd")
 	viper.SetDefault("DB_DBNAME", "food")
 	viper.AutomaticEnv()
 

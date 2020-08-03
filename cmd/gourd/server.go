@@ -14,9 +14,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/manager"
-	"github.com/nickysemenza/food/server"
+	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/server"
 )
 
 func getDBConn() (*sql.DB, error) {

@@ -21,11 +21,11 @@ import (
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/plugin/othttp"
 
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/graph"
-	"github.com/nickysemenza/food/graph/generated"
-	"github.com/nickysemenza/food/manager"
-	"github.com/nickysemenza/food/scraper"
+	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/graph"
+	"github.com/nickysemenza/gourd/graph/generated"
+	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/scraper"
 )
 
 // Server represents a server

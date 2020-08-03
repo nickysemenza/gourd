@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"github.com/nickysemenza/food/db"
-	"github.com/nickysemenza/food/manager"
+	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/manager"
 )
 
 //go:generate go run github.com/99designs/gqlgen

@@ -3,7 +3,7 @@ package manager
 import (
 	"testing"
 
-	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/gourd/db"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/guregu/null.v3/zero"
 )

@@ -12,7 +12,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/nickysemenza/food/parser"
+	"github.com/nickysemenza/gourd/parser"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/plugin/httptrace"

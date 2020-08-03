@@ -1,4 +1,4 @@
-module github.com/nickysemenza/food
+module github.com/nickysemenza/gourd
 
 go 1.14
 

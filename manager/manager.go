@@ -4,7 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 
-	"github.com/nickysemenza/food/db"
+	"github.com/nickysemenza/gourd/db"
 	yaml "gopkg.in/yaml.v2"
 )
 

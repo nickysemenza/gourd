@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nickysemenza/food/parser"
-	"github.com/nickysemenza/food/scraper"
+	"github.com/nickysemenza/gourd/parser"
+	"github.com/nickysemenza/gourd/scraper"
 	"github.com/spf13/cobra"
 )
 
@@ -18,11 +18,8 @@ func main() {
 
 // nolint:gochecknoglobals
 var rootCmd = &cobra.Command{
-	Use:   "food",
-	Short: "Food app",
-	Long: `A Fast and Flexible Static Site Generator built with
-				  love by spf13 and friends in Go.
-				  Complete documentation is available at http://hugo.spf13.com`,
+	Use:   "gourd",
+	Short: "Go Universal Recipe Database",
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = cmd.Help()
 	},

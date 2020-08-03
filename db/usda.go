@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/nickysemenza/food/graph/model"
+	"github.com/nickysemenza/gourd/graph/model"
 )
 
 type Food struct {

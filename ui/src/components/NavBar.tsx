@@ -7,7 +7,7 @@ const NavBar: React.FC = () => {
   return (
     <Flex px={2} color="white" bg="black" alignItems="center">
       <Text p={2} fontWeight="bold" onClick={() => history.push("/")}>
-        food
+        gourd
       </Text>
       <Box mx="auto" />
       <Box
