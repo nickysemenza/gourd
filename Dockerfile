@@ -21,4 +21,4 @@ WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/migrations ./migrations
 RUN ls
-ENTRYPOINT ["./bin/food"]
+ENTRYPOINT ["./bin/food","server"]
