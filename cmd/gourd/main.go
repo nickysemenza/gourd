@@ -62,7 +62,13 @@ func init() {
 			Short: "scrape a recipe",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				_, err := scraper.GetIngredients(context.Background(), strings.Join(args, " "))
+				s := makeServer()
+
+				r, err := scraper.FetchAndTransform(context.Background(), strings.Join(args, " "), s.GetResolver().Mutation().UpsertIngredient)
+				if err != nil {
+					return err
+				}
+				_, err = s.GetResolver().Mutation().UpdateRecipe(context.Background(), r)
 				return err
 			},
 		},

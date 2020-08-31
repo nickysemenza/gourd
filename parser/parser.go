@@ -62,6 +62,13 @@ type Ingredient struct {
 	Modifier string
 }
 
+func (i *Ingredient) Grams() float64 {
+	if !unit.IsGram(i.Weight.Unit) {
+		return 0
+	}
+	return i.Weight.Value
+}
+
 // ToString converts the structure back to a string. This will be a normalized version of what was parsed, if applicable.
 func (i *Ingredient) ToString() string {
 	var weight, volume string
