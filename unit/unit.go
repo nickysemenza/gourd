@@ -13,7 +13,7 @@ const (
 
 	Liter      // liter
 	Millileter // millileter
-	Quart      // quuart
+	Quart      // quart
 	Cup        // cpu
 	Teaspoon   // tsp
 	Tablespoon // tbsp
@@ -65,6 +65,13 @@ func normalize(unit string) string {
 func IsWeight(unit string) bool {
 	_, ok := weights[normalize(unit)]
 	return ok
+}
+func IsGram(unit string) bool {
+	val, ok := weights[normalize(unit)]
+	if !ok {
+		return false
+	}
+	return val == Gram
 }
 func IsVolume(unit string) bool {
 	_, ok := volumes[normalize(unit)]

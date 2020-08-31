@@ -51,6 +51,13 @@ func timing(next http.Handler) http.Handler {
 	return http.HandlerFunc(fn)
 }
 
+func (s *Server) GetResolver() generated.ResolverRoot {
+	return &graph.Resolver{
+		Manager: s.Manager,
+		DB:      s.DB,
+	}
+}
+
 func (s *Server) Run(_ context.Context) error {
 	r := chi.NewRouter()
 
@@ -70,30 +77,25 @@ func (s *Server) Run(_ context.Context) error {
 		return nil
 	}
 
-	r.Get("/metrics", hf)
-	r.Mount("/debug", middleware.Profiler())
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-		Resolvers: &graph.Resolver{
-			Manager: s.Manager,
-			DB:      s.DB,
-		}},
-	))
-
+	// gql server
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: s.GetResolver()}))
 	srv.Use(extension.FixedComplexityLimit(100))
 	srv.Use(graph.Observability{})
+
+	// http routes
+	r.Get("/metrics", hf)
+	r.Mount("/debug", middleware.Profiler())
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", othttp.WithRouteTag("/query", srv))
 	r.Get("/scrape", s.Scrape)
-
 	r.Get("/h", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("hi"))
 	})
+
 	r.Get("/recipes/{uuid}", s.GetRecipe)
 
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
-	log.Printf("connect to http://localhost:%d/ for GraphQL playground", s.HTTPPort)
-	log.Printf("running on: %s", addr)
+	log.Printf("running on: http://%s/", addr)
 	return http.ListenAndServe(addr,
 		othttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
 			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
@@ -112,11 +114,15 @@ func (s *Server) GetRecipe(w http.ResponseWriter, req *http.Request) {
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
-	recipe, err := scraper.GetIngredients(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html")
+	recipe, err := scraper.FetchAndTransform(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html", s.GetResolver().Mutation().UpsertIngredient)
 	if err != nil {
-		writeJSON(w, http.StatusInternalServerError, err)
+		writeErr(w, err)
+		return
 	}
 	writeJSON(w, http.StatusOK, recipe)
+}
+func writeErr(w http.ResponseWriter, err error) {
+	writeJSON(w, http.StatusInternalServerError, err.Error())
 }
 
 func writeJSON(w http.ResponseWriter, status int, payload interface{}) {

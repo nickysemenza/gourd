@@ -122,6 +122,8 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 }
 
 func (r *mutationResolver) UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error) {
+	ctx, span := global.Tracer("graph").Start(ctx, "UpsertIngredient")
+	defer span.End()
 	switch kind {
 	case model.SectionIngredientKindIngredient:
 		ing, err := r.DB.IngredientByName(ctx, name)

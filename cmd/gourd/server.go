@@ -35,9 +35,7 @@ func getDBConn() (*sql.DB, error) {
 		viper.GetInt64("DB_PORT")))
 	return dbConn, err
 }
-func runServer() {
-	ctx := context.Background()
-
+func makeServer() server.Server {
 	// setupMisc()
 
 	// postgres database
@@ -46,7 +44,7 @@ func runServer() {
 		log.Fatal(err)
 	}
 	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
-	defer dbConn.Close()
+	// defer dbConn.Close()
 
 	dbClient, err := db.New(dbConn)
 	if err != nil {
@@ -59,13 +57,17 @@ func runServer() {
 	}
 
 	// server
-	s := server.Server{
+	return server.Server{
 		Manager:     manager.New(dbClient),
 		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 	}
+}
+func runServer() {
+	ctx := context.Background()
+	s := makeServer()
 	log.Fatal(s.Run(ctx))
 }
 
