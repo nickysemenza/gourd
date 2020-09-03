@@ -240,3 +240,22 @@ func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, er
 	}
 	return res, nil
 }
+
+func (c *Client) GetRecipeSource(ctx context.Context, recipeUUID string) (*model.Source, error) {
+	query, args, err := c.psql.Select(
+		"name", "meta",
+	).From("recipe_sources").Where(sq.Eq{"recipe": recipeUUID}).ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+
+	x := &model.Source{}
+	err = c.db.GetContext(ctx, x, query, args...)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return x, nil
+}

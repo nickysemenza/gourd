@@ -42,6 +42,7 @@ export const parseRecipe = (text: string): Recipe | undefined => {
     totalMinutes: 0,
     unit: "",
     sections: [{ uuid: "", minutes: 0, ingredients, instructions: [] }],
+    notes: [],
   };
   return recipe;
 };

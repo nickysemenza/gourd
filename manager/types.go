@@ -49,10 +49,10 @@ func (r *Recipe) toDB() *db.Recipe {
 		Name:         r.Name,
 		TotalMinutes: zero.IntFrom(r.TotalMinutes),
 		Equipment:    zero.StringFrom(r.Equipment),
-		Source:       zero.StringFrom(r.Source),
-		Servings:     zero.IntFrom(r.Servings),
-		Quantity:     zero.IntFrom(r.Quantity),
-		Unit:         zero.StringFrom(r.Unit),
+		// Source:       zero.StringFrom(r.Source),
+		Servings: zero.IntFrom(r.Servings),
+		Quantity: zero.IntFrom(r.Quantity),
+		Unit:     zero.StringFrom(r.Unit),
 	}
 	for _, s := range r.Sections {
 		dbs := db.Section{
@@ -88,10 +88,10 @@ func FromRecipe(dbr *db.Recipe) *Recipe {
 		Name:         dbr.Name,
 		TotalMinutes: dbr.TotalMinutes.Int64,
 		Equipment:    dbr.Equipment.String,
-		Source:       dbr.Source.String,
-		Servings:     dbr.Servings.Int64,
-		Quantity:     dbr.Quantity.Int64,
-		Unit:         dbr.Unit.String,
+		// Source:       dbr.Source.String,
+		Servings: dbr.Servings.Int64,
+		Quantity: dbr.Quantity.Int64,
+		Unit:     dbr.Unit.String,
 	}
 	for _, dbs := range dbr.Sections {
 		s := Section{
