@@ -60,6 +60,7 @@ impl Recipe {
             unit: Some(self.unit.to_string()),
             total_minutes: Some(self.total_minutes),
             sections: Some(sections),
+            source: None, //TODO
         };
         return ri;
     }

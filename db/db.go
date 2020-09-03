@@ -19,6 +19,7 @@ const (
 	sectionsTable      = "recipe_sections"
 	recipesTable       = "recipes"
 	ingredientsTable   = "ingredients"
+	sourcesTable       = "recipe_sources"
 )
 
 // Client is a database client
@@ -43,6 +44,11 @@ type Recipe struct {
 	Quantity     zero.Int    `db:"quantity"`
 	Unit         zero.String `db:"unit"`
 	Sections     []Section
+	Sources      []Source
+}
+type Source struct {
+	Name string `db:"name"`
+	Meta string `db:"meta"`
 }
 
 // Section represents a Section
@@ -125,6 +131,9 @@ func setUUID(val string) string {
 	if val != "" {
 		return val
 	}
+	return getUUID()
+}
+func getUUID() string {
 	u, _ := uuid.NewV4()
 	return u.String()
 }
@@ -221,12 +230,17 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 		return fmt.Errorf("failed to delete sections: %w", err)
 	}
 
+	if _, err = tx.ExecContext(ctx,
+		`DELETE FROM recipe_sources WHERE recipe = $1`, r.UUID); err != nil {
+		return fmt.Errorf("failed to delete sources: %w", err)
+	}
+
 	if len(r.Sections) == 0 {
 		return nil
 	}
 
+	// sections
 	sectionInsert := c.psql.Insert(sectionsTable).Columns("uuid", "recipe", "minutes")
-
 	for _, s := range r.Sections {
 		sectionInsert = sectionInsert.Values(s.UUID, s.RecipeUUID, s.Minutes)
 	}
@@ -238,6 +252,22 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		return err
+	}
+
+	if len(r.Sources) > 0 {
+		sourcesInsert := c.psql.Insert(sourcesTable).Columns("uuid", "recipe", "name", "meta")
+		for _, s := range r.Sources {
+			sourcesInsert = sourcesInsert.Values(getUUID(), r.UUID, s.Name, s.Meta)
+		}
+		query, args, err = sourcesInsert.ToSql()
+
+		if err != nil {
+			return fmt.Errorf("failed to build query: %w", err)
+		}
+		_, err = tx.ExecContext(ctx, query, args...)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, s := range r.Sections {

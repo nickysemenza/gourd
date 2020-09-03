@@ -13,6 +13,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  Date: any;
 };
 
 export type Ingredient = {
@@ -63,6 +64,20 @@ export type Recipe = {
   unit: Scalars["String"];
   sections: Array<Section>;
   meals: Array<Meal>;
+  notes: Array<Note>;
+  source?: Maybe<Source>;
+};
+
+export type Source = {
+  __typename?: "Source";
+  name: Scalars["String"];
+  meta: Scalars["String"];
+};
+
+export type Note = {
+  __typename?: "Note";
+  note: Scalars["String"];
+  date: Scalars["Date"];
 };
 
 export type Meal = {
@@ -73,12 +88,18 @@ export type Meal = {
   imageURLs: Array<Scalars["String"]>;
 };
 
+export type SourceInput = {
+  name: Scalars["String"];
+  meta: Scalars["String"];
+};
+
 export type RecipeInput = {
   uuid: Scalars["String"];
   name: Scalars["String"];
   totalMinutes?: Maybe<Scalars["Int"]>;
   unit?: Maybe<Scalars["String"]>;
   sections?: Maybe<Array<SectionInput>>;
+  source?: Maybe<SourceInput>;
 };
 
 export type SectionInstructionInput = {
@@ -167,6 +188,7 @@ export type Mutation = {
   createRecipe: Recipe;
   updateRecipe: Recipe;
   upsertIngredient: Scalars["String"];
+  addNote: Scalars["String"];
 };
 
 export type MutationCreateRecipeArgs = {
@@ -180,6 +202,11 @@ export type MutationUpdateRecipeArgs = {
 export type MutationUpsertIngredientArgs = {
   name: Scalars["String"];
   kind: SectionIngredientKind;
+};
+
+export type MutationAddNoteArgs = {
+  recipeUUID: Scalars["String"];
+  note: Scalars["String"];
 };
 
 export type Query = {

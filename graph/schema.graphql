@@ -42,6 +42,20 @@ type Recipe {
   unit: String!
   sections: [Section!]!
   meals: [Meal!]!
+  notes: [Note!]!
+  source: Source
+}
+
+scalar Date
+
+type Source {
+  name: String!
+  meta: String! # url or page num
+}
+
+type Note {
+  note: String!
+  date: Date!
 }
 
 # notion stuff
@@ -54,6 +68,10 @@ type Meal {
 }
 
 # Recipe api inputs
+input SourceInput {
+  name: String!
+  meta: String! # url or page num
+}
 
 input RecipeInput {
   uuid: String!
@@ -61,6 +79,7 @@ input RecipeInput {
   totalMinutes: Int
   unit: String
   sections: [SectionInput!]
+  source: SourceInput
 }
 
 input SectionInstructionInput {
@@ -147,6 +166,7 @@ type Mutation {
   createRecipe(recipe: NewRecipe): Recipe!
   updateRecipe(recipe: RecipeInput): Recipe!
   upsertIngredient(name: String!, kind: SectionIngredientKind!): String! # returns UUID
+  addNote(recipeUUID: String!, note: String!): String! # returns UUID
 }
 
 type Query {

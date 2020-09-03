@@ -42,6 +42,11 @@ type NewRecipe struct {
 	Name string `json:"name"`
 }
 
+type Note struct {
+	Note string `json:"note"`
+	Date string `json:"date"`
+}
+
 type Nutrient struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
@@ -54,6 +59,7 @@ type RecipeInput struct {
 	TotalMinutes *int            `json:"totalMinutes"`
 	Unit         *string         `json:"unit"`
 	Sections     []*SectionInput `json:"sections"`
+	Source       *SourceInput    `json:"source"`
 }
 
 type SectionIngredient struct {
@@ -90,6 +96,16 @@ type SectionInstruction struct {
 
 type SectionInstructionInput struct {
 	Instruction string `json:"instruction"`
+}
+
+type Source struct {
+	Name string `json:"name"`
+	Meta string `json:"meta"`
+}
+
+type SourceInput struct {
+	Name string `json:"name"`
+	Meta string `json:"meta"`
 }
 
 type FoodDataType string

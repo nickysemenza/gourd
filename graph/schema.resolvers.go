@@ -79,6 +79,9 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 		UUID: uuid,
 		Name: recipe.Name,
 	}
+	if recipe.Source != nil {
+		dbr.Sources = []db.Source{{Name: recipe.Source.Name, Meta: recipe.Source.Meta}}
+	}
 	if recipe.TotalMinutes != nil {
 		dbr.TotalMinutes = zero.IntFrom(int64(*recipe.TotalMinutes))
 	}
@@ -150,6 +153,10 @@ func (r *mutationResolver) UpsertIngredient(ctx context.Context, name string, ki
 		return dbRrecipe.UUID, nil
 	}
 	return "", fmt.Errorf("unknown kind: %v", kind)
+}
+
+func (r *mutationResolver) AddNote(ctx context.Context, recipeUUID string, note string) (string, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error) {
@@ -239,6 +246,14 @@ func (r *recipeResolver) Meals(ctx context.Context, obj *model.Recipe) ([]*model
 	}
 
 	return res, err
+}
+
+func (r *recipeResolver) Notes(ctx context.Context, obj *model.Recipe) ([]*model.Note, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *recipeResolver) Source(ctx context.Context, obj *model.Recipe) (*model.Source, error) {
+	return r.DB.GetRecipeSource(ctx, obj.UUID)
 }
 
 func (r *sectionResolver) Instructions(ctx context.Context, obj *model.Section) ([]*model.SectionInstruction, error) {

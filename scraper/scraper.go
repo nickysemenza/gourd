@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,16 +21,16 @@ import (
 )
 
 // FetchAndTransform returns a recipe.
-func FetchAndTransform(ctx context.Context, url string, ingredientToUUID func(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error)) (*model.RecipeInput, error) {
+func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error)) (*model.RecipeInput, error) {
 	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
-	html, err := getHTML(ctx, url)
+	html, err := getHTML(ctx, addr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to scrape %s: %w", url, err)
+		return nil, fmt.Errorf("failed to scrape %s: %w", addr, err)
 	}
 	recipe, err := extractRecipeJSONLD(ctx, html)
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract ld+json from %s: %w", url, err)
+		return nil, fmt.Errorf("failed to extract ld+json from %s: %w", addr, err)
 	}
 	spew.Dump(recipe.RecipeIngredient, err)
 	output := []string{}
@@ -63,10 +64,18 @@ func FetchAndTransform(ctx context.Context, url string, ingredientToUUID func(ct
 	for _, item := range recipe.RecipeInstructions {
 		section.Instructions = append(section.Instructions, &model.SectionInstructionInput{Instruction: item.Text})
 	}
+	u, err := url.Parse(addr)
+	if err != nil {
+		return nil, err
+	}
 
 	r := model.RecipeInput{
 		Name:     recipe.Name,
 		Sections: []*model.SectionInput{section},
+		Source: &model.SourceInput{
+			Name: u.Host,
+			Meta: addr,
+		},
 	}
 	spew.Dump(r)
 
