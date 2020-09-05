@@ -7,7 +7,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.1.0
 	github.com/Masterminds/squirrel v1.2.0
 	github.com/PuerkitoBio/goquery v1.5.1
-	github.com/cosmtrek/air v1.12.1
+	github.com/cosmtrek/air v1.12.5-0.20200905080724-b538c70423fb
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dgraph-io/ristretto v0.0.2
 	github.com/getsentry/sentry-go v0.6.1
