@@ -1,6 +1,8 @@
 # gourd
 
-**Go**lang **U**niversal **R**ecipe **D**atabase
+**Go**(lang) **U**niversal **R**ecipe **D**atabase
+
+Before modern technology, people would use hollowed out gourds as food storage containers.
 
 ---
 

@@ -1,6 +1,8 @@
 #!/bin/sh
-# usage: ./import.sh ~/Downloads/FoodData_Central_csv_2020-04-29/
-# takes: ~6m18s
+# data from https://fdc.nal.usda.gov/download-datasets.html
+# e.g. https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2020-04-29.zip
+# usage: ./import.sh ./FoodData_Central_csv_2020-04-29/
+# takes: 6-8 min
 set -euf -o pipefail
 tables=(food_category food food_attribute_type acquisition_sample agricultural_acquisition branded_food food_attribute food_nutrient_conversion_factor food_calorie_conversion_factor food_component nutrient food_nutrient_source food_nutrient_derivation food_nutrient measure_unit food_portion food_protein_conversion_factor foundation_food input_food lab_method lab_method_code lab_method_nutrient market_acquisition nutrient_incoming_name retention_factor sample_food sr_legacy_food sub_sample_food sub_sample_result wweia_food_category survey_fndds_food)
 
@@ -16,4 +18,4 @@ for f in ${tables[@]}; do
     p -c "\copy usda_$f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
 done
 
-rm *:tmp.csv
+rm "*.csv"
