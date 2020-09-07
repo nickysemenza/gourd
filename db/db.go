@@ -93,8 +93,10 @@ type SectionInstruction struct {
 
 // Ingredient is a globally-scoped ingredient
 type Ingredient struct {
-	UUID string `json:"uuid"`
-	Name string `json:"name"`
+	UUID   string      `json:"uuid"`
+	Name   string      `json:"name"`
+	FdcID  zero.Int    `db:"fdc_id"`
+	SameAs zero.String `db:"same_as"`
 }
 
 // New creates a new Client.

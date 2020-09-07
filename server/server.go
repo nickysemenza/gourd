@@ -80,7 +80,7 @@ func (s *Server) Run(_ context.Context) error {
 	// gql server
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: s.GetResolver()}))
 	srv.Use(extension.FixedComplexityLimit(100))
-	srv.Use(graph.Observability{})
+	// srv.Use(graph.Observability{})
 
 	// http routes
 	r.Get("/metrics", hf)

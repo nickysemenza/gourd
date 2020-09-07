@@ -9,14 +9,14 @@ context("Basic Create, List, Edit test", () => {
 
   it("creates a new recipe", function () {
     const newName = "cy-" + new Date().getTime();
-    cy.contains("Create").click();
+    cy.contains("create").click();
     cy.get("input[data-cy=name-input]").first().type(newName);
     cy.contains("Create Recipe").click();
     // cy.contains("Recipes").click();
   });
   it("updates the recipe", function () {
     const newIngredient = "ingredient-" + new Date().getTime();
-    cy.contains("Recipes").click();
+    cy.contains("recipes").click();
     cy.get("[data-cy=recipe-table]").should("be.visible");
     cy.contains("details").click();
     cy.url().should("include", "/recipe/");
@@ -24,22 +24,16 @@ context("Basic Create, List, Edit test", () => {
     cy.contains("edit").click();
     cy.contains("add section").click();
     cy.contains("add ingredient").click();
-    cy.get("input[data-cy=grams-input]")
-      .first()
-      .type("{selectall}4");
-    cy.get("div[data-cy=name-input]")
-      .eq(0)
-      .type(`{selectall}${newIngredient}`);
+    cy.get("input[data-cy=grams-input]").first().type("{selectall}4");
+    cy.get("div[data-cy=name-input]").eq(0).type(`{selectall}${newIngredient}`);
     //sometimes typeahead shows non-matches?
     // cy.get(".result").eq(0).click();
     cy.contains("(create)").click();
     cy.wait(500);
     cy.contains("add instruction").click();
-    cy.get("input[data-cy=instruction-input]")
-      .first()
-      .type("mix");
+    cy.get("input[data-cy=instruction-input]").first().type("mix");
     cy.contains("save").click();
-    cy.contains("Ingredients").click();
+    cy.contains("ingredients").click();
     cy.reload();
     cy.contains(newIngredient);
   });

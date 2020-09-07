@@ -84,6 +84,25 @@ const _ = [
           uuid
           name
         }
+        same {
+          uuid
+          name
+        }
+        usdaFood {
+          description
+          dataType
+          category {
+            code
+            description
+          }
+          nutrients {
+            nutrient {
+              name
+              unitName
+            }
+            amount
+          }
+        }
       }
     }
   `,

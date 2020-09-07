@@ -54,6 +54,23 @@ func (r *ingredientResolver) Recipes(ctx context.Context, obj *model.Ingredient)
 	return recipes, nil
 }
 
+func (r *ingredientResolver) UsdaFood(ctx context.Context, obj *model.Ingredient) (*model.Food, error) {
+	return r.Resolver.Query().Food(ctx, int(obj.FdcID))
+}
+
+func (r *ingredientResolver) Same(ctx context.Context, obj *model.Ingredient) ([]*model.Ingredient, error) {
+	dbr, err := r.DB.GetIngrientsSameAs(ctx, obj.UUID)
+	if err != nil {
+		return nil, err
+	}
+	ingredients := []*model.Ingredient{}
+	for _, x := range dbr {
+		each := x
+		ingredients = append(ingredients, fromIngredient(&each))
+	}
+	return ingredients, nil
+}
+
 func (r *mutationResolver) CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error) {
 	uuid, err := r.DB.InsertRecipe(ctx, &db.Recipe{Name: recipe.Name})
 	if err != nil {

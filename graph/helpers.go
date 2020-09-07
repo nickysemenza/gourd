@@ -21,8 +21,14 @@ func fromIngredient(res *db.Ingredient) *model.Ingredient {
 	if res == nil {
 		return nil
 	}
-	return &model.Ingredient{
-		UUID: res.UUID,
-		Name: res.Name,
+	i := &model.Ingredient{
+		UUID:   res.UUID,
+		Name:   res.Name,
+		SameAs: res.SameAs.String,
 	}
+	if res.FdcID.Valid {
+		i.FdcID = res.FdcID.Int64
+	}
+
+	return i
 }

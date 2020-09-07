@@ -21,9 +21,11 @@ type Section struct {
 }
 
 type Ingredient struct {
-	UUID       string   `json:"uuid"`
-	Name       string   `json:"name"`
-	RecipesIDs []string `json:"recipes"`
+	UUID   string `json:"uuid"`
+	Name   string `json:"name"`
+	FdcID  int64
+	SameAs string
+	// RecipesIDs []string `json:"recipes"`
 }
 
 func (i Ingredient) IsIngredientInfo() {}

@@ -3,6 +3,8 @@ type Ingredient {
   uuid: String!
   name: String!
   recipes: [Recipe!]
+  usdaFood: Food
+  same: [Ingredient!]
 }
 
 type SectionInstruction {
