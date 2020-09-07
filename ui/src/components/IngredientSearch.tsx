@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Search, SearchProps, SearchResultData } from "semantic-ui-react";
+import AsyncCreatableSelect from "react-select/async-creatable";
+
 import {
   useSearchIngredientsAndRecipesQuery,
   useCreateIngredientMutation,
@@ -29,7 +30,10 @@ const IngredientSearch: React.FC<{
   ) => void;
   initial?: string;
 }> = ({ callback, initial }) => {
-  const [value, setValue] = useState(initial || "");
+  const i = initial || "";
+  const [value, setValue] = useState(i);
+
+  const [v, setV] = useState<any>({ label: i });
   const [createIngredientMutation] = useCreateIngredientMutation({
     variables: {
       name: value,
@@ -42,68 +46,78 @@ const IngredientSearch: React.FC<{
       searchQuery: value, // value for 'searchQuery'
     },
   });
-  const results: Results = {
-    ingredients: {
-      name: "ingredients",
-      results: [
-        ...(data?.ingredients.map((i) => ({
-          title: i.name,
-          uuid: i.uuid,
-          kind: SectionIngredientKind.Ingredient,
-        })) || []),
-        {
-          title: `${value} (create)`,
-          uuid: "",
-          kind: SectionIngredientKind.Ingredient,
-        },
-      ],
-    },
-    recipes: {
-      name: "recipes",
-      results:
-        data?.recipes.map((i) => ({
-          title: i.name,
-          uuid: i.uuid,
-          kind: SectionIngredientKind.Recipe,
-        })) || [],
-    },
+
+  const handleCreate = async (inputValue: any) => {
+    console.log("foo", inputValue);
+    let res = (await createIngredientMutation()).data;
+    if (res) {
+      callback(
+        { uuid: res.upsertIngredient, name: inputValue },
+        SectionIngredientKind.Ingredient
+      );
+    }
   };
 
-  const handleSearchChange = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>,
-    data: SearchProps
-  ) => {
-    setValue(data.value || "");
-  };
-  const handleResultSelect = async (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    data: SearchResultData
-  ) => {
-    const selection = data.result as ResultItem;
-    if (selection.uuid === "") {
+  const handleChange = async (newValue: any, actionMeta: any) => {
+    console.group("Value Changed");
+    console.log(newValue);
+    console.log(`action: ${actionMeta.action}`);
+    console.groupEnd();
+    if (newValue.__isNew__) {
       let res = (await createIngredientMutation()).data;
       if (res) {
         callback(
-          { uuid: res.upsertIngredient, name: value },
+          { uuid: res.upsertIngredient, name: newValue.label },
           SectionIngredientKind.Ingredient
         );
       }
     } else {
-      setValue(selection.title);
-      callback({ name: selection.title, uuid: selection.uuid }, selection.kind);
+      callback({ name: newValue.label, uuid: newValue.uuid }, newValue.kind);
     }
+    setV(newValue);
   };
+
+  const loadOptions = (inputValue: string, callback: any) => {
+    setValue(inputValue || "");
+
+    const foo = [
+      ...(data?.ingredients || []).map((i) => ({
+        label: i.name,
+        kind: SectionIngredientKind.Ingredient,
+        uuid: i.uuid,
+      })),
+      ...(data?.recipes || []).map((i) => ({
+        label: i.name + " (Recipe)",
+        kind: SectionIngredientKind.Recipe,
+        uuid: i.uuid,
+      })),
+    ];
+
+    // setTimeout(() => {
+    callback(foo);
+    // }, 1000);
+  };
+
   return (
-    <Search
-      data-cy="name-input"
-      category
-      loading={loading}
-      onResultSelect={handleResultSelect}
-      onSearchChange={handleSearchChange}
-      results={results}
-      value={value}
-      size="mini"
+    <AsyncCreatableSelect
+      // cacheOptions
+      // defaultOptions
+      onChange={handleChange}
+      loadOptions={loadOptions}
+      onCreateOption={handleCreate}
+      value={v}
+      // onChange={(e) =>}
     />
+    // <Search
+    //   data-cy="name-input"
+    //   category
+    //   loading={loading}
+    //   onResultSelect={handleResultSelect}
+    //   onSearchChange={handleSearchChange}
+    //   results={results}
+    //   value={value}
+    //   size="mini"
+    // />
   );
 };
 export default IngredientSearch;
