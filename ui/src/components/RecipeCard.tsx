@@ -1,6 +1,7 @@
 import React from "react";
 import { Recipe } from "../generated/graphql";
 import { Box, Heading } from "rebass";
+import RecipeSource from "./RecipeSource";
 
 export interface Props {
   recipe: Partial<Recipe>;
@@ -10,6 +11,7 @@ const RecipeCard: React.FC<Props> = ({ recipe }) => (
     <Heading fontSize={[4, 5, 6]} color="secondary" data-cy="recipe-name">
       {recipe.name}
     </Heading>
+    {recipe.source && <RecipeSource source={recipe.source} />}
     Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
   </Box>
 );
