@@ -5,6 +5,7 @@ import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import { Box } from "rebass";
 import IngredientSearch from "../components/IngredientSearch";
+import Debug from "../components/Debug";
 
 interface TableProps<T extends object> {
   columns: Array<Column<T>>;
@@ -101,7 +102,20 @@ const IngredientList: React.FC = () => {
       },
       {
         Header: "Name",
-        accessor: "name",
+        // accessor: "name",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const { name, same } = original;
+          return (
+            <Box>
+              {name}
+              <ul>
+                {(same || []).map((i) => (
+                  <li>{i.name}</li>
+                ))}
+              </ul>
+            </Box>
+          );
+        },
       },
       {
         Header: "Recipes",
@@ -120,6 +134,14 @@ const IngredientList: React.FC = () => {
               {/* <Debug data={original} /> */}
             </Box>
           );
+        },
+      },
+      {
+        Header: "USDA food",
+        // accessor: "name",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const { usdaFood } = original;
+          return <Box>{usdaFood?.description}</Box>;
         },
       },
     ],

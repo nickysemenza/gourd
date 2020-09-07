@@ -8,7 +8,7 @@ const NavBar: React.FC = () => {
     title: string;
     path: string;
   }[] = [
-    { title: "Recipes", path: "recipes" },
+    { title: "recipes", path: "recipes" },
     { title: "ingredients", path: "ingredients" },
     { title: "create", path: "create" },
     { title: "food (usda)", path: "food" },

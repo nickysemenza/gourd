@@ -203,13 +203,10 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 
 	return r, nil
 }
-
-// GetIngredients returns all ingredients.
-func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingredient, error) {
+func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, error) {
 	q := c.psql.Select("*").From(ingredientsTable)
-	if searchQuery != "" {
-		q = q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
-	}
+	q = addons(q)
+
 	query, args, err := q.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
@@ -224,6 +221,22 @@ func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingr
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
 	return i, nil
+}
+
+// GetIngredients returns all ingredients.
+func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingredient, error) {
+	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
+		q = q.Where(sq.Eq{"same_as": nil})
+		if searchQuery != "" {
+			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+		}
+		return q
+	})
+}
+func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingredient, error) {
+	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
+		return q.Where(sq.Eq{"same_as": parent})
+	})
 }
 
 func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {

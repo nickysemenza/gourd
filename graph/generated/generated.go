@@ -84,9 +84,11 @@ type ComplexityRoot struct {
 	}
 
 	Ingredient struct {
-		Name    func(childComplexity int) int
-		Recipes func(childComplexity int) int
-		UUID    func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Recipes  func(childComplexity int) int
+		Same     func(childComplexity int) int
+		UUID     func(childComplexity int) int
+		UsdaFood func(childComplexity int) int
 	}
 
 	Meal struct {
@@ -175,6 +177,8 @@ type FoodNutrientResolver interface {
 }
 type IngredientResolver interface {
 	Recipes(ctx context.Context, obj *model.Ingredient) ([]*model.Recipe, error)
+	UsdaFood(ctx context.Context, obj *model.Ingredient) (*model.Food, error)
+	Same(ctx context.Context, obj *model.Ingredient) ([]*model.Ingredient, error)
 }
 type MutationResolver interface {
 	CreateRecipe(ctx context.Context, recipe *model.NewRecipe) (*model.Recipe, error)
@@ -363,12 +367,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Ingredient.Recipes(childComplexity), true
 
+	case "Ingredient.same":
+		if e.complexity.Ingredient.Same == nil {
+			break
+		}
+
+		return e.complexity.Ingredient.Same(childComplexity), true
+
 	case "Ingredient.uuid":
 		if e.complexity.Ingredient.UUID == nil {
 			break
 		}
 
 		return e.complexity.Ingredient.UUID(childComplexity), true
+
+	case "Ingredient.usdaFood":
+		if e.complexity.Ingredient.UsdaFood == nil {
+			break
+		}
+
+		return e.complexity.Ingredient.UsdaFood(childComplexity), true
 
 	case "Meal.imageURLs":
 		if e.complexity.Meal.ImageURLs == nil {
@@ -790,6 +808,8 @@ type Ingredient {
   uuid: String!
   name: String!
   recipes: [Recipe!]
+  usdaFood: Food
+  same: [Ingredient!]
 }
 
 type SectionInstruction {
@@ -1924,6 +1944,68 @@ func (ec *executionContext) _Ingredient_recipes(ctx context.Context, field graph
 	res := resTmp.([]*model.Recipe)
 	fc.Result = res
 	return ec.marshalORecipe2ᚕᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐRecipeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ingredient_usdaFood(ctx context.Context, field graphql.CollectedField, obj *model.Ingredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Ingredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Ingredient().UsdaFood(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Food)
+	fc.Result = res
+	return ec.marshalOFood2ᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐFood(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Ingredient_same(ctx context.Context, field graphql.CollectedField, obj *model.Ingredient) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Ingredient",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Ingredient().Same(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Ingredient)
+	fc.Result = res
+	return ec.marshalOIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐIngredientᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Meal_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Meal) (ret graphql.Marshaler) {
@@ -5051,6 +5133,28 @@ func (ec *executionContext) _Ingredient(ctx context.Context, sel ast.SelectionSe
 				res = ec._Ingredient_recipes(ctx, field, obj)
 				return res
 			})
+		case "usdaFood":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Ingredient_usdaFood(ctx, field, obj)
+				return res
+			})
+		case "same":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Ingredient_same(ctx, field, obj)
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6854,6 +6958,46 @@ func (ec *executionContext) marshalOFoodDataType2ᚖgithubᚗcomᚋnickysemenza�
 
 func (ec *executionContext) marshalOIngredient2githubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v model.Ingredient) graphql.Marshaler {
 	return ec._Ingredient(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOIngredient2ᚕᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐIngredientᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Ingredient) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐIngredient(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOIngredient2ᚖgithubᚗcomᚋnickysemenzaᚋgourdᚋgraphᚋmodelᚐIngredient(ctx context.Context, sel ast.SelectionSet, v *model.Ingredient) graphql.Marshaler {
