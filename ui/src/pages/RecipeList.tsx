@@ -97,7 +97,9 @@ const RecipeList: React.FC = () => {
         Header: "test",
         accessor: "test",
         Cell: (cell: CellProps<any>) => (
-          <Link to={`recipe/${cell.row.original.uuid}`}>details</Link>
+          <Link to={`recipe/${cell.row.original.uuid}`} className="link">
+            details
+          </Link>
         ),
       },
     ],

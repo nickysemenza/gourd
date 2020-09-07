@@ -3,3 +3,13 @@
 @tailwind components;
 
 @tailwind utilities;
+
+.link {
+  @apply text-blue-600;
+}
+
+.ing-table-row {
+  display: grid;
+  /* grams, g (BP), ing, amount, unit, adj */
+  grid-template-columns: 1.5fr 70px 3fr 1fr 3fr 3fr;
+}
