@@ -27,7 +27,7 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 
   // Render the UI for your table
   return (
-    <table {...getTableProps()}>
+    <table className="table-auto" {...getTableProps()}>
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
@@ -41,7 +41,7 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
+            <tr {...row.getRowProps()} className="bg-white odd:bg-gray-200">
               {row.cells.map((cell) => {
                 return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
               })}

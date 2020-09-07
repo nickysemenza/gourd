@@ -15,7 +15,6 @@ import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Image } from "semantic-ui-react";
 import { encodeRecipe } from "../parser";
 
 type override = {
@@ -282,9 +281,9 @@ const RecipeDetail: React.FC = () => {
       {recipe.meals.map((snippet) => (
         <>
           {snippet.name}
-          {snippet.imageURLs.map((u) => (
+          {/* {snippet.imageURLs.map((u) => (
             <Image src={u} size="small" />
-          ))}
+          ))} */}
         </>
       ))}
       <Debug data={{ recipe, loading, error, data, multiplier, override }} />

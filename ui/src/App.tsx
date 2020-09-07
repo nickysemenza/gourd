@@ -14,6 +14,8 @@ import IngredientList from "./pages/IngredientList";
 import CreateRecipe from "./pages/CreateRecipe";
 import Food from "./pages/Food";
 
+import "./tailwind.output.css";
+
 function App() {
   const client = new ApolloClient({
     uri: process.env.REACT_APP_GQL_URL,
