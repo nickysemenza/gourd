@@ -15,7 +15,7 @@ import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Divider, Image } from "semantic-ui-react";
+import { Image } from "semantic-ui-react";
 import { encodeRecipe } from "../parser";
 
 type override = {

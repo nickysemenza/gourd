@@ -1,9 +1,18 @@
 import React from "react";
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex } from "rebass";
 import { useHistory } from "react-router-dom";
 
 const NavBar: React.FC = () => {
   const history = useHistory();
+  const navItems: {
+    title: string;
+    path: string;
+  }[] = [
+    { title: "Recipes", path: "recipes" },
+    { title: "ingredients", path: "ingredients" },
+    { title: "create", path: "create" },
+    { title: "food (usda)", path: "food" },
+  ];
   return (
     <Flex px={2} color="white" bg="grey" alignItems="center">
       {/* <Text p={2} fontWeight="bold">
@@ -35,39 +44,19 @@ const NavBar: React.FC = () => {
       </Flex>
 
       <Box mx="auto" />
-      <Box
-        sx={{
-          display: "inline-block",
-          fontWeight: "bold",
-          px: 2,
-          py: 1,
-          color: "inherit",
-        }}
-      >
-        <Box onClick={() => history.push("/recipes")}>Recipes</Box>
-      </Box>
-      <Box
-        sx={{
-          display: "inline-block",
-          fontWeight: "bold",
-          px: 2,
-          py: 1,
-          color: "inherit",
-        }}
-      >
-        <Box onClick={() => history.push("/ingredients")}>Ingredients</Box>
-      </Box>
-      <Box
-        sx={{
-          display: "inline-block",
-          fontWeight: "bold",
-          px: 2,
-          py: 1,
-          color: "inherit",
-        }}
-      >
-        <Box onClick={() => history.push("/create")}>Create</Box>
-      </Box>
+      {navItems.map((item) => (
+        <Box
+          sx={{
+            display: "inline-block",
+            fontWeight: "bold",
+            px: 2,
+            py: 1,
+            color: "inherit",
+          }}
+        >
+          <Box onClick={() => history.push("/" + item.path)}>{item.title}</Box>
+        </Box>
+      ))}
     </Flex>
   );
 };

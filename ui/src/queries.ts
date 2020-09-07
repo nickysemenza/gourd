@@ -14,6 +14,10 @@ const _ = [
           name
           imageURLs
         }
+        source {
+          meta
+          name
+        }
         sections {
           minutes
           uuid

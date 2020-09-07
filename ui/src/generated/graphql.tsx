@@ -258,6 +258,9 @@ export type GetRecipeByUuidQuery = { __typename?: "Query" } & {
         meals: Array<
           { __typename?: "Meal" } & Pick<Meal, "uuid" | "name" | "imageURLs">
         >;
+        source?: Maybe<
+          { __typename?: "Source" } & Pick<Source, "meta" | "name">
+        >;
         sections: Array<
           { __typename?: "Section" } & Pick<Section, "minutes" | "uuid"> & {
               ingredients: Array<
@@ -390,6 +393,10 @@ export const GetRecipeByUuidDocument = gql`
         uuid
         name
         imageURLs
+      }
+      source {
+        meta
+        name
       }
       sections {
         minutes
