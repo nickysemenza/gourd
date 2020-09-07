@@ -7,15 +7,14 @@ import {
   Ingredient,
 } from "../generated/graphql";
 
-import { Box, Button } from "rebass";
 import { useParams } from "react-router-dom";
 import RecipeTable, { UpdateIngredientProps } from "../components/RecipeTable";
 import Debug from "../components/Debug";
-import RecipeCard from "../components/RecipeCard";
 import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
+import RecipeSource from "../components/RecipeSource";
 
 type override = {
   sectionID: number;
@@ -77,10 +76,17 @@ const RecipeDetail: React.FC = () => {
   const e = error || saveError;
   if (e) {
     console.error({ e });
+    // todo: extract to error component
+
     return (
-      <Box color="primary" fontSize={4}>
-        {e.message}
-      </Box>
+      <div role="alert">
+        <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+          oops
+        </div>
+        <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+          <p>{e.message}</p>
+        </div>
+      </div>
     );
   }
 
@@ -260,10 +266,44 @@ const RecipeDetail: React.FC = () => {
 
   return (
     <div>
-      <Button onClick={resetMultiplier}>Reset</Button>
+      <div className="lg:flex lg:items-center lg:justify-between">
+        <h2 className="text-2xl font-bold leading-7 text-gray-900">
+          {recipe.name}
+        </h2>
+        <div className="inline-flex">
+          <button
+            onClick={resetMultiplier}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+          >
+            Reset
+          </button>
+          <button
+            onClick={saveUpdate}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4"
+          >
+            save
+          </button>
+          <button
+            onClick={toggleEdit}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r"
+          >
+            {edit ? "view" : "edit"}
+          </button>
+        </div>
+      </div>
+      <div className="flex space-x-2">
+        <div className="mt-2 text-sm text-gray-600">
+          {recipe.source && <RecipeSource source={recipe.source} />}
+        </div>
+        <div className="mt-2 text-sm text-gray-600">
+          Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
+        </div>
+      </div>
+
+      {/* <Button onClick={resetMultiplier}>Reset</Button>
       <Button onClick={saveUpdate}>save</Button>
-      <Button onClick={toggleEdit}>{edit ? "view" : "edit"}</Button>
-      <RecipeCard recipe={recipe} />
+      <Button onClick={toggleEdit}>{edit ? "view" : "edit"}</Button> */}
+      {/* <RecipeCard recipe={recipe} /> */}
       <RecipeTable
         updateIngredient={updateIngredient}
         updateIngredientInfo={updateIngredientInfo}

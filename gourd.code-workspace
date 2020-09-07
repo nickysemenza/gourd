@@ -1,13 +1,16 @@
 {
   "folders": [
-	{
-		"path": "cli"
-	},
-	{
-		"path": "ui"
-	},
-	{
-		"path": "."
-	}
-]
+    {
+      "path": "cli"
+    },
+    {
+      "path": "ui"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": ["bradlc.vscode-tailwindcss"]
+  }
 }

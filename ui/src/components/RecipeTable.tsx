@@ -6,8 +6,6 @@ import {
   SectionIngredientKind,
 } from "../generated/graphql";
 import { Box, Text } from "rebass";
-import { Input } from "@rebass/forms";
-import { InputProps } from "theme-ui";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 export interface UpdateIngredientProps {
@@ -83,6 +81,8 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>{section.minutes}</TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => (
+          <div className="ing-table-row" key={y}>
+            {/* 
           <Box
             key={y}
             sx={{
@@ -93,6 +93,7 @@ const RecipeTable: React.FC<TableProps> = ({
               borderBottomColor: "green",
             }}
           >
+            */}
             <TableInput
               data-cy="grams-input"
               edit={edit}
@@ -148,7 +149,7 @@ const RecipeTable: React.FC<TableProps> = ({
             )}
             <TableInput
               data-cy="amount-input"
-              width={"128px"}
+              // width={16}
               edit={edit}
               softEdit
               value={getIngredientValue(x, y, ingredient.amount || 0)}
@@ -163,7 +164,7 @@ const RecipeTable: React.FC<TableProps> = ({
             />
             <TableInput
               data-cy="unit-input"
-              width={"64px"}
+              width={16}
               edit={edit}
               value={ingredient.unit}
               onChange={(e) =>
@@ -177,7 +178,7 @@ const RecipeTable: React.FC<TableProps> = ({
             />
             <TableInput
               data-cy="adjective-input"
-              width={"128px"}
+              width={16}
               edit={edit}
               value={ingredient.adjective}
               onChange={(e) =>
@@ -190,21 +191,22 @@ const RecipeTable: React.FC<TableProps> = ({
               }
             />
             {/* TODO: optional toggle */}
-          </Box>
+            {/* </Box> */}
+          </div>
         ))}
         {edit && <Text onClick={() => addIngredient(x)}>add ingredient</Text>}
       </TableCell>
       <TableCell>
-        <ol style={{ margin: 0 }}>
+        <ol className="list-decimal list-inside">
           {section.instructions.map((instruction, y) => (
             <li key={y}>
               <TableInput
                 data-cy="instruction-input"
-                width={"128px"}
+                width={16}
                 edit={edit}
                 value={instruction.instruction}
                 onChange={(e) => updateInstruction(x, y, e.target.value)}
-              />{" "}
+              />
             </li>
           ))}
         </ol>
@@ -227,7 +229,14 @@ const RecipeTable: React.FC<TableProps> = ({
         <TableCell>Section</TableCell>
         <TableCell>Minutes</TableCell>
         <TableCell>
-          Ingredients: x grams (BP) of y (z units, modifier)
+          <div className="ing-table-row">
+            <div>x</div>
+            <div>grams (BP)</div>
+            <div>of y</div>
+            <div>z</div>
+            <div>units</div>
+            <div>modifier</div>
+          </div>
         </TableCell>
         <TableCell>Instructions</TableCell>
       </TableRow>
@@ -267,26 +276,31 @@ const TableInput: React.FC<{
   edit: boolean;
   softEdit?: boolean;
   value: string | number;
-  width?: InputProps["width"];
+  width?: number;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ edit, softEdit = false, width = "64px", ...props }) =>
+}> = ({ edit, softEdit = false, width = 8, ...props }) =>
   edit || softEdit ? (
-    <Input
+    <input
       {...props}
-      padding={0}
-      // width={width}
-      sx={{
-        textAlign: softEdit ? "end" : "begin",
-        ":not(:focus)": {
-          borderColor: edit ? "text" : "transparent",
-        },
-        ":hover": {
-          borderColor: softEdit ? "text" : "transparent",
-          borderStyle: "dashed",
-        },
-        borderRadius: 0,
-      }}
+      className={`border-2 border-dashed p-0 h-6 w-${width} border-gray-200 hover:border-black`}
+      // style={{ width }}
     />
   ) : (
-    <Text>{props.value}</Text>
+    // <Input
+    //   {...props}
+    //   padding={0}
+    //   // width={width}
+    //   sx={{
+    //     textAlign: softEdit ? "end" : "begin",
+    //     ":not(:focus)": {
+    //       borderColor: edit ? "text" : "transparent",
+    //     },
+    //     ":hover": {
+    //       borderColor: softEdit ? "text" : "transparent",
+    //       borderStyle: "dashed",
+    //     },
+    //     borderRadius: 0,
+    //   }}
+    // />
+    <div>{props.value}</div>
   );

@@ -5,7 +5,6 @@ import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import { Box } from "rebass";
 import IngredientSearch from "../components/IngredientSearch";
-import Debug from "../components/Debug";
 
 interface TableProps<T extends object> {
   columns: Array<Column<T>>;
@@ -127,7 +126,9 @@ const IngredientList: React.FC = () => {
               <ul>
                 {recipes.map((r) => (
                   <li>
-                    <Link to={`recipe/${r.uuid}`}>{r.name}</Link>
+                    <Link to={`recipe/${r.uuid}`} className="link">
+                      {r.name}
+                    </Link>
                   </li>
                 ))}
               </ul>

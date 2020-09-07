@@ -1,16 +1,13 @@
 import React from "react";
-import { Box } from "rebass";
 
 const Debug: React.FC<{ data: any }> = ({ data }) => (
-  <Box
-    sx={{
-      borderWidth: "1",
-      borderStyle: "solid",
-      borderColor: "highlight",
-    }}
-  >
-    <pre>{JSON.stringify(data, null, 2)}</pre>
-  </Box>
+  <div className="rounded-md bg-gray-800 text-purple-300 text-xs">
+    <pre className="scrollbar-none m-0 p-0">
+      <code className="inline-block p-4 scrolling-touch">
+        {JSON.stringify(data, null, 2)}
+      </code>
+    </pre>
+  </div>
 );
 
 export default Debug;
