@@ -1,9 +1,7 @@
 import React from "react";
 import { useGetIngredientsQuery } from "../generated/graphql";
-import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
-import { Box } from "rebass";
 import IngredientSearch from "../components/IngredientSearch";
 
 interface TableProps<T extends object> {
@@ -26,12 +24,20 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 
   // Render the UI for your table
   return (
-    <table className="table-auto" {...getTableProps()}>
+    <table
+      className="table-auto border-collapse border-1 border-gray-500"
+      {...getTableProps()}
+    >
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              <th
+                className="border border-gray-400"
+                {...column.getHeaderProps()}
+              >
+                {column.render("Header")}
+              </th>
             ))}
           </tr>
         ))}
@@ -42,7 +48,14 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
           return (
             <tr {...row.getRowProps()} className="bg-white odd:bg-gray-200">
               {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                return (
+                  <td
+                    className="border border-gray-400 p-2"
+                    {...cell.getCellProps()}
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                );
               })}
             </tr>
           );
@@ -51,35 +64,6 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
     </table>
   );
 };
-
-const Styles = styled.div`
-  padding: 1rem;
-
-  table {
-    border-spacing: 0;
-    border: 1px solid black;
-
-    tr {
-      :last-child {
-        td {
-          border-bottom: 0;
-        }
-      }
-    }
-
-    th,
-    td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
-  }
-`;
 
 const IngredientList: React.FC = () => {
   const { data } = useGetIngredientsQuery({});
@@ -91,13 +75,11 @@ const IngredientList: React.FC = () => {
     () => [
       {
         Header: "UUID",
-        // accessor: ({ uuid }: CellProps<i>) => uuid,
-        accessor: "uuid",
-        // Cell: ({
-        //   row: {
-        //     original: { uuid },
-        //   },
-        // }: CellProps<i>) => uuid,
+        Cell: ({
+          row: {
+            original: { uuid },
+          },
+        }: CellProps<i>) => <code>{uuid}</code>,
       },
       {
         Header: "Name",
@@ -105,14 +87,14 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { name, same } = original;
           return (
-            <Box>
+            <div>
               {name}
               <ul>
                 {(same || []).map((i) => (
                   <li>{i.name}</li>
                 ))}
               </ul>
-            </Box>
+            </div>
           );
         },
       },
@@ -122,7 +104,7 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const recipes = original.recipes || [];
           return (
-            <Box>
+            <div>
               <ul>
                 {recipes.map((r) => (
                   <li>
@@ -133,7 +115,7 @@ const IngredientList: React.FC = () => {
                 ))}
               </ul>
               {/* <Debug data={original} /> */}
-            </Box>
+            </div>
           );
         },
       },
@@ -142,7 +124,7 @@ const IngredientList: React.FC = () => {
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { usdaFood } = original;
-          return <Box>{usdaFood?.description}</Box>;
+          return <div>{usdaFood?.description}</div>;
         },
       },
     ],
@@ -155,9 +137,7 @@ const IngredientList: React.FC = () => {
         initial="eg"
         callback={(item, kind) => console.log({ item, kind })}
       />
-      <Styles>
-        <Table<i> columns={columns} data={ingredients} />
-      </Styles>
+      <Table<i> columns={columns} data={ingredients} />
     </>
   );
 };

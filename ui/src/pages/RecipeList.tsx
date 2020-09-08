@@ -1,6 +1,5 @@
 import React from "react";
 import { useGetRecipesQuery } from "../generated/graphql";
-import styled from "styled-components";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import Debug from "../components/Debug";
@@ -25,12 +24,21 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 
   // Render the UI for your table
   return (
-    <table {...getTableProps()} data-cy="recipe-table">
+    <table
+      className="table-auto border-collapse border-1 border-gray-500"
+      {...getTableProps()}
+      data-cy="recipe-table"
+    >
       <thead>
         {headerGroups.map((headerGroup) => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+              <th
+                className="border border-gray-400"
+                {...column.getHeaderProps()}
+              >
+                {column.render("Header")}
+              </th>
             ))}
           </tr>
         ))}
@@ -39,9 +47,16 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
         {rows.map((row) => {
           prepareRow(row);
           return (
-            <tr {...row.getRowProps()}>
+            <tr {...row.getRowProps()} className="bg-white odd:bg-gray-200">
               {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                return (
+                  <td
+                    className="border border-gray-400 p-2"
+                    {...cell.getCellProps()}
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                );
               })}
             </tr>
           );
@@ -50,35 +65,6 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
     </table>
   );
 };
-
-const Styles = styled.div`
-  padding: 1rem;
-
-  table {
-    border-spacing: 0;
-    border: 1px solid black;
-
-    tr {
-      :last-child {
-        td {
-          border-bottom: 0;
-        }
-      }
-    }
-
-    th,
-    td {
-      margin: 0;
-      padding: 0.5rem;
-      border-bottom: 1px solid black;
-      border-right: 1px solid black;
-
-      :last-child {
-        border-right: 0;
-      }
-    }
-  }
-`;
 
 const RecipeList: React.FC = () => {
   const { data, error } = useGetRecipesQuery({});
@@ -107,10 +93,10 @@ const RecipeList: React.FC = () => {
   );
 
   return (
-    <Styles>
+    <div>
       <Table columns={columns} data={data?.recipes || []} />
       <Debug data={{ error }} />
-    </Styles>
+    </div>
   );
 };
 

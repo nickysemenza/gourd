@@ -1,24 +1,17 @@
 import { useGetFoodQuery } from "../generated/graphql";
 import React from "react";
-import { Box, Heading, Text } from "rebass";
 import Debug from "../components/Debug";
 
 const Food: React.FC = () => {
   // const [food, setFood]
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridGap: 3, // theme.space[3]
-        gridTemplateColumns: "repeat(auto-fit, minmax(128px, 1fr))",
-      }}
-    >
+    <div className="grid grid-cols-5 gap-4">
       <FoodInfo fdc_id={171047} />
       <FoodInfo fdc_id={392941} />
       <FoodInfo fdc_id={747448} />
       <FoodInfo fdc_id={789097} />
       <FoodInfo fdc_id={335560} />
-    </Box>
+    </div>
   );
 };
 export default Food;
@@ -31,12 +24,11 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
   });
   if (!data) return null;
   const { food } = data;
-  // const { description = null, nutrients = null, category = null } = food;
   return (
-    <Box>
-      <Heading>{food?.description}</Heading>
-      <Text>{food?.dataType}</Text>
-      <Text>{fdc_id}</Text>
+    <div>
+      <h2>{food?.description}</h2>
+      <div>{food?.dataType}</div>
+      <div>{fdc_id}</div>
       <Debug data={food?.category} />
 
       <table>
@@ -50,6 +42,6 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
             </tr>
           ))}
       </table>
-    </Box>
+    </div>
   );
 };

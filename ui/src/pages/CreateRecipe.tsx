@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useCreateRecipeMutation } from "../generated/graphql";
 import Debug from "../components/Debug";
-import { Box, Button } from "rebass";
-import { Input } from "@rebass/forms";
 
 const CreateRecipe: React.FC = () => {
   const [name, setName] = useState("");
@@ -19,17 +17,25 @@ const CreateRecipe: React.FC = () => {
     createRecipeMutation();
   };
   return (
-    <Box>
-      <Debug data={{ data, loading, error }} />
-      <Input
+    <form>
+      <Debug data={{ name, data, loading, error }} />
+      <input
+        className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
+        placeholder="recipe name"
         data-cy="name-input"
         value={name}
         onChange={(e) => {
           setName(e.target.value);
         }}
       />
-      <Button onClick={create}>Create Recipe</Button>
-    </Box>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        type="button"
+        onClick={create}
+      >
+        Create Recipe
+      </button>
+    </form>
   );
 };
 
