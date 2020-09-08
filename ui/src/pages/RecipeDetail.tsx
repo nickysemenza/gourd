@@ -266,10 +266,25 @@ const RecipeDetail: React.FC = () => {
 
   return (
     <div>
-      <div className="lg:flex lg:items-center lg:justify-between">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900">
-          {recipe.name}
-        </h2>
+      <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
+        <div>
+          <h2 className="text-2xl font-bold leading-7 text-gray-900">
+            {recipe.name}
+          </h2>
+
+          <div className="flex">
+            {recipe.source && (
+              <div className="text-sm text-gray-600">
+                <RecipeSource source={recipe.source} />
+              </div>
+            )}
+            {recipe.unit !== "" && (
+              <div className="text-sm text-gray-600">
+                Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
+              </div>
+            )}
+          </div>
+        </div>
         <div className="inline-flex">
           <button
             onClick={resetMultiplier}
@@ -291,19 +306,7 @@ const RecipeDetail: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="flex space-x-2">
-        <div className="mt-2 text-sm text-gray-600">
-          {recipe.source && <RecipeSource source={recipe.source} />}
-        </div>
-        <div className="mt-2 text-sm text-gray-600">
-          Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
-        </div>
-      </div>
 
-      {/* <Button onClick={resetMultiplier}>Reset</Button>
-      <Button onClick={saveUpdate}>save</Button>
-      <Button onClick={toggleEdit}>{edit ? "view" : "edit"}</Button> */}
-      {/* <RecipeCard recipe={recipe} /> */}
       <RecipeTable
         updateIngredient={updateIngredient}
         updateIngredientInfo={updateIngredientInfo}

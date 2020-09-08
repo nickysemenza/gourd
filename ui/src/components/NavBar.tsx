@@ -1,5 +1,4 @@
 import React from "react";
-import { Box, Flex } from "rebass";
 import { useHistory } from "react-router-dom";
 
 const NavBar: React.FC = () => {
@@ -14,9 +13,10 @@ const NavBar: React.FC = () => {
     { title: "food (usda)", path: "food" },
   ];
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
+    <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6 mb-2">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
         <svg
+          onClick={() => history.push("/")}
           width="158"
           height="40"
           viewBox="0 0 158 59"

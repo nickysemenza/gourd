@@ -5,7 +5,6 @@ import {
   Ingredient,
   SectionIngredientKind,
 } from "../generated/graphql";
-import { Box, Text } from "rebass";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 export interface UpdateIngredientProps {
@@ -64,36 +63,14 @@ const RecipeTable: React.FC<TableProps> = ({
   const renderRow = (section: Section, x: number) => (
     <TableRow key={x}>
       <TableCell>
-        <Box
-          sx={{
-            display: "inline-block",
-            color: "highlight",
-            bg: "primary",
-            px: 1,
-            py: 0,
-            fontSize: 12,
-            borderRadius: "50%",
-          }}
-        >
+        <div className="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">
           {String.fromCharCode(65 + x)}
-        </Box>
+        </div>
       </TableCell>
       <TableCell>{section.minutes}</TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => (
           <div className="ing-table-row" key={y}>
-            {/* 
-          <Box
-            key={y}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: "1fr 70px 3fr 1fr 4fr 4fr",
-              borderBottomWidth: "1px",
-              borderBottomStyle: "solid",
-              borderBottomColor: "green",
-            }}
-          >
-            */}
             <TableInput
               data-cy="grams-input"
               edit={edit}
@@ -108,44 +85,29 @@ const RecipeTable: React.FC<TableProps> = ({
                 })
               }
             />
-            <Text pr={1} color="gray">
-              g{" "}
+            <div className="text-gray-600">
+              g
               {flourMass > 0 && (
-                <i>({Math.round((ingredient.grams / flourMass) * 100)}%)</i>
+                <i> ({Math.round((ingredient.grams / flourMass) * 100)}%)</i>
               )}
-            </Text>
-            {/* <TableInput
-              data-cy="name-input"
-              width={"128px"}
-              edit={edit}
-              value={ingredient.info.name}
-              onChange={(e) =>
-                updateIngredient({
-                  sectionID: x,
-                  ingredientID: y,
-                  value: e.target.value,
-                  attr: "name",
-                })
-              }
-            /> */}
+            </div>
             {edit ? (
               <IngredientSearch
                 initial={ingredient.info.name}
                 callback={(item, kind) =>
-                  // console.log({ item, kind })
                   updateIngredientInfo(x, y, item, kind)
                 }
               />
             ) : (
-              <Text pr={1} color="black">
+              <div className="text-gray-600">
                 {ingredient.kind === SectionIngredientKind.Recipe ? (
-                  <Link to={`/recipe/${ingredient.info.uuid}`}>
+                  <Link to={`/recipe/${ingredient.info.uuid}`} className="link">
                     {ingredient.info.name}
                   </Link>
                 ) : (
                   ingredient.info.name
                 )}
-              </Text>
+              </div>
             )}
             <TableInput
               data-cy="amount-input"
@@ -191,10 +153,13 @@ const RecipeTable: React.FC<TableProps> = ({
               }
             />
             {/* TODO: optional toggle */}
-            {/* </Box> */}
           </div>
         ))}
-        {edit && <Text onClick={() => addIngredient(x)}>add ingredient</Text>}
+        {edit && (
+          <div className="add-item" onClick={() => addIngredient(x)}>
+            add ingredient
+          </div>
+        )}
       </TableCell>
       <TableCell>
         <ol className="list-decimal list-inside">
@@ -210,22 +175,18 @@ const RecipeTable: React.FC<TableProps> = ({
             </li>
           ))}
         </ol>
-        {edit && <Text onClick={() => addInstruction(x)}>add instruction</Text>}
+        {edit && (
+          <div className="add-item" onClick={() => addInstruction(x)}>
+            add instruction
+          </div>
+        )}
       </TableCell>
     </TableRow>
   );
 
   return (
-    <Box
-      sx={{
-        borderWidth: 1,
-        borderStyle: "solid",
-        borderColor: "highlight",
-        boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
-      }}
-      bg="muted"
-    >
-      <TableRow>
+    <div className="border-gray-900 shadow-xl bg-gray-100">
+      <TableRow header>
         <TableCell>Section</TableCell>
         <TableCell>Minutes</TableCell>
         <TableCell>
@@ -241,35 +202,24 @@ const RecipeTable: React.FC<TableProps> = ({
         <TableCell>Instructions</TableCell>
       </TableRow>
       {recipe.sections?.map((section, x) => renderRow(section, x))}
-      {edit && <Text onClick={() => addSection()}>add section</Text>}
-    </Box>
+      {edit && (
+        <div className="add-item" onClick={() => addSection()}>
+          add section
+        </div>
+      )}
+    </div>
   );
 };
 export default RecipeTable;
 
-const TableCell: typeof Box = ({ children }) => (
-  <Box
-    sx={{
-      borderLeftWidth: "1px",
-      borderLeftStyle: "solid",
-      borderLeftColor: "highlight",
-    }}
-  >
-    {children}
-  </Box>
+const TableCell: React.FC = ({ children }) => (
+  <div className="border-solid border border-gray-600 p-1">{children}</div>
 );
-const TableRow: typeof Box = ({ children }) => (
-  <Box
-    sx={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr 4fr 2fr",
-      borderBottomWidth: "1px",
-      borderBottomStyle: "solid",
-      borderBottomColor: "highlight",
-    }}
-  >
-    {children}
-  </Box>
+const TableRow: React.FC<{ header?: boolean }> = ({
+  children,
+  header = false,
+}) => (
+  <div className={`rec-table-row ${header && "font-semibold"}`}>{children}</div>
 );
 
 const TableInput: React.FC<{
@@ -278,29 +228,14 @@ const TableInput: React.FC<{
   value: string | number;
   width?: number;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ edit, softEdit = false, width = 8, ...props }) =>
+}> = ({ edit, softEdit = false, width = 10, ...props }) =>
   edit || softEdit ? (
     <input
       {...props}
-      className={`border-2 border-dashed p-0 h-6 w-${width} border-gray-200 hover:border-black`}
-      // style={{ width }}
+      className={`border-2 border-dashed p-0 h-6 w-${width} border-gray-200 hover:border-black ${
+        softEdit && !edit && "bg-transparent"
+      } focus:bg-gray-200`}
     />
   ) : (
-    // <Input
-    //   {...props}
-    //   padding={0}
-    //   // width={width}
-    //   sx={{
-    //     textAlign: softEdit ? "end" : "begin",
-    //     ":not(:focus)": {
-    //       borderColor: edit ? "text" : "transparent",
-    //     },
-    //     ":hover": {
-    //       borderColor: softEdit ? "text" : "transparent",
-    //       borderStyle: "dashed",
-    //     },
-    //     borderRadius: 0,
-    //   }}
-    // />
     <div>{props.value}</div>
   );

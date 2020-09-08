@@ -11,5 +11,17 @@
 .ing-table-row {
   display: grid;
   /* grams, g (BP), ing, amount, unit, adj */
-  grid-template-columns: 1.5fr 70px 3fr 1fr 3fr 3fr;
+  grid-template-columns: 2.5rem 70px 3fr 2.5rem 3fr 3fr;
+}
+
+.rec-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 4fr 2fr;
+}
+
+.add-item {
+  @apply text-gray-800;
+  @apply font-light;
+  @apply uppercase;
+  @apply text-xs;
 }

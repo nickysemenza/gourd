@@ -1,38 +1,24 @@
 import React from "react";
 
-import { Box, Card, Heading, Text, Button } from "rebass";
-import { useColorMode } from "theme-ui";
-
 const Test: React.FC = () => {
-  const [colorMode, setColorMode] = useColorMode();
   return (
     <div>
-      <button
-        onClick={(e) => {
-          setColorMode(colorMode === "default" ? "dark" : "default");
-        }}
-      >
-        Toggle {colorMode === "default" ? "Dark" : "Light"}
-      </button>
-      <Box width={256}>
-        <Card
-          sx={{
-            p: 1,
-            borderRadius: 2,
-            boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
-          }}
-        >
-          <Box px={2}>
-            <Heading as="h3">Card Demo</Heading>
-            <Text fontSize={0}>You can edit this code</Text>
-          </Box>
-        </Card>
-      </Box>
-
-      <Button variant="primary" mr={2}>
-        Beep
-      </Button>
-      <Button variant="secondary">Boop</Button>
+      {/* https://mertjf.github.io/tailblocks/ */}
+      <section className="text-gray-700 body-font">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-20">
+            <h2 className="text-xs text-teal-500 tracking-widest font-medium title-font mb-1">
+              Go Universal Recipe Database
+            </h2>
+            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
+              gourd
+            </h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+              Nicky's Recipe Database
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
