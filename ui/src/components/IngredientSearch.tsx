@@ -80,7 +80,7 @@ const IngredientSearch: React.FC<{
   const loadOptions = (inputValue: string, callback: any) => {
     setValue(inputValue || "");
 
-    const foo = [
+    callback([
       ...(data?.ingredients || []).map((i) => ({
         label: i.name,
         kind: SectionIngredientKind.Ingredient,
@@ -91,33 +91,18 @@ const IngredientSearch: React.FC<{
         kind: SectionIngredientKind.Recipe,
         uuid: i.uuid,
       })),
-    ];
-
-    // setTimeout(() => {
-    callback(foo);
-    // }, 1000);
+    ]);
   };
 
   return (
-    <AsyncCreatableSelect
-      // cacheOptions
-      // defaultOptions
-      onChange={handleChange}
-      loadOptions={loadOptions}
-      onCreateOption={handleCreate}
-      value={v}
-      // onChange={(e) =>}
-    />
-    // <Search
-    //   data-cy="name-input"
-    //   category
-    //   loading={loading}
-    //   onResultSelect={handleResultSelect}
-    //   onSearchChange={handleSearchChange}
-    //   results={results}
-    //   value={value}
-    //   size="mini"
-    // />
+    <div data-cy="name-input">
+      <AsyncCreatableSelect
+        onChange={handleChange}
+        loadOptions={loadOptions}
+        onCreateOption={handleCreate}
+        value={v}
+      />
+    </div>
   );
 };
 export default IngredientSearch;
