@@ -13,8 +13,8 @@ const NavBar: React.FC = () => {
     { title: "food (usda)", path: "food" },
   ];
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6 mb-2">
-      <div className="flex items-center flex-shrink-0 text-white mr-6">
+    <nav className="flex items-center justify-between flex-wrap bg-teal-500 px-6 py-3 mb-2">
+      <div className="flex items-center flex-shrink-0 text-white mr-1">
         <svg
           onClick={() => history.push("/")}
           width="158"
@@ -38,7 +38,6 @@ const NavBar: React.FC = () => {
             fill="black"
           />
         </svg>
-        {/* <span className="font-semibold text-xl tracking-tight">Gourd</span> */}
       </div>
       <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
         <div className="text-sm lg:flex-grow">
@@ -46,20 +45,12 @@ const NavBar: React.FC = () => {
             <a
               href="#link"
               onClick={() => history.push("/" + item.path)}
-              className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
+              className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4 font-medium"
             >
               {item.title}
             </a>
           ))}
         </div>
-        {/* <div>
-          <a
-            href="#"
-            className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"
-          >
-            Download
-          </a>
-        </div> */}
       </div>
     </nav>
   );
