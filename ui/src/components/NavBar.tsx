@@ -11,6 +11,7 @@ const NavBar: React.FC = () => {
     { title: "ingredients", path: "ingredients" },
     { title: "create", path: "create" },
     { title: "food (usda)", path: "food" },
+    { title: "playground", path: "playground" },
   ];
   return (
     <nav className="flex items-center justify-between flex-wrap bg-teal-500 px-6 py-3 mb-2">

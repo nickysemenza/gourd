@@ -20,9 +20,9 @@ func _() {
 	_ = x[Item-9]
 }
 
-const _Unit_name = "gramozpoundlitermillileterquuartcputsptbspitem"
+const _Unit_name = "gramozpoundlitermillileterquartcputsptbspitem"
 
-var _Unit_index = [...]uint8{0, 4, 6, 11, 16, 26, 32, 35, 38, 42, 46}
+var _Unit_index = [...]uint8{0, 4, 6, 11, 16, 26, 31, 34, 37, 41, 45}
 
 func (i Unit) String() string {
 	if i < 0 || i >= Unit(len(_Unit_index)-1) {
