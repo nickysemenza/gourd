@@ -1,0 +1,178 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Swagger Recipestore
+  license:
+    name: MIT
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/nickysemenza/sss/1.0.0
+  - url: http://recipestore.swagger.io/v1
+paths:
+  /recipes:
+    get:
+      summary: List all recipes
+      operationId: list_recipes
+      tags:
+        - recipes
+      parameters:
+        - name: limit
+          in: query
+          description: How many items to return at one time (max 100)
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            maximum: 1000
+      responses:
+        "200":
+          description: A paged array of recipes
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRecipes"
+          # content:
+          #   application/json:
+          #     schema:
+          #       allOf:
+          #         - $ref: "#/components/schemas/List"
+          #         - type: object
+          #           properties:
+          #             items:
+          #               # type: object
+          #               # items:
+          #               $ref: "#/components/schemas/Recipes"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a recipe
+      operationId: create_recipes
+      tags:
+        - recipes
+      responses:
+        "201":
+          description: Newly created recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /recipes/{recipe_id}:
+    get:
+      summary: Info for a specific recipe
+      operationId: get_recipe_by_id
+      tags:
+        - recipes
+      parameters:
+        - name: recipe_id
+          in: path
+          required: true
+          description: The id of the recipe to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Recipe:
+      description: A recipe
+      type: object
+      required:
+        - id
+        - name
+        - quantity
+        - unit
+      properties:
+        id:
+          description: UUID
+          type: string
+        name:
+          description: recipe name
+          type: string
+        total_minutes:
+          description: todo
+          type: integer
+        source:
+          description: book or website? deprecated?
+          type: string
+        servings:
+          description: num servings
+          type: integer
+        quantity:
+          description: serving quantity
+          type: integer
+        unit:
+          description: serving unit
+          type: string
+        # tag:
+        # type: string
+    # Recipes:
+    #   type: array
+    #   items:
+    #     $ref: "#/components/schemas/Recipe"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    List:
+      type: object
+      required:
+        - page_number
+        - limit
+        - total_count
+      properties:
+        page_number:
+          description: What number apge this is
+          type: integer
+        limit:
+          description: How many items were requested for this page
+          type: integer
+        total_count:
+          description: Total number of items across all pages
+          type: integer
+
+    PaginatedRecipes:
+      type: object
+      properties:
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe"
+        # data2:
+        #   $ref: "#/components/schemas/Recipes"
+        meta:
+          $ref: "#/components/schemas/List"

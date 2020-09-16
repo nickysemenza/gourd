@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -21,6 +22,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/plugin/othttp"
 
+	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/graph"
 	"github.com/nickysemenza/gourd/graph/generated"
@@ -69,6 +71,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(NewStructuredLogger(log.New()))
 	r.Use(cors.Handler(cors.Options{}))
 	r.Use(timing)
+	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(sentryMiddleware.Handle)
 
@@ -92,7 +95,22 @@ func (s *Server) Run(_ context.Context) error {
 		_, _ = w.Write([]byte("hi"))
 	})
 
+	apiManager := api.NewAPI()
+	r.Mount("/api", api.Handler(apiManager))
+
 	r.Get("/recipes/{uuid}", s.GetRecipe)
+
+	r.Get("/routes", func(w http.ResponseWriter, req *http.Request) {
+		walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+			route = strings.Replace(route, "/*/", "/", -1)
+			fmt.Fprintf(w, "%s %s\n", method, route)
+			return nil
+		}
+
+		if err := chi.Walk(r, walkFunc); err != nil {
+			fmt.Printf("Logging err: %s\n", err.Error())
+		}
+	})
 
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
 	log.Printf("running on: http://%s/", addr)

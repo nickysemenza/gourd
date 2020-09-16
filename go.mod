@@ -9,7 +9,9 @@ require (
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/cosmtrek/air v1.12.5-0.20200905080724-b538c70423fb
 	github.com/davecgh/go-spew v1.1.1
+	github.com/deepmap/oapi-codegen v1.3.13
 	github.com/dgraph-io/ristretto v0.0.2
+	github.com/getkin/kin-openapi v0.22.0
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible
 	github.com/go-chi/cors v1.1.1
@@ -33,5 +35,5 @@ require (
 	golang.org/x/tools v0.0.0-20200731060945-b5fad4ed8dd6
 	google.golang.org/grpc v1.27.1
 	gopkg.in/guregu/null.v3 v3.4.0
-	gopkg.in/yaml.v2 v2.2.7
+	gopkg.in/yaml.v2 v2.3.0
 )

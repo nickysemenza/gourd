@@ -10,6 +10,7 @@ import NavBar from "./components/NavBar";
 import IngredientList from "./pages/IngredientList";
 import CreateRecipe from "./pages/CreateRecipe";
 import Food from "./pages/Food";
+import Playground from "./pages/Playground";
 
 import "./tailwind.output.css";
 
@@ -37,6 +38,9 @@ function App() {
             </Route>
             <Route path="/food">
               <Food />
+            </Route>
+            <Route path="/playground">
+              <Playground />
             </Route>
             <Route path="/">
               <Test />
