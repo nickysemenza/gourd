@@ -13,8 +13,8 @@ import (
 	"github.com/nickysemenza/gourd/graph/model"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/vektah/gqlparser/gqlerror"
-	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/label"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
@@ -193,7 +193,7 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 	tr := global.Tracer("graph")
 	ctx, span := tr.Start(ctx, "Recipe")
 	defer span.End()
-	span.SetAttributes(core.KeyValue{Key: "uuid", Value: core.String(uuid)})
+	span.SetAttributes(label.String("uuid", uuid))
 	res, err := r.Resolver.DB.GetRecipeByUUID(ctx, uuid)
 	if err != nil {
 		return nil, err

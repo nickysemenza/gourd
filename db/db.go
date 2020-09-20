@@ -9,6 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/api/trace"
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
@@ -25,9 +26,10 @@ const (
 
 // Client is a database client
 type Client struct {
-	db    *sqlx.DB
-	psql  sq.StatementBuilderType
-	cache *ristretto.Cache
+	db     *sqlx.DB
+	psql   sq.StatementBuilderType
+	cache  *ristretto.Cache
+	tracer trace.Tracer
 }
 
 func getRecipeColumns() []string {
@@ -118,9 +120,10 @@ func New(dbConn *sql.DB) (*Client, error) {
 		return nil, err
 	}
 	return &Client{
-		db:    dbx,
-		psql:  sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
-		cache: cache,
+		db:     dbx,
+		psql:   sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
+		cache:  cache,
+		tracer: global.Tracer("db"),
 	}, nil
 }
 
@@ -337,7 +340,7 @@ func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 }
 
 func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
-	ctx, span := global.Tracer("db").Start(ctx, "getContext")
+	ctx, span := c.tracer.Start(ctx, "getContext")
 	defer span.End()
 
 	query, args, err := q.ToSql()
@@ -347,7 +350,7 @@ func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interf
 	return c.db.GetContext(ctx, dest, query, args...)
 }
 func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
-	ctx, span := global.Tracer("db").Start(ctx, "selectContext")
+	ctx, span := c.tracer.Start(ctx, "selectContext")
 	defer span.End()
 
 	query, args, err := q.ToSql()

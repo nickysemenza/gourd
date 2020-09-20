@@ -16,11 +16,11 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 	log "github.com/sirupsen/logrus"
+	othttp "go.opentelemetry.io/contrib/instrumentation/net/http"
 	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/key"
 	"go.opentelemetry.io/otel/api/metric"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/plugin/othttp"
+	"go.opentelemetry.io/otel/label"
 
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/db"
@@ -41,14 +41,14 @@ type Server struct {
 
 // nolint:gochecknoglobals
 var httpRequestsDurationMetric = metric.Must(global.Meter("ex.com/basic")).
-	NewFloat64Measure("http.requests.duration", metric.WithKeys(key.New("method")))
+	NewFloat64Counter("http.requests.duration")
 
 func timing(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		t := time.Now()
 		next.ServeHTTP(w, r)
 		d := time.Since(t).Seconds()
-		httpRequestsDurationMetric.Record(r.Context(), d, key.String("method", r.Method))
+		httpRequestsDurationMetric.Add(r.Context(), d, label.String("method", r.Method))
 	}
 	return http.HandlerFunc(fn)
 }
@@ -75,7 +75,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(middleware.Recoverer)
 	r.Use(sentryMiddleware.Handle)
 
-	_, hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
+	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
 		return nil
 	}
@@ -86,7 +86,7 @@ func (s *Server) Run(_ context.Context) error {
 	// srv.Use(graph.Observability{})
 
 	// http routes
-	r.Get("/metrics", hf)
+	r.Mount("/metrics", hf)
 	r.Mount("/debug", middleware.Profiler())
 	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	r.Handle("/query", othttp.WithRouteTag("/query", srv))

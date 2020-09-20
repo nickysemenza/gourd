@@ -13,8 +13,9 @@ import (
 
 	"github.com/nickysemenza/gourd/unit"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/otel/api/core"
+
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/label"
 )
 
 type tokenKind int
@@ -110,7 +111,7 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 
 	segments, err := p.getsegments(ctx, s)
 	span.AddEvent(ctx, "got segments")
-	span.SetAttributes(core.KeyValue{Key: "raw", Value: core.String(s)})
+	span.SetAttributes(label.String("raw",s))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get segments: %v", err)
 	}

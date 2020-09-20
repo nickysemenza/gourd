@@ -10,7 +10,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/nickysemenza/gourd/graph/model"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/otel/api/global"
 )
 
 // GetRecipeSections finds the sections.
@@ -59,7 +58,7 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
 	cacheKey := fmt.Sprintf("i:%s", uuid)
 
-	ctx, span := global.Tracer("db").Start(ctx, "GetIngredientByUUID")
+	ctx, span := c.tracer.Start(ctx, "GetIngredientByUUID")
 	defer span.End()
 
 	cval, hit := c.cache.Get(cacheKey)
