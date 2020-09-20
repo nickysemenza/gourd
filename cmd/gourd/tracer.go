@@ -5,9 +5,9 @@ import (
 	"database/sql/driver"
 
 	"github.com/luna-duclos/instrumentedsql"
-	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel/label"
 )
 
 type tracer struct {
@@ -46,7 +46,7 @@ func (s span) NewChild(name string) instrumentedsql.Span {
 }
 
 func (s span) SetLabel(k, v string) {
-	s.parent.SetAttributes(core.Key(k).String(v))
+	s.parent.SetAttributes(label.Key(k).String(v))
 }
 
 func (s span) SetError(err error) {

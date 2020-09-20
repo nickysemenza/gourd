@@ -6,10 +6,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/trace"
-	"google.golang.org/grpc/codes"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/label"
 )
 
 // Observability is a Middleware for tracing graphql queries
@@ -39,15 +39,15 @@ func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver
 
 	field := fc.Field
 	span.SetAttributes(
-		core.Key("resolver.path").String(fc.Path().String()),
-		core.Key("resolver.object").String(field.ObjectDefinition.Name),
-		core.Key("resolver.field").String(field.Name),
-		core.Key("resolver.alias").String(field.Alias),
+		label.Key("resolver.path").String(fc.Path().String()),
+		label.Key("resolver.object").String(field.ObjectDefinition.Name),
+		label.Key("resolver.field").String(field.Name),
+		label.Key("resolver.alias").String(field.Alias),
 	)
 	for _, arg := range field.Arguments {
 		if arg.Value != nil {
 			span.SetAttributes(
-				core.Key(fmt.Sprintf("resolver.args.%s", arg.Name)).String(arg.Value.String()),
+				label.Key(fmt.Sprintf("resolver.args.%s", arg.Name)).String(arg.Value.String()),
 			)
 		}
 	}
@@ -55,11 +55,11 @@ func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver
 	errs := graphql.GetErrors(ctx)
 	if len(errs) != 0 {
 		span.SetStatus(codes.Unknown, errs.Error())
-		span.SetAttributes(core.Key("error").Bool(true))
+		span.SetAttributes(label.Key("error").Bool(true))
 		for i, err := range errs {
 			span.SetAttributes(
-				core.Key(fmt.Sprintf("resolver.error.%d.message", i)).String(err.Error()),
-				core.Key(fmt.Sprintf("resolver.error.%d.kind", i)).String(fmt.Sprintf("%T", err)),
+				label.Key(fmt.Sprintf("resolver.error.%d.message", i)).String(err.Error()),
+				label.Key(fmt.Sprintf("resolver.error.%d.kind", i)).String(fmt.Sprintf("%T", err)),
 			)
 		}
 	}
@@ -75,16 +75,16 @@ func (c Observability) InterceptOperation(ctx context.Context, next graphql.Oper
 	span.SetName(operationName(ctx))
 
 	span.SetAttributes(
-		core.KeyValue{Key: "request.query", Value: core.String(oc.RawQuery)},
+		label.String("request.query", oc.RawQuery),
 	)
 
 	if stats := extension.GetComplexityStats(ctx); stats != nil {
-		span.SetAttributes(core.Key("request.complexity.actual").Int(stats.Complexity))
-		span.SetAttributes(core.Key("request.complexity.limit").Int(stats.ComplexityLimit))
+		span.SetAttributes(label.Key("request.complexity.actual").Int(stats.Complexity))
+		span.SetAttributes(label.Key("request.complexity.limit").Int(stats.ComplexityLimit))
 	}
 
 	for k, v := range oc.Variables {
-		span.SetAttributes(core.Key(fmt.Sprintf("request.variables.%s", k)).String(fmt.Sprintf("%+v", v)))
+		span.SetAttributes(label.Key(fmt.Sprintf("request.variables.%s", k)).String(fmt.Sprintf("%+v", v)))
 	}
 	span.AddEvent(ctx, "graphql: processing begin")
 	span.AddEventWithTimestamp(ctx, oc.Stats.Read.Start, "graphql read: start")

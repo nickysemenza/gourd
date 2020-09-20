@@ -16,8 +16,8 @@ import (
 	"github.com/nickysemenza/gourd/graph/model"
 	"github.com/nickysemenza/gourd/parser"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace"
 	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/plugin/httptrace"
 )
 
 // FetchAndTransform returns a recipe.

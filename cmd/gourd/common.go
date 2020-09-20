@@ -8,10 +8,10 @@ import (
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"go.opentelemetry.io/otel/api/core"
 	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/key"
+
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
+	"go.opentelemetry.io/otel/label"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -33,15 +33,14 @@ func initTracer() error {
 		}
 		global.SetTraceProvider(tp)
 	} else if endpoint != "" {
-		_, _, err := jaeger.NewExportPipeline(
+		_, err := jaeger.InstallNewPipeline(
 			jaeger.WithCollectorEndpoint(endpoint),
 			jaeger.WithProcess(jaeger.Process{
 				ServiceName: "gourd",
-				Tags: []core.KeyValue{
-					key.String("exporter", "jaeger"),
+				Tags: []label.KeyValue{
+					label.String("exporter", "jaeger"),
 				},
 			}),
-			jaeger.RegisterAsGlobal(),
 			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
 		)
 		return err
