@@ -59,7 +59,7 @@ func (r *ingredientResolver) UsdaFood(ctx context.Context, obj *model.Ingredient
 }
 
 func (r *ingredientResolver) Same(ctx context.Context, obj *model.Ingredient) ([]*model.Ingredient, error) {
-	dbr, err := r.DB.GetIngrientsSameAs(ctx, obj.UUID)
+	dbr, _, err := r.DB.GetIngrientsSameAs(ctx, obj.UUID)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe,
 }
 
 func (r *queryResolver) Ingredients(ctx context.Context, searchQuery string) ([]*model.Ingredient, error) {
-	dbr, err := r.DB.GetIngredients(ctx, searchQuery)
+	dbr, _, err := r.DB.GetIngredients(ctx, searchQuery)
 	if err != nil {
 		return nil, err
 	}

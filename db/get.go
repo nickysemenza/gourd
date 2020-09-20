@@ -59,8 +59,7 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
 	cacheKey := fmt.Sprintf("i:%s", uuid)
 
-	tr := global.Tracer("db")
-	ctx, span := tr.Start(ctx, "GetIngredientByUUID")
+	ctx, span := global.Tracer("db").Start(ctx, "GetIngredientByUUID")
 	defer span.End()
 
 	cval, hit := c.cache.Get(cacheKey)
@@ -203,37 +202,76 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 
 	return r, nil
 }
-func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, error) {
-	q := c.psql.Select("*").From(ingredientsTable)
-	q = addons(q)
-
-	query, args, err := q.ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
+func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, uint64, error) {
+	q := addons(c.psql.Select("*").From(ingredientsTable))
+	cq := addons(c.psql.Select("count(*)").From(ingredientsTable)).RemoveLimit().RemoveOffset()
 
 	i := []Ingredient{}
-	err = c.db.SelectContext(ctx, &i, query, args...)
+	err := c.selectContext(ctx, q, &i)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, 0, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to select: %w", err)
+		return nil, 0, fmt.Errorf("failed to select: %w", err)
 	}
-	return i, nil
+	var count uint64
+	if err := c.getContext(ctx, cq, &count); err != nil {
+		return nil, 0, err
+	}
+
+	return i, count, nil
+}
+
+type SearchQuery struct {
+	offset uint64
+	limit  uint64
+}
+
+func (s *SearchQuery) apply(q sq.SelectBuilder) sq.SelectBuilder {
+	if s.limit != 0 {
+		q = q.Limit(s.limit)
+	}
+	if s.offset != 0 {
+		q = q.Offset(s.offset)
+	}
+	return q
+}
+
+type SearchOption func(*SearchQuery)
+
+func WithOffset(offset uint64) SearchOption {
+	return func(q *SearchQuery) {
+		q.offset = offset
+	}
+}
+func WithLimit(limit uint64) SearchOption {
+	return func(q *SearchQuery) {
+		q.limit = limit
+	}
+}
+
+func newSearchQuery(opts ...SearchOption) *SearchQuery {
+	q := &SearchQuery{}
+	for _, opt := range opts {
+		// Call the option giving the instantiated
+		// *House as the argument
+		opt(q)
+	}
+	return q
 }
 
 // GetIngredients returns all ingredients.
-func (c *Client) GetIngredients(ctx context.Context, searchQuery string) ([]Ingredient, error) {
+func (c *Client) GetIngredients(ctx context.Context, name string, opts ...SearchOption) ([]Ingredient, uint64, error) {
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		q = q.Where(sq.Eq{"same_as": nil})
-		if searchQuery != "" {
-			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+		q = newSearchQuery(opts...).apply(q)
+		if name != "" {
+			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", name)})
 		}
 		return q
 	})
 }
-func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingredient, error) {
+func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingredient, uint64, error) {
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		return q.Where(sq.Eq{"same_as": parent})
 	})

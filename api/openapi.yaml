@@ -10,6 +10,31 @@ servers:
     url: https://virtserver.swaggerhub.com/nickysemenza/sss/1.0.0
   - url: http://recipestore.swagger.io/v1
 paths:
+  /ingredients:
+    get:
+      summary: List all ingredients
+      operationId: list_ingredients
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A page of ingredient results
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedIngredients"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /recipes:
     get:
       summary: List all recipes
@@ -17,15 +42,8 @@ paths:
       tags:
         - recipes
       parameters:
-        - name: limit
-          in: query
-          description: How many items to return at one time (max 100)
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 20
-            maximum: 1000
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
       responses:
         "200":
           description: A paged array of recipes
@@ -133,6 +151,29 @@ components:
           type: string
         # tag:
         # type: string
+    Ingredient:
+      description: "An Ingredient"
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          description: UUID
+          type: string
+        name:
+          description: Ingredient name
+          type: string
+        recipes:
+          description: Recipes referencing this ingredient
+          type: array
+          items:
+            $ref: "#/components/schemas/Recipe"
+        children:
+          description: Ingredients that are equivalent
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient"
     # Recipes:
     #   type: array
     #   items:
@@ -154,12 +195,16 @@ components:
         - page_number
         - limit
         - total_count
+        - offset
       properties:
         page_number:
-          description: What number apge this is
+          description: What number page this is
           type: integer
         limit:
           description: How many items were requested for this page
+          type: integer
+        offset:
+          description: todo
           type: integer
         total_count:
           description: Total number of items across all pages
@@ -176,3 +221,31 @@ components:
         #   $ref: "#/components/schemas/Recipes"
         meta:
           $ref: "#/components/schemas/List"
+    PaginatedIngredients:
+      type: object
+      properties:
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient"
+        meta:
+          $ref: "#/components/schemas/List"
+  parameters:
+    offsetParam:
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+      description: The number of items to skip before starting to collect the result set.
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+      description: The numbers of items to return.

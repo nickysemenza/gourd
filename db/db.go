@@ -8,6 +8,7 @@ import (
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"go.opentelemetry.io/otel/api/global"
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
@@ -333,4 +334,25 @@ func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 		return "", err
 	}
 	return r.UUID, tx.Commit()
+}
+
+func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
+	ctx, span := global.Tracer("db").Start(ctx, "getContext")
+	defer span.End()
+
+	query, args, err := q.ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build query: %w", err)
+	}
+	return c.db.GetContext(ctx, dest, query, args...)
+}
+func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
+	ctx, span := global.Tracer("db").Start(ctx, "selectContext")
+	defer span.End()
+
+	query, args, err := q.ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build query: %w", err)
+	}
+	return c.db.SelectContext(ctx, dest, query, args...)
 }

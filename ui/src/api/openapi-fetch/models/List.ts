@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface List {
     /**
-     * What number apge this is
+     * What number page this is
      * @type {number}
      * @memberof List
      */
@@ -31,6 +31,12 @@ export interface List {
      * @memberof List
      */
     limit: number;
+    /**
+     * todo
+     * @type {number}
+     * @memberof List
+     */
+    offset: number;
     /**
      * Total number of items across all pages
      * @type {number}
@@ -51,6 +57,7 @@ export function ListFromJSONTyped(json: any, ignoreDiscriminator: boolean): List
         
         'pageNumber': json['page_number'],
         'limit': json['limit'],
+        'offset': json['offset'],
         'totalCount': json['total_count'],
     };
 }
@@ -66,6 +73,7 @@ export function ListToJSON(value?: List | null): any {
         
         'page_number': value.pageNumber,
         'limit': value.limit,
+        'offset': value.offset,
         'total_count': value.totalCount,
     };
 }

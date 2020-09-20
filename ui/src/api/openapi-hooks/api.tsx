@@ -64,6 +64,28 @@ export interface Recipe {
   unit: string;
 }
 
+/**
+ * An Ingredient
+ */
+export interface Ingredient {
+  /**
+   * UUID
+   */
+  id: string;
+  /**
+   * Ingredient name
+   */
+  name: string;
+  /**
+   * Recipes referencing this ingredient
+   */
+  recipes?: Recipe[];
+  /**
+   * Ingredients that are equivalent
+   */
+  children?: Ingredient[];
+}
+
 export interface Error {
   code: number;
   message: string;
@@ -71,13 +93,17 @@ export interface Error {
 
 export interface List {
   /**
-   * What number apge this is
+   * What number page this is
    */
   page_number: number;
   /**
    * How many items were requested for this page
    */
   limit: number;
+  /**
+   * todo
+   */
+  offset: number;
   /**
    * Total number of items across all pages
    */
@@ -89,9 +115,58 @@ export interface PaginatedRecipes {
   meta?: List;
 }
 
+export interface PaginatedIngredients {
+  ingredients?: Ingredient[];
+  meta?: List;
+}
+
+export interface ListIngredientsQueryParams {
+  /**
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
+   */
+  limit?: number;
+}
+
+export type ListIngredientsProps = Omit<
+  GetProps<PaginatedIngredients, Error, ListIngredientsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all ingredients
+ */
+export const ListIngredients = (props: ListIngredientsProps) => (
+  <Get<PaginatedIngredients, Error, ListIngredientsQueryParams, void>
+    path={encode`/ingredients`}
+    {...props}
+  />
+);
+
+export type UseListIngredientsProps = Omit<
+  UseGetProps<PaginatedIngredients, Error, ListIngredientsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all ingredients
+ */
+export const useListIngredients = (props: UseListIngredientsProps) =>
+  useGet<PaginatedIngredients, Error, ListIngredientsQueryParams, void>(
+    encode`/ingredients`,
+    props
+  );
+
 export interface ListRecipesQueryParams {
   /**
-   * How many items to return at one time (max 100)
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
    */
   limit?: number;
 }
