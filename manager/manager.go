@@ -17,6 +17,10 @@ func New(db *db.Client) *Manager {
 	return &Manager{db: db}
 }
 
+func (m *Manager) DB() *db.Client {
+	return m.db
+}
+
 func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*Recipe, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {

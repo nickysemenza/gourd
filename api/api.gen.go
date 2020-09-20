@@ -26,17 +26,42 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// Ingredient defines model for Ingredient.
+type Ingredient struct {
+
+	// Ingredients that are equivalent
+	Children *[]Ingredient `json:"children,omitempty"`
+
+	// UUID
+	Id string `json:"id"`
+
+	// Ingredient name
+	Name string `json:"name"`
+
+	// Recipes referencing this ingredient
+	Recipes *[]Recipe `json:"recipes,omitempty"`
+}
+
 // List defines model for List.
 type List struct {
 
 	// How many items were requested for this page
 	Limit int `json:"limit"`
 
-	// What number apge this is
+	// todo
+	Offset int `json:"offset"`
+
+	// What number page this is
 	PageNumber int `json:"page_number"`
 
 	// Total number of items across all pages
 	TotalCount int `json:"total_count"`
+}
+
+// PaginatedIngredients defines model for PaginatedIngredients.
+type PaginatedIngredients struct {
+	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
+	Meta        *List         `json:"meta,omitempty"`
 }
 
 // PaginatedRecipes defines model for PaginatedRecipes.
@@ -70,11 +95,30 @@ type Recipe struct {
 	Unit string `json:"unit"`
 }
 
+// LimitParam defines model for limitParam.
+type LimitParam int
+
+// OffsetParam defines model for offsetParam.
+type OffsetParam int
+
+// ListIngredientsParams defines parameters for ListIngredients.
+type ListIngredientsParams struct {
+
+	// The number of items to skip before starting to collect the result set.
+	Offset *OffsetParam `json:"offset,omitempty"`
+
+	// The numbers of items to return.
+	Limit *LimitParam `json:"limit,omitempty"`
+}
+
 // ListRecipesParams defines parameters for ListRecipes.
 type ListRecipesParams struct {
 
-	// How many items to return at one time (max 100)
-	Limit *int32 `json:"limit,omitempty"`
+	// The number of items to skip before starting to collect the result set.
+	Offset *OffsetParam `json:"offset,omitempty"`
+
+	// The numbers of items to return.
+	Limit *LimitParam `json:"limit,omitempty"`
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -148,6 +192,9 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
+	// ListIngredients request
+	ListIngredients(ctx context.Context, params *ListIngredientsParams) (*http.Response, error)
+
 	// ListRecipes request
 	ListRecipes(ctx context.Context, params *ListRecipesParams) (*http.Response, error)
 
@@ -156,6 +203,21 @@ type ClientInterface interface {
 
 	// GetRecipeById request
 	GetRecipeById(ctx context.Context, recipeId string) (*http.Response, error)
+}
+
+func (c *Client) ListIngredients(ctx context.Context, params *ListIngredientsParams) (*http.Response, error) {
+	req, err := NewListIngredientsRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if c.RequestEditor != nil {
+		err = c.RequestEditor(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListRecipes(ctx context.Context, params *ListRecipesParams) (*http.Response, error) {
@@ -203,6 +265,69 @@ func (c *Client) GetRecipeById(ctx context.Context, recipeId string) (*http.Resp
 	return c.Client.Do(req)
 }
 
+// NewListIngredientsRequest generates requests for ListIngredients
+func NewListIngredientsRequest(server string, params *ListIngredientsParams) (*http.Request, error) {
+	var err error
+
+	queryUrl, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	basePath := fmt.Sprintf("/ingredients")
+	if basePath[0] == '/' {
+		basePath = basePath[1:]
+	}
+
+	queryUrl, err = queryUrl.Parse(basePath)
+	if err != nil {
+		return nil, err
+	}
+
+	queryValues := queryUrl.Query()
+
+	if params.Offset != nil {
+
+		if queryFrag, err := runtime.StyleParam("form", true, "offset", *params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	if params.Limit != nil {
+
+		if queryFrag, err := runtime.StyleParam("form", true, "limit", *params.Limit); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
+
+	queryUrl.RawQuery = queryValues.Encode()
+
+	req, err := http.NewRequest("GET", queryUrl.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewListRecipesRequest generates requests for ListRecipes
 func NewListRecipesRequest(server string, params *ListRecipesParams) (*http.Request, error) {
 	var err error
@@ -223,6 +348,22 @@ func NewListRecipesRequest(server string, params *ListRecipesParams) (*http.Requ
 	}
 
 	queryValues := queryUrl.Query()
+
+	if params.Offset != nil {
+
+		if queryFrag, err := runtime.StyleParam("form", true, "offset", *params.Offset); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+	}
 
 	if params.Limit != nil {
 
@@ -340,6 +481,9 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// ListIngredients request
+	ListIngredientsWithResponse(ctx context.Context, params *ListIngredientsParams) (*ListIngredientsResponse, error)
+
 	// ListRecipes request
 	ListRecipesWithResponse(ctx context.Context, params *ListRecipesParams) (*ListRecipesResponse, error)
 
@@ -348,6 +492,29 @@ type ClientWithResponsesInterface interface {
 
 	// GetRecipeById request
 	GetRecipeByIdWithResponse(ctx context.Context, recipeId string) (*GetRecipeByIdResponse, error)
+}
+
+type ListIngredientsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *PaginatedIngredients
+	JSONDefault  *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r ListIngredientsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListIngredientsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type ListRecipesResponse struct {
@@ -419,6 +586,15 @@ func (r GetRecipeByIdResponse) StatusCode() int {
 	return 0
 }
 
+// ListIngredientsWithResponse request returning *ListIngredientsResponse
+func (c *ClientWithResponses) ListIngredientsWithResponse(ctx context.Context, params *ListIngredientsParams) (*ListIngredientsResponse, error) {
+	rsp, err := c.ListIngredients(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListIngredientsResponse(rsp)
+}
+
 // ListRecipesWithResponse request returning *ListRecipesResponse
 func (c *ClientWithResponses) ListRecipesWithResponse(ctx context.Context, params *ListRecipesParams) (*ListRecipesResponse, error) {
 	rsp, err := c.ListRecipes(ctx, params)
@@ -444,6 +620,39 @@ func (c *ClientWithResponses) GetRecipeByIdWithResponse(ctx context.Context, rec
 		return nil, err
 	}
 	return ParseGetRecipeByIdResponse(rsp)
+}
+
+// ParseListIngredientsResponse parses an HTTP response from a ListIngredientsWithResponse call
+func ParseListIngredientsResponse(rsp *http.Response) (*ListIngredientsResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer rsp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListIngredientsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest PaginatedIngredients
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
 }
 
 // ParseListRecipesResponse parses an HTTP response from a ListRecipesWithResponse call
@@ -547,6 +756,9 @@ func ParseGetRecipeByIdResponse(rsp *http.Response) (*GetRecipeByIdResponse, err
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List all ingredients
+	// (GET /ingredients)
+	ListIngredients(w http.ResponseWriter, r *http.Request, params ListIngredientsParams)
 	// List all recipes
 	// (GET /recipes)
 	ListRecipes(w http.ResponseWriter, r *http.Request, params ListRecipesParams)
@@ -563,6 +775,40 @@ type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
+// ListIngredients operation middleware
+func (siw *ServerInterfaceWrapper) ListIngredients(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListIngredientsParams
+
+	// ------------- Optional query parameter "offset" -------------
+	if paramValue := r.URL.Query().Get("offset"); paramValue != "" {
+
+	}
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Invalid format for parameter offset: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+	if paramValue := r.URL.Query().Get("limit"); paramValue != "" {
+
+	}
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Invalid format for parameter limit: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	siw.Handler.ListIngredients(w, r.WithContext(ctx), params)
+}
+
 // ListRecipes operation middleware
 func (siw *ServerInterfaceWrapper) ListRecipes(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -571,6 +817,17 @@ func (siw *ServerInterfaceWrapper) ListRecipes(w http.ResponseWriter, r *http.Re
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListRecipesParams
+
+	// ------------- Optional query parameter "offset" -------------
+	if paramValue := r.URL.Query().Get("offset"); paramValue != "" {
+
+	}
+
+	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Invalid format for parameter offset: %s", err), http.StatusBadRequest)
+		return
+	}
 
 	// ------------- Optional query parameter "limit" -------------
 	if paramValue := r.URL.Query().Get("limit"); paramValue != "" {
@@ -623,6 +880,9 @@ func HandlerFromMux(si ServerInterface, r chi.Router) http.Handler {
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get("/ingredients", wrapper.ListIngredients)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get("/recipes", wrapper.ListRecipes)
 	})
 	r.Group(func(r chi.Router) {
@@ -638,22 +898,26 @@ func HandlerFromMux(si ServerInterface, r chi.Router) http.Handler {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"H4sIAAAAAAAC/+RXX2/bNhD/KgS3R81yUuxFL0W2FauBdQi6FHsIgoCmTvY1EqkcT068wN99IClZsiUn",
+	"BZoBxfqUyLw73p/f3f34JLWtamvAsJPZk6wVqQoYKHyVWCFf+p/8Vw5OE9aM1shMXq1BmKZaAjlhC4EM",
+	"lRNsBQE3ZGYykejF7hugrUykURXILFqUiXR6DZWKVgvVlCyz83kiK/WIVVPJ7Gf/gSZ+nCWSt7VXR8Ow",
+	"ApK7XSJtUTh42bsD59wd1mIJhSUQjhUxmpX/XduyBM2C1yAIXFOycMCngog3H0Sx93U+4euukwxJfUdk",
+	"KeSabA3ECOFnbXPwfwtLleKo/+Zcjs0lsgLn1CpIt4eOCc0qpIXgvkGCXGbX0WYvf7M3ZpefQbO3tTAr",
+	"ghzB8DiJF0YMjpNjh9dY5gRmrNcrOcFrxUIRCO/WRpXRUiiIV/yRoJCZ/CHtYZi2uUoHd+/2nisitfXf",
+	"mI8v/vRp8VufsS4pXd1OuymCwIQigcY6hnuo+zEeCIICCIwOOFqjEzhM2BeFGU2NQzyqJeYdAKfK+Ac6",
+	"HmMqdtvI+ff2QVTKbNu+eADyqL9vwDHkorAUQ6k9Zqbw1+J/ZJdtbicVvKXb2I5jrb89Qtpe9YJtHt2k",
+	"Jbasylttmym8XvnDUdsrTdY5ocoymJ+ye5TqobvJfmQNr97nYKoWl2qFRjHkgz4Y1wYPD1+hIypg9ZKF",
+	"gJPd7jmvP/aYP/T4y+0fNM7XNsHI01Z2PK5EvHU0qb5+VETDJ8fEfaMMI2/Hig5o42fDXmIK1K3QxJgx",
+	"TSX2p5OqtiE94fDS2jthSTzA0iHDW5FDTaB9fd9ORRDBXaFpeGrcnezsxkwNmC7qcJq8sKT6wTZIZGt5",
+	"3F5eG01h43jTYFyIvt3MHxZXIRrk0n/+9aBWKyDRQpot+Us2QC76eTabz+ZhotVgVI0yk2/CT35k8Tok",
+	"Ij1q1FWcfB5fyoe7yGUWxu+w25MDInU9jf1eJB1ymV3yoviAl+1ufDZdbY2LhTufzyOdMNwudVXXJerg",
+	"bPrZ2bCwe+byXFdOTrJQguPOC4Pbj9x+p0Ye5XOxBpW3jPLxJwOPU1RDlGjuPBXzFMzL7E320Q0J1zGm",
+	"olMtlXyl8CNTm4i3MfBYg/bbElqZRLqmqhRtWzSEfYMHaUtkOhiLJ3HUzd//G4a6uE7iJxdh6Meadzn4",
+	"brHTp4CVXw3X+5164xmVdRPw+ZVAMfQAOirq2atF163rcXh/wkO5FTo4kncL+RvKb0yRUD1XGKd30Knp",
+	"U/znFvPdya79Hdqm/WW7yMd9O36ZYu7BGR+bgVjEdzMhbKB7c/oF1D85917I4fJkauA5YP+XfX0aAu+6",
+	"/Hd3+/CU2KgS8+6d8S1BYmEKG149SrgaNBaon0VHy9i68jZUykyumWuXpekGiePpzEX2sW6WM22r1KC+",
+	"2zqowPyjUudcetZSjUNnW87yvlmKi8uFuGjYig9W30WiNrwuSzuUemLTXTdDm27O5O5m928AAAD//4c6",
+	"TubcEQAA",
 }
 
 // GetSwagger returns the Swagger specification corresponding to the generated code

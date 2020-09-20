@@ -95,8 +95,8 @@ func (s *Server) Run(_ context.Context) error {
 		_, _ = w.Write([]byte("hi"))
 	})
 
-	apiManager := api.NewAPI()
-	r.Mount("/api", api.Handler(apiManager))
+	apiManager := api.NewAPI(s.Manager)
+	r.Mount("/api", othttp.NewHandler(api.Handler(apiManager), "/api"))
 
 	r.Get("/recipes/{uuid}", s.GetRecipe)
 

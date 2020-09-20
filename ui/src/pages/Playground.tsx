@@ -1,17 +1,34 @@
-import React from "react";
-import { Configuration, RecipesApi } from "../api/openapi-fetch";
-import { useListRecipes } from "../api/openapi-hooks/api";
+import React, { useEffect, useState } from "react";
+import { useGet } from "restful-react";
+import {
+  Configuration,
+  PaginatedIngredients,
+  DefaultApi,
+} from "../api/openapi-fetch";
+import { useListIngredients } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
 
 const Playground: React.FC = () => {
-  const foo = useListRecipes({ base: "http://localhost:4242/api" });
+  const url = "http://localhost:4242/api";
+  const foo = useListIngredients({ base: url });
+  const bar = useGet({ path: url + "/ingredients?limit=5&offset=10" });
+  const [r2, setR2] = useState<PaginatedIngredients>();
 
-  const c = new Configuration({ basePath: "http://localhost:4242/api" });
-  const bar = new RecipesApi(c);
-  const r2 = bar.listRecipes({});
+  useEffect(() => {
+    const fetchData = async () => {
+      const c = new Configuration({ basePath: url });
+      const bar = new DefaultApi(c);
+      const result = await bar.listIngredients({});
+      setR2(result);
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <div className="grid grid-cols-5 gap-4">
-      <Debug data={{ foo, r: foo.data?.recipes, r2 }} />
+    <div className="grid grid-cols-2 gap-4">
+      <Debug data={{ foo, r: foo.data, bar }} />
+      <Debug data={{ r2 }} />
     </div>
   );
 };

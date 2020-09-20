@@ -28,6 +28,7 @@ export interface GetRecipeByIdRequest {
 }
 
 export interface ListRecipesRequest {
+    offset?: number;
     limit?: number;
 }
 
@@ -97,6 +98,10 @@ export class RecipesApi extends runtime.BaseAPI {
      */
     async listRecipesRaw(requestParameters: ListRecipesRequest): Promise<runtime.ApiResponse<PaginatedRecipes>> {
         const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
 
         if (requestParameters.limit !== undefined) {
             queryParameters['limit'] = requestParameters.limit;
