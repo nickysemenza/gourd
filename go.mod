@@ -14,11 +14,12 @@ require (
 	github.com/getkin/kin-openapi v0.22.0
 	github.com/getsentry/sentry-go v0.6.1
 	github.com/go-chi/chi v4.1.0+incompatible
-	github.com/go-chi/cors v1.1.1
+	github.com/go-chi/cors v1.1.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.10.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kjk/notionapi v0.0.0-20200324071853-a111439018ed
+	github.com/labstack/echo/v4 v4.1.17
 	github.com/lib/pq v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.2
 	github.com/mgechev/revive v1.0.2
@@ -28,6 +29,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.0.1
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo v0.11.0
 	go.opentelemetry.io/contrib/instrumentation/net/http v0.11.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace v0.11.0
 	go.opentelemetry.io/otel v0.11.0

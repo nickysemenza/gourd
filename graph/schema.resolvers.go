@@ -177,7 +177,7 @@ func (r *mutationResolver) AddNote(ctx context.Context, recipeUUID string, note 
 }
 
 func (r *queryResolver) Recipes(ctx context.Context, searchQuery string) ([]*model.Recipe, error) {
-	dbr, err := r.DB.GetRecipes(ctx, searchQuery)
+	dbr, _, err := r.DB.GetRecipes(ctx, searchQuery)
 	if err != nil {
 		return nil, err
 	}

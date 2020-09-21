@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
-	sentryhttp "github.com/getsentry/sentry-go/http"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/cors"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	log "github.com/sirupsen/logrus"
+	echotrace "go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo"
 	othttp "go.opentelemetry.io/contrib/instrumentation/net/http"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/metric"
@@ -61,19 +61,25 @@ func (s *Server) GetResolver() generated.ResolverRoot {
 }
 
 func (s *Server) Run(_ context.Context) error {
-	r := chi.NewRouter()
+	r := echo.New()
 
-	sentryMiddleware := sentryhttp.New(sentryhttp.Options{
-		Repanic: true,
-	})
+	r.Use(echotrace.Middleware("my-server"))
+	// sentryMiddleware := sentryhttp.New(sentryhttp.Options{
+	// 	Repanic: true,
+	// })
+	r.Use(middleware.CORS())
 
-	r.Use(middleware.RequestID)
-	r.Use(NewStructuredLogger(log.New()))
-	r.Use(cors.Handler(cors.Options{}))
-	r.Use(timing)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(sentryMiddleware.Handle)
+	r.Use(middleware.Logger())
+	r.Use(middleware.RequestID())
+	r.Use(middleware.Recover())
+
+	// r.Use(middleware.RequestID)
+	// r.Use(NewStructuredLogger(log.New()))
+	// r.Use(cors.Handler(cors.Options{}))
+	// r.Use(timing)
+	// r.Use(middleware.Logger)
+	// r.Use(middleware.Recoverer)
+	// r.Use(sentryMiddleware.Handle)
 
 	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
@@ -86,30 +92,24 @@ func (s *Server) Run(_ context.Context) error {
 	// srv.Use(graph.Observability{})
 
 	// http routes
-	r.Mount("/metrics", hf)
-	r.Mount("/debug", middleware.Profiler())
-	r.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	r.Handle("/query", othttp.WithRouteTag("/query", srv))
-	r.Get("/scrape", s.Scrape)
-	r.Get("/h", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("hi"))
-	})
+	r.GET("/metrics", echo.WrapHandler(hf))
+	// r.Any("/debug", echo.WrapHandler(http.HandlerFunc(middleware.Profiler())))
+	r.Any("/", echo.WrapHandler(http.HandlerFunc(playground.Handler("GraphQL playground", "/query"))))
+	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)))
+	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
+	// r.GET("/h", func(w http.ResponseWriter, r *http.Request) {
+	// 	_, _ = w.Write([]byte("hi"))
+	// })
 
 	apiManager := api.NewAPI(s.Manager)
-	r.Mount("/api", othttp.NewHandler(api.Handler(apiManager), "/api"))
+	// r.Any("/api", echo.WrapHandler(othttp.NewHandler(api.Handler(apiManager), "/api")))
+	g := r.Group("/api")
+	api.RegisterHandlers(g, apiManager)
 
-	r.Get("/recipes/{uuid}", s.GetRecipe)
+	r.GET("/recipes/{uuid}", s.GetRecipe)
 
-	r.Get("/routes", func(w http.ResponseWriter, req *http.Request) {
-		walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
-			route = strings.Replace(route, "/*/", "/", -1)
-			fmt.Fprintf(w, "%s %s\n", method, route)
-			return nil
-		}
-
-		if err := chi.Walk(r, walkFunc); err != nil {
-			fmt.Printf("Logging err: %s\n", err.Error())
-		}
+	r.GET("/routes", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, r.Routes())
 	})
 
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
@@ -121,12 +121,10 @@ func (s *Server) Run(_ context.Context) error {
 	)
 }
 
-func (s *Server) GetRecipe(w http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
-
-	id := chi.URLParam(req, "uuid")
-	recipe, _ := s.Manager.GetRecipe(ctx, id)
-	writeJSON(w, http.StatusOK, recipe)
+func (s *Server) GetRecipe(c echo.Context) error {
+	recipe, _ := s.Manager.GetRecipe(c.Request().Context(), c.QueryParam("uuid"))
+	return c.JSON(http.StatusOK, recipe)
+	// writeJSON(w, http.StatusOK, recipe)
 }
 
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {

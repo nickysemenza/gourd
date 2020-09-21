@@ -6,18 +6,14 @@ package api
 import (
 	"bytes"
 	"compress/gzip"
-	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/go-chi/chi"
+	"github.com/labstack/echo/v4"
 )
 
 // Error defines model for Error.
@@ -95,6 +91,61 @@ type Recipe struct {
 	Unit string `json:"unit"`
 }
 
+// RecipeDetail defines model for RecipeDetail.
+type RecipeDetail struct {
+
+	// A recipe
+	Recipe Recipe `json:"recipe"`
+
+	// A step in the recipe
+	Sections RecipeSection `json:"sections"`
+}
+
+// RecipeSection defines model for RecipeSection.
+type RecipeSection struct {
+
+	// UUID
+	Id string `json:"id"`
+
+	// x
+	Ingredients []SectionIngredient `json:"ingredients"`
+
+	// x
+	Instructions []SectionInstruction `json:"instructions"`
+
+	// How many minutes the step takes, approximately (todo - make this a range)
+	Minutes int `json:"minutes"`
+}
+
+// SectionIngredient defines model for SectionIngredient.
+type SectionIngredient struct {
+
+	// weight in grams
+	Grams *float32 `json:"grams,omitempty"`
+
+	// UUID
+	Id string `json:"id"`
+
+	// An Ingredient
+	Ingredient *Ingredient `json:"ingredient,omitempty"`
+
+	// what kind of ingredient
+	Kind string `json:"kind"`
+
+	// A recipe
+	Recipe *Recipe `json:"recipe,omitempty"`
+}
+
+// SectionInstruction defines model for SectionInstruction.
+type SectionInstruction struct {
+
+	// UUID
+	Id string `json:"id"`
+
+	// instruction
+	Instruction string `json:"instruction"`
+}
+
 // LimitParam defines model for limitParam.
 type LimitParam int
 
@@ -121,803 +172,158 @@ type ListRecipesParams struct {
 	Limit *LimitParam `json:"limit,omitempty"`
 }
 
-// RequestEditorFn  is the function signature for the RequestEditor callback function
-type RequestEditorFn func(ctx context.Context, req *http.Request) error
-
-// Doer performs HTTP requests.
-//
-// The standard http.Client implements this interface.
-type HttpRequestDoer interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
-// Client which conforms to the OpenAPI3 specification for this service.
-type Client struct {
-	// The endpoint of the server conforming to this interface, with scheme,
-	// https://api.deepmap.com for example.
-	Server string
-
-	// Doer for performing requests, typically a *http.Client with any
-	// customized settings, such as certificate chains.
-	Client HttpRequestDoer
-
-	// A callback for modifying requests which are generated before sending over
-	// the network.
-	RequestEditor RequestEditorFn
-}
-
-// ClientOption allows setting custom parameters during construction
-type ClientOption func(*Client) error
-
-// Creates a new Client, with reasonable defaults
-func NewClient(server string, opts ...ClientOption) (*Client, error) {
-	// create a client with sane default values
-	client := Client{
-		Server: server,
-	}
-	// mutate client and add all optional params
-	for _, o := range opts {
-		if err := o(&client); err != nil {
-			return nil, err
-		}
-	}
-	// ensure the server URL always has a trailing slash
-	if !strings.HasSuffix(client.Server, "/") {
-		client.Server += "/"
-	}
-	// create httpClient, if not already present
-	if client.Client == nil {
-		client.Client = http.DefaultClient
-	}
-	return &client, nil
-}
-
-// WithHTTPClient allows overriding the default Doer, which is
-// automatically created using http.Client. This is useful for tests.
-func WithHTTPClient(doer HttpRequestDoer) ClientOption {
-	return func(c *Client) error {
-		c.Client = doer
-		return nil
-	}
-}
-
-// WithRequestEditorFn allows setting up a callback function, which will be
-// called right before sending the request. This can be used to mutate the request.
-func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
-	return func(c *Client) error {
-		c.RequestEditor = fn
-		return nil
-	}
-}
-
-// The interface specification for the client above.
-type ClientInterface interface {
-	// ListIngredients request
-	ListIngredients(ctx context.Context, params *ListIngredientsParams) (*http.Response, error)
-
-	// ListRecipes request
-	ListRecipes(ctx context.Context, params *ListRecipesParams) (*http.Response, error)
-
-	// CreateRecipes request
-	CreateRecipes(ctx context.Context) (*http.Response, error)
-
-	// GetRecipeById request
-	GetRecipeById(ctx context.Context, recipeId string) (*http.Response, error)
-}
-
-func (c *Client) ListIngredients(ctx context.Context, params *ListIngredientsParams) (*http.Response, error) {
-	req, err := NewListIngredientsRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if c.RequestEditor != nil {
-		err = c.RequestEditor(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) ListRecipes(ctx context.Context, params *ListRecipesParams) (*http.Response, error) {
-	req, err := NewListRecipesRequest(c.Server, params)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if c.RequestEditor != nil {
-		err = c.RequestEditor(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) CreateRecipes(ctx context.Context) (*http.Response, error) {
-	req, err := NewCreateRecipesRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if c.RequestEditor != nil {
-		err = c.RequestEditor(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) GetRecipeById(ctx context.Context, recipeId string) (*http.Response, error) {
-	req, err := NewGetRecipeByIdRequest(c.Server, recipeId)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if c.RequestEditor != nil {
-		err = c.RequestEditor(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.Client.Do(req)
-}
-
-// NewListIngredientsRequest generates requests for ListIngredients
-func NewListIngredientsRequest(server string, params *ListIngredientsParams) (*http.Request, error) {
-	var err error
-
-	queryUrl, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	basePath := fmt.Sprintf("/ingredients")
-	if basePath[0] == '/' {
-		basePath = basePath[1:]
-	}
-
-	queryUrl, err = queryUrl.Parse(basePath)
-	if err != nil {
-		return nil, err
-	}
-
-	queryValues := queryUrl.Query()
-
-	if params.Offset != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "offset", *params.Offset); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-	}
-
-	if params.Limit != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "limit", *params.Limit); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-	}
-
-	queryUrl.RawQuery = queryValues.Encode()
-
-	req, err := http.NewRequest("GET", queryUrl.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewListRecipesRequest generates requests for ListRecipes
-func NewListRecipesRequest(server string, params *ListRecipesParams) (*http.Request, error) {
-	var err error
-
-	queryUrl, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	basePath := fmt.Sprintf("/recipes")
-	if basePath[0] == '/' {
-		basePath = basePath[1:]
-	}
-
-	queryUrl, err = queryUrl.Parse(basePath)
-	if err != nil {
-		return nil, err
-	}
-
-	queryValues := queryUrl.Query()
-
-	if params.Offset != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "offset", *params.Offset); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-	}
-
-	if params.Limit != nil {
-
-		if queryFrag, err := runtime.StyleParam("form", true, "limit", *params.Limit); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-	}
-
-	queryUrl.RawQuery = queryValues.Encode()
-
-	req, err := http.NewRequest("GET", queryUrl.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewCreateRecipesRequest generates requests for CreateRecipes
-func NewCreateRecipesRequest(server string) (*http.Request, error) {
-	var err error
-
-	queryUrl, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	basePath := fmt.Sprintf("/recipes")
-	if basePath[0] == '/' {
-		basePath = basePath[1:]
-	}
-
-	queryUrl, err = queryUrl.Parse(basePath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryUrl.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// NewGetRecipeByIdRequest generates requests for GetRecipeById
-func NewGetRecipeByIdRequest(server string, recipeId string) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParam("simple", false, "recipe_id", recipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	queryUrl, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	basePath := fmt.Sprintf("/recipes/%s", pathParam0)
-	if basePath[0] == '/' {
-		basePath = basePath[1:]
-	}
-
-	queryUrl, err = queryUrl.Parse(basePath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryUrl.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
-// ClientWithResponses builds on ClientInterface to offer response payloads
-type ClientWithResponses struct {
-	ClientInterface
-}
-
-// NewClientWithResponses creates a new ClientWithResponses, which wraps
-// Client with return type handling
-func NewClientWithResponses(server string, opts ...ClientOption) (*ClientWithResponses, error) {
-	client, err := NewClient(server, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &ClientWithResponses{client}, nil
-}
-
-// WithBaseURL overrides the baseURL.
-func WithBaseURL(baseURL string) ClientOption {
-	return func(c *Client) error {
-		newBaseURL, err := url.Parse(baseURL)
-		if err != nil {
-			return err
-		}
-		c.Server = newBaseURL.String()
-		return nil
-	}
-}
-
-// ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface interface {
-	// ListIngredients request
-	ListIngredientsWithResponse(ctx context.Context, params *ListIngredientsParams) (*ListIngredientsResponse, error)
-
-	// ListRecipes request
-	ListRecipesWithResponse(ctx context.Context, params *ListRecipesParams) (*ListRecipesResponse, error)
-
-	// CreateRecipes request
-	CreateRecipesWithResponse(ctx context.Context) (*CreateRecipesResponse, error)
-
-	// GetRecipeById request
-	GetRecipeByIdWithResponse(ctx context.Context, recipeId string) (*GetRecipeByIdResponse, error)
-}
-
-type ListIngredientsResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedIngredients
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r ListIngredientsResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListIngredientsResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type ListRecipesResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *PaginatedRecipes
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r ListRecipesResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r ListRecipesResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type CreateRecipesResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON201      *Recipe
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r CreateRecipesResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r CreateRecipesResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type GetRecipeByIdResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Recipe
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r GetRecipeByIdResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetRecipeByIdResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-// ListIngredientsWithResponse request returning *ListIngredientsResponse
-func (c *ClientWithResponses) ListIngredientsWithResponse(ctx context.Context, params *ListIngredientsParams) (*ListIngredientsResponse, error) {
-	rsp, err := c.ListIngredients(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListIngredientsResponse(rsp)
-}
-
-// ListRecipesWithResponse request returning *ListRecipesResponse
-func (c *ClientWithResponses) ListRecipesWithResponse(ctx context.Context, params *ListRecipesParams) (*ListRecipesResponse, error) {
-	rsp, err := c.ListRecipes(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	return ParseListRecipesResponse(rsp)
-}
-
-// CreateRecipesWithResponse request returning *CreateRecipesResponse
-func (c *ClientWithResponses) CreateRecipesWithResponse(ctx context.Context) (*CreateRecipesResponse, error) {
-	rsp, err := c.CreateRecipes(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return ParseCreateRecipesResponse(rsp)
-}
-
-// GetRecipeByIdWithResponse request returning *GetRecipeByIdResponse
-func (c *ClientWithResponses) GetRecipeByIdWithResponse(ctx context.Context, recipeId string) (*GetRecipeByIdResponse, error) {
-	rsp, err := c.GetRecipeById(ctx, recipeId)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetRecipeByIdResponse(rsp)
-}
-
-// ParseListIngredientsResponse parses an HTTP response from a ListIngredientsWithResponse call
-func ParseListIngredientsResponse(rsp *http.Response) (*ListIngredientsResponse, error) {
-	bodyBytes, err := ioutil.ReadAll(rsp.Body)
-	defer rsp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListIngredientsResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedIngredients
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseListRecipesResponse parses an HTTP response from a ListRecipesWithResponse call
-func ParseListRecipesResponse(rsp *http.Response) (*ListRecipesResponse, error) {
-	bodyBytes, err := ioutil.ReadAll(rsp.Body)
-	defer rsp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &ListRecipesResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedRecipes
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseCreateRecipesResponse parses an HTTP response from a CreateRecipesWithResponse call
-func ParseCreateRecipesResponse(rsp *http.Response) (*CreateRecipesResponse, error) {
-	bodyBytes, err := ioutil.ReadAll(rsp.Body)
-	defer rsp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &CreateRecipesResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
-		var dest Recipe
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON201 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseGetRecipeByIdResponse parses an HTTP response from a GetRecipeByIdWithResponse call
-func ParseGetRecipeByIdResponse(rsp *http.Response) (*GetRecipeByIdResponse, error) {
-	bodyBytes, err := ioutil.ReadAll(rsp.Body)
-	defer rsp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetRecipeByIdResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Recipe
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// List all ingredients
 	// (GET /ingredients)
-	ListIngredients(w http.ResponseWriter, r *http.Request, params ListIngredientsParams)
+	ListIngredients(ctx echo.Context, params ListIngredientsParams) error
 	// List all recipes
 	// (GET /recipes)
-	ListRecipes(w http.ResponseWriter, r *http.Request, params ListRecipesParams)
+	ListRecipes(ctx echo.Context, params ListRecipesParams) error
 	// Create a recipe
 	// (POST /recipes)
-	CreateRecipes(w http.ResponseWriter, r *http.Request)
+	CreateRecipes(ctx echo.Context) error
 	// Info for a specific recipe
 	// (GET /recipes/{recipe_id})
-	GetRecipeById(w http.ResponseWriter, r *http.Request, recipeId string)
+	GetRecipeById(ctx echo.Context, recipeId string) error
 }
 
-// ServerInterfaceWrapper converts contexts to parameters.
+// ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
 }
 
-// ListIngredients operation middleware
-func (siw *ServerInterfaceWrapper) ListIngredients(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
+// ListIngredients converts echo context to params.
+func (w *ServerInterfaceWrapper) ListIngredients(ctx echo.Context) error {
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListIngredientsParams
-
 	// ------------- Optional query parameter "offset" -------------
-	if paramValue := r.URL.Query().Get("offset"); paramValue != "" {
 
-	}
-
-	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid format for parameter offset: %s", err), http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
 	}
 
 	// ------------- Optional query parameter "limit" -------------
-	if paramValue := r.URL.Query().Get("limit"); paramValue != "" {
 
-	}
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid format for parameter limit: %s", err), http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
 	}
 
-	siw.Handler.ListIngredients(w, r.WithContext(ctx), params)
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ListIngredients(ctx, params)
+	return err
 }
 
-// ListRecipes operation middleware
-func (siw *ServerInterfaceWrapper) ListRecipes(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
+// ListRecipes converts echo context to params.
+func (w *ServerInterfaceWrapper) ListRecipes(ctx echo.Context) error {
 	var err error
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ListRecipesParams
-
 	// ------------- Optional query parameter "offset" -------------
-	if paramValue := r.URL.Query().Get("offset"); paramValue != "" {
 
-	}
-
-	err = runtime.BindQueryParameter("form", true, false, "offset", r.URL.Query(), &params.Offset)
+	err = runtime.BindQueryParameter("form", true, false, "offset", ctx.QueryParams(), &params.Offset)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid format for parameter offset: %s", err), http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter offset: %s", err))
 	}
 
 	// ------------- Optional query parameter "limit" -------------
-	if paramValue := r.URL.Query().Get("limit"); paramValue != "" {
 
-	}
-
-	err = runtime.BindQueryParameter("form", true, false, "limit", r.URL.Query(), &params.Limit)
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid format for parameter limit: %s", err), http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
 	}
 
-	siw.Handler.ListRecipes(w, r.WithContext(ctx), params)
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ListRecipes(ctx, params)
+	return err
 }
 
-// CreateRecipes operation middleware
-func (siw *ServerInterfaceWrapper) CreateRecipes(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	siw.Handler.CreateRecipes(w, r.WithContext(ctx))
-}
-
-// GetRecipeById operation middleware
-func (siw *ServerInterfaceWrapper) GetRecipeById(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
+// CreateRecipes converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateRecipes(ctx echo.Context) error {
 	var err error
 
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CreateRecipes(ctx)
+	return err
+}
+
+// GetRecipeById converts echo context to params.
+func (w *ServerInterfaceWrapper) GetRecipeById(ctx echo.Context) error {
+	var err error
 	// ------------- Path parameter "recipe_id" -------------
 	var recipeId string
 
-	err = runtime.BindStyledParameter("simple", false, "recipe_id", chi.URLParam(r, "recipe_id"), &recipeId)
+	err = runtime.BindStyledParameter("simple", false, "recipe_id", ctx.Param("recipe_id"), &recipeId)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Invalid format for parameter recipe_id: %s", err), http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter recipe_id: %s", err))
 	}
 
-	siw.Handler.GetRecipeById(w, r.WithContext(ctx), recipeId)
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetRecipeById(ctx, recipeId)
+	return err
 }
 
-// Handler creates http.Handler with routing matching OpenAPI spec.
-func Handler(si ServerInterface) http.Handler {
-	return HandlerFromMux(si, chi.NewRouter())
+// This is a simple interface which specifies echo.Route addition functions which
+// are present on both echo.Echo and echo.Group, since we want to allow using
+// either of them for path registration
+type EchoRouter interface {
+	CONNECT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	TRACE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
 }
 
-// HandlerFromMux creates http.Handler with routing matching OpenAPI spec based on the provided mux.
-func HandlerFromMux(si ServerInterface, r chi.Router) http.Handler {
+// RegisterHandlers adds each server route to the EchoRouter.
+func RegisterHandlers(router EchoRouter, si ServerInterface) {
+
 	wrapper := ServerInterfaceWrapper{
 		Handler: si,
 	}
 
-	r.Group(func(r chi.Router) {
-		r.Get("/ingredients", wrapper.ListIngredients)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get("/recipes", wrapper.ListRecipes)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post("/recipes", wrapper.CreateRecipes)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get("/recipes/{recipe_id}", wrapper.GetRecipeById)
-	})
+	router.GET("/ingredients", wrapper.ListIngredients)
+	router.GET("/recipes", wrapper.ListRecipes)
+	router.POST("/recipes", wrapper.CreateRecipes)
+	router.GET("/recipes/:recipe_id", wrapper.GetRecipeById)
 
-	return r
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+RXX2/bNhD/KgS3R81yUuxFL0W2FauBdQi6FHsIgoCmTvY1EqkcT068wN99IClZsiUn",
-	"BZoBxfqUyLw73p/f3f34JLWtamvAsJPZk6wVqQoYKHyVWCFf+p/8Vw5OE9aM1shMXq1BmKZaAjlhC4EM",
-	"lRNsBQE3ZGYykejF7hugrUykURXILFqUiXR6DZWKVgvVlCyz83kiK/WIVVPJ7Gf/gSZ+nCWSt7VXR8Ow",
-	"ApK7XSJtUTh42bsD59wd1mIJhSUQjhUxmpX/XduyBM2C1yAIXFOycMCngog3H0Sx93U+4euukwxJfUdk",
-	"KeSabA3ECOFnbXPwfwtLleKo/+Zcjs0lsgLn1CpIt4eOCc0qpIXgvkGCXGbX0WYvf7M3ZpefQbO3tTAr",
-	"ghzB8DiJF0YMjpNjh9dY5gRmrNcrOcFrxUIRCO/WRpXRUiiIV/yRoJCZ/CHtYZi2uUoHd+/2nisitfXf",
-	"mI8v/vRp8VufsS4pXd1OuymCwIQigcY6hnuo+zEeCIICCIwOOFqjEzhM2BeFGU2NQzyqJeYdAKfK+Ac6",
-	"HmMqdtvI+ff2QVTKbNu+eADyqL9vwDHkorAUQ6k9Zqbw1+J/ZJdtbicVvKXb2I5jrb89Qtpe9YJtHt2k",
-	"Jbasylttmym8XvnDUdsrTdY5ocoymJ+ye5TqobvJfmQNr97nYKoWl2qFRjHkgz4Y1wYPD1+hIypg9ZKF",
-	"gJPd7jmvP/aYP/T4y+0fNM7XNsHI01Z2PK5EvHU0qb5+VETDJ8fEfaMMI2/Hig5o42fDXmIK1K3QxJgx",
-	"TSX2p5OqtiE94fDS2jthSTzA0iHDW5FDTaB9fd9ORRDBXaFpeGrcnezsxkwNmC7qcJq8sKT6wTZIZGt5",
-	"3F5eG01h43jTYFyIvt3MHxZXIRrk0n/+9aBWKyDRQpot+Us2QC76eTabz+ZhotVgVI0yk2/CT35k8Tok",
-	"Ij1q1FWcfB5fyoe7yGUWxu+w25MDInU9jf1eJB1ymV3yoviAl+1ufDZdbY2LhTufzyOdMNwudVXXJerg",
-	"bPrZ2bCwe+byXFdOTrJQguPOC4Pbj9x+p0Ye5XOxBpW3jPLxJwOPU1RDlGjuPBXzFMzL7E320Q0J1zGm",
-	"olMtlXyl8CNTm4i3MfBYg/bbElqZRLqmqhRtWzSEfYMHaUtkOhiLJ3HUzd//G4a6uE7iJxdh6Meadzn4",
-	"brHTp4CVXw3X+5164xmVdRPw+ZVAMfQAOirq2atF163rcXh/wkO5FTo4kncL+RvKb0yRUD1XGKd30Knp",
-	"U/znFvPdya79Hdqm/WW7yMd9O36ZYu7BGR+bgVjEdzMhbKB7c/oF1D85917I4fJkauA5YP+XfX0aAu+6",
-	"/Hd3+/CU2KgS8+6d8S1BYmEKG149SrgaNBaon0VHy9i68jZUykyumWuXpekGiePpzEX2sW6WM22r1KC+",
-	"2zqowPyjUudcetZSjUNnW87yvlmKi8uFuGjYig9W30WiNrwuSzuUemLTXTdDm27O5O5m928AAAD//4c6",
-	"TubcEQAA",
+	"H4sIAAAAAAAC/+RY227cNhN+FYL/f9ECimUn6M3eBGkTJAaaIsgBvTCMgCuNtMxKpDwceb0N9t0LHnRa",
+	"cQ+BUyBor2wth8OZb77hzPArz3TdaAWKDF985Y1AUQMBuq9K1pLe2Z/sVw4mQ9mQ1Iov+McVMNXWS0DD",
+	"dMEkQW0YaYZALaoLnnBpxe5awC1PuBI18IXXyBNushXUwmstRFsRXzy9THgtHmTd1nzxi/2Qyn9cJZy2",
+	"jd0uFUEJyHe7hOuiMHDauolxZi0btoRCIzBDAkmq0v6e6aqCjBitgCGYtiJmgA454U+eeNHbehmxdddJ",
+	"OlBfIWp0WKNuAEmC+znTOdi/hcZakN//7Cmfq0t4DcaI0kmHRUMoVelgQbhrJULOFzde5yB/2yvTyy+Q",
+	"kdV1rUqEXIKiOYgvFBstJ/sGr2SVI6j5vmGTYbQSxAQCs2bdi8prcgGxG/+PUPAF/1860DANWKWjs3e9",
+	"5QJRbO23zOcHf/p0/XJArAOli9thM5kTiGxEyGTj3Z3ufe8XGEIBCCpzPFpJw+QYsLPc9KrmLu7FUuYd",
+	"AWNh/F0amnPKZ9vM+Dd6w2qhtiEvNoCW9XctGIKcFRq9K43lTIx/gf8zvaRzHd1gNX326Tjf9adlSMhV",
+	"KxhwNFFNpElUnzPdxvj60S7O0l5kqI1hoqqc+pjePajH5ib9lTU+uscgFot3opRKEOSjPJjHRk4Xv0NG",
+	"1EDilAbHk93umNXvB85PLT5f/yRxHpsEM0uD7Py6Yv7U2U31+KvCKz54Tdy1QpGk7XyjAby3d0MvESN1",
+	"EIpcM6qtWb8a3apbzCIGL7VeM41sA0sjCZ6zHBqEzMb3ecwDT+5aqpZi193BzG5V7ILpvHaryYkiNVxs",
+	"IyCD5tuD4X8JJGR1mARsI2nFTLsc9Tf7vMCeSOdR00BmTzmTzB+89MzfXkuXJUe87HRE3DQEDZMqtCyP",
+	"5v3edTTd9HBuLQv2nqjcyhC2A5SPPavXFr0UD1G6L4JBwgHpQCWxBpMw0TSoH2QtCKot+8mmAHvCarEO",
+	"FUowFKqEn0/XE8fwzpA9/6fIx5gwx/RowyUVE8xIVVbAAtVmxChR1BFINiDLFVkNXqA3JtTCb+y65MTi",
+	"8+vaWqrIKRvbJtglV9nHXRYo23jf8D4LRqu3B5u6c9M+Fktn4dFYDZyMBGsI/1nR+jbMj5w8XjzrVh5v",
+	"mLu7c+cV2neaGSjjQA1D0tvrjy4fJVX287VuMWceVPZSkFgKY2N1D2i8dVcXlxeXrr1sQIlG8gV/5n6y",
+	"/SOtHBTp3jVV+jbUoiUc8DlfuF543Holk6n2Jh72QSQdD5a75KT4aEje3VoQTaOV8aF7ennpZztFIQ1E",
+	"01Qyc8amX4yP0jBGHiNktK10QdgvDa6LnmRJGGotFisQeRjvH54oeIjNfaySam3nYnsnWple5eDdePrd",
+	"p5I3Ksz138l9PzZH/G0VPDSQ2dEFgkzCTVvXAreBDa75lxPYEp6OetSDPOqa4X8bhzq/DvInZ66E+ph3",
+	"GPxnuTNAQML26Tf9gHNrx1ttIvT5DUEQDATaC+rVd/Our1Qz9/6ATbVlmTMk77rEHwhfD5HtpLrSPYd3",
+	"lKnpV//PZ5nvDmbtawhJ++v2Op/n7fyZULqOYmijwyMmSriH7gHQFqDh/a+3go9rJmELx4j9T+b1ZCaK",
+	"xOFVF4XOAuukYPeiknn39PMjEeNaFdo9RAlmGshkIbOjHAlDdBfkFiu+4CuixizS9F4i+dULsxFlCbhq",
+	"lxeZrlMls/XWQA3qL5EaY9Kr0HBMjf3gd71pl+zFu2v2oiXN3ups7Xuu8XGLNC20zi/Git1Jtp/Z3e7+",
+	"DgAA//9xHyDdbxcAAA==",
 }
 
 // GetSwagger returns the Swagger specification corresponding to the generated code

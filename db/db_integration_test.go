@@ -16,7 +16,7 @@ func TestInsertGet(t *testing.T) {
 	require := require.New(t)
 	db := NewDB(t)
 
-	all1, err := db.GetRecipes(ctx, "")
+	all1, _, err := db.GetRecipes(ctx, "")
 	require.NoError(err)
 
 	uuid, err := db.InsertRecipe(ctx, &Recipe{
@@ -25,7 +25,7 @@ func TestInsertGet(t *testing.T) {
 	})
 
 	require.NoError(err)
-	all2, err := db.GetRecipes(ctx, "")
+	all2, _, err := db.GetRecipes(ctx, "")
 	require.NoError(err)
 
 	ingEgg, err := db.IngredientByName(ctx, "egg")
