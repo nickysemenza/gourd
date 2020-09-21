@@ -32,7 +32,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	for _, i := range ing {
 		items = append(items, Recipe{Id: i.UUID, Name: i.Name, Source: i.Source.Ptr()})
 	}
-	listMeta.TotalCount = int(count)
+	listMeta.setTotalCount(count)
 
 	resp := PaginatedRecipes{
 		Recipes: &items,
@@ -84,4 +84,10 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
 		limit = int(*l)
 	}
 	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, &List{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
+}
+
+func (l *List) setTotalCount(count uint64) {
+	c := int(count)
+	l.TotalCount = c
+	l.PageCount = c / l.Limit
 }

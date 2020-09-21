@@ -172,6 +172,10 @@ export interface List {
    * Total number of items across all pages
    */
   total_count: number;
+  /**
+   * Total number of pages available
+   */
+  page_count: number;
 }
 
 export interface PaginatedRecipes {

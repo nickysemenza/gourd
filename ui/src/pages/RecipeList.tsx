@@ -1,75 +1,34 @@
-import React from "react";
-import { useGetRecipesQuery } from "../generated/graphql";
-import { useTable, Column, CellProps } from "react-table";
+import React, { useState } from "react";
+import { useTable, Column, CellProps, usePagination } from "react-table";
 import { Link } from "react-router-dom";
 import Debug from "../components/Debug";
 import { useListRecipes } from "../api/openapi-hooks/api";
-
-interface TableProps<T extends object> {
-  columns: Column<T>[];
-  data: T[];
-}
-
-const Table = <T extends object>({ columns, data }: TableProps<T>) => {
-  // Use the state and functions returned from useTable to build your UI
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = useTable({
-    columns,
-    data,
-  });
-
-  // Render the UI for your table
-  return (
-    <table
-      className="table-auto border-collapse border-1 border-gray-500"
-      {...getTableProps()}
-      data-cy="recipe-table"
-    >
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th
-                className="border border-gray-400"
-                {...column.getHeaderProps()}
-              >
-                {column.render("Header")}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()} className="bg-white odd:bg-gray-200">
-              {row.cells.map((cell) => {
-                return (
-                  <td
-                    className="border border-gray-400 p-2"
-                    {...cell.getCellProps()}
-                  >
-                    {cell.render("Cell")}
-                  </td>
-                );
-              })}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-};
+import PaginatedTable, {
+  PaginationParameters,
+} from "../components/PaginatedTable";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
-  const { data, error } = useListRecipes({ base: "http://localhost:4242/api" });
+  // const queryParams = React.useMemo(
+  //   () => queryString.stringify(params as any),
+  //   [params]
+  // );
+
+  let initialParams: PaginationParameters = {
+    offset: 0,
+    limit: 2,
+  };
+
+  const [params, setParams] = useState(initialParams);
+
+  const fetchData = React.useCallback((params: PaginationParameters) => {
+    setParams(params);
+  }, []);
+
+  const { data, error } = useListRecipes({
+    base: "http://localhost:4242/api",
+    queryParams: params,
+  });
 
   const columns = React.useMemo(
     () => [
@@ -96,7 +55,14 @@ const RecipeList: React.FC = () => {
 
   return (
     <div>
-      <Table columns={columns} data={data?.recipes || []} />
+      <PaginatedTable
+        columns={columns}
+        data={data?.recipes || []}
+        fetchData={fetchData}
+        isLoading={false}
+        totalCount={data?.meta?.total_count || 0}
+        pageCount={data?.meta?.page_count || 1}
+      />
       <Debug data={{ error }} />
     </div>
   );

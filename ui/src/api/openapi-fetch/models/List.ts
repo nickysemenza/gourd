@@ -43,6 +43,12 @@ export interface List {
      * @memberof List
      */
     totalCount: number;
+    /**
+     * Total number of pages available
+     * @type {number}
+     * @memberof List
+     */
+    pageCount: number;
 }
 
 export function ListFromJSON(json: any): List {
@@ -59,6 +65,7 @@ export function ListFromJSONTyped(json: any, ignoreDiscriminator: boolean): List
         'limit': json['limit'],
         'offset': json['offset'],
         'totalCount': json['total_count'],
+        'pageCount': json['page_count'],
     };
 }
 
@@ -75,6 +82,7 @@ export function ListToJSON(value?: List | null): any {
         'limit': value.limit,
         'offset': value.offset,
         'total_count': value.totalCount,
+        'page_count': value.pageCount,
     };
 }
 
