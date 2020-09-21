@@ -112,25 +112,30 @@ func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, e
 }
 
 // GetRecipes returns all recipes, shallowly.
-func (c *Client) GetRecipes(ctx context.Context, searchQuery string) ([]Recipe, error) {
+func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]Recipe, uint64, error) {
 	q := c.psql.Select("*").From(recipesTable)
+	cq := c.psql.Select("count(*)").From(recipesTable)
+	q = newSearchQuery(opts...).apply(q)
+	cq = newSearchQuery(opts...).apply(cq)
 	if searchQuery != "" {
 		q = q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+		cq = cq.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
 	}
-	query, args, err := q.ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
+	cq = cq.RemoveLimit().RemoveOffset()
 
 	r := []Recipe{}
-	err = c.db.SelectContext(ctx, &r, query, args...)
+	err := c.selectContext(ctx, q, &r)
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
+		return nil, 0, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to select: %w", err)
+		return nil, 0, fmt.Errorf("failed to select: %w", err)
 	}
-	return r, nil
+	var count uint64
+	if err := c.getContext(ctx, cq, &count); err != nil {
+		return nil, 0, err
+	}
+	return r, count, nil
 }
 
 // GetRecipesWithIngredient gets all recipes with an ingredeitn

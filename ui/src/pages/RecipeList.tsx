@@ -3,6 +3,7 @@ import { useGetRecipesQuery } from "../generated/graphql";
 import { useTable, Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import Debug from "../components/Debug";
+import { useListRecipes } from "../api/openapi-hooks/api";
 
 interface TableProps<T extends object> {
   columns: Column<T>[];
@@ -67,13 +68,14 @@ const Table = <T extends object>({ columns, data }: TableProps<T>) => {
 };
 
 const RecipeList: React.FC = () => {
-  const { data, error } = useGetRecipesQuery({});
+  // const { data, error } = useGetRecipesQuery({});
+  const { data, error } = useListRecipes({ base: "http://localhost:4242/api" });
 
   const columns = React.useMemo(
     () => [
       {
-        Header: "UUID",
-        accessor: "uuid",
+        Header: "id",
+        accessor: "id",
       },
       {
         Header: "Name",
@@ -83,7 +85,7 @@ const RecipeList: React.FC = () => {
         Header: "test",
         accessor: "test",
         Cell: (cell: CellProps<any>) => (
-          <Link to={`recipe/${cell.row.original.uuid}`} className="link">
+          <Link to={`recipe/${cell.row.original.id}`} className="link">
             details
           </Link>
         ),

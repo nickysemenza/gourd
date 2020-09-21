@@ -1,14 +1,14 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: Swagger Recipestore
+  title: Gourd Recipe Database
   license:
     name: MIT
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/nickysemenza/sss/1.0.0
-  - url: http://recipestore.swagger.io/v1
+  - url: http://food.nickysemenza.com/api
 paths:
   /ingredients:
     get:
@@ -110,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Recipe"
+                $ref: "#/components/schemas/RecipeDetail"
         default:
           description: unexpected error
           content:
@@ -119,6 +119,87 @@ paths:
                 $ref: "#/components/schemas/Error"
 components:
   schemas:
+    SectionIngredient:
+      description: Ingredients in a single section
+      type: object
+      required:
+        - id
+        # - info
+        - kind
+      properties:
+        id:
+          description: UUID
+          type: string
+        kind:
+          description: what kind of ingredient
+          type: string
+          enum: [recipe, ingredient]
+        # info:
+        #   type: object
+        #   oneOf:
+        #     - $ref: "#/components/schemas/Recipe"
+        #     - $ref: "#/components/schemas/Ingredient"
+        recipe:
+          type: object
+          $ref: "#/components/schemas/Recipe"
+        ingredient:
+          type: object
+          $ref: "#/components/schemas/Ingredient"
+        grams:
+          description: weight in grams
+          type: number
+    SectionInstruction:
+      description: Instructions in a single section
+      type: object
+      required:
+        - id
+        - instruction
+      properties:
+        id:
+          description: UUID
+          type: string
+        instruction:
+          description: instruction
+          type: string
+    RecipeSection:
+      description: A step in the recipe
+      type: object
+      required:
+        - id
+        - minutes
+        - instructions
+        - ingredients
+      properties:
+        id:
+          description: UUID
+          type: string
+        minutes:
+          description: How many minutes the step takes, approximately (todo - make this a range)
+          type: integer
+        instructions:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionInstruction"
+        ingredients:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredient"
+    RecipeDetail:
+      description: A recipe with subcomponents
+      type: object
+      required:
+        - sections
+        - recipe
+      properties:
+        sections:
+          description: sections of the recipe
+          type: object
+          $ref: "#/components/schemas/RecipeSection"
+        recipe:
+          description: The recipe
+          $ref: "#/components/schemas/Recipe"
     Recipe:
       description: A recipe
       type: object

@@ -34,4 +34,6 @@ This is comprised mulitple components:
 4. weights per-ingredient
 5. meals w/ multiple recipes at set quantities
 6. slugs for recipe urls
-7. associate ingredients with fdc ids 
+7. associate ingredients with fdc ids
+
+range: min max approx unit kind (time, amount)

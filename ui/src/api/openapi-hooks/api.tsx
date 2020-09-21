@@ -31,6 +31,70 @@ const encodingTagFactory = (encodingFn: typeof encodeURIComponent) => (
 const encode = encodingTagFactory(encodingFn);
 
 /**
+ * Ingredients in a single section
+ */
+export interface SectionIngredient {
+  /**
+   * UUID
+   */
+  id: string;
+  /**
+   * what kind of ingredient
+   */
+  kind: "recipe" | "ingredient";
+  recipe?: Recipe;
+  ingredient?: Ingredient;
+  /**
+   * weight in grams
+   */
+  grams?: number;
+}
+
+/**
+ * Instructions in a single section
+ */
+export interface SectionInstruction {
+  /**
+   * UUID
+   */
+  id: string;
+  /**
+   * instruction
+   */
+  instruction: string;
+}
+
+/**
+ * A step in the recipe
+ */
+export interface RecipeSection {
+  /**
+   * UUID
+   */
+  id: string;
+  /**
+   * How many minutes the step takes, approximately (todo - make this a range)
+   */
+  minutes: number;
+  /**
+   * x
+   */
+  instructions: SectionInstruction[];
+  /**
+   * x
+   */
+  ingredients: SectionIngredient[];
+}
+
+/**
+ * A recipe with subcomponents
+ */
+export interface RecipeDetail {
+  sections: RecipeSection;
+  recipe: Recipe;
+}
+
+/**
  * A recipe
  */
 export interface Recipe {
@@ -235,7 +299,7 @@ export interface GetRecipeByIdPathParams {
 }
 
 export type GetRecipeByIdProps = Omit<
-  GetProps<Recipe, Error, void, GetRecipeByIdPathParams>,
+  GetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -244,14 +308,14 @@ export type GetRecipeByIdProps = Omit<
  * Info for a specific recipe
  */
 export const GetRecipeById = ({ recipe_id, ...props }: GetRecipeByIdProps) => (
-  <Get<Recipe, Error, void, GetRecipeByIdPathParams>
+  <Get<RecipeDetail, Error, void, GetRecipeByIdPathParams>
     path={encode`/recipes/${recipe_id}`}
     {...props}
   />
 );
 
 export type UseGetRecipeByIdProps = Omit<
-  UseGetProps<Recipe, Error, void, GetRecipeByIdPathParams>,
+  UseGetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -263,7 +327,7 @@ export const useGetRecipeById = ({
   recipe_id,
   ...props
 }: UseGetRecipeByIdProps) =>
-  useGet<Recipe, Error, void, GetRecipeByIdPathParams>(
+  useGet<RecipeDetail, Error, void, GetRecipeByIdPathParams>(
     (paramsInPath: GetRecipeByIdPathParams) =>
       encode`/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }

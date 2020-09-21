@@ -76,8 +76,11 @@ graphql: generate-graphql-go generate-graphql-ts
 validate-openapi:
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc
 generate-openapi: validate-openapi
+	rm -rf ui/src/api/openapi-*
 	# https://github.com/OpenAPITools/openapi-generator/issues/3869#issuecomment-584152932
-	openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --additional-properties=typescriptThreePlus=true
+	openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --additional-properties=typescriptThreePlus=true,supportsES6=true,enumPropertyNaming=UPPERCASE
+	# openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript --additional-properties=supportsES6=true
 	go generate ./api
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher
+	./ui/node_modules/redoc-cli/index.js bundle api/openapi.yaml

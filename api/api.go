@@ -1,12 +1,11 @@
-//go:generate oapi-codegen --package api --generate types,client,chi-server,spec -o api.gen.go openapi.yaml
+//go:generate oapi-codegen --package api --generate types,server,spec -o api.gen.go openapi.yaml
 
 package api
 
 import (
-	"context"
-	"encoding/json"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 )
@@ -21,55 +20,47 @@ func NewAPI(m *manager.Manager) *API {
 
 // List all recipes
 // (GET /recipes)
-func (a *API) ListRecipes(w http.ResponseWriter, r *http.Request, params ListRecipesParams) {
+func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
+	ctx := c.Request().Context()
+	items := []Recipe{}
 
-	// var x = 4
-
-	var items = []Recipe{{Id: "foo", Name: "bar", Quantity: 52, Unit: "cookies"}}
-	// var items2 = Recipes{Recipe{Id: 1}}
+	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	ing, count, err := a.Manager.DB().GetRecipes(ctx, "", paginationParams...)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	}
+	for _, i := range ing {
+		items = append(items, Recipe{Id: i.UUID, Name: i.Name, Source: i.Source.Ptr()})
+	}
+	listMeta.TotalCount = int(count)
 
 	resp := PaginatedRecipes{
 		Recipes: &items,
-		// Data2: &items2,
-		Meta: &List{PageNumber: 2, Limit: 3},
+		Meta:    listMeta,
 	}
-
-	success(w, resp)
-}
-func writeErr(ctx context.Context, w http.ResponseWriter, err error) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Header().Set("Content-Type", "application/json")
-	e := Error{Message: err.Error()}
-	json.NewEncoder(w).Encode(e)
-}
-func success(w http.ResponseWriter, resp interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 // Create a recipe
 // (POST /recipes)
-func (a *API) CreateRecipes(w http.ResponseWriter, r *http.Request) {
+func (a *API) CreateRecipes(c echo.Context) error {
 	panic("not implemented") // TODO: Implement
 }
 
 // Info for a specific recipe
 // (GET /recipes/{recipeId})
-func (a *API) GetRecipeById(w http.ResponseWriter, r *http.Request, recipeId string) {
+func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	panic("not implemented") // TODO: Implement
 }
 
-func (a *API) ListIngredients(w http.ResponseWriter, r *http.Request, params ListIngredientsParams) {
-
-	ctx := r.Context()
+func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
+	ctx := c.Request().Context()
 	items := []Ingredient{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", paginationParams...)
 	if err != nil {
-		writeErr(ctx, w, err)
-		return
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
 	for _, i := range ing {
 		items = append(items, Ingredient{Id: i.UUID, Name: i.Name})
@@ -80,7 +71,7 @@ func (a *API) ListIngredients(w http.ResponseWriter, r *http.Request, params Lis
 		Ingredients: &items,
 		Meta:        listMeta,
 	}
-	success(w, resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {

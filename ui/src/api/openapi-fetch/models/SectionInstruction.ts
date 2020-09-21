@@ -14,41 +14,41 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * Instructions in a single section
  * @export
- * @interface ModelError
+ * @interface SectionInstruction
  */
-export interface ModelError {
+export interface SectionInstruction {
     /**
-     * 
-     * @type {number}
-     * @memberof ModelError
-     */
-    code: number;
-    /**
-     * 
+     * UUID
      * @type {string}
-     * @memberof ModelError
+     * @memberof SectionInstruction
      */
-    message: string;
+    id: string;
+    /**
+     * instruction
+     * @type {string}
+     * @memberof SectionInstruction
+     */
+    instruction: string;
 }
 
-export function ModelErrorFromJSON(json: any): ModelError {
-    return ModelErrorFromJSONTyped(json, false);
+export function SectionInstructionFromJSON(json: any): SectionInstruction {
+    return SectionInstructionFromJSONTyped(json, false);
 }
 
-export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): ModelError {
+export function SectionInstructionFromJSONTyped(json: any, ignoreDiscriminator: boolean): SectionInstruction {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'code': json['code'],
-        'message': json['message'],
+        'id': json['id'],
+        'instruction': json['instruction'],
     };
 }
 
-export function ModelErrorToJSON(value?: ModelError | null): any {
+export function SectionInstructionToJSON(value?: SectionInstruction | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -57,8 +57,8 @@ export function ModelErrorToJSON(value?: ModelError | null): any {
     }
     return {
         
-        'code': value.code,
-        'message': value.message,
+        'id': value.id,
+        'instruction': value.instruction,
     };
 }
 
