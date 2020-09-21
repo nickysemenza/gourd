@@ -41,7 +41,7 @@ const IngredientSearch: React.FC<{
     },
   });
 
-  const { data, loading } = useSearchIngredientsAndRecipesQuery({
+  const { data } = useSearchIngredientsAndRecipesQuery({
     variables: {
       searchQuery: value, // value for 'searchQuery'
     },

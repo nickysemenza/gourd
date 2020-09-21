@@ -277,6 +277,7 @@ components:
         - limit
         - total_count
         - offset
+        - page_count
       properties:
         page_number:
           description: What number page this is
@@ -289,6 +290,9 @@ components:
           type: integer
         total_count:
           description: Total number of items across all pages
+          type: integer
+        page_count:
+          description: Total number of pages available
           type: integer
 
     PaginatedRecipes:
