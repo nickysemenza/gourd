@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/dgraph-io/ristretto"
@@ -347,7 +348,11 @@ func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interf
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}
-	return c.db.GetContext(ctx, dest, query, args...)
+	err = c.db.GetContext(ctx, dest, query, args...)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("failed to GetContext: %w", err)
+	}
+	return nil
 }
 func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
 	ctx, span := c.tracer.Start(ctx, "selectContext")
@@ -357,5 +362,9 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}
-	return c.db.SelectContext(ctx, dest, query, args...)
+	err = c.db.SelectContext(ctx, dest, query, args...)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return fmt.Errorf("failed to SelectContext: %w", err)
+	}
+	return nil
 }

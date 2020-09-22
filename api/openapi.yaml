@@ -78,13 +78,20 @@ paths:
       operationId: create_recipes
       tags:
         - recipes
+      requestBody:
+        description: Creates a recipe by payload. If the UUID/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeDetail"
       responses:
         "201":
           description: Newly created recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Recipe"
+                $ref: "#/components/schemas/RecipeDetail"
         default:
           description: unexpected error
           content:
@@ -195,8 +202,9 @@ components:
       properties:
         sections:
           description: sections of the recipe
-          type: object
-          $ref: "#/components/schemas/RecipeSection"
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSection"
         recipe:
           description: The recipe
           $ref: "#/components/schemas/Recipe"

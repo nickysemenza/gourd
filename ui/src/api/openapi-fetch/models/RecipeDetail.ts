@@ -31,11 +31,11 @@ import {
  */
 export interface RecipeDetail {
     /**
-     * 
-     * @type {RecipeSection}
+     * sections of the recipe
+     * @type {Array<RecipeSection>}
      * @memberof RecipeDetail
      */
-    sections: RecipeSection;
+    sections: Array<RecipeSection>;
     /**
      * 
      * @type {Recipe}
@@ -54,7 +54,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'sections': json['sections'],
+        'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'recipe': RecipeFromJSON(json['recipe']),
     };
 }
@@ -68,7 +68,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
     }
     return {
         
-        'sections': value.sections,
+        'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'recipe': RecipeToJSON(value.recipe),
     };
 }
