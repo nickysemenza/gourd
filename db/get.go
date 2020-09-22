@@ -14,41 +14,27 @@ import (
 
 // GetRecipeSections finds the sections.
 func (c *Client) GetRecipeSections(ctx context.Context, recipeUUID string) ([]Section, error) {
-	query, args, err := c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe": recipeUUID}).ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
-	var sections []Section
-	err = c.db.SelectContext(ctx, &sections, query, args...)
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, fmt.Errorf("failed to select: %w", err)
-	}
-	return sections, nil
-}
-
-// GetSectionInstructions finds the instructions for a section.
-func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string) ([]SectionInstruction, error) {
-	query, args, err := c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
-	if err != nil {
-		return nil, err
-	}
-	var res []SectionInstruction
-	err = c.db.SelectContext(ctx, &res, query, args...)
-	if err != nil {
+	var res []Section
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe": recipeUUID}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-// GetSectionIngredients finds the ingredients for a section.
-func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) ([]SectionIngredient, error) {
-	query, args, err := c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}).ToSql()
-	if err != nil {
+// GetSectionInstructions finds the instructions for a section.
+func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string) ([]SectionInstruction, error) {
+	var res []SectionInstruction
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
 		return nil, err
 	}
+	return res, nil
+
+}
+
+// GetSectionIngredients finds the ingredients for a section.
+func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) ([]SectionIngredient, error) {
 	var res []SectionIngredient
-	err = c.db.SelectContext(ctx, &res, query, args...)
-	if err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil

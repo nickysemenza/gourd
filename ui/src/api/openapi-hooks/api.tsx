@@ -90,7 +90,10 @@ export interface RecipeSection {
  * A recipe with subcomponents
  */
 export interface RecipeDetail {
-  sections: RecipeSection;
+  /**
+   * sections of the recipe
+   */
+  sections: RecipeSection[];
   recipe: Recipe;
 }
 
@@ -269,7 +272,7 @@ export const useListRecipes = (props: UseListRecipesProps) =>
   );
 
 export type CreateRecipesProps = Omit<
-  MutateProps<Recipe, Error, void, void, void>,
+  MutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
   "path" | "verb"
 >;
 
@@ -277,7 +280,7 @@ export type CreateRecipesProps = Omit<
  * Create a recipe
  */
 export const CreateRecipes = (props: CreateRecipesProps) => (
-  <Mutate<Recipe, Error, void, void, void>
+  <Mutate<RecipeDetail, Error, void, RecipeDetail, void>
     verb="POST"
     path={encode`/recipes`}
     {...props}
@@ -285,7 +288,7 @@ export const CreateRecipes = (props: CreateRecipesProps) => (
 );
 
 export type UseCreateRecipesProps = Omit<
-  UseMutateProps<Recipe, Error, void, void, void>,
+  UseMutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
   "path" | "verb"
 >;
 
@@ -293,7 +296,11 @@ export type UseCreateRecipesProps = Omit<
  * Create a recipe
  */
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
-  useMutate<Recipe, Error, void, void, void>("POST", encode`/recipes`, props);
+  useMutate<RecipeDetail, Error, void, RecipeDetail, void>(
+    "POST",
+    encode`/recipes`,
+    props
+  );
 
 export interface GetRecipeByIdPathParams {
   /**

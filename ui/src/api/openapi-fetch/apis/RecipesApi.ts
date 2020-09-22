@@ -18,13 +18,14 @@ import {
     PaginatedRecipes,
     PaginatedRecipesFromJSON,
     PaginatedRecipesToJSON,
-    Recipe,
-    RecipeFromJSON,
-    RecipeToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
 } from '../models';
+
+export interface CreateRecipesRequest {
+    recipeDetail: RecipeDetail;
+}
 
 export interface GetRecipeByIdRequest {
     recipeId: string;
@@ -43,26 +44,33 @@ export class RecipesApi extends runtime.BaseAPI {
     /**
      * Create a recipe
      */
-    async createRecipesRaw(): Promise<runtime.ApiResponse<Recipe>> {
+    async createRecipesRaw(requestParameters: CreateRecipesRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
+        if (requestParameters.recipeDetail === null || requestParameters.recipeDetail === undefined) {
+            throw new runtime.RequiredError('recipeDetail','Required parameter requestParameters.recipeDetail was null or undefined when calling createRecipes.');
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/recipes`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: RecipeDetailToJSON(requestParameters.recipeDetail),
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
     }
 
     /**
      * Create a recipe
      */
-    async createRecipes(): Promise<Recipe> {
-        const response = await this.createRecipesRaw();
+    async createRecipes(requestParameters: CreateRecipesRequest): Promise<RecipeDetail> {
+        const response = await this.createRecipesRaw(requestParameters);
         return await response.value();
     }
 
