@@ -41,13 +41,13 @@ export interface IngredientDetail {
      * @type {Array<Recipe>}
      * @memberof IngredientDetail
      */
-    recipes: Array<Recipe>;
+    recipes?: Array<Recipe>;
     /**
      * Ingredients that are equivalent
      * @type {Array<Ingredient>}
      * @memberof IngredientDetail
      */
-    children: Array<Ingredient>;
+    children?: Array<Ingredient>;
 }
 
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
@@ -61,8 +61,8 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'ingredient': json['ingredient'],
-        'recipes': ((json['recipes'] as Array<any>).map(RecipeFromJSON)),
-        'children': ((json['children'] as Array<any>).map(IngredientFromJSON)),
+        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeFromJSON)),
+        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientFromJSON)),
     };
 }
 
@@ -76,8 +76,8 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
     return {
         
         'ingredient': value.ingredient,
-        'recipes': ((value.recipes as Array<any>).map(RecipeToJSON)),
-        'children': ((value.children as Array<any>).map(IngredientToJSON)),
+        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeToJSON)),
+        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientToJSON)),
     };
 }
 

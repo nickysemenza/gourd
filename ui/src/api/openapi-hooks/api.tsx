@@ -47,7 +47,7 @@ export interface SectionIngredient {
   /**
    * weight in grams
    */
-  grams?: number;
+  grams: number;
   /**
    * amount
    */
@@ -55,11 +55,11 @@ export interface SectionIngredient {
   /**
    * unit
    */
-  unit?: string;
+  unit: string;
   /**
    * adjective
    */
-  adjective?: string;
+  adjective: string;
   /**
    * optional
    */
@@ -169,11 +169,11 @@ export interface IngredientDetail {
   /**
    * Recipes referencing this ingredient
    */
-  recipes: Recipe[];
+  recipes?: Recipe[];
   /**
    * Ingredients that are equivalent
    */
-  children: Ingredient[];
+  children?: Ingredient[];
 }
 
 export interface Error {

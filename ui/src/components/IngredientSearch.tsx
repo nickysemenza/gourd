@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import AsyncCreatableSelect from "react-select/async-creatable";
+import { Ingredient } from "../api/openapi-fetch";
 
 import {
   useSearchIngredientsAndRecipesQuery,
   useCreateIngredientMutation,
-  Ingredient,
   SectionIngredientKind,
 } from "../generated/graphql";
 
@@ -25,7 +25,7 @@ export interface ResultType {
 
 const IngredientSearch: React.FC<{
   callback: (
-    ingredient: Pick<Ingredient, "uuid" | "name">,
+    ingredient: Pick<Ingredient, "id" | "name">,
     kind: SectionIngredientKind
   ) => void;
   initial?: string;
@@ -52,7 +52,7 @@ const IngredientSearch: React.FC<{
     let res = (await createIngredientMutation()).data;
     if (res) {
       callback(
-        { uuid: res.upsertIngredient, name: inputValue },
+        { id: res.upsertIngredient, name: inputValue },
         SectionIngredientKind.Ingredient
       );
     }
@@ -67,12 +67,12 @@ const IngredientSearch: React.FC<{
       let res = (await createIngredientMutation()).data;
       if (res) {
         callback(
-          { uuid: res.upsertIngredient, name: newValue.label },
+          { id: res.upsertIngredient, name: newValue.label },
           SectionIngredientKind.Ingredient
         );
       }
     } else {
-      callback({ name: newValue.label, uuid: newValue.uuid }, newValue.kind);
+      callback({ name: newValue.label, id: newValue.uuid }, newValue.kind);
     }
     setV(newValue);
   };

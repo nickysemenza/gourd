@@ -70,7 +70,7 @@ func TestAPI(t *testing.T) {
 			Recipe: Recipe{Name: rName},
 			Sections: []RecipeSection{{Minutes: 3,
 				Instructions: []SectionInstruction{{Instruction: "mix"}},
-				Ingredients:  []SectionIngredient{{Grams: &w, Ingredient: &newIngredient, Kind: "ingredient"}},
+				Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
 			}},
 		}
 		resultRecipe := makeRecipe(newRecipe)
@@ -79,7 +79,7 @@ func TestAPI(t *testing.T) {
 		uuid = resultRecipe.Recipe.Id
 
 		newRecipe.Recipe.Name = newRecipe.Recipe.Name + "sub"
-		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{Grams: &w, Recipe: &resultRecipe.Recipe, Kind: "recipe"})
+		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{Grams: w, Recipe: &resultRecipe.Recipe, Kind: "recipe"})
 		makeRecipe(newRecipe)
 
 	}

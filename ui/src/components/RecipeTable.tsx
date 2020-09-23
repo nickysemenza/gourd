@@ -1,12 +1,12 @@
 import React from "react";
-import {
-  Recipe,
-  Section,
-  Ingredient,
-  SectionIngredientKind,
-} from "../generated/graphql";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
+import {
+  RecipeDetail,
+  Ingredient,
+  RecipeSection,
+} from "../api/openapi-hooks/api";
+import { getIngredient } from "../util";
 export interface UpdateIngredientProps {
   sectionID: number;
   ingredientID: number;
@@ -15,13 +15,13 @@ export interface UpdateIngredientProps {
 }
 
 export interface TableProps {
-  recipe: Partial<Recipe>;
+  recipe: RecipeDetail;
   updateIngredient: (i: UpdateIngredientProps) => void;
   updateIngredientInfo: (
     sectionID: number,
     ingredientID: number,
-    ingredient: Pick<Ingredient, "uuid" | "name">,
-    kind: SectionIngredientKind
+    ingredient: Pick<Ingredient, "id" | "name">,
+    kind: "recipe" | "ingredient"
   ) => void;
   updateInstruction: (
     sectionID: number,
@@ -55,12 +55,12 @@ const RecipeTable: React.FC<TableProps> = ({
     (acc, section) =>
       acc +
       section.ingredients
-        .filter((item) => item.info.name.includes("flour"))
-        .reduce((acc, ingredient) => acc + ingredient.grams, 0),
+        .filter((item) => item.ingredient?.name.includes("flour"))
+        .reduce((acc, ingredient) => acc + ingredient?.grams, 0),
     0
   );
 
-  const renderRow = (section: Section, x: number) => (
+  const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>
         <div className="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">
@@ -93,19 +93,22 @@ const RecipeTable: React.FC<TableProps> = ({
             </div>
             {edit ? (
               <IngredientSearch
-                initial={ingredient.info.name}
+                initial={getIngredient(ingredient).name}
                 callback={(item, kind) =>
                   updateIngredientInfo(x, y, item, kind)
                 }
               />
             ) : (
               <div className="text-gray-600">
-                {ingredient.kind === SectionIngredientKind.Recipe ? (
-                  <Link to={`/recipe/${ingredient.info.uuid}`} className="link">
-                    {ingredient.info.name}
+                {ingredient.kind === "recipe" ? (
+                  <Link
+                    to={`/recipe/${ingredient.recipe?.id}`}
+                    className="link"
+                  >
+                    {ingredient.ingredient?.name}
                   </Link>
                 ) : (
-                  ingredient.info.name
+                  ingredient.ingredient?.name
                 )}
               </div>
             )}
