@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
+	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/server"
@@ -56,13 +57,17 @@ func makeServer() server.Server {
 		log.Fatal(err)
 	}
 
+	m := manager.New(dbClient)
+	apiManager := api.NewAPI(m)
+
 	// server
 	return server.Server{
-		Manager:     manager.New(dbClient),
+		Manager:     m,
 		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
+		APIManager:  apiManager,
 	}
 }
 func runServer() {

@@ -37,6 +37,7 @@ type Server struct {
 	HTTPHost    string
 	HTTPPort    uint
 	HTTPTimeout time.Duration
+	APIManager  *api.API
 }
 
 // nolint:gochecknoglobals
@@ -86,10 +87,9 @@ func (s *Server) Run(_ context.Context) error {
 	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)))
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
-	apiManager := api.NewAPI(s.Manager)
 	// r.Any("/api", echo.WrapHandler(othttp.NewHandler(api.Handler(apiManager), "/api")))
 	g := r.Group("/api")
-	api.RegisterHandlers(g, apiManager)
+	api.RegisterHandlers(g, s.APIManager)
 
 	r.GET("/recipes/{uuid}", s.GetRecipe)
 
@@ -115,7 +115,7 @@ func (s *Server) GetRecipe(c echo.Context) error {
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
-	recipe, err := scraper.FetchAndTransform(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html", s.GetResolver().Mutation().UpsertIngredient)
+	recipe, err := scraper.FetchAndTransform(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html", s.APIManager.IngredientUUIDByName)
 	if err != nil {
 		writeErr(w, err)
 		return
