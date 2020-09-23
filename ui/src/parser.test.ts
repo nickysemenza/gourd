@@ -1,5 +1,4 @@
-import { parseRecipe, parseLine, encodeIngredient } from "./parser";
-import { SectionIngredientKind } from "./generated/graphql";
+import { parseLine, encodeIngredient } from "./parser";
 
 test("parse with adjective", () => {
   const [grams, ingredient, adjective] = parseLine("30g butter, melted");
@@ -20,7 +19,7 @@ test("encode igredient", () => {
     encodeIngredient({
       ingredient: { name: "egg", id: "" },
       id: "",
-      kind: SectionIngredientKind.Ingredient,
+      kind: "ingredient",
       grams: 27,
       amount: 0,
       unit: "",
@@ -32,7 +31,7 @@ test("encode igredient", () => {
     encodeIngredient({
       ingredient: { name: "apple", id: "" },
       id: "",
-      kind: SectionIngredientKind.Ingredient,
+      kind: "ingredient",
       grams: 2,
       amount: 0,
       unit: "",

@@ -7,7 +7,7 @@ RUN yarn
 
 COPY . .
 ENV CYPRESS_BASE_URL=http://localhost:3001
-ENV REACT_APP_GQL_URL=http://gourd:4242/query
+ENV REACT_APP_API_URL=http://gourd:4242
 EXPOSE 3001
 RUN pwd
 RUN ls

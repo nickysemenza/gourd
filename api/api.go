@@ -162,11 +162,18 @@ func (a *API) CreateRecipes(c echo.Context) error {
 	return c.JSON(http.StatusCreated, recipe)
 }
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
-	uuid, err := a.DB().InsertRecipe(ctx, r.toDB())
-	if err != nil {
+	id := r.Recipe.Id
+	var err error
+	if id == "" {
+		id, err = a.DB().InsertRecipe(ctx, r.toDB())
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := a.DB().UpdateRecipe(ctx, r.toDB()); err != nil {
 		return nil, err
 	}
-	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, uuid)
+	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
 	if err != nil {
 		return nil, err
 	}
