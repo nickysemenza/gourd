@@ -5,6 +5,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -31,8 +32,8 @@ func transformRecipe(dbr db.Recipe) Recipe {
 		TotalMinutes: dbr.TotalMinutes.Ptr(),
 	}
 }
-func transformRecipeFull(dbr *db.Recipe) RecipeDetail {
-	return RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(*&dbr.Sections)}
+func transformRecipeFull(dbr *db.Recipe) *RecipeDetail {
+	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(*&dbr.Sections)}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
@@ -154,12 +155,22 @@ func (a *API) CreateRecipes(c echo.Context) error {
 		err = fmt.Errorf("invalid format for input: %w", err)
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	uuid, err := a.DB().InsertRecipe(ctx, r.toDB())
+	recipe, err := a.CreateRecipe(ctx, &r)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
+	return c.JSON(http.StatusCreated, recipe)
+}
+func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
+	uuid, err := a.DB().InsertRecipe(ctx, r.toDB())
+	if err != nil {
+		return nil, err
+	}
 	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, uuid)
-	return c.JSON(http.StatusCreated, transformRecipeFull(r2))
+	if err != nil {
+		return nil, err
+	}
+	return transformRecipeFull(r2), nil
 }
 
 // Info for a specific recipe
@@ -185,7 +196,14 @@ func (a *API) CreateIngredients(c echo.Context) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
+}
 
+func (a *API) IngredientUUIDByName(ctx context.Context, name, kind string) (string, error) {
+	ing, err := a.DB().IngredientByName(ctx, name)
+	if err != nil {
+		return "", err
+	}
+	return ing.UUID, nil
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
 	ctx := c.Request().Context()

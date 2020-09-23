@@ -13,7 +13,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/nickysemenza/gourd/graph/model"
+	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace"
@@ -21,7 +21,7 @@ import (
 )
 
 // FetchAndTransform returns a recipe.
-func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error)) (*model.RecipeInput, error) {
+func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeDetail, error) {
 	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 	html, err := getHTML(ctx, addr)
@@ -35,7 +35,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 	spew.Dump(recipe.RecipeIngredient, err)
 	output := []string{}
 
-	section := &model.SectionInput{}
+	section := api.RecipeSection{}
 
 	for _, item := range recipe.RecipeIngredient {
 		i, err := parser.Parse(ctx, item)
@@ -47,35 +47,40 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 		}
 		output = append(output, i.ToString())
 		fmt.Println(i.ToString())
-		uuid, err := ingredientToUUID(ctx, i.Name, model.SectionIngredientKindIngredient)
+		uuid, err := ingredientToUUID(ctx, i.Name, "ingredient")
 		if err != nil {
 			return nil, fmt.Errorf("failed to map ingredient %s to uuid: %w", i.Name, err)
 		}
 		spew.Dump(uuid)
-		section.Ingredients = append(section.Ingredients, &model.SectionIngredientInput{
-			InfoUUID:  uuid,
-			Kind:      model.SectionIngredientKindIngredient,
-			Amount:    &i.Volume.Value,
-			Unit:      &i.Volume.Unit,
-			Adjective: &i.Modifier,
-			Grams:     i.Grams(),
+		g := i.Grams()
+		section.Ingredients = append(section.Ingredients, api.SectionIngredient{
+			Ingredient: &api.Ingredient{Id: uuid},
+			Kind:       "ingredient",
+			Amount:     &i.Volume.Value,
+			Unit:       &i.Volume.Unit,
+			Adjective:  &i.Modifier,
+			Grams:      &g,
 		})
 	}
 	for _, item := range recipe.RecipeInstructions {
-		section.Instructions = append(section.Instructions, &model.SectionInstructionInput{Instruction: item.Text})
+		section.Instructions = append(section.Instructions, api.SectionInstruction{Instruction: item.Text})
 	}
 	u, err := url.Parse(addr)
 	if err != nil {
 		return nil, err
 	}
 
-	r := model.RecipeInput{
-		Name:     recipe.Name,
-		Sections: []*model.SectionInput{section},
-		Source: &model.SourceInput{
-			Name: u.Host,
-			Meta: addr,
+	source := fmt.Sprintf("todo: %s %s", u.Host, addr)
+	r := api.RecipeDetail{
+		Recipe: api.Recipe{
+			Name:   recipe.Name,
+			Source: &source,
+			// Source: &api.Source{
+			// 	Name: u.Host,
+			// 	Meta: addr,
+			// },
 		},
+		Sections: []api.RecipeSection{section},
 	}
 	spew.Dump(r)
 

@@ -63,12 +63,13 @@ func init() {
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				s := makeServer()
+				ctx := context.Background()
 
-				r, err := scraper.FetchAndTransform(context.Background(), strings.Join(args, " "), s.GetResolver().Mutation().UpsertIngredient)
+				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientUUIDByName)
 				if err != nil {
 					return err
 				}
-				_, err = s.GetResolver().Mutation().UpdateRecipe(context.Background(), r)
+				_, err = s.APIManager.CreateRecipe(ctx, r)
 				return err
 			},
 		},
