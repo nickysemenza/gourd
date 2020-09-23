@@ -23,13 +23,13 @@ type Ingredient struct {
 type IngredientDetail struct {
 
 	// Ingredients that are equivalent
-	Children []Ingredient `json:"children"`
+	Children *[]Ingredient `json:"children,omitempty"`
 
 	// An Ingredient
 	Ingredient Ingredient `json:"ingredient"`
 
 	// Recipes referencing this ingredient
-	Recipes []Recipe `json:"recipes"`
+	Recipes *[]Recipe `json:"recipes,omitempty"`
 }
 
 // List defines model for List.
@@ -118,13 +118,13 @@ type RecipeSection struct {
 type SectionIngredient struct {
 
 	// adjective
-	Adjective *string `json:"adjective,omitempty"`
+	Adjective string `json:"adjective"`
 
 	// amount
 	Amount *float64 `json:"amount,omitempty"`
 
 	// weight in grams
-	Grams *float64 `json:"grams,omitempty"`
+	Grams float64 `json:"grams"`
 
 	// UUID
 	Id string `json:"id"`
@@ -142,7 +142,7 @@ type SectionIngredient struct {
 	Recipe *Recipe `json:"recipe,omitempty"`
 
 	// unit
-	Unit *string `json:"unit,omitempty"`
+	Unit string `json:"unit"`
 }
 
 // SectionInstruction defines model for SectionInstruction.

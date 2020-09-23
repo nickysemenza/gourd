@@ -18,8 +18,8 @@ test("parse without adjective", () => {
 test("encode igredient", () => {
   expect(
     encodeIngredient({
-      info: { name: "egg", uuid: "" },
-      uuid: "",
+      ingredient: { name: "egg", id: "" },
+      id: "",
       kind: SectionIngredientKind.Ingredient,
       grams: 27,
       amount: 0,
@@ -30,8 +30,8 @@ test("encode igredient", () => {
   ).toEqual("27g egg");
   expect(
     encodeIngredient({
-      info: { name: "apple", uuid: "" },
-      uuid: "",
+      ingredient: { name: "apple", id: "" },
+      id: "",
       kind: SectionIngredientKind.Ingredient,
       grams: 2,
       amount: 0,

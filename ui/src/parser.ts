@@ -1,9 +1,5 @@
-import {
-  Recipe,
-  SectionIngredient,
-  SectionIngredientKind,
-  GetRecipeByUuidQuery,
-} from "./generated/graphql";
+import { RecipeDetail, SectionIngredient } from "./api/openapi-hooks/api";
+import { getIngredient } from "./util";
 
 export const parseLine = (line: string): [number, string, string] => {
   if (line.includes(",")) {
@@ -19,14 +15,14 @@ export const parseLine = (line: string): [number, string, string] => {
   }
 };
 
-export const parseRecipe = (text: string): Recipe | undefined => {
+export const parseRecipe = (text: string): RecipeDetail | undefined => {
   const lines = text.split(/\r?\n/);
   const ingredients: Array<SectionIngredient> = lines.map((line) => {
     const [grams, ingredient, adjective] = parseLine(line);
     const si: SectionIngredient = {
-      uuid: "",
-      info: { uuid: "", name: ingredient },
-      kind: SectionIngredientKind.Ingredient,
+      id: "",
+      ingredient: { id: "", name: ingredient },
+      kind: "ingredient",
       grams,
       adjective,
       amount: 0,
@@ -35,29 +31,22 @@ export const parseRecipe = (text: string): Recipe | undefined => {
     };
     return si;
   });
-  const recipe: Recipe = {
-    name: "",
-    meals: [],
-    uuid: "",
-    totalMinutes: 0,
-    unit: "",
-    sections: [{ uuid: "", minutes: 0, ingredients, instructions: [] }],
-    notes: [],
+  const recipe: RecipeDetail = {
+    recipe: { name: "", id: "", quantity: 0, unit: "" },
+    sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
   };
   return recipe;
 };
-export const encodeIngredient = (
-  ingredient: Pick<SectionIngredient, "grams" | "info" | "adjective"> | any
-): string => {
-  const { info, grams, adjective, amount, unit } = ingredient;
+export const encodeIngredient = (ingredient: SectionIngredient): string => {
+  const { grams, adjective, amount, unit } = ingredient;
   let res = grams + "g";
   if (amount !== 0 && unit !== "") res += ` (${amount} ${unit})`;
-  res += ` ${info.name}`;
+  res += ` ${getIngredient(ingredient).name}`;
   if (adjective !== "") res += `, ${adjective}`;
   return res;
 };
 
-export const encodeRecipe = (recipe: GetRecipeByUuidQuery["recipe"]): string =>
+export const encodeRecipe = (recipe: RecipeDetail): string =>
   recipe && recipe.sections
     ? recipe.sections
         .map((section) => section.ingredients.map(encodeIngredient).join("\n"))

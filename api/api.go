@@ -61,10 +61,10 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 		}
 		for _, i := range s.Ingredients {
 			si := db.SectionIngredient{
-				Grams:     zero.FloatFromPtr(i.Grams),
+				Grams:     zero.FloatFrom(i.Grams),
 				Amount:    zero.FloatFromPtr(i.Amount),
-				Unit:      zero.StringFromPtr(i.Unit),
-				Adjective: zero.StringFromPtr(i.Adjective),
+				Unit:      zero.StringFrom(i.Unit),
+				Adjective: zero.StringFrom(i.Adjective),
 				Optional:  zero.BoolFromPtr(i.Optional),
 			}
 			if i.Kind == "recipe" {
@@ -95,10 +95,10 @@ func transformRecipeSections(dbs []db.Section) []RecipeSection {
 		for _, i := range d.Ingredients {
 			item := SectionIngredient{
 				Id:        i.UUID,
-				Grams:     i.Grams.Ptr(),
+				Grams:     i.Grams.Float64,
 				Amount:    i.Amount.Ptr(),
-				Unit:      i.Unit.Ptr(),
-				Adjective: i.Adjective.Ptr(),
+				Unit:      i.Unit.String,
+				Adjective: i.Adjective.String,
 				Optional:  i.Optional.Ptr(),
 			}
 			if i.RawRecipe != nil {

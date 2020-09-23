@@ -52,14 +52,13 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 			return nil, fmt.Errorf("failed to map ingredient %s to uuid: %w", i.Name, err)
 		}
 		spew.Dump(uuid)
-		g := i.Grams()
 		section.Ingredients = append(section.Ingredients, api.SectionIngredient{
 			Ingredient: &api.Ingredient{Id: uuid},
 			Kind:       "ingredient",
 			Amount:     &i.Volume.Value,
-			Unit:       &i.Volume.Unit,
-			Adjective:  &i.Modifier,
-			Grams:      &g,
+			Unit:       i.Volume.Unit,
+			Adjective:  i.Modifier,
+			Grams:      i.Grams(),
 		})
 	}
 	for _, item := range recipe.RecipeInstructions {

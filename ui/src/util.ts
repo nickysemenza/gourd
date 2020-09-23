@@ -1,3 +1,4 @@
+import { Ingredient, SectionIngredient } from "./api/openapi-hooks/api";
 import { Recipe, RecipeInput } from "./generated/graphql";
 
 export const recipeToRecipeInput = (recipe: Partial<Recipe>): RecipeInput => {
@@ -25,4 +26,15 @@ export const recipeToRecipeInput = (recipe: Partial<Recipe>): RecipeInput => {
       })
     ),
   };
+};
+
+export const getIngredient = (
+  si: Partial<SectionIngredient>
+): { name: "" } | Recipe | Ingredient => {
+  if (si.recipe) {
+    return si.recipe;
+  } else if (si.ingredient) {
+    return si.ingredient;
+  }
+  return { name: "" };
 };

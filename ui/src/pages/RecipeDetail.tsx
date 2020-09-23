@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  useGetRecipeByUuidQuery,
-  useUpdateRecipeMutation,
-  RecipeInput,
-  SectionIngredientKind,
-  Ingredient,
-} from "../generated/graphql";
 
 import { useParams } from "react-router-dom";
 import RecipeTable, { UpdateIngredientProps } from "../components/RecipeTable";
 import Debug from "../components/Debug";
-import { recipeToRecipeInput } from "../util";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
-import RecipeSource from "../components/RecipeSource";
+import { useGetRecipeById, Ingredient } from "../api/openapi-hooks/api";
 
 type override = {
   sectionID: number;
@@ -22,24 +14,31 @@ type override = {
   value: number;
 };
 const RecipeDetail: React.FC = () => {
-  let { uuid } = useParams();
-  const { loading, error, data, refetch } = useGetRecipeByUuidQuery({
-    variables: { uuid: uuid || "" },
+  let { uuid } = useParams() as { uuid?: string };
+  // const { loading, error, data, refetch } = useGetRecipeByUuidQuery({
+  //   variables: { id: uuid || "" },
+  // });
+  const { loading, error, data } = useGetRecipeById({
+    recipe_id: uuid || "",
+    base: "http://localhost:4242/api",
   });
+
+  // const
+
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<override>();
   const [edit, setEdit] = useState(false);
-  const [recipe, setRecipe] = useState(data?.recipe);
+  const [recipe, setRecipe] = useState(data);
 
-  const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>({
-    name: "tmp",
-    uuid: "tmp",
-  });
-  const [updateRecipeMutation, { error: saveError }] = useUpdateRecipeMutation({
-    variables: {
-      recipe: recipeUpdate,
-    },
-  });
+  // const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>({
+  //   name: "tmp",
+  //   id: "tmp",
+  // });
+  // const [updateRecipeMutation, { error: saveError }] = useUpdateRecipeMutation({
+  //   variables: {
+  //     recipe: recipeUpdate,
+  //   },
+  // });
 
   const resetMultiplier = () => setMultiplier(1);
   const toggleEdit = () => {
@@ -47,8 +46,8 @@ const RecipeDetail: React.FC = () => {
     setEdit(!edit);
   };
   const saveUpdate = async () => {
-    await updateRecipeMutation();
-    await refetch();
+    // await updateRecipeMutation();
+    // await refetch();
   };
 
   useHotkeys("e", () => {
@@ -63,17 +62,17 @@ const RecipeDetail: React.FC = () => {
 
   useEffect(() => {
     if (data?.recipe) {
-      setRecipe(data.recipe);
+      setRecipe(data);
     }
   }, [data]);
 
-  useEffect(() => {
-    if (recipe) {
-      setRecipeUpdate(recipeToRecipeInput(recipe));
-    }
-  }, [recipe]);
+  // useEffect(() => {
+  //   if (recipe) {
+  //     setRecipeUpdate(recipeToRecipeInput(recipe));
+  //   }
+  // }, [recipe]);
 
-  const e = error || saveError;
+  const e = error; // || saveError;
   if (e) {
     console.error({ e });
     // todo: extract to error component
@@ -95,29 +94,24 @@ const RecipeDetail: React.FC = () => {
   const updateIngredientInfo = (
     sectionID: number,
     ingredientID: number,
-    ingredient: Pick<Ingredient, "uuid" | "name">,
-    kind: SectionIngredientKind
+    ingredient: Ingredient,
+    kind: "recipe" | "ingredient"
   ) => {
-    const { uuid, name } = ingredient;
+    const { id, name } = ingredient;
     setRecipe(
       update(recipe, {
         sections: {
           [sectionID]: {
             ingredients: {
               [ingredientID]: {
-                info: {
+                recipe: {
                   $set:
-                    kind === SectionIngredientKind.Recipe
-                      ? {
-                          uuid,
-                          name,
-                          __typename: "Recipe",
-                        }
-                      : {
-                          uuid,
-                          name,
-                          __typename: "Ingredient",
-                        },
+                    kind === "recipe"
+                      ? { id, name, quantity: 0, unit: "" }
+                      : undefined,
+                },
+                ingredient: {
+                  $set: kind === "ingredient" ? { id, name } : undefined,
                 },
                 kind: { $set: kind },
               },
@@ -150,7 +144,7 @@ const RecipeDetail: React.FC = () => {
                 ingredients: {
                   [ingredientID]: {
                     // info: {
-                    //   uuid: "",
+                    //   id: "",
                     //   name: {
                     //     $apply: (v) => (attr === "name" ? value : v),
                     //   },
@@ -222,7 +216,7 @@ const RecipeDetail: React.FC = () => {
         sections: {
           [sectionID]: {
             instructions: {
-              $push: [{ uuid: "x", instruction: "" }],
+              $push: [{ id: "x", instruction: "" }],
             },
           },
         },
@@ -238,10 +232,10 @@ const RecipeDetail: React.FC = () => {
             ingredients: {
               $push: [
                 {
-                  uuid: "x",
+                  id: "x",
                   grams: 1,
-                  kind: SectionIngredientKind.Ingredient,
-                  info: { name: "", uuid: "", __typename: "Ingredient" },
+                  kind: "ingredient",
+                  // info: { name: "", id: "", __typename: "Ingredient" },
                   amount: 0,
                   unit: "",
                   adjective: "",
@@ -258,29 +252,29 @@ const RecipeDetail: React.FC = () => {
     setRecipe(
       update(recipe, {
         sections: {
-          $push: [{ uuid: "", minutes: 0, ingredients: [], instructions: [] }],
+          $push: [{ id: "", minutes: 0, ingredients: [], instructions: [] }],
         },
       })
     );
   };
-
+  const info = recipe.recipe;
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
         <div>
           <h2 className="text-2xl font-bold leading-7 text-gray-900">
-            {recipe.name}
+            {info.name}
           </h2>
 
           <div className="flex">
-            {recipe.source && (
+            {/* {info.source && (
               <div className="text-sm text-gray-600">
-                <RecipeSource source={recipe.source} />
+                <RecipeSource source={info.source} />
               </div>
-            )}
-            {recipe.unit !== "" && (
+            )} */}
+            {info.unit !== "" && (
               <div className="text-sm text-gray-600">
-                Makes x {recipe.unit}. {recipe.totalMinutes} minutes.
+                Makes x {info.unit}. {info.total_minutes} minutes.
               </div>
             )}
           </div>
@@ -321,14 +315,6 @@ const RecipeDetail: React.FC = () => {
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
-      {recipe.meals.map((snippet) => (
-        <>
-          {snippet.name}
-          {/* {snippet.imageURLs.map((u) => (
-            <Image src={u} size="small" />
-          ))} */}
-        </>
-      ))}
       <Debug data={{ recipe, loading, error, data, multiplier, override }} />
     </div>
   );
