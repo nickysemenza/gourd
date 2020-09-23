@@ -149,31 +149,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    put:
-      summary: Update a recipe
-      operationId: update_recipe_by_id
-      tags:
-        - recipes
-      parameters:
-        - name: recipe_id
-          in: path
-          required: true
-          description: The id of the recipe to retrieve
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Expected response to a valid request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecipeDetail"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+    # put:
+    #   summary: Update a recipe
+    #   operationId: update_recipe_by_id
+    #   tags:
+    #     - recipes
+    #   parameters:
+    #     - name: recipe_id
+    #       in: path
+    #       required: true
+    #       description: The id of the recipe to retrieve
+    #       schema:
+    #         type: string
+    #   responses:
+    #     "200":
+    #       description: Expected response to a valid request
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/RecipeDetail"
+    #     default:
+    #       description: unexpected error
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/Error"
 components:
   schemas:
     SectionIngredient:
