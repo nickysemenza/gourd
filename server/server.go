@@ -14,13 +14,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	log "github.com/sirupsen/logrus"
 	echotrace "go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo"
 	othttp "go.opentelemetry.io/contrib/instrumentation/net/http"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/metric"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/label"
 
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/db"
@@ -43,15 +43,15 @@ type Server struct {
 var httpRequestsDurationMetric = metric.Must(global.Meter("ex.com/basic")).
 	NewFloat64Counter("http.requests.duration")
 
-func timing(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		t := time.Now()
-		next.ServeHTTP(w, r)
-		d := time.Since(t).Seconds()
-		httpRequestsDurationMetric.Add(r.Context(), d, label.String("method", r.Method))
-	}
-	return http.HandlerFunc(fn)
-}
+// func timing(next http.Handler) http.Handler {
+// 	fn := func(w http.ResponseWriter, r *http.Request) {
+// 		t := time.Now()
+// 		next.ServeHTTP(w, r)
+// 		d := time.Since(t).Seconds()
+// 		httpRequestsDurationMetric.Add(r.Context(), d, label.String("method", r.Method))
+// 	}
+// 	return http.HandlerFunc(fn)
+// }
 
 func (s *Server) GetResolver() generated.ResolverRoot {
 	return &graph.Resolver{
@@ -63,23 +63,12 @@ func (s *Server) GetResolver() generated.ResolverRoot {
 func (s *Server) Run(_ context.Context) error {
 	r := echo.New()
 
-	r.Use(echotrace.Middleware("my-server"))
-	// sentryMiddleware := sentryhttp.New(sentryhttp.Options{
-	// 	Repanic: true,
-	// })
+	r.Use(echotrace.Middleware("gourd-backend"))
 	r.Use(middleware.CORS())
-
 	r.Use(middleware.Logger())
 	r.Use(middleware.RequestID())
 	r.Use(middleware.Recover())
-
-	// r.Use(middleware.RequestID)
-	// r.Use(NewStructuredLogger(log.New()))
-	// r.Use(cors.Handler(cors.Options{}))
-	// r.Use(timing)
-	// r.Use(middleware.Logger)
-	// r.Use(middleware.Recoverer)
-	// r.Use(sentryMiddleware.Handle)
+	r.Use(sentryecho.New(sentryecho.Options{}))
 
 	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
@@ -93,13 +82,9 @@ func (s *Server) Run(_ context.Context) error {
 
 	// http routes
 	r.GET("/metrics", echo.WrapHandler(hf))
-	// r.Any("/debug", echo.WrapHandler(http.HandlerFunc(middleware.Profiler())))
 	r.Any("/", echo.WrapHandler(http.HandlerFunc(playground.Handler("GraphQL playground", "/query"))))
 	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)))
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
-	// r.GET("/h", func(w http.ResponseWriter, r *http.Request) {
-	// 	_, _ = w.Write([]byte("hi"))
-	// })
 
 	apiManager := api.NewAPI(s.Manager)
 	// r.Any("/api", echo.WrapHandler(othttp.NewHandler(api.Handler(apiManager), "/api")))
