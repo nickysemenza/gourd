@@ -189,7 +189,7 @@ func (a *API) CreateIngredients(c echo.Context) error {
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
 	ctx := c.Request().Context()
-	items := []Ingredient{}
+	items := []IngredientDetail{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", paginationParams...)
@@ -197,7 +197,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	for _, i := range ing {
-		items = append(items, transformIngredient(i))
+		items = append(items, IngredientDetail{Ingredient: transformIngredient(i)})
 	}
 	listMeta.TotalCount = int(count)
 

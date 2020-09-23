@@ -72,7 +72,7 @@ jobs:
           path: /tmp/artifacts
   build_ui:
     docker:
-      - image: node:13
+      - image: node:12
     working_directory: ~/work
     steps:
       - checkout

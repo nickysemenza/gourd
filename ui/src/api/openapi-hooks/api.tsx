@@ -159,14 +159,21 @@ export interface Ingredient {
    * Ingredient name
    */
   name: string;
+}
+
+/**
+ * An Ingredient
+ */
+export interface IngredientDetail {
+  ingredient: Ingredient;
   /**
    * Recipes referencing this ingredient
    */
-  recipes?: Recipe[];
+  recipes: Recipe[];
   /**
    * Ingredients that are equivalent
    */
-  children?: Ingredient[];
+  children: Ingredient[];
 }
 
 export interface Error {
@@ -203,7 +210,7 @@ export interface PaginatedRecipes {
 }
 
 export interface PaginatedIngredients {
-  ingredients?: Ingredient[];
+  ingredients?: IngredientDetail[];
   meta?: List;
 }
 

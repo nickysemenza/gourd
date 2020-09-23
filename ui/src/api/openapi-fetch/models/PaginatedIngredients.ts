@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    Ingredient,
-    IngredientFromJSON,
-    IngredientFromJSONTyped,
-    IngredientToJSON,
+    IngredientDetail,
+    IngredientDetailFromJSON,
+    IngredientDetailFromJSONTyped,
+    IngredientDetailToJSON,
     List,
     ListFromJSON,
     ListFromJSONTyped,
@@ -32,10 +32,10 @@ import {
 export interface PaginatedIngredients {
     /**
      * 
-     * @type {Array<Ingredient>}
+     * @type {Array<IngredientDetail>}
      * @memberof PaginatedIngredients
      */
-    ingredients?: Array<Ingredient>;
+    ingredients?: Array<IngredientDetail>;
     /**
      * 
      * @type {List}
@@ -54,7 +54,7 @@ export function PaginatedIngredientsFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientFromJSON)),
+        'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientDetailFromJSON)),
         'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
     };
 }
@@ -68,7 +68,7 @@ export function PaginatedIngredientsToJSON(value?: PaginatedIngredients | null):
     }
     return {
         
-        'ingredients': value.ingredients === undefined ? undefined : ((value.ingredients as Array<any>).map(IngredientToJSON)),
+        'ingredients': value.ingredients === undefined ? undefined : ((value.ingredients as Array<any>).map(IngredientDetailToJSON)),
         'meta': ListToJSON(value.meta),
     };
 }
