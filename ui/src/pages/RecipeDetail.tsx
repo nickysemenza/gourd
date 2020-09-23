@@ -6,7 +6,11 @@ import Debug from "../components/Debug";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
-import { useGetRecipeById, Ingredient } from "../api/openapi-hooks/api";
+import {
+  useGetRecipeById,
+  Ingredient,
+  useCreateRecipes,
+} from "../api/openapi-hooks/api";
 
 type override = {
   sectionID: number;
@@ -15,30 +19,21 @@ type override = {
 };
 const RecipeDetail: React.FC = () => {
   let { uuid } = useParams() as { uuid?: string };
-  // const { loading, error, data, refetch } = useGetRecipeByUuidQuery({
-  //   variables: { id: uuid || "" },
-  // });
+
   const { loading, error, data } = useGetRecipeById({
     recipe_id: uuid || "",
-    base: "http://localhost:4242/api",
   });
-
-  // const
 
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<override>();
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
 
-  // const [recipeUpdate, setRecipeUpdate] = useState<RecipeInput>({
-  //   name: "tmp",
-  //   id: "tmp",
-  // });
-  // const [updateRecipeMutation, { error: saveError }] = useUpdateRecipeMutation({
-  //   variables: {
-  //     recipe: recipeUpdate,
-  //   },
-  // });
+  const { mutate: post } = useCreateRecipes({
+    onMutate: (_, data) => {
+      setRecipe(data);
+    },
+  });
 
   const resetMultiplier = () => setMultiplier(1);
   const toggleEdit = () => {
@@ -46,8 +41,7 @@ const RecipeDetail: React.FC = () => {
     setEdit(!edit);
   };
   const saveUpdate = async () => {
-    // await updateRecipeMutation();
-    // await refetch();
+    recipe && post(recipe);
   };
 
   useHotkeys("e", () => {
@@ -65,12 +59,6 @@ const RecipeDetail: React.FC = () => {
       setRecipe(data);
     }
   }, [data]);
-
-  // useEffect(() => {
-  //   if (recipe) {
-  //     setRecipeUpdate(recipeToRecipeInput(recipe));
-  //   }
-  // }, [recipe]);
 
   const e = error; // || saveError;
   if (e) {

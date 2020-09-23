@@ -45,7 +45,7 @@ services:
     depends_on:
       - gourd
     environment:
-      REACT_APP_GQL_URL: http://gourd:4242/query
+      REACT_APP_API_URL: http://gourd:4242
     ports:
       - "3001:3001"
     volumes:

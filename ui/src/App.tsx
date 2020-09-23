@@ -13,44 +13,47 @@ import Food from "./pages/Food";
 import Playground from "./pages/Playground";
 
 import "./tailwind.output.css";
+import { RestfulProvider } from "restful-react";
 
 function App() {
   const client = new ApolloClient({
-    uri: process.env.REACT_APP_GQL_URL,
+    uri: process.env.REACT_APP_API_URL + "/query",
   });
   return (
-    <ApolloProvider client={client}>
-      <Router>
-        <NavBar />
-        <div className="container mx-auto">
-          <Switch>
-            <Route path="/recipe/:uuid">
-              <RecipeDetail />
-            </Route>
-            <Route path="/recipes">
-              <RecipeList />
-            </Route>
-            <Route path="/ingredients">
-              <IngredientList />
-            </Route>
-            <Route path="/create">
-              <CreateRecipe />
-            </Route>
-            <Route path="/food">
-              <Food />
-            </Route>
-            <Route path="/playground">
-              <Playground />
-            </Route>
-            <Route path="/">
-              <Test />
-            </Route>
-          </Switch>
-        </div>
-      </Router>
+    <RestfulProvider base={process.env.REACT_APP_API_URL + "/api"}>
+      <ApolloProvider client={client}>
+        <Router>
+          <NavBar />
+          <div className="container mx-auto">
+            <Switch>
+              <Route path="/recipe/:uuid">
+                <RecipeDetail />
+              </Route>
+              <Route path="/recipes">
+                <RecipeList />
+              </Route>
+              <Route path="/ingredients">
+                <IngredientList />
+              </Route>
+              <Route path="/create">
+                <CreateRecipe />
+              </Route>
+              <Route path="/food">
+                <Food />
+              </Route>
+              <Route path="/playground">
+                <Playground />
+              </Route>
+              <Route path="/">
+                <Test />
+              </Route>
+            </Switch>
+          </div>
+        </Router>
 
-      <hr />
-    </ApolloProvider>
+        <hr />
+      </ApolloProvider>
+    </RestfulProvider>
   );
 }
 
