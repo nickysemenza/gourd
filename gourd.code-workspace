@@ -7,10 +7,27 @@
       "path": "ui"
     },
     {
+      // https://code.visualstudio.com/docs/editor/multi-root-workspaces
+      "name": "go",
       "path": "."
     }
   ],
   "extensions": {
     "recommendations": ["bradlc.vscode-tailwindcss"]
+  },
+  "tasks": {
+    "version": "1.0.0",
+    "options": {
+      "cwd": "${workspaceFolder:go}/"
+    },
+    "tasks": [
+      {
+        "label": "oapi",
+        "type": "shell",
+        "command": "make",
+        "args": ["generate-openapi"],
+        "problemMatcher": []
+      }
+    ]
   }
 }

@@ -169,6 +169,8 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 		if err != nil {
 			return nil, err
 		}
+		r.Recipe.Id = id
+
 	}
 	if err := a.DB().UpdateRecipe(ctx, r.toDB()); err != nil {
 		return nil, err
