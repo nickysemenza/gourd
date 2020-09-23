@@ -5,6 +5,7 @@ apis/RecipesApi.ts
 apis/index.ts
 index.ts
 models/Ingredient.ts
+models/IngredientDetail.ts
 models/List.ts
 models/ModelError.ts
 models/PaginatedIngredients.ts

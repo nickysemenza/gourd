@@ -46,9 +46,9 @@ func TestAPI(t *testing.T) {
 
 		found := false
 		for _, e := range *results.Ingredients {
-			if e.Name == newIngredient.Name {
+			if e.Ingredient.Name == newIngredient.Name {
 				found = true
-				require.NotEmpty(e.Id)
+				require.NotEmpty(e.Ingredient.Id)
 			}
 		}
 		require.True(found)

@@ -295,6 +295,18 @@ components:
         name:
           description: Ingredient name
           type: string
+    IngredientDetail:
+      description: "An Ingredient"
+      type: object
+      required:
+        - ingredient
+        - recipes
+        - children
+      properties:
+        ingredient:
+          description: the ingredient
+          type: object
+          $ref: "#/components/schemas/Ingredient"
         recipes:
           description: Recipes referencing this ingredient
           type: array
@@ -362,7 +374,7 @@ components:
         ingredients:
           type: array
           items:
-            $ref: "#/components/schemas/Ingredient"
+            $ref: "#/components/schemas/IngredientDetail"
         meta:
           $ref: "#/components/schemas/List"
   parameters:

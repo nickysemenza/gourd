@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
-} from './';
-
 /**
  * An Ingredient
  * @export
@@ -38,18 +31,6 @@ export interface Ingredient {
      * @memberof Ingredient
      */
     name: string;
-    /**
-     * Recipes referencing this ingredient
-     * @type {Array<Recipe>}
-     * @memberof Ingredient
-     */
-    recipes?: Array<Recipe>;
-    /**
-     * Ingredients that are equivalent
-     * @type {Array<Ingredient>}
-     * @memberof Ingredient
-     */
-    children?: Array<Ingredient>;
 }
 
 export function IngredientFromJSON(json: any): Ingredient {
@@ -64,8 +45,6 @@ export function IngredientFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'id': json['id'],
         'name': json['name'],
-        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeFromJSON)),
-        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientFromJSON)),
     };
 }
 
@@ -80,8 +59,6 @@ export function IngredientToJSON(value?: Ingredient | null): any {
         
         'id': value.id,
         'name': value.name,
-        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeToJSON)),
-        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientToJSON)),
     };
 }
 

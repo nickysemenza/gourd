@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTable, Column, CellProps, usePagination } from "react-table";
+import { CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import Debug from "../components/Debug";
 import { useListRecipes } from "../api/openapi-hooks/api";

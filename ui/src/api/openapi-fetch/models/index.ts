@@ -1,4 +1,5 @@
 export * from './Ingredient';
+export * from './IngredientDetail';
 export * from './List';
 export * from './ModelError';
 export * from './PaginatedIngredients';

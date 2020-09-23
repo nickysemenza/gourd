@@ -12,17 +12,24 @@ type Error struct {
 // Ingredient defines model for Ingredient.
 type Ingredient struct {
 
-	// Ingredients that are equivalent
-	Children *[]Ingredient `json:"children,omitempty"`
-
 	// UUID
 	Id string `json:"id"`
 
 	// Ingredient name
 	Name string `json:"name"`
+}
+
+// IngredientDetail defines model for IngredientDetail.
+type IngredientDetail struct {
+
+	// Ingredients that are equivalent
+	Children []Ingredient `json:"children"`
+
+	// An Ingredient
+	Ingredient Ingredient `json:"ingredient"`
 
 	// Recipes referencing this ingredient
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Recipes []Recipe `json:"recipes"`
 }
 
 // List defines model for List.
@@ -46,8 +53,8 @@ type List struct {
 
 // PaginatedIngredients defines model for PaginatedIngredients.
 type PaginatedIngredients struct {
-	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
-	Meta        *List         `json:"meta,omitempty"`
+	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
+	Meta        *List               `json:"meta,omitempty"`
 }
 
 // PaginatedRecipes defines model for PaginatedRecipes.
