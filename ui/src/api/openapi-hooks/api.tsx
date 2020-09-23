@@ -48,6 +48,22 @@ export interface SectionIngredient {
    * weight in grams
    */
   grams?: number;
+  /**
+   * amount
+   */
+  amount?: number;
+  /**
+   * unit
+   */
+  unit?: string;
+  /**
+   * adjective
+   */
+  adjective?: string;
+  /**
+   * optional
+   */
+  optional?: boolean;
 }
 
 /**
@@ -227,6 +243,37 @@ export type UseListIngredientsProps = Omit<
  */
 export const useListIngredients = (props: UseListIngredientsProps) =>
   useGet<PaginatedIngredients, Error, ListIngredientsQueryParams, void>(
+    encode`/ingredients`,
+    props
+  );
+
+export type CreateIngredientsProps = Omit<
+  MutateProps<Ingredient, Error, void, Ingredient, void>,
+  "path" | "verb"
+>;
+
+/**
+ * Create a ingredient
+ */
+export const CreateIngredients = (props: CreateIngredientsProps) => (
+  <Mutate<Ingredient, Error, void, Ingredient, void>
+    verb="POST"
+    path={encode`/ingredients`}
+    {...props}
+  />
+);
+
+export type UseCreateIngredientsProps = Omit<
+  UseMutateProps<Ingredient, Error, void, Ingredient, void>,
+  "path" | "verb"
+>;
+
+/**
+ * Create a ingredient
+ */
+export const useCreateIngredients = (props: UseCreateIngredientsProps) =>
+  useMutate<Ingredient, Error, void, Ingredient, void>(
+    "POST",
     encode`/ingredients`,
     props
   );

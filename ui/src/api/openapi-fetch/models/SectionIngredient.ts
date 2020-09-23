@@ -60,6 +60,30 @@ export interface SectionIngredient {
      * @memberof SectionIngredient
      */
     grams?: number;
+    /**
+     * amount
+     * @type {number}
+     * @memberof SectionIngredient
+     */
+    amount?: number;
+    /**
+     * unit
+     * @type {string}
+     * @memberof SectionIngredient
+     */
+    unit?: string;
+    /**
+     * adjective
+     * @type {string}
+     * @memberof SectionIngredient
+     */
+    adjective?: string;
+    /**
+     * optional
+     * @type {boolean}
+     * @memberof SectionIngredient
+     */
+    optional?: boolean;
 }
 
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
@@ -77,6 +101,10 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'recipe': !exists(json, 'recipe') ? undefined : json['recipe'],
         'ingredient': !exists(json, 'ingredient') ? undefined : json['ingredient'],
         'grams': !exists(json, 'grams') ? undefined : json['grams'],
+        'amount': !exists(json, 'amount') ? undefined : json['amount'],
+        'unit': !exists(json, 'unit') ? undefined : json['unit'],
+        'adjective': !exists(json, 'adjective') ? undefined : json['adjective'],
+        'optional': !exists(json, 'optional') ? undefined : json['optional'],
     };
 }
 
@@ -94,6 +122,10 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'recipe': value.recipe,
         'ingredient': value.ingredient,
         'grams': value.grams,
+        'amount': value.amount,
+        'unit': value.unit,
+        'adjective': value.adjective,
+        'optional': value.optional,
     };
 }
 

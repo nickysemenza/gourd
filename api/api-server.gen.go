@@ -16,176 +16,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Error defines model for Error.
-type Error struct {
-	Code    int32  `json:"code"`
-	Message string `json:"message"`
-}
-
-// Ingredient defines model for Ingredient.
-type Ingredient struct {
-
-	// Ingredients that are equivalent
-	Children *[]Ingredient `json:"children,omitempty"`
-
-	// UUID
-	Id string `json:"id"`
-
-	// Ingredient name
-	Name string `json:"name"`
-
-	// Recipes referencing this ingredient
-	Recipes *[]Recipe `json:"recipes,omitempty"`
-}
-
-// List defines model for List.
-type List struct {
-
-	// How many items were requested for this page
-	Limit int `json:"limit"`
-
-	// todo
-	Offset int `json:"offset"`
-
-	// Total number of pages available
-	PageCount int `json:"page_count"`
-
-	// What number page this is
-	PageNumber int `json:"page_number"`
-
-	// Total number of items across all pages
-	TotalCount int `json:"total_count"`
-}
-
-// PaginatedIngredients defines model for PaginatedIngredients.
-type PaginatedIngredients struct {
-	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
-	Meta        *List         `json:"meta,omitempty"`
-}
-
-// PaginatedRecipes defines model for PaginatedRecipes.
-type PaginatedRecipes struct {
-	Meta    *List     `json:"meta,omitempty"`
-	Recipes *[]Recipe `json:"recipes,omitempty"`
-}
-
-// Recipe defines model for Recipe.
-type Recipe struct {
-
-	// UUID
-	Id string `json:"id"`
-
-	// recipe name
-	Name string `json:"name"`
-
-	// serving quantity
-	Quantity int `json:"quantity"`
-
-	// num servings
-	Servings *int `json:"servings,omitempty"`
-
-	// book or website? deprecated?
-	Source *string `json:"source,omitempty"`
-
-	// todo
-	TotalMinutes *int `json:"total_minutes,omitempty"`
-
-	// serving unit
-	Unit string `json:"unit"`
-}
-
-// RecipeDetail defines model for RecipeDetail.
-type RecipeDetail struct {
-
-	// A recipe
-	Recipe Recipe `json:"recipe"`
-
-	// sections of the recipe
-	Sections []RecipeSection `json:"sections"`
-}
-
-// RecipeSection defines model for RecipeSection.
-type RecipeSection struct {
-
-	// UUID
-	Id string `json:"id"`
-
-	// x
-	Ingredients []SectionIngredient `json:"ingredients"`
-
-	// x
-	Instructions []SectionInstruction `json:"instructions"`
-
-	// How many minutes the step takes, approximately (todo - make this a range)
-	Minutes int `json:"minutes"`
-}
-
-// SectionIngredient defines model for SectionIngredient.
-type SectionIngredient struct {
-
-	// weight in grams
-	Grams *float32 `json:"grams,omitempty"`
-
-	// UUID
-	Id string `json:"id"`
-
-	// An Ingredient
-	Ingredient *Ingredient `json:"ingredient,omitempty"`
-
-	// what kind of ingredient
-	Kind string `json:"kind"`
-
-	// A recipe
-	Recipe *Recipe `json:"recipe,omitempty"`
-}
-
-// SectionInstruction defines model for SectionInstruction.
-type SectionInstruction struct {
-
-	// UUID
-	Id string `json:"id"`
-
-	// instruction
-	Instruction string `json:"instruction"`
-}
-
-// LimitParam defines model for limitParam.
-type LimitParam int
-
-// OffsetParam defines model for offsetParam.
-type OffsetParam int
-
-// ListIngredientsParams defines parameters for ListIngredients.
-type ListIngredientsParams struct {
-
-	// The number of items to skip before starting to collect the result set.
-	Offset *OffsetParam `json:"offset,omitempty"`
-
-	// The numbers of items to return.
-	Limit *LimitParam `json:"limit,omitempty"`
-}
-
-// ListRecipesParams defines parameters for ListRecipes.
-type ListRecipesParams struct {
-
-	// The number of items to skip before starting to collect the result set.
-	Offset *OffsetParam `json:"offset,omitempty"`
-
-	// The numbers of items to return.
-	Limit *LimitParam `json:"limit,omitempty"`
-}
-
-// CreateRecipesJSONBody defines parameters for CreateRecipes.
-type CreateRecipesJSONBody RecipeDetail
-
-// CreateRecipesRequestBody defines body for CreateRecipes for application/json ContentType.
-type CreateRecipesJSONRequestBody CreateRecipesJSONBody
-
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// List all ingredients
 	// (GET /ingredients)
 	ListIngredients(ctx echo.Context, params ListIngredientsParams) error
+	// Create a ingredient
+	// (POST /ingredients)
+	CreateIngredients(ctx echo.Context) error
 	// List all recipes
 	// (GET /recipes)
 	ListRecipes(ctx echo.Context, params ListRecipesParams) error
@@ -224,6 +62,15 @@ func (w *ServerInterfaceWrapper) ListIngredients(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.ListIngredients(ctx, params)
+	return err
+}
+
+// CreateIngredients converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateIngredients(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CreateIngredients(ctx)
 	return err
 }
 
@@ -300,6 +147,7 @@ func RegisterHandlers(router EchoRouter, si ServerInterface) {
 	}
 
 	router.GET("/ingredients", wrapper.ListIngredients)
+	router.POST("/ingredients", wrapper.CreateIngredients)
 	router.GET("/recipes", wrapper.ListRecipes)
 	router.POST("/recipes", wrapper.CreateRecipes)
 	router.GET("/recipes/:recipe_id", wrapper.GetRecipeById)
@@ -309,31 +157,32 @@ func RegisterHandlers(router EchoRouter, si ServerInterface) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"X/UVu5Nsc7a/2/8VAAD//0eboQrZGAAA",
+	"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",
 }
 
 // GetSwagger returns the Swagger specification corresponding to the generated code

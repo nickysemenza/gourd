@@ -76,10 +76,11 @@ type SectionIngredient struct {
 	Adjective   zero.String `db:"adjective"`
 	Optional    zero.Bool   `db:"optional"`
 
-	// one of the following:
+	// one of the following is required for get and update:
 	RecipeUUID     zero.String `db:"recipe"`
 	IngredientUUID zero.String `db:"ingredient"`
 
+	// one of these is populated via gets
 	RawRecipe     *Recipe
 	RawIngredient *Ingredient
 

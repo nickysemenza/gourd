@@ -35,6 +35,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a ingredient
+      operationId: create_ingredients
+      tags:
+        - ingredients
+      requestBody:
+        description: Creates a ingredient by payload. If the UUID/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ingredient"
+      responses:
+        "201":
+          description: Newly created ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /recipes:
     get:
       summary: List all recipes
@@ -131,7 +156,6 @@ components:
       type: object
       required:
         - id
-        # - info
         - kind
       properties:
         id:
@@ -155,6 +179,20 @@ components:
         grams:
           description: weight in grams
           type: number
+          format: double # float64
+        amount:
+          description: amount
+          type: number
+          format: double # float64
+        unit:
+          description: unit
+          type: string
+        adjective:
+          description: adjective
+          type: string
+        optional:
+          description: optional
+          type: boolean
     SectionInstruction:
       description: Instructions in a single section
       type: object
@@ -183,6 +221,7 @@ components:
         minutes:
           description: How many minutes the step takes, approximately (todo - make this a range)
           type: integer
+          format: int64
         instructions:
           description: x
           type: array
@@ -226,15 +265,18 @@ components:
         total_minutes:
           description: todo
           type: integer
+          format: int64
         source:
           description: book or website? deprecated?
           type: string
         servings:
           description: num servings
           type: integer
+          format: int64
         quantity:
           description: serving quantity
           type: integer
+          format: int64
         unit:
           description: serving unit
           type: string

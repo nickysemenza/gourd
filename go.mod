@@ -12,9 +12,8 @@ require (
 	github.com/deepmap/oapi-codegen v1.3.13
 	github.com/dgraph-io/ristretto v0.0.2
 	github.com/getkin/kin-openapi v0.22.0
-	github.com/getsentry/sentry-go v0.6.1
-	github.com/go-chi/chi v4.1.0+incompatible
-	github.com/go-chi/cors v1.1.1 // indirect
+	github.com/getsentry/sentry-go v0.7.0
+	github.com/go-chi/chi v4.1.0+incompatible // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.10.0
 	github.com/jmoiron/sqlx v1.2.0
