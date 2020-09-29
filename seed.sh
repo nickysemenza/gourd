@@ -3,5 +3,3 @@
 ./bin/gourd scrape http://cooking.nytimes.com/recipes/1017060-doughnuts
 ./bin/gourd scrape http://cooking.nytimes.com/recipes/1017456-three-cup-chicken
 ./bin/gourd scrape http://www.seriouseats.com/recipes/2011/08/grilled-naan-recipe.html
-./bin/gourd scrape 
-./bin/gourd scrape 

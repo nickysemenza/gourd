@@ -84,10 +84,10 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 
 }
 func transformRecipeSections(dbs []db.Section) []RecipeSection {
-	var s []RecipeSection
+	s := make([]RecipeSection, 0)
 	for _, d := range dbs {
-		var ing []SectionIngredient
-		var ins []SectionInstruction
+		ing := make([]SectionIngredient, 1)
+		ins := make([]SectionInstruction, 1)
 
 		for _, i := range d.Instructions {
 			ins = append(ins, SectionInstruction{Id: i.UUID, Instruction: i.Instruction})
@@ -170,7 +170,6 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 			return nil, err
 		}
 		r.Recipe.Id = id
-
 	}
 	if err := a.DB().UpdateRecipe(ctx, r.toDB()); err != nil {
 		return nil, err
