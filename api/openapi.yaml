@@ -5,10 +5,10 @@ info:
   license:
     name: MIT
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/nickysemenza/sss/1.0.0
-  - url: http://food.nickysemenza.com/api
+  - description: test
+    url: http://localhost:4242/api
+  - description: prod
+    url: https://food.nickysemenza.com/api
 paths:
   /ingredients:
     get:
@@ -423,4 +423,5 @@ components:
         minimum: 1
         maximum: 50
         default: 20
+        format: "barz"
       description: The numbers of items to return.

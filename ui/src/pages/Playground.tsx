@@ -10,7 +10,7 @@ import Debug from "../components/Debug";
 
 const Playground: React.FC = () => {
   const url = "http://localhost:4242/api";
-  const foo = useListIngredients({ base: url });
+  const foo = useListIngredients({});
   const bar = useGet({ path: url + "/ingredients?limit=5&offset=10" });
   const [r2, setR2] = useState<PaginatedIngredients>();
 

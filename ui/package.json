@@ -41,7 +41,7 @@
     "prebuild": "run-s build:tailwind",
     "start": "npm-run-all build:tailwind --parallel watch:tailwind start:react",
     "x": "x",
-    "start:react": "REACT_APP_GQL_URL=http://localhost:4242 react-scripts -r @cypress/instrument-cra start",
+    "start:react": "REACT_APP_API_URL=http://localhost:4242 react-scripts -r @cypress/instrument-cra start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

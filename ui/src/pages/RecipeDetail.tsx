@@ -31,7 +31,7 @@ const RecipeDetail: React.FC = () => {
 
   const { mutate: post } = useCreateRecipes({
     onMutate: (_, data) => {
-      setRecipe(data);
+      // setRecipe(data);
     },
   });
 
@@ -198,6 +198,14 @@ const RecipeDetail: React.FC = () => {
       );
   };
 
+  const updateRecipeName = (value: string) => {
+    setRecipe(
+      update(recipe, {
+        recipe: { name: { $set: value } },
+      })
+    );
+  };
+
   const addInstruction = (sectionID: number) => {
     setRecipe(
       update(recipe, {
@@ -250,9 +258,17 @@ const RecipeDetail: React.FC = () => {
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
         <div>
-          <h2 className="text-2xl font-bold leading-7 text-gray-900">
-            {info.name}
-          </h2>
+          {edit ? (
+            <input
+              className="border-2"
+              value={info.name}
+              onChange={(e) => updateRecipeName(e.target.value)}
+            ></input>
+          ) : (
+            <h2 className="text-2xl font-bold leading-7 text-gray-900">
+              {info.name}
+            </h2>
+          )}
 
           <div className="flex">
             {/* {info.source && (

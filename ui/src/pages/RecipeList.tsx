@@ -26,7 +26,6 @@ const RecipeList: React.FC = () => {
   }, []);
 
   const { data, error } = useListRecipes({
-    base: "http://localhost:4242/api",
     queryParams: params,
   });
 

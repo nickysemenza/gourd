@@ -25,9 +25,7 @@ context("Basic Create, List, Edit test", () => {
     cy.contains("add section").click();
     cy.contains("add ingredient").click();
     cy.get("input[data-cy=grams-input]").first().type("{selectall}4");
-    cy.get("div[data-cy=name-input]")
-      .eq(1)
-      .type(`{selectall}${newIngredient}{enter}`);
+    cy.get("div[data-cy=name-input]").first().type(`${newIngredient}{enter}`);
     cy.wait(500);
     cy.contains("add instruction").click();
     cy.get("input[data-cy=instruction-input]").first().type("mix");
