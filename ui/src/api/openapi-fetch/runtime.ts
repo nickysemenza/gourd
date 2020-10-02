@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://virtserver.swaggerhub.com/nickysemenza/sss/1.0.0".replace(/\/+$/, "");
+export const BASE_PATH = "http://localhost:4242/api".replace(/\/+$/, "");
 
 const isBlob = (value: any) => typeof Blob !== 'undefined' && value instanceof Blob;
 

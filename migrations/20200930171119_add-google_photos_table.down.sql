@@ -1,0 +1,1 @@
+DROP TABLE gphotos_photos DROP TABLE gphotos_albums

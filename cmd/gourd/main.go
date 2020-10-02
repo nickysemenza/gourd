@@ -44,6 +44,14 @@ func init() {
 			},
 		},
 		&cobra.Command{
+			Use:   "sync",
+			Short: "Run the server",
+			RunE: func(cmd *cobra.Command, args []string) error {
+				s := makeServer()
+				return s.Manager.Google.SyncAlbums(context.Background())
+			},
+		},
+		&cobra.Command{
 			Use:   "ingredient-parse [ingredient]",
 			Short: "parse an ingredient",
 			Args:  cobra.MinimumNArgs(1),

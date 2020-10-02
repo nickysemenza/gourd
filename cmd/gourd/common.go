@@ -61,12 +61,25 @@ func setupEnv() {
 	viper.SetDefault("SENTRY_DSN", "https://8220ab8a2b3d4c3c9cf7f636ec183c7a@o83311.ingest.sentry.io/5298706")
 
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
+
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
+	}
+
 }
 
 func setupMisc() {
 	// env vars
 	setupEnv()
 	viper.AutomaticEnv()
+	// if err := viper.WriteConfig(); err != nil {
+	// 	panic(err)
+	// }
 
 	// tracing
 	if err := initTracer(); err != nil {

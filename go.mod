@@ -29,6 +29,8 @@ require (
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/flatbuffers v1.12.0 // indirect
 	github.com/google/uuid v1.1.2 // indirect
+	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
+	github.com/gphotosuploader/googlemirror v0.3.5
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
@@ -65,11 +67,12 @@ require (
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.11.0
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.11.0
 	go.opentelemetry.io/otel/sdk v0.11.0
+	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
 	golang.org/x/sys v0.0.0-20200922070232-aee5d888a860 // indirect
 	golang.org/x/tools v0.0.0-20200923014426-f5e916c686e1
+	google.golang.org/api v0.32.0
 	google.golang.org/genproto v0.0.0-20200921165018-b9da36f5f452 // indirect
 	gopkg.in/guregu/null.v3 v3.5.0
-	gopkg.in/yaml.v2 v2.3.0
 	modernc.org/golex v1.0.1 // indirect
 	modernc.org/ql v1.1.0 // indirect
 )
