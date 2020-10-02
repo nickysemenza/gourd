@@ -176,6 +176,24 @@ export interface IngredientDetail {
   children?: Ingredient[];
 }
 
+/**
+ * A google photo
+ */
+export interface GooglePhoto {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * public image
+   */
+  base_url: string;
+  /**
+   * when it was taken
+   */
+  created: string;
+}
+
 export interface Error {
   code: number;
   message: string;
@@ -213,6 +231,51 @@ export interface PaginatedIngredients {
   ingredients?: IngredientDetail[];
   meta?: List;
 }
+
+export interface PaginatedPhotos {
+  photos?: GooglePhoto[];
+  meta?: List;
+}
+
+export interface ListPhotosQueryParams {
+  /**
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
+   */
+  limit?: number;
+}
+
+export type ListPhotosProps = Omit<
+  GetProps<PaginatedPhotos, Error, ListPhotosQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all photos
+ */
+export const ListPhotos = (props: ListPhotosProps) => (
+  <Get<PaginatedPhotos, Error, ListPhotosQueryParams, void>
+    path={encode`/photos`}
+    {...props}
+  />
+);
+
+export type UseListPhotosProps = Omit<
+  UseGetProps<PaginatedPhotos, Error, ListPhotosQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all photos
+ */
+export const useListPhotos = (props: UseListPhotosProps) =>
+  useGet<PaginatedPhotos, Error, ListPhotosQueryParams, void>(
+    encode`/photos`,
+    props
+  );
 
 export interface ListIngredientsQueryParams {
   /**

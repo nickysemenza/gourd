@@ -18,9 +18,17 @@ import {
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
+    PaginatedPhotos,
+    PaginatedPhotosFromJSON,
+    PaginatedPhotosToJSON,
 } from '../models';
 
 export interface ListIngredientsRequest {
+    offset?: number;
+    limit?: number;
+}
+
+export interface ListPhotosRequest {
     offset?: number;
     limit?: number;
 }
@@ -34,7 +42,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * List all ingredients
      */
     async listIngredientsRaw(requestParameters: ListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -61,6 +69,40 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async listIngredients(requestParameters: ListIngredientsRequest): Promise<PaginatedIngredients> {
         const response = await this.listIngredientsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * List all photos
+     */
+    async listPhotosRaw(requestParameters: ListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/photos`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedPhotosFromJSON(jsonValue));
+    }
+
+    /**
+     * List all photos
+     */
+    async listPhotos(requestParameters: ListPhotosRequest): Promise<PaginatedPhotos> {
+        const response = await this.listPhotosRaw(requestParameters);
         return await response.value();
     }
 

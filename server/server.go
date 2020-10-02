@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -91,10 +92,25 @@ func (s *Server) Run(_ context.Context) error {
 	g := r.Group("/api")
 	api.RegisterHandlers(g, s.APIManager)
 
-	r.GET("/recipes/{uuid}", s.GetRecipe)
-
 	r.GET("/routes", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, r.Routes())
+	})
+
+	r.GET("/auth/redirect", func(c echo.Context) error {
+		return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())
+	})
+	r.GET("/auth/callback", func(c echo.Context) error {
+		code := c.Request().FormValue("code")
+		return c.JSON(http.StatusOK, s.APIManager.Google.Finish(c.Request().Context(), code))
+	})
+
+	r.GET("/photos", func(c echo.Context) error {
+		pics, err := s.APIManager.Google.GetTest(c.Request().Context())
+		if err != nil {
+			spew.Dump(err)
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		return c.JSON(http.StatusOK, pics)
 	})
 
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
@@ -104,12 +120,6 @@ func (s *Server) Run(_ context.Context) error {
 			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
 		),
 	)
-}
-
-func (s *Server) GetRecipe(c echo.Context) error {
-	recipe, _ := s.Manager.GetRecipe(c.Request().Context(), c.QueryParam("uuid"))
-	return c.JSON(http.StatusOK, recipe)
-	// writeJSON(w, http.StatusOK, recipe)
 }
 
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {

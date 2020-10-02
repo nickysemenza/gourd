@@ -16,6 +16,7 @@ import (
 
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/server"
 )
@@ -58,6 +59,11 @@ func makeServer() server.Server {
 	}
 
 	m := manager.New(dbClient)
+	m.Google = google.New(dbClient,
+		viper.GetString("GOOGLE_CLIENT_ID"),
+		viper.GetString("GOOGLE_CLIENT_SECRET"),
+		viper.GetString("GOOGLE_REDIRECT_URL"),
+	)
 	apiManager := api.NewAPI(m)
 
 	// server

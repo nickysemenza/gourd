@@ -10,6 +10,26 @@ servers:
   - description: prod
     url: https://food.nickysemenza.com/api
 paths:
+  /photos:
+    get:
+      summary: List all photos
+      operationId: list_photos
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A page of photos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPhotos"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients:
     get:
       summary: List all ingredients
@@ -349,6 +369,24 @@ components:
     #   type: array
     #   items:
     #     $ref: "#/components/schemas/Recipe"
+    GooglePhoto:
+      description: A google photo
+      type: object
+      required:
+        - id
+        - base_url
+        - created
+      properties:
+        id:
+          description: id
+          type: string
+        base_url:
+          description: public image
+          type: string
+        created:
+          description: when it was taken
+          type: string
+          format: date-time
     Error:
       type: object
       required:
@@ -405,6 +443,15 @@ components:
             $ref: "#/components/schemas/IngredientDetail"
         meta:
           $ref: "#/components/schemas/List"
+    PaginatedPhotos:
+      type: object
+      properties:
+        photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/GooglePhoto"
+        meta:
+          $ref: "#/components/schemas/List"
   parameters:
     offsetParam:
       in: query
@@ -423,5 +470,4 @@ components:
         minimum: 1
         maximum: 50
         default: 20
-        format: "barz"
       description: The numbers of items to return.

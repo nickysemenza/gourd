@@ -1,16 +1,14 @@
 package manager
 
 import (
-	"context"
-	"io/ioutil"
-
 	"github.com/nickysemenza/gourd/db"
-	yaml "gopkg.in/yaml.v2"
+	"github.com/nickysemenza/gourd/google"
 )
 
 // Manager manages recipes
 type Manager struct {
-	db *db.Client
+	db     *db.Client
+	Google *google.Client
 }
 
 func New(db *db.Client) *Manager {
@@ -19,26 +17,4 @@ func New(db *db.Client) *Manager {
 
 func (m *Manager) DB() *db.Client {
 	return m.db
-}
-
-func (m *Manager) LoadFromFile(ctx context.Context, filename string) (*Recipe, error) {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	r := &Recipe{}
-	err = yaml.Unmarshal(data, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
-}
-
-func (m *Manager) GetRecipe(ctx context.Context, uuid string) (*Recipe, error) {
-	r, err := m.db.GetRecipeByUUIDFull(ctx, uuid)
-	if err != nil {
-		return nil, err
-	}
-	return FromRecipe(r), nil
 }

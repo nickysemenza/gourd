@@ -234,6 +234,37 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
+func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
+	ctx := c.Request().Context()
+	photos, err := a.Manager.DB().GetPhotos(ctx)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	items := []GooglePhoto{}
+	var ids []string
+	for _, p := range photos {
+		items = append(items, GooglePhoto{Id: p.PhotoID, Created: p.Created})
+		ids = append(ids, p.PhotoID)
+	}
+
+	urls, err := a.Manager.Google.GetBaseURLs(ctx, ids)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	for x, item := range items {
+		url, ok := urls[item.Id]
+		if !ok {
+			continue
+		}
+		items[x].BaseUrl = url
+	}
+
+	resp := PaginatedPhotos{
+		Photos: &items,
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
 func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
 	offset := 0
 	limit := 20
