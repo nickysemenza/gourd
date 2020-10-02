@@ -48,7 +48,17 @@ func init() {
 			Short: "Run the server",
 			RunE: func(cmd *cobra.Command, args []string) error {
 				s := makeServer()
-				return s.Manager.Google.SyncAlbums(context.Background())
+				ctx := context.Background()
+				err := s.Manager.Google.SyncAlbums(ctx)
+				if err != nil {
+					return err
+				}
+				err = s.DB.SyncMealsFromPhotos(ctx)
+				if err != nil {
+					return err
+				}
+
+				return nil
 			},
 		},
 		&cobra.Command{

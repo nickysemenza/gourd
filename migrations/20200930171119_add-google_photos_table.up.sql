@@ -7,5 +7,14 @@ CREATE TABLE "gphotos_photos" (
     "id" text NOT NULL,
     "album_id" text references gphotos_albums(id) NOT NULL,
     "creation_time" timestamp NOT NULL,
+    "last_seen" timestamp NOT NULL DEFAULT now(),
     PRIMARY KEY ("id")
 );
+CREATE TABLE IF NOT EXISTS "meal_photo" (
+    "meal" TEXT references meals(uuid) NOT NULL,
+    "gphotos_id" TEXT references gphotos_photos(id) NOT NULL,
+    "highlight_recipe" TEXT references recipes(uuid),
+    unique (meal, gphotos_id)
+);
+ALTER TABLE "meals"
+ADD COLUMN "ate_at" timestamp NOT NULL;

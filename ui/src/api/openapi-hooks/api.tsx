@@ -194,6 +194,25 @@ export interface GooglePhoto {
   created: string;
 }
 
+/**
+ * A google photo
+ */
+export interface Meal {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * public image
+   */
+  name: string;
+  /**
+   * when it was taken
+   */
+  ate_at: string;
+  photos: GooglePhoto[];
+}
+
 export interface Error {
   code: number;
   message: string;
@@ -237,6 +256,11 @@ export interface PaginatedPhotos {
   meta?: List;
 }
 
+export interface PaginatedMeals {
+  meals?: Meal[];
+  meta?: List;
+}
+
 export interface ListPhotosQueryParams {
   /**
    * The number of items to skip before starting to collect the result set.
@@ -274,6 +298,46 @@ export type UseListPhotosProps = Omit<
 export const useListPhotos = (props: UseListPhotosProps) =>
   useGet<PaginatedPhotos, Error, ListPhotosQueryParams, void>(
     encode`/photos`,
+    props
+  );
+
+export interface ListMealsQueryParams {
+  /**
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
+   */
+  limit?: number;
+}
+
+export type ListMealsProps = Omit<
+  GetProps<PaginatedMeals, Error, ListMealsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all meals
+ */
+export const ListMeals = (props: ListMealsProps) => (
+  <Get<PaginatedMeals, Error, ListMealsQueryParams, void>
+    path={encode`/meals`}
+    {...props}
+  />
+);
+
+export type UseListMealsProps = Omit<
+  UseGetProps<PaginatedMeals, Error, ListMealsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * List all meals
+ */
+export const useListMeals = (props: UseListMealsProps) =>
+  useGet<PaginatedMeals, Error, ListMealsQueryParams, void>(
+    encode`/meals`,
     props
   );
 

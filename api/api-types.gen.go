@@ -68,10 +68,30 @@ type List struct {
 	TotalCount int `json:"total_count"`
 }
 
+// Meal defines model for Meal.
+type Meal struct {
+
+	// when it was taken
+	AteAt time.Time `json:"ate_at"`
+
+	// id
+	Id string `json:"id"`
+
+	// public image
+	Name   string        `json:"name"`
+	Photos []GooglePhoto `json:"photos"`
+}
+
 // PaginatedIngredients defines model for PaginatedIngredients.
 type PaginatedIngredients struct {
 	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
 	Meta        *List               `json:"meta,omitempty"`
+}
+
+// PaginatedMeals defines model for PaginatedMeals.
+type PaginatedMeals struct {
+	Meals *[]Meal `json:"meals,omitempty"`
+	Meta  *List   `json:"meta,omitempty"`
 }
 
 // PaginatedPhotos defines model for PaginatedPhotos.
@@ -196,6 +216,16 @@ type ListIngredientsParams struct {
 
 // CreateIngredientsJSONBody defines parameters for CreateIngredients.
 type CreateIngredientsJSONBody Ingredient
+
+// ListMealsParams defines parameters for ListMeals.
+type ListMealsParams struct {
+
+	// The number of items to skip before starting to collect the result set.
+	Offset *OffsetParam `json:"offset,omitempty"`
+
+	// The numbers of items to return.
+	Limit *LimitParam `json:"limit,omitempty"`
+}
 
 // ListPhotosParams defines parameters for ListPhotos.
 type ListPhotosParams struct {
