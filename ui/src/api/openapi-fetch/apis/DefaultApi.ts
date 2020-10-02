@@ -18,12 +18,20 @@ import {
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
+    PaginatedMeals,
+    PaginatedMealsFromJSON,
+    PaginatedMealsToJSON,
     PaginatedPhotos,
     PaginatedPhotosFromJSON,
     PaginatedPhotosToJSON,
 } from '../models';
 
 export interface ListIngredientsRequest {
+    offset?: number;
+    limit?: number;
+}
+
+export interface ListMealsRequest {
     offset?: number;
     limit?: number;
 }
@@ -42,7 +50,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * List all ingredients
      */
     async listIngredientsRaw(requestParameters: ListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -73,10 +81,44 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * List all meals
+     */
+    async listMealsRaw(requestParameters: ListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/meals`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedMealsFromJSON(jsonValue));
+    }
+
+    /**
+     * List all meals
+     */
+    async listMeals(requestParameters: ListMealsRequest): Promise<PaginatedMeals> {
+        const response = await this.listMealsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * List all photos
      */
     async listPhotosRaw(requestParameters: ListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;

@@ -30,6 +30,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /meals:
+    get:
+      summary: List all meals
+      operationId: list_meals
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A page of meals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMeals"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients:
     get:
       summary: List all ingredients
@@ -387,6 +407,29 @@ components:
           description: when it was taken
           type: string
           format: date-time
+    Meal:
+      description: A google photo
+      type: object
+      required:
+        - id
+        - name
+        - ate_at
+        - photos
+      properties:
+        id:
+          description: id
+          type: string
+        name:
+          description: public image
+          type: string
+        ate_at:
+          description: when it was taken
+          type: string
+          format: date-time
+        photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/GooglePhoto"
     Error:
       type: object
       required:
@@ -450,6 +493,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GooglePhoto"
+        meta:
+          $ref: "#/components/schemas/List"
+    PaginatedMeals:
+      type: object
+      properties:
+        meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
         meta:
           $ref: "#/components/schemas/List"
   parameters:

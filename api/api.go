@@ -234,12 +234,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
-	ctx := c.Request().Context()
-	photos, err := a.Manager.DB().GetPhotos(ctx)
-	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
-	}
+func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo) ([]GooglePhoto, error) {
 	items := []GooglePhoto{}
 	var ids []string
 	for _, p := range photos {
@@ -249,7 +244,7 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 
 	urls, err := a.Manager.Google.GetBaseURLs(ctx, ids)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
 	for x, item := range items {
 		url, ok := urls[item.Id]
@@ -258,9 +253,53 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 		}
 		items[x].BaseUrl = url
 	}
+	return items, nil
+}
+func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
+	ctx := c.Request().Context()
+	photos, err := a.Manager.DB().GetPhotos(ctx)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	items, err := a.fromDBPhoto(ctx, photos)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
 
 	resp := PaginatedPhotos{
 		Photos: &items,
+	}
+	return c.JSON(http.StatusOK, resp)
+}
+
+func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
+	ctx := c.Request().Context()
+
+	items := []Meal{}
+
+	meals, err := a.DB().GetAllMeals(ctx)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	for _, m := range meals {
+		meal := Meal{Id: m.ID, Name: m.Name, AteAt: m.AteAt}
+
+		photos, err := a.DB().GetPhotosForMeal(ctx, m.ID)
+		if err != nil {
+			return sendErr(c, http.StatusInternalServerError, err)
+		}
+
+		photos2, err := a.fromDBPhoto(ctx, photos)
+		if err != nil {
+			return sendErr(c, http.StatusInternalServerError, err)
+		}
+		meal.Photos = photos2
+
+		items = append(items, meal)
+	}
+
+	resp := PaginatedMeals{
+		Meals: &items,
 	}
 	return c.JSON(http.StatusOK, resp)
 }

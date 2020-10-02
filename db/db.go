@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
@@ -352,7 +351,7 @@ func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interf
 	}
 	err = c.db.GetContext(ctx, dest, query, args...)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return fmt.Errorf("failed to GetContext: %w", err)
+		return fmt.Errorf("failed to GetContext: (%s %s) %w", query, args, err)
 	}
 	return nil
 }
@@ -380,47 +379,4 @@ func (c *Client) execContext(ctx context.Context, q sq.InsertBuilder) (sql.Resul
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 	return c.db.ExecContext(ctx, query, args...)
-}
-
-func (c *Client) GetKV(ctx context.Context, key string) (string, error) {
-	var json string
-	q := c.psql.Select("value").From("kv").Where(sq.Eq{"key": key})
-	err := c.getContext(ctx, q, &json)
-	return json, err
-}
-func (c *Client) SetKV(ctx context.Context, key string, json string) error {
-	q := c.psql.Insert("kv").Columns("key", "value").Values(key, json).Suffix("ON CONFLICT (key) DO UPDATE SET value = ?", json)
-	_, err := c.execContext(ctx, q)
-	return err
-}
-
-func (c *Client) GetAlbums(ctx context.Context) ([]string, error) {
-	var albums []string
-	q := c.psql.Select("id").From("gphotos_albums")
-	err := c.selectContext(ctx, q, &albums)
-	return albums, err
-}
-
-type Photo struct {
-	AlbumID string    `db:"album_id"`
-	PhotoID string    `db:"id"`
-	Created time.Time `db:"creation_time"`
-}
-
-func (c *Client) UpsertPhotos(ctx context.Context, photos []Photo) error {
-	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time")
-	for _, photo := range photos {
-		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created)
-	}
-	q = q.Suffix("ON CONFLICT (id) DO NOTHING")
-	_, err := c.execContext(ctx, q)
-	return err
-}
-
-func (c *Client) GetPhotos(ctx context.Context) ([]Photo, error) {
-	q := c.psql.Select("*").From("gphotos_photos").OrderBy("creation_time DESC")
-	var results []Photo
-	err := c.selectContext(ctx, q, &results)
-	return results, err
-
 }
