@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	gphotos "github.com/gphotosuploader/google-photos-api-client-go/lib-gphotos"
@@ -63,15 +64,35 @@ func (c *Client) GetBaseURLs(ctx context.Context, ids []string) (map[string]stri
 	defer span.End()
 	chunks := chunkBy(ids, maxPhotoBatchGet)
 	urls := map[string]string{}
+	// for _, chunk := range chunks {
+	// 	items, err := c.batchGet(ctx, chunk)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	for _, item := range items {
+	// 		urls[item.Id] = item.BaseUrl
+	// 	}
+	// }
+	wg := sync.WaitGroup{}
+	var m sync.Mutex
 	for _, chunk := range chunks {
-		items, err := c.batchGet(ctx, chunk)
-		if err != nil {
-			return nil, err
-		}
-		for _, item := range items {
-			urls[item.Id] = item.BaseUrl
-		}
+		wg.Add(1)
+		go func(chunk []string) {
+			items, err := c.batchGet(ctx, chunk)
+			if err != nil {
+				log.Error(err)
+			}
+			m.Lock()
+			for _, item := range items {
+				urls[item.Id] = item.BaseUrl
+			}
+			m.Unlock()
+			wg.Done()
+		}(chunk)
 	}
+
+	wg.Wait()
+
 	return urls, nil
 
 }

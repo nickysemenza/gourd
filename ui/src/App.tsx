@@ -15,6 +15,7 @@ import Playground from "./pages/Playground";
 import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
+import Meals from "./pages/Meals";
 
 function App() {
   const client = new ApolloClient({
@@ -47,6 +48,9 @@ function App() {
               </Route>
               <Route path="/photos">
                 <Photos />
+              </Route>
+              <Route path="/meals">
+                <Meals />
               </Route>
               <Route path="/">
                 <Test />

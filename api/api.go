@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
+	"go.opentelemetry.io/otel/api/global"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
@@ -234,7 +235,9 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo) ([]GooglePhoto, error) {
+func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) ([]GooglePhoto, []string, error) {
+	ctx, span := global.Tracer("api").Start(ctx, "google.fromDBPhoto")
+	defer span.End()
 	items := []GooglePhoto{}
 	var ids []string
 	for _, p := range photos {
@@ -242,18 +245,20 @@ func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo) ([]GooglePhoto
 		ids = append(ids, p.PhotoID)
 	}
 
-	urls, err := a.Manager.Google.GetBaseURLs(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-	for x, item := range items {
-		url, ok := urls[item.Id]
-		if !ok {
-			continue
+	if getURLs {
+		urls, err := a.Manager.Google.GetBaseURLs(ctx, ids)
+		if err != nil {
+			return nil, nil, err
 		}
-		items[x].BaseUrl = url
+		for x, item := range items {
+			url, ok := urls[item.Id]
+			if !ok {
+				continue
+			}
+			items[x].BaseUrl = url
+		}
 	}
-	return items, nil
+	return items, ids, nil
 }
 func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	ctx := c.Request().Context()
@@ -261,7 +266,7 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
-	items, err := a.fromDBPhoto(ctx, photos)
+	items, _, err := a.fromDBPhoto(ctx, photos, true)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -281,6 +286,7 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	var gphotoIDs []string
 	for _, m := range meals {
 		meal := Meal{Id: m.ID, Name: m.Name, AteAt: m.AteAt}
 
@@ -289,13 +295,27 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 			return sendErr(c, http.StatusInternalServerError, err)
 		}
 
-		photos2, err := a.fromDBPhoto(ctx, photos)
+		photos2, gIDs, err := a.fromDBPhoto(ctx, photos, false)
 		if err != nil {
 			return sendErr(c, http.StatusInternalServerError, err)
 		}
 		meal.Photos = photos2
+		gphotoIDs = append(gphotoIDs, gIDs...)
 
 		items = append(items, meal)
+	}
+	urls, err := a.Manager.Google.GetBaseURLs(ctx, gphotoIDs)
+	if err != nil {
+		return err
+	}
+	for x, item := range items {
+		for y, photo := range item.Photos {
+			url, ok := urls[photo.Id]
+			if !ok {
+				continue
+			}
+			items[x].Photos[y].BaseUrl = url
+		}
 	}
 
 	resp := PaginatedMeals{
