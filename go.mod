@@ -20,6 +20,7 @@ require (
 	github.com/deepmap/oapi-codegen v1.3.13
 	github.com/denisenkom/go-mssqldb v0.0.0-20200910202707-1e08a3fab204 // indirect
 	github.com/dgraph-io/ristretto v0.0.3
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/getkin/kin-openapi v0.22.0
 	github.com/getsentry/sentry-go v0.7.0

@@ -1,3 +1,4 @@
+export * from './AuthResp';
 export * from './GooglePhoto';
 export * from './Ingredient';
 export * from './IngredientDetail';

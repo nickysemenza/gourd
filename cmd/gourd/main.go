@@ -47,9 +47,12 @@ func init() {
 			Use:   "sync",
 			Short: "Run the server",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s := makeServer()
+				s, err := makeServer()
+				if err != nil {
+					return err
+				}
 				ctx := context.Background()
-				err := s.Manager.Google.SyncAlbums(ctx)
+				err = s.Manager.Google.SyncAlbums(ctx)
 				if err != nil {
 					return err
 				}
@@ -80,7 +83,10 @@ func init() {
 			Short: "scrape a recipe",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s := makeServer()
+				s, err := makeServer()
+				if err != nil {
+					return err
+				}
 				ctx := context.Background()
 
 				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientUUIDByName)

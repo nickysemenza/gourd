@@ -36,7 +36,7 @@ func TestCreateUpdateList(t *testing.T) {
 	tdb := db.NewDB(t)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
 		Resolvers: &Resolver{
-			Manager: manager.New(tdb),
+			Manager: manager.New(tdb, nil, nil),
 			DB:      tdb,
 		}},
 	))

@@ -323,6 +323,19 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	}
 	return c.JSON(http.StatusOK, resp)
 }
+func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
+	ctx := c.Request().Context()
+	jwt, rawUser, err := a.Manager.ProcessGoogleAuth(ctx, params.Code)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	resp := AuthResp{
+		Jwt:  jwt,
+		User: rawUser,
+	}
+	return c.JSON(http.StatusOK, resp)
+}
 
 func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
 	offset := 0

@@ -218,6 +218,11 @@ export interface Error {
   message: string;
 }
 
+export interface AuthResp {
+  user: { [key: string]: any };
+  jwt: string;
+}
+
 export interface List {
   /**
    * What number page this is
@@ -260,6 +265,44 @@ export interface PaginatedMeals {
   meals?: Meal[];
   meta?: List;
 }
+
+export interface AuthLoginQueryParams {
+  /**
+   * Google code
+   */
+  code: string;
+}
+
+export type AuthLoginProps = Omit<
+  MutateProps<AuthResp, Error, AuthLoginQueryParams, void, void>,
+  "path" | "verb"
+>;
+
+/**
+ * Login
+ */
+export const AuthLogin = (props: AuthLoginProps) => (
+  <Mutate<AuthResp, Error, AuthLoginQueryParams, void, void>
+    verb="POST"
+    path={encode`/auth`}
+    {...props}
+  />
+);
+
+export type UseAuthLoginProps = Omit<
+  UseMutateProps<AuthResp, Error, AuthLoginQueryParams, void, void>,
+  "path" | "verb"
+>;
+
+/**
+ * Login
+ */
+export const useAuthLogin = (props: UseAuthLoginProps) =>
+  useMutate<AuthResp, Error, AuthLoginQueryParams, void, void>(
+    "POST",
+    encode`/auth`,
+    props
+  );
 
 export interface ListPhotosQueryParams {
   /**

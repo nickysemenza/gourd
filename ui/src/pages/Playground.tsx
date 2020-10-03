@@ -7,9 +7,10 @@ import {
 } from "../api/openapi-fetch";
 import { useListIngredients } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
+import { getAPIURL } from "../config";
 
 const Playground: React.FC = () => {
-  const url = "http://localhost:4242/api";
+  const url = getAPIURL();
   const foo = useListIngredients({});
   const bar = useGet({ path: url + "/ingredients?limit=5&offset=10" });
   const [r2, setR2] = useState<PaginatedIngredients>();
@@ -23,7 +24,7 @@ const Playground: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [url]);
 
   return (
     <div className="grid grid-cols-2 gap-4">

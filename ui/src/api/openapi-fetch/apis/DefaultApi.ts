@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    AuthResp,
+    AuthRespFromJSON,
+    AuthRespToJSON,
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
@@ -25,6 +28,10 @@ import {
     PaginatedPhotosFromJSON,
     PaginatedPhotosToJSON,
 } from '../models';
+
+export interface AuthLoginRequest {
+    code: string;
+}
 
 export interface ListIngredientsRequest {
     offset?: number;
@@ -45,6 +52,40 @@ export interface ListPhotosRequest {
  * 
  */
 export class DefaultApi extends runtime.BaseAPI {
+
+    /**
+     * Login
+     */
+    async authLoginRaw(requestParameters: AuthLoginRequest): Promise<runtime.ApiResponse<AuthResp>> {
+        if (requestParameters.code === null || requestParameters.code === undefined) {
+            throw new runtime.RequiredError('code','Required parameter requestParameters.code was null or undefined when calling authLogin.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.code !== undefined) {
+            queryParameters['code'] = requestParameters.code;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/auth`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AuthRespFromJSON(jsonValue));
+    }
+
+    /**
+     * Login
+     */
+    async authLogin(requestParameters: AuthLoginRequest): Promise<AuthResp> {
+        const response = await this.authLoginRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * List all ingredients

@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+// AuthResp defines model for AuthResp.
+type AuthResp struct {
+	Jwt  string                 `json:"jwt"`
+	User map[string]interface{} `json:"user"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Code    int32  `json:"code"`
@@ -203,6 +209,13 @@ type LimitParam int
 
 // OffsetParam defines model for offsetParam.
 type OffsetParam int
+
+// AuthLoginParams defines parameters for AuthLogin.
+type AuthLoginParams struct {
+
+	// Google code
+	Code string `json:"code"`
+}
 
 // ListIngredientsParams defines parameters for ListIngredients.
 type ListIngredientsParams struct {
