@@ -19,6 +19,8 @@ const maxPhotoBatchGet = 50
 type Client struct {
 	oc oauth2.Config
 	db *db.Client
+
+	_token *oauth2.Token
 }
 
 func New(db *db.Client, clientID, clientSecret, redirectURL string) *Client {
@@ -33,7 +35,7 @@ func New(db *db.Client, clientID, clientSecret, redirectURL string) *Client {
 			gauth.UserinfoEmailScope,
 		},
 	}
-	return &Client{oc, db}
+	return &Client{oc: oc, db: db}
 }
 func (c *Client) GetURL() string {
 	return c.oc.AuthCodeURL("state", oauth2.AccessTypeOffline)
@@ -57,6 +59,11 @@ func (c *Client) Finish(ctx context.Context, code string) error {
 func (c *Client) getToken(ctx context.Context) (*oauth2.Token, error) {
 	ctx, span := global.Tracer("google").Start(ctx, "google.getToken")
 	defer span.End()
+
+	if c._token != nil {
+		return c._token, nil
+	}
+
 	var token oauth2.Token
 	res, err := c.db.GetKV(ctx, "gphotos-oauth2-token")
 	if err != nil {
@@ -67,6 +74,7 @@ func (c *Client) getToken(ctx context.Context) (*oauth2.Token, error) {
 	if err != nil {
 		return nil, err
 	}
+	c._token = &token
 	return &token, nil
 }
 

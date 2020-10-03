@@ -6,7 +6,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/lib/pq"
 )
 
@@ -81,15 +80,14 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 			if err != sql.ErrNoRows {
 				return err
 			}
+			//insert
 			mealID = getUUID()
 			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, "n/a")
 			_, err := c.execContext(ctx, iq)
 			if err != nil {
 				return err
 			}
-			// log.Info("need to insert")
 		}
-		spew.Dump(mealID)
 
 		q := c.psql.Insert("meal_photo").Columns("meal", "gphotos_id").Values(mealID, m.PhotoID)
 		_, err = c.execContext(ctx, q)
@@ -111,7 +109,7 @@ type Meal struct {
 func (c *Client) GetAllMeals(ctx context.Context) ([]Meal, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
-	q := c.psql.Select("uuid", "name", "ate_at").From("meals")
+	q := c.psql.Select("uuid", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
 	var results []Meal
 	err := c.selectContext(ctx, q, &results)
 	return results, err
