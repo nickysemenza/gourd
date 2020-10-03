@@ -1,8 +1,11 @@
 import React from "react";
+import Login from "./components/Login";
 
 const Test: React.FC = () => {
   return (
     <div>
+      <Login />
+
       {/* https://mertjf.github.io/tailblocks/ */}
       <section className="text-gray-700 body-font">
         <div className="container px-5 py-24 mx-auto">

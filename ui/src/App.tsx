@@ -16,52 +16,56 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
+import { getAPIURL, getGQLURL } from "./config";
+import { CookiesProvider } from "react-cookie";
 
 function App() {
   const client = new ApolloClient({
-    uri: process.env.REACT_APP_API_URL + "/query",
+    uri: getGQLURL(),
   });
   return (
-    <RestfulProvider base={process.env.REACT_APP_API_URL + "/api"}>
-      <ApolloProvider client={client}>
-        <Router>
-          <NavBar />
-          <div className="container mx-auto">
-            <Switch>
-              <Route path="/recipe/:uuid">
-                <RecipeDetail />
-              </Route>
-              <Route path="/recipes">
-                <RecipeList />
-              </Route>
-              <Route path="/ingredients">
-                <IngredientList />
-              </Route>
-              <Route path="/create">
-                <CreateRecipe />
-              </Route>
-              <Route path="/food">
-                <Food />
-              </Route>
-              <Route path="/playground">
-                <Playground />
-              </Route>
-              <Route path="/photos">
-                <Photos />
-              </Route>
-              <Route path="/meals">
-                <Meals />
-              </Route>
-              <Route path="/">
-                <Test />
-              </Route>
-            </Switch>
-          </div>
-        </Router>
+    <CookiesProvider>
+      <RestfulProvider base={getAPIURL()}>
+        <ApolloProvider client={client}>
+          <Router>
+            <NavBar />
+            <div className="container mx-auto">
+              <Switch>
+                <Route path="/recipe/:uuid">
+                  <RecipeDetail />
+                </Route>
+                <Route path="/recipes">
+                  <RecipeList />
+                </Route>
+                <Route path="/ingredients">
+                  <IngredientList />
+                </Route>
+                <Route path="/create">
+                  <CreateRecipe />
+                </Route>
+                <Route path="/food">
+                  <Food />
+                </Route>
+                <Route path="/playground">
+                  <Playground />
+                </Route>
+                <Route path="/photos">
+                  <Photos />
+                </Route>
+                <Route path="/meals">
+                  <Meals />
+                </Route>
+                <Route path="/">
+                  <Test />
+                </Route>
+              </Switch>
+            </div>
+          </Router>
 
-        <hr />
-      </ApolloProvider>
-    </RestfulProvider>
+          <hr />
+        </ApolloProvider>
+      </RestfulProvider>
+    </CookiesProvider>
   );
 }
 

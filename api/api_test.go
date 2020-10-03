@@ -18,7 +18,7 @@ func TestAPI(t *testing.T) {
 	require := require.New(t)
 
 	tdb := db.NewDB(t)
-	m := manager.New(tdb)
+	m := manager.New(tdb, nil, nil)
 
 	apiManager := NewAPI(m)
 	e := echo.New()

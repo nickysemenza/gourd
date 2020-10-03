@@ -101,7 +101,11 @@ func (s *Server) Run(_ context.Context) error {
 	})
 	r.GET("/auth/callback", func(c echo.Context) error {
 		code := c.Request().FormValue("code")
-		return c.JSON(http.StatusOK, s.APIManager.Google.Finish(c.Request().Context(), code))
+		err := s.APIManager.Google.Finish(c.Request().Context(), code)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+		return c.JSON(http.StatusOK, "ok")
 	})
 
 	r.GET("/photos", func(c echo.Context) error {

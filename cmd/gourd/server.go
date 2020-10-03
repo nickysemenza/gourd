@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/nickysemenza/gourd/api"
+	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/manager"
@@ -37,7 +38,7 @@ func getDBConn() (*sql.DB, error) {
 		viper.GetInt64("DB_PORT")))
 	return dbConn, err
 }
-func makeServer() server.Server {
+func makeServer() (*server.Server, error) {
 	// setupMisc()
 
 	// postgres database
@@ -58,27 +59,35 @@ func makeServer() server.Server {
 		log.Fatal(err)
 	}
 
-	m := manager.New(dbClient)
-	m.Google = google.New(dbClient,
+	gClient := google.New(dbClient,
 		viper.GetString("GOOGLE_CLIENT_ID"),
 		viper.GetString("GOOGLE_CLIENT_SECRET"),
 		viper.GetString("GOOGLE_REDIRECT_URL"),
 	)
+	auth, err := auth.New(viper.GetString("JWT_KEY"))
+	if err != nil {
+		return nil, err
+	}
+
+	m := manager.New(dbClient, gClient, auth)
 	apiManager := api.NewAPI(m)
 
 	// server
-	return server.Server{
+	return &server.Server{
 		Manager:     m,
 		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 		APIManager:  apiManager,
-	}
+	}, nil
 }
 func runServer() {
 	ctx := context.Background()
-	s := makeServer()
+	s, err := makeServer()
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Fatal(s.Run(ctx))
 }
 

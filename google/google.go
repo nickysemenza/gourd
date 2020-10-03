@@ -28,7 +28,7 @@ func New(db *db.Client, clientID, clientSecret, redirectURL string) *Client {
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     google.Endpoint,
-		RedirectURL:  redirectURL,
+		RedirectURL:  "postmessage", // https://github.com/anthonyjgrove/react-google-login/issues/66#issuecomment-648521442
 		Scopes: []string{
 			"https://www.googleapis.com/auth/photoslibrary.readonly",
 			gauth.UserinfoProfileScope,
@@ -41,7 +41,7 @@ func (c *Client) GetURL() string {
 	return c.oc.AuthCodeURL("state", oauth2.AccessTypeOffline)
 }
 func (c *Client) Finish(ctx context.Context, code string) error {
-	token, err := c.oc.Exchange(ctx, code, oauth2.AccessTypeOffline)
+	token, err := c.oc.Exchange(ctx, code)
 	if err != nil {
 		return fmt.Errorf("bad token exchage: %w", err)
 	}
@@ -78,7 +78,11 @@ func (c *Client) getToken(ctx context.Context) (*oauth2.Token, error) {
 	return &token, nil
 }
 
-func (c *Client) GetUserInfo(ctx context.Context, token *oauth2.Token) (*gauth.Userinfo, error) {
+func (c *Client) GetUserInfo(ctx context.Context) (*gauth.Userinfo, error) {
+	token, err := c.getToken(ctx)
+	if err != nil {
+		return nil, err
+	}
 	oauth2Service, err := gauth.NewService(ctx, option.WithTokenSource(c.oc.TokenSource(ctx, token)))
 	if err != nil {
 		return nil, err

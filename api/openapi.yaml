@@ -10,6 +10,30 @@ servers:
   - description: prod
     url: https://food.nickysemenza.com/api
 paths:
+  /auth:
+    post:
+      summary: Login
+      operationId: auth_login
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: Google code
+      responses:
+        "200":
+          description: Auth response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResp"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /photos:
     get:
       summary: List all photos
@@ -214,7 +238,15 @@ paths:
     #         application/json:
     #           schema:
     #             $ref: "#/components/schemas/Error"
+security:
+  - bearerAuth: [] # use the same name as above
 components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, arbitrary value for documentation purposes
+
   schemas:
     SectionIngredient:
       description: Ingredients in a single section
@@ -440,6 +472,16 @@ components:
           type: integer
           format: int32
         message:
+          type: string
+    AuthResp:
+      type: object
+      required:
+        - user
+        - jwt
+      properties:
+        user:
+          type: object
+        jwt:
           type: string
     List:
       type: object

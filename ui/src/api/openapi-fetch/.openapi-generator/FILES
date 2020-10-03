@@ -4,6 +4,7 @@ apis/IngredientsApi.ts
 apis/RecipesApi.ts
 apis/index.ts
 index.ts
+models/AuthResp.ts
 models/GooglePhoto.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
