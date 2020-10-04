@@ -12,13 +12,13 @@ import (
 type Manager struct {
 	db     *db.Client
 	Google *google.Client
-	auth   *auth.Auth
+	Auth   *auth.Auth
 }
 
 func New(db *db.Client, g *google.Client, auth *auth.Auth) *Manager {
 	return &Manager{db: db,
 		Google: g,
-		auth:   auth,
+		Auth:   auth,
 	}
 }
 
@@ -37,6 +37,6 @@ func (m *Manager) ProcessGoogleAuth(ctx context.Context, code string) (jwt strin
 	}
 	rawUser = map[string]interface{}{"raw": user}
 
-	jwt, err = m.auth.GetJWT(user)
+	jwt, err = m.Auth.GetJWT(user)
 	return
 }

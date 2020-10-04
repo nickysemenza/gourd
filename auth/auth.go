@@ -17,11 +17,11 @@ func New(key string) (*Auth, error) {
 	if key == "" {
 		return nil, fmt.Errorf("auth: key is empty")
 	}
-	return &Auth{jwtKey: []byte(key)}, nil
+	return &Auth{Key: []byte(key)}, nil
 }
 
 type Auth struct {
-	jwtKey []byte
+	Key []byte
 }
 
 func (a *Auth) GetJWT(user *gauth.Userinfo) (string, error) {
@@ -35,13 +35,13 @@ func (a *Auth) GetJWT(user *gauth.Userinfo) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(a.jwtKey)
+	return token.SignedString(a.Key)
 
 }
 func (a *Auth) ParseJWT(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	tkn, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return a.jwtKey, nil
+		return a.Key, nil
 	})
 
 	if err != nil {

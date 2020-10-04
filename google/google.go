@@ -13,9 +13,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-// https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
-const maxPhotoBatchGet = 50
-
 type Client struct {
 	oc oauth2.Config
 	db *db.Client
@@ -44,6 +41,14 @@ func (c *Client) Finish(ctx context.Context, code string) error {
 	token, err := c.oc.Exchange(ctx, code)
 	if err != nil {
 		return fmt.Errorf("bad token exchage: %w", err)
+	}
+
+	ui, err := c.getUserInfo(ctx, token)
+	if err != nil {
+		return err
+	}
+	if ui.Email != "14nicholasse@gmail.com" {
+		return fmt.Errorf("user not allowed")
 	}
 
 	tokenStr, err := json.Marshal(token)
@@ -83,6 +88,10 @@ func (c *Client) GetUserInfo(ctx context.Context) (*gauth.Userinfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	return c.getUserInfo(ctx, token)
+
+}
+func (c *Client) getUserInfo(ctx context.Context, token *oauth2.Token) (*gauth.Userinfo, error) {
 	oauth2Service, err := gauth.NewService(ctx, option.WithTokenSource(c.oc.TokenSource(ctx, token)))
 	if err != nil {
 		return nil, err

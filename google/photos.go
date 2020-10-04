@@ -17,6 +17,9 @@ import (
 	"go.opentelemetry.io/otel/api/global"
 )
 
+// https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
+const maxPhotoBatchGet = 50
+
 func (c *Client) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
 	token, err := c.getToken(ctx)
 	if err != nil {

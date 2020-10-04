@@ -10,7 +10,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -24,6 +23,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 
 	"github.com/nickysemenza/gourd/api"
+	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/graph"
 	"github.com/nickysemenza/gourd/graph/generated"
@@ -77,6 +77,19 @@ func (s *Server) Run(_ context.Context) error {
 		return nil
 	}
 
+	skipper := func(c echo.Context) bool {
+		if c.Path() == "/api/auth" {
+			return true
+		}
+		return false
+	}
+	config := middleware.JWTConfig{
+		Skipper:    skipper,
+		Claims:     &auth.Claims{},
+		SigningKey: s.Manager.Auth.Key,
+	}
+	jwtMiddleware := middleware.JWTWithConfig(config)
+
 	// gql server
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: s.GetResolver()}))
 	srv.Use(extension.FixedComplexityLimit(100))
@@ -85,37 +98,39 @@ func (s *Server) Run(_ context.Context) error {
 	// http routes
 	r.GET("/metrics", echo.WrapHandler(hf))
 	r.Any("/", echo.WrapHandler(http.HandlerFunc(playground.Handler("GraphQL playground", "/query"))))
-	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)))
+	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)), jwtMiddleware)
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
 	// r.Any("/api", echo.WrapHandler(othttp.NewHandler(api.Handler(apiManager), "/api")))
 	g := r.Group("/api")
+
+	g.Use(jwtMiddleware)
 	api.RegisterHandlers(g, s.APIManager)
 
 	r.GET("/routes", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, r.Routes())
 	})
 
-	r.GET("/auth/redirect", func(c echo.Context) error {
-		return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())
-	})
-	r.GET("/auth/callback", func(c echo.Context) error {
-		code := c.Request().FormValue("code")
-		err := s.APIManager.Google.Finish(c.Request().Context(), code)
-		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-		return c.JSON(http.StatusOK, "ok")
-	})
+	// r.GET("/auth/redirect", func(c echo.Context) error {
+	// 	return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())
+	// })
+	// r.GET("/auth/callback", func(c echo.Context) error {
+	// 	code := c.Request().FormValue("code")
+	// 	err := s.APIManager.Google.Finish(c.Request().Context(), code)
+	// 	if err != nil {
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// 	return c.JSON(http.StatusOK, "ok")
+	// })
 
-	r.GET("/photos", func(c echo.Context) error {
-		pics, err := s.APIManager.Google.GetTest(c.Request().Context())
-		if err != nil {
-			spew.Dump(err)
-			return c.JSON(http.StatusInternalServerError, err.Error())
-		}
-		return c.JSON(http.StatusOK, pics)
-	})
+	// r.GET("/photos", func(c echo.Context) error {
+	// 	pics, err := s.APIManager.Google.GetTest(c.Request().Context())
+	// 	if err != nil {
+	// 		spew.Dump(err)
+	// 		return c.JSON(http.StatusInternalServerError, err.Error())
+	// 	}
+	// 	return c.JSON(http.StatusOK, pics)
+	// })
 
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
 	log.Printf("running on: http://%s/", addr)

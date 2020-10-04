@@ -4,7 +4,13 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import Test from "./Test";
 import RecipeList from "./pages/RecipeList";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+  RouteProps,
+} from "react-router-dom";
 import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
 import IngredientList from "./pages/IngredientList";
@@ -16,16 +22,43 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import { getAPIURL, getGQLURL } from "./config";
+import {
+  getAPIURL,
+  getGQLURL,
+  getJWT,
+  isLoggedIn,
+  onAPIRequest,
+} from "./config";
 import { CookiesProvider } from "react-cookie";
+
+const PrivateRoute = ({ children, ...rest }: RouteProps) => {
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        isLoggedIn() ? (
+          children
+        ) : (
+          <Redirect
+            to={{
+              pathname: "/login",
+              state: { from: location },
+            }}
+          />
+        )
+      }
+    />
+  );
+};
 
 function App() {
   const client = new ApolloClient({
     uri: getGQLURL(),
+    headers: { authorization: "Bearer " + getJWT() },
   });
   return (
     <CookiesProvider>
-      <RestfulProvider base={getAPIURL()}>
+      <RestfulProvider base={getAPIURL()} onRequest={onAPIRequest}>
         <ApolloProvider client={client}>
           <Router>
             <NavBar />
@@ -49,12 +82,12 @@ function App() {
                 <Route path="/playground">
                   <Playground />
                 </Route>
-                <Route path="/photos">
+                <PrivateRoute path="/photos">
                   <Photos />
-                </Route>
-                <Route path="/meals">
+                </PrivateRoute>
+                <PrivateRoute path="/meals">
                   <Meals />
-                </Route>
+                </PrivateRoute>
                 <Route path="/">
                   <Test />
                 </Route>

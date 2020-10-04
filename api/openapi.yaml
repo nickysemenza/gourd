@@ -13,6 +13,7 @@ paths:
   /auth:
     post:
       summary: Login
+      security: []
       operationId: auth_login
       parameters:
         - in: query

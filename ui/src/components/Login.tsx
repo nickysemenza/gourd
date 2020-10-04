@@ -7,13 +7,18 @@ import {
   useGoogleLogin,
 } from "react-google-login";
 import { AuthResp, Configuration, DefaultApi } from "../api/openapi-fetch";
-import { getAPIURL, getConfig } from "../config";
+import {
+  COOKIE_NAME,
+  getAPIURL,
+  getConfig,
+  getName,
+  isLoggedIn,
+} from "../config";
 import Debug from "./Debug";
 
 const Login: React.FC = () => {
   const api = new DefaultApi(new Configuration({ basePath: getAPIURL() }));
-  const cookieName = "jwt";
-  const [cookies, setCookie, removeCookie] = useCookies(["cookie-name"]);
+  const [cookies, setCookie] = useCookies(["cookie-name"]);
 
   const [auth, setAuth] = useState<AuthResp>();
 
@@ -25,7 +30,7 @@ const Login: React.FC = () => {
     if (code !== undefined) {
       const resp = await api.authLogin({ code });
       console.log({ resp });
-      setCookie(cookieName, resp.jwt);
+      setCookie(COOKIE_NAME, resp.jwt);
       setAuth(resp);
     } else {
       throw new Error("bad auth" + response);
@@ -54,9 +59,14 @@ const Login: React.FC = () => {
     // prompt,
   });
 
+  const loggedIn = isLoggedIn();
   return (
     <div>
-      {loaded && <button onClick={signIn}>login</button>}
+      {!loggedIn ? (
+        loaded && <button onClick={signIn}>login</button>
+      ) : (
+        <button>logged in as {getName()}</button>
+      )}
       <Debug data={{ auth, cookies }} />
     </div>
   );
