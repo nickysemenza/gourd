@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useGet } from "restful-react";
-import {
-  Configuration,
-  PaginatedIngredients,
-  DefaultApi,
-} from "../api/openapi-fetch";
+import { PaginatedIngredients, DefaultApi } from "../api/openapi-fetch";
 import { useListIngredients } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
-import { getAPIURL } from "../config";
+import { getAPIURL, getOpenapiFetchConfig } from "../config";
 
 const Playground: React.FC = () => {
   const url = getAPIURL();
@@ -17,8 +13,7 @@ const Playground: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const c = new Configuration({ basePath: url });
-      const bar = new DefaultApi(c);
+      const bar = new DefaultApi(getOpenapiFetchConfig());
       const result = await bar.listIngredients({});
       setR2(result);
     };
