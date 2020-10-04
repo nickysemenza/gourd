@@ -78,10 +78,12 @@ func (s *Server) Run(_ context.Context) error {
 	}
 
 	skipper := func(c echo.Context) bool {
-		if c.Path() == "/api/auth" {
+		switch c.Path() {
+		case "/api/auth", "/spec":
 			return true
+		default:
+			return false
 		}
-		return false
 	}
 	config := middleware.JWTConfig{
 		Skipper:    skipper,
@@ -109,6 +111,13 @@ func (s *Server) Run(_ context.Context) error {
 
 	r.GET("/routes", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, r.Routes())
+	})
+	r.GET("/spec", func(c echo.Context) error {
+		spec, err := api.GetSwagger()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, api.Error{Message: err.Error()})
+		}
+		return c.JSON(http.StatusOK, spec)
 	})
 
 	// r.GET("/auth/redirect", func(c echo.Context) error {

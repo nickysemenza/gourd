@@ -18,10 +18,18 @@ import {
     Ingredient,
     IngredientFromJSON,
     IngredientToJSON,
+    PaginatedIngredients,
+    PaginatedIngredientsFromJSON,
+    PaginatedIngredientsToJSON,
 } from '../models';
 
 export interface CreateIngredientsRequest {
     ingredient: Ingredient;
+}
+
+export interface ListIngredientsRequest {
+    offset?: number;
+    limit?: number;
 }
 
 /**
@@ -67,6 +75,48 @@ export class IngredientsApi extends runtime.BaseAPI {
      */
     async createIngredients(requestParameters: CreateIngredientsRequest): Promise<Ingredient> {
         const response = await this.createIngredientsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * List all ingredients
+     */
+    async listIngredientsRaw(requestParameters: ListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/ingredients`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedIngredientsFromJSON(jsonValue));
+    }
+
+    /**
+     * List all ingredients
+     */
+    async listIngredients(requestParameters: ListIngredientsRequest): Promise<PaginatedIngredients> {
+        const response = await this.listIngredientsRaw(requestParameters);
         return await response.value();
     }
 

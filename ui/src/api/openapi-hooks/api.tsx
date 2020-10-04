@@ -279,7 +279,9 @@ export type AuthLoginProps = Omit<
 >;
 
 /**
- * Login
+ * Google Login callback
+ *
+ * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
  */
 export const AuthLogin = (props: AuthLoginProps) => (
   <Mutate<AuthResp, Error, AuthLoginQueryParams, void, void>
@@ -295,7 +297,9 @@ export type UseAuthLoginProps = Omit<
 >;
 
 /**
- * Login
+ * Google Login callback
+ *
+ * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
  */
 export const useAuthLogin = (props: UseAuthLoginProps) =>
   useMutate<AuthResp, Error, AuthLoginQueryParams, void, void>(

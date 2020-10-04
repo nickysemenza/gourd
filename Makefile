@@ -83,4 +83,4 @@ generate-openapi: validate-openapi
 	go generate ./api
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher
-	./ui/node_modules/redoc-cli/index.js bundle api/openapi.yaml
+	# ./ui/node_modules/redoc-cli/index.js bundle api/openapi.yaml

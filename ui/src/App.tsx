@@ -30,6 +30,7 @@ import {
   onAPIRequest,
 } from "./config";
 import { CookiesProvider } from "react-cookie";
+import { Docs } from "./pages/Misc";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -62,7 +63,7 @@ function App() {
         <ApolloProvider client={client}>
           <Router>
             <NavBar />
-            <div className="container mx-auto">
+            <div className="lg:container lg:mx-auto">
               <Switch>
                 <Route path="/recipe/:uuid">
                   <RecipeDetail />
@@ -78,6 +79,9 @@ function App() {
                 </Route>
                 <Route path="/food">
                   <Food />
+                </Route>
+                <Route path="/docs">
+                  <Docs />
                 </Route>
                 <Route path="/playground">
                   <Playground />
