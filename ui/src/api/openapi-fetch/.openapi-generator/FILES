@@ -1,6 +1,8 @@
 .openapi-generator-ignore
-apis/DefaultApi.ts
+apis/AuthenticationApi.ts
 apis/IngredientsApi.ts
+apis/MealsApi.ts
+apis/PhotosApi.ts
 apis/RecipesApi.ts
 apis/index.ts
 index.ts

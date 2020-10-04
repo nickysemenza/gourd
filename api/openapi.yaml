@@ -12,9 +12,12 @@ servers:
 paths:
   /auth:
     post:
-      summary: Login
+      summary: Google Login callback
+      description: Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
       security: []
       operationId: auth_login
+      tags:
+        - authentication
       parameters:
         - in: query
           name: code
@@ -39,6 +42,8 @@ paths:
     get:
       summary: List all photos
       operationId: list_photos
+      tags:
+        - photos
       parameters:
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/limitParam"
@@ -59,6 +64,8 @@ paths:
     get:
       summary: List all meals
       operationId: list_meals
+      tags:
+        - meals
       parameters:
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/limitParam"
@@ -79,6 +86,8 @@ paths:
     get:
       summary: List all ingredients
       operationId: list_ingredients
+      tags:
+        - ingredients
       parameters:
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/limitParam"

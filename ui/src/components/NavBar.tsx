@@ -14,9 +14,10 @@ const NavBar: React.FC = () => {
     { title: "playground", path: "playground" },
     { title: "photos", path: "photos" },
     { title: "meals", path: "meals" },
+    { title: "docs", path: "docs" },
   ];
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 px-6 py-3 mb-2">
+    <nav className="flex items-center justify-between flex-wrap bg-teal-500 px-6 py-3">
       <div className="flex items-center flex-shrink-0 text-white mr-1">
         <svg
           onClick={() => history.push("/")}
