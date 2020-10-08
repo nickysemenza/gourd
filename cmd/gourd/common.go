@@ -27,11 +27,9 @@ func initTracer() error {
 			return fmt.Errorf("texporter.NewExporter: %w", err)
 		}
 
-		tp, err := sdktrace.NewProvider(sdktrace.WithSyncer(exporter))
-		if err != nil {
-			return err
-		}
-		global.SetTraceProvider(tp)
+		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(exporter))
+
+		global.SetTracerProvider(tp)
 	} else if endpoint != "" {
 		_, err := jaeger.InstallNewPipeline(
 			jaeger.WithCollectorEndpoint(endpoint),

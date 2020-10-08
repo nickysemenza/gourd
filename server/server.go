@@ -10,14 +10,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
-
+	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-
-	sentryecho "github.com/getsentry/sentry-go/echo"
 	log "github.com/sirupsen/logrus"
-	echotrace "go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo"
-	othttp "go.opentelemetry.io/contrib/instrumentation/net/http"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/metric"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
@@ -65,7 +63,7 @@ func (s *Server) GetResolver() generated.ResolverRoot {
 func (s *Server) Run(_ context.Context) error {
 	r := echo.New()
 
-	r.Use(echotrace.Middleware("gourd-backend"))
+	r.Use(otelecho.Middleware("gourd-server"))
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
 	r.Use(middleware.RequestID())
@@ -100,10 +98,10 @@ func (s *Server) Run(_ context.Context) error {
 	// http routes
 	r.GET("/metrics", echo.WrapHandler(hf))
 	r.Any("/", echo.WrapHandler(http.HandlerFunc(playground.Handler("GraphQL playground", "/query"))))
-	r.Any("/query", echo.WrapHandler(othttp.WithRouteTag("/query", srv)), jwtMiddleware)
+	r.Any("/query", echo.WrapHandler(otelhttp.WithRouteTag("/query", srv)), jwtMiddleware)
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
-	// r.Any("/api", echo.WrapHandler(othttp.NewHandler(api.Handler(apiManager), "/api")))
+	// r.Any("/api", echo.WrapHandler(otelhttp.NewHandler(api.Handler(apiManager), "/api")))
 	g := r.Group("/api")
 
 	g.Use(jwtMiddleware)
@@ -144,8 +142,8 @@ func (s *Server) Run(_ context.Context) error {
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
 	log.Printf("running on: http://%s/", addr)
 	return http.ListenAndServe(addr,
-		othttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
-			othttp.WithMessageEvents(othttp.ReadEvents, othttp.WriteEvents),
+		otelhttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
+			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
 		),
 	)
 }

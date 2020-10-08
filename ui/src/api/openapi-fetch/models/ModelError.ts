@@ -21,12 +21,6 @@ import { exists, mapValues } from '../runtime';
 export interface ModelError {
     /**
      * 
-     * @type {number}
-     * @memberof ModelError
-     */
-    code: number;
-    /**
-     * 
      * @type {string}
      * @memberof ModelError
      */
@@ -43,7 +37,6 @@ export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'code': json['code'],
         'message': json['message'],
     };
 }
@@ -57,7 +50,6 @@ export function ModelErrorToJSON(value?: ModelError | null): any {
     }
     return {
         
-        'code': value.code,
         'message': value.message,
     };
 }
