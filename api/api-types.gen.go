@@ -15,7 +15,6 @@ type AuthResp struct {
 
 // Error defines model for Error.
 type Error struct {
-	Code    int32  `json:"code"`
 	Message string `json:"message"`
 }
 

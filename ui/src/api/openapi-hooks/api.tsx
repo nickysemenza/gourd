@@ -214,7 +214,6 @@ export interface Meal {
 }
 
 export interface Error {
-  code: number;
   message: string;
 }
 

@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/storage v1.12.0 // indirect
 	github.com/99designs/gqlgen v0.13.0
 	github.com/ClickHouse/clickhouse-go v1.4.3 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.11.0
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.12.0
 	github.com/Masterminds/squirrel v1.4.0
 	github.com/PuerkitoBio/goquery v1.5.1
 	github.com/agnivade/levenshtein v1.1.0 // indirect
@@ -61,13 +61,13 @@ require (
 	github.com/vektah/gqlparser/v2 v2.1.0
 	github.com/xanzy/go-gitlab v0.38.1 // indirect
 	go.mongodb.org/mongo-driver v1.4.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo v0.11.0
-	go.opentelemetry.io/contrib/instrumentation/net/http v0.11.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace v0.11.0
-	go.opentelemetry.io/otel v0.11.0
-	go.opentelemetry.io/otel/exporters/metric/prometheus v0.11.0
-	go.opentelemetry.io/otel/exporters/trace/jaeger v0.11.0
-	go.opentelemetry.io/otel/sdk v0.11.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.12.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.12.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.12.0
+	go.opentelemetry.io/otel v0.12.0
+	go.opentelemetry.io/otel/exporters/metric/prometheus v0.12.0
+	go.opentelemetry.io/otel/exporters/trace/jaeger v0.12.0
+	go.opentelemetry.io/otel/sdk v0.12.0
 	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
 	golang.org/x/sys v0.0.0-20200922070232-aee5d888a860 // indirect
 	golang.org/x/tools v0.0.0-20200923014426-f5e916c686e1

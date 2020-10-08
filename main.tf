@@ -66,6 +66,10 @@ resource "google_cloud_run_service" "my-service" {
           name  = "GOOGLE_CLOUD_PROJECT"
           value = var.project_id
         }
+        env {
+          name  = "JWT_KEY"
+          value = "tmp"
+        }
       }
     }
   }
@@ -84,6 +88,60 @@ resource "google_cloud_run_service_iam_member" "allUsers" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+resource "google_service_account" "sa" {
+  account_id   = "my-service-account"
+  display_name = "A service account that only Jane can use"
+}
+
+data "google_iam_policy" "admin" {
+  binding {
+    role = "roles/run.invoker"
+
+    members = [
+      "serviceAccount:${google_service_account.sa.email}",
+    ]
+  }
+}
+data "google_iam_policy" "admin2" {
+  binding {
+    role = "roles/cloudscheduler.admin"
+
+    members = [
+      "serviceAccount:${google_service_account.sa.email}",
+    ]
+  }
+}
+
+# https://benjamincongdon.me/blog/2019/11/21/Setting-up-Cloud-Scheduler-to-Trigger-Cloud-Run/
+
+# resource "google_service_account_iam_binding" "admin-account-iam" {
+#   service_account_id = google_service_account.sa.name
+#   role               = "roles/run.invoker"
+
+#   members = [
+#     "user:14nicholasse@gmail.com",
+#   ]
+# }
+
+resource "google_cloud_scheduler_job" "job" {
+  name             = "test-job"
+  description      = "test http job"
+  schedule         = "*/8 * * * *"
+  time_zone        = "America/New_York"
+  attempt_deadline = "320s"
+
+  http_target {
+    http_method = "GET"
+    uri         = google_cloud_run_service.my-service.status[0].url
+
+    # oidc_token {
+    #   service_account_email = google_service_account.sa.email
+    # }
+  }
+}
+
+
 
 output "url" {
   value = google_cloud_run_service.my-service.status[0].url

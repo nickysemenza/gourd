@@ -16,7 +16,7 @@ import (
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/otel/api/global"
 )
 
@@ -116,8 +116,8 @@ func getHTML(ctx context.Context, url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	ctx, req = httptrace.W3C(ctx, req)
-	httptrace.Inject(ctx, req)
+	ctx, req = otelhttptrace.W3C(ctx, req)
+	otelhttptrace.Inject(ctx, req)
 
 	// nolint:gosec
 	res, err := http.DefaultClient.Do(req)

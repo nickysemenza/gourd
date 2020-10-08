@@ -474,15 +474,12 @@ components:
             $ref: "#/components/schemas/GooglePhoto"
     Error:
       type: object
-      required:
-        - code
-        - message
+      required: ["message"]
       properties:
-        code:
-          type: integer
-          format: int32
         message:
           type: string
+      example:
+        message: "Something went wrong"
     AuthResp:
       type: object
       required:
