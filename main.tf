@@ -10,6 +10,12 @@ terraform {
 variable "db_password" {
   type = string
 }
+variable "google_client_id" {
+  type = string
+}
+variable "google_client_secret" {
+  type = string
+}
 
 variable "image_name" {
   type = string
@@ -70,6 +76,14 @@ resource "google_cloud_run_service" "my-service" {
           name  = "JWT_KEY"
           value = "tmp"
         }
+        env {
+          name  = "GOOGLE_CLIENT_ID"
+          value = var.google_client_id
+        }
+        env {
+          name  = "GOOGLE_CLIENT_SECRET"
+          value = var.google_client_secret
+        }
       }
     }
   }
@@ -124,22 +138,7 @@ data "google_iam_policy" "admin2" {
 #   ]
 # }
 
-resource "google_cloud_scheduler_job" "job" {
-  name             = "test-job"
-  description      = "test http job"
-  schedule         = "*/8 * * * *"
-  time_zone        = "America/New_York"
-  attempt_deadline = "320s"
 
-  http_target {
-    http_method = "GET"
-    uri         = google_cloud_run_service.my-service.status[0].url
-
-    # oidc_token {
-    #   service_account_email = google_service_account.sa.email
-    # }
-  }
-}
 
 
 

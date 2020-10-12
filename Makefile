@@ -7,8 +7,10 @@ GCR_IMAGE := gcr.io/$(GCP_PROJECT)/gourd-backend:$(VERSION)
 
 deploy: deploy-image deploy-run
 deploy-image:
+	echo "building $(GCR_IMAGE)"
 	gcloud builds submit --tag $(GCR_IMAGE)
 deploy-run:
+	echo "deploying $(GCR_IMAGE)"
 	terraform apply -var-file="prod.tfvars" -var="image_name=$(GCR_IMAGE)" -var="project_id=$(GCP_PROJECT)"
 
 

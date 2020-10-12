@@ -110,6 +110,9 @@ func (s *Server) Run(_ context.Context) error {
 	r.GET("/routes", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, r.Routes())
 	})
+	r.GET("/debug", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]interface{}{"headers": c.Request().Header})
+	})
 	r.GET("/spec", func(c echo.Context) error {
 		spec, err := api.GetSwagger()
 		if err != nil {
