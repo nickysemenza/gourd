@@ -20,7 +20,7 @@ export const getConfig = () => {
 
 export const COOKIE_NAME = "gourd-jwt";
 
-export const getJWT = (): string => {
+export const getJWT = (): string | undefined => {
   const cookies = new Cookies();
   return cookies.get(COOKIE_NAME);
 };
@@ -34,17 +34,22 @@ export const onAPIRequest = (req: Request): void => {
   req.headers.set("Authorization", "Bearer " + getJWT());
 };
 
-export const isLoggedIn = () => {
+export const parseJWT = (): JWT | undefined => {
   const jwt = getJWT();
-  if (jwt === "") return false;
+  if (jwt === "" || !jwt) return;
   const d: JWT = jwt_decode(jwt);
-  if (d.exp < Math.floor(Date.now() / 1000)) return false;
+  return d;
+};
+export const isLoggedIn = () => {
+  const t = parseJWT();
+  if (!t || t.exp < Math.floor(Date.now() / 1000)) return false;
   return true;
 };
 
 export const getName = () => {
-  const d: JWT = jwt_decode(getJWT());
-  return d.user_info.name;
+  if (!isLoggedIn()) return;
+  const t = parseJWT();
+  return t?.user_info.name;
 };
 
 export interface UserInfo {

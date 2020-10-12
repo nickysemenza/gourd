@@ -42,6 +42,9 @@ const Login: React.FC = () => {
       throw new Error("bad auth" + response);
     }
   };
+  const onFailure = async (error: any) => {
+    console.log("error", error);
+  };
   const { google } = getConfig();
   const { signIn, loaded } = useGoogleLogin({
     onSuccess,
@@ -55,7 +58,7 @@ const Login: React.FC = () => {
     // fetchBasicProfile,
     // redirectUri,
     // discoveryDocs,
-    // onFailure,
+    onFailure,
     // uxMode,
     scope: google.scopes,
     accessType: "offline",
