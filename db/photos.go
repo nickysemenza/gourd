@@ -21,9 +21,14 @@ func (c *Client) SetKV(ctx context.Context, key string, json string) error {
 	return err
 }
 
-func (c *Client) GetAlbums(ctx context.Context) ([]string, error) {
-	var albums []string
-	q := c.psql.Select("id").From("gphotos_albums")
+type GAlbum struct {
+	ID      string `db:"id"`
+	Usecase string `db:"usecase"`
+}
+
+func (c *Client) GetAlbums(ctx context.Context) ([]GAlbum, error) {
+	var albums []GAlbum
+	q := c.psql.Select("id", "usecase").From("gphotos_albums")
 	err := c.selectContext(ctx, q, &albums)
 	return albums, err
 }

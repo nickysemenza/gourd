@@ -99,6 +99,9 @@ func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, e
 
 // GetRecipes returns all recipes, shallowly.
 func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]Recipe, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipes")
+	defer span.End()
+
 	q := c.psql.Select("*").From(recipesTable)
 	cq := c.psql.Select("count(*)").From(recipesTable)
 	q = newSearchQuery(opts...).apply(q)

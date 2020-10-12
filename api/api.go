@@ -14,15 +14,20 @@ import (
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel/api/trace"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
 type API struct {
 	*manager.Manager
+	tracer trace.Tracer
 }
 
 func NewAPI(m *manager.Manager) *API {
-	return &API{Manager: m}
+	return &API{
+		Manager: m,
+		tracer:  global.Tracer("db"),
+	}
 }
 
 func transformRecipe(dbr db.Recipe) Recipe {
@@ -128,6 +133,8 @@ func transformRecipeSections(dbs []db.Section) []RecipeSection {
 // (GET /recipes)
 func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx := c.Request().Context()
+	ctx, span := a.tracer.Start(ctx, "ListRecipes")
+	defer span.End()
 	items := []Recipe{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)

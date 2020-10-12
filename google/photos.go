@@ -119,7 +119,7 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 	for _, album := range albums {
 		var photos []db.Photo
 		err = client.MediaItems.Search(&photoslibrary.SearchMediaItemsRequest{
-			AlbumId:  album,
+			AlbumId:  album.ID,
 			PageSize: 50,
 		}).Pages(ctx, func(r *photoslibrary.SearchMediaItemsResponse) error {
 			for _, m := range r.MediaItems {
@@ -128,7 +128,7 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 					return err
 				}
 				photos = append(photos, db.Photo{
-					AlbumID: album,
+					AlbumID: album.ID,
 					PhotoID: m.Id,
 					Created: t,
 				})
