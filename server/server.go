@@ -158,19 +158,24 @@ func wrapHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Before")
 
-		opts := []trace.SpanOption{}
+		// opts := []trace.SpanOption{}
 		sc, ok := (&propagation.HTTPFormat{}).SpanContextFromRequest(r)
 		if ok && sc.SpanID.String() != "" {
-			opts = append(opts, trace.WithLinks(trace.Link{SpanContext: trace.SpanContext{
+			sc2 := trace.SpanContext{
 				SpanID:  trace.SpanID(sc.SpanID),
 				TraceID: trace.ID(sc.TraceID),
-			}}))
-			spew.Dump("extracted span", opts)
+			}
+			sc2.TraceFlags |= trace.FlagsSampled
+			spew.Dump("ctx-before", r.Context())
+
+			ctx := trace.ContextWithRemoteSpanContext(r.Context(), sc2)
+			r = r.Clone(ctx)
+			spew.Dump("extracted span", sc2)
 		}
 
 		h2 := otelhttp.NewHandler(h, "server",
 			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-			otelhttp.WithSpanOptions(opts...),
+			// otelhttp.WithSpanOptions(opts...),
 		)
 		h2.ServeHTTP(w, r) // call original
 		log.Println("After")
