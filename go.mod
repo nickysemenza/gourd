@@ -61,6 +61,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.1.0
 	github.com/xanzy/go-gitlab v0.38.1 // indirect
 	go.mongodb.org/mongo-driver v1.4.1 // indirect
+	go.opencensus.io v0.22.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.12.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.12.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.12.0

@@ -10,14 +10,17 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/davecgh/go-spew/spew"
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
+	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/api/global"
 	"go.opentelemetry.io/otel/api/metric"
+	"go.opentelemetry.io/otel/api/trace"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 
 	"github.com/nickysemenza/gourd/api"
@@ -145,10 +148,33 @@ func (s *Server) Run(_ context.Context) error {
 	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
 	log.Printf("running on: http://%s/", addr)
 	return http.ListenAndServe(addr,
-		otelhttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
-			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-		),
+		wrapHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout")),
+		// otelhttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
+		// 	otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+		// ),
 	)
+}
+func wrapHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Before")
+
+		opts := []trace.SpanOption{}
+		sc, ok := (&propagation.HTTPFormat{}).SpanContextFromRequest(r)
+		if ok && sc.SpanID.String() != "" {
+			opts = append(opts, trace.WithLinks(trace.Link{SpanContext: trace.SpanContext{
+				SpanID:  trace.SpanID(sc.SpanID),
+				TraceID: trace.ID(sc.TraceID),
+			}}))
+			spew.Dump("extracted span", opts)
+		}
+
+		h2 := otelhttp.NewHandler(h, "server",
+			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+			otelhttp.WithSpanOptions(opts...),
+		)
+		h2.ServeHTTP(w, r) // call original
+		log.Println("After")
+	})
 }
 
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {
