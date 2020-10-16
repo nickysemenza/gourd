@@ -32,11 +32,29 @@ export interface GooglePhoto {
      */
     baseUrl: string;
     /**
+     * blur hash
+     * @type {string}
+     * @memberof GooglePhoto
+     */
+    blurHash?: string;
+    /**
      * when it was taken
      * @type {Date}
      * @memberof GooglePhoto
      */
     created: Date;
+    /**
+     * width px
+     * @type {number}
+     * @memberof GooglePhoto
+     */
+    width: number;
+    /**
+     * height px
+     * @type {number}
+     * @memberof GooglePhoto
+     */
+    height: number;
 }
 
 export function GooglePhotoFromJSON(json: any): GooglePhoto {
@@ -51,7 +69,10 @@ export function GooglePhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'baseUrl': json['base_url'],
+        'blurHash': !exists(json, 'blur_hash') ? undefined : json['blur_hash'],
         'created': (new Date(json['created'])),
+        'width': json['width'],
+        'height': json['height'],
     };
 }
 
@@ -66,7 +87,10 @@ export function GooglePhotoToJSON(value?: GooglePhoto | null): any {
         
         'id': value.id,
         'base_url': value.baseUrl,
+        'blur_hash': value.blurHash,
         'created': (value.created.toISOString()),
+        'width': value.width,
+        'height': value.height,
     };
 }
 

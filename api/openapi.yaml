@@ -438,6 +438,8 @@ components:
         - id
         - base_url
         - created
+        - width
+        - height
       properties:
         id:
           description: id
@@ -445,10 +447,21 @@ components:
         base_url:
           description: public image
           type: string
+        blur_hash:
+          description: blur hash
+          type: string  
         created:
           description: when it was taken
           type: string
           format: date-time
+        width:
+          description: width px
+          type: integer
+          format: int64
+        height:
+          description: height px
+          type: integer
+          format: int64                  
     Meal:
       description: A google photo
       type: object

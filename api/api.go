@@ -248,21 +248,29 @@ func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) 
 	items := []GooglePhoto{}
 	var ids []string
 	for _, p := range photos {
-		items = append(items, GooglePhoto{Id: p.PhotoID, Created: p.Created})
+		spew.Dump(p.BlurHash)
+		gp := GooglePhoto{Id: p.PhotoID, Created: p.Created}
+		if p.BlurHash.Valid {
+			s := p.BlurHash.String
+			gp.BlurHash = &s
+		}
+		items = append(items, gp)
 		ids = append(ids, p.PhotoID)
 	}
 
 	if getURLs {
-		urls, err := a.Manager.Google.GetBaseURLs(ctx, ids)
+		results, err := a.Manager.Google.GetMediaItems(ctx, ids)
 		if err != nil {
 			return nil, nil, err
 		}
 		for x, item := range items {
-			url, ok := urls[item.Id]
+			val, ok := results[item.Id]
 			if !ok {
 				continue
 			}
-			items[x].BaseUrl = url
+			items[x].BaseUrl = val.BaseUrl
+			items[x].Width = val.MediaMetadata.Width
+			items[x].Height = val.MediaMetadata.Height
 		}
 	}
 	return items, ids, nil
@@ -311,17 +319,19 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 
 		items = append(items, meal)
 	}
-	urls, err := a.Manager.Google.GetBaseURLs(ctx, gphotoIDs)
+	urls, err := a.Manager.Google.GetMediaItems(ctx, gphotoIDs)
 	if err != nil {
 		return err
 	}
 	for x, item := range items {
 		for y, photo := range item.Photos {
-			url, ok := urls[photo.Id]
+			val, ok := urls[photo.Id]
 			if !ok {
 				continue
 			}
-			items[x].Photos[y].BaseUrl = url
+			items[x].Photos[y].BaseUrl = val.BaseUrl
+			items[x].Photos[y].Width = val.MediaMetadata.Width
+			items[x].Photos[y].Height = val.MediaMetadata.Height
 		}
 	}
 

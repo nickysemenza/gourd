@@ -6,6 +6,7 @@ import { GooglePhoto, useListMeals } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
+import ProgressiveImage from "../components/ProgressiveImage";
 
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -44,7 +45,15 @@ const Meals: React.FC = () => {
           return (
             <div className="flex flex-wrap">
               {photos.map((photo: GooglePhoto) => (
-                <img key={photo.id} src={`${photo.base_url}=w120`} alt="todo" />
+                <ProgressiveImage photo={photo} />
+                // <img
+                //   onLoad={(x) => {
+                //     console.log(x);
+                //   }}
+                //   key={photo.id}
+                //   src={`${photo.base_url}=w120`}
+                //   alt="todo"
+                // />
               ))}
             </div>
           );

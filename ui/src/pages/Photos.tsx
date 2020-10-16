@@ -6,6 +6,8 @@ import { useListPhotos } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
+import { Blurhash } from "react-blurhash";
+import ProgressiveImage from "../components/ProgressiveImage";
 
 const Photos: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -25,10 +27,6 @@ const Photos: React.FC = () => {
 
   const columns = React.useMemo(
     () => [
-      //   {
-      //     Header: "id",
-      //     accessor: "id",
-      //   },
       {
         Header: "Created",
         accessor: "created",
@@ -43,8 +41,7 @@ const Photos: React.FC = () => {
         Header: "test",
         accessor: "test",
         Cell: (cell: CellProps<any>) => (
-          // https://developers.google.com/photos/library/guides/access-media-items#image-base-urls
-          <img src={`${cell.row.original.base_url}=w200`} alt="todo" />
+          <ProgressiveImage photo={cell.row.original} />
         ),
       },
     ],

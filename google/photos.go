@@ -2,6 +2,7 @@ package google
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,6 +14,7 @@ import (
 	gphotos "github.com/gphotosuploader/google-photos-api-client-go/lib-gphotos"
 	"github.com/gphotosuploader/googlemirror/api/photoslibrary/v1"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
 )
@@ -60,13 +62,14 @@ func (c *Client) batchGet(ctx context.Context, ids []string) ([]photoslibrary.Me
 	for _, b := range batchResult.MediaItemResults {
 		items = append(items, b.MediaItem)
 	}
+	span.SetAttribute("result-raw", batchResult)
 	return items, nil
 }
-func (c *Client) GetBaseURLs(ctx context.Context, ids []string) (map[string]string, error) {
-	ctx, span := global.Tracer("google").Start(ctx, "google.GetBaseURLs")
+func (c *Client) GetMediaItems(ctx context.Context, ids []string) (map[string]photoslibrary.MediaItem, error) {
+	ctx, span := global.Tracer("google").Start(ctx, "google.GetMediaItems")
 	defer span.End()
 	chunks := chunkBy(ids, maxPhotoBatchGet)
-	urls := map[string]string{}
+	urls := map[string]photoslibrary.MediaItem{}
 	// for _, chunk := range chunks {
 	// 	items, err := c.batchGet(ctx, chunk)
 	// 	if err != nil {
@@ -87,7 +90,7 @@ func (c *Client) GetBaseURLs(ctx context.Context, ids []string) (map[string]stri
 			}
 			m.Lock()
 			for _, item := range items {
-				urls[item.Id] = item.BaseUrl
+				urls[item.Id] = item
 			}
 			m.Unlock()
 			wg.Done()
@@ -102,11 +105,27 @@ func (c *Client) GetBaseURLs(ctx context.Context, ids []string) (map[string]stri
 func (c *Client) GetTest(ctx context.Context) (interface{}, error) {
 	ids := []string{"AIbigFqimylf7SUbAvFeiDPDBg_K_rH5DYtsZUMAiD2yMhJDeHIadDYJnc2Q7vnqKT4DQJeB5IQ7qNEk1Iu0-9k9lfolG6i9-A",
 		"AIbigFrtZdWe-gFN1KOuPBhPlFsSNftIy2tyH0yW3JxQPALG-qPg1BsByn12LwoUM_om-DI_rB7OLwhZ8UpzPBxStrlbb9_SQQ"}
-	return c.GetBaseURLs(ctx, ids)
+	return c.GetMediaItems(ctx, ids)
 
+}
+func (c *Client) GetAvailableAlbums(ctx context.Context) error {
+	client, err := c.getPhotosClient(ctx)
+	if err != nil {
+		return fmt.Errorf("bad client: %w", err)
+	}
+	return client.Albums.List().Pages(ctx, func(r *photoslibrary.ListAlbumsResponse) error {
+		for _, m := range r.Albums {
+			fmt.Println(m.Id, m.Title)
+		}
+		return nil
+	})
 }
 
 func (c *Client) SyncAlbums(ctx context.Context) error {
+	ctx, span := global.Tracer("google").Start(ctx, "google.SyncAlbums")
+	defer span.End()
+	// c.GetAvailableAlbums(ctx)
+
 	client, err := c.getPhotosClient(ctx)
 	if err != nil {
 		return fmt.Errorf("bad client: %w", err)
@@ -127,10 +146,16 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
+				bh, err := image.GetBlurHash(ctx, m.BaseUrl)
+				if err != nil {
+					return err
+				}
+
 				photos = append(photos, db.Photo{
-					AlbumID: album.ID,
-					PhotoID: m.Id,
-					Created: t,
+					AlbumID:  album.ID,
+					PhotoID:  m.Id,
+					Created:  t,
+					BlurHash: sql.NullString{String: bh, Valid: true},
 				})
 			}
 			return nil

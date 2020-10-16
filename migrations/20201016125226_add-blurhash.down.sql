@@ -1,0 +1,1 @@
+ALTER TABLE "gphotos_photos" DROP COLUMN "blur_hash";

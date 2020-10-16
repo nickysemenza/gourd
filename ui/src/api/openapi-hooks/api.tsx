@@ -189,9 +189,21 @@ export interface GooglePhoto {
    */
   base_url: string;
   /**
+   * blur hash
+   */
+  blur_hash?: string;
+  /**
    * when it was taken
    */
   created: string;
+  /**
+   * width px
+   */
+  width: number;
+  /**
+   * height px
+   */
+  height: number;
 }
 
 /**

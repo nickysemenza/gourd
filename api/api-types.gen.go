@@ -24,11 +24,20 @@ type GooglePhoto struct {
 	// public image
 	BaseUrl string `json:"base_url"`
 
+	// blur hash
+	BlurHash *string `json:"blur_hash,omitempty"`
+
 	// when it was taken
 	Created time.Time `json:"created"`
 
+	// height px
+	Height int64 `json:"height"`
+
 	// id
 	Id string `json:"id"`
+
+	// width px
+	Width int64 `json:"width"`
 }
 
 // Ingredient defines model for Ingredient.

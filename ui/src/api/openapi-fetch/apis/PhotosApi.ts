@@ -34,7 +34,7 @@ export class PhotosApi extends runtime.BaseAPI {
      * List all photos
      */
     async listPhotosRaw(requestParameters: ListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;

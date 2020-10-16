@@ -34,24 +34,47 @@ func (c *Client) GetAlbums(ctx context.Context) ([]GAlbum, error) {
 }
 
 type Photo struct {
-	AlbumID string    `db:"album_id"`
-	PhotoID string    `db:"id"`
-	Created time.Time `db:"creation_time"`
-	Seen    time.Time `db:"last_seen"`
+	AlbumID  string         `db:"album_id"`
+	PhotoID  string         `db:"id"`
+	Created  time.Time      `db:"creation_time"`
+	Seen     time.Time      `db:"last_seen"`
+	BlurHash sql.NullString `db:"blur_hash"`
+	// MetadataJSON types.JSONText `db:"media_metadata"`
 }
 
+// type PhotoMetadata struct {
+// 	Width  int64
+// 	Height int64
+// }
+
+// func (p *Photo) SetMetadata(meta PhotoMetadata) error {
+// 	marshaled, err := json.Marshal(meta)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	p.MetadataJSON = types.JSONText(marshaled)
+// 	return nil
+// }
+
+// // GetMetadata returns the json metadata
+// func (p *Photo) GetMetadata() (PhotoMetadata, error) {
+// 	var meta PhotoMetadata
+// 	err := p.MetadataJSON.Unmarshal(&meta)
+// 	return meta, err
+// }
+
 func (c *Client) UpsertPhotos(ctx context.Context, photos []Photo) error {
-	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time")
+	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "blur_hash")
 	for _, photo := range photos {
-		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created)
+		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created, photo.BlurHash)
 	}
-	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?", time.Now())
+	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?, blur_hash = excluded.blur_hash", time.Now())
 	_, err := c.execContext(ctx, q)
 	return err
 }
 
 func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Photo, error) {
-	q := c.psql.Select("id", "album_id", "creation_time", "last_seen").From("gphotos_photos").OrderBy("creation_time DESC")
+	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "blur_hash").From("gphotos_photos").OrderBy("creation_time DESC")
 	q = addons(q)
 	var results []Photo
 	err := c.selectContext(ctx, q, &results)
@@ -87,7 +110,7 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 			}
 			//insert
 			mealID = getUUID()
-			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, "n/a")
+			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, mealID)
 			_, err := c.execContext(ctx, iq)
 			if err != nil {
 				return err

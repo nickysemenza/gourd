@@ -38,7 +38,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('code','Required parameter requestParameters.code was null or undefined when calling authLogin.');
         }
 
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.code !== undefined) {
             queryParameters['code'] = requestParameters.code;
