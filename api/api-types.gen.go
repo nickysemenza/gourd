@@ -40,6 +40,22 @@ type GooglePhoto struct {
 	Width int64 `json:"width"`
 }
 
+// GooglePhotosAlbum defines model for GooglePhotosAlbum.
+type GooglePhotosAlbum struct {
+
+	// id
+	Id string `json:"id"`
+
+	// product_url
+	ProductUrl string `json:"product_url"`
+
+	// title
+	Title string `json:"title"`
+
+	// usecase
+	Usecase string `json:"usecase"`
+}
+
 // Ingredient defines model for Ingredient.
 type Ingredient struct {
 

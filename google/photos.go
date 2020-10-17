@@ -108,23 +108,24 @@ func (c *Client) GetTest(ctx context.Context) (interface{}, error) {
 	return c.GetMediaItems(ctx, ids)
 
 }
-func (c *Client) GetAvailableAlbums(ctx context.Context) error {
+func (c *Client) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album, error) {
 	client, err := c.getPhotosClient(ctx)
 	if err != nil {
-		return fmt.Errorf("bad client: %w", err)
+		return nil, fmt.Errorf("bad client: %w", err)
 	}
-	return client.Albums.List().Pages(ctx, func(r *photoslibrary.ListAlbumsResponse) error {
-		for _, m := range r.Albums {
-			fmt.Println(m.Id, m.Title)
+	var albums []photoslibrary.Album
+	err = client.Albums.List().PageSize(50).Pages(ctx, func(r *photoslibrary.ListAlbumsResponse) error {
+		for _, a := range r.Albums {
+			albums = append(albums, *a)
 		}
 		return nil
 	})
+	return albums, err
 }
 
 func (c *Client) SyncAlbums(ctx context.Context) error {
 	ctx, span := global.Tracer("google").Start(ctx, "google.SyncAlbums")
 	defer span.End()
-	// c.GetAvailableAlbums(ctx)
 
 	client, err := c.getPhotosClient(ctx)
 	if err != nil {

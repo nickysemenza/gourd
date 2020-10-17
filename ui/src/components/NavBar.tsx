@@ -14,6 +14,7 @@ const NavBar: React.FC = () => {
     { title: "playground", path: "playground" },
     { title: "photos", path: "photos" },
     { title: "meals", path: "meals" },
+    { title: "albums", path: "albums" },
     { title: "docs", path: "docs" },
   ];
   return (

@@ -60,6 +60,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /albums:
+    get:
+      summary: List all albums
+      operationId: list_all_albums
+      tags:
+        - albums
+      responses:
+        "200":
+          description: All available albums from google
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  albums:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GooglePhotosAlbum"   
+                    description: The list of albums
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                
   /meals:
     get:
       summary: List all meals
@@ -431,6 +456,27 @@ components:
     #   type: array
     #   items:
     #     $ref: "#/components/schemas/Recipe"
+    GooglePhotosAlbum:
+      description: an album containing `GooglePhoto`
+      type: object
+      required:
+        - id
+        - title
+        - product_url
+        - usecase
+      properties:
+        id:
+          description: id
+          type: string        
+        title:
+          description: title
+          type: string 
+        product_url:
+          description: product_url
+          type: string
+        usecase:
+          description: usecase
+          type: string          
     GooglePhoto:
       description: A google photo
       type: object

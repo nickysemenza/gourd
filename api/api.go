@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
@@ -85,7 +84,6 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 		dbr.Sections = append(dbr.Sections, dbs)
 	}
 
-	spew.Dump(dbr)
 	return &dbr
 
 }
@@ -248,7 +246,6 @@ func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) 
 	items := []GooglePhoto{}
 	var ids []string
 	for _, p := range photos {
-		spew.Dump(p.BlurHash)
 		gp := GooglePhoto{Id: p.PhotoID, Created: p.Created}
 		if p.BlurHash.Valid {
 			s := p.BlurHash.String
@@ -376,4 +373,42 @@ func sendErr(ctx echo.Context, code int, err error) error {
 	return ctx.JSON(code, Error{
 		Message: err.Error(),
 	})
+}
+
+type Test struct {
+	Albums []GooglePhotosAlbum `json:"albums,omitempty"`
+}
+
+func (a *API) ListAllAlbums(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var resp Test
+
+	dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
+	if err != nil {
+		return err
+	}
+
+	albums, err := a.Manager.Google.GetAvailableAlbums(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, a := range albums {
+		gpa := GooglePhotosAlbum{
+			Id:         a.Id,
+			ProductUrl: a.ProductUrl,
+			Title:      a.Title,
+		}
+
+		for _, dbA := range dbAlbums {
+			if dbA.ID == gpa.Id {
+				gpa.Usecase = dbA.Usecase
+			}
+		}
+
+		resp.Albums = append(resp.Albums, gpa)
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }

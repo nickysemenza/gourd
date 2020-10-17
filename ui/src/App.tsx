@@ -31,6 +31,7 @@ import {
 } from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
+import Albums from "./pages/Albums";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -91,6 +92,9 @@ function App() {
                 </PrivateRoute>
                 <PrivateRoute path="/meals">
                   <Meals />
+                </PrivateRoute>
+                <PrivateRoute path="/albums">
+                  <Albums />
                 </PrivateRoute>
                 <Route path="/">
                   <Test />

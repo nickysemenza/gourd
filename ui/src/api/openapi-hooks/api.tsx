@@ -177,6 +177,28 @@ export interface IngredientDetail {
 }
 
 /**
+ * an album containing `GooglePhoto`
+ */
+export interface GooglePhotosAlbum {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * title
+   */
+  title: string;
+  /**
+   * product_url
+   */
+  product_url: string;
+  /**
+   * usecase
+   */
+  usecase: string;
+}
+
+/**
  * A google photo
  */
 export interface GooglePhoto {
@@ -358,6 +380,39 @@ export const useListPhotos = (props: UseListPhotosProps) =>
     encode`/photos`,
     props
   );
+
+export interface ListAllAlbumsResponse {
+  /**
+   * The list of albums
+   */
+  albums?: GooglePhotosAlbum[];
+}
+
+export type ListAllAlbumsProps = Omit<
+  GetProps<ListAllAlbumsResponse, Error, void, void>,
+  "path"
+>;
+
+/**
+ * List all albums
+ */
+export const ListAllAlbums = (props: ListAllAlbumsProps) => (
+  <Get<ListAllAlbumsResponse, Error, void, void>
+    path={encode`/albums`}
+    {...props}
+  />
+);
+
+export type UseListAllAlbumsProps = Omit<
+  UseGetProps<ListAllAlbumsResponse, Error, void, void>,
+  "path"
+>;
+
+/**
+ * List all albums
+ */
+export const useListAllAlbums = (props: UseListAllAlbumsProps) =>
+  useGet<ListAllAlbumsResponse, Error, void, void>(encode`/albums`, props);
 
 export interface ListMealsQueryParams {
   /**
