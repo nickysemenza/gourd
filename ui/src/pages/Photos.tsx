@@ -6,7 +6,6 @@ import { useListPhotos } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
-import { Blurhash } from "react-blurhash";
 import ProgressiveImage from "../components/ProgressiveImage";
 
 const Photos: React.FC = () => {

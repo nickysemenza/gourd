@@ -1,26 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { CellProps } from "react-table";
-import dayjs from "dayjs";
 import Debug from "../components/Debug";
 import { useListAllAlbums } from "../api/openapi-hooks/api";
-import PaginatedTable, {
-  PaginationParameters,
-} from "../components/PaginatedTable";
-import { Blurhash } from "react-blurhash";
-import ProgressiveImage from "../components/ProgressiveImage";
+import PaginatedTable from "../components/PaginatedTable";
 
 const Albums: React.FC = () => {
-  let initialParams: PaginationParameters = {
-    offset: 0,
-    limit: 2,
-  };
-
-  const [params, setParams] = useState(initialParams);
-
-  const fetchData = React.useCallback((params: PaginationParameters) => {
-    setParams(params);
-  }, []);
-
   const { data, error } = useListAllAlbums({});
 
   const columns = React.useMemo(
@@ -58,7 +42,7 @@ const Albums: React.FC = () => {
       <PaginatedTable
         columns={columns}
         data={data?.albums || []}
-        fetchData={fetchData}
+        fetchData={() => {}}
         isLoading={false}
         totalCount={0}
         pageCount={1}
