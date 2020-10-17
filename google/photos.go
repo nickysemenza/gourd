@@ -2,7 +2,6 @@ package google
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -17,6 +16,7 @@ import (
 	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
+	"gopkg.in/guregu/null.v3/zero"
 )
 
 // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
@@ -114,7 +114,7 @@ func (c *Client) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album,
 		return nil, fmt.Errorf("bad client: %w", err)
 	}
 	var albums []photoslibrary.Album
-	err = client.Albums.List().PageSize(50).Pages(ctx, func(r *photoslibrary.ListAlbumsResponse) error {
+	err = client.Albums.List().PageSize(maxPhotoBatchGet).Pages(ctx, func(r *photoslibrary.ListAlbumsResponse) error {
 		for _, a := range r.Albums {
 			albums = append(albums, *a)
 		}
@@ -132,31 +132,43 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 		return fmt.Errorf("bad client: %w", err)
 	}
 
+	dbPhotos, err := c.db.GetAllPhotos(ctx)
+	if err != nil {
+		return err
+	}
 	albums, err := c.db.GetAlbums(ctx)
 	if err != nil {
 		return err
 	}
+	log.Infof("syncing %d album(s)", len(albums))
+	numBlurHashCalculated := 0
 	for _, album := range albums {
 		var photos []db.Photo
 		err = client.MediaItems.Search(&photoslibrary.SearchMediaItemsRequest{
 			AlbumId:  album.ID,
-			PageSize: 50,
+			PageSize: maxPhotoBatchGet,
 		}).Pages(ctx, func(r *photoslibrary.SearchMediaItemsResponse) error {
 			for _, m := range r.MediaItems {
 				t, err := time.Parse(time.RFC3339, m.MediaMetadata.CreationTime)
 				if err != nil {
 					return err
 				}
-				bh, err := image.GetBlurHash(ctx, m.BaseUrl)
-				if err != nil {
-					return err
+				var bh string
+				if dbPhoto, ok := dbPhotos[m.Id]; ok && dbPhoto.BlurHash.Valid && dbPhoto.BlurHash.String != "" {
+					bh = dbPhoto.BlurHash.String
+				} else {
+					bh, err = image.GetBlurHash(ctx, m.BaseUrl)
+					if err != nil {
+						return err
+					}
+					numBlurHashCalculated++
 				}
 
 				photos = append(photos, db.Photo{
 					AlbumID:  album.ID,
 					PhotoID:  m.Id,
 					Created:  t,
-					BlurHash: sql.NullString{String: bh, Valid: true},
+					BlurHash: zero.StringFrom(bh),
 				})
 			}
 			return nil
@@ -168,7 +180,9 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		log.Infof("synced %d photos from album %s", len(photos), album)
+		log.Infof(
+			"synced %d photos from album %s. Calcualted %d blur hashes",
+			len(photos), album, numBlurHashCalculated)
 	}
 	return nil
 }

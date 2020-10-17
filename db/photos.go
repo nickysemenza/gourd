@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
+	"gopkg.in/guregu/null.v3/zero"
 )
 
 func (c *Client) GetKV(ctx context.Context, key string) (string, error) {
@@ -34,11 +35,11 @@ func (c *Client) GetAlbums(ctx context.Context) ([]GAlbum, error) {
 }
 
 type Photo struct {
-	AlbumID  string         `db:"album_id"`
-	PhotoID  string         `db:"id"`
-	Created  time.Time      `db:"creation_time"`
-	Seen     time.Time      `db:"last_seen"`
-	BlurHash sql.NullString `db:"blur_hash"`
+	AlbumID  string      `db:"album_id"`
+	PhotoID  string      `db:"id"`
+	Created  time.Time   `db:"creation_time"`
+	Seen     time.Time   `db:"last_seen"`
+	BlurHash zero.String `db:"blur_hash"`
 	// MetadataJSON types.JSONText `db:"media_metadata"`
 }
 
@@ -74,6 +75,8 @@ func (c *Client) UpsertPhotos(ctx context.Context, photos []Photo) error {
 }
 
 func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Photo, error) {
+	ctx, span := c.tracer.Start(ctx, "db.getPhotos")
+	defer span.End()
 	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "blur_hash").From("gphotos_photos").OrderBy("creation_time DESC")
 	q = addons(q)
 	var results []Photo
@@ -82,6 +85,19 @@ func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) 
 }
 func (c *Client) GetPhotos(ctx context.Context) ([]Photo, error) {
 	return c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder { return q })
+}
+func (c *Client) GetAllPhotos(ctx context.Context) (map[string]Photo, error) {
+	ctx, span := c.tracer.Start(ctx, "db.GetAllPhotos")
+	defer span.End()
+	photos, err := c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder { return q })
+	if err != nil {
+		return nil, err
+	}
+	byId := make(map[string]Photo)
+	for _, p := range photos {
+		byId[p.PhotoID] = p
+	}
+	return byId, nil
 }
 
 func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
