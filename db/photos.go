@@ -43,27 +43,6 @@ type Photo struct {
 	// MetadataJSON types.JSONText `db:"media_metadata"`
 }
 
-// type PhotoMetadata struct {
-// 	Width  int64
-// 	Height int64
-// }
-
-// func (p *Photo) SetMetadata(meta PhotoMetadata) error {
-// 	marshaled, err := json.Marshal(meta)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	p.MetadataJSON = types.JSONText(marshaled)
-// 	return nil
-// }
-
-// // GetMetadata returns the json metadata
-// func (p *Photo) GetMetadata() (PhotoMetadata, error) {
-// 	var meta PhotoMetadata
-// 	err := p.MetadataJSON.Unmarshal(&meta)
-// 	return meta, err
-// }
-
 func (c *Client) UpsertPhotos(ctx context.Context, photos []Photo) error {
 	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "blur_hash")
 	for _, photo := range photos {

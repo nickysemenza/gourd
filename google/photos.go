@@ -70,15 +70,6 @@ func (c *Client) GetMediaItems(ctx context.Context, ids []string) (map[string]ph
 	defer span.End()
 	chunks := chunkBy(ids, maxPhotoBatchGet)
 	urls := map[string]photoslibrary.MediaItem{}
-	// for _, chunk := range chunks {
-	// 	items, err := c.batchGet(ctx, chunk)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	for _, item := range items {
-	// 		urls[item.Id] = item.BaseUrl
-	// 	}
-	// }
 	wg := sync.WaitGroup{}
 	var m sync.Mutex
 	for _, chunk := range chunks {
