@@ -1,4 +1,4 @@
-package google
+package photos
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	gphotos "github.com/gphotosuploader/google-photos-api-client-go/lib-gphotos"
 	"github.com/gphotosuploader/googlemirror/api/photoslibrary/v1"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/api/global"
@@ -22,50 +23,66 @@ import (
 // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
 const maxPhotoBatchGet = 50
 
-func (c *Client) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
-	token, err := c.getToken(ctx)
+type Photos struct {
+	g  *google.Client
+	db *db.Client
+}
+
+func New(db *db.Client, g *google.Client) *Photos {
+	return &Photos{g: g, db: db}
+
+}
+func (p *Photos) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
+	token, err := p.g.GetToken(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bad token: %w", err)
 	}
-	tc := c.oc.Client(ctx, token)
+	tc := p.g.GetOauth().Client(ctx, token)
+
 	return gphotos.NewClient(tc)
 }
-func (c *Client) batchGet(ctx context.Context, ids []string) ([]photoslibrary.MediaItem, error) {
+func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.MediaItem, error) {
 	ctx, span := global.Tracer("google").Start(ctx, "google.batchGet")
 	defer span.End()
 	if size := len(ids); size > maxPhotoBatchGet {
 		return nil, fmt.Errorf("requested %d, limit is %d", size, maxPhotoBatchGet)
 	}
-	token, err := c.getToken(ctx)
+	token, err := p.g.GetToken(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bad token: %w", err)
 	}
-	tc := c.oc.Client(ctx, token)
+	tc := p.g.GetOauth().Client(ctx, token)
 
 	url := "https://photoslibrary.googleapis.com/v1/mediaItems:batchGet?mediaItemIds=" + strings.Join(ids, "&mediaItemIds=")
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("batchGet failed: %w", err)
 	}
 	req.Header.Add("content-type", "application/json")
 	res, err := tc.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("batchGet failed: %w", err)
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, fmt.Errorf("batchGet failed: %w", err)
+	}
 
 	var batchResult BatchGetResult
-	json.Unmarshal(body, &batchResult)
+	if err := json.Unmarshal(body, &batchResult); err != nil {
+		return nil, fmt.Errorf("batchGet failed: %w", err)
+	}
 	var items []photoslibrary.MediaItem
 	for _, b := range batchResult.MediaItemResults {
 		items = append(items, b.MediaItem)
 	}
 	span.SetAttribute("result-raw", batchResult)
+
 	return items, nil
 }
-func (c *Client) GetMediaItems(ctx context.Context, ids []string) (map[string]photoslibrary.MediaItem, error) {
+func (p *Photos) GetMediaItems(ctx context.Context, ids []string) (map[string]photoslibrary.MediaItem, error) {
 	ctx, span := global.Tracer("google").Start(ctx, "google.GetMediaItems")
 	defer span.End()
 	chunks := chunkBy(ids, maxPhotoBatchGet)
@@ -75,7 +92,7 @@ func (c *Client) GetMediaItems(ctx context.Context, ids []string) (map[string]ph
 	for _, chunk := range chunks {
 		wg.Add(1)
 		go func(chunk []string) {
-			items, err := c.batchGet(ctx, chunk)
+			items, err := p.batchGet(ctx, chunk)
 			if err != nil {
 				log.Error(err)
 			}
@@ -93,14 +110,15 @@ func (c *Client) GetMediaItems(ctx context.Context, ids []string) (map[string]ph
 	return urls, nil
 
 }
-func (c *Client) GetTest(ctx context.Context) (interface{}, error) {
+func (p *Photos) GetTest(ctx context.Context) (interface{}, error) {
 	ids := []string{"AIbigFqimylf7SUbAvFeiDPDBg_K_rH5DYtsZUMAiD2yMhJDeHIadDYJnc2Q7vnqKT4DQJeB5IQ7qNEk1Iu0-9k9lfolG6i9-A",
 		"AIbigFrtZdWe-gFN1KOuPBhPlFsSNftIy2tyH0yW3JxQPALG-qPg1BsByn12LwoUM_om-DI_rB7OLwhZ8UpzPBxStrlbb9_SQQ"}
-	return c.GetMediaItems(ctx, ids)
+
+	return p.GetMediaItems(ctx, ids)
 
 }
-func (c *Client) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album, error) {
-	client, err := c.getPhotosClient(ctx)
+func (p *Photos) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album, error) {
+	client, err := p.getPhotosClient(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("bad client: %w", err)
 	}
@@ -114,20 +132,20 @@ func (c *Client) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album,
 	return albums, err
 }
 
-func (c *Client) SyncAlbums(ctx context.Context) error {
+func (p *Photos) SyncAlbums(ctx context.Context) error {
 	ctx, span := global.Tracer("google").Start(ctx, "google.SyncAlbums")
 	defer span.End()
 
-	client, err := c.getPhotosClient(ctx)
+	client, err := p.getPhotosClient(ctx)
 	if err != nil {
 		return fmt.Errorf("bad client: %w", err)
 	}
 
-	dbPhotos, err := c.db.GetAllPhotos(ctx)
+	dbPhotos, err := p.db.GetAllPhotos(ctx)
 	if err != nil {
 		return err
 	}
-	albums, err := c.db.GetAlbums(ctx)
+	albums, err := p.db.GetAlbums(ctx)
 	if err != nil {
 		return err
 	}
@@ -167,12 +185,12 @@ func (c *Client) SyncAlbums(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		err = c.db.UpsertPhotos(ctx, photos)
+		err = p.db.UpsertPhotos(ctx, photos)
 		if err != nil {
 			return err
 		}
 		log.Infof(
-			"synced %d photos from album %s. Calcualted %d blur hashes",
+			"synced %d photos from album %s. Calculated %d blur hashes",
 			len(photos), album, numBlurHashCalculated)
 	}
 	return nil
@@ -182,4 +200,13 @@ type BatchGetResult struct {
 	MediaItemResults []struct {
 		MediaItem photoslibrary.MediaItem `json:"mediaItem"`
 	} `json:"mediaItemResults"`
+}
+
+// https://gist.github.com/mustafaturan/7a29e8251a7369645fb6c2965f8c2daf
+func chunkBy(items []string, chunkSize int) (chunks [][]string) {
+	for chunkSize < len(items) {
+		items, chunks = items[chunkSize:], append(chunks, items[0:chunkSize:chunkSize])
+	}
+
+	return append(chunks, items)
 }

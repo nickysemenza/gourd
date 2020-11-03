@@ -256,7 +256,7 @@ func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) 
 	}
 
 	if getURLs {
-		results, err := a.Manager.Google.GetMediaItems(ctx, ids)
+		results, err := a.Manager.Photos.GetMediaItems(ctx, ids)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -316,7 +316,7 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 
 		items = append(items, meal)
 	}
-	urls, err := a.Manager.Google.GetMediaItems(ctx, gphotoIDs)
+	urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
 	if err != nil {
 		return err
 	}
@@ -389,7 +389,7 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 		return err
 	}
 
-	albums, err := a.Manager.Google.GetAvailableAlbums(ctx)
+	albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
 	if err != nil {
 		return err
 	}

@@ -6,12 +6,14 @@ import (
 	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
+	"github.com/nickysemenza/gourd/photos"
 )
 
 // Manager manages recipes
 type Manager struct {
 	db     *db.Client
 	Google *google.Client
+	Photos *photos.Photos
 	Auth   *auth.Auth
 }
 
@@ -19,6 +21,7 @@ func New(db *db.Client, g *google.Client, auth *auth.Auth) *Manager {
 	return &Manager{db: db,
 		Google: g,
 		Auth:   auth,
+		Photos: photos.New(db, g),
 	}
 }
 

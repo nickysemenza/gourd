@@ -52,7 +52,7 @@ func init() {
 					return err
 				}
 				ctx := context.Background()
-				err = s.Manager.Google.SyncAlbums(ctx)
+				err = s.Manager.Photos.SyncAlbums(ctx)
 				if err != nil {
 					return err
 				}

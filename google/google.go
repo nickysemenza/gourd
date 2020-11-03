@@ -20,6 +20,8 @@ type Client struct {
 	_token *oauth2.Token
 }
 
+func (c *Client) GetOauth() *oauth2.Config { return &c.oc }
+
 func New(db *db.Client, clientID, clientSecret, redirectURL string) *Client {
 	oc := oauth2.Config{
 		ClientID:     clientID,
@@ -61,7 +63,7 @@ func (c *Client) Finish(ctx context.Context, code string) error {
 
 	return nil
 }
-func (c *Client) getToken(ctx context.Context) (*oauth2.Token, error) {
+func (c *Client) GetToken(ctx context.Context) (*oauth2.Token, error) {
 	ctx, span := global.Tracer("google").Start(ctx, "google.getToken")
 	defer span.End()
 
@@ -84,7 +86,7 @@ func (c *Client) getToken(ctx context.Context) (*oauth2.Token, error) {
 }
 
 func (c *Client) GetUserInfo(ctx context.Context) (*gauth.Userinfo, error) {
-	token, err := c.getToken(ctx)
+	token, err := c.GetToken(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -97,13 +99,4 @@ func (c *Client) getUserInfo(ctx context.Context, token *oauth2.Token) (*gauth.U
 		return nil, err
 	}
 	return gauth.NewUserinfoV2MeService(oauth2Service).Get().Context(ctx).Do()
-}
-
-// https://gist.github.com/mustafaturan/7a29e8251a7369645fb6c2965f8c2daf
-func chunkBy(items []string, chunkSize int) (chunks [][]string) {
-	for chunkSize < len(items) {
-		items, chunks = items[chunkSize:], append(chunks, items[0:chunkSize:chunkSize])
-	}
-
-	return append(chunks, items)
 }
