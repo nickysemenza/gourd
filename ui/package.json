@@ -42,7 +42,7 @@
     "react-table": "^7.5.1",
     "redoc": "^2.0.0-rc.40",
     "restful-react": "^14.5.1",
-    "typescript": "^3.9.7",
+    "typescript": "^4.0.5",
     "universal-cookie": "^4.0.4"
   },
   "scripts": {
