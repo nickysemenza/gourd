@@ -14,7 +14,6 @@ require (
 	github.com/apache/arrow/go/arrow v0.0.0-20200922190503-8563b422bdba // indirect
 	github.com/aws/aws-sdk-go v1.34.29 // indirect
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/cockroachdb/cockroach-go v2.0.1+incompatible // indirect
 	github.com/cosmtrek/air v1.12.5-0.20200905080724-b538c70423fb
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/davecgh/go-spew v1.1.1
