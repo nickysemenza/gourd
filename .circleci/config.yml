@@ -110,6 +110,10 @@ jobs:
       - run:
           command: docker-compose run ui
           no_output_timeout: 3m
+      - run:
+          name: "output container logs to console"
+          command: |
+            docker-compose logs
       - codecov/upload:
           file: ui/coverage/coverage-final.json
       - store_artifacts:
