@@ -1,6 +1,7 @@
 import React from "react";
 
-import ApolloClient from "apollo-boost";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+
 import { ApolloProvider } from "@apollo/react-hooks";
 import Test from "./Test";
 import RecipeList from "./pages/RecipeList";
@@ -54,9 +55,16 @@ const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 };
 
 function App() {
-  const client = new ApolloClient({
+  const cache = new InMemoryCache();
+  const link = createHttpLink({
     uri: getGQLURL(),
     headers: { authorization: "Bearer " + getJWT() },
+  });
+
+  const client = new ApolloClient({
+    // Provide required constructor fields
+    cache: cache,
+    link: link,
   });
   return (
     <CookiesProvider>
