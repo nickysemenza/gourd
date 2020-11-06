@@ -1,0 +1,16 @@
+name: e2e-cypress
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build e2e docker-compose
+        run: docker-compose build
+      - name: run e2e
+        run: docker-compose run ui
+      - name: Archive cypress results
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-results
+          path: ui/cypress
