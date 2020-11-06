@@ -80,6 +80,7 @@ func makeServer() (*server.Server, error) {
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 		APIManager:  apiManager,
+		BypassAuth:  viper.GetBool("BYPASS_AUTH"),
 	}, nil
 }
 func runServer() {

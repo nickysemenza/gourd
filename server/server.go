@@ -40,6 +40,7 @@ type Server struct {
 	HTTPPort    uint
 	HTTPTimeout time.Duration
 	APIManager  *api.API
+	BypassAuth  bool
 }
 
 // nolint:gochecknoglobals
@@ -79,6 +80,9 @@ func (s *Server) Run(_ context.Context) error {
 	}
 
 	skipper := func(c echo.Context) bool {
+		if s.BypassAuth {
+			return true
+		}
 		switch c.Path() {
 		case "/api/auth", "/spec":
 			return true

@@ -8,7 +8,7 @@ jobs:
   build_backend:
     docker:
       # specify the version
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.15
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: gourd

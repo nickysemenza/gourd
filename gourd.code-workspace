@@ -13,7 +13,7 @@
     "recommendations": ["bradlc.vscode-tailwindcss"]
   },
   "tasks": {
-    "version": "1.0.0",
+    "version": "2.0.0",
     "options": {
       "cwd": "${workspaceFolder:go}/"
     },
@@ -26,5 +26,8 @@
         "problemMatcher": []
       }
     ]
+  },
+  "settings": {
+    "typescript.tsdk": "ui/node_modules/typescript/lib"
   }
 }
