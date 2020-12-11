@@ -16,6 +16,17 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 
   require("@cypress/code-coverage/task")(on, config);
+  const options = {
+    printLogsToFile: "always",
+    printLogsToConsole: "onFail",
+    outputRoot: config.projectRoot + "/cypress/logs/",
+    outputTarget: {
+      "out.txt": "txt",
+      "out.json": "json",
+    },
+  };
+  require("cypress-terminal-report/src/installLogsPrinter")(on, options);
+
   // IMPORTANT to return the config object
   // with the any changed environment variables
   return config;

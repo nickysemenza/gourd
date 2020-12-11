@@ -10,6 +10,7 @@
 .nyc_output
 cypress/videos
 cypress/screenshots
+cypress/logs
 
 # production
 /build

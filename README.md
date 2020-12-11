@@ -35,5 +35,6 @@ This is comprised mulitple components:
 5. meals w/ multiple recipes at set quantities
 6. slugs for recipe urls
 7. associate ingredients with fdc ids
+8. convert ingredient into recipe
 
 range: min max approx unit kind (time, amount)

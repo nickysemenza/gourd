@@ -18,3 +18,4 @@ linters:
     - lll
     - gomnd
     - scopelint
+    - exhaustivestruct

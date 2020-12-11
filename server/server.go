@@ -81,6 +81,8 @@ func (s *Server) Run(_ context.Context) error {
 
 	skipper := func(c echo.Context) bool {
 		if s.BypassAuth {
+			log.Debugf("bypassing auth for %s", c.Path())
+
 			return true
 		}
 		switch c.Path() {
