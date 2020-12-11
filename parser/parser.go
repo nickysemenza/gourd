@@ -14,7 +14,7 @@ import (
 	"github.com/nickysemenza/gourd/unit"
 	log "github.com/sirupsen/logrus"
 
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
 )
 
@@ -106,12 +106,12 @@ func Parse(ctx context.Context, s string) (*Ingredient, error) {
 }
 
 func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
-	ctx, span := global.Tracer("parser").Start(ctx, "parser.Parse")
+	ctx, span := otel.Tracer("parser").Start(ctx, "parser.Parse")
 	defer span.End()
 
 	segments, err := p.getsegments(ctx, s)
-	span.AddEvent(ctx, "got segments")
-	span.SetAttributes(label.String("raw",s))
+	span.AddEvent("got segments")
+	span.SetAttributes(label.String("raw", s))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get segments: %v", err)
 	}
@@ -125,7 +125,7 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 
 // nolint:gocognit,funlen
 func (p *parser) handleSegments(ctx context.Context, segments []segment) (*Ingredient, error) {
-	_, span := global.Tracer("parser").Start(ctx, "parser.handleSegments")
+	_, span := otel.Tracer("parser").Start(ctx, "parser.handleSegments")
 	defer span.End()
 	ing := Ingredient{}
 	for i := 0; i < len(segments); i++ {
@@ -189,7 +189,7 @@ func (p *parser) handleSegments(ctx context.Context, segments []segment) (*Ingre
 	return &ing, nil
 }
 func (p *parser) getsegments(ctx context.Context, s string) ([]segment, error) {
-	_, span := global.Tracer("parser").Start(ctx, "parser.getsegments")
+	_, span := otel.Tracer("parser").Start(ctx, "parser.getsegments")
 	defer span.End()
 	p.current = none
 	r := strings.NewReader(s)

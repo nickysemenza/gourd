@@ -18,10 +18,10 @@ import (
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/metric"
-	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/auth"
@@ -44,7 +44,7 @@ type Server struct {
 }
 
 // nolint:gochecknoglobals
-var httpRequestsDurationMetric = metric.Must(global.Meter("ex.com/basic")).
+var httpRequestsDurationMetric = metric.Must(otel.Meter("ex.com/basic")).
 	NewFloat64Counter("http.requests.duration")
 
 // func timing(next http.Handler) http.Handler {
@@ -169,7 +169,7 @@ func wrapHandler(h http.Handler) http.Handler {
 		if ok && sc.SpanID.String() != "" {
 			sc2 := trace.SpanContext{
 				SpanID:  trace.SpanID(sc.SpanID),
-				TraceID: trace.ID(sc.TraceID),
+				TraceID: trace.TraceID(sc.TraceID),
 			}
 			sc2.TraceFlags |= trace.FlagsSampled
 			spew.Dump("ctx-before", r.Context())

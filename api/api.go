@@ -12,8 +12,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
-	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
@@ -25,7 +25,7 @@ type API struct {
 func NewAPI(m *manager.Manager) *API {
 	return &API{
 		Manager: m,
-		tracer:  global.Tracer("db"),
+		tracer:  otel.Tracer("db"),
 	}
 }
 
@@ -241,7 +241,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 }
 
 func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) ([]GooglePhoto, []string, error) {
-	ctx, span := global.Tracer("api").Start(ctx, "google.fromDBPhoto")
+	ctx, span := otel.Tracer("api").Start(ctx, "google.fromDBPhoto")
 	defer span.End()
 	items := []GooglePhoto{}
 	var ids []string

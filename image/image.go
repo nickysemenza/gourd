@@ -11,11 +11,12 @@ import (
 	_ "image/png"
 
 	"github.com/buckket/go-blurhash"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 )
 
 func GetBlurHash(ctx context.Context, url string) (string, error) {
-	ctx, span := global.Tracer("image").Start(ctx, "image.GetBlurHash")
+	ctx, span := otel.Tracer("image").Start(ctx, "image.GetBlurHash")
 	defer span.End()
 
 	image, err := GetFromURL(ctx, url)
@@ -27,7 +28,7 @@ func GetBlurHash(ctx context.Context, url string) (string, error) {
 }
 
 func GetFromURL(ctx context.Context, url string) (image.Image, error) {
-	ctx, span := global.Tracer("image").Start(ctx, "image.GetFromURL")
+	ctx, span := otel.Tracer("image").Start(ctx, "image.GetFromURL")
 	defer span.End()
 	resp, err := http.Get(url)
 	if err != nil {
@@ -39,7 +40,7 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}
-	span.SetAttribute("image.format", format)
+	span.SetAttributes(label.String("image.format", format))
 	return m, err
 
 }

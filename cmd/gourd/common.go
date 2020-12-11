@@ -8,7 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	"go.opentelemetry.io/otel/label"
@@ -29,7 +29,7 @@ func initTracer() error {
 
 		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(exporter))
 
-		global.SetTracerProvider(tp)
+		otel.SetTracerProvider(tp)
 	} else if endpoint != "" {
 		_, err := jaeger.InstallNewPipeline(
 			jaeger.WithCollectorEndpoint(endpoint),
@@ -82,6 +82,7 @@ func setupMisc() {
 
 	// tracing
 	if err := initTracer(); err != nil {
+		err := fmt.Errorf("failed to init tracer: %w", err)
 		log.Fatal(err)
 	}
 	log.Infof("tracer initialized")

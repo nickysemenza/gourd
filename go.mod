@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/99designs/gqlgen v0.13.0
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.12.0
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.13.1-0.20201210214614-d8551be9a708
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/buckket/go-blurhash v1.1.0
@@ -32,13 +32,13 @@ require (
 	github.com/vektah/gqlparser v1.3.1
 	github.com/vektah/gqlparser/v2 v2.1.0
 	go.opencensus.io v0.22.5
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.12.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.12.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.12.0
-	go.opentelemetry.io/otel v0.12.0
-	go.opentelemetry.io/otel/exporters/metric/prometheus v0.12.0
-	go.opentelemetry.io/otel/exporters/trace/jaeger v0.12.0
-	go.opentelemetry.io/otel/sdk v0.12.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.14.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.14.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.14.0
+	go.opentelemetry.io/otel v0.15.0
+	go.opentelemetry.io/otel/exporters/metric/prometheus v0.14.0
+	go.opentelemetry.io/otel/exporters/trace/jaeger v0.14.0
+	go.opentelemetry.io/otel/sdk v0.15.0
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/tools v0.0.0-20201211025543-abf6a1d87e11
 	google.golang.org/api v0.36.0

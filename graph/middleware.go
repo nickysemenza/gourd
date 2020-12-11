@@ -6,10 +6,10 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Observability is a Middleware for tracing graphql queries
@@ -32,7 +32,7 @@ func (c Observability) Validate(schema graphql.ExecutableSchema) error {
 func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver) (res interface{}, err error) {
 	fc := graphql.GetFieldContext(ctx)
 
-	tr := global.Tracer("graphql")
+	tr := otel.Tracer("graphql")
 	ctx, span := tr.Start(ctx, fmt.Sprintf("graphql: field.%s", fc.Field.Name))
 
 	defer span.End()
@@ -54,7 +54,7 @@ func (c Observability) InterceptField(ctx context.Context, next graphql.Resolver
 
 	errs := graphql.GetErrors(ctx)
 	if len(errs) != 0 {
-		span.SetStatus(codes.Unknown, errs.Error())
+		span.SetStatus(codes.Error, errs.Error())
 		span.SetAttributes(label.Key("error").Bool(true))
 		for i, err := range errs {
 			span.SetAttributes(
@@ -86,9 +86,9 @@ func (c Observability) InterceptOperation(ctx context.Context, next graphql.Oper
 	for k, v := range oc.Variables {
 		span.SetAttributes(label.Key(fmt.Sprintf("request.variables.%s", k)).String(fmt.Sprintf("%+v", v)))
 	}
-	span.AddEvent(ctx, "graphql: processing begin")
-	span.AddEventWithTimestamp(ctx, oc.Stats.Read.Start, "graphql read: start")
-	span.AddEventWithTimestamp(ctx, oc.Stats.Read.Start, "graphql read: end")
+	span.AddEvent("graphql: processing begin")
+	span.AddEvent("graphql read: start", trace.WithTimestamp(oc.Stats.Read.Start))
+	span.AddEvent("graphql read: end", trace.WithTimestamp(oc.Stats.Read.End))
 	return next(ctx)
 }
 

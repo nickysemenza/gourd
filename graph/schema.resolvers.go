@@ -13,7 +13,7 @@ import (
 	"github.com/nickysemenza/gourd/graph/model"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/vektah/gqlparser/gqlerror"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
 	"gopkg.in/guregu/null.v3/zero"
 )
@@ -142,7 +142,7 @@ func (r *mutationResolver) UpdateRecipe(ctx context.Context, recipe *model.Recip
 }
 
 func (r *mutationResolver) UpsertIngredient(ctx context.Context, name string, kind model.SectionIngredientKind) (string, error) {
-	ctx, span := global.Tracer("graph").Start(ctx, "UpsertIngredient")
+	ctx, span := otel.Tracer("graph").Start(ctx, "UpsertIngredient")
 	defer span.End()
 	switch kind {
 	case model.SectionIngredientKindIngredient:
@@ -190,7 +190,7 @@ func (r *queryResolver) Recipes(ctx context.Context, searchQuery string) ([]*mod
 }
 
 func (r *queryResolver) Recipe(ctx context.Context, uuid string) (*model.Recipe, error) {
-	tr := global.Tracer("graph")
+	tr := otel.Tracer("graph")
 	ctx, span := tr.Start(ctx, "Recipe")
 	defer span.End()
 	span.SetAttributes(label.String("uuid", uuid))

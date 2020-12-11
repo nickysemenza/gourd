@@ -44,6 +44,7 @@ func makeServer() (*server.Server, error) {
 	// postgres database
 	dbConn, err := getDBConn()
 	if err != nil {
+		err := fmt.Errorf("failed to init db conn: %w", err)
 		log.Fatal(err)
 	}
 	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
@@ -51,11 +52,13 @@ func makeServer() (*server.Server, error) {
 
 	dbClient, err := db.New(dbConn)
 	if err != nil {
+		err := fmt.Errorf("failed to init db: %w", err)
 		log.Fatal(err)
 	}
 
 	// postgres migrations
 	if err := autoMigrate(dbConn); err != nil {
+		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
 	}
 
@@ -87,6 +90,7 @@ func runServer() {
 	ctx := context.Background()
 	s, err := makeServer()
 	if err != nil {
+		err := fmt.Errorf("failed to make server: %w", err)
 		log.Fatal(err)
 	}
 	log.Fatal(s.Run(ctx))

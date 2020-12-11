@@ -5,9 +5,9 @@ import (
 	"database/sql/driver"
 
 	"github.com/luna-duclos/instrumentedsql"
-	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type tracer struct {
@@ -40,7 +40,7 @@ func (s span) NewChild(name string) instrumentedsql.Span {
 	if s.parent != nil {
 		ctx = trace.ContextWithSpan(context.Background(), s.parent)
 	}
-	_, parent := global.Tracer("db").Start(ctx, name)
+	_, parent := otel.Tracer("db").Start(ctx, name)
 
 	return span{parent: parent, tracer: s.tracer}
 }
@@ -53,7 +53,7 @@ func (s span) SetError(err error) {
 	if err == nil || err == driver.ErrSkip {
 		return
 	}
-	s.parent.RecordError(context.Background(), err)
+	s.parent.RecordError(err)
 	s.SetLabel("error", "true")
 }
 

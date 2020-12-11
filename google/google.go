@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/nickysemenza/gourd/db"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	gauth "google.golang.org/api/oauth2/v2"
@@ -64,7 +64,7 @@ func (c *Client) Finish(ctx context.Context, code string) error {
 	return nil
 }
 func (c *Client) GetToken(ctx context.Context) (*oauth2.Token, error) {
-	ctx, span := global.Tracer("google").Start(ctx, "google.getToken")
+	ctx, span := otel.Tracer("google").Start(ctx, "google.getToken")
 	defer span.End()
 
 	if c._token != nil {

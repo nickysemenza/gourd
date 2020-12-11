@@ -16,7 +16,8 @@ import (
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
@@ -42,7 +43,7 @@ func (p *Photos) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
 	return gphotos.NewClient(tc)
 }
 func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.MediaItem, error) {
-	ctx, span := global.Tracer("google").Start(ctx, "google.batchGet")
+	ctx, span := otel.Tracer("google").Start(ctx, "google.batchGet")
 	defer span.End()
 	if size := len(ids); size > maxPhotoBatchGet {
 		return nil, fmt.Errorf("requested %d, limit is %d", size, maxPhotoBatchGet)
@@ -78,12 +79,12 @@ func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.Me
 	for _, b := range batchResult.MediaItemResults {
 		items = append(items, b.MediaItem)
 	}
-	span.SetAttribute("result-raw", batchResult)
+	span.SetAttributes(label.Any("result-raw", batchResult))
 
 	return items, nil
 }
 func (p *Photos) GetMediaItems(ctx context.Context, ids []string) (map[string]photoslibrary.MediaItem, error) {
-	ctx, span := global.Tracer("google").Start(ctx, "google.GetMediaItems")
+	ctx, span := otel.Tracer("google").Start(ctx, "google.GetMediaItems")
 	defer span.End()
 	chunks := chunkBy(ids, maxPhotoBatchGet)
 	urls := map[string]photoslibrary.MediaItem{}
@@ -133,7 +134,7 @@ func (p *Photos) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album,
 }
 
 func (p *Photos) SyncAlbums(ctx context.Context) error {
-	ctx, span := global.Tracer("google").Start(ctx, "google.SyncAlbums")
+	ctx, span := otel.Tracer("google").Start(ctx, "google.SyncAlbums")
 	defer span.End()
 
 	client, err := p.getPhotosClient(ctx)

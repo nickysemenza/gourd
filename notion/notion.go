@@ -5,13 +5,13 @@ import (
 	"fmt"
 
 	"github.com/kjk/notionapi"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
 )
 
 // GetPage fetches a snippet of a notion page.
 func GetPage(ctx context.Context, pageID string) (*Page, error) {
-	tr := global.Tracer("notion")
+	tr := otel.Tracer("notion")
 	_, span := tr.Start(ctx, "notion: GetPage")
 	span.SetAttributes(label.Key("page_id").String(pageID))
 	defer span.End()

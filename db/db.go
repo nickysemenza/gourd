@@ -9,8 +9,8 @@ import (
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
-	"go.opentelemetry.io/otel/api/global"
-	"go.opentelemetry.io/otel/api/trace"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v3/zero"
 
 	sq "github.com/Masterminds/squirrel"
@@ -125,7 +125,7 @@ func New(dbConn *sql.DB) (*Client, error) {
 		db:     dbx,
 		psql:   sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		cache:  cache,
-		tracer: global.Tracer("db"),
+		tracer: otel.Tracer("db"),
 	}, nil
 }
 

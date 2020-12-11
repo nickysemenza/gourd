@@ -17,12 +17,12 @@ import (
 	"github.com/nickysemenza/gourd/parser"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
-	"go.opentelemetry.io/otel/api/global"
+	"go.opentelemetry.io/otel"
 )
 
 // FetchAndTransform returns a recipe.
 func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeDetail, error) {
-	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
+	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 	html, err := getHTML(ctx, addr)
 	if err != nil {
@@ -86,7 +86,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 	return &r, nil
 }
 func extractRecipeJSONLD(ctx context.Context, html string) (*Recipe, error) {
-	_, span := global.Tracer("scraper").Start(ctx, "scraper.extractRecipeJSONLD")
+	_, span := otel.Tracer("scraper").Start(ctx, "scraper.extractRecipeJSONLD")
 	defer span.End()
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
@@ -109,7 +109,7 @@ func extractRecipeJSONLD(ctx context.Context, html string) (*Recipe, error) {
 	return &recipe, err
 }
 func getHTML(ctx context.Context, url string) (string, error) {
-	ctx, span := global.Tracer("scraper").Start(ctx, "scraper.getHTML")
+	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.getHTML")
 	defer span.End()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
@@ -122,6 +122,7 @@ func getHTML(ctx context.Context, url string) (string, error) {
 	// nolint:gosec
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		err := fmt.Errorf("failed to get html: %w", err)
 		log.Fatal(err)
 	}
 	defer res.Body.Close()
