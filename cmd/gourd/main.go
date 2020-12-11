@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
 	"github.com/nickysemenza/gourd/scraper"
 	"github.com/spf13/cobra"
@@ -95,6 +96,31 @@ func init() {
 				}
 				_, err = s.APIManager.CreateRecipe(ctx, r)
 				return err
+			},
+		},
+		&cobra.Command{
+			Use:   "import [file]",
+			Short: "import a recipe",
+			Args:  cobra.MinimumNArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				s, err := makeServer()
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+
+				r, err := api.RecipeFromFile(ctx, strings.Join(args, " "))
+				if err != nil {
+					return err
+				}
+
+				out, err := s.APIManager.CreateRecipe(ctx, r)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("imported %s as %s", out.Recipe.Id, out.Recipe.Name)
+
+				return nil
 			},
 		},
 	)

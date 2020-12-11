@@ -6,14 +6,15 @@ import (
 	"errors"
 	"fmt"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v3/zero"
-
-	sq "github.com/Masterminds/squirrel"
 )
 
 const (
@@ -139,10 +140,15 @@ func setUUID(val string) string {
 	if val != "" {
 		return val
 	}
-	return getUUID()
+	return GetUUID()
 }
-func getUUID() string {
-	u, _ := uuid.NewV4()
+
+// GetUUID returns a UUID
+func GetUUID() string {
+	u, err := uuid.NewV4()
+	if err != nil {
+		panic(fmt.Errorf("failed to make uuid: %w", err))
+	}
 	return u.String()
 }
 
@@ -265,7 +271,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 	if len(r.Sources) > 0 {
 		sourcesInsert := c.psql.Insert(sourcesTable).Columns("uuid", "recipe", "name", "meta")
 		for _, s := range r.Sources {
-			sourcesInsert = sourcesInsert.Values(getUUID(), r.UUID, s.Name, s.Meta)
+			sourcesInsert = sourcesInsert.Values(GetUUID(), r.UUID, s.Name, s.Meta)
 		}
 		query, args, err = sourcesInsert.ToSql()
 
@@ -316,10 +322,11 @@ func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
 	}
 	return tx.Commit()
 }
-
-// InsertRecipe inserts a recipe.
-func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
+func (c *Client) insertRecipe(ctx context.Context, r *Recipe) (string, error) {
+	ctx, span := c.tracer.Start(ctx, "insertRecipe")
+	defer span.End()
 	r.UUID = setUUID(r.UUID)
+	log.Println("inserting", r.UUID, r.Name)
 	query, args, err := c.psql.
 		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
 		ToSql()
@@ -339,6 +346,31 @@ func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 		return "", err
 	}
 	return r.UUID, tx.Commit()
+}
+
+// InsertRecipe inserts a recipe.
+func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
+	ctx, span := c.tracer.Start(ctx, "InsertRecipe")
+	defer span.End()
+	for version := 0; version < 20; version++ {
+		if version > 0 {
+			r.Name = fmt.Sprintf("%s (dup)", r.Name)
+			fmt.Println("aa", r.Name)
+
+		}
+		res, err := c.insertRecipe(ctx, r)
+		if err == nil {
+			log.Println("all done")
+			return res, nil
+		}
+		var pqe *pq.Error
+		if !(errors.As(err, &pqe) && pqe.Code.Name() == "unique_violation") {
+			return "", err
+		}
+		log.Info("incr dup counter")
+
+	}
+	return "", fmt.Errorf("too many duplicates for %s", r.Name)
 }
 
 func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {

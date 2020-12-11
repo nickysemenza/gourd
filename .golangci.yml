@@ -19,3 +19,4 @@ linters:
     - gomnd
     - scopelint
     - exhaustivestruct
+    - wrapcheck

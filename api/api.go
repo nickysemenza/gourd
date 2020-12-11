@@ -47,7 +47,7 @@ func (i *Ingredient) toDB() *db.Ingredient {
 	return &db.Ingredient{UUID: i.Id, Name: i.Name}
 }
 
-func (r *RecipeDetail) toDB() *db.Recipe {
+func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe, error) {
 	dbr := db.Recipe{
 		UUID:         r.Recipe.Id,
 		Name:         r.Recipe.Name,
@@ -60,6 +60,9 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 			Minutes: zero.IntFrom(s.Minutes),
 		}
 		for _, i := range s.Instructions {
+			if i.Instruction == "" {
+				continue
+			}
 			dbs.Instructions = append(dbs.Instructions, db.SectionInstruction{
 				Instruction: i.Instruction,
 			})
@@ -73,9 +76,24 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 				Optional:  zero.BoolFromPtr(i.Optional),
 			}
 			if i.Kind == "recipe" {
+				if i.Recipe == nil {
+					continue
+				}
 				si.RecipeUUID = zero.StringFrom(i.Recipe.Id)
 			} else {
+				if i.Ingredient == nil || i.Ingredient.Name == "" {
+					continue
+				}
 				si.IngredientUUID = zero.StringFrom(i.Ingredient.Id)
+			}
+			if !si.RecipeUUID.Valid && !si.IngredientUUID.Valid {
+				// missing uuids, assume ingredient
+				ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
+				if err != nil {
+					return nil, err
+				}
+
+				si.IngredientUUID = zero.StringFrom(ing.UUID)
 			}
 
 			dbs.Ingredients = append(dbs.Ingredients, si)
@@ -84,14 +102,14 @@ func (r *RecipeDetail) toDB() *db.Recipe {
 		dbr.Sections = append(dbr.Sections, dbs)
 	}
 
-	return &dbr
+	return &dbr, nil
 
 }
 func transformRecipeSections(dbs []db.Section) []RecipeSection {
-	s := make([]RecipeSection, 0)
+	s := []RecipeSection{}
 	for _, d := range dbs {
-		ing := make([]SectionIngredient, 1)
-		ins := make([]SectionInstruction, 1)
+		ing := []SectionIngredient{}
+		ins := []SectionInstruction{}
 
 		for _, i := range d.Instructions {
 			ins = append(ins, SectionInstruction{Id: i.UUID, Instruction: i.Instruction})
@@ -149,6 +167,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		Recipes: &items,
 		Meta:    listMeta,
 	}
+	
 	return c.JSON(http.StatusOK, resp)
 }
 
@@ -159,25 +178,30 @@ func (a *API) CreateRecipes(c echo.Context) error {
 	var r RecipeDetail
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
+
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	recipe, err := a.CreateRecipe(ctx, &r)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
+
 	return c.JSON(http.StatusCreated, recipe)
 }
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
 	id := r.Recipe.Id
-	var err error
+	dbVersion, err := a.recipeDetailtoDB(ctx, r)
+	if err != nil {
+		return nil, err
+	}
 	if id == "" {
-		id, err = a.DB().InsertRecipe(ctx, r.toDB())
+		id, err = a.DB().InsertRecipe(ctx, dbVersion)
 		if err != nil {
 			return nil, err
 		}
 		r.Recipe.Id = id
 	}
-	if err := a.DB().UpdateRecipe(ctx, r.toDB()); err != nil {
+	if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
 		return nil, err
 	}
 	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
