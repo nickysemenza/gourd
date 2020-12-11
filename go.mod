@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/cosmtrek/air v1.21.2
+	github.com/cosmtrek/air v1.15.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.4.1
 	github.com/dgraph-io/ristretto v0.0.3
