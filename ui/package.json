@@ -10,7 +10,7 @@
     "@cypress/instrument-cra": "^1.4.0",
     "@sentry/browser": "^5.29.0",
     "@testing-library/jest-dom": "^5.11.6",
-    "@testing-library/react": "^9.3.2",
+    "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^7.1.2",
     "@types/jest": "^24.0.0",
     "@types/jwt-decode": "^2.2.1",
