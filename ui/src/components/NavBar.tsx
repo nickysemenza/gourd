@@ -18,7 +18,7 @@ const NavBar: React.FC = () => {
     { title: "docs", path: "docs" },
   ];
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-teal-500 px-6 py-3">
+    <nav className="flex items-center justify-between flex-wrap bg-indigo-500 px-6 py-3">
       <div className="flex items-center flex-shrink-0 text-white mr-1">
         <svg
           onClick={() => history.push("/")}
@@ -50,7 +50,7 @@ const NavBar: React.FC = () => {
             <a
               href="#link"
               onClick={() => history.push("/" + item.path)}
-              className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4 font-medium"
+              className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4 font-medium"
             >
               {item.title}
             </a>

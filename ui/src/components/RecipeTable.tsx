@@ -63,7 +63,7 @@ const RecipeTable: React.FC<TableProps> = ({
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>
-        <div className="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">
+        <div className="inline-block bg-blue-200 text-blue-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">
           {String.fromCharCode(65 + x)}
         </div>
       </TableCell>
