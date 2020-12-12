@@ -104,7 +104,7 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 				return err
 			}
 			//insert
-			mealID = getUUID()
+			mealID = GetUUID()
 			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, mealID)
 			_, err := c.execContext(ctx, iq)
 			if err != nil {

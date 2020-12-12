@@ -78,7 +78,7 @@ func TestAPI(t *testing.T) {
 		require.Equal(resultRecipe.Recipe.Name, newRecipe.Recipe.Name)
 		uuid = resultRecipe.Recipe.Id
 
-		newRecipe.Recipe.Name = newRecipe.Recipe.Name + "sub"
+		newRecipe.Recipe.Name += "sub"
 		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{Grams: w, Recipe: &resultRecipe.Recipe, Kind: "recipe"})
 		makeRecipe(newRecipe)
 
