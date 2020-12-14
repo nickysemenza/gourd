@@ -1,24 +1,27 @@
 import React, { useState } from "react";
-import { useCreateRecipeMutation } from "../generated/graphql";
 import Debug from "../components/Debug";
+import { RecipesApi } from "../api/openapi-fetch";
+import { getOpenapiFetchConfig } from "../config";
 
 const CreateRecipe: React.FC = () => {
   const [name, setName] = useState("");
-  const [
-    createRecipeMutation,
-    { data, loading, error },
-  ] = useCreateRecipeMutation({
-    variables: {
-      recipe: { name },
-    },
-  });
+  const [resp, setResp] = useState<any>();
 
-  const create = () => {
-    createRecipeMutation();
+  const api = new RecipesApi(getOpenapiFetchConfig());
+
+  const create = async () => {
+    const r = await api.createRecipes({
+      recipeDetail: {
+        recipe: { name, id: "", quantity: 0, unit: "" },
+        sections: [],
+      },
+    });
+    setResp(r);
+    // createRecipeMutation();
   };
   return (
     <form>
-      <Debug data={{ name, data, loading, error }} />
+      <Debug data={{ name, resp }} />
       <input
         className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
         placeholder="recipe name"

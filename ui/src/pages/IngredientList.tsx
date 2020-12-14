@@ -1,15 +1,30 @@
-import React from "react";
-import { useGetIngredientsQuery } from "../generated/graphql";
+import React, { useState } from "react";
 import { Column, CellProps } from "react-table";
 import { Link } from "react-router-dom";
 import IngredientSearch from "../components/IngredientSearch";
-import PaginatedTable from "../components/PaginatedTable";
+import PaginatedTable, {
+  PaginationParameters,
+} from "../components/PaginatedTable";
+import { useListIngredients } from "../api/openapi-hooks/api";
 
 const IngredientList: React.FC = () => {
-  const { data } = useGetIngredientsQuery({});
+  let initialParams: PaginationParameters = {
+    offset: 0,
+    limit: 2,
+  };
+
+  const [params, setParams] = useState(initialParams);
+
+  const fetchData = React.useCallback((params: PaginationParameters) => {
+    setParams(params);
+  }, []);
+
+  const { data, error } = useListIngredients({
+    queryParams: params,
+  });
 
   const ingredients = data?.ingredients || [];
-  type i = Partial<typeof ingredients[0]>;
+  type i = typeof ingredients[0];
 
   const columns: Array<Column<i>> = React.useMemo(
     () => [
@@ -17,20 +32,22 @@ const IngredientList: React.FC = () => {
         Header: "UUID",
         Cell: ({
           row: {
-            original: { uuid },
+            original: {
+              ingredient: { id },
+            },
           },
-        }: CellProps<i>) => <code>{uuid}</code>,
+        }: CellProps<i>) => <code>{id}</code>,
       },
       {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { name, same } = original;
+          const { ingredient, children } = original;
           return (
             <div>
-              {name}
+              {ingredient.name}
               <ul>
-                {(same || []).map((i) => (
+                {(children || []).map((i) => (
                   <li>{i.name}</li>
                 ))}
               </ul>
@@ -48,7 +65,7 @@ const IngredientList: React.FC = () => {
               <ul>
                 {recipes.map((r) => (
                   <li>
-                    <Link to={`recipe/${r.uuid}`} className="link">
+                    <Link to={`recipe/${r.id}`} className="link">
                       {r.name}
                     </Link>
                   </li>
@@ -59,14 +76,14 @@ const IngredientList: React.FC = () => {
           );
         },
       },
-      {
-        Header: "USDA food",
-        // accessor: "name",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          const { usdaFood } = original;
-          return <div>{usdaFood?.description}</div>;
-        },
-      },
+      // {
+      //   Header: "USDA food",
+      //   // accessor: "name",
+      //   Cell: ({ row: { original } }: CellProps<i>) => {
+      //     const { usdaFood } = original;
+      //     return <div>{usdaFood?.description}</div>;
+      //   },
+      // },
     ],
     []
   );
@@ -79,11 +96,11 @@ const IngredientList: React.FC = () => {
       />
       <PaginatedTable
         columns={columns}
-        data={ingredients}
-        fetchData={() => {}}
+        data={data?.ingredients || []}
+        fetchData={fetchData}
         isLoading={false}
-        pageCount={1}
-        totalCount={ingredients.length}
+        totalCount={data?.meta?.total_count || 0}
+        pageCount={data?.meta?.page_count || 1}
       />
     </>
   );
