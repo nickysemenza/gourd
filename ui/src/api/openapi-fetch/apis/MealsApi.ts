@@ -20,7 +20,7 @@ import {
     PaginatedMealsToJSON,
 } from '../models';
 
-export interface ListMealsRequest {
+export interface MealsApiListMealsRequest {
     offset?: number;
     limit?: number;
 }
@@ -33,8 +33,8 @@ export class MealsApi extends runtime.BaseAPI {
     /**
      * List all meals
      */
-    async listMealsRaw(requestParameters: ListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
-        const queryParameters: runtime.HTTPQuery = {};
+    async listMealsRaw(requestParameters: MealsApiListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -67,7 +67,7 @@ export class MealsApi extends runtime.BaseAPI {
     /**
      * List all meals
      */
-    async listMeals(requestParameters: ListMealsRequest): Promise<PaginatedMeals> {
+    async listMeals(requestParameters: MealsApiListMealsRequest): Promise<PaginatedMeals> {
         const response = await this.listMealsRaw(requestParameters);
         return await response.value();
     }

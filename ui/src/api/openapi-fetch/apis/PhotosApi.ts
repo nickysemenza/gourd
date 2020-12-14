@@ -20,7 +20,7 @@ import {
     PaginatedPhotosToJSON,
 } from '../models';
 
-export interface ListPhotosRequest {
+export interface PhotosApiListPhotosRequest {
     offset?: number;
     limit?: number;
 }
@@ -33,8 +33,8 @@ export class PhotosApi extends runtime.BaseAPI {
     /**
      * List all photos
      */
-    async listPhotosRaw(requestParameters: ListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
-        const queryParameters: runtime.HTTPQuery = {};
+    async listPhotosRaw(requestParameters: PhotosApiListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -67,7 +67,7 @@ export class PhotosApi extends runtime.BaseAPI {
     /**
      * List all photos
      */
-    async listPhotos(requestParameters: ListPhotosRequest): Promise<PaginatedPhotos> {
+    async listPhotos(requestParameters: PhotosApiListPhotosRequest): Promise<PaginatedPhotos> {
         const response = await this.listPhotosRaw(requestParameters);
         return await response.value();
     }

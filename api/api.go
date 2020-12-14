@@ -465,3 +465,61 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, resp)
 }
+
+func (a *API) Search(c echo.Context, params SearchParams) error {
+	ctx := c.Request().Context()
+
+	ctx, span := a.tracer.Start(ctx, "Search")
+	defer span.End()
+
+	var resp []Entity
+
+	_, listMeta := parsePagination(params.Offset, params.Limit)
+
+	recipes, recipesCount, err := a.Manager.DB().GetRecipes(ctx, string(params.Name))
+	if err != nil {
+		return err
+	}
+	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name))
+	if err != nil {
+		return err
+	}
+
+	listMeta.setTotalCount(recipesCount + ingredientsCount)
+
+	for _, x := range recipes {
+		r := transformRecipe(x)
+		resp = append(resp, Entity{Recipe: &r})
+	}
+	for _, x := range ingredients {
+		i := transformIngredient(x)
+		resp = append(resp, Entity{Ingredient: &i})
+	}
+	// dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// for _, a := range albums {
+	// 	gpa := GooglePhotosAlbum{
+	// 		Id:         a.Id,
+	// 		ProductUrl: a.ProductUrl,
+	// 		Title:      a.Title,
+	// 	}
+
+	// 	for _, dbA := range dbAlbums {
+	// 		if dbA.ID == gpa.Id {
+	// 			gpa.Usecase = dbA.Usecase
+	// 		}
+	// 	}
+
+	// 	resp.Albums = append(resp.Albums, gpa)
+	// }
+
+	return c.JSON(http.StatusOK, resp)
+}

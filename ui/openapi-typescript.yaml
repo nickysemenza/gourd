@@ -1,0 +1,5 @@
+additionalProperties:
+  typescriptThreePlus: true # https://github.com/OpenAPITools/openapi-generator/issues/3869#issuecomment-584152932
+  supportsES6: true
+  enumPropertyNaming: UPPERCASE
+  prefixParameterInterfaces: true # https://github.com/OpenAPITools/openapi-generator/issues/1998
