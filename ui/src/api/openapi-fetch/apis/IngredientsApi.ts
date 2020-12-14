@@ -18,16 +18,25 @@ import {
     Ingredient,
     IngredientFromJSON,
     IngredientToJSON,
+    InlineResponse2001,
+    InlineResponse2001FromJSON,
+    InlineResponse2001ToJSON,
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
 } from '../models';
 
-export interface CreateIngredientsRequest {
+export interface IngredientsApiCreateIngredientsRequest {
     ingredient: Ingredient;
 }
 
-export interface ListIngredientsRequest {
+export interface IngredientsApiListIngredientsRequest {
+    offset?: number;
+    limit?: number;
+}
+
+export interface IngredientsApiSearchRequest {
+    name: string;
     offset?: number;
     limit?: number;
 }
@@ -40,12 +49,12 @@ export class IngredientsApi extends runtime.BaseAPI {
     /**
      * Create a ingredient
      */
-    async createIngredientsRaw(requestParameters: CreateIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
+    async createIngredientsRaw(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
         if (requestParameters.ingredient === null || requestParameters.ingredient === undefined) {
             throw new runtime.RequiredError('ingredient','Required parameter requestParameters.ingredient was null or undefined when calling createIngredients.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -73,7 +82,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     /**
      * Create a ingredient
      */
-    async createIngredients(requestParameters: CreateIngredientsRequest): Promise<Ingredient> {
+    async createIngredients(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<Ingredient> {
         const response = await this.createIngredientsRaw(requestParameters);
         return await response.value();
     }
@@ -81,8 +90,8 @@ export class IngredientsApi extends runtime.BaseAPI {
     /**
      * List all ingredients
      */
-    async listIngredientsRaw(requestParameters: ListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
-        const queryParameters: runtime.HTTPQuery = {};
+    async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -115,8 +124,58 @@ export class IngredientsApi extends runtime.BaseAPI {
     /**
      * List all ingredients
      */
-    async listIngredients(requestParameters: ListIngredientsRequest): Promise<PaginatedIngredients> {
+    async listIngredients(requestParameters: IngredientsApiListIngredientsRequest): Promise<PaginatedIngredients> {
         const response = await this.listIngredientsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Search recipes and ingredients
+     */
+    async searchRaw(requestParameters: IngredientsApiSearchRequest): Promise<runtime.ApiResponse<InlineResponse2001>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.name !== undefined) {
+            queryParameters['name'] = requestParameters.name;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/search`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+    }
+
+    /**
+     * Search recipes and ingredients
+     */
+    async search(requestParameters: IngredientsApiSearchRequest): Promise<InlineResponse2001> {
+        const response = await this.searchRaw(requestParameters);
         return await response.value();
     }
 

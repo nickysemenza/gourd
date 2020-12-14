@@ -11,25 +11,6 @@ import {
   useMutate,
   UseMutateProps,
 } from "restful-react";
-
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-const encodingFn = encodeURIComponent;
-
-const encodingTagFactory = (encodingFn: typeof encodeURIComponent) => (
-  strings: TemplateStringsArray,
-  ...params: (string | number | boolean)[]
-) =>
-  strings.reduce(
-    (accumulatedPath, pathPart, idx) =>
-      `${accumulatedPath}${pathPart}${
-        idx < params.length ? encodingFn(params[idx]) : ""
-      }`,
-    ""
-  );
-
-const encode = encodingTagFactory(encodingFn);
-
 /**
  * Ingredients in a single section
  */
@@ -247,6 +228,14 @@ export interface Meal {
   photos: GooglePhoto[];
 }
 
+/**
+ * An entity wrapper, which contains one child
+ */
+export interface Entity {
+  ingredient?: Ingredient;
+  recipe?: Recipe;
+}
+
 export interface Error {
   message: string;
 }
@@ -319,7 +308,7 @@ export type AuthLoginProps = Omit<
 export const AuthLogin = (props: AuthLoginProps) => (
   <Mutate<AuthResp, Error, AuthLoginQueryParams, void, void>
     verb="POST"
-    path={encode`/auth`}
+    path={`/auth`}
     {...props}
   />
 );
@@ -337,7 +326,7 @@ export type UseAuthLoginProps = Omit<
 export const useAuthLogin = (props: UseAuthLoginProps) =>
   useMutate<AuthResp, Error, AuthLoginQueryParams, void, void>(
     "POST",
-    encode`/auth`,
+    `/auth`,
     props
   );
 
@@ -362,7 +351,7 @@ export type ListPhotosProps = Omit<
  */
 export const ListPhotos = (props: ListPhotosProps) => (
   <Get<PaginatedPhotos, Error, ListPhotosQueryParams, void>
-    path={encode`/photos`}
+    path={`/photos`}
     {...props}
   />
 );
@@ -376,10 +365,7 @@ export type UseListPhotosProps = Omit<
  * List all photos
  */
 export const useListPhotos = (props: UseListPhotosProps) =>
-  useGet<PaginatedPhotos, Error, ListPhotosQueryParams, void>(
-    encode`/photos`,
-    props
-  );
+  useGet<PaginatedPhotos, Error, ListPhotosQueryParams, void>(`/photos`, props);
 
 export interface ListAllAlbumsResponse {
   /**
@@ -397,10 +383,7 @@ export type ListAllAlbumsProps = Omit<
  * List all albums
  */
 export const ListAllAlbums = (props: ListAllAlbumsProps) => (
-  <Get<ListAllAlbumsResponse, Error, void, void>
-    path={encode`/albums`}
-    {...props}
-  />
+  <Get<ListAllAlbumsResponse, Error, void, void> path={`/albums`} {...props} />
 );
 
 export type UseListAllAlbumsProps = Omit<
@@ -412,7 +395,55 @@ export type UseListAllAlbumsProps = Omit<
  * List all albums
  */
 export const useListAllAlbums = (props: UseListAllAlbumsProps) =>
-  useGet<ListAllAlbumsResponse, Error, void, void>(encode`/albums`, props);
+  useGet<ListAllAlbumsResponse, Error, void, void>(`/albums`, props);
+
+export interface SearchResponse {
+  /**
+   * The list of entities
+   */
+  entities?: Entity[];
+}
+
+export interface SearchQueryParams {
+  /**
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
+   */
+  limit?: number;
+  /**
+   * The search query (name).
+   */
+  name: string;
+}
+
+export type SearchProps = Omit<
+  GetProps<SearchResponse, Error, SearchQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Search recipes and ingredients
+ */
+export const Search = (props: SearchProps) => (
+  <Get<SearchResponse, Error, SearchQueryParams, void>
+    path={`/search`}
+    {...props}
+  />
+);
+
+export type UseSearchProps = Omit<
+  UseGetProps<SearchResponse, Error, SearchQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Search recipes and ingredients
+ */
+export const useSearch = (props: UseSearchProps) =>
+  useGet<SearchResponse, Error, SearchQueryParams, void>(`/search`, props);
 
 export interface ListMealsQueryParams {
   /**
@@ -435,7 +466,7 @@ export type ListMealsProps = Omit<
  */
 export const ListMeals = (props: ListMealsProps) => (
   <Get<PaginatedMeals, Error, ListMealsQueryParams, void>
-    path={encode`/meals`}
+    path={`/meals`}
     {...props}
   />
 );
@@ -449,10 +480,7 @@ export type UseListMealsProps = Omit<
  * List all meals
  */
 export const useListMeals = (props: UseListMealsProps) =>
-  useGet<PaginatedMeals, Error, ListMealsQueryParams, void>(
-    encode`/meals`,
-    props
-  );
+  useGet<PaginatedMeals, Error, ListMealsQueryParams, void>(`/meals`, props);
 
 export interface ListIngredientsQueryParams {
   /**
@@ -475,7 +503,7 @@ export type ListIngredientsProps = Omit<
  */
 export const ListIngredients = (props: ListIngredientsProps) => (
   <Get<PaginatedIngredients, Error, ListIngredientsQueryParams, void>
-    path={encode`/ingredients`}
+    path={`/ingredients`}
     {...props}
   />
 );
@@ -490,7 +518,7 @@ export type UseListIngredientsProps = Omit<
  */
 export const useListIngredients = (props: UseListIngredientsProps) =>
   useGet<PaginatedIngredients, Error, ListIngredientsQueryParams, void>(
-    encode`/ingredients`,
+    `/ingredients`,
     props
   );
 
@@ -505,7 +533,7 @@ export type CreateIngredientsProps = Omit<
 export const CreateIngredients = (props: CreateIngredientsProps) => (
   <Mutate<Ingredient, Error, void, Ingredient, void>
     verb="POST"
-    path={encode`/ingredients`}
+    path={`/ingredients`}
     {...props}
   />
 );
@@ -521,7 +549,7 @@ export type UseCreateIngredientsProps = Omit<
 export const useCreateIngredients = (props: UseCreateIngredientsProps) =>
   useMutate<Ingredient, Error, void, Ingredient, void>(
     "POST",
-    encode`/ingredients`,
+    `/ingredients`,
     props
   );
 
@@ -546,7 +574,7 @@ export type ListRecipesProps = Omit<
  */
 export const ListRecipes = (props: ListRecipesProps) => (
   <Get<PaginatedRecipes, Error, ListRecipesQueryParams, void>
-    path={encode`/recipes`}
+    path={`/recipes`}
     {...props}
   />
 );
@@ -561,7 +589,7 @@ export type UseListRecipesProps = Omit<
  */
 export const useListRecipes = (props: UseListRecipesProps) =>
   useGet<PaginatedRecipes, Error, ListRecipesQueryParams, void>(
-    encode`/recipes`,
+    `/recipes`,
     props
   );
 
@@ -576,7 +604,7 @@ export type CreateRecipesProps = Omit<
 export const CreateRecipes = (props: CreateRecipesProps) => (
   <Mutate<RecipeDetail, Error, void, RecipeDetail, void>
     verb="POST"
-    path={encode`/recipes`}
+    path={`/recipes`}
     {...props}
   />
 );
@@ -592,7 +620,7 @@ export type UseCreateRecipesProps = Omit<
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
   useMutate<RecipeDetail, Error, void, RecipeDetail, void>(
     "POST",
-    encode`/recipes`,
+    `/recipes`,
     props
   );
 
@@ -614,7 +642,7 @@ export type GetRecipeByIdProps = Omit<
  */
 export const GetRecipeById = ({ recipe_id, ...props }: GetRecipeByIdProps) => (
   <Get<RecipeDetail, Error, void, GetRecipeByIdPathParams>
-    path={encode`/recipes/${recipe_id}`}
+    path={`/recipes/${recipe_id}`}
     {...props}
   />
 );
@@ -634,6 +662,6 @@ export const useGetRecipeById = ({
 }: UseGetRecipeByIdProps) =>
   useGet<RecipeDetail, Error, void, GetRecipeByIdPathParams>(
     (paramsInPath: GetRecipeByIdPathParams) =>
-      encode`/recipes/${paramsInPath.recipe_id}`,
+      `/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }
   );

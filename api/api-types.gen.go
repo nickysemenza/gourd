@@ -13,6 +13,16 @@ type AuthResp struct {
 	User map[string]interface{} `json:"user"`
 }
 
+// Entity defines model for Entity.
+type Entity struct {
+
+	// An Ingredient
+	Ingredient *Ingredient `json:"ingredient,omitempty"`
+
+	// A recipe
+	Recipe *Recipe `json:"recipe,omitempty"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
@@ -231,6 +241,9 @@ type SectionInstruction struct {
 // LimitParam defines model for limitParam.
 type LimitParam int
 
+// NameParam defines model for nameParam.
+type NameParam string
+
 // OffsetParam defines model for offsetParam.
 type OffsetParam int
 
@@ -286,6 +299,19 @@ type ListRecipesParams struct {
 
 // CreateRecipesJSONBody defines parameters for CreateRecipes.
 type CreateRecipesJSONBody RecipeDetail
+
+// SearchParams defines parameters for Search.
+type SearchParams struct {
+
+	// The number of items to skip before starting to collect the result set.
+	Offset *OffsetParam `json:"offset,omitempty"`
+
+	// The numbers of items to return.
+	Limit *LimitParam `json:"limit,omitempty"`
+
+	// The search query (name).
+	Name NameParam `json:"name"`
+}
 
 // CreateIngredientsRequestBody defines body for CreateIngredients for application/json ContentType.
 type CreateIngredientsJSONRequestBody CreateIngredientsJSONBody

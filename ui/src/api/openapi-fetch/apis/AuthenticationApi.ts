@@ -20,7 +20,7 @@ import {
     AuthRespToJSON,
 } from '../models';
 
-export interface AuthLoginRequest {
+export interface AuthenticationApiAuthLoginRequest {
     code: string;
 }
 
@@ -33,12 +33,12 @@ export class AuthenticationApi extends runtime.BaseAPI {
      * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
      * Google Login callback
      */
-    async authLoginRaw(requestParameters: AuthLoginRequest): Promise<runtime.ApiResponse<AuthResp>> {
+    async authLoginRaw(requestParameters: AuthenticationApiAuthLoginRequest): Promise<runtime.ApiResponse<AuthResp>> {
         if (requestParameters.code === null || requestParameters.code === undefined) {
             throw new runtime.RequiredError('code','Required parameter requestParameters.code was null or undefined when calling authLogin.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.code !== undefined) {
             queryParameters['code'] = requestParameters.code;
@@ -60,7 +60,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
      * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
      * Google Login callback
      */
-    async authLogin(requestParameters: AuthLoginRequest): Promise<AuthResp> {
+    async authLogin(requestParameters: AuthenticationApiAuthLoginRequest): Promise<AuthResp> {
         const response = await this.authLoginRaw(requestParameters);
         return await response.value();
     }

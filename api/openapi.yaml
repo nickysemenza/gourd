@@ -85,6 +85,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"                
+  /search:
+    get:
+      summary: Search recipes and ingredients
+      operationId: search
+      tags:
+        - ingredients
+        - recipes
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"        
+        - $ref: "#/components/parameters/nameParam"        
+      responses:
+        "200":
+          description: A page of recipes and/or ingredients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entities:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Entity"   
+                    description: The list of entities
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                          
   /meals:
     get:
       summary: List all meals
@@ -531,6 +561,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GooglePhoto"
+    Entity:
+      description: An entity wrapper, which contains one child
+      type: object
+      properties:
+        ingredient:
+          description: The ingredient
+          $ref: "#/components/schemas/Ingredient" 
+        recipe:
+          description: The recipe
+          $ref: "#/components/schemas/Recipe"            
     Error:
       type: object
       required: ["message"]
@@ -631,3 +671,10 @@ components:
         maximum: 50
         default: 20
       description: The numbers of items to return.
+    nameParam:
+      in: query
+      name: name
+      required: true
+      schema:
+        type: string
+      description: The search query (name).
