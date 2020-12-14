@@ -25,7 +25,7 @@ type API struct {
 func NewAPI(m *manager.Manager) *API {
 	return &API{
 		Manager: m,
-		tracer:  otel.Tracer("db"),
+		tracer:  otel.Tracer("api"),
 	}
 }
 
@@ -167,7 +167,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		Recipes: &items,
 		Meta:    listMeta,
 	}
-	
+
 	return c.JSON(http.StatusOK, resp)
 }
 
@@ -245,6 +245,10 @@ func (a *API) IngredientUUIDByName(ctx context.Context, name, kind string) (stri
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
 	ctx := c.Request().Context()
+
+	ctx, span := a.tracer.Start(ctx, "ListIngredients")
+	defer span.End()
+
 	items := []IngredientDetail{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
@@ -253,7 +257,32 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	for _, i := range ing {
-		items = append(items, IngredientDetail{Ingredient: transformIngredient(i)})
+		// find linked ingredients
+		sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, i.UUID)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
+		same := []Ingredient{}
+		for _, x := range sameAs {
+			same = append(same, transformIngredient(x))
+		}
+
+		// find linked recipes
+		linkedRecipes, err := a.Manager.DB().GetRecipesWithIngredient(ctx, i.UUID)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
+		recipes := []Recipe{}
+		for _, x := range linkedRecipes {
+			recipes = append(recipes, transformRecipe(x))
+		}
+
+		// assemble
+		items = append(items, IngredientDetail{
+			Ingredient: transformIngredient(i),
+			Children:   &same,
+			Recipes:    &recipes,
+		})
 	}
 	listMeta.TotalCount = int(count)
 
@@ -265,7 +294,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 }
 
 func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) ([]GooglePhoto, []string, error) {
-	ctx, span := otel.Tracer("api").Start(ctx, "google.fromDBPhoto")
+	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
 	items := []GooglePhoto{}
 	var ids []string

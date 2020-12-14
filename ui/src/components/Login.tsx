@@ -6,24 +6,18 @@ import {
   GoogleLoginResponseOffline,
   useGoogleLogin,
 } from "react-google-login";
-import {
-  AuthResp,
-  Configuration,
-  AuthenticationApi,
-} from "../api/openapi-fetch";
+import { AuthResp, AuthenticationApi } from "../api/openapi-fetch";
 import {
   COOKIE_NAME,
-  getAPIURL,
   getConfig,
   getName,
+  getOpenapiFetchConfig,
   isLoggedIn,
 } from "../config";
 import Debug from "./Debug";
 
 const Login: React.FC = () => {
-  const api = new AuthenticationApi(
-    new Configuration({ basePath: getAPIURL() })
-  );
+  const api = new AuthenticationApi(getOpenapiFetchConfig());
   const [cookies, setCookie] = useCookies(["cookie-name"]);
 
   const [auth, setAuth] = useState<AuthResp>();

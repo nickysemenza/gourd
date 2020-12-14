@@ -130,6 +130,8 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 // GetRecipesWithIngredient gets all recipes with an ingredeitn
 // todo: consolidate into getrecipes
 func (c *Client) GetRecipesWithIngredient(ctx context.Context, ingredient string) ([]Recipe, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipesWithIngredient")
+	defer span.End()
 	query, args, err := c.psql.Select(getRecipeColumns()...).From(recipesTable).
 		Join("recipe_sections on recipe_sections.recipe = recipes.uuid").
 		Join("recipe_section_ingredients on recipe_sections.uuid = recipe_section_ingredients.section").
@@ -196,6 +198,8 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 	return r, nil
 }
 func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "getIngredients")
+	defer span.End()
 	q := addons(c.psql.Select("*").From(ingredientsTable))
 	cq := addons(c.psql.Select("count(*)").From(ingredientsTable)).RemoveLimit().RemoveOffset()
 
@@ -255,6 +259,8 @@ func newSearchQuery(opts ...SearchOption) *SearchQuery {
 
 // GetIngredients returns all ingredients.
 func (c *Client) GetIngredients(ctx context.Context, name string, opts ...SearchOption) ([]Ingredient, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngredients")
+	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		q = q.Where(sq.Eq{"same_as": nil})
 		q = newSearchQuery(opts...).apply(q)
@@ -265,6 +271,8 @@ func (c *Client) GetIngredients(ctx context.Context, name string, opts ...Search
 	})
 }
 func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingredient, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		return q.Where(sq.Eq{"same_as": parent})
 	})
