@@ -33,7 +33,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.1.0
 	go.opencensus.io v0.22.5
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.15.1
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.14.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.14.0
 	go.opentelemetry.io/otel v0.15.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.15.0
