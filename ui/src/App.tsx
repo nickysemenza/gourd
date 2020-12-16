@@ -29,10 +29,13 @@ import {
   getJWT,
   isLoggedIn,
   onAPIRequest,
+  onAPIError,
 } from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -68,9 +71,14 @@ function App() {
   });
   return (
     <CookiesProvider>
-      <RestfulProvider base={getAPIURL()} onRequest={onAPIRequest}>
+      <RestfulProvider
+        base={getAPIURL()}
+        onRequest={onAPIRequest}
+        onError={onAPIError}
+      >
         <ApolloProvider client={client}>
           <Router>
+            <ToastContainer />
             <NavBar />
             <div className="lg:container lg:mx-auto">
               <Switch>
