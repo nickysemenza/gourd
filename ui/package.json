@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.8.8",
-    "@graphql-codegen/cli": "^1.13.2",
+    "@graphql-codegen/cli": "^1.19.4",
     "@graphql-codegen/introspection": "1.18.1",
     "@graphql-codegen/typescript": "1.19.0",
     "@graphql-codegen/typescript-document-nodes": "1.17.9",
