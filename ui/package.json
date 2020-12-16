@@ -90,7 +90,7 @@
     "@graphql-codegen/typescript-graphql-files-modules": "1.13.2",
     "@graphql-codegen/typescript-operations": "1.17.12",
     "@graphql-codegen/typescript-react-apollo": "2.2.1",
-    "@openapitools/openapi-generator-cli": "^2.1.9",
+    "@openapitools/openapi-generator-cli": "^2.1.10",
     "autoprefixer": "^10.1.0",
     "chokidar-cli": "^2.1.0",
     "cypress": "^6.1.0",
