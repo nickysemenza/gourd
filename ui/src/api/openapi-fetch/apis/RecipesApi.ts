@@ -15,15 +15,15 @@
 
 import * as runtime from '../runtime';
 import {
-    InlineResponse2001,
-    InlineResponse2001FromJSON,
-    InlineResponse2001ToJSON,
     PaginatedRecipes,
     PaginatedRecipesFromJSON,
     PaginatedRecipesToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
+    SearchResult,
+    SearchResultFromJSON,
+    SearchResultToJSON,
 } from '../models';
 
 export interface RecipesApiCreateRecipesRequest {
@@ -174,7 +174,7 @@ export class RecipesApi extends runtime.BaseAPI {
     /**
      * Search recipes and ingredients
      */
-    async searchRaw(requestParameters: RecipesApiSearchRequest): Promise<runtime.ApiResponse<InlineResponse2001>> {
+    async searchRaw(requestParameters: RecipesApiSearchRequest): Promise<runtime.ApiResponse<SearchResult>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
         }
@@ -210,13 +210,13 @@ export class RecipesApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SearchResultFromJSON(jsonValue));
     }
 
     /**
      * Search recipes and ingredients
      */
-    async search(requestParameters: RecipesApiSearchRequest): Promise<InlineResponse2001> {
+    async search(requestParameters: RecipesApiSearchRequest): Promise<SearchResult> {
         const response = await this.searchRaw(requestParameters);
         return await response.value();
     }

@@ -98,17 +98,11 @@ paths:
         - $ref: "#/components/parameters/nameParam"        
       responses:
         "200":
-          description: A page of recipes and/or ingredients
+          description: Search results
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  entities:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Entity"   
-                    description: The list of entities
+                $ref: "#/components/schemas/SearchResult"
         default:
           description: unexpected error
           content:
@@ -561,16 +555,20 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GooglePhoto"
-    Entity:
-      description: An entity wrapper, which contains one child
+    SearchResult:
+      description: A search result wrapper, which contains ingredients and recipes
       type: object
       properties:
-        ingredient:
-          description: The ingredient
-          $ref: "#/components/schemas/Ingredient" 
-        recipe:
-          description: The recipe
-          $ref: "#/components/schemas/Recipe"            
+        ingredients:
+          description: The ingredients
+          type: array
+          items:          
+            $ref: "#/components/schemas/Ingredient" 
+        recipes:
+          description: The recipes
+          type: array
+          items:          
+            $ref: "#/components/schemas/Recipe"            
     Error:
       type: object
       required: ["message"]

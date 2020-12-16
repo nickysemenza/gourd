@@ -229,11 +229,17 @@ export interface Meal {
 }
 
 /**
- * An entity wrapper, which contains one child
+ * A search result wrapper, which contains ingredients and recipes
  */
-export interface Entity {
-  ingredient?: Ingredient;
-  recipe?: Recipe;
+export interface SearchResult {
+  /**
+   * The ingredients
+   */
+  ingredients?: Ingredient[];
+  /**
+   * The recipes
+   */
+  recipes?: Recipe[];
 }
 
 export interface Error {
@@ -397,13 +403,6 @@ export type UseListAllAlbumsProps = Omit<
 export const useListAllAlbums = (props: UseListAllAlbumsProps) =>
   useGet<ListAllAlbumsResponse, Error, void, void>(`/albums`, props);
 
-export interface SearchResponse {
-  /**
-   * The list of entities
-   */
-  entities?: Entity[];
-}
-
 export interface SearchQueryParams {
   /**
    * The number of items to skip before starting to collect the result set.
@@ -420,7 +419,7 @@ export interface SearchQueryParams {
 }
 
 export type SearchProps = Omit<
-  GetProps<SearchResponse, Error, SearchQueryParams, void>,
+  GetProps<SearchResult, Error, SearchQueryParams, void>,
   "path"
 >;
 
@@ -428,14 +427,14 @@ export type SearchProps = Omit<
  * Search recipes and ingredients
  */
 export const Search = (props: SearchProps) => (
-  <Get<SearchResponse, Error, SearchQueryParams, void>
+  <Get<SearchResult, Error, SearchQueryParams, void>
     path={`/search`}
     {...props}
   />
 );
 
 export type UseSearchProps = Omit<
-  UseGetProps<SearchResponse, Error, SearchQueryParams, void>,
+  UseGetProps<SearchResult, Error, SearchQueryParams, void>,
   "path"
 >;
 
@@ -443,7 +442,7 @@ export type UseSearchProps = Omit<
  * Search recipes and ingredients
  */
 export const useSearch = (props: UseSearchProps) =>
-  useGet<SearchResponse, Error, SearchQueryParams, void>(`/search`, props);
+  useGet<SearchResult, Error, SearchQueryParams, void>(`/search`, props);
 
 export interface ListMealsQueryParams {
   /**

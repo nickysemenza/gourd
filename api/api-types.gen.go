@@ -13,16 +13,6 @@ type AuthResp struct {
 	User map[string]interface{} `json:"user"`
 }
 
-// Entity defines model for Entity.
-type Entity struct {
-
-	// An Ingredient
-	Ingredient *Ingredient `json:"ingredient,omitempty"`
-
-	// A recipe
-	Recipe *Recipe `json:"recipe,omitempty"`
-}
-
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
@@ -195,6 +185,16 @@ type RecipeSection struct {
 
 	// How many minutes the step takes, approximately (todo - make this a range)
 	Minutes int64 `json:"minutes"`
+}
+
+// SearchResult defines model for SearchResult.
+type SearchResult struct {
+
+	// The ingredients
+	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
+
+	// The recipes
+	Recipes *[]Recipe `json:"recipes,omitempty"`
 }
 
 // SectionIngredient defines model for SectionIngredient.

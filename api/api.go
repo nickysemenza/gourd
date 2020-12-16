@@ -472,8 +472,6 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	ctx, span := a.tracer.Start(ctx, "Search")
 	defer span.End()
 
-	var resp []Entity
-
 	_, listMeta := parsePagination(params.Offset, params.Limit)
 
 	recipes, recipesCount, err := a.Manager.DB().GetRecipes(ctx, string(params.Name))
@@ -487,39 +485,17 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
 
+	var resRecipes []Recipe
+	var resIngredients []Ingredient
+
 	for _, x := range recipes {
 		r := transformRecipe(x)
-		resp = append(resp, Entity{Recipe: &r})
+		resRecipes = append(resRecipes, r)
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)
-		resp = append(resp, Entity{Ingredient: &i})
+		resIngredients = append(resIngredients, i)
 	}
-	// dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
-	// if err != nil {
-	// 	return err
-	// }
 
-	// albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// for _, a := range albums {
-	// 	gpa := GooglePhotosAlbum{
-	// 		Id:         a.Id,
-	// 		ProductUrl: a.ProductUrl,
-	// 		Title:      a.Title,
-	// 	}
-
-	// 	for _, dbA := range dbAlbums {
-	// 		if dbA.ID == gpa.Id {
-	// 			gpa.Usecase = dbA.Usecase
-	// 		}
-	// 	}
-
-	// 	resp.Albums = append(resp.Albums, gpa)
-	// }
-
-	return c.JSON(http.StatusOK, resp)
+	return c.JSON(http.StatusOK, SearchResult{Recipes: &resRecipes, Ingredients: &resIngredients})
 }
