@@ -1,6 +1,7 @@
 import Cookies from "universal-cookie";
 import { Configuration } from "./api/openapi-fetch";
 import jwt_decode from "jwt-decode";
+import { toast } from "react-toastify";
 
 export const getAPIURL = () => getBaseURL() + "/api";
 export const getGQLURL = () => getBaseURL() + "/query";
@@ -32,6 +33,17 @@ export const getOpenapiFetchConfig = () => {
 
 export const onAPIRequest = (req: Request): void => {
   req.headers.set("Authorization", "Bearer " + getJWT());
+};
+export const onAPIError = (
+  err: {
+    message: string;
+    data: any;
+    status?: number;
+  },
+  retry: () => Promise<any>,
+  response?: Response
+) => {
+  toast.error(err.message);
 };
 
 export const parseJWT = (): JWT | undefined => {

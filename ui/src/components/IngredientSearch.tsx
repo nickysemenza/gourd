@@ -5,6 +5,7 @@ import { Ingredient, IngredientsApi } from "../api/openapi-fetch";
 import { useSearch } from "../api/openapi-hooks/api";
 import { getOpenapiFetchConfig } from "../config";
 import { ActionMeta } from "react-select";
+import { toast } from "react-toastify";
 
 export interface Results {
   ingredients: ResultType;
@@ -35,13 +36,14 @@ const IngredientSearch: React.FC<{
 
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
 
-  const { data, error } = useSearch({ queryParams: { name: value } });
+  const { data } = useSearch({ queryParams: { name: value } });
 
   const handleCreate = async (inputValue: any) => {
     console.log("foo", inputValue);
     let res = await iApi.createIngredients({
       ingredient: { name: inputValue.value, id: "" },
     });
+    toast(`ingredient ${res.id} created`);
 
     // let res = (await createIngredientMutation()).data;
     if (res) {
