@@ -8,13 +8,11 @@ apis/RecipesApi.ts
 apis/index.ts
 index.ts
 models/AuthResp.ts
-models/Entity.ts
 models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
 models/InlineResponse200.ts
-models/InlineResponse2001.ts
 models/List.ts
 models/Meal.ts
 models/ModelError.ts
@@ -25,6 +23,7 @@ models/PaginatedRecipes.ts
 models/Recipe.ts
 models/RecipeDetail.ts
 models/RecipeSection.ts
+models/SearchResult.ts
 models/SectionIngredient.ts
 models/SectionInstruction.ts
 models/index.ts

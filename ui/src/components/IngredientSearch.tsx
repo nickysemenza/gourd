@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import AsyncCreatableSelect from "react-select/async-creatable";
-import { Ingredient } from "../api/openapi-fetch";
+import { Ingredient, IngredientsApi } from "../api/openapi-fetch";
 
-import {
-  useSearchIngredientsAndRecipesQuery,
-  useCreateIngredientMutation,
-  SectionIngredientKind,
-} from "../generated/graphql";
+import { useSearch } from "../api/openapi-hooks/api";
+import { getOpenapiFetchConfig } from "../config";
+import { ActionMeta } from "react-select";
 
 export interface Results {
   ingredients: ResultType;
@@ -16,7 +14,7 @@ export interface Results {
 export interface ResultItem {
   title: string;
   uuid: string;
-  kind: SectionIngredientKind;
+  kind: "recipe" | "ingredient";
 }
 export interface ResultType {
   name: "ingredients" | "recipes";
@@ -26,7 +24,7 @@ export interface ResultType {
 const IngredientSearch: React.FC<{
   callback: (
     ingredient: Pick<Ingredient, "id" | "name">,
-    kind: SectionIngredientKind
+    kind: "recipe" | "ingredient"
   ) => void;
   initial?: string;
 }> = ({ callback, initial }) => {
@@ -34,43 +32,30 @@ const IngredientSearch: React.FC<{
   const [value, setValue] = useState(i);
 
   const [v, setV] = useState<any>({ label: i });
-  const [createIngredientMutation] = useCreateIngredientMutation({
-    variables: {
-      name: value,
-      kind: SectionIngredientKind.Ingredient,
-    },
-  });
 
-  const { data } = useSearchIngredientsAndRecipesQuery({
-    variables: {
-      searchQuery: value, // value for 'searchQuery'
-    },
-  });
+  const iApi = new IngredientsApi(getOpenapiFetchConfig());
+
+  const { data, error } = useSearch({ queryParams: { name: value } });
 
   const handleCreate = async (inputValue: any) => {
     console.log("foo", inputValue);
-    let res = (await createIngredientMutation()).data;
+    let res = await iApi.createIngredients({
+      ingredient: { name: inputValue.value, id: "" },
+    });
+
+    // let res = (await createIngredientMutation()).data;
     if (res) {
-      callback(
-        { id: res.upsertIngredient, name: inputValue },
-        SectionIngredientKind.Ingredient
-      );
+      callback({ id: res.id, name: res.name }, "ingredient");
     }
   };
 
-  const handleChange = async (newValue: any, actionMeta: any) => {
+  const handleChange = async (newValue: any, actionMeta: ActionMeta<any>) => {
     console.group("Value Changed");
     console.log(newValue);
     console.log(`action: ${actionMeta.action}`);
     console.groupEnd();
     if (newValue.__isNew__) {
-      let res = (await createIngredientMutation()).data;
-      if (res) {
-        callback(
-          { id: res.upsertIngredient, name: newValue.label },
-          SectionIngredientKind.Ingredient
-        );
-      }
+      handleCreate(newValue);
     } else {
       callback({ name: newValue.label, id: newValue.uuid }, newValue.kind);
     }
@@ -83,13 +68,13 @@ const IngredientSearch: React.FC<{
     callback([
       ...(data?.ingredients || []).map((i) => ({
         label: i.name,
-        kind: SectionIngredientKind.Ingredient,
-        uuid: i.uuid,
+        kind: "ingredient",
+        uuid: i.id,
       })),
       ...(data?.recipes || []).map((i) => ({
         label: i.name + " (Recipe)",
-        kind: SectionIngredientKind.Recipe,
-        uuid: i.uuid,
+        kind: "recipe",
+        uuid: i.id,
       })),
     ]);
   };

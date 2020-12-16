@@ -105,7 +105,7 @@ const RecipeTable: React.FC<TableProps> = ({
                     to={`/recipe/${ingredient.recipe?.id}`}
                     className="link"
                   >
-                    {ingredient.ingredient?.name}
+                    {ingredient.recipe?.name}
                   </Link>
                 ) : (
                   ingredient.ingredient?.name

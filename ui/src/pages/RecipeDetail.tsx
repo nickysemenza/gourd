@@ -212,7 +212,7 @@ const RecipeDetail: React.FC = () => {
         sections: {
           [sectionID]: {
             instructions: {
-              $push: [{ id: "x", instruction: "" }],
+              $push: [{ id: "", instruction: "" }],
             },
           },
         },
@@ -228,7 +228,7 @@ const RecipeDetail: React.FC = () => {
             ingredients: {
               $push: [
                 {
-                  id: "x",
+                  id: "",
                   grams: 1,
                   kind: "ingredient",
                   // info: { name: "", id: "", __typename: "Ingredient" },
