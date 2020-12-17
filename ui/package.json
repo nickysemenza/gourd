@@ -26,7 +26,7 @@
     "core-js": "^3.8.1",
     "dayjs": "^1.9.7",
     "graphql": "^15.4.0",
-    "ibm-openapi-validator": "^0.29.3",
+    "ibm-openapi-validator": "^0.31.1",
     "immutability-helper": "^3.0.2",
     "jwt-decode": "^3.0.0",
     "query-string": "^6.13.7",
