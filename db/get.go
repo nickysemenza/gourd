@@ -8,7 +8,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/nickysemenza/gourd/graph/model"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -278,36 +277,38 @@ func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingre
 	})
 }
 
-func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {
-	query, args, err := c.psql.Select("meal_uuid AS uuid", "name", "notion_link AS notionURL").From("meals").
-		LeftJoin("meal_recipe on meals.uuid = meal_recipe.meal_uuid").
-		Where(sq.Eq{"recipe_uuid": recipe}).ToSql()
-	if err != nil {
-		return nil, err
-	}
-	var res []*model.Meal
-	err = c.db.SelectContext(ctx, &res, query, args...)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
+//TODO: non-gql version
+// func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {
+// 	query, args, err := c.psql.Select("meal_uuid AS uuid", "name", "notion_link AS notionURL").From("meals").
+// 		LeftJoin("meal_recipe on meals.uuid = meal_recipe.meal_uuid").
+// 		Where(sq.Eq{"recipe_uuid": recipe}).ToSql()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var res []*model.Meal
+// 	err = c.db.SelectContext(ctx, &res, query, args...)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return res, nil
+// }
 
-func (c *Client) GetRecipeSource(ctx context.Context, recipeUUID string) (*model.Source, error) {
-	query, args, err := c.psql.Select(
-		"name", "meta",
-	).From("recipe_sources").Where(sq.Eq{"recipe": recipeUUID}).ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
+//TODO: non-gql version
+// func (c *Client) GetRecipeSource(ctx context.Context, recipeUUID string) (*model.Source, error) {
+// 	query, args, err := c.psql.Select(
+// 		"name", "meta",
+// 	).From("recipe_sources").Where(sq.Eq{"recipe": recipeUUID}).ToSql()
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to build query: %w", err)
+// 	}
 
-	x := &model.Source{}
-	err = c.db.GetContext(ctx, x, query, args...)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, fmt.Errorf("failed to select: %w", err)
-	}
-	return x, nil
-}
+// 	x := &model.Source{}
+// 	err = c.db.GetContext(ctx, x, query, args...)
+// 	if errors.Is(err, sql.ErrNoRows) {
+// 		return nil, nil
+// 	}
+// 	if err != nil {
+// 		return nil, fmt.Errorf("failed to select: %w", err)
+// 	}
+// 	return x, nil
+// }

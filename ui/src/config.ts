@@ -4,7 +4,6 @@ import jwt_decode from "jwt-decode";
 import { toast } from "react-toastify";
 
 export const getAPIURL = () => getBaseURL() + "/api";
-export const getGQLURL = () => getBaseURL() + "/query";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;
 
 export const getConfig = () => {

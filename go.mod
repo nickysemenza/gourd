@@ -3,7 +3,6 @@ module github.com/nickysemenza/gourd
 go 1.14
 
 require (
-	github.com/99designs/gqlgen v0.13.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.13.1-0.20201210214614-d8551be9a708
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.0
@@ -29,8 +28,6 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
-	github.com/vektah/gqlparser v1.3.1
-	github.com/vektah/gqlparser/v2 v2.1.0
 	go.opencensus.io v0.22.5
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.15.1
