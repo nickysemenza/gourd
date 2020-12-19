@@ -67,13 +67,7 @@ migrate: bin/migrate
 migrate-down: bin/migrate
 	./bin/migrate -source file://migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
 
-.PHONY: generate-graphql-go
-generate-graphql-go: 
-	go generate ./graph
-generate-graphql-ts:
-	cd ui && yarn run generate
 
-graphql: generate-graphql-go generate-graphql-ts
 
 validate-openapi:
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc

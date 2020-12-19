@@ -7,9 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/davecgh/go-spew/spew"
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
@@ -26,8 +23,6 @@ import (
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/graph"
-	"github.com/nickysemenza/gourd/graph/generated"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/scraper"
 )
@@ -56,13 +51,6 @@ var httpRequestsDurationMetric = metric.Must(otel.Meter("ex.com/basic")).
 // 	}
 // 	return http.HandlerFunc(fn)
 // }
-
-func (s *Server) GetResolver() generated.ResolverRoot {
-	return &graph.Resolver{
-		Manager: s.Manager,
-		DB:      s.DB,
-	}
-}
 
 func (s *Server) Run(_ context.Context) error {
 	r := echo.New()
@@ -99,15 +87,8 @@ func (s *Server) Run(_ context.Context) error {
 	}
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
-	// gql server
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: s.GetResolver()}))
-	srv.Use(extension.FixedComplexityLimit(100))
-	// srv.Use(graph.Observability{})
-
 	// http routes
 	r.GET("/metrics", echo.WrapHandler(hf))
-	r.Any("/", echo.WrapHandler(http.HandlerFunc(playground.Handler("GraphQL playground", "/query"))))
-	r.Any("/query", echo.WrapHandler(otelhttp.WithRouteTag("/query", srv)), jwtMiddleware)
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
 	// r.Any("/api", echo.WrapHandler(otelhttp.NewHandler(api.Handler(apiManager), "/api")))

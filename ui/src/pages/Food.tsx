@@ -1,6 +1,4 @@
-import { useGetFoodQuery } from "../generated/graphql";
 import React from "react";
-import Debug from "../components/Debug";
 
 const Food: React.FC = () => {
   // const [food, setFood]
@@ -17,16 +15,9 @@ const Food: React.FC = () => {
 export default Food;
 
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
-  const { data } = useGetFoodQuery({
-    variables: {
-      fdc_id,
-    },
-  });
-  if (!data) return null;
-  const { food } = data;
   return (
     <div>
-      <h2>{food?.description}</h2>
+      {/* <h2>{food?.description}</h2>
       <div>{food?.dataType}</div>
       <div>{fdc_id}</div>
       <Debug data={food?.category} />
@@ -41,7 +32,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
               <td>{n.nutrient.name} </td>
             </tr>
           ))}
-      </table>
+      </table> */}
     </div>
   );
 };

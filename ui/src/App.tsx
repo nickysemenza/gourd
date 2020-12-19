@@ -1,8 +1,5 @@
 import React from "react";
 
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
-
-import { ApolloProvider } from "@apollo/react-hooks";
 import Test from "./Test";
 import RecipeList from "./pages/RecipeList";
 import {
@@ -23,14 +20,7 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import {
-  getAPIURL,
-  getGQLURL,
-  getJWT,
-  isLoggedIn,
-  onAPIRequest,
-  onAPIError,
-} from "./config";
+import { getAPIURL, isLoggedIn, onAPIRequest, onAPIError } from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
@@ -58,17 +48,6 @@ const PrivateRoute = ({ children, ...rest }: RouteProps) => {
 };
 
 function App() {
-  const cache = new InMemoryCache();
-  const link = createHttpLink({
-    uri: getGQLURL(),
-    headers: { authorization: "Bearer " + getJWT() },
-  });
-
-  const client = new ApolloClient({
-    // Provide required constructor fields
-    cache: cache,
-    link: link,
-  });
   return (
     <CookiesProvider>
       <RestfulProvider
@@ -76,51 +55,49 @@ function App() {
         onRequest={onAPIRequest}
         onError={onAPIError}
       >
-        <ApolloProvider client={client}>
-          <Router>
-            <ToastContainer />
-            <NavBar />
-            <div className="lg:container lg:mx-auto">
-              <Switch>
-                <Route path="/recipe/:uuid">
-                  <RecipeDetail />
-                </Route>
-                <Route path="/recipes">
-                  <RecipeList />
-                </Route>
-                <Route path="/ingredients">
-                  <IngredientList />
-                </Route>
-                <Route path="/create">
-                  <CreateRecipe />
-                </Route>
-                <Route path="/food">
-                  <Food />
-                </Route>
-                <Route path="/docs">
-                  <Docs />
-                </Route>
-                <Route path="/playground">
-                  <Playground />
-                </Route>
-                <PrivateRoute path="/photos">
-                  <Photos />
-                </PrivateRoute>
-                <PrivateRoute path="/meals">
-                  <Meals />
-                </PrivateRoute>
-                <PrivateRoute path="/albums">
-                  <Albums />
-                </PrivateRoute>
-                <Route path="/">
-                  <Test />
-                </Route>
-              </Switch>
-            </div>
-          </Router>
+        <Router>
+          <ToastContainer />
+          <NavBar />
+          <div className="lg:container lg:mx-auto">
+            <Switch>
+              <Route path="/recipe/:uuid">
+                <RecipeDetail />
+              </Route>
+              <Route path="/recipes">
+                <RecipeList />
+              </Route>
+              <Route path="/ingredients">
+                <IngredientList />
+              </Route>
+              <Route path="/create">
+                <CreateRecipe />
+              </Route>
+              <Route path="/food">
+                <Food />
+              </Route>
+              <Route path="/docs">
+                <Docs />
+              </Route>
+              <Route path="/playground">
+                <Playground />
+              </Route>
+              <PrivateRoute path="/photos">
+                <Photos />
+              </PrivateRoute>
+              <PrivateRoute path="/meals">
+                <Meals />
+              </PrivateRoute>
+              <PrivateRoute path="/albums">
+                <Albums />
+              </PrivateRoute>
+              <Route path="/">
+                <Test />
+              </Route>
+            </Switch>
+          </div>
+        </Router>
 
-          <hr />
-        </ApolloProvider>
+        <hr />
       </RestfulProvider>
     </CookiesProvider>
   );

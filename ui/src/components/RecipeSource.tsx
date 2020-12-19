@@ -1,8 +1,7 @@
 import React from "react";
-import { Source } from "../generated/graphql";
 
 export interface Props {
-  source: Pick<Source, "meta" | "name">;
+  source: any;
 }
 const RecipeSource: React.FC<Props> = ({ source }) => (
   <div>

@@ -23,7 +23,7 @@ This is comprised mulitple components:
    - e.g. [plain strawberries](https://fdc.nal.usda.gov/fdc-app.html#/food-details/747448/nutrients) or [C&H brown sugar](https://fdc.nal.usda.gov/fdc-app.html#/food-details/392083/nutrients)
 4. **ui** for viewing/editing/creating recipes.
 5. **cli** for interacting with the server instead of the API
-6. **server** for exposing graphQL + http APIs.
+6. **server** for exposing rest api
 7. **notion** for extracting images from my Notion food log.
 
 ### todo
