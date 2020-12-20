@@ -38,13 +38,10 @@ func transformRecipe(dbr db.Recipe) Recipe {
 	}
 }
 func transformRecipeFull(dbr *db.Recipe) *RecipeDetail {
-	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(*&dbr.Sections)}
+	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
-}
-func (i *Ingredient) toDB() *db.Ingredient {
-	return &db.Ingredient{UUID: i.Id, Name: i.Name}
 }
 
 func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe, error) {

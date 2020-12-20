@@ -5,6 +5,7 @@ package parser
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -113,9 +114,9 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 	span.AddEvent("got segments")
 	span.SetAttributes(label.String("raw", s))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get segments: %v", err)
+		return nil, fmt.Errorf("failed to get segments: %w", err)
 	}
-	if len(segments) < 2 {
+	if len(segments) < 2 { //nolint:gomnd
 		return nil, fmt.Errorf("no enough segments found")
 	}
 	// spew.Dump(segments)
@@ -123,7 +124,7 @@ func (p *parser) parse(ctx context.Context, s string) (*Ingredient, error) {
 	return p.handleSegments(ctx, segments)
 }
 
-// nolint:gocognit,funlen
+// nolint:gocognit,funlen,exhaustive
 func (p *parser) handleSegments(ctx context.Context, segments []segment) (*Ingredient, error) {
 	_, span := otel.Tracer("parser").Start(ctx, "parser.handleSegments")
 	defer span.End()
@@ -188,6 +189,8 @@ func (p *parser) handleSegments(ctx context.Context, segments []segment) (*Ingre
 	}
 	return &ing, nil
 }
+
+// nolint:exhaustive
 func (p *parser) getsegments(ctx context.Context, s string) ([]segment, error) {
 	_, span := otel.Tracer("parser").Start(ctx, "parser.getsegments")
 	defer span.End()
@@ -200,9 +203,9 @@ func (p *parser) getsegments(ctx context.Context, s string) ([]segment, error) {
 		ch, _, err := r.ReadRune() // err will only ever be EOF
 
 		switch {
-		case unicode.IsSpace(ch), err == io.EOF:
+		case unicode.IsSpace(ch), errors.Is(err, io.EOF):
 			p.handleDone()
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return p.res, nil
 			}
 		case unicode.IsDigit(ch):
@@ -282,6 +285,7 @@ func (p *parser) handleDone() {
 	p.current = none
 }
 
+//nolint:gomnd
 func runeNumberToString(r rune) string {
 	switch r {
 	case 188:
@@ -293,15 +297,6 @@ func runeNumberToString(r rune) string {
 	default:
 		return ""
 	}
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
 }
 
 func parseFloat(s string) (float64, error) {

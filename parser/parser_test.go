@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+//nolint:scopelint
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -48,6 +49,7 @@ func TestParse(t *testing.T) {
 	}
 }
 
+//nolint:scopelint
 func TestParseAndStringify(t *testing.T) {
 	tests := []struct {
 		in  string

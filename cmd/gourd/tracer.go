@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql/driver"
+	"errors"
 
 	"github.com/luna-duclos/instrumentedsql"
 	"go.opentelemetry.io/otel"
@@ -50,7 +51,7 @@ func (s span) SetLabel(k, v string) {
 }
 
 func (s span) SetError(err error) {
-	if err == nil || err == driver.ErrSkip {
+	if err == nil || errors.Is(err, driver.ErrSkip) {
 		return
 	}
 	s.parent.RecordError(err)

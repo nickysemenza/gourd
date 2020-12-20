@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -100,10 +101,10 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 WHERE ate_at > $1::timestamp - INTERVAL '1 hour'
 AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 		if err != nil {
-			if err != sql.ErrNoRows {
+			if !errors.Is(err, sql.ErrNoRows) {
 				return err
 			}
-			//insert
+			// insert
 			mealID = GetUUID()
 			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, mealID)
 			_, err := c.execContext(ctx, iq)

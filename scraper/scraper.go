@@ -33,7 +33,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 		return nil, fmt.Errorf("failed to extract ld+json from %s: %w", addr, err)
 	}
 	spew.Dump(recipe.RecipeIngredient, err)
-	output := []string{}
+	debugMsgs := []string{}
 
 	section := api.RecipeSection{}
 
@@ -42,10 +42,10 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 		if err != nil {
 			msg := fmt.Sprintf("failed to parse: %s", err)
 			log.Errorf(msg)
-			output = append(output, msg)
+			debugMsgs = append(debugMsgs, msg)
 			continue
 		}
-		output = append(output, i.ToString())
+		debugMsgs = append(debugMsgs, i.ToString())
 		fmt.Println(i.ToString())
 		uuid, err := ingredientToUUID(ctx, i.Name, "ingredient")
 		if err != nil {
@@ -81,7 +81,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 		},
 		Sections: []api.RecipeSection{section},
 	}
-	spew.Dump(r)
+	spew.Dump(r, debugMsgs)
 
 	return &r, nil
 }
@@ -98,7 +98,7 @@ func extractRecipeJSONLD(ctx context.Context, html string) (*Recipe, error) {
 	doc.Find("script[type='application/ld+json']").Each(func(i int, s *goquery.Selection) {
 		var r Recipe
 		err = json.Unmarshal([]byte(
-			strings.Replace(s.Text(), "\n", "", -1),
+			strings.ReplaceAll(s.Text(), "\n", ""),
 		), &r)
 		if err == nil && r.Type == "Recipe" {
 			recipe = r
@@ -123,10 +123,10 @@ func getHTML(ctx context.Context, url string) (string, error) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		err := fmt.Errorf("failed to get html: %w", err)
-		log.Fatal(err)
+		return "", err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != 200 {
+	if res.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("got status code: %d %s while downloading %s", res.StatusCode, res.Status, url)
 	}
 	buf := new(bytes.Buffer)

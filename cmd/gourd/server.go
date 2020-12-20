@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -109,7 +110,7 @@ func autoMigrate(dbConn *sql.DB) error {
 		return fmt.Errorf("failed to initialize migrator: %w", err)
 	}
 	if err := m.Up(); err != nil {
-		if err != migrate.ErrNoChange {
+		if !errors.Is(err, migrate.ErrNoChange) {
 			return fmt.Errorf("failed to migrate: %w", err)
 		}
 	}

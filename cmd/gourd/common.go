@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -65,8 +66,9 @@ func setupEnv() {
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		var configErr *viper.ConfigFileNotFoundError
+		if errors.As(err, &configErr) {
+			panic(fmt.Errorf("Fatal error config file: %s \n", configErr))
 		}
 	}
 

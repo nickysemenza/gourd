@@ -174,6 +174,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 					numBlurHashCalculated++
 				}
 
+				//nolint:scopelint
 				photos = append(photos, db.Photo{
 					AlbumID:  album.ID,
 					PhotoID:  m.Id,

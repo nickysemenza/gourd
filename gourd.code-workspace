@@ -28,6 +28,10 @@
     ]
   },
   "settings": {
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": ["--fast"],
+    "editor.formatOnSave": true,
     "typescript.tsdk": "ui/node_modules/typescript/lib"
+    
   }
 }

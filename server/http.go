@@ -15,9 +15,7 @@ import (
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
-	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/api"
@@ -37,20 +35,6 @@ type Server struct {
 	APIManager  *api.API
 	BypassAuth  bool
 }
-
-// nolint:gochecknoglobals
-var httpRequestsDurationMetric = metric.Must(otel.Meter("ex.com/basic")).
-	NewFloat64Counter("http.requests.duration")
-
-// func timing(next http.Handler) http.Handler {
-// 	fn := func(w http.ResponseWriter, r *http.Request) {
-// 		t := time.Now()
-// 		next.ServeHTTP(w, r)
-// 		d := time.Since(t).Seconds()
-// 		httpRequestsDurationMetric.Add(r.Context(), d, label.String("method", r.Method))
-// 	}
-// 	return http.HandlerFunc(fn)
-// }
 
 func (s *Server) Run(_ context.Context) error {
 	r := echo.New()

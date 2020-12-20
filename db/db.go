@@ -194,7 +194,7 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 	ingredient := &Ingredient{}
 	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
 	WHERE name = $1 LIMIT 1`, name)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (uuid, name) VALUES ($1, $2)`, setUUID(""), name)
 		if err != nil {
 			return nil, err
@@ -221,9 +221,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 	if err := c.AssignUUIDs(ctx, r); err != nil {
 		return err
 	}
-	//update recipe_section_instructions
-	//update recipe_section_ingredients
-	//update recipe_sections
+	// update recipe_section_instructions
+	// update recipe_section_ingredients
+	// update recipe_sections
 
 	// c.psql.Delete(sectionInstructionsTable).Where(sq.Eq{""})
 
@@ -402,6 +402,7 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 	return nil
 }
 
+// nolint: unparam
 func (c *Client) execContext(ctx context.Context, q sq.InsertBuilder) (sql.Result, error) {
 	ctx, span := c.tracer.Start(ctx, "execContext")
 	defer span.End()

@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+//nolint:scopelint
 func TestIsWeightVolume(t *testing.T) {
 	tests := []struct {
 		name     string

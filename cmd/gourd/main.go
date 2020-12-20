@@ -14,7 +14,7 @@ import (
 
 func main() {
 	setupMisc()
-	_ = rootCmd.Execute()
+	Execute()
 }
 
 // nolint:gochecknoglobals

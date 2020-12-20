@@ -15,6 +15,9 @@ import (
 	"go.opentelemetry.io/otel/label"
 )
 
+const aspectWidth = 4
+const aspectHeight = 3
+
 func GetBlurHash(ctx context.Context, url string) (string, error) {
 	ctx, span := otel.Tracer("image").Start(ctx, "image.GetBlurHash")
 	defer span.End()
@@ -24,13 +27,17 @@ func GetBlurHash(ctx context.Context, url string) (string, error) {
 		return "", err
 	}
 
-	return blurhash.Encode(4, 3, image)
+	return blurhash.Encode(aspectWidth, aspectHeight, image)
 }
 
 func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	ctx, span := otel.Tracer("image").Start(ctx, "image.GetFromURL")
 	defer span.End()
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}
