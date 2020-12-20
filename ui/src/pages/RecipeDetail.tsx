@@ -260,7 +260,7 @@ const RecipeDetail: React.FC = () => {
         <div>
           {edit ? (
             <input
-              className="border-2"
+              className="border-2 w-96"
               value={info.name}
               onChange={(e) => updateRecipeName(e.target.value)}
             ></input>

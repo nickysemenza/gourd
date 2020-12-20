@@ -59,6 +59,7 @@ const RecipeTable: React.FC<TableProps> = ({
         .reduce((acc, ingredient) => acc + ingredient?.grams, 0),
     0
   );
+  const showBP = flourMass > 0;
 
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
@@ -69,95 +70,104 @@ const RecipeTable: React.FC<TableProps> = ({
       </TableCell>
       <TableCell>{section.minutes}</TableCell>
       <TableCell>
-        {section.ingredients.map((ingredient, y) => (
-          <div className="ing-table-row" key={y}>
-            <TableInput
-              data-cy="grams-input"
-              edit={edit}
-              softEdit
-              value={getIngredientValue(x, y, ingredient.grams || 0)}
-              onChange={(e) =>
-                updateIngredient({
-                  sectionID: x,
-                  ingredientID: y,
-                  value: e.target.value,
-                  attr: "grams",
-                })
-              }
-            />
-            <div className="text-gray-600">
-              g
-              {flourMass > 0 && (
-                <i> ({Math.round((ingredient.grams / flourMass) * 100)}%)</i>
-              )}
-            </div>
-            {edit ? (
-              <IngredientSearch
-                initial={getIngredient(ingredient).name}
-                callback={(item, kind) =>
-                  updateIngredientInfo(x, y, item, kind)
+        {section.ingredients.map((ingredient, y) => {
+          const bp = Math.round((ingredient.grams / flourMass) * 100);
+          return (
+            <div className="ing-table-row" key={y}>
+              <TableInput
+                data-cy="grams-input"
+                edit={edit}
+                softEdit
+                value={getIngredientValue(x, y, ingredient.grams || 0)}
+                onChange={(e) =>
+                  updateIngredient({
+                    sectionID: x,
+                    ingredientID: y,
+                    value: e.target.value,
+                    attr: "grams",
+                  })
                 }
               />
-            ) : (
-              <div className="text-gray-600">
-                {ingredient.kind === "recipe" ? (
-                  <Link
-                    to={`/recipe/${ingredient.recipe?.id}`}
-                    className="link"
+              <div className="flex space-x-0.5">
+                <div className="text-gray-600">g</div>
+                {showBP && (
+                  <div
+                    className={`${
+                      bp > 0 ? "text-gray-600" : "text-red-300"
+                    } italic`}
                   >
-                    {ingredient.recipe?.name}
-                  </Link>
-                ) : (
-                  ingredient.ingredient?.name
+                    ({bp}%)
+                  </div>
                 )}
               </div>
-            )}
-            <TableInput
-              data-cy="amount-input"
-              // width={16}
-              edit={edit}
-              softEdit
-              value={getIngredientValue(x, y, ingredient.amount || 0)}
-              onChange={(e) =>
-                updateIngredient({
-                  sectionID: x,
-                  ingredientID: y,
-                  value: e.target.value,
-                  attr: "amount",
-                })
-              }
-            />
-            <TableInput
-              data-cy="unit-input"
-              width={16}
-              edit={edit}
-              value={ingredient.unit}
-              onChange={(e) =>
-                updateIngredient({
-                  sectionID: x,
-                  ingredientID: y,
-                  value: e.target.value,
-                  attr: "unit",
-                })
-              }
-            />
-            <TableInput
-              data-cy="adjective-input"
-              width={16}
-              edit={edit}
-              value={ingredient.adjective}
-              onChange={(e) =>
-                updateIngredient({
-                  sectionID: x,
-                  ingredientID: y,
-                  value: e.target.value,
-                  attr: "adjective",
-                })
-              }
-            />
-            {/* TODO: optional toggle */}
-          </div>
-        ))}
+              {edit ? (
+                <IngredientSearch
+                  initial={getIngredient(ingredient).name}
+                  callback={(item, kind) =>
+                    updateIngredientInfo(x, y, item, kind)
+                  }
+                />
+              ) : (
+                <div className="text-gray-600">
+                  {ingredient.kind === "recipe" ? (
+                    <Link
+                      to={`/recipe/${ingredient.recipe?.id}`}
+                      className="link"
+                    >
+                      {ingredient.recipe?.name}
+                    </Link>
+                  ) : (
+                    ingredient.ingredient?.name
+                  )}
+                </div>
+              )}
+              <TableInput
+                data-cy="amount-input"
+                // width={16}
+                edit={edit}
+                softEdit
+                value={getIngredientValue(x, y, ingredient.amount || 0)}
+                onChange={(e) =>
+                  updateIngredient({
+                    sectionID: x,
+                    ingredientID: y,
+                    value: e.target.value,
+                    attr: "amount",
+                  })
+                }
+              />
+              <TableInput
+                data-cy="unit-input"
+                width={16}
+                edit={edit}
+                value={ingredient.unit}
+                onChange={(e) =>
+                  updateIngredient({
+                    sectionID: x,
+                    ingredientID: y,
+                    value: e.target.value,
+                    attr: "unit",
+                  })
+                }
+              />
+              <TableInput
+                data-cy="adjective-input"
+                width={16}
+                edit={edit}
+                value={ingredient.adjective}
+                onChange={(e) =>
+                  updateIngredient({
+                    sectionID: x,
+                    ingredientID: y,
+                    value: e.target.value,
+                    attr: "adjective",
+                  })
+                }
+              />
+              {/* TODO: optional toggle */}
+            </div>
+          );
+        })}
         {edit && (
           <div className="add-item" onClick={() => addIngredient(x)}>
             add ingredient
@@ -170,7 +180,8 @@ const RecipeTable: React.FC<TableProps> = ({
             <li key={y}>
               <TableInput
                 data-cy="instruction-input"
-                width={16}
+                width={72}
+                tall
                 edit={edit}
                 value={instruction.instruction}
                 onChange={(e) => updateInstruction(x, y, e.target.value)}
@@ -193,7 +204,7 @@ const RecipeTable: React.FC<TableProps> = ({
         <TableCell>Section</TableCell>
         <TableCell>Minutes</TableCell>
         <TableCell>
-          <div className="ing-table-row">
+          <div className="ing-table-row font-mono">
             <div>x</div>
             <div>grams (BP)</div>
             <div>of y</div>
@@ -230,15 +241,23 @@ const TableInput: React.FC<{
   softEdit?: boolean;
   value: string | number;
   width?: number;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ edit, softEdit = false, width = 10, ...props }) =>
-  edit || softEdit ? (
-    <input
-      {...props}
-      className={`border-2 border-dashed p-0 h-6 w-${width} border-gray-200 hover:border-black ${
-        softEdit && !edit && "bg-transparent"
-      } focus:bg-gray-200`}
-    />
+  tall?: boolean;
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+}> = ({ edit, softEdit = false, width = 10, tall, ...props }) => {
+  const className = `border-2 border-dashed p-0 h-${
+    tall ? 18 : 6
+  } w-${width} border-gray-200 hover:border-black ${
+    softEdit && !edit && "bg-transparent"
+  } focus:bg-gray-200`;
+  return edit || softEdit ? (
+    tall ? (
+      <textarea {...props} className={className} rows={3} />
+    ) : (
+      <input {...props} className={className} />
+    )
   ) : (
     <div>{props.value}</div>
   );
+};

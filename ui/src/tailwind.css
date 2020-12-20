@@ -16,7 +16,8 @@
 
 .rec-table-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 4fr 2fr;
+  /* section, minutes, ing-table-row, instructions */
+  grid-template-columns: 1fr 1fr 8fr 4fr;
 }
 
 .add-item {
