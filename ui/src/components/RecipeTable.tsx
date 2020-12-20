@@ -32,7 +32,8 @@ export interface TableProps {
   getIngredientValue: (
     sectionID: number,
     ingredientID: number,
-    value: number
+    value: number,
+    attr: "grams" | "amount"
   ) => number;
   edit: boolean;
   addInstruction: (sectionID: number) => void;
@@ -78,7 +79,7 @@ const RecipeTable: React.FC<TableProps> = ({
                 data-cy="grams-input"
                 edit={edit}
                 softEdit
-                value={getIngredientValue(x, y, ingredient.grams || 0)}
+                value={getIngredientValue(x, y, ingredient.grams || 0, "grams")}
                 onChange={(e) =>
                   updateIngredient({
                     sectionID: x,
@@ -126,7 +127,12 @@ const RecipeTable: React.FC<TableProps> = ({
                 // width={16}
                 edit={edit}
                 softEdit
-                value={getIngredientValue(x, y, ingredient.amount || 0)}
+                value={getIngredientValue(
+                  x,
+                  y,
+                  ingredient.amount || 0,
+                  "amount"
+                )}
                 onChange={(e) =>
                   updateIngredient({
                     sectionID: x,
@@ -248,14 +254,14 @@ const TableInput: React.FC<{
 }> = ({ edit, softEdit = false, width = 10, tall, ...props }) => {
   const className = `border-2 border-dashed p-0 h-${
     tall ? 18 : 6
-  } w-${width} border-gray-200 hover:border-black ${
+  } w-${width} border-gray-200 disabled:border-red-100 hover:border-black ${
     softEdit && !edit && "bg-transparent"
   } focus:bg-gray-200`;
   return edit || softEdit ? (
     tall ? (
       <textarea {...props} className={className} rows={3} />
     ) : (
-      <input {...props} className={className} />
+      <input {...props} className={className} disabled={props.value === 0} />
     )
   ) : (
     <div>{props.value}</div>

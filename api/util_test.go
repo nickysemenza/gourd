@@ -35,3 +35,13 @@ func TestRecipeFromFile(t *testing.T) {
 
 	require.Equal(fmt.Sprintf("%s (dup)", baseName), r3.Recipe.Name)
 }
+func TestRecipeReferencingRecipe(t *testing.T) {
+	require := require.New(t)
+	ctx := context.Background()
+	r, err := RecipeFromFile(ctx, "../testdata/dep_1.json")
+	tdb := db.NewDB(t)
+	m := manager.New(tdb, nil, nil)
+	apiManager := NewAPI(m)
+	_, err = apiManager.CreateRecipe(ctx, r)
+	require.NoError(err)
+}

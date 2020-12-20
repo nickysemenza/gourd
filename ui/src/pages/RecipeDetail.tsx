@@ -16,6 +16,7 @@ type override = {
   sectionID: number;
   ingredientID: number;
   value: number;
+  attr: "grams" | "amount";
 };
 const RecipeDetail: React.FC = () => {
   let { uuid } = useParams() as { uuid?: string };
@@ -115,65 +116,76 @@ const RecipeDetail: React.FC = () => {
     value,
     attr,
   }: UpdateIngredientProps) => {
-    const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-    attr === "grams" &&
-      !edit &&
-      setOverride({
-        sectionID,
-        ingredientID,
-        value: newValue,
-      });
-    const { grams } = recipe.sections[sectionID]!.ingredients[ingredientID];
-    edit
-      ? setRecipe(
-          update(recipe, {
-            sections: {
-              [sectionID]: {
-                ingredients: {
-                  [ingredientID]: {
-                    // info: {
-                    //   id: "",
-                    //   name: {
-                    //     $apply: (v) => (attr === "name" ? value : v),
-                    //   },
-                    // },
-                    // yikes
-                    grams: {
-                      $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
-                    },
-                    amount: {
-                      $apply: (v) =>
-                        attr === "amount" ? parseFloat(value) : v,
-                    },
-                    unit: {
-                      $apply: (v) => (attr === "unit" ? value : v),
-                    },
-                    adjective: {
-                      $apply: (v) => (attr === "adjective" ? value : v),
-                    },
-                    optional: {
-                      $apply: (v) =>
-                        attr === "optional" ? value === "true" : v,
-                    },
+    if (edit) {
+      setRecipe(
+        update(recipe, {
+          sections: {
+            [sectionID]: {
+              ingredients: {
+                [ingredientID]: {
+                  // info: {
+                  //   id: "",
+                  //   name: {
+                  //     $apply: (v) => (attr === "name" ? value : v),
+                  //   },
+                  // },
+                  // yikes
+                  grams: {
+                    $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
+                  },
+                  amount: {
+                    $apply: (v) => (attr === "amount" ? parseFloat(value) : v),
+                  },
+                  unit: {
+                    $apply: (v) => (attr === "unit" ? value : v),
+                  },
+                  adjective: {
+                    $apply: (v) => (attr === "adjective" ? value : v),
+                  },
+                  optional: {
+                    $apply: (v) => (attr === "optional" ? value === "true" : v),
                   },
                 },
               },
             },
-          })
-        )
-      : setMultiplier(
-          Math.round((newValue / grams + Number.EPSILON) * 100) / 100
+          },
+        })
+      );
+    } else {
+      const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
+      const { grams, amount } = recipe.sections[sectionID]!.ingredients[
+        ingredientID
+      ];
+
+      if (attr === "grams" || attr === "amount") {
+        setOverride({
+          sectionID,
+          ingredientID,
+          value: newValue,
+          attr,
+        });
+
+        setMultiplier(
+          Math.round(
+            (newValue / (attr === "grams" ? grams : amount || 0) +
+              Number.EPSILON) *
+              100
+          ) / 100
         );
+      }
+    }
   };
 
   const getIngredientValue = (
     sectionID: number,
     ingredientID: number,
-    value: number
+    value: number,
+    attr: "grams" | "amount"
   ) => {
     if (
       override?.ingredientID === ingredientID &&
-      override.sectionID === sectionID
+      override.sectionID === sectionID &&
+      override.attr === attr
     )
       return override.value;
     return value * multiplier;
@@ -287,8 +299,9 @@ const RecipeDetail: React.FC = () => {
           <button
             onClick={resetMultiplier}
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
+            disabled={multiplier === 0}
           >
-            Reset
+            reset (<code>@{multiplier}x</code>)
           </button>
           <button
             onClick={saveUpdate}
@@ -319,7 +332,7 @@ const RecipeDetail: React.FC = () => {
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
-      <Debug data={{ recipe, loading, error, data, multiplier, override }} />
+      <Debug data={{ loading, error, multiplier, override, recipe }} />
     </div>
   );
 };

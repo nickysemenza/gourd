@@ -72,27 +72,49 @@ func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe
 				Adjective: zero.StringFrom(i.Adjective),
 				Optional:  zero.BoolFromPtr(i.Optional),
 			}
-			if i.Kind == "recipe" {
+			switch i.Kind {
+			case "recipe":
 				if i.Recipe == nil {
 					continue
 				}
-				si.RecipeUUID = zero.StringFrom(i.Recipe.Id)
-			} else {
-				// ingredient
-
+				id := i.Recipe.Id
+				if id == "" {
+					r, err := a.DB().GetRecipeByName(ctx, i.Recipe.Name)
+					if err != nil {
+						return nil, err
+					}
+					if r != nil {
+						id = r.UUID
+					} else {
+						id, err = a.DB().InsertRecipe(ctx, &db.Recipe{Name: i.Recipe.Name})
+						if err != nil {
+							return nil, err
+						}
+					}
+				}
+				si.RecipeUUID = zero.StringFrom(id)
+			case "ingredient":
 				if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
 					continue
 				}
-				si.IngredientUUID = zero.StringFrom(i.Ingredient.Id)
-			}
-			if !si.RecipeUUID.Valid && !si.IngredientUUID.Valid {
-				// missing uuids, assume ingredient
-				ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
-				if err != nil {
-					return nil, err
+				id := i.Ingredient.Id
+
+				// missing id, need to find/create
+				if id == "" {
+					ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
+					if err != nil {
+						return nil, err
+					}
+					id = ing.UUID
 				}
 
-				si.IngredientUUID = zero.StringFrom(ing.UUID)
+				si.IngredientUUID = zero.StringFrom(id)
+			case "":
+				// empty table row, drop it
+				continue
+			default:
+				return nil, fmt.Errorf("unknown kind: %s", i.Kind)
+
 			}
 
 			dbs.Ingredients = append(dbs.Ingredients, si)
