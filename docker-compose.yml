@@ -11,6 +11,7 @@ services:
       POSTGRES_USER: gourd
       POSTGRES_PASSWORD: gourd
       POSTGRES_DB: food
+    command: ["postgres", "-c", "log_statement=all"]
   jaeger:
     container_name: food-jaeger
     environment:

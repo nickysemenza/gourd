@@ -19,7 +19,7 @@ const IngredientList: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error } = useListIngredients({
+  const { data } = useListIngredients({
     queryParams: params,
   });
 

@@ -81,7 +81,9 @@ func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe
 				}
 				si.RecipeUUID = zero.StringFrom(i.Recipe.Id)
 			} else {
-				if i.Ingredient == nil || i.Ingredient.Name == "" {
+				// ingredient
+
+				if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
 					continue
 				}
 				si.IngredientUUID = zero.StringFrom(i.Ingredient.Id)
@@ -200,14 +202,15 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 			return nil, err
 		}
 		r.Recipe.Id = id
-	}
-	if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
+	} else if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
 		return nil, err
 	}
+
 	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
 	if err != nil {
 		return nil, err
 	}
+
 	return transformRecipeFull(r2), nil
 }
 

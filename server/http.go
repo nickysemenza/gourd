@@ -143,7 +143,6 @@ func (s *Server) Run(_ context.Context) error {
 }
 func wrapHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Before")
 
 		// opts := []trace.SpanOption{}
 		sc, ok := (&propagation.HTTPFormat{}).SpanContextFromRequest(r)
@@ -165,7 +164,6 @@ func wrapHandler(h http.Handler) http.Handler {
 			// otelhttp.WithSpanOptions(opts...),
 		)
 		h2.ServeHTTP(w, r) // call original
-		log.Println("After")
 	})
 }
 
