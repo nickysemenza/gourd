@@ -1,22 +1,14 @@
 linters:
   enable:
-    - dupl
-    - gofmt
-    - goconst
+    - megacheck
+    - govet
+    - unparam
+    - sqlclosecheck
     - misspell
-    - gosec
-    - golint
-  presets:
-    - complexity
-    - bugs
-    - format
-    - style
-  disable:
-    - wsl
-    - godox
-    - testpackage
-    - lll
+    - noctx
     - gomnd
-    - scopelint
-    - exhaustivestruct
-    - wrapcheck
+    - gocritic
+    - bodyclose
+  presets:
+    - bugs
+    - unused
