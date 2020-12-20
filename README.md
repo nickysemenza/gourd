@@ -28,13 +28,18 @@ This is comprised mulitple components:
 
 ### todo
 
-1. add authentication
-2. deploy UI + backend properly
-3. allow merging ingredients together
-4. weights per-ingredient
-5. meals w/ multiple recipes at set quantities
-6. slugs for recipe urls
-7. associate ingredients with fdc ids
-8. convert ingredient into recipe
+* allow merging ingredients together
+* calcualge average weights per-ingredient
+* meals w/ multiple recipes at set quantities
+* slugs for recipe urls
+* associate ingredients with fdc ids
+* convert ingredient into recipe
+* ingredient amounts should be generic (1-n val-unit pairs)
+* `$/unit` for ingredients?
+* drag-and-drop ingredients/instructions into a new section 
+* drag-and-drop reorder for ingredients/instructions
+* change duration columns to seconds
+* for imported recips, keep 'original' ingredient line items pre-parsing
+* ingredient dependency graph
 
 range: min max approx unit kind (time, amount)
