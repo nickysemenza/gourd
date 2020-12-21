@@ -10,7 +10,6 @@ import (
 	"github.com/dgraph-io/ristretto"
 	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -50,6 +49,7 @@ type Recipe struct {
 	Unit         zero.String `db:"unit"`
 	Sections     []Section
 	Sources      []Source
+	Version      int64 `db:"version"`
 }
 type Source struct {
 	Name string `db:"name"`
@@ -154,12 +154,12 @@ func GetUUID() string {
 
 // AssignUUIDs adds uuids where missing.
 func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
-	r.UUID = setUUID(r.UUID)
+	// r.UUID = setUUID(r.UUID)
 	for x := range r.Sections {
-		r.Sections[x].UUID = setUUID(r.Sections[x].UUID)
+		r.Sections[x].UUID = GetUUID()
 		r.Sections[x].RecipeUUID = r.UUID
 		for y := range r.Sections[x].Ingredients {
-			r.Sections[x].Ingredients[y].UUID = setUUID(r.Sections[x].Ingredients[y].UUID)
+			r.Sections[x].Ingredients[y].UUID = GetUUID()
 			r.Sections[x].Ingredients[y].SectionUUID = r.Sections[x].UUID
 
 			// ingName := r.Sections[x].Ingredients[y].Name
@@ -182,7 +182,7 @@ func (c *Client) AssignUUIDs(ctx context.Context, r *Recipe) error {
 			// }
 		}
 		for y := range r.Sections[x].Instructions {
-			r.Sections[x].Instructions[y].UUID = setUUID(r.Sections[x].Instructions[y].UUID)
+			r.Sections[x].Instructions[y].UUID = GetUUID()
 			r.Sections[x].Instructions[y].SectionUUID = r.Sections[x].UUID
 		}
 	}
@@ -311,24 +311,24 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *Recipe) error 
 }
 
 // UpdateRecipe updates a recipe.
-func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
-	tx, err := c.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	err = c.updateRecipe(ctx, tx, r)
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
-}
+// func (c *Client) UpdateRecipe(ctx context.Context, r *Recipe) error {
+// 	tx, err := c.db.BeginTx(ctx, nil)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	err = c.updateRecipe(ctx, tx, r)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return tx.Commit()
+// }
 func (c *Client) insertRecipe(ctx context.Context, r *Recipe) (string, error) {
 	ctx, span := c.tracer.Start(ctx, "insertRecipe")
 	defer span.End()
 	r.UUID = setUUID(r.UUID)
 	log.Println("inserting", r.UUID, r.Name)
 	query, args, err := c.psql.
-		Insert(recipesTable).Columns("uuid", "name").Values(r.UUID, r.Name).
+		Insert(recipesTable).Columns("uuid", "name", "version").Values(r.UUID, r.Name, r.Version).
 		ToSql()
 	if err != nil {
 		return "", fmt.Errorf("failed to build query: %w", err)
@@ -352,25 +352,30 @@ func (c *Client) insertRecipe(ctx context.Context, r *Recipe) (string, error) {
 func (c *Client) InsertRecipe(ctx context.Context, r *Recipe) (string, error) {
 	ctx, span := c.tracer.Start(ctx, "InsertRecipe")
 	defer span.End()
-	for version := 0; version < 20; version++ {
-		if version > 0 {
-			r.Name = fmt.Sprintf("%s (dup)", r.Name)
-			fmt.Println("aa", r.Name)
 
+	// if we have an existing recipe with the same UUID or name, this one is a n+1 version of that one
+	version := int64(1)
+	var prior *Recipe
+	var err error
+	if r.UUID != "" {
+		prior, err = c.GetRecipeByUUID(ctx, r.UUID)
+		if err != nil {
+			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
-		res, err := c.insertRecipe(ctx, r)
-		if err == nil {
-			log.Println("all done")
-			return res, nil
-		}
-		var pqe *pq.Error
-		if !(errors.As(err, &pqe) && pqe.Code.Name() == "unique_violation") {
-			return "", err
-		}
-		log.Info("incr dup counter")
-
 	}
-	return "", fmt.Errorf("too many duplicates for %s", r.Name)
+	if prior == nil {
+		prior, err = c.GetRecipeByName(ctx, r.Name)
+		if err != nil {
+			return "", fmt.Errorf("failed to find prior recipe: %w", err)
+		}
+	}
+	if prior != nil {
+		version = prior.Version + 1
+	}
+	r.Version = version
+	r.UUID = GetUUID()
+	return c.insertRecipe(ctx, r)
+
 }
 
 func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {

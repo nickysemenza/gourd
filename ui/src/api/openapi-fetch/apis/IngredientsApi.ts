@@ -54,7 +54,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('ingredient','Required parameter requestParameters.ingredient was null or undefined when calling createIngredients.');
         }
 
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -91,7 +91,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * List all ingredients
      */
     async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -137,7 +137,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
         }
 
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;

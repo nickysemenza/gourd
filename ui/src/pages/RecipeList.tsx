@@ -40,6 +40,10 @@ const RecipeList: React.FC = () => {
         accessor: "name",
       },
       {
+        Header: "Version",
+        accessor: "version",
+      },
+      {
         Header: "test",
         accessor: "test",
         Cell: (cell: CellProps<any>) => (

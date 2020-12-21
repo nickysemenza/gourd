@@ -29,7 +29,7 @@ export class AlbumsApi extends runtime.BaseAPI {
      * List all albums
      */
     async listAllAlbumsRaw(): Promise<runtime.ApiResponse<InlineResponse200>> {
-        const queryParameters: any = {};
+        const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 

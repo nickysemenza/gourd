@@ -61,6 +61,18 @@ export interface Recipe {
      * @memberof Recipe
      */
     unit: string;
+    /**
+     * version of the recipe
+     * @type {number}
+     * @memberof Recipe
+     */
+    version?: number;
+    /**
+     * whether or not it is the most recent version
+     * @type {boolean}
+     * @memberof Recipe
+     */
+    isLatestVersion?: boolean;
 }
 
 export function RecipeFromJSON(json: any): Recipe {
@@ -80,6 +92,8 @@ export function RecipeFromJSONTyped(json: any, ignoreDiscriminator: boolean): Re
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
         'unit': json['unit'],
+        'version': !exists(json, 'version') ? undefined : json['version'],
+        'isLatestVersion': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
     };
 }
 
@@ -99,6 +113,8 @@ export function RecipeToJSON(value?: Recipe | null): any {
         'servings': value.servings,
         'quantity': value.quantity,
         'unit': value.unit,
+        'version': value.version,
+        'is_latest_version': value.isLatestVersion,
     };
 }
 

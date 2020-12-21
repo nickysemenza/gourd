@@ -126,6 +126,14 @@ export interface Recipe {
    * serving unit
    */
   unit: string;
+  /**
+   * version of the recipe
+   */
+  version?: number;
+  /**
+   * whether or not it is the most recent version
+   */
+  is_latest_version?: boolean;
 }
 
 /**

@@ -439,6 +439,13 @@ components:
         unit:
           description: serving unit
           type: string
+        version:
+          description: version of the recipe
+          type: integer
+          format: int64
+        is_latest_version:
+          description: whether or not it is the most recent version
+          type: boolean
         # tag:
         # type: string
     Ingredient:

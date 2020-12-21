@@ -35,6 +35,7 @@ func transformRecipe(dbr db.Recipe) Recipe {
 		Name:         dbr.Name,
 		Source:       dbr.Source.Ptr(),
 		TotalMinutes: dbr.TotalMinutes.Ptr(),
+		Version:      &dbr.Version,
 	}
 }
 func transformRecipeFull(dbr *db.Recipe) *RecipeDetail {
@@ -210,38 +211,13 @@ func (a *API) CreateRecipes(c echo.Context) error {
 	return c.JSON(http.StatusCreated, recipe)
 }
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
-	id := r.Recipe.Id
 	dbVersion, err := a.recipeDetailtoDB(ctx, r)
 	if err != nil {
 		return nil, err
 	}
-	// if id == "" {
-	// 	id, err = a.DB().InsertRecipe(ctx, dbVersion)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	r.Recipe.Id = id
-	// } else if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
-	// 	return nil, err
-	// }
-	if id == "" {
-		r, err := a.DB().GetRecipeByName(ctx, r.Recipe.Name)
-		if err != nil {
-			return nil, err
-		}
-		if r == nil {
-			id, err = a.DB().InsertRecipe(ctx, dbVersion)
-			if err != nil {
-				return nil, err
-			}
-			dbVersion.UUID = id
-		} else {
-			dbVersion.UUID = r.UUID
-			id = r.UUID
-		}
 
-	}
-	if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
+	id, err := a.DB().InsertRecipe(ctx, dbVersion)
+	if err != nil {
 		return nil, err
 	}
 
@@ -250,7 +226,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 		return nil, err
 	}
 	if r2 == nil {
-		return nil, fmt.Errorf("failed to find recipe with UUID %s", id)
+		return nil, fmt.Errorf("failed to create recipe with name %s", r.Recipe.Name)
 	}
 
 	return transformRecipeFull(r2), nil

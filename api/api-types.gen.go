@@ -142,6 +142,9 @@ type Recipe struct {
 	// UUID
 	Id string `json:"id"`
 
+	// whether or not it is the most recent version
+	IsLatestVersion *bool `json:"is_latest_version,omitempty"`
+
 	// recipe name
 	Name string `json:"name"`
 
@@ -159,6 +162,9 @@ type Recipe struct {
 
 	// serving unit
 	Unit string `json:"unit"`
+
+	// version of the recipe
+	Version *int64 `json:"version,omitempty"`
 }
 
 // RecipeDetail defines model for RecipeDetail.
