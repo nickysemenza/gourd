@@ -215,19 +215,42 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 	if err != nil {
 		return nil, err
 	}
+	// if id == "" {
+	// 	id, err = a.DB().InsertRecipe(ctx, dbVersion)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	r.Recipe.Id = id
+	// } else if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
+	// 	return nil, err
+	// }
 	if id == "" {
-		id, err = a.DB().InsertRecipe(ctx, dbVersion)
+		r, err := a.DB().GetRecipeByName(ctx, r.Recipe.Name)
 		if err != nil {
 			return nil, err
 		}
-		r.Recipe.Id = id
-	} else if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
+		if r == nil {
+			id, err = a.DB().InsertRecipe(ctx, dbVersion)
+			if err != nil {
+				return nil, err
+			}
+			dbVersion.UUID = id
+		} else {
+			dbVersion.UUID = r.UUID
+			id = r.UUID
+		}
+
+	}
+	if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
 		return nil, err
 	}
 
 	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+	if r2 == nil {
+		return nil, fmt.Errorf("failed to find recipe with UUID %s", id)
 	}
 
 	return transformRecipeFull(r2), nil
