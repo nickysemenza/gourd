@@ -31,7 +31,7 @@ context("Basic Create, List, Edit test", () => {
     // cy.get("div[data-cy=name-input]").first().type(`{enter}`);
     cy.wait(500);
     cy.contains("add instruction").click();
-    cy.get("input[data-cy=instruction-input]").first().type("mix");
+    cy.get("textarea[data-cy=instruction-input]").first().type("mix");
     cy.contains("save").click();
     cy.contains("ingredients").click();
     cy.reload();
