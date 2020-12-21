@@ -40,7 +40,11 @@ func transformRecipe(dbr db.RecipeDetail) Recipe {
 	}
 }
 func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
-	return &RecipeWrapper{Detail: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
+	return &RecipeWrapper{
+		Id:       dbr.RecipeUUID,
+		Detail:   transformRecipe(*dbr),
+		Sections: transformRecipeSections(dbr.Sections),
+	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
@@ -84,7 +88,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 				if id == "" {
 					eq = sq.Eq{"name": i.Recipe.Name}
 				} else {
-					eq = sq.Eq{"id": i.Recipe.Id}
+					eq = sq.Eq{"recipe": i.Recipe.Id}
 				}
 				r, err := a.DB().GetRecipeDetailWhere(ctx, eq)
 				if err != nil {
@@ -97,6 +101,11 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 					if err != nil {
 						return nil, err
 					}
+					r, err = a.DB().GetRecipeDetailWhere(ctx, eq)
+					if err != nil {
+						return nil, err
+					}
+					id = r.RecipeUUID
 				}
 				si.RecipeUUID = zero.StringFrom(id)
 			case "ingredient":

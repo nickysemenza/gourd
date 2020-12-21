@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "quantity" INTEGER,
   "unit" TEXT,
   "version" INTEGER NOT NULL,
-  PRIMARY KEY ("uuid")
+  PRIMARY KEY ("uuid"),
+  unique("recipe", "version")
 );
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "uuid" TEXT NOT NULL UNIQUE,

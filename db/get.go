@@ -13,6 +13,8 @@ import (
 
 // GetRecipeDetailSections finds the sections.
 func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) ([]Section, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailSections")
+	defer span.End()
 	var res []Section
 	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe_detail": detailID}), &res); err != nil {
 		return nil, err
@@ -22,6 +24,8 @@ func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) (
 
 // GetSectionInstructions finds the instructions for a section.
 func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string) ([]SectionInstruction, error) {
+	ctx, span := c.tracer.Start(ctx, "GetSectionInstructions")
+	defer span.End()
 	var res []SectionInstruction
 	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
 		return nil, err
@@ -32,6 +36,8 @@ func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string)
 
 // GetSectionIngredients finds the ingredients for a section.
 func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) ([]SectionIngredient, error) {
+	ctx, span := c.tracer.Start(ctx, "GetSectionIngredients")
+	defer span.End()
 	var res []SectionIngredient
 	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
 		return nil, err
@@ -41,10 +47,9 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) 
 
 // GetIngredientByUUID finds an ingredient.
 func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
-	cacheKey := fmt.Sprintf("i:%s", uuid)
-
 	ctx, span := c.tracer.Start(ctx, "GetIngredientByUUID")
 	defer span.End()
+	cacheKey := fmt.Sprintf("i:%s", uuid)
 
 	cval, hit := c.cache.Get(cacheKey)
 	log.WithField("key", cacheKey).WithField("hit", hit).Debug("cache:ingredients")
@@ -71,6 +76,8 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 
 // GetRecipeByUUID gets a recipe by name, shallowly.
 func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDetail, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailWhere")
+	defer span.End()
 	return c.getRecipeDetail(ctx,
 		c.psql.Select("*").
 			From(recipeDetailsTable).
@@ -80,6 +87,8 @@ func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDet
 }
 
 func (c *Client) getRecipeDetail(ctx context.Context, sb sq.SelectBuilder) (*RecipeDetail, error) {
+	ctx, span := c.tracer.Start(ctx, "getRecipeDetail")
+	defer span.End()
 	query, args, err := sb.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
@@ -153,6 +162,8 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 
 // GetRecipeDetailByUUIDFull gets a recipe by UUID, with all dependencies.
 func (c *Client) GetRecipeDetailByUUIDFull(ctx context.Context, uuid string) (*RecipeDetail, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailByUUIDFull")
+	defer span.End()
 	r, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": uuid})
 	if err != nil {
 		return nil, err

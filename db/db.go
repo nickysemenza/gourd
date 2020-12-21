@@ -294,25 +294,29 @@ func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (string, err
 
 	// if we have an existing recipe with the same UUID or name, this one is a n+1 version of that one
 	version := int64(1)
-	var prior *RecipeDetail
+	var modifying *RecipeDetail
 	parentID := ""
 	var err error
 	if r.UUID != "" {
-		prior, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": r.UUID})
+		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": r.UUID})
 		if err != nil {
 			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 	}
-	if prior == nil {
-		prior, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
+	if modifying == nil {
+		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
 		if err != nil {
 			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 	}
 
-	if prior != nil {
-		version = prior.Version + 1
-		parentID = prior.RecipeUUID
+	if modifying != nil {
+		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": modifying.RecipeUUID})
+		if err != nil {
+			return "", fmt.Errorf("failed to find prior recipe: %w", err)
+		}
+		version = latestVersion.Version + 1
+		parentID = latestVersion.RecipeUUID
 	}
 	r.Version = version
 	r.UUID = GetUUID()
