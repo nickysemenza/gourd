@@ -56,7 +56,7 @@ const RecipeDetail: React.FC = () => {
   });
 
   useEffect(() => {
-    if (data?.recipe) {
+    if (data?.detail) {
       setRecipe(data);
     }
   }, [data]);
@@ -213,7 +213,7 @@ const RecipeDetail: React.FC = () => {
   const updateRecipeName = (value: string) => {
     setRecipe(
       update(recipe, {
-        recipe: { name: { $set: value } },
+        detail: { name: { $set: value } },
       })
     );
   };
@@ -265,7 +265,7 @@ const RecipeDetail: React.FC = () => {
       })
     );
   };
-  const info = recipe.recipe;
+  const info = recipe.detail;
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">

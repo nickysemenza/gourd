@@ -232,14 +232,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecipeDetail"
+              $ref: "#/components/schemas/RecipeWrapper"
       responses:
         "201":
           description: Newly created recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: "#/components/schemas/RecipeWrapper"
         default:
           description: unexpected error
           content:
@@ -265,38 +265,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: "#/components/schemas/RecipeWrapper"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    # put:
-    #   summary: Update a recipe
-    #   operationId: update_recipe_by_id
-    #   tags:
-    #     - recipes
-    #   parameters:
-    #     - name: recipe_id
-    #       in: path
-    #       required: true
-    #       description: The id of the recipe to retrieve
-    #       schema:
-    #         type: string
-    #   responses:
-    #     "200":
-    #       description: Expected response to a valid request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/RecipeDetail"
-    #     default:
-    #       description: unexpected error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/Error"
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -391,12 +366,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SectionIngredient"
-    RecipeDetail:
+    RecipeWrapper:
       description: A recipe with subcomponents
       type: object
       required:
         - sections
-        - recipe
+        - detail
         - id
       properties:
         id:
@@ -407,7 +382,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RecipeSection"
-        recipe:
+        detail:
           description: The recipe
           $ref: "#/components/schemas/Recipe"
     Recipe:
@@ -579,7 +554,7 @@ components:
           description: The recipes
           type: array
           items:          
-            $ref: "#/components/schemas/RecipeDetail"            
+            $ref: "#/components/schemas/RecipeWrapper"            
     Error:
       type: object
       required: ["message"]

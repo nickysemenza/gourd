@@ -74,7 +74,7 @@ const IngredientSearch: React.FC<{
         uuid: i.id,
       })),
       ...(data?.recipes || []).map((i) => ({
-        label: i.recipe.name + " (Recipe) (v " + i.recipe.version + ")",
+        label: i.detail.name + " (Recipe) (v " + i.detail.version + ")",
         kind: "recipe",
         uuid: i.id,
       })),

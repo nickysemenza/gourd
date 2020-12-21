@@ -121,7 +121,7 @@ func init() {
 				}
 				res, err := glamour.Render(fmt.Sprintf(`
 # Import Complete
-Imported `+" **%s** as `%s`", out.Recipe.Name, out.Recipe.Id), "dark")
+Imported `+" **%s** as `%s`", out.Detail.Name, out.Detail.Id), "dark")
 				if err != nil {
 					return err
 				}

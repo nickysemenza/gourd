@@ -167,19 +167,6 @@ type Recipe struct {
 	Version *int64 `json:"version,omitempty"`
 }
 
-// RecipeDetail defines model for RecipeDetail.
-type RecipeDetail struct {
-
-	// UUID
-	Id string `json:"id"`
-
-	// A recipe
-	Recipe Recipe `json:"recipe"`
-
-	// sections of the recipe
-	Sections []RecipeSection `json:"sections"`
-}
-
 // RecipeSection defines model for RecipeSection.
 type RecipeSection struct {
 
@@ -196,6 +183,19 @@ type RecipeSection struct {
 	Minutes int64 `json:"minutes"`
 }
 
+// RecipeWrapper defines model for RecipeWrapper.
+type RecipeWrapper struct {
+
+	// A recipe
+	Detail Recipe `json:"detail"`
+
+	// UUID
+	Id string `json:"id"`
+
+	// sections of the recipe
+	Sections []RecipeSection `json:"sections"`
+}
+
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
 
@@ -203,7 +203,7 @@ type SearchResult struct {
 	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
 
 	// The recipes
-	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
+	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
 }
 
 // SectionIngredient defines model for SectionIngredient.
@@ -307,7 +307,7 @@ type ListRecipesParams struct {
 }
 
 // CreateRecipesJSONBody defines parameters for CreateRecipes.
-type CreateRecipesJSONBody RecipeDetail
+type CreateRecipesJSONBody RecipeWrapper
 
 // SearchParams defines parameters for Search.
 type SearchParams struct {

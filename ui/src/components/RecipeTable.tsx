@@ -2,7 +2,7 @@ import React from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 import {
-  RecipeDetail,
+  RecipeWrapper,
   Ingredient,
   RecipeSection,
 } from "../api/openapi-hooks/api";
@@ -15,7 +15,7 @@ export interface UpdateIngredientProps {
 }
 
 export interface TableProps {
-  recipe: RecipeDetail;
+  recipe: RecipeWrapper;
   updateIngredient: (i: UpdateIngredientProps) => void;
   updateIngredientInfo: (
     sectionID: number,

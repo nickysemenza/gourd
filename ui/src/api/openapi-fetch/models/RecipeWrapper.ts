@@ -27,34 +27,34 @@ import {
 /**
  * A recipe with subcomponents
  * @export
- * @interface RecipeDetail
+ * @interface RecipeWrapper
  */
-export interface RecipeDetail {
+export interface RecipeWrapper {
     /**
      * UUID
      * @type {string}
-     * @memberof RecipeDetail
+     * @memberof RecipeWrapper
      */
     id: string;
     /**
      * sections of the recipe
      * @type {Array<RecipeSection>}
-     * @memberof RecipeDetail
+     * @memberof RecipeWrapper
      */
     sections: Array<RecipeSection>;
     /**
      * 
      * @type {Recipe}
-     * @memberof RecipeDetail
+     * @memberof RecipeWrapper
      */
-    recipe: Recipe;
+    detail: Recipe;
 }
 
-export function RecipeDetailFromJSON(json: any): RecipeDetail {
-    return RecipeDetailFromJSONTyped(json, false);
+export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
+    return RecipeWrapperFromJSONTyped(json, false);
 }
 
-export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeDetail {
+export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeWrapper {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -62,11 +62,11 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
-        'recipe': RecipeFromJSON(json['recipe']),
+        'detail': RecipeFromJSON(json['detail']),
     };
 }
 
-export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
+export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -77,7 +77,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         
         'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
-        'recipe': RecipeToJSON(value.recipe),
+        'detail': RecipeToJSON(value.detail),
     };
 }
 

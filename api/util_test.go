@@ -16,9 +16,9 @@ func TestRecipeFromFile(t *testing.T) {
 
 	r, err := RecipeFromFile(ctx, "../testdata/cookies_1.json")
 	require.NoError(err)
-	require.Equal("cookies 1", r.Recipe.Name)
-	baseName := fmt.Sprintf("%s-%s", r.Recipe.Name, db.GetUUID())
-	r.Recipe.Name = baseName
+	require.Equal("cookies 1", r.Detail.Name)
+	baseName := fmt.Sprintf("%s-%s", r.Detail.Name, db.GetUUID())
+	r.Detail.Name = baseName
 
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
@@ -27,13 +27,13 @@ func TestRecipeFromFile(t *testing.T) {
 	r2, err := apiManager.CreateRecipe(ctx, r)
 	require.NoError(err)
 
-	require.Equal(baseName, r2.Recipe.Name)
-	r.Recipe.Id = "" // reset so we create a dup instead of update, ptr
+	require.Equal(baseName, r2.Detail.Name)
+	r.Detail.Id = "" // reset so we create a dup instead of update, ptr
 
 	r3, err := apiManager.CreateRecipe(ctx, r)
 	require.NoError(err)
 
-	require.Equal((*r2.Recipe.Version)+1, *r3.Recipe.Version)
+	require.Equal((*r2.Detail.Version)+1, *r3.Detail.Version)
 }
 func TestRecipeReferencingRecipe(t *testing.T) {
 	require := require.New(t)

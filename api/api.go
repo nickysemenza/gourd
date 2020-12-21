@@ -39,19 +39,19 @@ func transformRecipe(dbr db.RecipeDetail) Recipe {
 		Version:      &dbr.Version,
 	}
 }
-func transformRecipeFull(dbr *db.RecipeDetail) *RecipeDetail {
-	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
+func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
+	return &RecipeWrapper{Detail: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
 }
 
-func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.RecipeDetail, error) {
+func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
-		UUID:         r.Recipe.Id,
-		Name:         r.Recipe.Name,
-		Source:       zero.StringFromPtr(r.Recipe.Source),
-		TotalMinutes: zero.IntFromPtr(r.Recipe.TotalMinutes),
+		UUID:         r.Detail.Id,
+		Name:         r.Detail.Name,
+		Source:       zero.StringFromPtr(r.Detail.Source),
+		TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
 	}
 
 	for _, s := range r.Sections {
@@ -202,7 +202,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 // (POST /recipes)
 func (a *API) CreateRecipes(c echo.Context) error {
 	ctx := c.Request().Context()
-	var r RecipeDetail
+	var r RecipeWrapper
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
 
@@ -215,8 +215,8 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
-func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
-	dbVersion, err := a.recipeDetailtoDB(ctx, r)
+func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrapper, error) {
+	dbVersion, err := a.recipeWrappertoDB(ctx, r)
 	if err != nil {
 		return nil, err
 	}
@@ -231,7 +231,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 		return nil, err
 	}
 	if r2 == nil {
-		return nil, fmt.Errorf("failed to create recipe with name %s", r.Recipe.Name)
+		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
 
 	return transformRecipeFull(r2), nil
@@ -514,12 +514,12 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
 
-	var resRecipes []RecipeDetail
+	var resRecipes []RecipeWrapper
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
 		r := transformRecipe(x)
-		resRecipes = append(resRecipes, RecipeDetail{Recipe: r, Id: x.RecipeUUID})
+		resRecipes = append(resRecipes, RecipeWrapper{Detail: r, Id: x.RecipeUUID})
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)

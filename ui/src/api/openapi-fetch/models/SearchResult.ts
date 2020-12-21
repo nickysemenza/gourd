@@ -18,10 +18,10 @@ import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    RecipeDetail,
-    RecipeDetailFromJSON,
-    RecipeDetailFromJSONTyped,
-    RecipeDetailToJSON,
+    RecipeWrapper,
+    RecipeWrapperFromJSON,
+    RecipeWrapperFromJSONTyped,
+    RecipeWrapperToJSON,
 } from './';
 
 /**
@@ -38,10 +38,10 @@ export interface SearchResult {
     ingredients?: Array<Ingredient>;
     /**
      * The recipes
-     * @type {Array<RecipeDetail>}
+     * @type {Array<RecipeWrapper>}
      * @memberof SearchResult
      */
-    recipes?: Array<RecipeDetail>;
+    recipes?: Array<RecipeWrapper>;
 }
 
 export function SearchResultFromJSON(json: any): SearchResult {
@@ -55,7 +55,7 @@ export function SearchResultFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientFromJSON)),
-        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
+        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeWrapperFromJSON)),
     };
 }
 
@@ -69,7 +69,7 @@ export function SearchResultToJSON(value?: SearchResult | null): any {
     return {
         
         'ingredients': value.ingredients === undefined ? undefined : ((value.ingredients as Array<any>).map(IngredientToJSON)),
-        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
+        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeWrapperToJSON)),
     };
 }
 

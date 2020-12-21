@@ -67,8 +67,8 @@ func TestInsertGet(t *testing.T) {
 		}},
 	}}
 
-	// err = db.UpdateRecipe(ctx, r)
-	// require.NoError(err)
+	uuid, err = db.InsertRecipe(ctx, r)
+	require.NoError(err)
 	r2, err := db.GetRecipeDetailByUUIDFull(ctx, uuid)
 	require.NoError(err)
 	require.EqualValues(3, r2.TotalMinutes.Int64)
@@ -82,7 +82,7 @@ func TestInsertGet(t *testing.T) {
 			Minutes: zero.IntFrom(33),
 			Ingredients: []SectionIngredient{{
 				Grams:      zero.FloatFrom(52),
-				RecipeUUID: zero.StringFrom(r2.UUID),
+				RecipeUUID: zero.StringFrom(r2.RecipeUUID),
 			}}}},
 	})
 	require.NoError(err)

@@ -1,4 +1,4 @@
-import { RecipeDetail, SectionIngredient } from "./api/openapi-hooks/api";
+import { RecipeWrapper, SectionIngredient } from "./api/openapi-hooks/api";
 import { getIngredient } from "./util";
 
 export const parseLine = (line: string): [number, string, string] => {
@@ -15,7 +15,7 @@ export const parseLine = (line: string): [number, string, string] => {
   }
 };
 
-export const parseRecipe = (text: string): RecipeDetail | undefined => {
+export const parseRecipe = (text: string): RecipeWrapper | undefined => {
   const lines = text.split(/\r?\n/);
   const ingredients: Array<SectionIngredient> = lines.map((line) => {
     const [grams, ingredient, adjective] = parseLine(line);
@@ -31,8 +31,8 @@ export const parseRecipe = (text: string): RecipeDetail | undefined => {
     };
     return si;
   });
-  const recipe: RecipeDetail = {
-    recipe: { name: "", id: "", quantity: 0, unit: "" },
+  const recipe: RecipeWrapper = {
+    detail: { name: "", id: "", quantity: 0, unit: "" },
     sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
     id: "",
   };
@@ -47,7 +47,7 @@ export const encodeIngredient = (ingredient: SectionIngredient): string => {
   return res;
 };
 
-export const encodeRecipe = (recipe: RecipeDetail): string =>
+export const encodeRecipe = (recipe: RecipeWrapper): string =>
   recipe && recipe.sections
     ? recipe.sections
         .map((section) => section.ingredients.map(encodeIngredient).join("\n"))

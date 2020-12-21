@@ -86,7 +86,7 @@ export interface RecipeSection {
 /**
  * A recipe with subcomponents
  */
-export interface RecipeDetail {
+export interface RecipeWrapper {
   /**
    * UUID
    */
@@ -95,7 +95,7 @@ export interface RecipeDetail {
    * sections of the recipe
    */
   sections: RecipeSection[];
-  recipe: Recipe;
+  detail: Recipe;
 }
 
 /**
@@ -251,7 +251,7 @@ export interface SearchResult {
   /**
    * The recipes
    */
-  recipes?: RecipeDetail[];
+  recipes?: RecipeWrapper[];
 }
 
 export interface Error {
@@ -605,7 +605,7 @@ export const useListRecipes = (props: UseListRecipesProps) =>
   );
 
 export type CreateRecipesProps = Omit<
-  MutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
+  MutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
   "path" | "verb"
 >;
 
@@ -613,7 +613,7 @@ export type CreateRecipesProps = Omit<
  * Create a recipe
  */
 export const CreateRecipes = (props: CreateRecipesProps) => (
-  <Mutate<RecipeDetail, Error, void, RecipeDetail, void>
+  <Mutate<RecipeWrapper, Error, void, RecipeWrapper, void>
     verb="POST"
     path={`/recipes`}
     {...props}
@@ -621,7 +621,7 @@ export const CreateRecipes = (props: CreateRecipesProps) => (
 );
 
 export type UseCreateRecipesProps = Omit<
-  UseMutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
+  UseMutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
   "path" | "verb"
 >;
 
@@ -629,7 +629,7 @@ export type UseCreateRecipesProps = Omit<
  * Create a recipe
  */
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
-  useMutate<RecipeDetail, Error, void, RecipeDetail, void>(
+  useMutate<RecipeWrapper, Error, void, RecipeWrapper, void>(
     "POST",
     `/recipes`,
     props
@@ -643,7 +643,7 @@ export interface GetRecipeByIdPathParams {
 }
 
 export type GetRecipeByIdProps = Omit<
-  GetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
+  GetProps<RecipeWrapper, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -652,14 +652,14 @@ export type GetRecipeByIdProps = Omit<
  * Info for a specific recipe
  */
 export const GetRecipeById = ({ recipe_id, ...props }: GetRecipeByIdProps) => (
-  <Get<RecipeDetail, Error, void, GetRecipeByIdPathParams>
+  <Get<RecipeWrapper, Error, void, GetRecipeByIdPathParams>
     path={`/recipes/${recipe_id}`}
     {...props}
   />
 );
 
 export type UseGetRecipeByIdProps = Omit<
-  UseGetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
+  UseGetProps<RecipeWrapper, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -671,7 +671,7 @@ export const useGetRecipeById = ({
   recipe_id,
   ...props
 }: UseGetRecipeByIdProps) =>
-  useGet<RecipeDetail, Error, void, GetRecipeByIdPathParams>(
+  useGet<RecipeWrapper, Error, void, GetRecipeByIdPathParams>(
     (paramsInPath: GetRecipeByIdPathParams) =>
       `/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }

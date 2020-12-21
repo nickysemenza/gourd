@@ -54,11 +54,11 @@ func TestAPI(t *testing.T) {
 		require.True(found)
 	}
 
-	makeRecipe := func(newRecipe RecipeDetail) RecipeDetail {
+	makeRecipe := func(newRecipe RecipeWrapper) RecipeWrapper {
 		result := testutil.NewRequest().Post("/recipes").WithJsonBody(newRecipe).Go(t, e)
 		require.Equal(http.StatusCreated, result.Code(), result.Recorder.Body)
 
-		var resultRecipe RecipeDetail
+		var resultRecipe RecipeWrapper
 		err := result.UnmarshalBodyToObject(&resultRecipe)
 		require.NoError(err)
 		return resultRecipe
@@ -66,8 +66,8 @@ func TestAPI(t *testing.T) {
 	uuid := ""
 	{
 		w := 12.5
-		newRecipe := RecipeDetail{
-			Recipe: Recipe{Name: rName},
+		newRecipe := RecipeWrapper{
+			Detail: Recipe{Name: rName},
 			Sections: []RecipeSection{{Minutes: 3,
 				Instructions: []SectionInstruction{{Instruction: "mix"}},
 				Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
@@ -75,10 +75,10 @@ func TestAPI(t *testing.T) {
 		}
 		resultRecipe := makeRecipe(newRecipe)
 
-		require.Equal(resultRecipe.Recipe.Name, newRecipe.Recipe.Name)
-		uuid = resultRecipe.Recipe.Id
+		require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
+		uuid = resultRecipe.Detail.Id
 
-		newRecipe.Recipe.Name += "sub"
+		newRecipe.Detail.Name += "sub"
 		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{
 			Grams:  w,
 			Recipe: &Recipe{Id: resultRecipe.Id},
@@ -94,16 +94,16 @@ func TestAPI(t *testing.T) {
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)
 		// require.Contains(results, name)
-		// require.Equal(resultRecipe.Recipe.Name, newRecipe.Recipe.Name)
+		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
 	}
 	{
 		result := testutil.NewRequest().Get("/recipes/"+uuid).Go(t, e)
 		require.Equal(http.StatusOK, result.Code())
-		var results RecipeDetail
+		var results RecipeWrapper
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)
 		// require.Contains(results, name)
-		require.Equal(results.Recipe.Name, rName)
+		require.Equal(results.Detail.Name, rName)
 	}
 }
 

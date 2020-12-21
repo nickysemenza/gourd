@@ -11,8 +11,8 @@ const CreateRecipe: React.FC = () => {
 
   const create = async () => {
     const r = await api.createRecipes({
-      recipeDetail: {
-        recipe: { name, id: "", quantity: 0, unit: "" },
+      recipeWrapper: {
+        detail: { name, id: "", quantity: 0, unit: "" },
         sections: [],
         id: "",
       },

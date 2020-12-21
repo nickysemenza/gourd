@@ -21,7 +21,7 @@ import (
 )
 
 // FetchAndTransform returns a recipe.
-func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeDetail, error) {
+func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeWrapper, error) {
 	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 	html, err := getHTML(ctx, addr)
@@ -70,8 +70,8 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 	}
 
 	source := fmt.Sprintf("todo: %s %s", u.Host, addr)
-	r := api.RecipeDetail{
-		Recipe: api.Recipe{
+	r := api.RecipeWrapper{
+		Detail: api.Recipe{
 			Name:   recipe.Name,
 			Source: &source,
 			// Source: &api.Source{

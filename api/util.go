@@ -12,7 +12,7 @@ import (
 )
 
 // RecipeFromFile reads a recipe from json file
-func RecipeFromFile(ctx context.Context, inputPath string) (*RecipeDetail, error) {
+func RecipeFromFile(ctx context.Context, inputPath string) (*RecipeWrapper, error) {
 	inputFile, err := os.Open(inputPath)
 
 	if err != nil {
@@ -40,7 +40,7 @@ func RecipeFromFile(ctx context.Context, inputPath string) (*RecipeDetail, error
 	}
 
 	// we initialize our Users array
-	var r RecipeDetail
+	var r RecipeWrapper
 
 	// we unmarshal our byteArray which contains our
 	// jsonFile's content into 'users' which we defined above
