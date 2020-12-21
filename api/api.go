@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
@@ -29,7 +30,7 @@ func NewAPI(m *manager.Manager) *API {
 	}
 }
 
-func transformRecipe(dbr db.Recipe) Recipe {
+func transformRecipe(dbr db.RecipeDetail) Recipe {
 	return Recipe{
 		Id:           dbr.UUID,
 		Name:         dbr.Name,
@@ -38,15 +39,15 @@ func transformRecipe(dbr db.Recipe) Recipe {
 		Version:      &dbr.Version,
 	}
 }
-func transformRecipeFull(dbr *db.Recipe) *RecipeDetail {
+func transformRecipeFull(dbr *db.RecipeDetail) *RecipeDetail {
 	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
 }
 
-func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe, error) {
-	dbr := db.Recipe{
+func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.RecipeDetail, error) {
+	dbr := db.RecipeDetail{
 		UUID:         r.Recipe.Id,
 		Name:         r.Recipe.Name,
 		Source:       zero.StringFromPtr(r.Recipe.Source),
@@ -78,19 +79,23 @@ func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe
 				if i.Recipe == nil {
 					continue
 				}
+				var eq sq.Eq
 				id := i.Recipe.Id
 				if id == "" {
-					r, err := a.DB().GetRecipeByName(ctx, i.Recipe.Name)
+					eq = sq.Eq{"name": i.Recipe.Name}
+				} else {
+					eq = sq.Eq{"id": i.Recipe.Id}
+				}
+				r, err := a.DB().GetRecipeDetailWhere(ctx, eq)
+				if err != nil {
+					return nil, err
+				}
+				if r != nil {
+					id = r.RecipeUUID
+				} else {
+					id, err = a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
 					if err != nil {
 						return nil, err
-					}
-					if r != nil {
-						id = r.UUID
-					} else {
-						id, err = a.DB().InsertRecipe(ctx, &db.Recipe{Name: i.Recipe.Name})
-						if err != nil {
-							return nil, err
-						}
 					}
 				}
 				si.RecipeUUID = zero.StringFrom(id)
@@ -221,7 +226,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 		return nil, err
 	}
 
-	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
+	r2, err := a.Manager.DB().GetRecipeDetailByUUIDFull(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -236,9 +241,12 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 // (GET /recipes/{recipeId})
 func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	ctx := c.Request().Context()
-	r, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, recipeId)
+	r, err := a.Manager.DB().GetRecipeDetailByUUIDFull(ctx, recipeId)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
+	}
+	if r == nil {
+		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 	}
 	return c.JSON(http.StatusOK, transformRecipeFull(r))
 }
@@ -289,7 +297,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		}
 
 		// find linked recipes
-		linkedRecipes, err := a.Manager.DB().GetRecipesWithIngredient(ctx, i.UUID)
+		linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, i.UUID)
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
@@ -506,12 +514,12 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
 
-	var resRecipes []Recipe
+	var resRecipes []RecipeDetail
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
 		r := transformRecipe(x)
-		resRecipes = append(resRecipes, r)
+		resRecipes = append(resRecipes, RecipeDetail{Recipe: r, Id: x.RecipeUUID})
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)

@@ -397,7 +397,11 @@ components:
       required:
         - sections
         - recipe
+        - id
       properties:
+        id:
+          description: UUID
+          type: string
         sections:
           description: sections of the recipe
           type: array
@@ -575,7 +579,7 @@ components:
           description: The recipes
           type: array
           items:          
-            $ref: "#/components/schemas/Recipe"            
+            $ref: "#/components/schemas/RecipeDetail"            
     Error:
       type: object
       required: ["message"]

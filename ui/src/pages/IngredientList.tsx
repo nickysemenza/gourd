@@ -66,7 +66,9 @@ const IngredientList: React.FC = () => {
                 {recipes.map((r) => (
                   <li>
                     <Link to={`recipe/${r.id}`} className="link">
-                      {r.name}
+                      <div className="flex">
+                        {r.name} (<div className="font-mono">v{r.version}</div>)
+                      </div>
                     </Link>
                   </li>
                 ))}

@@ -11,10 +11,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// GetRecipeSections finds the sections.
-func (c *Client) GetRecipeSections(ctx context.Context, recipeUUID string) ([]Section, error) {
+// GetRecipeDetailSections finds the sections.
+func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) ([]Section, error) {
 	var res []Section
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe": recipeUUID}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe_detail": detailID}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -69,33 +69,23 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 	return ingredient, nil
 }
 
-// GetRecipeByUUID gets a recipe by UUID, shallowly.
-func (c *Client) GetRecipeByUUID(ctx context.Context, uuid string) (*Recipe, error) {
-	return c.getRecipe(ctx,
-		c.psql.Select("*").
-			From(recipesTable).
-			Where(sq.Eq{"uuid": uuid}).
-			OrderBy("version DESC").
-			Limit(1))
-}
-
 // GetRecipeByUUID gets a recipe by name, shallowly.
-func (c *Client) GetRecipeByName(ctx context.Context, name string) (*Recipe, error) {
-	return c.getRecipe(ctx,
+func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDetail, error) {
+	return c.getRecipeDetail(ctx,
 		c.psql.Select("*").
-			From(recipesTable).
-			Where(sq.Eq{"name": name}).
+			From(recipeDetailsTable).
+			Where(eq).
 			OrderBy("version DESC").
 			Limit(1))
 }
 
-func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, error) {
+func (c *Client) getRecipeDetail(ctx context.Context, sb sq.SelectBuilder) (*RecipeDetail, error) {
 	query, args, err := sb.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	r := &Recipe{}
+	r := &RecipeDetail{}
 	err = c.db.GetContext(ctx, r, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
@@ -107,12 +97,12 @@ func (c *Client) getRecipe(ctx context.Context, sb sq.SelectBuilder) (*Recipe, e
 }
 
 // GetRecipes returns all recipes, shallowly.
-func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]Recipe, uint64, error) {
+func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]RecipeDetail, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipes")
 	defer span.End()
 
-	q := c.psql.Select("*").From(recipesTable)
-	cq := c.psql.Select("count(*)").From(recipesTable)
+	q := c.psql.Select("*").From(recipeDetailsTable)
+	cq := c.psql.Select("count(*)").From(recipeDetailsTable)
 	q = newSearchQuery(opts...).apply(q)
 	cq = newSearchQuery(opts...).apply(cq)
 	if searchQuery != "" {
@@ -121,7 +111,7 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 	}
 	cq = cq.RemoveLimit().RemoveOffset()
 
-	r := []Recipe{}
+	r := []RecipeDetail{}
 	err := c.selectContext(ctx, q, &r)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, 0, nil
@@ -136,13 +126,13 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 	return r, count, nil
 }
 
-// GetRecipesWithIngredient gets all recipes with an ingredeitn
+// GetRecipeDetailsWithIngredient gets all recipes with an ingredeitn
 // todo: consolidate into getrecipes
-func (c *Client) GetRecipesWithIngredient(ctx context.Context, ingredient string) ([]Recipe, error) {
+func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient string) ([]RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipesWithIngredient")
 	defer span.End()
-	query, args, err := c.psql.Select(getRecipeColumns()...).From(recipesTable).
-		Join("recipe_sections on recipe_sections.recipe = recipes.uuid").
+	query, args, err := c.psql.Select(getRecipeDetailColumns()...).From(recipeDetailsTable).
+		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.uuid").
 		Join("recipe_section_ingredients on recipe_sections.uuid = recipe_section_ingredients.section").
 		Where(sq.Eq{"ingredient": ingredient}).
 		ToSql()
@@ -150,7 +140,7 @@ func (c *Client) GetRecipesWithIngredient(ctx context.Context, ingredient string
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	r := []Recipe{}
+	r := []RecipeDetail{}
 	err = c.db.SelectContext(ctx, &r, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
@@ -161,9 +151,9 @@ func (c *Client) GetRecipesWithIngredient(ctx context.Context, ingredient string
 	return r, nil
 }
 
-// GetRecipeByUUIDFull gets a recipe by UUID, with all dependencies.
-func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe, error) {
-	r, err := c.GetRecipeByUUID(ctx, uuid)
+// GetRecipeDetailByUUIDFull gets a recipe by UUID, with all dependencies.
+func (c *Client) GetRecipeDetailByUUIDFull(ctx context.Context, uuid string) (*RecipeDetail, error) {
+	r, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": uuid})
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +161,7 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 		return r, nil
 	}
 
-	r.Sections, err = c.GetRecipeSections(ctx, uuid)
+	r.Sections, err = c.GetRecipeDetailSections(ctx, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +185,7 @@ func (c *Client) GetRecipeByUUIDFull(ctx context.Context, uuid string) (*Recipe,
 				r.Sections[x].Ingredients[y].RawIngredient = ing
 			}
 			if i.RecipeUUID.String != "" {
-				rec, err := c.GetRecipeByUUID(ctx, i.RecipeUUID.String)
+				rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeUUID.String})
 				if err != nil {
 					return nil, err
 				}
@@ -301,24 +291,4 @@ func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingre
 // 		return nil, err
 // 	}
 // 	return res, nil
-// }
-
-//TODO: non-gql version
-// func (c *Client) GetRecipeSource(ctx context.Context, recipeUUID string) (*model.Source, error) {
-// 	query, args, err := c.psql.Select(
-// 		"name", "meta",
-// 	).From("recipe_sources").Where(sq.Eq{"recipe": recipeUUID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
-
-// 	x := &model.Source{}
-// 	err = c.db.GetContext(ctx, x, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	return x, nil
 // }

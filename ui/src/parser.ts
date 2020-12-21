@@ -34,6 +34,7 @@ export const parseRecipe = (text: string): RecipeDetail | undefined => {
   const recipe: RecipeDetail = {
     recipe: { name: "", id: "", quantity: 0, unit: "" },
     sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
+    id: "",
   };
   return recipe;
 };

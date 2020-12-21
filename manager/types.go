@@ -40,11 +40,11 @@ type Instruction struct {
 	Instruction string `json:"instruction,omitempty" yaml:"instruction,omitempty"`
 }
 
-func (r *Recipe) toDB() *db.Recipe {
+func (r *Recipe) toDB() *db.RecipeDetail {
 	if r == nil {
 		return nil
 	}
-	dbr := db.Recipe{
+	dbr := db.RecipeDetail{
 		UUID:         r.UUID,
 		Name:         r.Name,
 		TotalMinutes: zero.IntFrom(r.TotalMinutes),
@@ -79,7 +79,7 @@ func (r *Recipe) toDB() *db.Recipe {
 	return &dbr
 }
 
-func FromRecipe(dbr *db.Recipe) *Recipe {
+func FromRecipe(dbr *db.RecipeDetail) *Recipe {
 	if dbr == nil {
 		return nil
 	}

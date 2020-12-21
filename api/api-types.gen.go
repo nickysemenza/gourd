@@ -170,6 +170,9 @@ type Recipe struct {
 // RecipeDetail defines model for RecipeDetail.
 type RecipeDetail struct {
 
+	// UUID
+	Id string `json:"id"`
+
 	// A recipe
 	Recipe Recipe `json:"recipe"`
 
@@ -200,7 +203,7 @@ type SearchResult struct {
 	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
 
 	// The recipes
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
 // SectionIngredient defines model for SectionIngredient.

@@ -88,6 +88,10 @@ export interface RecipeSection {
  */
 export interface RecipeDetail {
   /**
+   * UUID
+   */
+  id: string;
+  /**
    * sections of the recipe
    */
   sections: RecipeSection[];
@@ -247,7 +251,7 @@ export interface SearchResult {
   /**
    * The recipes
    */
-  recipes?: Recipe[];
+  recipes?: RecipeDetail[];
 }
 
 export interface Error {

@@ -31,6 +31,12 @@ import {
  */
 export interface RecipeDetail {
     /**
+     * UUID
+     * @type {string}
+     * @memberof RecipeDetail
+     */
+    id: string;
+    /**
      * sections of the recipe
      * @type {Array<RecipeSection>}
      * @memberof RecipeDetail
@@ -54,6 +60,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
+        'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'recipe': RecipeFromJSON(json['recipe']),
     };
@@ -68,6 +75,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
     }
     return {
         
+        'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'recipe': RecipeToJSON(value.recipe),
     };

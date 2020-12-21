@@ -14,6 +14,7 @@ const CreateRecipe: React.FC = () => {
       recipeDetail: {
         recipe: { name, id: "", quantity: 0, unit: "" },
         sections: [],
+        id: "",
       },
     });
     setResp(r);

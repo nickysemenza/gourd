@@ -33,7 +33,7 @@ func TestRecipeFromFile(t *testing.T) {
 	r3, err := apiManager.CreateRecipe(ctx, r)
 	require.NoError(err)
 
-	require.Equal(fmt.Sprintf("%s (dup)", baseName), r3.Recipe.Name)
+	require.Equal((*r2.Recipe.Version)+1, *r3.Recipe.Version)
 }
 func TestRecipeReferencingRecipe(t *testing.T) {
 	require := require.New(t)

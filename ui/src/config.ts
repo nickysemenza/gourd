@@ -42,7 +42,9 @@ export const onAPIError = (
   retry: () => Promise<any>,
   response?: Response
 ) => {
-  toast.error(err.message);
+  console.log(err);
+  const apiErr: Error = err.data;
+  toast.error(`${err.message} ${apiErr.message}`);
 };
 
 export const parseJWT = (): JWT | undefined => {

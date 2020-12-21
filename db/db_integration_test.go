@@ -19,7 +19,7 @@ func TestInsertGet(t *testing.T) {
 	all1, _, err := db.GetRecipes(ctx, "")
 	require.NoError(err)
 
-	uuid, err := db.InsertRecipe(ctx, &Recipe{
+	uuid, err := db.InsertRecipe(ctx, &RecipeDetail{
 		Name:     fmt.Sprintf("r-%d", time.Now().Unix()),
 		Sections: []Section{{Minutes: zero.IntFrom(33)}},
 	})
@@ -36,7 +36,7 @@ func TestInsertGet(t *testing.T) {
 	require.NoError(err)
 
 	require.Equal(1, len(all2)-len(all1), "inserting 1 recipe should increase length of getAll by 1")
-	r, err := db.GetRecipeByUUIDFull(ctx, uuid)
+	r, err := db.GetRecipeDetailByUUIDFull(ctx, uuid)
 	require.NoError(err)
 	r.TotalMinutes = zero.IntFrom(3)
 	r.Unit = zero.StringFrom("items")
@@ -69,14 +69,14 @@ func TestInsertGet(t *testing.T) {
 
 	// err = db.UpdateRecipe(ctx, r)
 	// require.NoError(err)
-	r2, err := db.GetRecipeByUUIDFull(ctx, uuid)
+	r2, err := db.GetRecipeDetailByUUIDFull(ctx, uuid)
 	require.NoError(err)
 	require.EqualValues(3, r2.TotalMinutes.Int64)
 	require.EqualValues("items", r2.Unit.String)
 	require.EqualValues("add flour", r2.Sections[0].Instructions[0].Instruction)
 	require.EqualValues(.7, r2.Sections[1].Ingredients[1].Amount.Float64)
 
-	_, err = db.InsertRecipe(ctx, &Recipe{
+	_, err = db.InsertRecipe(ctx, &RecipeDetail{
 		Name: fmt.Sprintf("r2-%d", time.Now().Unix()),
 		Sections: []Section{{
 			Minutes: zero.IntFrom(33),

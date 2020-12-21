@@ -5,18 +5,24 @@ CREATE TABLE IF NOT EXISTS "ingredients" (
 );
 CREATE TABLE IF NOT EXISTS "recipes" (
   "uuid" TEXT NOT NULL UNIQUE,
-  "name" TEXT NOT NULL UNIQUE,
+  PRIMARY KEY ("uuid")
+);
+CREATE TABLE IF NOT EXISTS "recipe_details" (
+  "uuid" TEXT NOT NULL UNIQUE,
+  "recipe" TEXT references recipes(uuid) NOT NULL,
+  "name" TEXT NOT NULL,
   "total_minutes" INTEGER,
   "equipment" TEXT,
-  "source" TEXT,
+  "source" JSONB,
   "servings" INTEGER,
   "quantity" INTEGER,
   "unit" TEXT,
+  "version" INTEGER NOT NULL,
   PRIMARY KEY ("uuid")
 );
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "uuid" TEXT NOT NULL UNIQUE,
-  "recipe" TEXT references recipes(uuid) NOT NULL,
+  "recipe_detail" TEXT references recipe_details(uuid) NOT NULL,
   "sort" INTEGER,
   "minutes" INTEGER,
   PRIMARY KEY ("uuid")
