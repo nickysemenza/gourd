@@ -38,10 +38,22 @@ func TestRecipeFromFile(t *testing.T) {
 func TestRecipeReferencingRecipe(t *testing.T) {
 	require := require.New(t)
 	ctx := context.Background()
-	r, err := RecipeFromFile(ctx, "../testdata/dep_1.json")
+	r, err := RecipeFromFile(ctx, "../testdata/dep_1.yaml")
+	require.NoError(err)
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
 	apiManager := NewAPI(m)
 	_, err = apiManager.CreateRecipe(ctx, r)
 	require.NoError(err)
+}
+
+func TestRecipeFromFileYAMLvsJSON(t *testing.T) {
+	require := require.New(t)
+	ctx := context.Background()
+
+	r1, err := RecipeFromFile(ctx, "../testdata/cookies_1.json")
+	require.NoError(err)
+	r2, err := RecipeFromFile(ctx, "../testdata/cookies_1.yaml")
+	require.NoError(err)
+	require.Equal(r1, r2)
 }

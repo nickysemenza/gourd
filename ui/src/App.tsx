@@ -56,7 +56,7 @@ function App() {
         onError={onAPIError}
       >
         <Router>
-          <ToastContainer />
+          <ToastContainer position="bottom-right" />
           <NavBar />
           <div className="lg:container lg:mx-auto">
             <Switch>

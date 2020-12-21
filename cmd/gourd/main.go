@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/charmbracelet/glamour"
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
 	"github.com/nickysemenza/gourd/scraper"
@@ -118,7 +119,13 @@ func init() {
 				if err != nil {
 					return err
 				}
-				fmt.Printf("imported %s as %s", out.Recipe.Id, out.Recipe.Name)
+				res, err := glamour.Render(fmt.Sprintf(`
+# Import Complete
+Imported `+" **%s** as `%s`", out.Recipe.Name, out.Recipe.Id), "dark")
+				if err != nil {
+					return err
+				}
+				fmt.Print(res)
 
 				return nil
 			},
