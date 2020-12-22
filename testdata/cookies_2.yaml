@@ -1,0 +1,174 @@
+---
+detail:
+  name: CS Pecan Brittle
+  quantity: 0
+  unit: ''
+  version: 2
+sections:
+- ingredients:
+  - adjective: chopped
+    amount: 1.25
+    grams: 142
+    ingredient:
+      name: pecans
+    kind: ingredient
+    unit: cups
+  instructions:
+  - instruction: toast pecans for 10 minutes @ 350
+  minutes: 15
+- ingredients:
+  - amount: 0.75
+    grams: 150
+    ingredient:
+      name: sugar
+    kind: ingredient
+    unit: cups
+  - amount: 0.5
+    grams: 57
+    ingredient:
+      name: butter
+    kind: ingredient
+    unit: stick
+  - amount: 2
+    grams: 28
+    ingredient:
+      name: water
+    kind: ingredient
+    unit: tbsp
+  instructions:
+  - instruction: melt, cook for 10 minutes with minimal stirring
+  minutes: 10
+- ingredients:
+  - amount: 0.5
+    grams: 3
+    ingredient:
+      name: baking soda
+    kind: ingredient
+    unit: tsp
+  - amount: 0.5
+    grams: 1.5
+    ingredient:
+      name: salt
+    kind: ingredient
+    unit: tsp
+  instructions:
+  - instruction: add salt/BS/pecans, pour onto parchment to cool
+  minutes: 20
+---
+detail:
+  name: CS Oat Pecan Cookies
+  quantity: 0
+  unit: ''
+  version: 2
+id: f296c469-37d7-4f49-b089-479d6c8829d8
+sections:
+- ingredients:
+  - amount: 1
+    grams: 113
+    ingredient:
+      name: butter
+    kind: ingredient
+    unit: stick
+  instructions:
+  - instruction: brown, add to mixer
+  minutes: 10
+- ingredients:
+  - adjective: cold
+    amount: 1
+    grams: 113
+    ingredient:
+      name: butter
+    kind: ingredient
+    unit: stick
+  instructions:
+  - instruction: 'add  to mixer with hot brown butter, '
+  - instruction: let cool
+  minutes: 30
+- ingredients:
+  - amount: 75
+    grams: 150
+    ingredient:
+      name: brown sugar
+    kind: ingredient
+    unit: cups
+  - amount: 5
+    grams: 100
+    ingredient:
+      name: sugar
+    kind: ingredient
+    unit: cups
+  instructions:
+  - instruction: add to butters, cream
+  minutes: 3
+- ingredients:
+  - amount: 2
+    grams: 100
+    ingredient:
+      name: eggs
+    kind: ingredient
+    unit: large
+    adjective: cold
+  - amount: 1
+    grams: 13
+    ingredient:
+      name: vanilla extract
+    kind: ingredient
+    unit: tbsp
+  instructions:
+  - instruction: add to sugar/butter, mix
+  minutes: 2
+- ingredients:
+  - amount: 0.5
+    grams: 100
+    kind: recipe
+    recipe:
+      name: CS Pecan Brittle
+    unit: 'recipe'
+  - amount: 1
+    grams: 100
+    ingredient:
+      name: oats
+    kind: ingredient
+    unit: cup
+  - amount: 1.3
+    grams: 173
+    ingredient:
+      name: flour
+    kind: ingredient
+    unit: cup
+  - amount: 2
+    grams: 6
+    ingredient:
+      name: salt
+    kind: ingredient
+    unit: tsp
+  - amount: 1
+    grams: 6
+    ingredient:
+      name: baking soda
+    kind: ingredient
+    unit: tsp
+  instructions:
+  - instruction: food processor until combined
+  - instruction: add to mixer
+  minutes: 2
+- ingredients:
+  - amount: 0.5
+    grams: 100
+    kind: recipe
+    recipe:
+      name: CS Pecan Brittle
+    unit: 'recipe'
+  - amount: 1
+    grams: 100
+    ingredient:
+      name: oats
+    kind: ingredient
+    unit: cup
+  instructions:
+  - instruction: add to mixer
+  minutes: 1
+- ingredients: []
+  instructions:
+  - instruction: roll out cookies, feeze for hours
+  minutes: 360

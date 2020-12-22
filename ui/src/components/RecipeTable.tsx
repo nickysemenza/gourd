@@ -183,7 +183,8 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>
         <ol className="list-decimal list-inside">
           {section.instructions.map((instruction, y) => (
-            <li key={y}>
+            <li key={y} className="flex space-x-2">
+              <div>{y + 1}.</div>
               <TableInput
                 data-cy="instruction-input"
                 width={72}
@@ -261,7 +262,11 @@ const TableInput: React.FC<{
     tall ? (
       <textarea {...props} className={className} rows={3} />
     ) : (
-      <input {...props} className={className} disabled={props.value === 0} />
+      <input
+        {...props}
+        className={className}
+        disabled={!edit && props.value === 0}
+      />
     )
   ) : (
     <div>{props.value}</div>
