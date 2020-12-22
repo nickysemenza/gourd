@@ -18,6 +18,9 @@ import {
     PaginatedRecipes,
     PaginatedRecipesFromJSON,
     PaginatedRecipesToJSON,
+    Recipe,
+    RecipeFromJSON,
+    RecipeToJSON,
     RecipeWrapper,
     RecipeWrapperFromJSON,
     RecipeWrapperToJSON,
@@ -25,6 +28,10 @@ import {
     SearchResultFromJSON,
     SearchResultToJSON,
 } from '../models';
+
+export interface RecipesApiConvertIngredientToRecipeRequest {
+    ingredientId: string;
+}
 
 export interface RecipesApiCreateRecipesRequest {
     recipeWrapper: RecipeWrapper;
@@ -49,6 +56,44 @@ export interface RecipesApiSearchRequest {
  * 
  */
 export class RecipesApi extends runtime.BaseAPI {
+
+    /**
+     * Converts an ingredient to a recipe, updating all recipes depending on it.
+     */
+    async convertIngredientToRecipeRaw(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<Recipe>> {
+        if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
+            throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling convertIngredientToRecipe.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/ingredients/{ingredient_id}/convert_to_recipe`.replace(`{${"ingredient_id"}}`, encodeURIComponent(String(requestParameters.ingredientId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeFromJSON(jsonValue));
+    }
+
+    /**
+     * Converts an ingredient to a recipe, updating all recipes depending on it.
+     */
+    async convertIngredientToRecipe(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<Recipe> {
+        const response = await this.convertIngredientToRecipeRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * Create a recipe

@@ -676,3 +676,56 @@ export const useGetRecipeById = ({
       `/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }
   );
+
+export interface ConvertIngredientToRecipePathParams {
+  /**
+   * The id of the ingredient
+   */
+  ingredient_id: string;
+}
+
+export type ConvertIngredientToRecipeProps = Omit<
+  MutateProps<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>,
+  "path" | "verb"
+> &
+  ConvertIngredientToRecipePathParams;
+
+/**
+ * Converts an ingredient to a recipe, updating all recipes depending on it.
+ */
+export const ConvertIngredientToRecipe = ({
+  ingredient_id,
+  ...props
+}: ConvertIngredientToRecipeProps) => (
+  <Mutate<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>
+    verb="POST"
+    path={`/ingredients/${ingredient_id}/convert_to_recipe`}
+    {...props}
+  />
+);
+
+export type UseConvertIngredientToRecipeProps = Omit<
+  UseMutateProps<
+    Recipe,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >,
+  "path" | "verb"
+> &
+  ConvertIngredientToRecipePathParams;
+
+/**
+ * Converts an ingredient to a recipe, updating all recipes depending on it.
+ */
+export const useConvertIngredientToRecipe = ({
+  ingredient_id,
+  ...props
+}: UseConvertIngredientToRecipeProps) =>
+  useMutate<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>(
+    "POST",
+    (paramsInPath: ConvertIngredientToRecipePathParams) =>
+      `/ingredients/${paramsInPath.ingredient_id}/convert_to_recipe`,
+    { pathParams: { ingredient_id }, ...props }
+  );

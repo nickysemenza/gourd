@@ -97,11 +97,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 				if r != nil {
 					id = r.RecipeUUID
 				} else {
-					id, err = a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
-					if err != nil {
-						return nil, err
-					}
-					r, err = a.DB().GetRecipeDetailWhere(ctx, eq)
+					r, err = a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
 					if err != nil {
 						return nil, err
 					}
@@ -230,15 +226,11 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrappe
 		return nil, err
 	}
 
-	id, err := a.DB().InsertRecipe(ctx, dbVersion)
+	r2, err := a.DB().InsertRecipe(ctx, dbVersion)
 	if err != nil {
 		return nil, err
 	}
 
-	r2, err := a.Manager.DB().GetRecipeDetailByUUIDFull(ctx, id)
-	if err != nil {
-		return nil, err
-	}
 	if r2 == nil {
 		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
@@ -409,7 +401,7 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	}
 	urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 	for x, item := range items {
 		for y, photo := range item.Photos {
@@ -461,6 +453,7 @@ func (l *List) setTotalCount(count uint64) {
 }
 
 func sendErr(ctx echo.Context, code int, err error) error {
+	trace.SpanFromContext(ctx.Request().Context()).AddEvent(fmt.Sprintf("error: %s", err))
 	return ctx.JSON(code, Error{
 		Message: err.Error(),
 	})
@@ -477,12 +470,12 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 
 	dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	for _, a := range albums {
@@ -514,11 +507,11 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	recipes, recipesCount, err := a.Manager.DB().GetRecipes(ctx, string(params.Name))
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name))
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
@@ -536,4 +529,16 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	}
 
 	return c.JSON(http.StatusOK, SearchResult{Recipes: &resRecipes, Ingredients: &resIngredients})
+}
+
+func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "ConvertIngredientToRecipe")
+	defer span.End()
+
+	detail, err := a.DB().IngredientToRecipe(ctx, ingredientId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusCreated, transformRecipe(*detail))
 }

@@ -261,7 +261,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	return nil
 }
 
-func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (string, error) {
+func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "insertRecipe")
 	defer span.End()
 	r.UUID = setUUID(r.UUID)
@@ -270,25 +270,30 @@ func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (string, err
 		Insert(recipeDetailsTable).Columns("uuid", "recipe", "name", "version").Values(r.UUID, r.RecipeUUID, r.Name, r.Version).
 		ToSql()
 	if err != nil {
-		return "", fmt.Errorf("failed to build query: %w", err)
+		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	err = c.updateRecipe(ctx, tx, r)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return r.UUID, tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return c.GetRecipeDetailByUUIDFull(ctx, r.UUID)
 }
 
 // InsertRecipe inserts a recipe.
-func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (string, error) {
+func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "InsertRecipe")
 	defer span.End()
 
@@ -300,20 +305,20 @@ func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (string, err
 	if r.UUID != "" {
 		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": r.UUID})
 		if err != nil {
-			return "", fmt.Errorf("failed to find prior recipe: %w", err)
+			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 	}
 	if modifying == nil {
 		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
 		if err != nil {
-			return "", fmt.Errorf("failed to find prior recipe: %w", err)
+			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 	}
 
 	if modifying != nil {
 		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": modifying.RecipeUUID})
 		if err != nil {
-			return "", fmt.Errorf("failed to find prior recipe: %w", err)
+			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 		version = latestVersion.Version + 1
 		parentID = latestVersion.RecipeUUID
@@ -326,7 +331,7 @@ func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (string, err
 		_, err = c.execContext(ctx, c.psql.
 			Insert(recipesTable).Columns("uuid").Values(parentID))
 		if err != nil {
-			return "", fmt.Errorf("failed to insert parent recipe: %w", err)
+			return nil, fmt.Errorf("failed to insert parent recipe: %w", err)
 		}
 	}
 	r.RecipeUUID = parentID
@@ -365,7 +370,7 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 }
 
 // nolint: unparam
-func (c *Client) execContext(ctx context.Context, q sq.InsertBuilder) (sql.Result, error) {
+func (c *Client) execContext(ctx context.Context, q sq.Sqlizer) (sql.Result, error) {
 	ctx, span := c.tracer.Start(ctx, "execContext")
 	defer span.End()
 
@@ -374,4 +379,40 @@ func (c *Client) execContext(ctx context.Context, q sq.InsertBuilder) (sql.Resul
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 	return c.db.ExecContext(ctx, query, args...)
+}
+
+func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*RecipeDetail, error) {
+	ctx, span := c.tracer.Start(ctx, "IngredientToRecipe")
+	defer span.End()
+
+	i, err := c.GetIngredientByUUID(ctx, ingredientID)
+	if err != nil {
+		return nil, err
+	}
+	if i == nil {
+		return nil, fmt.Errorf("failed to find ingredient with id %s", ingredientID)
+	}
+
+	newRecipe, err := c.InsertRecipe(ctx, &RecipeDetail{Name: i.Name})
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err = c.execContext(ctx,
+		c.psql.
+			Update(sIngredientsTable).
+			Set("ingredient", nil).
+			Set("recipe", newRecipe.RecipeUUID).
+			Where(sq.Eq{"ingredient": ingredientID})); err != nil {
+		return nil, fmt.Errorf("failed to update references to transformed ingredient: %w", err)
+	}
+
+	if _, err = c.execContext(ctx, c.psql.
+		Update(ingredientsTable).
+		Set("name", fmt.Sprintf("[deprecated] %s", i.Name)).
+		Where(sq.Eq{"uuid": i.UUID})); err != nil {
+		return nil, fmt.Errorf("failed to deprecated ingredient: %w", err)
+	}
+
+	return newRecipe, nil
 }

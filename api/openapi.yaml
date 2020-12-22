@@ -272,6 +272,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/convert_to_recipe:
+    post:
+      summary: Converts an ingredient to a recipe, updating all recipes depending on it.
+      operationId: convert_ingredient_to_recipe
+      tags:
+        - recipes
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Newly converted ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                
 security:
   - bearerAuth: [] # use the same name as above
 components:

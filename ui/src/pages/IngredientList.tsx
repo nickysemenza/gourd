@@ -6,6 +6,9 @@ import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
 import { useListIngredients } from "../api/openapi-hooks/api";
+import { IngredientsApi } from "../api/openapi-fetch";
+import { getOpenapiFetchConfig } from "../config";
+import { toast } from "react-toastify";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -25,6 +28,12 @@ const IngredientList: React.FC = () => {
 
   const ingredients = data?.ingredients || [];
   type i = typeof ingredients[0];
+
+  const iApi = new IngredientsApi(getOpenapiFetchConfig());
+  const convertToRecipe = async (id: string) => {
+    let res = await iApi.convertIngredientToRecipe({ ingredientId: id });
+    toast.success(`created recipe ${res.id} for ${res.name}`);
+  };
 
   const columns: Array<Column<i>> = React.useMemo(
     () => [
@@ -54,6 +63,23 @@ const IngredientList: React.FC = () => {
             </div>
           );
         },
+      },
+      {
+        Header: "Actions",
+        Cell: ({
+          row: {
+            original: { ingredient },
+          },
+        }: CellProps<i>) => (
+          <div>
+            <button
+              className="px-4 py-1 text-sm text-purple-600 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"
+              onClick={() => convertToRecipe(ingredient.id)}
+            >
+              Convert to Recipe
+            </button>
+          </div>
+        ),
       },
       {
         Header: "Recipes",
