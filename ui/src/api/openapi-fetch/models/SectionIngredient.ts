@@ -31,7 +31,7 @@ import {
  */
 export interface SectionIngredient {
     /**
-     * UUID
+     * id
      * @type {string}
      * @memberof SectionIngredient
      */

@@ -164,7 +164,7 @@ paths:
       tags:
         - ingredients
       requestBody:
-        description: Creates a ingredient by payload. If the UUID/name exists, it errors
+        description: Creates a ingredient by payload. If the id/name exists, it errors
         required: true
         content:
           application/json:
@@ -227,7 +227,7 @@ paths:
       tags:
         - recipes
       requestBody:
-        description: Creates a recipe by payload. If the UUID/name exists, it errors
+        description: Creates a recipe by payload. If the id/name exists, it errors
         required: true
         content:
           application/json:
@@ -320,7 +320,7 @@ components:
         - adjective
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         kind:
           description: what kind of ingredient
@@ -362,7 +362,7 @@ components:
         - instruction
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         instruction:
           description: instruction
@@ -377,7 +377,7 @@ components:
         - ingredients
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         minutes:
           description: How many minutes the step takes, approximately (todo - make this a range)
@@ -402,7 +402,7 @@ components:
         - id
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         sections:
           description: sections of the recipe
@@ -422,7 +422,7 @@ components:
         - unit
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         name:
           description: recipe name
@@ -462,7 +462,7 @@ components:
         - name
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         name:
           description: Ingredient name

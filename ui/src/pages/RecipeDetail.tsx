@@ -19,10 +19,10 @@ type override = {
   attr: "grams" | "amount";
 };
 const RecipeDetail: React.FC = () => {
-  let { uuid } = useParams() as { uuid?: string };
+  let { id } = useParams() as { id?: string };
 
   const { loading, error, data } = useGetRecipeById({
-    recipe_id: uuid || "",
+    recipe_id: id || "",
   });
 
   const [multiplier, setMultiplier] = useState(1.0);

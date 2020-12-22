@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/deepmap/oapi-codegen/pkg/testutil"
-	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	echo_middleware "github.com/labstack/echo/v4/middleware"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/stretchr/testify/require"
@@ -25,8 +25,8 @@ func TestAPI(t *testing.T) {
 	e.Use(echo_middleware.Logger())
 	RegisterHandlers(e, apiManager)
 
-	rName := fmt.Sprintf("recipe-%s", getUUID(t))
-	iName := fmt.Sprintf("ing-%s", getUUID(t))
+	rName := fmt.Sprintf("recipe-%s", common.UUID())
+	iName := fmt.Sprintf("ing-%s", common.UUID())
 
 	newIngredient := Ingredient{Name: iName}
 
@@ -63,7 +63,7 @@ func TestAPI(t *testing.T) {
 		require.NoError(err)
 		return resultRecipe
 	}
-	uuid := ""
+	id := ""
 	{
 		w := 12.5
 		newRecipe := RecipeWrapper{
@@ -76,7 +76,7 @@ func TestAPI(t *testing.T) {
 		resultRecipe := makeRecipe(newRecipe)
 
 		require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
-		uuid = resultRecipe.Detail.Id
+		id = resultRecipe.Detail.Id
 
 		newRecipe.Detail.Name += "sub"
 		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{
@@ -97,7 +97,7 @@ func TestAPI(t *testing.T) {
 		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
 	}
 	{
-		result := testutil.NewRequest().Get("/recipes/"+uuid).Go(t, e)
+		result := testutil.NewRequest().Get("/recipes/"+id).Go(t, e)
 		require.Equal(http.StatusOK, result.Code())
 		var results RecipeWrapper
 		err := result.UnmarshalBodyToObject(&results)
@@ -105,11 +105,4 @@ func TestAPI(t *testing.T) {
 		// require.Contains(results, name)
 		require.Equal(results.Detail.Name, rName)
 	}
-}
-
-func getUUID(t *testing.T) string {
-	t.Helper()
-	u, err := uuid.NewV4()
-	require.NoError(t, err)
-	return u.String()
 }

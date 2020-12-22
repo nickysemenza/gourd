@@ -23,11 +23,11 @@ func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) (
 }
 
 // GetSectionInstructions finds the instructions for a section.
-func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string) ([]SectionInstruction, error) {
+func (c *Client) GetSectionInstructions(ctx context.Context, sectionId string) ([]SectionInstruction, error) {
 	ctx, span := c.tracer.Start(ctx, "GetSectionInstructions")
 	defer span.End()
 	var res []SectionInstruction
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -35,21 +35,21 @@ func (c *Client) GetSectionInstructions(ctx context.Context, sectionUUID string)
 }
 
 // GetSectionIngredients finds the ingredients for a section.
-func (c *Client) GetSectionIngredients(ctx context.Context, sectionUUID string) ([]SectionIngredient, error) {
+func (c *Client) GetSectionIngredients(ctx context.Context, sectionId string) ([]SectionIngredient, error) {
 	ctx, span := c.tracer.Start(ctx, "GetSectionIngredients")
 	defer span.End()
 	var res []SectionIngredient
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionUUID}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-// GetIngredientByUUID finds an ingredient.
-func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredient, error) {
-	ctx, span := c.tracer.Start(ctx, "GetIngredientByUUID")
+// GetIngredientById finds an ingredient.
+func (c *Client) GetIngredientById(ctx context.Context, id string) (*Ingredient, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngredientById")
 	defer span.End()
-	cacheKey := fmt.Sprintf("i:%s", uuid)
+	cacheKey := fmt.Sprintf("i:%s", id)
 
 	cval, hit := c.cache.Get(cacheKey)
 	log.WithField("key", cacheKey).WithField("hit", hit).Debug("cache:ingredients")
@@ -60,7 +60,7 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 		}
 	}
 
-	query, args, err := c.psql.Select("*").From(ingredientsTable).Where(sq.Eq{"uuid": uuid}).ToSql()
+	query, args, err := c.psql.Select("*").From(ingredientsTable).Where(sq.Eq{"id": id}).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Client) GetIngredientByUUID(ctx context.Context, uuid string) (*Ingredi
 	return ingredient, nil
 }
 
-// GetRecipeByUUID gets a recipe by name, shallowly.
+// GetRecipeById gets a recipe by name, shallowly.
 func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailWhere")
 	defer span.End()
@@ -141,8 +141,8 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 	ctx, span := c.tracer.Start(ctx, "GetRecipesWithIngredient")
 	defer span.End()
 	query, args, err := c.psql.Select(getRecipeDetailColumns()...).From(recipeDetailsTable).
-		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.uuid").
-		Join("recipe_section_ingredients on recipe_sections.uuid = recipe_section_ingredients.section").
+		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.id").
+		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section").
 		Where(sq.Eq{"ingredient": ingredient}).
 		ToSql()
 	if err != nil {
@@ -160,11 +160,11 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 	return r, nil
 }
 
-// GetRecipeDetailByUUIDFull gets a recipe by UUID, with all dependencies.
-func (c *Client) GetRecipeDetailByUUIDFull(ctx context.Context, uuid string) (*RecipeDetail, error) {
-	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailByUUIDFull")
+// GetRecipeDetailByIdFull gets a recipe by Id, with all dependencies.
+func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*RecipeDetail, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailByIdFull")
 	defer span.End()
-	r, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": uuid})
+	r, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": id})
 	if err != nil {
 		return nil, err
 	}
@@ -172,31 +172,31 @@ func (c *Client) GetRecipeDetailByUUIDFull(ctx context.Context, uuid string) (*R
 		return r, nil
 	}
 
-	r.Sections, err = c.GetRecipeDetailSections(ctx, uuid)
+	r.Sections, err = c.GetRecipeDetailSections(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	for x, s := range r.Sections {
-		r.Sections[x].Instructions, err = c.GetSectionInstructions(ctx, s.UUID)
+		r.Sections[x].Instructions, err = c.GetSectionInstructions(ctx, s.Id)
 		if err != nil {
 			return nil, err
 		}
-		r.Sections[x].Ingredients, err = c.GetSectionIngredients(ctx, s.UUID)
+		r.Sections[x].Ingredients, err = c.GetSectionIngredients(ctx, s.Id)
 		if err != nil {
 			return nil, err
 		}
 
 		for y, i := range r.Sections[x].Ingredients {
-			if i.IngredientUUID.String != "" {
-				ing, err := c.GetIngredientByUUID(ctx, i.IngredientUUID.String)
+			if i.IngredientId.String != "" {
+				ing, err := c.GetIngredientById(ctx, i.IngredientId.String)
 				if err != nil {
 					return nil, err
 				}
 				r.Sections[x].Ingredients[y].RawIngredient = ing
 			}
-			if i.RecipeUUID.String != "" {
-				rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeUUID.String})
+			if i.RecipeId.String != "" {
+				rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeId.String})
 				if err != nil {
 					return nil, err
 				}
@@ -290,9 +290,9 @@ func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingre
 
 //TODO: non-gql version
 // func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {
-// 	query, args, err := c.psql.Select("meal_uuid AS uuid", "name", "notion_link AS notionURL").From("meals").
-// 		LeftJoin("meal_recipe on meals.uuid = meal_recipe.meal_uuid").
-// 		Where(sq.Eq{"recipe_uuid": recipe}).ToSql()
+// 	query, args, err := c.psql.Select("meal_id AS id", "name", "notion_link AS notionURL").From("meals").
+// 		LeftJoin("meal_recipe on meals.id = meal_recipe.meal_id").
+// 		Where(sq.Eq{"recipe_id": recipe}).ToSql()
 // 	if err != nil {
 // 		return nil, err
 // 	}

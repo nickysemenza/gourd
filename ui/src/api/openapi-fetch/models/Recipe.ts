@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface Recipe {
     /**
-     * UUID
+     * id
      * @type {string}
      * @memberof Recipe
      */

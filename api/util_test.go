@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/stretchr/testify/require"
@@ -17,7 +18,7 @@ func TestRecipeFromFile(t *testing.T) {
 	r, err := RecipeFromFile(ctx, "../testdata/cookies_1.json")
 	require.NoError(err)
 	require.Equal("cookies 1", r.Detail.Name)
-	baseName := fmt.Sprintf("%s-%s", r.Detail.Name, db.GetUUID())
+	baseName := fmt.Sprintf("%s-%s", r.Detail.Name, common.UUID())
 	r.Detail.Name = baseName
 
 	tdb := db.NewDB(t)

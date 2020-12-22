@@ -36,7 +36,7 @@ func TestInsertGet(t *testing.T) {
 	require.NoError(err)
 
 	require.Equal(1, len(all2)-len(all1), "inserting 1 recipe should increase length of getAll by 1")
-	r, err := db.GetRecipeDetailByUUIDFull(ctx, insertedDetail.UUID)
+	r, err := db.GetRecipeDetailByIdFull(ctx, insertedDetail.Id)
 	require.NoError(err)
 	r.TotalMinutes = zero.IntFrom(3)
 	r.Unit = zero.StringFrom("items")
@@ -44,26 +44,26 @@ func TestInsertGet(t *testing.T) {
 		Minutes:      zero.IntFrom(88),
 		Instructions: []SectionInstruction{{Instruction: "add flour"}},
 		Ingredients: []SectionIngredient{{
-			Grams:          zero.FloatFrom(52),
-			IngredientUUID: zero.StringFrom(ingFlour.UUID),
+			Grams:        zero.FloatFrom(52),
+			IngredientId: zero.StringFrom(ingFlour.Id),
 		}},
 	}, {
 		Minutes:      zero.IntFrom(1),
 		Instructions: []SectionInstruction{{Instruction: "add more flour"}, {Instruction: "mix"}},
 		Ingredients: []SectionIngredient{{
-			Grams:          zero.FloatFrom(1),
-			IngredientUUID: zero.StringFrom(ingFlour.UUID),
+			Grams:        zero.FloatFrom(1),
+			IngredientId: zero.StringFrom(ingFlour.Id),
 		}, {
-			Grams:          zero.FloatFrom(178),
-			IngredientUUID: zero.StringFrom(ingWater.UUID),
-			Amount:         zero.FloatFrom(.7),
-			Unit:           zero.StringFrom("c"),
+			Grams:        zero.FloatFrom(178),
+			IngredientId: zero.StringFrom(ingWater.Id),
+			Amount:       zero.FloatFrom(.7),
+			Unit:         zero.StringFrom("c"),
 		}, {
 
-			Grams:          zero.FloatFrom(60),
-			IngredientUUID: zero.StringFrom(ingEgg.UUID),
-			Amount:         zero.FloatFrom(1),
-			Unit:           zero.StringFrom("large egg"),
+			Grams:        zero.FloatFrom(60),
+			IngredientId: zero.StringFrom(ingEgg.Id),
+			Amount:       zero.FloatFrom(1),
+			Unit:         zero.StringFrom("large egg"),
 		}},
 	}}
 
@@ -79,8 +79,8 @@ func TestInsertGet(t *testing.T) {
 		Sections: []Section{{
 			Minutes: zero.IntFrom(33),
 			Ingredients: []SectionIngredient{{
-				Grams:      zero.FloatFrom(52),
-				RecipeUUID: zero.StringFrom(r2.RecipeUUID),
+				Grams:    zero.FloatFrom(52),
+				RecipeId: zero.StringFrom(r2.RecipeId),
 			}}}},
 	})
 	require.NoError(err)

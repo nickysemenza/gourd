@@ -7,7 +7,7 @@ import (
 
 // Recipe is the presentation for a Recipe
 type Recipe struct {
-	UUID         string    `json:"uuid,omitempty" yaml:"uuid,omitempty"`
+	Id           string    `json:"id,omitempty" yaml:"id,omitempty"`
 	Name         string    `json:"name,omitempty" yaml:"name,omitempty"`
 	TotalMinutes int64     `json:"total_minutes,omitempty" yaml:"total_minutes,omitempty"`
 	Equipment    string    `json:"equipment,omitempty" yaml:"equipment,omitempty"`
@@ -45,7 +45,7 @@ func (r *Recipe) toDB() *db.RecipeDetail {
 		return nil
 	}
 	dbr := db.RecipeDetail{
-		UUID:         r.UUID,
+		Id:           r.Id,
 		Name:         r.Name,
 		TotalMinutes: zero.IntFrom(r.TotalMinutes),
 		Equipment:    zero.StringFrom(r.Equipment),
@@ -84,7 +84,7 @@ func FromRecipe(dbr *db.RecipeDetail) *Recipe {
 		return nil
 	}
 	r := Recipe{
-		UUID:         dbr.UUID,
+		Id:           dbr.Id,
 		Name:         dbr.Name,
 		TotalMinutes: dbr.TotalMinutes.Int64,
 		Equipment:    dbr.Equipment.String,

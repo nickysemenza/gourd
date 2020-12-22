@@ -31,7 +31,7 @@ import {
  */
 export interface RecipeWrapper {
     /**
-     * UUID
+     * id
      * @type {string}
      * @memberof RecipeWrapper
      */

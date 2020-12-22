@@ -91,7 +91,7 @@ func init() {
 				}
 				ctx := context.Background()
 
-				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientUUIDByName)
+				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientIdByName)
 				if err != nil {
 					return err
 				}

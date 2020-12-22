@@ -60,7 +60,7 @@ function App() {
           <NavBar />
           <div className="lg:container lg:mx-auto">
             <Switch>
-              <Route path="/recipe/:uuid">
+              <Route path="/recipe/:id">
                 <RecipeDetail />
               </Route>
               <Route path="/recipes">

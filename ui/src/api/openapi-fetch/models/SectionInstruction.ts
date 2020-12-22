@@ -20,7 +20,7 @@ import { exists, mapValues } from '../runtime';
  */
 export interface SectionInstruction {
     /**
-     * UUID
+     * id
      * @type {string}
      * @memberof SectionInstruction
      */

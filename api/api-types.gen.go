@@ -59,7 +59,7 @@ type GooglePhotosAlbum struct {
 // Ingredient defines model for Ingredient.
 type Ingredient struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// Ingredient name
@@ -139,7 +139,7 @@ type PaginatedRecipes struct {
 // Recipe defines model for Recipe.
 type Recipe struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// whether or not it is the most recent version
@@ -170,7 +170,7 @@ type Recipe struct {
 // RecipeSection defines model for RecipeSection.
 type RecipeSection struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// x
@@ -189,7 +189,7 @@ type RecipeWrapper struct {
 	// A recipe
 	Detail Recipe `json:"detail"`
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// sections of the recipe
@@ -218,7 +218,7 @@ type SectionIngredient struct {
 	// weight in grams
 	Grams float64 `json:"grams"`
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// An Ingredient
@@ -240,7 +240,7 @@ type SectionIngredient struct {
 // SectionInstruction defines model for SectionInstruction.
 type SectionInstruction struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// instruction

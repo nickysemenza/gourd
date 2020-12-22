@@ -16,7 +16,7 @@ import {
  */
 export interface SectionIngredient {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -52,7 +52,7 @@ export interface SectionIngredient {
  */
 export interface SectionInstruction {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -66,7 +66,7 @@ export interface SectionInstruction {
  */
 export interface RecipeSection {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -88,7 +88,7 @@ export interface RecipeSection {
  */
 export interface RecipeWrapper {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -103,7 +103,7 @@ export interface RecipeWrapper {
  */
 export interface Recipe {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -145,7 +145,7 @@ export interface Recipe {
  */
 export interface Ingredient {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**

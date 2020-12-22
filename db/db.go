@@ -8,8 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dgraph-io/ristretto"
-	"github.com/gofrs/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/nickysemenza/gourd/common"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -35,7 +35,7 @@ type Client struct {
 
 func getRecipeDetailColumns() []string {
 	return []string{
-		"recipe_details.uuid",
+		"recipe_details.id",
 		"name", "version",
 		"total_minutes", "equipment",
 		"source", "servings",
@@ -44,14 +44,14 @@ func getRecipeDetailColumns() []string {
 
 // RecipeDetail represents a recipe
 type Recipe struct {
-	UUID   string `db:"uuid"`
+	Id     string `db:"id"`
 	Detail RecipeDetail
 }
 
 // RecipeDetail represents a recipe
 type RecipeDetail struct {
-	UUID         string      `db:"uuid"`
-	RecipeUUID   string      `db:"recipe"`
+	Id           string      `db:"id"`
+	RecipeId     string      `db:"recipe"`
 	Name         string      `db:"name"`
 	TotalMinutes zero.Int    `db:"total_minutes"`
 	Equipment    zero.String `db:"equipment"`
@@ -65,28 +65,28 @@ type RecipeDetail struct {
 
 // Section represents a Section
 type Section struct {
-	UUID             string   `db:"uuid"`
-	RecipeDetailUUID string   `db:"recipe_detail"`
-	Minutes          zero.Int `db:"minutes"`
-	Sort             zero.Int `db:"sort"`
-	Ingredients      []SectionIngredient
-	Instructions     []SectionInstruction
+	Id             string   `db:"id"`
+	RecipeDetailId string   `db:"recipe_detail"`
+	Minutes        zero.Int `db:"minutes"`
+	Sort           zero.Int `db:"sort"`
+	Ingredients    []SectionIngredient
+	Instructions   []SectionInstruction
 }
 
 // SectionIngredient is a foo
 type SectionIngredient struct {
-	UUID        string      `db:"uuid"`
-	SectionUUID string      `db:"section"`
-	Sort        zero.Int    `db:"sort"`
-	Grams       zero.Float  `db:"grams"`
-	Amount      zero.Float  `db:"amount"`
-	Unit        zero.String `db:"unit"`
-	Adjective   zero.String `db:"adjective"`
-	Optional    zero.Bool   `db:"optional"`
+	Id        string      `db:"id"`
+	SectionId string      `db:"section"`
+	Sort      zero.Int    `db:"sort"`
+	Grams     zero.Float  `db:"grams"`
+	Amount    zero.Float  `db:"amount"`
+	Unit      zero.String `db:"unit"`
+	Adjective zero.String `db:"adjective"`
+	Optional  zero.Bool   `db:"optional"`
 
 	// one of the following is required for get and update:
-	RecipeUUID     zero.String `db:"recipe"`
-	IngredientUUID zero.String `db:"ingredient"`
+	RecipeId     zero.String `db:"recipe"`
+	IngredientId zero.String `db:"ingredient"`
 
 	// one of these is populated via gets
 	RawRecipe     *RecipeDetail
@@ -98,15 +98,15 @@ type SectionIngredient struct {
 
 // SectionInstruction represents a SectionInstruction
 type SectionInstruction struct {
-	UUID        string   `db:"uuid"`
+	Id          string   `db:"id"`
 	Sort        zero.Int `db:"sort"`
 	Instruction string   `db:"instruction"`
-	SectionUUID string   `db:"section"`
+	SectionId   string   `db:"section"`
 }
 
 // Ingredient is a globally-scoped ingredient
 type Ingredient struct {
-	UUID   string      `json:"uuid"`
+	Id     string      `json:"id"`
 	Name   string      `json:"name"`
 	FdcID  zero.Int    `db:"fdc_id"`
 	SameAs zero.String `db:"same_as"`
@@ -143,36 +143,27 @@ func ConnnectionString(host, user, password, dbname string, port int64) string {
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 }
-func setUUID(val string) string {
+func setId(val string) string {
 	if val != "" {
 		return val
 	}
-	return GetUUID()
+	return common.UUID()
 }
 
-// GetUUID returns a UUID
-func GetUUID() string {
-	u, err := uuid.NewV4()
-	if err != nil {
-		panic(fmt.Errorf("failed to make uuid: %w", err))
-	}
-	return u.String()
-}
-
-// AssignUUIDs adds uuids where missing.
-func (c *Client) AssignUUIDs(ctx context.Context, r *RecipeDetail) error {
-	// r.UUID = setUUID(r.UUID)
+// AssignIds adds ids where missing.
+func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
+	// r.Id = setId(r.Id)
 	for x := range r.Sections {
-		r.Sections[x].UUID = GetUUID()
-		r.Sections[x].RecipeDetailUUID = r.UUID
+		r.Sections[x].Id = common.UUID()
+		r.Sections[x].RecipeDetailId = r.Id
 		for y := range r.Sections[x].Ingredients {
-			r.Sections[x].Ingredients[y].UUID = GetUUID()
-			r.Sections[x].Ingredients[y].SectionUUID = r.Sections[x].UUID
+			r.Sections[x].Ingredients[y].Id = common.UUID()
+			r.Sections[x].Ingredients[y].SectionId = r.Sections[x].Id
 
 		}
 		for y := range r.Sections[x].Instructions {
-			r.Sections[x].Instructions[y].UUID = GetUUID()
-			r.Sections[x].Instructions[y].SectionUUID = r.Sections[x].UUID
+			r.Sections[x].Instructions[y].Id = common.UUID()
+			r.Sections[x].Instructions[y].SectionId = r.Sections[x].Id
 		}
 	}
 	return nil
@@ -184,7 +175,7 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
 	WHERE name = $1 LIMIT 1`, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (uuid, name) VALUES ($1, $2)`, setUUID(""), name)
+		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (id, name) VALUES ($1, $2)`, setId(""), name)
 		if err != nil {
 			return nil, err
 		}
@@ -196,7 +187,7 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 //nolint: funlen
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) error {
 	query, args, err := c.psql.
-		Update(recipeDetailsTable).Where(sq.Eq{"uuid": r.UUID}).Set("name", r.Name).
+		Update(recipeDetailsTable).Where(sq.Eq{"id": r.Id}).Set("name", r.Name).
 		Set("total_minutes", r.TotalMinutes).
 		Set("unit", r.Unit).
 		ToSql()
@@ -207,7 +198,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	if err != nil {
 		return err
 	}
-	if err := c.AssignUUIDs(ctx, r); err != nil {
+	if err := c.AssignIds(ctx, r); err != nil {
 		return err
 	}
 	// update recipe_section_instructions
@@ -221,9 +212,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	}
 
 	// sections
-	sectionInsert := c.psql.Insert(sectionsTable).Columns("uuid", "recipe_detail", "minutes")
+	sectionInsert := c.psql.Insert(sectionsTable).Columns("id", "recipe_detail", "minutes")
 	for _, s := range r.Sections {
-		sectionInsert = sectionInsert.Values(s.UUID, s.RecipeDetailUUID, s.Minutes)
+		sectionInsert = sectionInsert.Values(s.Id, s.RecipeDetailId, s.Minutes)
 	}
 	query, args, err = sectionInsert.ToSql()
 
@@ -237,9 +228,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	for _, s := range r.Sections {
 		if len(s.Instructions) > 0 {
-			instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("uuid", "section", "instruction")
+			instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
 			for _, i := range s.Instructions {
-				instructionsInsert = instructionsInsert.Values(i.UUID, i.SectionUUID, i.Instruction)
+				instructionsInsert = instructionsInsert.Values(i.Id, i.SectionId, i.Instruction)
 			}
 			if _, err = instructionsInsert.RunWith(tx).ExecContext(ctx); err != nil {
 				return err
@@ -247,10 +238,10 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		}
 
 		if len(s.Ingredients) > 0 {
-			ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("uuid", "section", "ingredient", "recipe",
+			ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
 				"grams", "amount", "unit", "adjective", "optional")
 			for _, i := range s.Ingredients {
-				ingredientsInsert = ingredientsInsert.Values(i.UUID, i.SectionUUID, i.IngredientUUID, i.RecipeUUID,
+				ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
 					i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional)
 			}
 			if _, err = ingredientsInsert.RunWith(tx).ExecContext(ctx); err != nil {
@@ -264,10 +255,10 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "insertRecipe")
 	defer span.End()
-	r.UUID = setUUID(r.UUID)
-	log.Println("inserting", r.UUID, r.Name)
+	r.Id = setId(r.Id)
+	log.Println("inserting", r.Id, r.Name)
 	query, args, err := c.psql.
-		Insert(recipeDetailsTable).Columns("uuid", "recipe", "name", "version").Values(r.UUID, r.RecipeUUID, r.Name, r.Version).
+		Insert(recipeDetailsTable).Columns("id", "recipe", "name", "version").Values(r.Id, r.RecipeId, r.Name, r.Version).
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
@@ -289,7 +280,7 @@ func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDeta
 		return nil, err
 	}
 
-	return c.GetRecipeDetailByUUIDFull(ctx, r.UUID)
+	return c.GetRecipeDetailByIdFull(ctx, r.Id)
 }
 
 // InsertRecipe inserts a recipe.
@@ -297,13 +288,13 @@ func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDeta
 	ctx, span := c.tracer.Start(ctx, "InsertRecipe")
 	defer span.End()
 
-	// if we have an existing recipe with the same UUID or name, this one is a n+1 version of that one
+	// if we have an existing recipe with the same Id or name, this one is a n+1 version of that one
 	version := int64(1)
 	var modifying *RecipeDetail
 	parentID := ""
 	var err error
-	if r.UUID != "" {
-		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"uuid": r.UUID})
+	if r.Id != "" {
+		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"id": r.Id})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
@@ -316,25 +307,25 @@ func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDeta
 	}
 
 	if modifying != nil {
-		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": modifying.RecipeUUID})
+		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": modifying.RecipeId})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 		version = latestVersion.Version + 1
-		parentID = latestVersion.RecipeUUID
+		parentID = latestVersion.RecipeId
 	}
 	r.Version = version
-	r.UUID = GetUUID()
+	r.Id = common.UUID()
 
 	if parentID == "" {
-		parentID = GetUUID()
+		parentID = common.UUID()
 		_, err = c.execContext(ctx, c.psql.
-			Insert(recipesTable).Columns("uuid").Values(parentID))
+			Insert(recipesTable).Columns("id").Values(parentID))
 		if err != nil {
 			return nil, fmt.Errorf("failed to insert parent recipe: %w", err)
 		}
 	}
-	r.RecipeUUID = parentID
+	r.RecipeId = parentID
 
 	return c.insertRecipe(ctx, r)
 
@@ -385,7 +376,7 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 	ctx, span := c.tracer.Start(ctx, "IngredientToRecipe")
 	defer span.End()
 
-	i, err := c.GetIngredientByUUID(ctx, ingredientID)
+	i, err := c.GetIngredientById(ctx, ingredientID)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +393,7 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 		c.psql.
 			Update(sIngredientsTable).
 			Set("ingredient", nil).
-			Set("recipe", newRecipe.RecipeUUID).
+			Set("recipe", newRecipe.RecipeId).
 			Where(sq.Eq{"ingredient": ingredientID})); err != nil {
 		return nil, fmt.Errorf("failed to update references to transformed ingredient: %w", err)
 	}
@@ -410,7 +401,7 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 	if _, err = c.execContext(ctx, c.psql.
 		Update(ingredientsTable).
 		Set("name", fmt.Sprintf("[deprecated] %s", i.Name)).
-		Where(sq.Eq{"uuid": i.UUID})); err != nil {
+		Where(sq.Eq{"id": i.Id})); err != nil {
 		return nil, fmt.Errorf("failed to deprecated ingredient: %w", err)
 	}
 

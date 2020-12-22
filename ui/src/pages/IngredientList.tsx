@@ -38,7 +38,7 @@ const IngredientList: React.FC = () => {
   const columns: Array<Column<i>> = React.useMemo(
     () => [
       {
-        Header: "UUID",
+        Header: "Id",
         Cell: ({
           row: {
             original: {
