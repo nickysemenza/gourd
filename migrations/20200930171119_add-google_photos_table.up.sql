@@ -11,9 +11,9 @@ CREATE TABLE "gphotos_photos" (
     PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "meal_photo" (
-    "meal" TEXT references meals(uuid) NOT NULL,
+    "meal" TEXT references meals(id) NOT NULL,
     "gphotos_id" TEXT references gphotos_photos(id) NOT NULL,
-    "highlight_recipe" TEXT references recipes(uuid),
+    "highlight_recipe" TEXT references recipes(id),
     unique (meal, gphotos_id)
 );
 ALTER TABLE "meals"

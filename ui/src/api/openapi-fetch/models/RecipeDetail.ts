@@ -14,10 +14,6 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
     RecipeSection,
     RecipeSectionFromJSON,
     RecipeSectionFromJSONTyped,
@@ -25,11 +21,17 @@ import {
 } from './';
 
 /**
- * A recipe with subcomponents
+ * A revision of a recipe
  * @export
  * @interface RecipeDetail
  */
 export interface RecipeDetail {
+    /**
+     * id
+     * @type {string}
+     * @memberof RecipeDetail
+     */
+    id: string;
     /**
      * sections of the recipe
      * @type {Array<RecipeSection>}
@@ -37,11 +39,53 @@ export interface RecipeDetail {
      */
     sections: Array<RecipeSection>;
     /**
-     * 
-     * @type {Recipe}
+     * recipe name
+     * @type {string}
      * @memberof RecipeDetail
      */
-    recipe: Recipe;
+    name: string;
+    /**
+     * todo
+     * @type {number}
+     * @memberof RecipeDetail
+     */
+    totalMinutes?: number;
+    /**
+     * book or website? deprecated?
+     * @type {string}
+     * @memberof RecipeDetail
+     */
+    source?: string;
+    /**
+     * num servings
+     * @type {number}
+     * @memberof RecipeDetail
+     */
+    servings?: number;
+    /**
+     * serving quantity
+     * @type {number}
+     * @memberof RecipeDetail
+     */
+    quantity: number;
+    /**
+     * serving unit
+     * @type {string}
+     * @memberof RecipeDetail
+     */
+    unit: string;
+    /**
+     * version of the recipe
+     * @type {number}
+     * @memberof RecipeDetail
+     */
+    version?: number;
+    /**
+     * whether or not it is the most recent version
+     * @type {boolean}
+     * @memberof RecipeDetail
+     */
+    isLatestVersion?: boolean;
 }
 
 export function RecipeDetailFromJSON(json: any): RecipeDetail {
@@ -54,8 +98,16 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
+        'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
-        'recipe': RecipeFromJSON(json['recipe']),
+        'name': json['name'],
+        'totalMinutes': !exists(json, 'total_minutes') ? undefined : json['total_minutes'],
+        'source': !exists(json, 'source') ? undefined : json['source'],
+        'servings': !exists(json, 'servings') ? undefined : json['servings'],
+        'quantity': json['quantity'],
+        'unit': json['unit'],
+        'version': !exists(json, 'version') ? undefined : json['version'],
+        'isLatestVersion': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
     };
 }
 
@@ -68,8 +120,16 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
     }
     return {
         
+        'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
-        'recipe': RecipeToJSON(value.recipe),
+        'name': value.name,
+        'total_minutes': value.totalMinutes,
+        'source': value.source,
+        'servings': value.servings,
+        'quantity': value.quantity,
+        'unit': value.unit,
+        'version': value.version,
+        'is_latest_version': value.isLatestVersion,
     };
 }
 

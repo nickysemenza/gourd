@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
@@ -29,30 +30,35 @@ func NewAPI(m *manager.Manager) *API {
 	}
 }
 
-func transformRecipe(dbr db.Recipe) Recipe {
-	return Recipe{
-		Id:           dbr.UUID,
+func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
+	return RecipeDetail{
+		Id:           dbr.Id,
 		Name:         dbr.Name,
 		Source:       dbr.Source.Ptr(),
 		TotalMinutes: dbr.TotalMinutes.Ptr(),
+		Version:      &dbr.Version,
+		Sections:     transformRecipeSections(dbr.Sections),
 	}
 }
-func transformRecipeFull(dbr *db.Recipe) *RecipeDetail {
-	return &RecipeDetail{Recipe: transformRecipe(*dbr), Sections: transformRecipeSections(dbr.Sections)}
+func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
+	return &RecipeWrapper{
+		Id:     dbr.RecipeId,
+		Detail: transformRecipe(*dbr),
+	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
-	return Ingredient{Id: dbr.UUID, Name: dbr.Name}
+	return Ingredient{Id: dbr.Id, Name: dbr.Name}
 }
 
-func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe, error) {
-	dbr := db.Recipe{
-		UUID:         r.Recipe.Id,
-		Name:         r.Recipe.Name,
-		Source:       zero.StringFromPtr(r.Recipe.Source),
-		TotalMinutes: zero.IntFromPtr(r.Recipe.TotalMinutes),
+func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
+	dbr := db.RecipeDetail{
+		Id:           r.Detail.Id,
+		Name:         r.Detail.Name,
+		Source:       zero.StringFromPtr(r.Detail.Source),
+		TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
 	}
 
-	for _, s := range r.Sections {
+	for _, s := range r.Detail.Sections {
 		dbs := db.Section{
 			Minutes: zero.IntFrom(s.Minutes),
 		}
@@ -77,22 +83,27 @@ func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe
 				if i.Recipe == nil {
 					continue
 				}
+				var eq sq.Eq
 				id := i.Recipe.Id
 				if id == "" {
-					r, err := a.DB().GetRecipeByName(ctx, i.Recipe.Name)
+					eq = sq.Eq{"name": i.Recipe.Name}
+				} else {
+					eq = sq.Eq{"recipe": i.Recipe.Id}
+				}
+				r, err := a.DB().GetRecipeDetailWhere(ctx, eq)
+				if err != nil {
+					return nil, err
+				}
+				if r != nil {
+					id = r.RecipeId
+				} else {
+					r, err = a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
 					if err != nil {
 						return nil, err
 					}
-					if r != nil {
-						id = r.UUID
-					} else {
-						id, err = a.DB().InsertRecipe(ctx, &db.Recipe{Name: i.Recipe.Name})
-						if err != nil {
-							return nil, err
-						}
-					}
+					id = r.RecipeId
 				}
-				si.RecipeUUID = zero.StringFrom(id)
+				si.RecipeId = zero.StringFrom(id)
 			case "ingredient":
 				if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
 					continue
@@ -105,10 +116,10 @@ func (a *API) recipeDetailtoDB(ctx context.Context, r *RecipeDetail) (*db.Recipe
 					if err != nil {
 						return nil, err
 					}
-					id = ing.UUID
+					id = ing.Id
 				}
 
-				si.IngredientUUID = zero.StringFrom(id)
+				si.IngredientId = zero.StringFrom(id)
 			case "":
 				// empty table row, drop it
 				continue
@@ -133,11 +144,11 @@ func transformRecipeSections(dbs []db.Section) []RecipeSection {
 		ins := []SectionInstruction{}
 
 		for _, i := range d.Instructions {
-			ins = append(ins, SectionInstruction{Id: i.UUID, Instruction: i.Instruction})
+			ins = append(ins, SectionInstruction{Id: i.Id, Instruction: i.Instruction})
 		}
 		for _, i := range d.Ingredients {
 			item := SectionIngredient{
-				Id:        i.UUID,
+				Id:        i.Id,
 				Grams:     i.Grams.Float64,
 				Amount:    i.Amount.Ptr(),
 				Unit:      i.Unit.String,
@@ -157,7 +168,7 @@ func transformRecipeSections(dbs []db.Section) []RecipeSection {
 		}
 
 		s = append(s, RecipeSection{
-			Id:           d.UUID,
+			Id:           d.Id,
 			Minutes:      d.Minutes.Int64,
 			Ingredients:  ing,
 			Instructions: ins,
@@ -172,7 +183,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx := c.Request().Context()
 	ctx, span := a.tracer.Start(ctx, "ListRecipes")
 	defer span.End()
-	items := []Recipe{}
+	items := []RecipeDetail{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	recipes, count, err := a.Manager.DB().GetRecipes(ctx, "", paginationParams...)
@@ -196,7 +207,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 // (POST /recipes)
 func (a *API) CreateRecipes(c echo.Context) error {
 	ctx := c.Request().Context()
-	var r RecipeDetail
+	var r RecipeWrapper
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
 
@@ -209,25 +220,19 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
-func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
-	id := r.Recipe.Id
-	dbVersion, err := a.recipeDetailtoDB(ctx, r)
+func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrapper, error) {
+	dbVersion, err := a.recipeWrappertoDB(ctx, r)
 	if err != nil {
-		return nil, err
-	}
-	if id == "" {
-		id, err = a.DB().InsertRecipe(ctx, dbVersion)
-		if err != nil {
-			return nil, err
-		}
-		r.Recipe.Id = id
-	} else if err := a.DB().UpdateRecipe(ctx, dbVersion); err != nil {
 		return nil, err
 	}
 
-	r2, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, id)
+	r2, err := a.DB().InsertRecipe(ctx, dbVersion)
 	if err != nil {
 		return nil, err
+	}
+
+	if r2 == nil {
+		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
 
 	return transformRecipeFull(r2), nil
@@ -237,9 +242,12 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail,
 // (GET /recipes/{recipeId})
 func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	ctx := c.Request().Context()
-	r, err := a.Manager.DB().GetRecipeByUUIDFull(ctx, recipeId)
+	r, err := a.Manager.DB().GetRecipeDetailByIdFull(ctx, recipeId)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
+	}
+	if r == nil {
+		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 	}
 	return c.JSON(http.StatusOK, transformRecipeFull(r))
 }
@@ -258,12 +266,12 @@ func (a *API) CreateIngredients(c echo.Context) error {
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
 }
 
-func (a *API) IngredientUUIDByName(ctx context.Context, name, kind string) (string, error) {
+func (a *API) IngredientIdByName(ctx context.Context, name, kind string) (string, error) {
 	ing, err := a.DB().IngredientByName(ctx, name)
 	if err != nil {
 		return "", err
 	}
-	return ing.UUID, nil
+	return ing.Id, nil
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
 	ctx := c.Request().Context()
@@ -280,7 +288,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	}
 	for _, i := range ing {
 		// find linked ingredients
-		sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, i.UUID)
+		sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, i.Id)
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
@@ -290,11 +298,11 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		}
 
 		// find linked recipes
-		linkedRecipes, err := a.Manager.DB().GetRecipesWithIngredient(ctx, i.UUID)
+		linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, i.Id)
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
-		recipes := []Recipe{}
+		recipes := []RecipeDetail{}
 		for _, x := range linkedRecipes {
 			recipes = append(recipes, transformRecipe(x))
 		}
@@ -393,7 +401,7 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	}
 	urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 	for x, item := range items {
 		for y, photo := range item.Photos {
@@ -445,6 +453,7 @@ func (l *List) setTotalCount(count uint64) {
 }
 
 func sendErr(ctx echo.Context, code int, err error) error {
+	trace.SpanFromContext(ctx.Request().Context()).AddEvent(fmt.Sprintf("error: %s", err))
 	return ctx.JSON(code, Error{
 		Message: err.Error(),
 	})
@@ -461,12 +470,12 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 
 	dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	for _, a := range albums {
@@ -498,21 +507,21 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	recipes, recipesCount, err := a.Manager.DB().GetRecipes(ctx, string(params.Name))
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name))
 	if err != nil {
-		return err
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
 
-	var resRecipes []Recipe
+	var resRecipes []RecipeWrapper
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
 		r := transformRecipe(x)
-		resRecipes = append(resRecipes, r)
+		resRecipes = append(resRecipes, RecipeWrapper{Detail: r, Id: x.RecipeId})
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)
@@ -520,4 +529,16 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	}
 
 	return c.JSON(http.StatusOK, SearchResult{Recipes: &resRecipes, Ingredients: &resIngredients})
+}
+
+func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "ConvertIngredientToRecipe")
+	defer span.End()
+
+	detail, err := a.DB().IngredientToRecipe(ctx, ingredientId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusCreated, transformRecipe(*detail))
 }

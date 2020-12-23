@@ -2,7 +2,7 @@ import React from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 import {
-  RecipeDetail,
+  RecipeWrapper,
   Ingredient,
   RecipeSection,
 } from "../api/openapi-hooks/api";
@@ -15,7 +15,7 @@ export interface UpdateIngredientProps {
 }
 
 export interface TableProps {
-  recipe: RecipeDetail;
+  recipe: RecipeWrapper;
   updateIngredient: (i: UpdateIngredientProps) => void;
   updateIngredientInfo: (
     sectionID: number,
@@ -52,7 +52,7 @@ const RecipeTable: React.FC<TableProps> = ({
   addSection,
 }) => {
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
-  const flourMass = (recipe.sections || []).reduce(
+  const flourMass = (recipe.detail.sections || []).reduce(
     (acc, section) =>
       acc +
       section.ingredients
@@ -183,7 +183,8 @@ const RecipeTable: React.FC<TableProps> = ({
       <TableCell>
         <ol className="list-decimal list-inside">
           {section.instructions.map((instruction, y) => (
-            <li key={y}>
+            <li key={y} className="flex space-x-2">
+              <div>{y + 1}.</div>
               <TableInput
                 data-cy="instruction-input"
                 width={72}
@@ -221,7 +222,7 @@ const RecipeTable: React.FC<TableProps> = ({
         </TableCell>
         <TableCell>Instructions</TableCell>
       </TableRow>
-      {recipe.sections?.map((section, x) => renderRow(section, x))}
+      {recipe.detail.sections?.map((section, x) => renderRow(section, x))}
       {edit && (
         <div className="add-item" onClick={() => addSection()}>
           add section
@@ -261,7 +262,11 @@ const TableInput: React.FC<{
     tall ? (
       <textarea {...props} className={className} rows={3} />
     ) : (
-      <input {...props} className={className} disabled={props.value === 0} />
+      <input
+        {...props}
+        className={className}
+        disabled={!edit && props.value === 0}
+      />
     )
   ) : (
     <div>{props.value}</div>

@@ -91,7 +91,7 @@ func init() {
 				}
 				ctx := context.Background()
 
-				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientUUIDByName)
+				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientIdByName)
 				if err != nil {
 					return err
 				}
@@ -110,23 +110,24 @@ func init() {
 				}
 				ctx := context.Background()
 
-				r, err := api.RecipeFromFile(ctx, strings.Join(args, " "))
+				recipes, err := api.RecipeFromFile(ctx, strings.Join(args, " "))
 				if err != nil {
 					return err
 				}
 
-				out, err := s.APIManager.CreateRecipe(ctx, r)
-				if err != nil {
-					return err
-				}
-				res, err := glamour.Render(fmt.Sprintf(`
+				for _, r := range recipes {
+					out, err := s.APIManager.CreateRecipe(ctx, &r)
+					if err != nil {
+						return err
+					}
+					res, err := glamour.Render(fmt.Sprintf(`
 # Import Complete
-Imported `+" **%s** as `%s`", out.Recipe.Name, out.Recipe.Id), "dark")
-				if err != nil {
-					return err
+Imported `+" **%s** as `%s`", out.Detail.Name, out.Detail.Id), "dark")
+					if err != nil {
+						return err
+					}
+					fmt.Print(res)
 				}
-				fmt.Print(res)
-
 				return nil
 			},
 		},

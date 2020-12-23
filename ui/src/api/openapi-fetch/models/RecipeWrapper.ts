@@ -13,42 +13,49 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailFromJSONTyped,
+    RecipeDetailToJSON,
+} from './';
+
 /**
- * An Ingredient
+ * A recipe with subcomponents
  * @export
- * @interface Ingredient
+ * @interface RecipeWrapper
  */
-export interface Ingredient {
+export interface RecipeWrapper {
     /**
      * id
      * @type {string}
-     * @memberof Ingredient
+     * @memberof RecipeWrapper
      */
     id: string;
     /**
-     * Ingredient name
-     * @type {string}
-     * @memberof Ingredient
+     * 
+     * @type {RecipeDetail}
+     * @memberof RecipeWrapper
      */
-    name: string;
+    detail: RecipeDetail;
 }
 
-export function IngredientFromJSON(json: any): Ingredient {
-    return IngredientFromJSONTyped(json, false);
+export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
+    return RecipeWrapperFromJSONTyped(json, false);
 }
 
-export function IngredientFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ingredient {
+export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeWrapper {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'id': json['id'],
-        'name': json['name'],
+        'detail': RecipeDetailFromJSON(json['detail']),
     };
 }
 
-export function IngredientToJSON(value?: Ingredient | null): any {
+export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -58,7 +65,7 @@ export function IngredientToJSON(value?: Ingredient | null): any {
     return {
         
         'id': value.id,
-        'name': value.name,
+        'detail': RecipeDetailToJSON(value.detail),
     };
 }
 

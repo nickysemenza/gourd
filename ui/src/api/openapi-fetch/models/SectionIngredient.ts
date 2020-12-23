@@ -18,10 +18,10 @@ import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailFromJSONTyped,
+    RecipeDetailToJSON,
 } from './';
 
 /**
@@ -31,7 +31,7 @@ import {
  */
 export interface SectionIngredient {
     /**
-     * UUID
+     * id
      * @type {string}
      * @memberof SectionIngredient
      */
@@ -44,10 +44,10 @@ export interface SectionIngredient {
     kind: SectionIngredientKindEnum;
     /**
      * 
-     * @type {Recipe}
+     * @type {RecipeDetail}
      * @memberof SectionIngredient
      */
-    recipe?: Recipe;
+    recipe?: RecipeDetail;
     /**
      * 
      * @type {Ingredient}

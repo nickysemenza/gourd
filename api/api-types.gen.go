@@ -59,7 +59,7 @@ type GooglePhotosAlbum struct {
 // Ingredient defines model for Ingredient.
 type Ingredient struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// Ingredient name
@@ -76,7 +76,7 @@ type IngredientDetail struct {
 	Ingredient Ingredient `json:"ingredient"`
 
 	// Recipes referencing this ingredient
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
 // List defines model for List.
@@ -132,21 +132,27 @@ type PaginatedPhotos struct {
 
 // PaginatedRecipes defines model for PaginatedRecipes.
 type PaginatedRecipes struct {
-	Meta    *List     `json:"meta,omitempty"`
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Meta    *List           `json:"meta,omitempty"`
+	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
-// Recipe defines model for Recipe.
-type Recipe struct {
+// RecipeDetail defines model for RecipeDetail.
+type RecipeDetail struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
+
+	// whether or not it is the most recent version
+	IsLatestVersion *bool `json:"is_latest_version,omitempty"`
 
 	// recipe name
 	Name string `json:"name"`
 
 	// serving quantity
 	Quantity int64 `json:"quantity"`
+
+	// sections of the recipe
+	Sections []RecipeSection `json:"sections"`
 
 	// num servings
 	Servings *int64 `json:"servings,omitempty"`
@@ -159,22 +165,15 @@ type Recipe struct {
 
 	// serving unit
 	Unit string `json:"unit"`
-}
 
-// RecipeDetail defines model for RecipeDetail.
-type RecipeDetail struct {
-
-	// A recipe
-	Recipe Recipe `json:"recipe"`
-
-	// sections of the recipe
-	Sections []RecipeSection `json:"sections"`
+	// version of the recipe
+	Version *int64 `json:"version,omitempty"`
 }
 
 // RecipeSection defines model for RecipeSection.
 type RecipeSection struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// x
@@ -187,6 +186,16 @@ type RecipeSection struct {
 	Minutes int64 `json:"minutes"`
 }
 
+// RecipeWrapper defines model for RecipeWrapper.
+type RecipeWrapper struct {
+
+	// A revision of a recipe
+	Detail RecipeDetail `json:"detail"`
+
+	// id
+	Id string `json:"id"`
+}
+
 // SearchResult defines model for SearchResult.
 type SearchResult struct {
 
@@ -194,7 +203,7 @@ type SearchResult struct {
 	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
 
 	// The recipes
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
 }
 
 // SectionIngredient defines model for SectionIngredient.
@@ -209,7 +218,7 @@ type SectionIngredient struct {
 	// weight in grams
 	Grams float64 `json:"grams"`
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// An Ingredient
@@ -221,8 +230,8 @@ type SectionIngredient struct {
 	// optional
 	Optional *bool `json:"optional,omitempty"`
 
-	// A recipe
-	Recipe *Recipe `json:"recipe,omitempty"`
+	// A revision of a recipe
+	Recipe *RecipeDetail `json:"recipe,omitempty"`
 
 	// unit
 	Unit string `json:"unit"`
@@ -231,7 +240,7 @@ type SectionIngredient struct {
 // SectionInstruction defines model for SectionInstruction.
 type SectionInstruction struct {
 
-	// UUID
+	// id
 	Id string `json:"id"`
 
 	// instruction
@@ -298,7 +307,7 @@ type ListRecipesParams struct {
 }
 
 // CreateRecipesJSONBody defines parameters for CreateRecipes.
-type CreateRecipesJSONBody RecipeDetail
+type CreateRecipesJSONBody RecipeWrapper
 
 // SearchParams defines parameters for Search.
 type SearchParams struct {

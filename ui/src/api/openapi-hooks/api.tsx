@@ -16,14 +16,14 @@ import {
  */
 export interface SectionIngredient {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
    * what kind of ingredient
    */
   kind: "recipe" | "ingredient";
-  recipe?: Recipe;
+  recipe?: RecipeDetail;
   ingredient?: Ingredient;
   /**
    * weight in grams
@@ -52,7 +52,7 @@ export interface SectionIngredient {
  */
 export interface SectionInstruction {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -66,7 +66,7 @@ export interface SectionInstruction {
  */
 export interface RecipeSection {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -86,22 +86,26 @@ export interface RecipeSection {
 /**
  * A recipe with subcomponents
  */
+export interface RecipeWrapper {
+  /**
+   * id
+   */
+  id: string;
+  detail: RecipeDetail;
+}
+
+/**
+ * A revision of a recipe
+ */
 export interface RecipeDetail {
+  /**
+   * id
+   */
+  id: string;
   /**
    * sections of the recipe
    */
   sections: RecipeSection[];
-  recipe: Recipe;
-}
-
-/**
- * A recipe
- */
-export interface Recipe {
-  /**
-   * UUID
-   */
-  id: string;
   /**
    * recipe name
    */
@@ -126,6 +130,14 @@ export interface Recipe {
    * serving unit
    */
   unit: string;
+  /**
+   * version of the recipe
+   */
+  version?: number;
+  /**
+   * whether or not it is the most recent version
+   */
+  is_latest_version?: boolean;
 }
 
 /**
@@ -133,7 +145,7 @@ export interface Recipe {
  */
 export interface Ingredient {
   /**
-   * UUID
+   * id
    */
   id: string;
   /**
@@ -150,7 +162,7 @@ export interface IngredientDetail {
   /**
    * Recipes referencing this ingredient
    */
-  recipes?: Recipe[];
+  recipes?: RecipeDetail[];
   /**
    * Ingredients that are equivalent
    */
@@ -239,7 +251,7 @@ export interface SearchResult {
   /**
    * The recipes
    */
-  recipes?: Recipe[];
+  recipes?: RecipeWrapper[];
 }
 
 export interface Error {
@@ -275,7 +287,7 @@ export interface List {
 }
 
 export interface PaginatedRecipes {
-  recipes?: Recipe[];
+  recipes?: RecipeDetail[];
   meta?: List;
 }
 
@@ -593,7 +605,7 @@ export const useListRecipes = (props: UseListRecipesProps) =>
   );
 
 export type CreateRecipesProps = Omit<
-  MutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
+  MutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
   "path" | "verb"
 >;
 
@@ -601,7 +613,7 @@ export type CreateRecipesProps = Omit<
  * Create a recipe
  */
 export const CreateRecipes = (props: CreateRecipesProps) => (
-  <Mutate<RecipeDetail, Error, void, RecipeDetail, void>
+  <Mutate<RecipeWrapper, Error, void, RecipeWrapper, void>
     verb="POST"
     path={`/recipes`}
     {...props}
@@ -609,7 +621,7 @@ export const CreateRecipes = (props: CreateRecipesProps) => (
 );
 
 export type UseCreateRecipesProps = Omit<
-  UseMutateProps<RecipeDetail, Error, void, RecipeDetail, void>,
+  UseMutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
   "path" | "verb"
 >;
 
@@ -617,7 +629,7 @@ export type UseCreateRecipesProps = Omit<
  * Create a recipe
  */
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
-  useMutate<RecipeDetail, Error, void, RecipeDetail, void>(
+  useMutate<RecipeWrapper, Error, void, RecipeWrapper, void>(
     "POST",
     `/recipes`,
     props
@@ -631,7 +643,7 @@ export interface GetRecipeByIdPathParams {
 }
 
 export type GetRecipeByIdProps = Omit<
-  GetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
+  GetProps<RecipeWrapper, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -640,14 +652,14 @@ export type GetRecipeByIdProps = Omit<
  * Info for a specific recipe
  */
 export const GetRecipeById = ({ recipe_id, ...props }: GetRecipeByIdProps) => (
-  <Get<RecipeDetail, Error, void, GetRecipeByIdPathParams>
+  <Get<RecipeWrapper, Error, void, GetRecipeByIdPathParams>
     path={`/recipes/${recipe_id}`}
     {...props}
   />
 );
 
 export type UseGetRecipeByIdProps = Omit<
-  UseGetProps<RecipeDetail, Error, void, GetRecipeByIdPathParams>,
+  UseGetProps<RecipeWrapper, Error, void, GetRecipeByIdPathParams>,
   "path"
 > &
   GetRecipeByIdPathParams;
@@ -659,8 +671,73 @@ export const useGetRecipeById = ({
   recipe_id,
   ...props
 }: UseGetRecipeByIdProps) =>
-  useGet<RecipeDetail, Error, void, GetRecipeByIdPathParams>(
+  useGet<RecipeWrapper, Error, void, GetRecipeByIdPathParams>(
     (paramsInPath: GetRecipeByIdPathParams) =>
       `/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }
+  );
+
+export interface ConvertIngredientToRecipePathParams {
+  /**
+   * The id of the ingredient
+   */
+  ingredient_id: string;
+}
+
+export type ConvertIngredientToRecipeProps = Omit<
+  MutateProps<
+    RecipeDetail,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >,
+  "path" | "verb"
+> &
+  ConvertIngredientToRecipePathParams;
+
+/**
+ * Converts an ingredient to a recipe, updating all recipes depending on it.
+ */
+export const ConvertIngredientToRecipe = ({
+  ingredient_id,
+  ...props
+}: ConvertIngredientToRecipeProps) => (
+  <Mutate<RecipeDetail, Error, void, void, ConvertIngredientToRecipePathParams>
+    verb="POST"
+    path={`/ingredients/${ingredient_id}/convert_to_recipe`}
+    {...props}
+  />
+);
+
+export type UseConvertIngredientToRecipeProps = Omit<
+  UseMutateProps<
+    RecipeDetail,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >,
+  "path" | "verb"
+> &
+  ConvertIngredientToRecipePathParams;
+
+/**
+ * Converts an ingredient to a recipe, updating all recipes depending on it.
+ */
+export const useConvertIngredientToRecipe = ({
+  ingredient_id,
+  ...props
+}: UseConvertIngredientToRecipeProps) =>
+  useMutate<
+    RecipeDetail,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >(
+    "POST",
+    (paramsInPath: ConvertIngredientToRecipePathParams) =>
+      `/ingredients/${paramsInPath.ingredient_id}/convert_to_recipe`,
+    { pathParams: { ingredient_id }, ...props }
   );

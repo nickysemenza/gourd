@@ -80,3 +80,5 @@ generate-openapi: validate-openapi
 	cd ui && yarn run generate-fetcher
 
 	go generate ./api
+cy:
+	cd ui && yarn run cy:open

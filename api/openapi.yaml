@@ -164,7 +164,7 @@ paths:
       tags:
         - ingredients
       requestBody:
-        description: Creates a ingredient by payload. If the UUID/name exists, it errors
+        description: Creates a ingredient by payload. If the id/name exists, it errors
         required: true
         content:
           application/json:
@@ -204,17 +204,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedRecipes"
-          # content:
-          #   application/json:
-          #     schema:
-          #       allOf:
-          #         - $ref: "#/components/schemas/List"
-          #         - type: object
-          #           properties:
-          #             items:
-          #               # type: object
-          #               # items:
-          #               $ref: "#/components/schemas/Recipes"
         default:
           description: unexpected error
           content:
@@ -227,19 +216,19 @@ paths:
       tags:
         - recipes
       requestBody:
-        description: Creates a recipe by payload. If the UUID/name exists, it errors
+        description: Creates a recipe by payload. If the id/name exists, it errors
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecipeDetail"
+              $ref: "#/components/schemas/RecipeWrapper"
       responses:
         "201":
           description: Newly created recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: "#/components/schemas/RecipeWrapper"
         default:
           description: unexpected error
           content:
@@ -265,38 +254,40 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: "#/components/schemas/RecipeWrapper"
         default:
           description: unexpected error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-    # put:
-    #   summary: Update a recipe
-    #   operationId: update_recipe_by_id
-    #   tags:
-    #     - recipes
-    #   parameters:
-    #     - name: recipe_id
-    #       in: path
-    #       required: true
-    #       description: The id of the recipe to retrieve
-    #       schema:
-    #         type: string
-    #   responses:
-    #     "200":
-    #       description: Expected response to a valid request
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/RecipeDetail"
-    #     default:
-    #       description: unexpected error
-    #       content:
-    #         application/json:
-    #           schema:
-    #             $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/convert_to_recipe:
+    post:
+      summary: Converts an ingredient to a recipe, updating all recipes depending on it.
+      operationId: convert_ingredient_to_recipe
+      tags:
+        - recipes
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Newly converted ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -318,20 +309,15 @@ components:
         - adjective
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         kind:
           description: what kind of ingredient
           type: string
           enum: [recipe, ingredient]
-        # info:
-        #   type: object
-        #   oneOf:
-        #     - $ref: "#/components/schemas/Recipe"
-        #     - $ref: "#/components/schemas/Ingredient"
         recipe:
           type: object
-          $ref: "#/components/schemas/Recipe"
+          $ref: "#/components/schemas/RecipeDetail"
         ingredient:
           type: object
           $ref: "#/components/schemas/Ingredient"
@@ -360,7 +346,7 @@ components:
         - instruction
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         instruction:
           description: instruction
@@ -375,7 +361,7 @@ components:
         - ingredients
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         minutes:
           description: How many minutes the step takes, approximately (todo - make this a range)
@@ -391,33 +377,37 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SectionIngredient"
-    RecipeDetail:
+    RecipeWrapper:
       description: A recipe with subcomponents
       type: object
       required:
-        - sections
-        - recipe
+        - detail
+        - id
       properties:
-        sections:
-          description: sections of the recipe
-          type: array
-          items:
-            $ref: "#/components/schemas/RecipeSection"
-        recipe:
+        id:
+          description: id
+          type: string
+        detail:
           description: The recipe
-          $ref: "#/components/schemas/Recipe"
-    Recipe:
-      description: A recipe
+          $ref: "#/components/schemas/RecipeDetail"
+    RecipeDetail:
+      description: A revision of a recipe
       type: object
       required:
         - id
         - name
         - quantity
         - unit
+        - sections
       properties:
         id:
-          description: UUID
+          description: id
           type: string
+        sections:
+          description: sections of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSection"          
         name:
           description: recipe name
           type: string
@@ -439,8 +429,13 @@ components:
         unit:
           description: serving unit
           type: string
-        # tag:
-        # type: string
+        version:
+          description: version of the recipe
+          type: integer
+          format: int64
+        is_latest_version:
+          description: whether or not it is the most recent version
+          type: boolean
     Ingredient:
       description: "An Ingredient"
       type: object
@@ -449,7 +444,7 @@ components:
         - name
       properties:
         id:
-          description: UUID
+          description: id
           type: string
         name:
           description: Ingredient name
@@ -459,8 +454,6 @@ components:
       type: object
       required:
         - ingredient
-        # - recipes
-        # - children
       properties:
         ingredient:
           description: the ingredient
@@ -470,16 +463,12 @@ components:
           description: Recipes referencing this ingredient
           type: array
           items:
-            $ref: "#/components/schemas/Recipe"
+            $ref: "#/components/schemas/RecipeDetail"
         children:
           description: Ingredients that are equivalent
           type: array
           items:
             $ref: "#/components/schemas/Ingredient"
-    # Recipes:
-    #   type: array
-    #   items:
-    #     $ref: "#/components/schemas/Recipe"
     GooglePhotosAlbum:
       description: an album containing `GooglePhoto`
       type: object
@@ -568,7 +557,7 @@ components:
           description: The recipes
           type: array
           items:          
-            $ref: "#/components/schemas/Recipe"            
+            $ref: "#/components/schemas/RecipeWrapper"            
     Error:
       type: object
       required: ["message"]
@@ -618,9 +607,7 @@ components:
         recipes:
           type: array
           items:
-            $ref: "#/components/schemas/Recipe"
-        # data2:
-        #   $ref: "#/components/schemas/Recipes"
+            $ref: "#/components/schemas/RecipeDetail"
         meta:
           $ref: "#/components/schemas/List"
     PaginatedIngredients:

@@ -8,6 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
+	"github.com/nickysemenza/gourd/common"
 	"gopkg.in/guregu/null.v3/zero"
 )
 
@@ -96,8 +97,8 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 		// 	Where(sq.GtOrEq{"ate_at": fmt.Sprintf("timestamp '%s' - INTERVAL '1 hour'", target)}).
 		// 	Limit(1)
 		var mealID string
-		// err := c.getContext(ctx, q, uuid)
-		err := c.db.GetContext(ctx, &mealID, `select uuid from meals
+		// err := c.getContext(ctx, q, id)
+		err := c.db.GetContext(ctx, &mealID, `select id from meals
 WHERE ate_at > $1::timestamp - INTERVAL '1 hour'
 AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 		if err != nil {
@@ -105,8 +106,8 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 				return err
 			}
 			// insert
-			mealID = GetUUID()
-			iq := c.psql.Insert("meals").Columns("uuid", "ate_at", "name").Values(mealID, m.Created, mealID)
+			mealID = common.UUID()
+			iq := c.psql.Insert("meals").Columns("id", "ate_at", "name").Values(mealID, m.Created, mealID)
 			_, err := c.execContext(ctx, iq)
 			if err != nil {
 				return err
@@ -125,7 +126,7 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
 }
 
 type Meal struct {
-	ID    string    `db:"uuid"`
+	ID    string    `db:"id"`
 	Name  string    `db:"name"`
 	AteAt time.Time `db:"ate_at"`
 }
@@ -133,7 +134,7 @@ type Meal struct {
 func (c *Client) GetAllMeals(ctx context.Context) ([]Meal, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
-	q := c.psql.Select("uuid", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
+	q := c.psql.Select("id", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
 	var results []Meal
 	err := c.selectContext(ctx, q, &results)
 	return results, err

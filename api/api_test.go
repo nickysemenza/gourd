@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/deepmap/oapi-codegen/pkg/testutil"
-	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 	echo_middleware "github.com/labstack/echo/v4/middleware"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/stretchr/testify/require"
@@ -25,8 +25,8 @@ func TestAPI(t *testing.T) {
 	e.Use(echo_middleware.Logger())
 	RegisterHandlers(e, apiManager)
 
-	rName := fmt.Sprintf("recipe-%s", getUUID(t))
-	iName := fmt.Sprintf("ing-%s", getUUID(t))
+	rName := fmt.Sprintf("recipe-%s", common.UUID())
+	iName := fmt.Sprintf("ing-%s", common.UUID())
 
 	newIngredient := Ingredient{Name: iName}
 
@@ -54,32 +54,35 @@ func TestAPI(t *testing.T) {
 		require.True(found)
 	}
 
-	makeRecipe := func(newRecipe RecipeDetail) RecipeDetail {
+	makeRecipe := func(newRecipe RecipeWrapper) RecipeWrapper {
 		result := testutil.NewRequest().Post("/recipes").WithJsonBody(newRecipe).Go(t, e)
 		require.Equal(http.StatusCreated, result.Code(), result.Recorder.Body)
 
-		var resultRecipe RecipeDetail
+		var resultRecipe RecipeWrapper
 		err := result.UnmarshalBodyToObject(&resultRecipe)
 		require.NoError(err)
 		return resultRecipe
 	}
-	uuid := ""
+	id := ""
 	{
 		w := 12.5
-		newRecipe := RecipeDetail{
-			Recipe: Recipe{Name: rName},
-			Sections: []RecipeSection{{Minutes: 3,
-				Instructions: []SectionInstruction{{Instruction: "mix"}},
-				Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
-			}},
+		newRecipe := RecipeWrapper{
+			Detail: RecipeDetail{Name: rName,
+				Sections: []RecipeSection{{Minutes: 3,
+					Instructions: []SectionInstruction{{Instruction: "mix"}},
+					Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
+				}}},
 		}
 		resultRecipe := makeRecipe(newRecipe)
 
-		require.Equal(resultRecipe.Recipe.Name, newRecipe.Recipe.Name)
-		uuid = resultRecipe.Recipe.Id
+		require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
+		id = resultRecipe.Detail.Id
 
-		newRecipe.Recipe.Name += "sub"
-		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{Grams: w, Recipe: &resultRecipe.Recipe, Kind: "recipe"})
+		newRecipe.Detail.Name += "sub"
+		newRecipe.Detail.Sections[0].Ingredients = append(newRecipe.Detail.Sections[0].Ingredients, SectionIngredient{
+			Grams:  w,
+			Recipe: &RecipeDetail{Id: resultRecipe.Id},
+			Kind:   "recipe"})
 		makeRecipe(newRecipe)
 
 	}
@@ -91,22 +94,15 @@ func TestAPI(t *testing.T) {
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)
 		// require.Contains(results, name)
-		// require.Equal(resultRecipe.Recipe.Name, newRecipe.Recipe.Name)
+		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
 	}
 	{
-		result := testutil.NewRequest().Get("/recipes/"+uuid).Go(t, e)
+		result := testutil.NewRequest().Get("/recipes/"+id).Go(t, e)
 		require.Equal(http.StatusOK, result.Code())
-		var results RecipeDetail
+		var results RecipeWrapper
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)
 		// require.Contains(results, name)
-		require.Equal(results.Recipe.Name, rName)
+		require.Equal(results.Detail.Name, rName)
 	}
-}
-
-func getUUID(t *testing.T) string {
-	t.Helper()
-	u, err := uuid.NewV4()
-	require.NoError(t, err)
-	return u.String()
 }

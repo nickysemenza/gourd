@@ -21,7 +21,7 @@ import (
 )
 
 // FetchAndTransform returns a recipe.
-func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeDetail, error) {
+func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string, kind string) (string, error)) (*api.RecipeWrapper, error) {
 	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 	html, err := getHTML(ctx, addr)
@@ -47,13 +47,13 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 		}
 		debugMsgs = append(debugMsgs, i.ToString())
 		fmt.Println(i.ToString())
-		uuid, err := ingredientToUUID(ctx, i.Name, "ingredient")
+		id, err := ingredientToId(ctx, i.Name, "ingredient")
 		if err != nil {
-			return nil, fmt.Errorf("failed to map ingredient %s to uuid: %w", i.Name, err)
+			return nil, fmt.Errorf("failed to map ingredient %s to id: %w", i.Name, err)
 		}
-		spew.Dump(uuid)
+		spew.Dump(id)
 		section.Ingredients = append(section.Ingredients, api.SectionIngredient{
-			Ingredient: &api.Ingredient{Id: uuid},
+			Ingredient: &api.Ingredient{Id: id},
 			Kind:       "ingredient",
 			Amount:     &i.Volume.Value,
 			Unit:       i.Volume.Unit,
@@ -70,16 +70,16 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToUUID func(c
 	}
 
 	source := fmt.Sprintf("todo: %s %s", u.Host, addr)
-	r := api.RecipeDetail{
-		Recipe: api.Recipe{
-			Name:   recipe.Name,
-			Source: &source,
+	r := api.RecipeWrapper{
+		Detail: api.RecipeDetail{
+			Name:     recipe.Name,
+			Source:   &source,
+			Sections: []api.RecipeSection{section},
 			// Source: &api.Source{
 			// 	Name: u.Host,
 			// 	Meta: addr,
 			// },
 		},
-		Sections: []api.RecipeSection{section},
 	}
 	spew.Dump(r, debugMsgs)
 

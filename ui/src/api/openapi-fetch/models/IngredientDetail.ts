@@ -18,10 +18,10 @@ import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailFromJSONTyped,
+    RecipeDetailToJSON,
 } from './';
 
 /**
@@ -38,10 +38,10 @@ export interface IngredientDetail {
     ingredient: Ingredient;
     /**
      * Recipes referencing this ingredient
-     * @type {Array<Recipe>}
+     * @type {Array<RecipeDetail>}
      * @memberof IngredientDetail
      */
-    recipes?: Array<Recipe>;
+    recipes?: Array<RecipeDetail>;
     /**
      * Ingredients that are equivalent
      * @type {Array<Ingredient>}
@@ -61,7 +61,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'ingredient': json['ingredient'],
-        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeFromJSON)),
+        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientFromJSON)),
     };
 }
@@ -76,7 +76,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
     return {
         
         'ingredient': value.ingredient,
-        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeToJSON)),
+        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientToJSON)),
     };
 }

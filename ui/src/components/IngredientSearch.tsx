@@ -14,7 +14,7 @@ export interface Results {
 
 export interface ResultItem {
   title: string;
-  uuid: string;
+  id: string;
   kind: "recipe" | "ingredient";
 }
 export interface ResultType {
@@ -59,7 +59,7 @@ const IngredientSearch: React.FC<{
     if (newValue.__isNew__) {
       handleCreate(newValue);
     } else {
-      callback({ name: newValue.label, id: newValue.uuid }, newValue.kind);
+      callback({ name: newValue.label, id: newValue.id }, newValue.kind);
     }
     setV(newValue);
   };
@@ -71,12 +71,12 @@ const IngredientSearch: React.FC<{
       ...(data?.ingredients || []).map((i) => ({
         label: i.name,
         kind: "ingredient",
-        uuid: i.id,
+        id: i.id,
       })),
       ...(data?.recipes || []).map((i) => ({
-        label: i.name + " (Recipe)",
+        label: i.detail.name + " (Recipe) (v " + i.detail.version + ")",
         kind: "recipe",
-        uuid: i.id,
+        id: i.id,
       })),
     ]);
   };

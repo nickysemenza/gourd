@@ -154,7 +154,7 @@ func wrapHandler(h http.Handler) http.Handler {
 func (s *Server) Scrape(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
-	recipe, err := scraper.FetchAndTransform(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html", s.APIManager.IngredientUUIDByName)
+	recipe, err := scraper.FetchAndTransform(ctx, "https://www.seriouseats.com/recipes/2013/12/roasted-kabocha-squash-soy-sauce-butter-shichimi-recipe.html", s.APIManager.IngredientIdByName)
 	if err != nil {
 		writeErr(w, err)
 		return

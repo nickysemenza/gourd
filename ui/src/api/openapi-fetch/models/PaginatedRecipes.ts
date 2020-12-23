@@ -18,10 +18,10 @@ import {
     ListFromJSON,
     ListFromJSONTyped,
     ListToJSON,
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailFromJSONTyped,
+    RecipeDetailToJSON,
 } from './';
 
 /**
@@ -32,10 +32,10 @@ import {
 export interface PaginatedRecipes {
     /**
      * 
-     * @type {Array<Recipe>}
+     * @type {Array<RecipeDetail>}
      * @memberof PaginatedRecipes
      */
-    recipes?: Array<Recipe>;
+    recipes?: Array<RecipeDetail>;
     /**
      * 
      * @type {List}
@@ -54,7 +54,7 @@ export function PaginatedRecipesFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeFromJSON)),
+        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
     };
 }
@@ -68,7 +68,7 @@ export function PaginatedRecipesToJSON(value?: PaginatedRecipes | null): any {
     }
     return {
         
-        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeToJSON)),
+        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'meta': ListToJSON(value.meta),
     };
 }
