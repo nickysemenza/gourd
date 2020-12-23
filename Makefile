@@ -38,16 +38,16 @@ bin/air:
 	@mkdir -p $(dir $@)
 	go build -o $@ ./vendor/github.com/cosmtrek/air
 
-bin/revive:
+bin/golangci-lint:
 	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/mgechev/revive
+	go build -o $@ ./vendor/github.com/golangci/golangci-lint/cmd/golangci-lint
 bin/migrate:
 	@mkdir -p $(dir $@)
 	go build -tags 'postgres' -o $@ ./vendor/github.com/golang-migrate/migrate/v4/cmd/migrate
 unit-test: 
 	go test -v -race -cover ./...
-lint: bin/revive
-	bin/revive -config revive.toml -formatter=friendly -exclude=vendor/... ./... || (echo "lint failed"; exit 1)	
+lint: bin/golangci-lint
+	bin/golangci-lint run || (echo "lint failed"; exit 1)	
 
 IMAGE := nicky/gourd-backend
 docker-build:

@@ -17,14 +17,14 @@ require (
 	github.com/getsentry/sentry-go v0.9.0
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
+	github.com/golangci/golangci-lint v1.33.0
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
 	github.com/gphotosuploader/googlemirror v0.5.0
-	github.com/jmoiron/sqlx v1.2.0
+	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/kjk/notionapi v0.0.0-20201107214737-0d0221669d7c
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/lib/pq v1.9.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
-	github.com/mgechev/revive v1.0.2
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1

@@ -115,8 +115,8 @@ func init() {
 					return err
 				}
 
-				for _, r := range recipes {
-					out, err := s.APIManager.CreateRecipe(ctx, &r)
+				for x := range recipes {
+					out, err := s.APIManager.CreateRecipe(ctx, &recipes[x])
 					if err != nil {
 						return err
 					}

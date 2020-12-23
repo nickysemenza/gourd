@@ -93,7 +93,7 @@ func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDeta
 	ctx, span := c.tracer.Start(ctx, "insertRecipe")
 	defer span.End()
 	if r.Id == "" {
-		//todo? needed?
+		// todo? needed?
 		r.Id = common.UUID()
 	}
 	log.Println("inserting", r.Id, r.Name)
