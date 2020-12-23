@@ -1,6 +1,9 @@
+// +build integration
+
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -105,4 +108,16 @@ func TestAPI(t *testing.T) {
 		// require.Contains(results, name)
 		require.Equal(results.Detail.Name, rName)
 	}
+}
+
+func TestRecipeReferencingRecipe(t *testing.T) {
+	require := require.New(t)
+	ctx := context.Background()
+	r, err := RecipeFromFile(ctx, "../testdata/dep_1.yaml")
+	require.NoError(err)
+	tdb := db.NewDB(t)
+	m := manager.New(tdb, nil, nil)
+	apiManager := NewAPI(m)
+	_, err = apiManager.CreateRecipe(ctx, &RecipeWrapper{Detail: r[0]})
+	require.NoError(err)
 }
