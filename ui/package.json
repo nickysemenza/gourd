@@ -82,7 +82,7 @@
     "@openapitools/openapi-generator-cli": "^2.1.13",
     "autoprefixer": "^10.1.0",
     "chokidar-cli": "^2.1.0",
-    "cypress": "^6.1.0",
+    "cypress": "^6.2.0",
     "cypress-terminal-report": "^2.4.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.1",
