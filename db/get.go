@@ -74,6 +74,22 @@ func (c *Client) GetIngredientById(ctx context.Context, id string) (*Ingredient,
 	return ingredient, nil
 }
 
+func (c *Client) getIngredientsById(ctx context.Context, id ...string) (map[string]Ingredient, error) {
+	ctx, span := c.tracer.Start(ctx, "getIngredientsById")
+	defer span.End()
+
+	var i []Ingredient
+	err := c.selectContext(ctx, c.psql.Select("*").From(ingredientsTable).Where(sq.Eq{"id": id}), &i)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	byId := map[string]Ingredient{}
+	for _, ing := range i {
+		byId[ing.Id] = ing
+	}
+	return byId, nil
+}
+
 // GetRecipeById gets a recipe by name, shallowly.
 func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailWhere")
@@ -177,6 +193,8 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 		return nil, err
 	}
 
+	var ingredientIds []string
+
 	for x, s := range r.Sections {
 		r.Sections[x].Instructions, err = c.GetSectionInstructions(ctx, s.Id)
 		if err != nil {
@@ -186,14 +204,9 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 		if err != nil {
 			return nil, err
 		}
-
 		for y, i := range r.Sections[x].Ingredients {
 			if i.IngredientId.String != "" {
-				ing, err := c.GetIngredientById(ctx, i.IngredientId.String)
-				if err != nil {
-					return nil, err
-				}
-				r.Sections[x].Ingredients[y].RawIngredient = ing
+				ingredientIds = append(ingredientIds, i.IngredientId.String)
 			}
 			if i.RecipeId.String != "" {
 				rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeId.String})
@@ -201,6 +214,19 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 					return nil, err
 				}
 				r.Sections[x].Ingredients[y].RawRecipe = rec
+			}
+		}
+	}
+	// load  all ingredients from all sections in one go
+	ingredientsById, err := c.getIngredientsById(ctx, ingredientIds...)
+	if err != nil {
+		return nil, err
+	}
+	for x := range r.Sections {
+		for y, i := range r.Sections[x].Ingredients {
+			if i.IngredientId.String != "" {
+				res := ingredientsById[i.IngredientId.String]
+				r.Sections[x].Ingredients[y].RawIngredient = &res
 			}
 		}
 	}

@@ -18,9 +18,13 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "quantity" INTEGER,
   "unit" TEXT,
   "version" INTEGER NOT NULL,
+  "is_latest_version" BOOLEAN DEFAULT FALSE,
   PRIMARY KEY ("id"),
   unique("recipe", "version")
 );
+-- https://stackoverflow.com/a/11014977
+create unique index one_latest_revision_of_recipe on recipe_details (recipe)
+where is_latest_version;
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "id" TEXT NOT NULL UNIQUE,
   "recipe_detail" TEXT references recipe_details(id) NOT NULL,

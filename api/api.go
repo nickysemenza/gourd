@@ -32,12 +32,13 @@ func NewAPI(m *manager.Manager) *API {
 
 func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 	return RecipeDetail{
-		Id:           dbr.Id,
-		Name:         dbr.Name,
-		Source:       dbr.Source.Ptr(),
-		TotalMinutes: dbr.TotalMinutes.Ptr(),
-		Version:      &dbr.Version,
-		Sections:     transformRecipeSections(dbr.Sections),
+		Id:              dbr.Id,
+		Name:            dbr.Name,
+		Source:          dbr.Source.Ptr(),
+		TotalMinutes:    dbr.TotalMinutes.Ptr(),
+		Version:         &dbr.Version,
+		IsLatestVersion: &dbr.LatestVersion,
+		Sections:        transformRecipeSections(dbr.Sections),
 	}
 }
 func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
