@@ -23,26 +23,35 @@ func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) (
 }
 
 // GetSectionInstructions finds the instructions for a section.
-func (c *Client) GetSectionInstructions(ctx context.Context, sectionId string) ([]SectionInstruction, error) {
+func (c *Client) GetSectionInstructions(ctx context.Context, sectionId []string) (map[string][]SectionInstruction, error) {
 	ctx, span := c.tracer.Start(ctx, "GetSectionInstructions")
 	defer span.End()
 	var res []SectionInstruction
 	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
 		return nil, err
 	}
-	return res, nil
+	byId := make(map[string][]SectionInstruction)
+	for _, i := range res {
+		byId[i.SectionId] = append(byId[i.SectionId], i)
+	}
+	return byId, nil
 
 }
 
 // GetSectionIngredients finds the ingredients for a section.
-func (c *Client) GetSectionIngredients(ctx context.Context, sectionId string) ([]SectionIngredient, error) {
+func (c *Client) GetSectionIngredients(ctx context.Context, sectionId []string) (map[string][]SectionIngredient, error) {
 	ctx, span := c.tracer.Start(ctx, "GetSectionIngredients")
 	defer span.End()
+
 	var res []SectionIngredient
 	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
 		return nil, err
 	}
-	return res, nil
+	byId := make(map[string][]SectionIngredient)
+	for _, i := range res {
+		byId[i.SectionId] = append(byId[i.SectionId], i)
+	}
+	return byId, nil
 }
 
 // GetIngredientById finds an ingredient.
@@ -91,7 +100,7 @@ func (c *Client) getIngredientsById(ctx context.Context, id ...string) (map[stri
 }
 
 // GetRecipeById gets a recipe by name, shallowly.
-func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Eq) (*RecipeDetail, error) {
+func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Sqlizer) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailWhere")
 	defer span.End()
 	return c.getRecipeDetail(ctx,
@@ -193,16 +202,31 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 		return nil, err
 	}
 
-	var ingredientIds []string
+	var sectionIds []string
+	for _, s := range r.Sections {
+		sectionIds = append(sectionIds, s.Id)
+	}
+	sIns, err := c.GetSectionInstructions(ctx, sectionIds)
+	if err != nil {
+		return nil, err
+	}
 
+	sIng, err := c.GetSectionIngredients(ctx, sectionIds)
+	if err != nil {
+		return nil, err
+	}
+
+	var ingredientIds []string
 	for x, s := range r.Sections {
-		r.Sections[x].Instructions, err = c.GetSectionInstructions(ctx, s.Id)
-		if err != nil {
-			return nil, err
+		for sectionId, i := range sIns {
+			if s.Id == sectionId {
+				r.Sections[x].Instructions = i
+			}
 		}
-		r.Sections[x].Ingredients, err = c.GetSectionIngredients(ctx, s.Id)
-		if err != nil {
-			return nil, err
+		for sectionId, i := range sIng {
+			if s.Id == sectionId {
+				r.Sections[x].Ingredients = i
+			}
 		}
 		for y, i := range r.Sections[x].Ingredients {
 			if i.IngredientId.String != "" {
