@@ -151,6 +151,9 @@ type RecipeDetail struct {
 	// serving quantity
 	Quantity int64 `json:"quantity"`
 
+	// sections of the recipe
+	Sections []RecipeSection `json:"sections"`
+
 	// num servings
 	Servings *int64 `json:"servings,omitempty"`
 
@@ -191,9 +194,6 @@ type RecipeWrapper struct {
 
 	// id
 	Id string `json:"id"`
-
-	// sections of the recipe
-	Sections []RecipeSection `json:"sections"`
 }
 
 // SearchResult defines model for SearchResult.

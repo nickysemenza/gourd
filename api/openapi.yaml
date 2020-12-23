@@ -381,18 +381,12 @@ components:
       description: A recipe with subcomponents
       type: object
       required:
-        - sections
         - detail
         - id
       properties:
         id:
           description: id
           type: string
-        sections:
-          description: sections of the recipe
-          type: array
-          items:
-            $ref: "#/components/schemas/RecipeSection"
         detail:
           description: The recipe
           $ref: "#/components/schemas/RecipeDetail"
@@ -404,10 +398,16 @@ components:
         - name
         - quantity
         - unit
+        - sections
       properties:
         id:
           description: id
           type: string
+        sections:
+          description: sections of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSection"          
         name:
           description: recipe name
           type: string

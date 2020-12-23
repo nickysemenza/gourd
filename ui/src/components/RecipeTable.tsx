@@ -52,7 +52,7 @@ const RecipeTable: React.FC<TableProps> = ({
   addSection,
 }) => {
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
-  const flourMass = (recipe.sections || []).reduce(
+  const flourMass = (recipe.detail.sections || []).reduce(
     (acc, section) =>
       acc +
       section.ingredients
@@ -222,7 +222,7 @@ const RecipeTable: React.FC<TableProps> = ({
         </TableCell>
         <TableCell>Instructions</TableCell>
       </TableRow>
-      {recipe.sections?.map((section, x) => renderRow(section, x))}
+      {recipe.detail.sections?.map((section, x) => renderRow(section, x))}
       {edit && (
         <div className="add-item" onClick={() => addSection()}>
           add section

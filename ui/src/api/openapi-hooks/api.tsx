@@ -91,10 +91,6 @@ export interface RecipeWrapper {
    * id
    */
   id: string;
-  /**
-   * sections of the recipe
-   */
-  sections: RecipeSection[];
   detail: RecipeDetail;
 }
 
@@ -106,6 +102,10 @@ export interface RecipeDetail {
    * id
    */
   id: string;
+  /**
+   * sections of the recipe
+   */
+  sections: RecipeSection[];
   /**
    * recipe name
    */

@@ -37,13 +37,13 @@ func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 		Source:       dbr.Source.Ptr(),
 		TotalMinutes: dbr.TotalMinutes.Ptr(),
 		Version:      &dbr.Version,
+		Sections:     transformRecipeSections(dbr.Sections),
 	}
 }
 func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
 	return &RecipeWrapper{
-		Id:       dbr.RecipeId,
-		Detail:   transformRecipe(*dbr),
-		Sections: transformRecipeSections(dbr.Sections),
+		Id:     dbr.RecipeId,
+		Detail: transformRecipe(*dbr),
 	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
@@ -58,7 +58,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 		TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
 	}
 
-	for _, s := range r.Sections {
+	for _, s := range r.Detail.Sections {
 		dbs := db.Section{
 			Minutes: zero.IntFrom(s.Minutes),
 		}

@@ -67,11 +67,11 @@ func TestAPI(t *testing.T) {
 	{
 		w := 12.5
 		newRecipe := RecipeWrapper{
-			Detail: RecipeDetail{Name: rName},
-			Sections: []RecipeSection{{Minutes: 3,
-				Instructions: []SectionInstruction{{Instruction: "mix"}},
-				Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
-			}},
+			Detail: RecipeDetail{Name: rName,
+				Sections: []RecipeSection{{Minutes: 3,
+					Instructions: []SectionInstruction{{Instruction: "mix"}},
+					Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
+				}}},
 		}
 		resultRecipe := makeRecipe(newRecipe)
 
@@ -79,7 +79,7 @@ func TestAPI(t *testing.T) {
 		id = resultRecipe.Detail.Id
 
 		newRecipe.Detail.Name += "sub"
-		newRecipe.Sections[0].Ingredients = append(newRecipe.Sections[0].Ingredients, SectionIngredient{
+		newRecipe.Detail.Sections[0].Ingredients = append(newRecipe.Detail.Sections[0].Ingredients, SectionIngredient{
 			Grams:  w,
 			Recipe: &RecipeDetail{Id: resultRecipe.Id},
 			Kind:   "recipe"})

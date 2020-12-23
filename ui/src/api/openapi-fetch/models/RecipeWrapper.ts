@@ -18,10 +18,6 @@ import {
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
-    RecipeSection,
-    RecipeSectionFromJSON,
-    RecipeSectionFromJSONTyped,
-    RecipeSectionToJSON,
 } from './';
 
 /**
@@ -36,12 +32,6 @@ export interface RecipeWrapper {
      * @memberof RecipeWrapper
      */
     id: string;
-    /**
-     * sections of the recipe
-     * @type {Array<RecipeSection>}
-     * @memberof RecipeWrapper
-     */
-    sections: Array<RecipeSection>;
     /**
      * 
      * @type {RecipeDetail}
@@ -61,7 +51,6 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'],
-        'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'detail': RecipeDetailFromJSON(json['detail']),
     };
 }
@@ -76,7 +65,6 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
     return {
         
         'id': value.id,
-        'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'detail': RecipeDetailToJSON(value.detail),
     };
 }

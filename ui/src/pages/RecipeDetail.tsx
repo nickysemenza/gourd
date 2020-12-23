@@ -89,20 +89,22 @@ const RecipeDetail: React.FC = () => {
     const { id, name } = ingredient;
     setRecipe(
       update(recipe, {
-        sections: {
-          [sectionID]: {
-            ingredients: {
-              [ingredientID]: {
-                recipe: {
-                  $set:
-                    kind === "recipe"
-                      ? { id, name, quantity: 0, unit: "" }
-                      : undefined,
+        detail: {
+          sections: {
+            [sectionID]: {
+              ingredients: {
+                [ingredientID]: {
+                  recipe: {
+                    $set:
+                      kind === "recipe"
+                        ? { id, name, quantity: 0, unit: "", sections: [] }
+                        : undefined,
+                  },
+                  ingredient: {
+                    $set: kind === "ingredient" ? { id, name } : undefined,
+                  },
+                  kind: { $set: kind },
                 },
-                ingredient: {
-                  $set: kind === "ingredient" ? { id, name } : undefined,
-                },
-                kind: { $set: kind },
               },
             },
           },
@@ -119,31 +121,35 @@ const RecipeDetail: React.FC = () => {
     if (edit) {
       setRecipe(
         update(recipe, {
-          sections: {
-            [sectionID]: {
-              ingredients: {
-                [ingredientID]: {
-                  // info: {
-                  //   id: "",
-                  //   name: {
-                  //     $apply: (v) => (attr === "name" ? value : v),
-                  //   },
-                  // },
-                  // yikes
-                  grams: {
-                    $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
-                  },
-                  amount: {
-                    $apply: (v) => (attr === "amount" ? parseFloat(value) : v),
-                  },
-                  unit: {
-                    $apply: (v) => (attr === "unit" ? value : v),
-                  },
-                  adjective: {
-                    $apply: (v) => (attr === "adjective" ? value : v),
-                  },
-                  optional: {
-                    $apply: (v) => (attr === "optional" ? value === "true" : v),
+          detail: {
+            sections: {
+              [sectionID]: {
+                ingredients: {
+                  [ingredientID]: {
+                    // info: {
+                    //   id: "",
+                    //   name: {
+                    //     $apply: (v) => (attr === "name" ? value : v),
+                    //   },
+                    // },
+                    // yikes
+                    grams: {
+                      $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
+                    },
+                    amount: {
+                      $apply: (v) =>
+                        attr === "amount" ? parseFloat(value) : v,
+                    },
+                    unit: {
+                      $apply: (v) => (attr === "unit" ? value : v),
+                    },
+                    adjective: {
+                      $apply: (v) => (attr === "adjective" ? value : v),
+                    },
+                    optional: {
+                      $apply: (v) =>
+                        attr === "optional" ? value === "true" : v,
+                    },
                   },
                 },
               },
@@ -153,7 +159,7 @@ const RecipeDetail: React.FC = () => {
       );
     } else {
       const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-      const { grams, amount } = recipe.sections[sectionID]!.ingredients[
+      const { grams, amount } = recipe.detail.sections[sectionID]!.ingredients[
         ingredientID
       ];
 
@@ -199,10 +205,12 @@ const RecipeDetail: React.FC = () => {
     edit &&
       setRecipe(
         update(recipe, {
-          sections: {
-            [sectionID]: {
-              instructions: {
-                [instructionID]: { instruction: { $set: value } },
+          detail: {
+            sections: {
+              [sectionID]: {
+                instructions: {
+                  [instructionID]: { instruction: { $set: value } },
+                },
               },
             },
           },
@@ -221,10 +229,12 @@ const RecipeDetail: React.FC = () => {
   const addInstruction = (sectionID: number) => {
     setRecipe(
       update(recipe, {
-        sections: {
-          [sectionID]: {
-            instructions: {
-              $push: [{ id: "", instruction: "" }],
+        detail: {
+          sections: {
+            [sectionID]: {
+              instructions: {
+                $push: [{ id: "", instruction: "" }],
+              },
             },
           },
         },
@@ -235,21 +245,23 @@ const RecipeDetail: React.FC = () => {
   const addIngredient = (sectionID: number) => {
     setRecipe(
       update(recipe, {
-        sections: {
-          [sectionID]: {
-            ingredients: {
-              $push: [
-                {
-                  id: "",
-                  grams: 1,
-                  kind: "ingredient",
-                  // info: { name: "", id: "", __typename: "Ingredient" },
-                  amount: 0,
-                  unit: "",
-                  adjective: "",
-                  optional: false,
-                },
-              ],
+        detail: {
+          sections: {
+            [sectionID]: {
+              ingredients: {
+                $push: [
+                  {
+                    id: "",
+                    grams: 1,
+                    kind: "ingredient",
+                    // info: { name: "", id: "", __typename: "Ingredient" },
+                    amount: 0,
+                    unit: "",
+                    adjective: "",
+                    optional: false,
+                  },
+                ],
+              },
             },
           },
         },
@@ -259,8 +271,10 @@ const RecipeDetail: React.FC = () => {
   const addSection = () => {
     setRecipe(
       update(recipe, {
-        sections: {
-          $push: [{ id: "", minutes: 0, ingredients: [], instructions: [] }],
+        detail: {
+          sections: {
+            $push: [{ id: "", minutes: 0, ingredients: [], instructions: [] }],
+          },
         },
       })
     );

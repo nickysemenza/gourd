@@ -1,8 +1,12 @@
-import { Ingredient, SectionIngredient, Recipe } from "./api/openapi-hooks/api";
+import {
+  Ingredient,
+  SectionIngredient,
+  RecipeDetail,
+} from "./api/openapi-hooks/api";
 
 export const getIngredient = (
   si: Partial<SectionIngredient>
-): { name: "" } | Recipe | Ingredient => {
+): { name: "" } | RecipeDetail | Ingredient => {
   if (si.recipe) {
     return si.recipe;
   } else if (si.ingredient) {

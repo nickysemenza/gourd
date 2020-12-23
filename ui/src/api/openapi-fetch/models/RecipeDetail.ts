@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    RecipeSection,
+    RecipeSectionFromJSON,
+    RecipeSectionFromJSONTyped,
+    RecipeSectionToJSON,
+} from './';
+
 /**
  * A revision of a recipe
  * @export
@@ -25,6 +32,12 @@ export interface RecipeDetail {
      * @memberof RecipeDetail
      */
     id: string;
+    /**
+     * sections of the recipe
+     * @type {Array<RecipeSection>}
+     * @memberof RecipeDetail
+     */
+    sections: Array<RecipeSection>;
     /**
      * recipe name
      * @type {string}
@@ -86,6 +99,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'id': json['id'],
+        'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'name': json['name'],
         'totalMinutes': !exists(json, 'total_minutes') ? undefined : json['total_minutes'],
         'source': !exists(json, 'source') ? undefined : json['source'],
@@ -107,6 +121,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
     return {
         
         'id': value.id,
+        'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'name': value.name,
         'total_minutes': value.totalMinutes,
         'source': value.source,

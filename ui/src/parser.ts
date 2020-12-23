@@ -32,8 +32,14 @@ export const parseRecipe = (text: string): RecipeWrapper | undefined => {
     return si;
   });
   const recipe: RecipeWrapper = {
-    detail: { name: "", id: "", quantity: 0, unit: "" },
-    sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
+    detail: {
+      name: "",
+      id: "",
+      quantity: 0,
+      unit: "",
+      sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
+    },
+
     id: "",
   };
   return recipe;
@@ -48,8 +54,8 @@ export const encodeIngredient = (ingredient: SectionIngredient): string => {
 };
 
 export const encodeRecipe = (recipe: RecipeWrapper): string =>
-  recipe && recipe.sections
-    ? recipe.sections
+  recipe && recipe.detail.sections
+    ? recipe.detail.sections
         .map((section) => section.ingredients.map(encodeIngredient).join("\n"))
         .join("\n")
     : "";
