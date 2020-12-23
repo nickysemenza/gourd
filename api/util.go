@@ -12,8 +12,8 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// RecipeFromFile reads a recipe from json file
-func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeWrapper, error) {
+// RecipeFromFile reads a recipe from json or yaml file
+func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, error) {
 	inputFile, err := os.Open(inputPath)
 
 	if err != nil {
@@ -28,9 +28,10 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeWrapper, err
 		return nil, fmt.Errorf("failed to read recipe: %w", err)
 	}
 	fileDocs := bytes.Split(fileBytes, []byte("---\n"))
-	var output []RecipeWrapper
+	var output []RecipeDetail
 	for _, doc := range fileDocs {
 		if len(doc) < len("recipe") {
+			// too short to be anything
 			continue
 		}
 		switch filepath.Ext(inputPath) {
@@ -45,14 +46,14 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeWrapper, err
 			return nil, fmt.Errorf("unknown extension: %s", inputPath)
 		}
 
-		// we initialize our Users array
-		var r RecipeWrapper
+		var r RecipeDetail
 
-		// we unmarshal our byteArray which contains our
-		// jsonFile's content into 'users' which we defined above
 		err = json.Unmarshal(doc, &r)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read recipe: %w", err)
+		}
+		if r.Name == "" {
+			return nil, fmt.Errorf("failed to read recipe name from file %s [%v]", inputPath, r)
 		}
 		output = append(output, r)
 	}

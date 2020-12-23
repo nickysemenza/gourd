@@ -15,20 +15,20 @@ func TestRecipeFromFile(t *testing.T) {
 
 	r, err := RecipeFromFile(ctx, "../testdata/cookies_1.json")
 	require.NoError(err)
-	detail := r[0].Detail
+	detail := r[0]
 	require.Equal("cookies 1", detail.Name)
 
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
 	apiManager := NewAPI(m)
 
-	r2, err := apiManager.CreateRecipe(ctx, &r[0])
+	r2, err := apiManager.CreateRecipe(ctx, &RecipeWrapper{Detail: detail})
 	require.NoError(err)
 
 	require.Equal(detail.Name, r2.Detail.Name)
 	detail.Id = "" // reset so we create a dup instead of update, ptr
 
-	r3, err := apiManager.CreateRecipe(ctx, &r[0])
+	r3, err := apiManager.CreateRecipe(ctx, &RecipeWrapper{Detail: detail})
 	require.NoError(err)
 
 	require.Equal((*r2.Detail.Version)+1, *r3.Detail.Version)
@@ -41,7 +41,7 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
 	apiManager := NewAPI(m)
-	_, err = apiManager.CreateRecipe(ctx, &r[0])
+	_, err = apiManager.CreateRecipe(ctx, &RecipeWrapper{Detail: r[0]})
 	require.NoError(err)
 }
 
