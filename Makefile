@@ -46,6 +46,8 @@ bin/migrate:
 	go build -tags 'postgres' -o $@ ./vendor/github.com/golang-migrate/migrate/v4/cmd/migrate
 unit-test: 
 	go test -v -race -cover ./...
+integration-test: 
+	go test -v -race -cover ./... -tags integration	
 lint: bin/golangci-lint
 	bin/golangci-lint run || (echo "lint failed"; exit 1)	
 
