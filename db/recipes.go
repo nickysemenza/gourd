@@ -28,18 +28,16 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 
 //nolint: funlen
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) error {
-	query, args, err := c.psql.
+	q := c.psql.
 		Update(recipeDetailsTable).Where(sq.Eq{"id": r.Id}).Set("name", r.Name).
 		Set("total_minutes", r.TotalMinutes).
-		Set("unit", r.Unit).
-		ToSql()
-	if err != nil {
-		return fmt.Errorf("failed to build query: %w", err)
-	}
-	_, err = tx.ExecContext(ctx, query, args...)
+		Set("unit", r.Unit)
+
+	_, err := c.execTx(ctx, tx, q)
 	if err != nil {
 		return err
 	}
+
 	if err := c.AssignIds(ctx, r); err != nil {
 		return err
 	}
@@ -53,37 +51,39 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	for _, s := range r.Sections {
 		sectionInsert = sectionInsert.Values(s.Id, s.RecipeDetailId, s.Minutes)
 	}
-	query, args, err = sectionInsert.ToSql()
 
-	if err != nil {
-		return fmt.Errorf("failed to build query: %w", err)
-	}
-	_, err = tx.ExecContext(ctx, query, args...)
+	_, err = c.execTx(ctx, tx, sectionInsert)
 	if err != nil {
 		return err
 	}
 
+	instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
+	ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
+		"grams", "amount", "unit", "adjective", "optional")
+
+	var hasInstructions, hasIngredients bool
 	for _, s := range r.Sections {
-		if len(s.Instructions) > 0 {
-			instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
-			for _, i := range s.Instructions {
-				instructionsInsert = instructionsInsert.Values(i.Id, i.SectionId, i.Instruction)
-			}
-			if _, err = instructionsInsert.RunWith(tx).ExecContext(ctx); err != nil {
-				return err
-			}
+		for _, i := range s.Instructions {
+			hasInstructions = true
+			instructionsInsert = instructionsInsert.Values(i.Id, i.SectionId, i.Instruction)
 		}
 
-		if len(s.Ingredients) > 0 {
-			ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
-				"grams", "amount", "unit", "adjective", "optional")
-			for _, i := range s.Ingredients {
-				ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
-					i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional)
-			}
-			if _, err = ingredientsInsert.RunWith(tx).ExecContext(ctx); err != nil {
-				return err
-			}
+		for _, i := range s.Ingredients {
+			hasIngredients = true
+
+			ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
+				i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional)
+		}
+
+	}
+	if hasInstructions {
+		if _, err = c.execTx(ctx, tx, instructionsInsert); err != nil {
+			return err
+		}
+	}
+	if hasIngredients {
+		if _, err = c.execTx(ctx, tx, ingredientsInsert); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -97,20 +97,21 @@ func (c *Client) insertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDeta
 		r.Id = common.UUID()
 	}
 	log.Println("inserting", r.Id, r.Name)
-	query, args, err := c.psql.
-		Insert(recipeDetailsTable).Columns("id", "recipe", "name", "version").Values(r.Id, r.RecipeId, r.Name, r.Version).
-		ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
+	q := c.psql.
+		Insert(recipeDetailsTable).
+		Columns("id", "recipe", "name", "version").
+		Values(r.Id, r.RecipeId, r.Name, r.Version)
+
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
-	_, err = tx.ExecContext(ctx, query, args...)
+
+	_, err = c.execTx(ctx, tx, q)
 	if err != nil {
 		return nil, err
 	}
+
 	err = c.updateRecipe(ctx, tx, r)
 	if err != nil {
 		return nil, err

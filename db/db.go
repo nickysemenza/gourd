@@ -190,14 +190,34 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 
 // nolint: unparam
 func (c *Client) execContext(ctx context.Context, q sq.Sqlizer) (sql.Result, error) {
-	ctx, span := c.tracer.Start(ctx, "execContext")
+
+	tx, err := c.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.execTx(ctx, tx, q)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (c *Client) execTx(ctx context.Context, tx *sql.Tx, q sq.Sqlizer) (sql.Result, error) {
+	ctx, span := c.tracer.Start(ctx, "execTx")
 	defer span.End()
 
 	query, args, err := q.ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
-	res, err := c.db.ExecContext(ctx, query, args...)
+
+	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
