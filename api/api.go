@@ -30,8 +30,8 @@ func NewAPI(m *manager.Manager) *API {
 	}
 }
 
-func transformRecipe(dbr db.RecipeDetail) Recipe {
-	return Recipe{
+func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
+	return RecipeDetail{
 		Id:           dbr.Id,
 		Name:         dbr.Name,
 		Source:       dbr.Source.Ptr(),
@@ -183,7 +183,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx := c.Request().Context()
 	ctx, span := a.tracer.Start(ctx, "ListRecipes")
 	defer span.End()
-	items := []Recipe{}
+	items := []RecipeDetail{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	recipes, count, err := a.Manager.DB().GetRecipes(ctx, "", paginationParams...)
@@ -302,7 +302,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
-		recipes := []Recipe{}
+		recipes := []RecipeDetail{}
 		for _, x := range linkedRecipes {
 			recipes = append(recipes, transformRecipe(x))
 		}

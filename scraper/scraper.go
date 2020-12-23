@@ -71,7 +71,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 
 	source := fmt.Sprintf("todo: %s %s", u.Host, addr)
 	r := api.RecipeWrapper{
-		Detail: api.Recipe{
+		Detail: api.RecipeDetail{
 			Name:   recipe.Name,
 			Source: &source,
 			// Source: &api.Source{

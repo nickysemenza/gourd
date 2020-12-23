@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    Recipe,
-    RecipeFromJSON,
-    RecipeFromJSONTyped,
-    RecipeToJSON,
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailFromJSONTyped,
+    RecipeDetailToJSON,
     RecipeSection,
     RecipeSectionFromJSON,
     RecipeSectionFromJSONTyped,
@@ -44,10 +44,10 @@ export interface RecipeWrapper {
     sections: Array<RecipeSection>;
     /**
      * 
-     * @type {Recipe}
+     * @type {RecipeDetail}
      * @memberof RecipeWrapper
      */
-    detail: Recipe;
+    detail: RecipeDetail;
 }
 
 export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
@@ -62,7 +62,7 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
-        'detail': RecipeFromJSON(json['detail']),
+        'detail': RecipeDetailFromJSON(json['detail']),
     };
 }
 
@@ -77,7 +77,7 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         
         'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
-        'detail': RecipeToJSON(value.detail),
+        'detail': RecipeDetailToJSON(value.detail),
     };
 }
 

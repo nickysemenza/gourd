@@ -23,7 +23,7 @@ export interface SectionIngredient {
    * what kind of ingredient
    */
   kind: "recipe" | "ingredient";
-  recipe?: Recipe;
+  recipe?: RecipeDetail;
   ingredient?: Ingredient;
   /**
    * weight in grams
@@ -95,13 +95,13 @@ export interface RecipeWrapper {
    * sections of the recipe
    */
   sections: RecipeSection[];
-  detail: Recipe;
+  detail: RecipeDetail;
 }
 
 /**
- * A recipe
+ * A revision of a recipe
  */
-export interface Recipe {
+export interface RecipeDetail {
   /**
    * id
    */
@@ -162,7 +162,7 @@ export interface IngredientDetail {
   /**
    * Recipes referencing this ingredient
    */
-  recipes?: Recipe[];
+  recipes?: RecipeDetail[];
   /**
    * Ingredients that are equivalent
    */
@@ -287,7 +287,7 @@ export interface List {
 }
 
 export interface PaginatedRecipes {
-  recipes?: Recipe[];
+  recipes?: RecipeDetail[];
   meta?: List;
 }
 
@@ -685,7 +685,13 @@ export interface ConvertIngredientToRecipePathParams {
 }
 
 export type ConvertIngredientToRecipeProps = Omit<
-  MutateProps<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>,
+  MutateProps<
+    RecipeDetail,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >,
   "path" | "verb"
 > &
   ConvertIngredientToRecipePathParams;
@@ -697,7 +703,7 @@ export const ConvertIngredientToRecipe = ({
   ingredient_id,
   ...props
 }: ConvertIngredientToRecipeProps) => (
-  <Mutate<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>
+  <Mutate<RecipeDetail, Error, void, void, ConvertIngredientToRecipePathParams>
     verb="POST"
     path={`/ingredients/${ingredient_id}/convert_to_recipe`}
     {...props}
@@ -706,7 +712,7 @@ export const ConvertIngredientToRecipe = ({
 
 export type UseConvertIngredientToRecipeProps = Omit<
   UseMutateProps<
-    Recipe,
+    RecipeDetail,
     Error,
     void,
     void,
@@ -723,7 +729,13 @@ export const useConvertIngredientToRecipe = ({
   ingredient_id,
   ...props
 }: UseConvertIngredientToRecipeProps) =>
-  useMutate<Recipe, Error, void, void, ConvertIngredientToRecipePathParams>(
+  useMutate<
+    RecipeDetail,
+    Error,
+    void,
+    void,
+    ConvertIngredientToRecipePathParams
+  >(
     "POST",
     (paramsInPath: ConvertIngredientToRecipePathParams) =>
       `/ingredients/${paramsInPath.ingredient_id}/convert_to_recipe`,

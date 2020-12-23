@@ -204,17 +204,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedRecipes"
-          # content:
-          #   application/json:
-          #     schema:
-          #       allOf:
-          #         - $ref: "#/components/schemas/List"
-          #         - type: object
-          #           properties:
-          #             items:
-          #               # type: object
-          #               # items:
-          #               $ref: "#/components/schemas/Recipes"
         default:
           description: unexpected error
           content:
@@ -292,7 +281,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Recipe"
+                $ref: "#/components/schemas/RecipeDetail"
         default:
           description: unexpected error
           content:
@@ -326,14 +315,9 @@ components:
           description: what kind of ingredient
           type: string
           enum: [recipe, ingredient]
-        # info:
-        #   type: object
-        #   oneOf:
-        #     - $ref: "#/components/schemas/Recipe"
-        #     - $ref: "#/components/schemas/Ingredient"
         recipe:
           type: object
-          $ref: "#/components/schemas/Recipe"
+          $ref: "#/components/schemas/RecipeDetail"
         ingredient:
           type: object
           $ref: "#/components/schemas/Ingredient"
@@ -411,9 +395,9 @@ components:
             $ref: "#/components/schemas/RecipeSection"
         detail:
           description: The recipe
-          $ref: "#/components/schemas/Recipe"
-    Recipe:
-      description: A recipe
+          $ref: "#/components/schemas/RecipeDetail"
+    RecipeDetail:
+      description: A revision of a recipe
       type: object
       required:
         - id
@@ -452,8 +436,6 @@ components:
         is_latest_version:
           description: whether or not it is the most recent version
           type: boolean
-        # tag:
-        # type: string
     Ingredient:
       description: "An Ingredient"
       type: object
@@ -472,8 +454,6 @@ components:
       type: object
       required:
         - ingredient
-        # - recipes
-        # - children
       properties:
         ingredient:
           description: the ingredient
@@ -483,16 +463,12 @@ components:
           description: Recipes referencing this ingredient
           type: array
           items:
-            $ref: "#/components/schemas/Recipe"
+            $ref: "#/components/schemas/RecipeDetail"
         children:
           description: Ingredients that are equivalent
           type: array
           items:
             $ref: "#/components/schemas/Ingredient"
-    # Recipes:
-    #   type: array
-    #   items:
-    #     $ref: "#/components/schemas/Recipe"
     GooglePhotosAlbum:
       description: an album containing `GooglePhoto`
       type: object
@@ -631,9 +607,7 @@ components:
         recipes:
           type: array
           items:
-            $ref: "#/components/schemas/Recipe"
-        # data2:
-        #   $ref: "#/components/schemas/Recipes"
+            $ref: "#/components/schemas/RecipeDetail"
         meta:
           $ref: "#/components/schemas/List"
     PaginatedIngredients:

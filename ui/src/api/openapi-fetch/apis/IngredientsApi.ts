@@ -21,9 +21,9 @@ import {
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
-    Recipe,
-    RecipeFromJSON,
-    RecipeToJSON,
+    RecipeDetail,
+    RecipeDetailFromJSON,
+    RecipeDetailToJSON,
     SearchResult,
     SearchResultFromJSON,
     SearchResultToJSON,
@@ -56,7 +56,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     /**
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
-    async convertIngredientToRecipeRaw(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<Recipe>> {
+    async convertIngredientToRecipeRaw(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling convertIngredientToRecipe.');
         }
@@ -80,13 +80,13 @@ export class IngredientsApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
     }
 
     /**
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
-    async convertIngredientToRecipe(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<Recipe> {
+    async convertIngredientToRecipe(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
         const response = await this.convertIngredientToRecipeRaw(requestParameters);
         return await response.value();
     }

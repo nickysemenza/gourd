@@ -14,72 +14,72 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * A recipe
+ * A revision of a recipe
  * @export
- * @interface Recipe
+ * @interface RecipeDetail
  */
-export interface Recipe {
+export interface RecipeDetail {
     /**
      * id
      * @type {string}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     id: string;
     /**
      * recipe name
      * @type {string}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     name: string;
     /**
      * todo
      * @type {number}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     totalMinutes?: number;
     /**
      * book or website? deprecated?
      * @type {string}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     source?: string;
     /**
      * num servings
      * @type {number}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     servings?: number;
     /**
      * serving quantity
      * @type {number}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     quantity: number;
     /**
      * serving unit
      * @type {string}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     unit: string;
     /**
      * version of the recipe
      * @type {number}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     version?: number;
     /**
      * whether or not it is the most recent version
      * @type {boolean}
-     * @memberof Recipe
+     * @memberof RecipeDetail
      */
     isLatestVersion?: boolean;
 }
 
-export function RecipeFromJSON(json: any): Recipe {
-    return RecipeFromJSONTyped(json, false);
+export function RecipeDetailFromJSON(json: any): RecipeDetail {
+    return RecipeDetailFromJSONTyped(json, false);
 }
 
-export function RecipeFromJSONTyped(json: any, ignoreDiscriminator: boolean): Recipe {
+export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeDetail {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -97,7 +97,7 @@ export function RecipeFromJSONTyped(json: any, ignoreDiscriminator: boolean): Re
     };
 }
 
-export function RecipeToJSON(value?: Recipe | null): any {
+export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
     if (value === undefined) {
         return undefined;
     }

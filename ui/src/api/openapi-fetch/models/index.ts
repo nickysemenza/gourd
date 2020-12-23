@@ -11,7 +11,7 @@ export * from './PaginatedIngredients';
 export * from './PaginatedMeals';
 export * from './PaginatedPhotos';
 export * from './PaginatedRecipes';
-export * from './Recipe';
+export * from './RecipeDetail';
 export * from './RecipeSection';
 export * from './RecipeWrapper';
 export * from './SearchResult';

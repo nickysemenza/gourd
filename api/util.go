@@ -30,7 +30,7 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeWrapper, err
 	fileDocs := bytes.Split(fileBytes, []byte("---\n"))
 	var output []RecipeWrapper
 	for _, doc := range fileDocs {
-		if len(doc) < 10 {
+		if len(doc) < len("recipe") {
 			continue
 		}
 		switch filepath.Ext(inputPath) {

@@ -76,7 +76,7 @@ type IngredientDetail struct {
 	Ingredient Ingredient `json:"ingredient"`
 
 	// Recipes referencing this ingredient
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
 // List defines model for List.
@@ -132,12 +132,12 @@ type PaginatedPhotos struct {
 
 // PaginatedRecipes defines model for PaginatedRecipes.
 type PaginatedRecipes struct {
-	Meta    *List     `json:"meta,omitempty"`
-	Recipes *[]Recipe `json:"recipes,omitempty"`
+	Meta    *List           `json:"meta,omitempty"`
+	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
-// Recipe defines model for Recipe.
-type Recipe struct {
+// RecipeDetail defines model for RecipeDetail.
+type RecipeDetail struct {
 
 	// id
 	Id string `json:"id"`
@@ -186,8 +186,8 @@ type RecipeSection struct {
 // RecipeWrapper defines model for RecipeWrapper.
 type RecipeWrapper struct {
 
-	// A recipe
-	Detail Recipe `json:"detail"`
+	// A revision of a recipe
+	Detail RecipeDetail `json:"detail"`
 
 	// id
 	Id string `json:"id"`
@@ -230,8 +230,8 @@ type SectionIngredient struct {
 	// optional
 	Optional *bool `json:"optional,omitempty"`
 
-	// A recipe
-	Recipe *Recipe `json:"recipe,omitempty"`
+	// A revision of a recipe
+	Recipe *RecipeDetail `json:"recipe,omitempty"`
 
 	// unit
 	Unit string `json:"unit"`
