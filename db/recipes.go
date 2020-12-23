@@ -96,16 +96,18 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	var modifying *RecipeDetail
 	parentID := ""
 	if r.Id != "" {
-		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"id": r.Id})
+		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": r.Id})
 		if err != nil {
 			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
+		modifying = res.First()
 	}
 	if modifying == nil {
-		modifying, err = c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
+		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
 		if err != nil {
 			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
+		modifying = res.First()
 	}
 
 	if modifying != nil {
@@ -113,8 +115,8 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		if err != nil {
 			return "", fmt.Errorf("failed to find prior recipe: %w", err)
 		}
-		version = latestVersion.Version + 1
-		parentID = latestVersion.RecipeId
+		version = latestVersion.First().Version + 1
+		parentID = latestVersion.First().RecipeId
 	}
 	r.Version = version
 	r.Id = common.UUID()

@@ -91,14 +91,16 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 				} else {
 					eq = sq.Eq{"recipe": i.Recipe.Id}
 				}
-				r, err := a.DB().GetRecipeDetailWhere(ctx, eq)
+				rs, err := a.DB().GetRecipeDetailWhere(ctx, eq)
 				if err != nil {
 					return nil, err
 				}
+
+				r := rs.First()
 				if r != nil {
 					id = r.RecipeId
 				} else {
-					r, err = a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
+					r, err := a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
 					if err != nil {
 						return nil, err
 					}

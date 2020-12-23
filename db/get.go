@@ -11,6 +11,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type RecipeDetails []RecipeDetail
+
+func (r RecipeDetails) ByDetailId() map[string]RecipeDetail {
+	m := make(map[string]RecipeDetail)
+	for _, x := range r {
+		m[x.Id] = x
+	}
+	return m
+}
+func (r RecipeDetails) ByRecipeId() map[string]RecipeDetail {
+	m := make(map[string]RecipeDetail)
+	for _, x := range r {
+		m[x.RecipeId] = x
+	}
+	return m
+}
+func (r RecipeDetails) First() *RecipeDetail {
+	if len(r) == 0 {
+		return nil
+	}
+	return &r[0]
+}
+
 // GetRecipeDetailSections finds the sections.
 func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) ([]Section, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailSections")
@@ -100,31 +123,24 @@ func (c *Client) getIngredientsById(ctx context.Context, id ...string) (map[stri
 }
 
 // GetRecipeById gets a recipe by name, shallowly.
-func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Sqlizer) (*RecipeDetail, error) {
+func (c *Client) GetRecipeDetailWhere(ctx context.Context, eq sq.Sqlizer) (RecipeDetails, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailWhere")
 	defer span.End()
 	return c.getRecipeDetail(ctx,
 		c.psql.Select("*").
 			From(recipeDetailsTable).
 			Where(eq).
-			OrderBy("version DESC").
-			Limit(1))
+			OrderBy("version DESC"),
+	)
 }
 
-func (c *Client) getRecipeDetail(ctx context.Context, sb sq.SelectBuilder) (*RecipeDetail, error) {
+func (c *Client) getRecipeDetail(ctx context.Context, sb sq.SelectBuilder) ([]RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "getRecipeDetail")
 	defer span.End()
-	query, args, err := sb.ToSql()
-	if err != nil {
-		return nil, fmt.Errorf("failed to build query: %w", err)
-	}
 
-	r := &RecipeDetail{}
-	err = c.db.GetContext(ctx, r, query, args...)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
-	if err != nil {
+	r := []RecipeDetail{}
+
+	if err := c.selectContext(ctx, sb, &r); err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
 	return r, nil
@@ -186,24 +202,27 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 }
 
 // GetRecipeDetailByIdFull gets a recipe by Id, with all dependencies.
-func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*RecipeDetail, error) {
+func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailByIdFull")
 	defer span.End()
-	r, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": id})
-	if err != nil {
-		return nil, err
-	}
-	if r == nil {
-		return r, nil
-	}
+	topLevelDetail := sq.Eq{"id": detailId}
 
-	r.Sections, err = c.GetRecipeDetailSections(ctx, id)
+	// rs, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": id})
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if len(rs) != 1 {
+	// 	return nil, fmt.Errorf("failed to find 1 recipe detail with id %s, found %d", id, len(rs))
+	// }
+	// r := rs[0]
+
+	sections, err := c.GetRecipeDetailSections(ctx, detailId)
 	if err != nil {
 		return nil, err
 	}
 
 	var sectionIds []string
-	for _, s := range r.Sections {
+	for _, s := range sections {
 		sectionIds = append(sectionIds, s.Id)
 	}
 	sIns, err := c.GetSectionInstructions(ctx, sectionIds)
@@ -217,27 +236,29 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 	}
 
 	var ingredientIds []string
-	for x, s := range r.Sections {
+	var recipeIds []string
+	for x, s := range sections {
 		for sectionId, i := range sIns {
 			if s.Id == sectionId {
-				r.Sections[x].Instructions = i
+				sections[x].Instructions = i
 			}
 		}
 		for sectionId, i := range sIng {
 			if s.Id == sectionId {
-				r.Sections[x].Ingredients = i
+				sections[x].Ingredients = i
 			}
 		}
-		for y, i := range r.Sections[x].Ingredients {
+		for _, i := range sections[x].Ingredients {
 			if i.IngredientId.String != "" {
 				ingredientIds = append(ingredientIds, i.IngredientId.String)
 			}
 			if i.RecipeId.String != "" {
-				rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeId.String})
-				if err != nil {
-					return nil, err
-				}
-				r.Sections[x].Ingredients[y].RawRecipe = rec
+				recipeIds = append(recipeIds, i.RecipeId.String)
+				// rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeId.String})
+				// if err != nil {
+				// 	return nil, err
+				// }
+				// sections[x].Ingredients[y].RawRecipe = &rec[0]
 			}
 		}
 	}
@@ -246,16 +267,38 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, id string) (*Recip
 	if err != nil {
 		return nil, err
 	}
-	for x := range r.Sections {
-		for y, i := range r.Sections[x].Ingredients {
+
+	var eq sq.Sqlizer
+	if len(recipeIds) == 0 {
+		eq = topLevelDetail
+	} else {
+		eq = sq.Or{topLevelDetail, sq.Eq{"recipe": recipeIds}}
+	}
+	recipes, err := c.GetRecipeDetailWhere(ctx, eq)
+	if err != nil {
+		return nil, err
+	}
+	r, ok := recipes.ByDetailId()[detailId]
+	if !ok {
+		return nil, fmt.Errorf("failed to find recipe with detail id %s", detailId)
+	}
+
+	recipesUsed := recipes.ByRecipeId()
+	for x := range sections {
+		for y, i := range sections[x].Ingredients {
 			if i.IngredientId.String != "" {
 				res := ingredientsById[i.IngredientId.String]
-				r.Sections[x].Ingredients[y].RawIngredient = &res
+				sections[x].Ingredients[y].RawIngredient = &res
+			}
+			if i.RecipeId.String != "" {
+				res := recipesUsed[i.RecipeId.String]
+				sections[x].Ingredients[y].RawRecipe = &res
 			}
 		}
 	}
+	r.Sections = sections
 
-	return r, nil
+	return &r, nil
 }
 func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "getIngredients")
