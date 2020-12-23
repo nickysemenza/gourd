@@ -51,6 +51,7 @@ const NavBar: React.FC = () => {
               href="#link"
               onClick={() => history.push("/" + item.path)}
               className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4 font-medium"
+              key={item.path}
             >
               {item.title}
             </a>

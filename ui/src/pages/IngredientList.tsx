@@ -29,14 +29,15 @@ const IngredientList: React.FC = () => {
   const ingredients = data?.ingredients || [];
   type i = typeof ingredients[0];
 
-  const iApi = new IngredientsApi(getOpenapiFetchConfig());
-  const convertToRecipe = async (id: string) => {
-    let res = await iApi.convertIngredientToRecipe({ ingredientId: id });
-    toast.success(`created recipe ${res.id} for ${res.name}`);
-  };
+  const columns: Array<Column<i>> = React.useMemo(() => {
+    const iApi = new IngredientsApi(getOpenapiFetchConfig());
 
-  const columns: Array<Column<i>> = React.useMemo(
-    () => [
+    const convertToRecipe = async (id: string) => {
+      let res = await iApi.convertIngredientToRecipe({ ingredientId: id });
+      toast.success(`created recipe ${res.id} for ${res.name}`);
+    };
+
+    return [
       {
         Header: "Id",
         Cell: ({
@@ -90,7 +91,7 @@ const IngredientList: React.FC = () => {
             <div>
               <ul>
                 {recipes.map((r) => (
-                  <li>
+                  <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
                     <Link to={`recipe/${r.id}`} className="link">
                       <div className="flex">
                         {r.name} (<div className="font-mono">v{r.version}</div>)
@@ -112,9 +113,8 @@ const IngredientList: React.FC = () => {
       //     return <div>{usdaFood?.description}</div>;
       //   },
       // },
-    ],
-    []
-  );
+    ];
+  }, []);
 
   return (
     <>
