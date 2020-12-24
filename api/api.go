@@ -223,6 +223,15 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
+func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetail) error {
+	for _, r := range recipes {
+		_, err := a.CreateRecipe(ctx, &RecipeWrapper{Detail: r})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrapper, error) {
 	dbVersion, err := a.recipeWrappertoDB(ctx, r)
 	if err != nil {

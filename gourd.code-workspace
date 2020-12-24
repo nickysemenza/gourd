@@ -31,6 +31,9 @@
     "go.lintTool": "golangci-lint",
     "go.lintFlags": ["--fast"],
     "editor.formatOnSave": true,
+    "go.buildFlags": [
+      "-tags", "integration"
+  ],
     "typescript.tsdk": "ui/node_modules/typescript/lib"
     
   }

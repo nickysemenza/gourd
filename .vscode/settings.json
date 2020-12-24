@@ -1,5 +1,0 @@
-{
-    "go.testFlags": [
-        "-tags", "integration"
-    ]
-}

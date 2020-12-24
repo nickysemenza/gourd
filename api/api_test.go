@@ -17,9 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAPI(t *testing.T) {
-	require := require.New(t)
-
+func makeHandler(t *testing.T) (*echo.Echo, *API) {
+	t.Helper()
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
 
@@ -27,7 +26,12 @@ func TestAPI(t *testing.T) {
 	e := echo.New()
 	e.Use(echo_middleware.Logger())
 	RegisterHandlers(e, apiManager)
+	return e, apiManager
+}
+func TestAPI(t *testing.T) {
+	require := require.New(t)
 
+	e, _ := makeHandler(t)
 	rName := fmt.Sprintf("recipe-%s", common.UUID())
 	iName := fmt.Sprintf("ing-%s", common.UUID())
 
@@ -94,8 +98,7 @@ func TestAPI(t *testing.T) {
 		result := testutil.NewRequest().Get("/recipes?offset=0&limit=10").Go(t, e)
 		require.Equal(http.StatusOK, result.Code())
 		var results PaginatedRecipes
-		err := result.UnmarshalBodyToObject(&results)
-		require.NoError(err)
+		require.NoError(result.UnmarshalBodyToObject(&results))
 		// require.Contains(results, name)
 		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
 	}
@@ -118,6 +121,62 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	tdb := db.NewDB(t)
 	m := manager.New(tdb, nil, nil)
 	apiManager := NewAPI(m)
-	_, err = apiManager.CreateRecipe(ctx, &RecipeWrapper{Detail: r[0]})
+	err = apiManager.CreateRecipeDetails(ctx, r...)
 	require.NoError(err)
+}
+
+func TestSearches(t *testing.T) {
+
+	require := require.New(t)
+	ctx := context.Background()
+	e, api := makeHandler(t)
+
+	rName := fmt.Sprintf("recipe-%s", common.UUID())
+	iName := fmt.Sprintf("ing-%s", common.UUID())
+	err := api.CreateRecipeDetails(ctx, RecipeDetail{
+		Name:     rName,
+		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &Ingredient{Name: iName}}}}},
+	})
+	require.NoError(err)
+
+	ingId := SearchByKind(t, e, iName, "ingredient")
+	require.NotEmpty(ingId)
+
+	result := testutil.NewRequest().Post("/ingredients/"+ingId+"/convert_to_recipe").Go(t, e)
+	require.Equal(http.StatusCreated, result.Code())
+	var results RecipeDetail
+	require.NoError(result.UnmarshalBodyToObject(&results))
+
+	recId := SearchByKind(t, e, iName, "recipe")
+	require.NotEmpty(recId)
+
+	// require.Equal(results.Id, recId)
+
+}
+
+func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
+	require := require.New(t)
+	result := testutil.NewRequest().Get("/search?name="+name).Go(t, e)
+	require.Equal(http.StatusOK, result.Code())
+	var results SearchResult
+	require.NoError(result.UnmarshalBodyToObject(&results))
+	id := ""
+	switch kind {
+	case "ingredient":
+		for _, x := range *results.Ingredients {
+			if x.Name == name {
+				id = x.Id
+			}
+		}
+	case "recipe":
+		for _, x := range *results.Recipes {
+			if x.Detail.Name == name {
+				id = x.Id
+			}
+		}
+	default:
+		t.Fatalf("bad kind: %s", kind)
+	}
+
+	return id
 }
