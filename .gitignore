@@ -6,3 +6,4 @@ prod.tfvars
 tmp/
 usda/FoodData_Central*
 config.toml
+coverage*

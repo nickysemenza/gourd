@@ -61,13 +61,13 @@ jobs:
             mkdir -p /tmp/artifacts
       - run:
           command: |
-            go test ./... -coverprofile=c.out -tags integration
-            go tool cover -html=c.out -o coverage.html
-            mv coverage.html /tmp/artifacts
-            mv c.out /tmp/artifacts
-
+            make test-full-cover
+            go test ./... -coverprofile=coverage-full.txt -tags integration
+            go tool cover -html=coverage-full.txt -o coverage-full.html
+            mv coverage-full.txt /tmp/artifacts
+            mv coverage-full.html /tmp/artifacts
       - codecov/upload:
-          file: /tmp/artifacts/c.out
+          file: /tmp/artifacts/coverage-full.txt
       - store_artifacts:
           path: /tmp/artifacts
   build_ui:
