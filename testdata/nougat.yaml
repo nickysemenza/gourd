@@ -84,6 +84,21 @@ sections:
     kind: ingredient
     optional: false
     unit: 
+  - grams: 220
+    ingredient:
+      name: candied orange peels
+    adjective: diced
+    kind: ingredient
+  - grams: 100
+    ingredient:
+      name: dried apricot peels
+    adjective: diced
+    kind: ingredient    
+  - grams: 40
+    ingredient:
+      name: dried ginger
+    adjective: diced
+    kind: ingredient     
   instructions:
   - instruction: mix with paddle, add to tray with wafer paper
   - instruction: let cool 30m

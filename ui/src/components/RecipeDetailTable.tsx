@@ -16,6 +16,7 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
+import { Button } from "./Button";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -73,6 +74,102 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     0
   );
   const showBP = flourMass > 0;
+
+  type I = "ingredients" | "instructions";
+  const calculateMoveI = (
+    sectionIndex: number,
+    index: number,
+    movingUp: boolean,
+    i: I
+  ) => {
+    const numI = recipe.detail.sections[sectionIndex][i].length;
+    const numSections = recipe.detail.sections.length;
+    const firstInSection = index === 0;
+    const lastInSection = index === numI - 1;
+
+    let newSectionIndex = sectionIndex;
+    let newInIndex: number;
+    if (firstInSection && movingUp) {
+      // needs to go to prior section
+      newSectionIndex--;
+      if (newSectionIndex < 0) {
+        return null;
+      }
+      newInIndex = recipe.detail.sections[newSectionIndex][i].length;
+    } else if (!firstInSection && movingUp) {
+      // prior row in same section
+
+      newInIndex = index - 1;
+    } else if (lastInSection && !movingUp) {
+      // needs to go to next section
+
+      newSectionIndex++;
+      if (newSectionIndex > numSections - 1) {
+        return null;
+      }
+      newInIndex = 0;
+    } else {
+      // next row in same section
+
+      newInIndex = index + 1;
+    }
+
+    return { newSectionIndex, newInIndex };
+  };
+  const canMoveI = (
+    sectionIndex: number,
+    index: number,
+    movingUp: boolean,
+    i: I
+  ) => !!calculateMoveI(sectionIndex, index, movingUp, i);
+  const moveI = (
+    sectionIndex: number,
+    index: number,
+    movingUp: boolean,
+    i: I
+  ) => {
+    const coords = calculateMoveI(sectionIndex, index, movingUp, i);
+    if (!coords) return;
+    console.log("moving!");
+    const { newSectionIndex, newInIndex } = coords;
+    console.log({
+      sectionIndex,
+      newSectionIndex,
+      index,
+      newInIndex,
+    });
+    const target = recipe.detail.sections[sectionIndex][i][index];
+    setRecipe(
+      update(recipe, {
+        detail: {
+          sections:
+            newSectionIndex === sectionIndex
+              ? {
+                  [sectionIndex]: {
+                    [i]: {
+                      $splice: [
+                        [index, 1],
+                        [newInIndex, 0, target],
+                      ],
+                    },
+                  },
+                }
+              : {
+                  [sectionIndex]: {
+                    [i]: {
+                      $splice: [[index, 1]],
+                    },
+                  },
+                  [newSectionIndex]: {
+                    [i]: {
+                      $splice: [[newInIndex, 0, target]],
+                    },
+                  },
+                },
+        },
+      })
+    );
+  };
 
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
@@ -182,6 +279,26 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   })
                 }
               />
+              <div>
+                {edit && (
+                  <div className="flex space-x-1">
+                    <Button
+                      onClick={() => {
+                        moveI(x, y, true, "ingredients");
+                      }}
+                      disabled={!canMoveI(x, y, true, "ingredients")}
+                      label={`up-${x}-${y}`}
+                    />
+                    <Button
+                      onClick={() => {
+                        moveI(x, y, false, "ingredients");
+                      }}
+                      disabled={!canMoveI(x, y, false, "ingredients")}
+                      label={`down-${x}-${y}`}
+                    />
+                  </div>
+                )}
+              </div>
               {/* TODO: optional toggle */}
             </div>
           );
@@ -205,6 +322,26 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               value={instruction.instruction}
               onChange={(e) => updateInstruction(x, y, e.target.value)}
             />
+            <div>
+              {edit && (
+                <div className="flex space-x-1">
+                  <Button
+                    onClick={() => {
+                      moveI(x, y, true, "instructions");
+                    }}
+                    disabled={!canMoveI(x, y, true, "instructions")}
+                    label={`up-${x}-${y}`}
+                  />
+                  <Button
+                    onClick={() => {
+                      moveI(x, y, false, "instructions");
+                    }}
+                    disabled={!canMoveI(x, y, false, "instructions")}
+                    label={`down-${x}-${y}`}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         ))}
         {/* </ol> */}
@@ -259,7 +396,13 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <TableCell>Instructions</TableCell>
         </TableRow>
         {sections?.map((section, x) => (
-          <Card key={section.id} index={x} id={section.id} moveCard={moveCard}>
+          <Card
+            key={section.id}
+            index={x}
+            id={section.id}
+            moveCard={moveCard}
+            enable={edit}
+          >
             {renderRow(section, x)}
           </Card>
         ))}
@@ -325,8 +468,6 @@ const formatText = (text: React.ReactText) => {
     return text;
   }
 
-  console.log(matches);
-  // matches.next
   let lastProcessed = 0;
   for (const match of matches) {
     const matchStart = match.index || 0;
@@ -353,6 +494,7 @@ export interface CardProps {
   id: any;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
+  enable: boolean;
 }
 
 interface DragItem {
@@ -366,7 +508,9 @@ export const Card: React.FC<CardProps> = ({
   index,
   moveCard,
   children,
+  enable,
 }) => {
+  // https://github.com/react-dnd/react-dnd/blob/main/packages/examples-hooks/src/04-sortable/simple/Card.tsx
   const ref = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop({
     accept: "card1",
@@ -428,7 +572,7 @@ export const Card: React.FC<CardProps> = ({
   });
 
   const opacity = isDragging ? 0 : 1;
-  drag(drop(ref));
+  if (enable) drag(drop(ref));
   return (
     <div ref={ref} style={{ opacity }}>
       {children}
