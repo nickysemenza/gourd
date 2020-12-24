@@ -25,6 +25,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/lib/pq v1.9.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
+	github.com/ory/go-acc v0.2.6
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1

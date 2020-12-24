@@ -44,10 +44,17 @@ bin/golangci-lint:
 bin/migrate:
 	@mkdir -p $(dir $@)
 	go build -tags 'postgres' -o $@ ./vendor/github.com/golang-migrate/migrate/v4/cmd/migrate
+bin/go-acc:
+	@mkdir -p $(dir $@)
+	go build -o $@ ./vendor/github.com/ory/go-acc
+
 unit-test: 
 	go test -v -race -cover ./...
 integration-test: 
 	go test -v -race -cover ./... -tags integration	
+test-full-cover: bin/go-acc
+	./bin/go-acc -o coverage-full.txt ./... -- -race -tags integration
+	
 lint: bin/golangci-lint
 	bin/golangci-lint run || (echo "lint failed"; exit 1)	
 
