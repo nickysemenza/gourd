@@ -91,3 +91,9 @@ generate-openapi: validate-openapi
 	go generate ./api
 cy:
 	cd ui && yarn run cy:open
+
+# https://jqplay.org/s/c1T3lLCJwH
+get-detail/%: 
+	curl -s http://localhost:4242/api/recipes/$(@F) | jq '.detail | del(.. | .id?)' > tmp1
+	dyff yaml tmp1 | pbcopy
+	rm tmp1

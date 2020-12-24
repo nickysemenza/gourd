@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 import { useParams } from "react-router-dom";
-import RecipeTable, { UpdateIngredientProps } from "../components/RecipeTable";
+import RecipeDetailTable, {
+  UpdateIngredientProps,
+} from "../components/RecipeDetailTable";
 import Debug from "../components/Debug";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -332,7 +334,7 @@ const RecipeDetail: React.FC = () => {
         </div>
       </div>
 
-      <RecipeTable
+      <RecipeDetailTable
         updateIngredient={updateIngredient}
         updateIngredientInfo={updateIngredientInfo}
         recipe={recipe}

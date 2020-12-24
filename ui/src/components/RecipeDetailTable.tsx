@@ -40,7 +40,7 @@ export interface TableProps {
   addIngredient: (sectionID: number) => void;
   addSection: () => void;
 }
-const RecipeTable: React.FC<TableProps> = ({
+const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
   updateIngredientInfo,
@@ -181,21 +181,21 @@ const RecipeTable: React.FC<TableProps> = ({
         )}
       </TableCell>
       <TableCell>
-        <ol className="list-decimal list-inside">
-          {section.instructions.map((instruction, y) => (
-            <li key={y} className="flex space-x-2">
-              <div>{y + 1}.</div>
-              <TableInput
-                data-cy="instruction-input"
-                width={72}
-                tall
-                edit={edit}
-                value={instruction.instruction}
-                onChange={(e) => updateInstruction(x, y, e.target.value)}
-              />
-            </li>
-          ))}
-        </ol>
+        {/* <ol className="list-decimal list-inside"> */}
+        {section.instructions.map((instruction, y) => (
+          <div key={y} className="flex font-serif">
+            <div className="mr-2 w-4">{y + 1}. </div>
+            <TableInput
+              data-cy="instruction-input"
+              width={72}
+              tall
+              edit={edit}
+              value={instruction.instruction}
+              onChange={(e) => updateInstruction(x, y, e.target.value)}
+            />
+          </div>
+        ))}
+        {/* </ol> */}
         {edit && (
           <div className="add-item" onClick={() => addInstruction(x)}>
             add instruction
@@ -231,7 +231,7 @@ const RecipeTable: React.FC<TableProps> = ({
     </div>
   );
 };
-export default RecipeTable;
+export default RecipeDetailTable;
 
 const TableCell: React.FC = ({ children }) => (
   <div className="border-solid border border-gray-600 p-1">{children}</div>
@@ -269,6 +269,41 @@ const TableInput: React.FC<{
       />
     )
   ) : (
-    <div>{props.value}</div>
+    <p className="flex flex-wrap">{formatText(props.value)}</p>
   );
+};
+const re = /[\d]* ?F/g;
+const formatText = (text: React.ReactText) => {
+  if (typeof text === "number") {
+    return text;
+  }
+
+  let pairs = [];
+  const matches = [...text.matchAll(re)];
+  if (matches.length === 0) {
+    return text;
+  }
+
+  console.log(matches);
+  // matches.next
+  let lastProcessed = 0;
+  for (const match of matches) {
+    const matchStart = match.index || 0;
+    const matchEnd = matchStart + match[0].length;
+    pairs.push(text.substring(lastProcessed, matchStart));
+    pairs.push(
+      <code className="text-red-800 mx-1">
+        {text.substring(matchStart, matchEnd)}
+      </code>
+    );
+    // pairs.push()
+    lastProcessed = matchEnd;
+    // pairs.push([, ]);
+  }
+  pairs.push(text.substring(lastProcessed));
+  // let res = [];
+  // for
+  return pairs;
+
+  // console.log(pairs);
 };
