@@ -344,6 +344,7 @@ const RecipeDetail: React.FC = () => {
         addIngredient={addIngredient}
         updateInstruction={updateInstruction}
         addSection={addSection}
+        setRecipe={setRecipe}
       />
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>

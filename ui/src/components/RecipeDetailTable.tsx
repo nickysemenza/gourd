@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 import {
@@ -7,6 +7,16 @@ import {
   RecipeSection,
 } from "../api/openapi-hooks/api";
 import { getIngredient } from "../util";
+import {
+  useDrag,
+  useDrop,
+  DropTargetMonitor,
+  XYCoord,
+  DndProvider,
+} from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import update from "immutability-helper";
+
 export interface UpdateIngredientProps {
   sectionID: number;
   ingredientID: number;
@@ -39,6 +49,7 @@ export interface TableProps {
   addInstruction: (sectionID: number) => void;
   addIngredient: (sectionID: number) => void;
   addSection: () => void;
+  setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
@@ -50,6 +61,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   addInstruction,
   addIngredient,
   addSection,
+  setRecipe,
 }) => {
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
   const flourMass = (recipe.detail.sections || []).reduce(
@@ -205,30 +217,59 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     </TableRow>
   );
 
+  const { sections } = recipe.detail;
+
+  const moveCard = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      const dragCard = sections[dragIndex];
+      console.log("drag", { dragIndex, hoverIndex, dragCard });
+
+      setRecipe(
+        update(recipe, {
+          detail: {
+            sections: {
+              $splice: [
+                [dragIndex, 1],
+                [hoverIndex, 0, dragCard],
+              ],
+            },
+          },
+        })
+      );
+    },
+    [sections, recipe, setRecipe]
+  );
+
   return (
-    <div className="border-gray-900 shadow-xl bg-gray-100">
-      <TableRow header>
-        <TableCell>Section</TableCell>
-        <TableCell>Minutes</TableCell>
-        <TableCell>
-          <div className="ing-table-row font-mono">
-            <div>x</div>
-            <div>grams (BP)</div>
-            <div>of y</div>
-            <div>z</div>
-            <div>units</div>
-            <div>modifier</div>
+    <DndProvider backend={HTML5Backend}>
+      <div className="border-gray-900 shadow-xl bg-gray-100">
+        <TableRow header>
+          <TableCell>Section</TableCell>
+          <TableCell>Minutes</TableCell>
+          <TableCell>
+            <div className="ing-table-row font-mono">
+              <div>x</div>
+              <div>grams (BP)</div>
+              <div>of y</div>
+              <div>z</div>
+              <div>units</div>
+              <div>modifier</div>
+            </div>
+          </TableCell>
+          <TableCell>Instructions</TableCell>
+        </TableRow>
+        {sections?.map((section, x) => (
+          <Card key={section.id} index={x} id={section.id} moveCard={moveCard}>
+            {renderRow(section, x)}
+          </Card>
+        ))}
+        {edit && (
+          <div className="add-item" onClick={() => addSection()}>
+            add section
           </div>
-        </TableCell>
-        <TableCell>Instructions</TableCell>
-      </TableRow>
-      {recipe.detail.sections?.map((section, x) => renderRow(section, x))}
-      {edit && (
-        <div className="add-item" onClick={() => addSection()}>
-          add section
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </DndProvider>
   );
 };
 export default RecipeDetailTable;
@@ -306,4 +347,91 @@ const formatText = (text: React.ReactText) => {
   return pairs;
 
   // console.log(pairs);
+};
+
+export interface CardProps {
+  id: any;
+  index: number;
+  moveCard: (dragIndex: number, hoverIndex: number) => void;
+}
+
+interface DragItem {
+  index: number;
+  id: string;
+  type: string;
+}
+
+export const Card: React.FC<CardProps> = ({
+  id,
+  index,
+  moveCard,
+  children,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [, drop] = useDrop({
+    accept: "card1",
+    hover(item: DragItem, monitor: DropTargetMonitor) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = item.index;
+      const hoverIndex = index;
+
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+
+      // Get vertical middle
+      const hoverMiddleY =
+        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+
+      // Get pixels to the top
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+
+      // Dragging downwards
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+        return;
+      }
+
+      // Dragging upwards
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+        return;
+      }
+
+      // Time to actually perform the action
+      moveCard(dragIndex, hoverIndex);
+
+      // Note: we're mutating the monitor item here!
+      // Generally it's better to avoid mutations,
+      // but it's good here for the sake of performance
+      // to avoid expensive index searches.
+      item.index = hoverIndex;
+    },
+  });
+
+  const [{ isDragging }, drag] = useDrag({
+    item: { type: "card1", id, index },
+    collect: (monitor: any) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const opacity = isDragging ? 0 : 1;
+  drag(drop(ref));
+  return (
+    <div ref={ref} style={{ opacity }}>
+      {children}
+    </div>
+  );
 };
