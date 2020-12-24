@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { CellProps } from "react-table";
-import { Link } from "react-router-dom";
+import { CellProps, Column } from "react-table";
 import Debug from "../components/Debug";
 import { useListRecipes } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
+import { RecipeLink } from "../components/Misc";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -29,7 +29,10 @@ const RecipeList: React.FC = () => {
     queryParams: params,
   });
 
-  const columns = React.useMemo(
+  const recipes = data?.recipes || [];
+  type i = typeof recipes[0];
+
+  const columns: Array<Column<i>> = React.useMemo(
     () => [
       {
         Header: "id",
@@ -37,21 +40,33 @@ const RecipeList: React.FC = () => {
       },
       {
         Header: "Name",
-        accessor: "name",
+        // accessor: "name",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const { versions } = original;
+          return (
+            <div>
+              <ul>
+                {(versions || []).map((i) => (
+                  <li>
+                    <div className="flex">
+                      <RecipeLink recipe={i} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        },
       },
-      {
-        Header: "Version",
-        accessor: "version",
-      },
-      {
-        Header: "test",
-        accessor: "test",
-        Cell: (cell: CellProps<any>) => (
-          <Link to={`recipe/${cell.row.original.id}`} className="link">
-            details
-          </Link>
-        ),
-      },
+      // {
+      //   Header: "test",
+      //   accessor: "test",
+      //   Cell: (cell: CellProps<any>) => (
+      //     <Link to={`recipe/${cell.row.original.id}`} className="link">
+      //       details
+      //     </Link>
+      //   ),
+      // },
     ],
     []
   );

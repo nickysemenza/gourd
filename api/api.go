@@ -7,6 +7,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"math"
 	"net/http"
 
 	sq "github.com/Masterminds/squirrel"
@@ -40,6 +41,14 @@ func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 		IsLatestVersion: &dbr.LatestVersion,
 		Sections:        transformRecipeSections(dbr.Sections),
 	}
+}
+func transformRecipes(dbr db.RecipeDetails) []RecipeDetail {
+	r := make([]RecipeDetail, len(dbr))
+	for x, d := range dbr {
+		r[x] = transformRecipe(d)
+	}
+	return r
+
 }
 func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
 	return &RecipeWrapper{
@@ -186,16 +195,28 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx := c.Request().Context()
 	ctx, span := a.tracer.Start(ctx, "ListRecipes")
 	defer span.End()
-	items := []RecipeDetail{}
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	recipes, count, err := a.Manager.DB().GetRecipes(ctx, "", paginationParams...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
+
+	var recipeIDs []string
 	for _, r := range recipes {
-		items = append(items, transformRecipe(r))
+		recipeIDs = append(recipeIDs, r.Id)
 	}
+
+	details, err := a.Manager.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": recipeIDs})
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+	byId := details.ByRecipeId()
+	items := []Recipe{}
+	for _, r := range recipeIDs {
+		items = append(items, Recipe{Id: r, Versions: transformRecipes(byId[r])})
+	}
+
 	listMeta.setTotalCount(count)
 
 	resp := PaginatedRecipes{
@@ -461,7 +482,7 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
 func (l *List) setTotalCount(count uint64) {
 	c := int(count)
 	l.TotalCount = c
-	l.PageCount = c / l.Limit
+	l.PageCount = int(math.Ceil(float64(c) / float64(l.Limit)))
 }
 
 func sendErr(ctx echo.Context, code int, err error) error {
@@ -517,7 +538,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	_, listMeta := parsePagination(params.Offset, params.Limit)
 
-	recipes, recipesCount, err := a.Manager.DB().GetRecipes(ctx, string(params.Name))
+	recipes, recipesCount, err := a.Manager.DB().GetRecipesDetails(ctx, string(params.Name))
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}

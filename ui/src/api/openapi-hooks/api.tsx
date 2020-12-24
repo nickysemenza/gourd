@@ -95,6 +95,20 @@ export interface RecipeWrapper {
 }
 
 /**
+ * A recipe with subcomponents
+ */
+export interface Recipe {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * all the versions of the recipe
+   */
+  versions: RecipeDetail[];
+}
+
+/**
  * A revision of a recipe
  */
 export interface RecipeDetail {
@@ -287,7 +301,7 @@ export interface List {
 }
 
 export interface PaginatedRecipes {
-  recipes?: RecipeDetail[];
+  recipes?: Recipe[];
   meta?: List;
 }
 

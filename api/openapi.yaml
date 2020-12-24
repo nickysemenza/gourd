@@ -390,6 +390,21 @@ components:
         detail:
           description: The recipe
           $ref: "#/components/schemas/RecipeDetail"
+    Recipe:
+      description: A recipe with subcomponents
+      type: object
+      required:
+        - versions
+        - id
+      properties:
+        id:
+          description: id
+          type: string
+        versions:
+          description: all the versions of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeDetail"          
     RecipeDetail:
       description: A revision of a recipe
       type: object
@@ -607,7 +622,7 @@ components:
         recipes:
           type: array
           items:
-            $ref: "#/components/schemas/RecipeDetail"
+            $ref: "#/components/schemas/Recipe"
         meta:
           $ref: "#/components/schemas/List"
     PaginatedIngredients:

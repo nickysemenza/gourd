@@ -7,8 +7,9 @@ context("Basic Create, List, Edit test", () => {
     cy.visit("/");
   });
 
+  const newName = "cy-" + new Date().getTime();
+
   it("creates a new recipe", function () {
-    const newName = "cy-" + new Date().getTime();
     cy.contains("create").click();
     cy.get("input[data-cy=name-input]").first().type(newName);
     cy.contains("Create Recipe").click();
@@ -18,7 +19,7 @@ context("Basic Create, List, Edit test", () => {
     const newIngredient = "ingredient-" + new Date().getTime();
     cy.contains("recipes").click();
     cy.get("[data-cy=recipe-table]").should("be.visible");
-    cy.contains("details").click();
+    cy.contains(newName).click();
     cy.url().should("include", "/recipe/");
 
     cy.contains("edit").click();

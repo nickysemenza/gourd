@@ -20,10 +20,10 @@ func (r RecipeDetails) ByDetailId() map[string]RecipeDetail {
 	}
 	return m
 }
-func (r RecipeDetails) ByRecipeId() map[string]RecipeDetail {
-	m := make(map[string]RecipeDetail)
+func (r RecipeDetails) ByRecipeId() map[string][]RecipeDetail {
+	m := make(map[string][]RecipeDetail)
 	for _, x := range r {
-		m[x.RecipeId] = x
+		m[x.RecipeId] = append(m[x.RecipeId], x)
 	}
 	return m
 }
@@ -147,7 +147,7 @@ func (c *Client) getRecipeDetail(ctx context.Context, sb sq.SelectBuilder) ([]Re
 }
 
 // GetRecipes returns all recipes, shallowly.
-func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]RecipeDetail, uint64, error) {
+func (c *Client) GetRecipesDetails(ctx context.Context, searchQuery string, opts ...SearchOption) ([]RecipeDetail, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipes")
 	defer span.End()
 
@@ -162,6 +162,34 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 	cq = cq.RemoveLimit().RemoveOffset()
 
 	r := []RecipeDetail{}
+	err := c.selectContext(ctx, q, &r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, 0, nil
+	}
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to select: %w", err)
+	}
+	var count uint64
+	if err := c.getContext(ctx, cq, &count); err != nil {
+		return nil, 0, err
+	}
+	return r, count, nil
+}
+func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...SearchOption) ([]Recipe, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetRecipes")
+	defer span.End()
+
+	q := c.psql.Select("*").From(recipesTable)
+	cq := c.psql.Select("count(*)").From(recipesTable)
+	q = newSearchQuery(opts...).apply(q)
+	cq = newSearchQuery(opts...).apply(cq)
+	if searchQuery != "" {
+		q = q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+		cq = cq.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
+	}
+	cq = cq.RemoveLimit().RemoveOffset()
+
+	r := []Recipe{}
 	err := c.selectContext(ctx, q, &r)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, 0, nil
@@ -292,7 +320,7 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 			}
 			if i.RecipeId.String != "" {
 				res := recipesUsed[i.RecipeId.String]
-				sections[x].Ingredients[y].RawRecipe = &res
+				sections[x].Ingredients[y].RawRecipe = &res[0]
 			}
 		}
 	}

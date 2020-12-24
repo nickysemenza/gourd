@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Column, CellProps } from "react-table";
-import { Link } from "react-router-dom";
 import IngredientSearch from "../components/IngredientSearch";
 import PaginatedTable, {
   PaginationParameters,
@@ -10,6 +9,7 @@ import { IngredientsApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { toast } from "react-toastify";
 import { Button } from "../components/Button";
+import { RecipeLink } from "../components/Misc";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -91,11 +91,7 @@ const IngredientList: React.FC = () => {
               <ul>
                 {recipes.map((r) => (
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
-                    <Link to={`recipe/${r.id}`} className="link">
-                      <div className="flex">
-                        {r.name} (<div className="font-mono">v{r.version}</div>)
-                      </div>
-                    </Link>
+                    <RecipeLink recipe={r} />
                   </li>
                 ))}
               </ul>

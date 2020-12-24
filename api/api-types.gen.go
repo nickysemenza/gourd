@@ -132,8 +132,18 @@ type PaginatedPhotos struct {
 
 // PaginatedRecipes defines model for PaginatedRecipes.
 type PaginatedRecipes struct {
-	Meta    *List           `json:"meta,omitempty"`
-	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
+	Meta    *List     `json:"meta,omitempty"`
+	Recipes *[]Recipe `json:"recipes,omitempty"`
+}
+
+// Recipe defines model for Recipe.
+type Recipe struct {
+
+	// id
+	Id string `json:"id"`
+
+	// all the versions of the recipe
+	Versions []RecipeDetail `json:"versions"`
 }
 
 // RecipeDetail defines model for RecipeDetail.
