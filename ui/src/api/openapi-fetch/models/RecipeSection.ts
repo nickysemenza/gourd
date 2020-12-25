@@ -22,6 +22,10 @@ import {
     SectionInstructionFromJSON,
     SectionInstructionFromJSONTyped,
     SectionInstructionToJSON,
+    TimeRange,
+    TimeRangeFromJSON,
+    TimeRangeFromJSONTyped,
+    TimeRangeToJSON,
 } from './';
 
 /**
@@ -37,11 +41,11 @@ export interface RecipeSection {
      */
     id: string;
     /**
-     * How many minutes the step takes, approximately (todo - make this a range)
-     * @type {number}
+     * 
+     * @type {TimeRange}
      * @memberof RecipeSection
      */
-    minutes: number;
+    duration: TimeRange;
     /**
      * x
      * @type {Array<SectionInstruction>}
@@ -67,7 +71,7 @@ export function RecipeSectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'],
-        'minutes': json['minutes'],
+        'duration': json['duration'],
         'instructions': ((json['instructions'] as Array<any>).map(SectionInstructionFromJSON)),
         'ingredients': ((json['ingredients'] as Array<any>).map(SectionIngredientFromJSON)),
     };
@@ -83,7 +87,7 @@ export function RecipeSectionToJSON(value?: RecipeSection | null): any {
     return {
         
         'id': value.id,
-        'minutes': value.minutes,
+        'duration': value.duration,
         'instructions': ((value.instructions as Array<any>).map(SectionInstructionToJSON)),
         'ingredients': ((value.ingredients as Array<any>).map(SectionIngredientToJSON)),
     };

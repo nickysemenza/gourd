@@ -13,6 +13,8 @@ import {
   Ingredient,
   useCreateRecipes,
 } from "../api/openapi-hooks/api";
+import { TimeRange } from "../api/openapi-fetch";
+import { formatTimeRange } from "../util";
 
 type override = {
   sectionID: number;
@@ -275,13 +277,26 @@ const RecipeDetail: React.FC = () => {
       update(recipe, {
         detail: {
           sections: {
-            $push: [{ id: "", minutes: 0, ingredients: [], instructions: [] }],
+            $push: [
+              {
+                id: "",
+                duration: { min: 0, max: 0 },
+                ingredients: [],
+                instructions: [],
+              },
+            ],
           },
         },
       })
     );
   };
   const info = recipe.detail;
+  let totalDuration: TimeRange = { min: 0, max: 0 };
+  info.sections.forEach((s) => {
+    totalDuration.min += s.duration.min;
+    totalDuration.max += s.duration.max || 0;
+  });
+
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -305,10 +320,9 @@ const RecipeDetail: React.FC = () => {
               </div>
             )} */}
             {info.unit !== "" && (
-              <div className="text-sm text-gray-600">
-                Makes x {info.unit}. {info.total_minutes} minutes.
-              </div>
+              <div className="text-sm text-gray-600">Makes x {info.unit}</div>
             )}
+            {formatTimeRange(totalDuration)}
           </div>
         </div>
         <div className="inline-flex">
@@ -321,6 +335,7 @@ const RecipeDetail: React.FC = () => {
           </button>
           <button
             onClick={saveUpdate}
+            disabled={!edit}
             className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4"
           >
             save

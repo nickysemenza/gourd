@@ -6,6 +6,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
@@ -32,14 +33,18 @@ func NewAPI(m *manager.Manager) *API {
 }
 
 func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
+	sections, err := transformRecipeSections(dbr.Sections)
+	if err != nil {
+		panic(err)
+	}
 	return RecipeDetail{
-		Id:              dbr.Id,
-		Name:            dbr.Name,
-		Source:          dbr.Source.Ptr(),
-		TotalMinutes:    dbr.TotalMinutes.Ptr(),
+		Id:     dbr.Id,
+		Name:   dbr.Name,
+		Source: dbr.Source.Ptr(),
+		// TotalMinutes:    dbr.TotalMinutes.Ptr(),
 		Version:         &dbr.Version,
 		IsLatestVersion: &dbr.LatestVersion,
-		Sections:        transformRecipeSections(dbr.Sections),
+		Sections:        sections,
 	}
 }
 func transformRecipes(dbr db.RecipeDetails) []RecipeDetail {
@@ -62,15 +67,24 @@ func transformIngredient(dbr db.Ingredient) Ingredient {
 
 func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
-		Id:           r.Detail.Id,
-		Name:         r.Detail.Name,
-		Source:       zero.StringFromPtr(r.Detail.Source),
-		TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
+		Id:     r.Detail.Id,
+		Name:   r.Detail.Name,
+		Source: zero.StringFromPtr(r.Detail.Source),
+		// TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
 	}
 
 	for _, s := range r.Detail.Sections {
+		if len(s.Ingredients) == 0 && len(s.Instructions) == 0 {
+			// empty section, drop it
+			continue
+		}
+		data, err := json.Marshal(s.Duration)
+		if err != nil {
+			return nil, err
+		}
+
 		dbs := db.Section{
-			Minutes: zero.IntFrom(s.Minutes),
+			TimeRange: string(data),
 		}
 		for _, i := range s.Instructions {
 			if i.Instruction == "" {
@@ -149,7 +163,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 	return &dbr, nil
 
 }
-func transformRecipeSections(dbs []db.Section) []RecipeSection {
+func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 	s := []RecipeSection{}
 	for _, d := range dbs {
 		ing := []SectionIngredient{}
@@ -178,15 +192,18 @@ func transformRecipeSections(dbs []db.Section) []RecipeSection {
 			}
 			ing = append(ing, item)
 		}
-
-		s = append(s, RecipeSection{
+		rs := RecipeSection{
 			Id:           d.Id,
-			Minutes:      d.Minutes.Int64,
 			Ingredients:  ing,
 			Instructions: ins,
-		})
+		}
+		err := json.Unmarshal([]byte(d.TimeRange), &rs.Duration)
+		if err != nil {
+			return nil, err
+		}
+		s = append(s, rs)
 	}
-	return s
+	return s, nil
 }
 
 // List all recipes

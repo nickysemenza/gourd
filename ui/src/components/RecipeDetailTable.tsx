@@ -6,7 +6,7 @@ import {
   Ingredient,
   RecipeSection,
 } from "../api/openapi-hooks/api";
-import { formatText, getIngredient } from "../util";
+import { formatText, formatTimeRange, getIngredient } from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -211,7 +211,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           {String.fromCharCode(65 + x)}
         </div>
       </TableCell>
-      <TableCell>{section.minutes}</TableCell>
+      <TableCell>{formatTimeRange(section.duration)}</TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => {
           const bp = Math.round((ingredient.grams / flourMass) * 100);

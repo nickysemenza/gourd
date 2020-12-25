@@ -31,7 +31,6 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) error {
 	q := c.psql.
 		Update(recipeDetailsTable).Where(sq.Eq{"id": r.Id}).Set("name", r.Name).
-		Set("total_minutes", r.TotalMinutes).
 		Set("unit", r.Unit)
 
 	_, err := c.execTx(ctx, tx, q)
@@ -48,9 +47,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	}
 
 	// sections
-	sectionInsert := c.psql.Insert(sectionsTable).Columns("id", "recipe_detail", "minutes")
+	sectionInsert := c.psql.Insert(sectionsTable).Columns("id", "recipe_detail", "duration_timerange")
 	for _, s := range r.Sections {
-		sectionInsert = sectionInsert.Values(s.Id, s.RecipeDetailId, s.Minutes)
+		sectionInsert = sectionInsert.Values(s.Id, s.RecipeDetailId, s.TimeRange)
 	}
 
 	_, err = c.execTx(ctx, tx, sectionInsert)

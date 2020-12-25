@@ -18,3 +18,4 @@ export * from './RecipeWrapper';
 export * from './SearchResult';
 export * from './SectionIngredient';
 export * from './SectionInstruction';
+export * from './TimeRange';

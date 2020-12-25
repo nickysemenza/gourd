@@ -69,10 +69,7 @@ export interface RecipeSection {
    * id
    */
   id: string;
-  /**
-   * How many minutes the step takes, approximately (todo - make this a range)
-   */
-  minutes: number;
+  duration: TimeRange;
   /**
    * x
    */
@@ -124,10 +121,6 @@ export interface RecipeDetail {
    * recipe name
    */
   name: string;
-  /**
-   * todo
-   */
-  total_minutes?: number;
   /**
    * book or website? deprecated?
    */
@@ -298,6 +291,20 @@ export interface List {
    * Total number of pages available
    */
   page_count: number;
+}
+
+/**
+ * A range of time or a specific duration of time (in seconds)
+ */
+export interface TimeRange {
+  /**
+   * The minimum amount of seconds (or the total, if not a range)
+   */
+  min: number;
+  /**
+   * The maximum amount of seconds (if a range)
+   */
+  max: number;
 }
 
 export interface PaginatedRecipes {

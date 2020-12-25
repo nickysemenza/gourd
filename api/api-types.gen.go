@@ -170,9 +170,6 @@ type RecipeDetail struct {
 	// book or website? deprecated?
 	Source *string `json:"source,omitempty"`
 
-	// todo
-	TotalMinutes *int64 `json:"total_minutes,omitempty"`
-
 	// serving unit
 	Unit string `json:"unit"`
 
@@ -183,6 +180,9 @@ type RecipeDetail struct {
 // RecipeSection defines model for RecipeSection.
 type RecipeSection struct {
 
+	// A range of time or a specific duration of time (in seconds)
+	Duration TimeRange `json:"duration"`
+
 	// id
 	Id string `json:"id"`
 
@@ -191,9 +191,6 @@ type RecipeSection struct {
 
 	// x
 	Instructions []SectionInstruction `json:"instructions"`
-
-	// How many minutes the step takes, approximately (todo - make this a range)
-	Minutes int64 `json:"minutes"`
 }
 
 // RecipeWrapper defines model for RecipeWrapper.
@@ -255,6 +252,16 @@ type SectionInstruction struct {
 
 	// instruction
 	Instruction string `json:"instruction"`
+}
+
+// TimeRange defines model for TimeRange.
+type TimeRange struct {
+
+	// The maximum amount of seconds (if a range)
+	Max int `json:"max"`
+
+	// The minimum amount of seconds (or the total, if not a range)
+	Min int `json:"min"`
 }
 
 // LimitParam defines model for limitParam.

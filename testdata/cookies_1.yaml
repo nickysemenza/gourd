@@ -22,7 +22,8 @@ sections:
   instructions:
   - instruction: ''
   - instruction: aa
-  minutes: 33
+  duration:
+    min: 33
 - ingredients:
   - adjective: ''
     grams: 0
@@ -37,4 +38,5 @@ sections:
   instructions:
   - instruction: ''
   - instruction: add flour
-  minutes: 88
+  duration:
+    min: 88

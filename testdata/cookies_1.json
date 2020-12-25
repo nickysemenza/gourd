@@ -26,7 +26,7 @@
         }
       ],
       "instructions": [{ "instruction": "" }, { "instruction": "aa" }],
-      "minutes": 33
+      "duration": { "min": 33 }
     },
     {
       "ingredients": [
@@ -47,7 +47,7 @@
           "instruction": "add flour"
         }
       ],
-      "minutes": 88
+      "duration": { "min": 88 }
     }
   ]
 }

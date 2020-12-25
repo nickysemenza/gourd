@@ -14,7 +14,8 @@ sections:
     unit: cups
   instructions:
   - instruction: toast pecans for 10 minutes @ 350
-  minutes: 15
+  duration:
+    min: 900
 - ingredients:
   - amount: 0.75
     grams: 150
@@ -36,7 +37,8 @@ sections:
     unit: tbsp
   instructions:
   - instruction: melt, cook for 10 minutes with minimal stirring
-  minutes: 10
+  duration:
+    min: 60
 - ingredients:
   - amount: 0.5
     grams: 3
@@ -52,7 +54,8 @@ sections:
     unit: tsp
   instructions:
   - instruction: add salt/BS/pecans, pour onto parchment to cool
-  minutes: 20
+  duration:
+    min: 20
 ---
 name: CS Oat Pecan Cookies
 quantity: 0
@@ -68,7 +71,8 @@ sections:
     unit: stick
   instructions:
   - instruction: brown, add to mixer
-  minutes: 10
+  duration:
+    min: 600
 - ingredients:
   - adjective: cold
     amount: 1
@@ -80,7 +84,8 @@ sections:
   instructions:
   - instruction: 'add  to mixer with hot brown butter, '
   - instruction: let cool
-  minutes: 30
+  duration:
+    min: 1800
 - ingredients:
   - amount: 75
     grams: 150
@@ -96,7 +101,8 @@ sections:
     unit: cups
   instructions:
   - instruction: add to butters, cream
-  minutes: 3
+  duration:
+    min: 180
 - ingredients:
   - amount: 2
     grams: 100
@@ -113,7 +119,8 @@ sections:
     unit: tbsp
   instructions:
   - instruction: add to sugar/butter, mix
-  minutes: 2
+  duration:
+    min: 120
 - ingredients:
   - amount: 0.5
     grams: 100
@@ -148,7 +155,8 @@ sections:
   instructions:
   - instruction: food processor until combined
   - instruction: add to mixer
-  minutes: 2
+  duration:
+    min: 120
 - ingredients:
   - amount: 0.5
     grams: 100
@@ -164,8 +172,17 @@ sections:
     unit: cup
   instructions:
   - instruction: add to mixer
-  minutes: 1
+  duration:
+    min: 1
 - ingredients: []
   instructions:
   - instruction: roll out cookies, feeze for hours
-  minutes: 360
+  duration:
+    min: 3600
+    max: 43200
+- ingredients: []
+  instructions:
+  - instruction: bake at 350F
+  duration:
+    min: 720
+    max: 900

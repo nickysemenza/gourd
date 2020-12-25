@@ -37,7 +37,7 @@ func getRecipeDetailColumns() []string {
 	return []string{
 		"recipe_details.id",
 		"name", "version",
-		"total_minutes", "equipment",
+		"equipment",
 		"source", "servings",
 		"quantity", "recipe_details.unit", "is_latest_version"}
 }
@@ -53,7 +53,6 @@ type RecipeDetail struct {
 	Id            string      `db:"id"`
 	RecipeId      string      `db:"recipe"`
 	Name          string      `db:"name"`
-	TotalMinutes  zero.Int    `db:"total_minutes"`
 	Equipment     zero.String `db:"equipment"`
 	Source        zero.String `db:"source"`
 	Servings      zero.Int    `db:"servings"`
@@ -68,7 +67,7 @@ type RecipeDetail struct {
 type Section struct {
 	Id             string   `db:"id"`
 	RecipeDetailId string   `db:"recipe_detail"`
-	Minutes        zero.Int `db:"minutes"`
+	TimeRange      string   `db:"duration_timerange"`
 	Sort           zero.Int `db:"sort"`
 	Ingredients    []SectionIngredient
 	Instructions   []SectionInstruction

@@ -22,7 +22,8 @@ sections:
     unit: 
   instructions:
   - instruction: mix until foamy, start sugar
-  minutes: 2
+  duration: 
+    min: 2
 - ingredients:
   - adjective: 
     amount: 0
@@ -51,7 +52,8 @@ sections:
   instructions:
   - instruction: heat until 220F (target 293F)
   - instruction: hold on medium
-  minutes: 15
+  duration: 
+    min: 15
 - ingredients:
   - adjective: 
     amount: 0
@@ -66,7 +68,8 @@ sections:
   - instruction: add to almost-soft-peaks
   - instruction: add sugar (when it is 293F)
   - instruction: mix on medium-high 5 minutes
-  minutes: 10
+  duration: 
+    min: 10
 - ingredients:
   - adjective: toasted
     amount: 0
@@ -102,7 +105,8 @@ sections:
   instructions:
   - instruction: mix with paddle, add to tray with wafer paper
   - instruction: let cool 30m
-  minutes: 30
+  duration: 
+    min: 30
 - ingredients:
   - adjective: 
     amount: 0
@@ -122,7 +126,8 @@ sections:
     unit: 
   instructions:
   - instruction: for dusting tray
-  minutes: 0
+  duration: 
+    min: 0
 unit: 
 version: 2
 

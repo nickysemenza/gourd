@@ -29,15 +29,13 @@ This is comprised mulitple components:
 ### todo
 
 * allow merging ingredients together
-* calcualge average weights per-ingredient
+* calculate average weights per-ingredient
 * meals w/ multiple recipes at set quantities
 * slugs for recipe urls
 * associate ingredients with fdc ids
 * convert ingredient into recipe
 * ingredient amounts should be generic (1-n val-unit pairs)
 * `$/unit` for ingredients?
-* drag-and-drop ingredients/instructions into a new section 
-* drag-and-drop reorder for ingredients/instructions
 * change duration columns to seconds
 * for imported recips, keep 'original' ingredient line items pre-parsing
 * ingredient dependency graph

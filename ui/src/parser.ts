@@ -37,7 +37,9 @@ export const parseRecipe = (text: string): RecipeWrapper | undefined => {
       id: "",
       quantity: 0,
       unit: "",
-      sections: [{ id: "", minutes: 0, ingredients, instructions: [] }],
+      sections: [
+        { id: "", duration: { min: 0, max: 0 }, ingredients, instructions: [] },
+      ],
     },
 
     id: "",

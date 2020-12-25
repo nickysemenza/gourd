@@ -45,12 +45,6 @@ export interface RecipeDetail {
      */
     name: string;
     /**
-     * todo
-     * @type {number}
-     * @memberof RecipeDetail
-     */
-    totalMinutes?: number;
-    /**
      * book or website? deprecated?
      * @type {string}
      * @memberof RecipeDetail
@@ -101,7 +95,6 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'name': json['name'],
-        'totalMinutes': !exists(json, 'total_minutes') ? undefined : json['total_minutes'],
         'source': !exists(json, 'source') ? undefined : json['source'],
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
@@ -123,7 +116,6 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'name': value.name,
-        'total_minutes': value.totalMinutes,
         'source': value.source,
         'servings': value.servings,
         'quantity': value.quantity,

@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "id" TEXT NOT NULL UNIQUE,
   "recipe" TEXT references recipes(id) NOT NULL,
   "name" TEXT NOT NULL,
-  "total_minutes" INTEGER,
   "equipment" TEXT,
   "source" JSONB,
   "servings" INTEGER,
@@ -29,7 +28,7 @@ CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "id" TEXT NOT NULL UNIQUE,
   "recipe_detail" TEXT references recipe_details(id) NOT NULL,
   "sort" INTEGER,
-  "minutes" INTEGER,
+  "duration_timerange" JSONB,
   PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "recipe_section_instructions" (
