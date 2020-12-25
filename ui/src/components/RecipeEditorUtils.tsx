@@ -1,4 +1,4 @@
-import { Ingredient, RecipeWrapper } from "../api/openapi-hooks/api";
+import { Ingredient, RecipeWrapper, TimeRange } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 export type Override = {
   sectionID: number;
@@ -142,6 +142,23 @@ export const addSection = (recipe: RecipeWrapper) =>
             instructions: [],
           },
         ],
+      },
+    },
+  });
+
+export const updateTimeRange = (
+  recipe: RecipeWrapper,
+  sectionID: number,
+  value: TimeRange
+) =>
+  update(recipe, {
+    detail: {
+      sections: {
+        [sectionID]: {
+          duration: {
+            $set: value,
+          },
+        },
       },
     },
   });

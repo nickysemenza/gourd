@@ -4,6 +4,7 @@ import {
   RecipeDetail,
 } from "./api/openapi-hooks/api";
 import { TimeRange } from "./api/openapi-fetch";
+import parse from "parse-duration";
 
 export const getIngredient = (
   si: Partial<SectionIngredient>
@@ -53,9 +54,11 @@ const formatSeconds = (seconds: number) => {
   const m = Math.floor(divisor_for_minutes / 60);
   const s = Math.ceil(divisor_for_minutes % 60);
 
-  return (
-    (h > 0 ? `${h}h` : "") + (m > 0 ? `${m}m` : "") + (s > 0 ? `${s}s` : "")
-  );
+  let vals = [];
+  vals.push(h > 0 ? `${h} hr` : null);
+  vals.push(m > 0 ? `${m} min` : null);
+  vals.push(s > 0 ? `${s} sec` : null);
+  return vals.join(" ");
 };
 export const formatTimeRange = (range: TimeRange) => {
   const { min, max } = range;
@@ -63,5 +66,14 @@ export const formatTimeRange = (range: TimeRange) => {
   if (max > 0) {
     items.push(" - ", formatSeconds(max));
   }
-  return <div className="flex">{items}</div>;
+  return items.join("");
+};
+
+export const parseTimeRange = (input: string): TimeRange | null => {
+  const parts = input.split(" - ");
+  if (parts.length === 0 || parts.length > 2) return null;
+  return {
+    min: (parse(parts[0]) || 0) / 1000,
+    max: ((parts.length === 2 && parse(parts[1])) || 0) / 1000,
+  };
 };

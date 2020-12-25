@@ -2,7 +2,12 @@ import React, { useCallback } from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 import { RecipeWrapper, RecipeSection } from "../api/openapi-hooks/api";
-import { formatText, formatTimeRange, getIngredient } from "../util";
+import {
+  formatText,
+  formatTimeRange,
+  getIngredient,
+  parseTimeRange,
+} from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -21,6 +26,7 @@ import {
   RecipeTweaks,
   updateIngredientInfo,
   updateInstruction,
+  updateTimeRange,
 } from "./RecipeEditorUtils";
 
 export interface UpdateIngredientProps {
@@ -88,7 +94,20 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           {String.fromCharCode(65 + x)}
         </div>
       </TableCell>
-      <TableCell>{formatTimeRange(section.duration)}</TableCell>
+      <TableCell>
+        <TableInput
+          width={40}
+          data-cy="grams-input"
+          edit={edit}
+          value={formatTimeRange(section.duration)}
+          blur
+          onChange={(e) =>
+            setRecipe(
+              updateTimeRange(recipe, x, parseTimeRange(e) || section.duration)
+            )
+          }
+        />
+      </TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => {
           const bp = Math.round((ingredient.grams / flourMass) * 100);
@@ -271,15 +290,15 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     <DndProvider backend={HTML5Backend}>
       <div className="border-gray-900 shadow-xl bg-gray-100">
         <TableRow header>
-          <TableCell>Section</TableCell>
-          <TableCell>Minutes</TableCell>
+          <TableCell></TableCell>
+          <TableCell>Time</TableCell>
           <TableCell>
             <div className="ing-table-row font-mono">
               <div>x</div>
-              <div>grams (BP)</div>
+              <div>g {showBP && "(BP)"}</div>
               <div>of y</div>
-              <div>z</div>
-              <div>units</div>
+              <div>[z</div>
+              <div>units],</div>
               <div>modifier</div>
             </div>
           </TableCell>

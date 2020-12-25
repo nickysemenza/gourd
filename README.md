@@ -8,7 +8,10 @@ Before modern technology, people would use hollowed out gourds as food storage c
 
 ## this project is a WIP
 
-[![codecov](https://codecov.io/gh/nickysemenza/gourd/branch/master/graph/badge.svg)](https://codecov.io/gh/nickysemenza/gourd) [![Go Report Card](https://goreportcard.com/badge/github.com/nickysemenza/gourd)](https://goreportcard.com/report/github.com/nickysemenza/gourd) [![CircleCI](https://circleci.com/gh/nickysemenza/gourd.svg?style=svg)](https://circleci.com/gh/nickysemenza/gourd) [![GoDoc](https://godoc.org/github.com/nickysemenza/gourd?status.svg)](https://pkg.go.dev/github.com/nickysemenza/gourd)
+[![codecov](https://codecov.io/gh/nickysemenza/gourd/branch/master/graph/badge.svg)](https://codecov.io/gh/nickysemenza/gourd)
+[![Go Report Card](https://goreportcard.com/badge/github.com/nickysemenza/gourd)](https://goreportcard.com/report/github.com/nickysemenza/gourd)
+[![CircleCI](https://circleci.com/gh/nickysemenza/gourd.svg?style=svg)](https://circleci.com/gh/nickysemenza/gourd)
+[![GoDoc](https://godoc.org/github.com/nickysemenza/gourd?status.svg)](https://pkg.go.dev/github.com/nickysemenza/gourd)
 
 ## features
 
@@ -32,12 +35,9 @@ This is comprised mulitple components:
 * calculate average weights per-ingredient
 * meals w/ multiple recipes at set quantities
 * slugs for recipe urls
-* associate ingredients with fdc ids
-* convert ingredient into recipe
+* associate ingredients with fdc ids on UI
 * ingredient amounts should be generic (1-n val-unit pairs)
+* substitute ingredients
 * `$/unit` for ingredients?
-* change duration columns to seconds
-* for imported recips, keep 'original' ingredient line items pre-parsing
+* for imported recipes, keep 'original' ingredient line items pre-parsing
 * ingredient dependency graph
-
-range: min max approx unit kind (time, amount)

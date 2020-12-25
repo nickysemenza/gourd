@@ -23,7 +23,7 @@ func TestInsertGet(t *testing.T) {
 
 	insertedDetail, err := db.InsertRecipe(ctx, &RecipeDetail{
 		Name:     fmt.Sprintf("r-%d", time.Now().Unix()),
-		Sections: []Section{{}},
+		Sections: []Section{{TimeRange: `{"max": 69, "min": 7}`}},
 	})
 
 	require.NoError(err)
@@ -42,12 +42,14 @@ func TestInsertGet(t *testing.T) {
 	require.NoError(err)
 	r.Unit = zero.StringFrom("items")
 	r.Sections = []Section{{
+		TimeRange:    `{"max": 69, "min": 7}`,
 		Instructions: []SectionInstruction{{Instruction: "add flour"}},
 		Ingredients: []SectionIngredient{{
 			Grams:        zero.FloatFrom(52),
 			IngredientId: zero.StringFrom(ingFlour.Id),
 		}},
 	}, {
+		TimeRange:    `{"max": 69, "min": 7}`,
 		Instructions: []SectionInstruction{{Instruction: "add more flour"}, {Instruction: "mix"}},
 		Ingredients: []SectionIngredient{{
 			Grams:        zero.FloatFrom(1),
@@ -75,6 +77,7 @@ func TestInsertGet(t *testing.T) {
 	_, err = db.InsertRecipe(ctx, &RecipeDetail{
 		Name: fmt.Sprintf("r2-%d", time.Now().Unix()),
 		Sections: []Section{{
+			TimeRange: `{"max": 69, "min": 7}`,
 			Ingredients: []SectionIngredient{{
 				Grams:    zero.FloatFrom(52),
 				RecipeId: zero.StringFrom(r2.RecipeId),
