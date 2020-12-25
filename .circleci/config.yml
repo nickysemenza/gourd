@@ -42,7 +42,7 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
       - run:
-          command: make bin/migrate && ./bin/migrate -source file://migrations -database postgres://gourd@localhost:5432/food?sslmode=disable up
+          command: make bin/migrate && ./bin/migrate -source file://db/migrations -database postgres://gourd@localhost:5432/food?sslmode=disable up
       - run:
           command: |
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)

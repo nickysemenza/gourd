@@ -57,7 +57,7 @@ func makeServer() (*server.Server, error) {
 		log.Fatal(err)
 	}
 
-	// postgres migrations
+	// postgres db/migrations
 	if err := autoMigrate(dbConn); err != nil {
 		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
@@ -104,7 +104,7 @@ func autoMigrate(dbConn *sql.DB) error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://./migrations",
+		"file://./db/migrations",
 		"postgres", driver)
 	if err != nil {
 		return fmt.Errorf("failed to initialize migrator: %w", err)

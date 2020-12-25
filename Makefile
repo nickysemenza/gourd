@@ -69,12 +69,12 @@ docker-push: docker-build
 dev-db:
 	pgcli postgres://gourd:gourd@localhost:5555/food
 new-migrate/%: bin/migrate
-	mkdir -p migrations
-	./bin/migrate create -dir migrations -ext sql $(@F)
+	mkdir -p db/migrations
+	./bin/migrate create -dir db/migrations -ext sql $(@F)
 migrate: bin/migrate
-	./bin/migrate -source file://migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable up
+	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable up
 migrate-down: bin/migrate
-	./bin/migrate -source file://migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
+	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
 
 
 

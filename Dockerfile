@@ -19,6 +19,6 @@ RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 WORKDIR /work
 COPY --from=builder /work/bin ./bin
-COPY --from=builder /work/migrations ./migrations
+COPY --from=builder /work/db/migrations ./db/migrations
 RUN ls
 ENTRYPOINT ["./bin/gourd","server"]
