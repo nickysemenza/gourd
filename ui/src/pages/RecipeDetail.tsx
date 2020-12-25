@@ -186,20 +186,22 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
+  const isOverride = (
+    sectionID: number,
+    ingredientID: number,
+    attr: "grams" | "amount"
+  ) =>
+    override?.ingredientID === ingredientID &&
+    override.sectionID === sectionID &&
+    override.attr === attr;
   const getIngredientValue = (
     sectionID: number,
     ingredientID: number,
     value: number,
     attr: "grams" | "amount"
-  ) => {
-    if (
-      override?.ingredientID === ingredientID &&
-      override.sectionID === sectionID &&
-      override.attr === attr
-    )
-      return override.value;
-    return value * multiplier;
-  };
+  ) =>
+    (isOverride(sectionID, ingredientID, attr) && override?.value) ||
+    value * multiplier;
 
   const updateInstruction = (
     sectionID: number,
@@ -354,6 +356,7 @@ const RecipeDetail: React.FC = () => {
         updateIngredientInfo={updateIngredientInfo}
         recipe={recipe}
         getIngredientValue={getIngredientValue}
+        isOverride={isOverride}
         edit={edit}
         addInstruction={addInstruction}
         addIngredient={addIngredient}

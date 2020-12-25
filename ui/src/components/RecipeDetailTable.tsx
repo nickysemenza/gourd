@@ -41,6 +41,11 @@ export interface TableProps {
     value: number,
     attr: "grams" | "amount"
   ) => number;
+  isOverride: (
+    sectionID: number,
+    ingredientID: number,
+    attr: "grams" | "amount"
+  ) => boolean;
   edit: boolean;
   addInstruction: (sectionID: number) => void;
   addIngredient: (sectionID: number) => void;
@@ -53,6 +58,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   updateIngredientInfo,
   updateInstruction,
   getIngredientValue,
+  isOverride,
   edit,
   addInstruction,
   addIngredient,
@@ -218,15 +224,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           return (
             <div className="ing-table-row" key={y}>
               <TableInput
+                width={14}
                 data-cy="grams-input"
                 edit={edit}
                 softEdit
                 value={getIngredientValue(x, y, ingredient.grams || 0, "grams")}
+                blur
+                highlight={isOverride(x, y, "grams")}
                 onChange={(e) =>
                   updateIngredient({
                     sectionID: x,
                     ingredientID: y,
-                    value: e.target.value,
+                    value: e,
                     attr: "grams",
                   })
                 }
@@ -269,6 +278,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 // width={16}
                 edit={edit}
                 softEdit
+                highlight={isOverride(x, y, "amount")}
                 value={getIngredientValue(
                   x,
                   y,
@@ -279,7 +289,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   updateIngredient({
                     sectionID: x,
                     ingredientID: y,
-                    value: e.target.value,
+                    value: e,
                     attr: "amount",
                   })
                 }
@@ -293,7 +303,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   updateIngredient({
                     sectionID: x,
                     ingredientID: y,
-                    value: e.target.value,
+                    value: e,
                     attr: "unit",
                   })
                 }
@@ -307,7 +317,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   updateIngredient({
                     sectionID: x,
                     ingredientID: y,
-                    value: e.target.value,
+                    value: e,
                     attr: "adjective",
                   })
                 }
@@ -334,7 +344,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               tall
               edit={edit}
               value={instruction.instruction}
-              onChange={(e) => updateInstruction(x, y, e.target.value)}
+              onChange={(e) => updateInstruction(x, y, e)}
             />
             <div>{iActions(x, y, "instructions")}</div>
           </div>
@@ -420,32 +430,84 @@ const TableRow: React.FC<{ header?: boolean }> = ({
   <div className={`rec-table-row ${header && "font-semibold"}`}>{children}</div>
 );
 
-const TableInput: React.FC<{
+// <input> can't do onBlur?
+type TallOrBlur =
+  | {
+      tall: true;
+      blur?: false;
+    }
+  | {
+      blur?: boolean;
+      tall?: false;
+    };
+
+type TableInputProps = {
   edit: boolean;
   softEdit?: boolean;
   value: string | number;
   width?: number;
-  tall?: boolean;
-  onChange: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
-}> = ({ edit, softEdit = false, width = 10, tall, ...props }) => {
-  const className = `border-2 border-dashed p-0 h-${
-    tall ? 18 : 6
-  } w-${width} border-gray-200 disabled:border-red-100 hover:border-black ${
+  highlight?: boolean;
+  onChange: (event: string) => void;
+} & TallOrBlur;
+
+const TableInput: React.FC<TableInputProps> = ({
+  edit,
+  softEdit = false,
+  width = 10,
+  tall = false,
+  blur = false,
+  highlight = false,
+  value,
+  onChange,
+  ...props
+}) => {
+  const controlledVal = value.toString();
+  const [internalVal, setVal] = React.useState(controlledVal);
+  React.useEffect(() => {
+    setVal(controlledVal);
+  }, [controlledVal]);
+
+  const oC = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setVal(e.target.value);
+    if (!blur) {
+      onChange(e.target.value);
+    }
+  };
+  const oB = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!blur) {
+      return;
+    }
+    if (internalVal !== controlledVal) {
+      onChange(internalVal);
+    }
+  };
+
+  const className = `border-2 border-dashedp-0 h-${tall ? 18 : 6} w-${width} ${
+    highlight ? "border-blue-400" : "border-gray-200"
+  } disabled:border-red-100 hover:border-black ${
     softEdit && !edit && "bg-transparent"
   } focus:bg-gray-200`;
+
   return edit || softEdit ? (
     tall ? (
-      <textarea {...props} className={className} rows={3} />
+      <textarea
+        {...props}
+        value={internalVal}
+        onChange={oC}
+        className={className}
+        rows={3}
+      />
     ) : (
       <input
         {...props}
+        value={internalVal}
+        onChange={oC}
+        onBlur={oB}
         className={className}
-        disabled={!edit && props.value === 0}
+        disabled={!edit && controlledVal === "0"}
       />
     )
   ) : (
-    <p className="flex flex-wrap">{formatText(props.value)}</p>
+    <p className="flex flex-wrap">{formatText(internalVal)}</p>
   );
 };
