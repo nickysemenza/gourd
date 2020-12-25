@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
 import {
@@ -6,17 +6,12 @@ import {
   Ingredient,
   RecipeSection,
 } from "../api/openapi-hooks/api";
-import { getIngredient } from "../util";
-import {
-  useDrag,
-  useDrop,
-  DropTargetMonitor,
-  XYCoord,
-  DndProvider,
-} from "react-dnd";
+import { formatText, getIngredient } from "../util";
+import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import { Button } from "./Button";
+import { DragWrapper } from "./DragDrop";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -64,8 +59,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   addSection,
   setRecipe,
 }) => {
+  const { sections } = recipe.detail;
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
-  const flourMass = (recipe.detail.sections || []).reduce(
+  const flourMass = (sections || []).reduce(
     (acc, section) =>
       acc +
       section.ingredients
@@ -82,8 +78,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     movingUp: boolean,
     i: I
   ) => {
-    const numI = recipe.detail.sections[sectionIndex][i].length;
-    const numSections = recipe.detail.sections.length;
+    const numI = sections[sectionIndex][i].length;
+    const numSections = sections.length;
     const firstInSection = index === 0;
     const lastInSection = index === numI - 1;
 
@@ -93,24 +89,23 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       // needs to go to prior section
       newSectionIndex--;
       if (newSectionIndex < 0) {
+        // out of bounds
         return null;
       }
-      newInIndex = recipe.detail.sections[newSectionIndex][i].length;
+      newInIndex = sections[newSectionIndex][i].length;
     } else if (!firstInSection && movingUp) {
       // prior row in same section
-
       newInIndex = index - 1;
     } else if (lastInSection && !movingUp) {
       // needs to go to next section
-
       newSectionIndex++;
       if (newSectionIndex > numSections - 1) {
+        // out of bounds
         return null;
       }
       newInIndex = 0;
     } else {
       // next row in same section
-
       newInIndex = index + 1;
     }
 
@@ -130,15 +125,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   ) => {
     const coords = calculateMoveI(sectionIndex, index, movingUp, i);
     if (!coords) return;
-    console.log("moving!");
     const { newSectionIndex, newInIndex } = coords;
-    console.log({
+    console.log("moving!", {
       sectionIndex,
       newSectionIndex,
       index,
       newInIndex,
     });
-    const target = recipe.detail.sections[sectionIndex][i][index];
+    const target = sections[sectionIndex][i][index];
     setRecipe(
       update(recipe, {
         detail: {
@@ -170,6 +164,45 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       })
     );
   };
+  const delI = (sectionIndex: number, index: number, i: I) =>
+    setRecipe(
+      update(recipe, {
+        detail: {
+          sections: {
+            [sectionIndex]: {
+              [i]: {
+                $splice: [[index, 1]],
+              },
+            },
+          },
+        },
+      })
+    );
+  const iActions = (x: number, y: number, i: I) =>
+    edit && (
+      <div className="flex space-x-1">
+        <Button
+          onClick={() => {
+            moveI(x, y, true, i);
+          }}
+          disabled={!canMoveI(x, y, true, i)}
+          label={`up`}
+        />
+        <Button
+          onClick={() => {
+            moveI(x, y, false, i);
+          }}
+          disabled={!canMoveI(x, y, false, i)}
+          label={`down`}
+        />
+        <Button
+          onClick={() => {
+            delI(x, y, i);
+          }}
+          label={`del`}
+        />
+      </div>
+    );
 
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
@@ -279,26 +312,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   })
                 }
               />
-              <div>
-                {edit && (
-                  <div className="flex space-x-1">
-                    <Button
-                      onClick={() => {
-                        moveI(x, y, true, "ingredients");
-                      }}
-                      disabled={!canMoveI(x, y, true, "ingredients")}
-                      label={`up-${x}-${y}`}
-                    />
-                    <Button
-                      onClick={() => {
-                        moveI(x, y, false, "ingredients");
-                      }}
-                      disabled={!canMoveI(x, y, false, "ingredients")}
-                      label={`down-${x}-${y}`}
-                    />
-                  </div>
-                )}
-              </div>
+              <div>{iActions(x, y, "ingredients")}</div>
               {/* TODO: optional toggle */}
             </div>
           );
@@ -322,26 +336,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               value={instruction.instruction}
               onChange={(e) => updateInstruction(x, y, e.target.value)}
             />
-            <div>
-              {edit && (
-                <div className="flex space-x-1">
-                  <Button
-                    onClick={() => {
-                      moveI(x, y, true, "instructions");
-                    }}
-                    disabled={!canMoveI(x, y, true, "instructions")}
-                    label={`up-${x}-${y}`}
-                  />
-                  <Button
-                    onClick={() => {
-                      moveI(x, y, false, "instructions");
-                    }}
-                    disabled={!canMoveI(x, y, false, "instructions")}
-                    label={`down-${x}-${y}`}
-                  />
-                </div>
-              )}
-            </div>
+            <div>{iActions(x, y, "instructions")}</div>
           </div>
         ))}
         {/* </ol> */}
@@ -353,8 +348,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       </TableCell>
     </TableRow>
   );
-
-  const { sections } = recipe.detail;
 
   const moveCard = useCallback(
     (dragIndex: number, hoverIndex: number) => {
@@ -396,7 +389,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <TableCell>Instructions</TableCell>
         </TableRow>
         {sections?.map((section, x) => (
-          <Card
+          <DragWrapper
             key={section.id}
             index={x}
             id={section.id}
@@ -404,7 +397,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             enable={edit}
           >
             {renderRow(section, x)}
-          </Card>
+          </DragWrapper>
         ))}
         {edit && (
           <div className="add-item" onClick={() => addSection()}>
@@ -454,128 +447,5 @@ const TableInput: React.FC<{
     )
   ) : (
     <p className="flex flex-wrap">{formatText(props.value)}</p>
-  );
-};
-const re = /[\d]* ?F/g;
-const formatText = (text: React.ReactText) => {
-  if (typeof text === "number") {
-    return text;
-  }
-
-  let pairs = [];
-  const matches = [...text.matchAll(re)];
-  if (matches.length === 0) {
-    return text;
-  }
-
-  let lastProcessed = 0;
-  for (const match of matches) {
-    const matchStart = match.index || 0;
-    const matchEnd = matchStart + match[0].length;
-    pairs.push(text.substring(lastProcessed, matchStart));
-    pairs.push(
-      <code className="text-red-800 mx-1">
-        {text.substring(matchStart, matchEnd)}
-      </code>
-    );
-    // pairs.push()
-    lastProcessed = matchEnd;
-    // pairs.push([, ]);
-  }
-  pairs.push(text.substring(lastProcessed));
-  // let res = [];
-  // for
-  return pairs;
-
-  // console.log(pairs);
-};
-
-export interface CardProps {
-  id: any;
-  index: number;
-  moveCard: (dragIndex: number, hoverIndex: number) => void;
-  enable: boolean;
-}
-
-interface DragItem {
-  index: number;
-  id: string;
-  type: string;
-}
-
-export const Card: React.FC<CardProps> = ({
-  id,
-  index,
-  moveCard,
-  children,
-  enable,
-}) => {
-  // https://github.com/react-dnd/react-dnd/blob/main/packages/examples-hooks/src/04-sortable/simple/Card.tsx
-  const ref = useRef<HTMLDivElement>(null);
-  const [, drop] = useDrop({
-    accept: "card1",
-    hover(item: DragItem, monitor: DropTargetMonitor) {
-      if (!ref.current) {
-        return;
-      }
-      const dragIndex = item.index;
-      const hoverIndex = index;
-
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-
-      // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
-
-      // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
-
-      // Get pixels to the top
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
-
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
-
-      // Dragging downwards
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return;
-      }
-
-      // Dragging upwards
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return;
-      }
-
-      // Time to actually perform the action
-      moveCard(dragIndex, hoverIndex);
-
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.index = hoverIndex;
-    },
-  });
-
-  const [{ isDragging }, drag] = useDrag({
-    item: { type: "card1", id, index },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const opacity = isDragging ? 0 : 1;
-  if (enable) drag(drop(ref));
-  return (
-    <div ref={ref} style={{ opacity }}>
-      {children}
-    </div>
   );
 };
