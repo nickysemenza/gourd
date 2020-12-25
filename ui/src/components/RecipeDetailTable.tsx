@@ -1,11 +1,7 @@
 import React, { useCallback } from "react";
 import IngredientSearch from "./IngredientSearch";
 import { Link } from "react-router-dom";
-import {
-  RecipeWrapper,
-  Ingredient,
-  RecipeSection,
-} from "../api/openapi-hooks/api";
+import { RecipeWrapper, RecipeSection } from "../api/openapi-hooks/api";
 import { formatText, formatTimeRange, getIngredient } from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -13,9 +9,18 @@ import update from "immutability-helper";
 import { Button } from "./Button";
 import { DragWrapper } from "./DragDrop";
 import {
-  IngredientAttr,
-  IngredientKind,
+  addIngredient,
+  addInstruction,
+  addSection,
+  canMoveI,
+  delI,
+  getIngredientValue,
+  I,
+  isOverride,
+  moveI,
   RecipeTweaks,
+  updateIngredientInfo,
+  updateInstruction,
 } from "./RecipeEditorUtils";
 
 export interface UpdateIngredientProps {
@@ -28,50 +33,16 @@ export interface UpdateIngredientProps {
 export interface TableProps {
   recipe: RecipeWrapper;
   updateIngredient: (i: UpdateIngredientProps) => void;
-  updateIngredientInfo: (
-    sectionID: number,
-    ingredientID: number,
-    ingredient: Pick<Ingredient, "id" | "name">,
-    kind: IngredientKind
-  ) => void;
-  updateInstruction: (
-    sectionID: number,
-    instructionID: number,
-    value: string
-  ) => void;
-
-  getIngredientValue: (
-    sectionID: number,
-    ingredientID: number,
-    value: number,
-    attr: IngredientAttr
-  ) => number;
-  isOverride: (
-    sectionID: number,
-    ingredientID: number,
-    attr: IngredientAttr
-  ) => boolean;
-  edit: boolean;
-  addInstruction: (sectionID: number) => void;
-  addIngredient: (sectionID: number) => void;
-  addSection: () => void;
   setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
   tweaks: RecipeTweaks;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
-  updateIngredientInfo,
-  updateInstruction,
-  getIngredientValue,
-  isOverride,
-  edit,
-  addInstruction,
-  addIngredient,
-  addSection,
   setRecipe,
   tweaks,
 }) => {
+  const { edit } = tweaks;
   const { sections } = recipe.detail;
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
   const flourMass = (sections || []).reduce(
@@ -84,133 +55,26 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   );
   const showBP = flourMass > 0;
 
-  type I = "ingredients" | "instructions";
-  const calculateMoveI = (
-    sectionIndex: number,
-    index: number,
-    movingUp: boolean,
-    i: I
-  ) => {
-    const numI = sections[sectionIndex][i].length;
-    const numSections = sections.length;
-    const firstInSection = index === 0;
-    const lastInSection = index === numI - 1;
-
-    let newSectionIndex = sectionIndex;
-    let newInIndex: number;
-    if (firstInSection && movingUp) {
-      // needs to go to prior section
-      newSectionIndex--;
-      if (newSectionIndex < 0) {
-        // out of bounds
-        return null;
-      }
-      newInIndex = sections[newSectionIndex][i].length;
-    } else if (!firstInSection && movingUp) {
-      // prior row in same section
-      newInIndex = index - 1;
-    } else if (lastInSection && !movingUp) {
-      // needs to go to next section
-      newSectionIndex++;
-      if (newSectionIndex > numSections - 1) {
-        // out of bounds
-        return null;
-      }
-      newInIndex = 0;
-    } else {
-      // next row in same section
-      newInIndex = index + 1;
-    }
-
-    return { newSectionIndex, newInIndex };
-  };
-  const canMoveI = (
-    sectionIndex: number,
-    index: number,
-    movingUp: boolean,
-    i: I
-  ) => !!calculateMoveI(sectionIndex, index, movingUp, i);
-  const moveI = (
-    sectionIndex: number,
-    index: number,
-    movingUp: boolean,
-    i: I
-  ) => {
-    const coords = calculateMoveI(sectionIndex, index, movingUp, i);
-    if (!coords) return;
-    const { newSectionIndex, newInIndex } = coords;
-    console.log("moving!", {
-      sectionIndex,
-      newSectionIndex,
-      index,
-      newInIndex,
-    });
-    const target = sections[sectionIndex][i][index];
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections:
-            newSectionIndex === sectionIndex
-              ? {
-                  [sectionIndex]: {
-                    [i]: {
-                      $splice: [
-                        [index, 1],
-                        [newInIndex, 0, target],
-                      ],
-                    },
-                  },
-                }
-              : {
-                  [sectionIndex]: {
-                    [i]: {
-                      $splice: [[index, 1]],
-                    },
-                  },
-                  [newSectionIndex]: {
-                    [i]: {
-                      $splice: [[newInIndex, 0, target]],
-                    },
-                  },
-                },
-        },
-      })
-    );
-  };
-  const delI = (sectionIndex: number, index: number, i: I) =>
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections: {
-            [sectionIndex]: {
-              [i]: {
-                $splice: [[index, 1]],
-              },
-            },
-          },
-        },
-      })
-    );
   const iActions = (x: number, y: number, i: I) =>
     edit && (
       <div className="flex space-x-1">
         <Button
           onClick={() => {
-            moveI(x, y, true, i);
+            setRecipe(moveI(recipe, x, y, true, i));
           }}
-          disabled={!canMoveI(x, y, true, i)}
+          disabled={!canMoveI(recipe, x, y, true, i)}
           label={`up`}
         />
         <Button
           onClick={() => {
-            moveI(x, y, false, i);
+            setRecipe(moveI(recipe, x, y, false, i));
           }}
-          disabled={!canMoveI(x, y, false, i)}
+          disabled={!canMoveI(recipe, x, y, false, i)}
           label={`down`}
         />
         <Button
           onClick={() => {
-            delI(x, y, i);
+            setRecipe(delI(recipe, x, y, i));
           }}
           label={`del`}
         />
@@ -228,6 +92,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       <TableCell>
         {section.ingredients.map((ingredient, y) => {
           const bp = Math.round((ingredient.grams / flourMass) * 100);
+          const { edit } = tweaks;
           return (
             <div className="ing-table-row" key={y}>
               <TableInput
@@ -235,9 +100,15 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 data-cy="grams-input"
                 edit={edit}
                 softEdit
-                value={getIngredientValue(x, y, ingredient.grams || 0, "grams")}
+                value={getIngredientValue(
+                  tweaks,
+                  x,
+                  y,
+                  ingredient.grams || 0,
+                  "grams"
+                )}
                 blur
-                highlight={isOverride(x, y, "grams")}
+                highlight={isOverride(tweaks, x, y, "grams")}
                 onChange={(e) =>
                   updateIngredient({
                     sectionID: x,
@@ -263,7 +134,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 <IngredientSearch
                   initial={getIngredient(ingredient).name}
                   callback={(item, kind) =>
-                    updateIngredientInfo(x, y, item, kind)
+                    setRecipe(updateIngredientInfo(recipe, x, y, item, kind))
                   }
                 />
               ) : (
@@ -285,8 +156,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 // width={16}
                 edit={edit}
                 softEdit
-                highlight={isOverride(x, y, "amount")}
+                highlight={isOverride(tweaks, x, y, "amount")}
                 value={getIngredientValue(
+                  tweaks,
                   x,
                   y,
                   ingredient.amount || 0,
@@ -335,7 +207,10 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           );
         })}
         {edit && (
-          <div className="add-item" onClick={() => addIngredient(x)}>
+          <div
+            className="add-item"
+            onClick={() => setRecipe(addIngredient(recipe, x))}
+          >
             add ingredient
           </div>
         )}
@@ -351,14 +226,19 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               tall
               edit={edit}
               value={instruction.instruction}
-              onChange={(e) => updateInstruction(x, y, e)}
+              onChange={(e) =>
+                setRecipe(updateInstruction(recipe, tweaks, x, y, e))
+              }
             />
             <div>{iActions(x, y, "instructions")}</div>
           </div>
         ))}
         {/* </ol> */}
         {edit && (
-          <div className="add-item" onClick={() => addInstruction(x)}>
+          <div
+            className="add-item"
+            onClick={() => setRecipe(addInstruction(recipe, x))}
+          >
             add instruction
           </div>
         )}
@@ -417,7 +297,10 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           </DragWrapper>
         ))}
         {edit && (
-          <div className="add-item" onClick={() => addSection()}>
+          <div
+            className="add-item"
+            onClick={() => setRecipe(addSection(recipe))}
+          >
             add section
           </div>
         )}

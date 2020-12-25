@@ -8,18 +8,13 @@ import Debug from "../components/Debug";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
-import {
-  useGetRecipeById,
-  Ingredient,
-  useCreateRecipes,
-} from "../api/openapi-hooks/api";
+import { useGetRecipeById, useCreateRecipes } from "../api/openapi-hooks/api";
 import { TimeRange } from "../api/openapi-fetch";
 import { formatTimeRange } from "../util";
 import {
-  IngredientAttr,
-  IngredientKind,
   Override,
   RecipeTweaks,
+  updateRecipeName,
 } from "../components/RecipeEditorUtils";
 
 const RecipeDetail: React.FC = () => {
@@ -36,7 +31,7 @@ const RecipeDetail: React.FC = () => {
 
   const tweaks: RecipeTweaks = { override, multiplier, edit };
   const { mutate: post } = useCreateRecipes({
-    onMutate: (_, data) => {
+    onMutate: (_) => {
       // setRecipe(data);
     },
   });
@@ -85,38 +80,6 @@ const RecipeDetail: React.FC = () => {
 
   if (!recipe) return null;
 
-  const updateIngredientInfo = (
-    sectionID: number,
-    ingredientID: number,
-    ingredient: Ingredient,
-    kind: IngredientKind
-  ) => {
-    const { id, name } = ingredient;
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections: {
-            [sectionID]: {
-              ingredients: {
-                [ingredientID]: {
-                  recipe: {
-                    $set:
-                      kind === "recipe"
-                        ? { id, name, quantity: 0, unit: "", sections: [] }
-                        : undefined,
-                  },
-                  ingredient: {
-                    $set: kind === "ingredient" ? { id, name } : undefined,
-                  },
-                  kind: { $set: kind },
-                },
-              },
-            },
-          },
-        },
-      })
-    );
-  };
   const updateIngredient = ({
     sectionID,
     ingredientID,
@@ -131,13 +94,6 @@ const RecipeDetail: React.FC = () => {
               [sectionID]: {
                 ingredients: {
                   [ingredientID]: {
-                    // info: {
-                    //   id: "",
-                    //   name: {
-                    //     $apply: (v) => (attr === "name" ? value : v),
-                    //   },
-                    // },
-                    // yikes
                     grams: {
                       $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
                     },
@@ -187,112 +143,6 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const isOverride = (
-    sectionID: number,
-    ingredientID: number,
-    attr: IngredientAttr
-  ) =>
-    override?.ingredientID === ingredientID &&
-    override.sectionID === sectionID &&
-    override.attr === attr;
-  const getIngredientValue = (
-    sectionID: number,
-    ingredientID: number,
-    value: number,
-    attr: IngredientAttr
-  ) =>
-    (isOverride(sectionID, ingredientID, attr) && override?.value) ||
-    value * multiplier;
-
-  const updateInstruction = (
-    sectionID: number,
-    instructionID: number,
-    value: string
-  ) => {
-    edit &&
-      setRecipe(
-        update(recipe, {
-          detail: {
-            sections: {
-              [sectionID]: {
-                instructions: {
-                  [instructionID]: { instruction: { $set: value } },
-                },
-              },
-            },
-          },
-        })
-      );
-  };
-
-  const updateRecipeName = (value: string) => {
-    setRecipe(
-      update(recipe, {
-        detail: { name: { $set: value } },
-      })
-    );
-  };
-
-  const addInstruction = (sectionID: number) => {
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections: {
-            [sectionID]: {
-              instructions: {
-                $push: [{ id: "", instruction: "" }],
-              },
-            },
-          },
-        },
-      })
-    );
-  };
-
-  const addIngredient = (sectionID: number) => {
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections: {
-            [sectionID]: {
-              ingredients: {
-                $push: [
-                  {
-                    id: "",
-                    grams: 1,
-                    kind: "ingredient",
-                    // info: { name: "", id: "", __typename: "Ingredient" },
-                    amount: 0,
-                    unit: "",
-                    adjective: "",
-                    optional: false,
-                  },
-                ],
-              },
-            },
-          },
-        },
-      })
-    );
-  };
-  const addSection = () => {
-    setRecipe(
-      update(recipe, {
-        detail: {
-          sections: {
-            $push: [
-              {
-                id: "",
-                duration: { min: 0, max: 0 },
-                ingredients: [],
-                instructions: [],
-              },
-            ],
-          },
-        },
-      })
-    );
-  };
   const info = recipe.detail;
   let totalDuration: TimeRange = { min: 0, max: 0 };
   info.sections.forEach((s) => {
@@ -308,7 +158,9 @@ const RecipeDetail: React.FC = () => {
             <input
               className="border-2 w-96"
               value={info.name}
-              onChange={(e) => updateRecipeName(e.target.value)}
+              onChange={(e) =>
+                setRecipe(updateRecipeName(recipe, e.target.value))
+              }
             ></input>
           ) : (
             <h2 className="text-2xl font-bold leading-7 text-gray-900">
@@ -317,11 +169,6 @@ const RecipeDetail: React.FC = () => {
           )}
 
           <div className="flex">
-            {/* {info.source && (
-              <div className="text-sm text-gray-600">
-                <RecipeSource source={info.source} />
-              </div>
-            )} */}
             {info.unit !== "" && (
               <div className="text-sm text-gray-600">Makes x {info.unit}</div>
             )}
@@ -355,15 +202,7 @@ const RecipeDetail: React.FC = () => {
       <RecipeDetailTable
         tweaks={tweaks}
         updateIngredient={updateIngredient}
-        updateIngredientInfo={updateIngredientInfo}
         recipe={recipe}
-        getIngredientValue={getIngredientValue}
-        isOverride={isOverride}
-        edit={edit}
-        addInstruction={addInstruction}
-        addIngredient={addIngredient}
-        updateInstruction={updateInstruction}
-        addSection={addSection}
         setRecipe={setRecipe}
       />
       <h2>raw</h2>

@@ -3,9 +3,6 @@ import {
   SectionIngredient,
   RecipeDetail,
 } from "./api/openapi-hooks/api";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { TimeRange } from "./api/openapi-fetch";
 
 export const getIngredient = (
@@ -42,16 +39,10 @@ export const formatText = (text: React.ReactText) => {
         {text.substring(matchStart, matchEnd)}
       </code>
     );
-    // pairs.push()
     lastProcessed = matchEnd;
-    // pairs.push([, ]);
   }
   pairs.push(text.substring(lastProcessed));
-  // let res = [];
-  // for
   return pairs;
-
-  // console.log(pairs);
 };
 
 const formatSeconds = (seconds: number) => {
@@ -66,12 +57,7 @@ const formatSeconds = (seconds: number) => {
     (h > 0 ? `${h}h` : "") + (m > 0 ? `${m}m` : "") + (s > 0 ? `${s}s` : "")
   );
 };
-// new Date(1000 * seconds).toISOString().substr(11, 8);
 export const formatTimeRange = (range: TimeRange) => {
-  // dayjs.extend(duration);
-  // dayjs.extend(relativeTime);
-  // const min = dayjs.duration({ seconds: range.min });
-  // const max = dayjs.dmin uration({ seconds: range.max });
   const { min, max } = range;
   let items = [formatSeconds(min)];
   if (max > 0) {
