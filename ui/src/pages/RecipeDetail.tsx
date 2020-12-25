@@ -15,13 +15,13 @@ import {
 } from "../api/openapi-hooks/api";
 import { TimeRange } from "../api/openapi-fetch";
 import { formatTimeRange } from "../util";
+import {
+  IngredientAttr,
+  IngredientKind,
+  Override,
+  RecipeTweaks,
+} from "../components/RecipeEditorUtils";
 
-type override = {
-  sectionID: number;
-  ingredientID: number;
-  value: number;
-  attr: "grams" | "amount";
-};
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
 
@@ -30,10 +30,11 @@ const RecipeDetail: React.FC = () => {
   });
 
   const [multiplier, setMultiplier] = useState(1.0);
-  const [override, setOverride] = useState<override>();
+  const [override, setOverride] = useState<Override>();
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
 
+  const tweaks: RecipeTweaks = { override, multiplier, edit };
   const { mutate: post } = useCreateRecipes({
     onMutate: (_, data) => {
       // setRecipe(data);
@@ -88,7 +89,7 @@ const RecipeDetail: React.FC = () => {
     sectionID: number,
     ingredientID: number,
     ingredient: Ingredient,
-    kind: "recipe" | "ingredient"
+    kind: IngredientKind
   ) => {
     const { id, name } = ingredient;
     setRecipe(
@@ -189,7 +190,7 @@ const RecipeDetail: React.FC = () => {
   const isOverride = (
     sectionID: number,
     ingredientID: number,
-    attr: "grams" | "amount"
+    attr: IngredientAttr
   ) =>
     override?.ingredientID === ingredientID &&
     override.sectionID === sectionID &&
@@ -198,7 +199,7 @@ const RecipeDetail: React.FC = () => {
     sectionID: number,
     ingredientID: number,
     value: number,
-    attr: "grams" | "amount"
+    attr: IngredientAttr
   ) =>
     (isOverride(sectionID, ingredientID, attr) && override?.value) ||
     value * multiplier;
@@ -352,6 +353,7 @@ const RecipeDetail: React.FC = () => {
       </div>
 
       <RecipeDetailTable
+        tweaks={tweaks}
         updateIngredient={updateIngredient}
         updateIngredientInfo={updateIngredientInfo}
         recipe={recipe}

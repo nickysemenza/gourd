@@ -6,6 +6,7 @@ import { useSearch } from "../api/openapi-hooks/api";
 import { getOpenapiFetchConfig } from "../config";
 import { ActionMeta } from "react-select";
 import { toast } from "react-toastify";
+import { IngredientKind } from "./RecipeEditorUtils";
 
 export interface Results {
   ingredients: ResultType;
@@ -15,7 +16,7 @@ export interface Results {
 export interface ResultItem {
   title: string;
   id: string;
-  kind: "recipe" | "ingredient";
+  kind: IngredientKind;
 }
 export interface ResultType {
   name: "ingredients" | "recipes";
@@ -25,7 +26,7 @@ export interface ResultType {
 const IngredientSearch: React.FC<{
   callback: (
     ingredient: Pick<Ingredient, "id" | "name">,
-    kind: "recipe" | "ingredient"
+    kind: IngredientKind
   ) => void;
   initial?: string;
 }> = ({ callback, initial }) => {

@@ -12,6 +12,11 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
 import { Button } from "./Button";
 import { DragWrapper } from "./DragDrop";
+import {
+  IngredientAttr,
+  IngredientKind,
+  RecipeTweaks,
+} from "./RecipeEditorUtils";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -27,7 +32,7 @@ export interface TableProps {
     sectionID: number,
     ingredientID: number,
     ingredient: Pick<Ingredient, "id" | "name">,
-    kind: "recipe" | "ingredient"
+    kind: IngredientKind
   ) => void;
   updateInstruction: (
     sectionID: number,
@@ -39,18 +44,19 @@ export interface TableProps {
     sectionID: number,
     ingredientID: number,
     value: number,
-    attr: "grams" | "amount"
+    attr: IngredientAttr
   ) => number;
   isOverride: (
     sectionID: number,
     ingredientID: number,
-    attr: "grams" | "amount"
+    attr: IngredientAttr
   ) => boolean;
   edit: boolean;
   addInstruction: (sectionID: number) => void;
   addIngredient: (sectionID: number) => void;
   addSection: () => void;
   setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
+  tweaks: RecipeTweaks;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
@@ -64,6 +70,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   addIngredient,
   addSection,
   setRecipe,
+  tweaks,
 }) => {
   const { sections } = recipe.detail;
   // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
