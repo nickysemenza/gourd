@@ -293,6 +293,11 @@ type ListIngredientsParams struct {
 // CreateIngredientsJSONBody defines parameters for CreateIngredients.
 type CreateIngredientsJSONBody Ingredient
 
+// MergeIngredientsJSONBody defines parameters for MergeIngredients.
+type MergeIngredientsJSONBody struct {
+	IngredientIds []string `json:"ingredient_ids"`
+}
+
 // ListMealsParams defines parameters for ListMeals.
 type ListMealsParams struct {
 
@@ -341,6 +346,9 @@ type SearchParams struct {
 
 // CreateIngredientsRequestBody defines body for CreateIngredients for application/json ContentType.
 type CreateIngredientsJSONRequestBody CreateIngredientsJSONBody
+
+// MergeIngredientsRequestBody defines body for MergeIngredients for application/json ContentType.
+type MergeIngredientsJSONRequestBody MergeIngredientsJSONBody
 
 // CreateRecipesRequestBody defines body for CreateRecipes for application/json ContentType.
 type CreateRecipesJSONRequestBody CreateRecipesJSONBody

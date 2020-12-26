@@ -57,6 +57,7 @@ const IngredientList: React.FC = () => {
           return (
             <div>
               {ingredient.name}
+              <hr />
               <ul>
                 {(children || []).map((i) => (
                   <li>{i.name}</li>

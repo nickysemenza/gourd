@@ -251,7 +251,6 @@ func (a *API) CreateRecipes(c echo.Context) error {
 	var r RecipeWrapper
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
-
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	recipe, err := a.CreateRecipe(ctx, &r)
@@ -336,14 +335,21 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
+	var ingredientIds []string
+	for _, i := range ing {
+		ingredientIds = append(ingredientIds, i.Id)
+	}
+
+	sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, ingredientIds...)
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
 	for _, i := range ing {
 		// find linked ingredients
-		sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, i.Id)
-		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
-		}
+
 		same := []Ingredient{}
-		for _, x := range sameAs {
+		for _, x := range sameAs.BySameAs()[i.Id] {
 			same = append(same, transformIngredient(x))
 		}
 
@@ -591,4 +597,27 @@ func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) err
 	}
 
 	return c.JSON(http.StatusCreated, transformRecipe(*detail))
+}
+
+func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "MergeIngredients")
+	defer span.End()
+
+	var r MergeIngredientsJSONRequestBody
+	if err := c.Bind(&r); err != nil {
+		err = fmt.Errorf("invalid format for input: %w", err)
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
+	err := a.DB().MergeIngredients(ctx, ingredientId, r.IngredientIds)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusCreated, transformIngredient(*ing))
 }

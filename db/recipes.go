@@ -235,3 +235,29 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 
 	return c.GetRecipeDetailByIdFull(ctx, newDetail.Id)
 }
+
+// MergeIngredients sets the provided ingredients `same_as` to the first one.
+// TODO: prevent cyclic loop?
+func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids []string) error {
+	ctx, span := c.tracer.Start(ctx, "IngredientToRecipe")
+	defer span.End()
+
+	tx, err := c.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	if _, err = c.execTx(ctx,
+		tx,
+		c.psql.
+			Update(ingredientsTable).
+			Set("same_as", ingredientID).
+			Where(sq.Eq{"id": ids})); err != nil {
+		return fmt.Errorf("failed to update ingredient: %w", err)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}

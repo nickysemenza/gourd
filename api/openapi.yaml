@@ -77,14 +77,14 @@ paths:
                   albums:
                     type: array
                     items:
-                      $ref: "#/components/schemas/GooglePhotosAlbum"   
+                      $ref: "#/components/schemas/GooglePhotosAlbum"
                     description: The list of albums
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"                
+                $ref: "#/components/schemas/Error"
   /search:
     get:
       summary: Search recipes and ingredients
@@ -94,8 +94,8 @@ paths:
         - recipes
       parameters:
         - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"        
-        - $ref: "#/components/parameters/nameParam"        
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/nameParam"
       responses:
         "200":
           description: Search results
@@ -108,7 +108,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"                          
+                $ref: "#/components/schemas/Error"
   /meals:
     get:
       summary: List all meals
@@ -277,7 +277,7 @@ paths:
             type: string
       responses:
         "201":
-          description: Newly converted ingredient
+          description: Newly converted recipe
           content:
             application/json:
               schema:
@@ -287,7 +287,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"                
+                $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/merge:
+    post:
+      summary: Merges the provide ingredients in the body into the param
+      operationId: merge_ingredients
+      tags:
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient to merge into
+          schema:
+            type: string
+      requestBody:
+        description: The ingredient ids to be merged
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ingredient_ids
+              properties:
+                ingredient_ids:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+                  maxItems: 50
+      responses:
+        "201":
+          description: The ingredient everything was merged into
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -404,7 +446,7 @@ components:
           description: all the versions of the recipe
           type: array
           items:
-            $ref: "#/components/schemas/RecipeDetail"          
+            $ref: "#/components/schemas/RecipeDetail"
     RecipeDetail:
       description: A revision of a recipe
       type: object
@@ -422,7 +464,7 @@ components:
           description: sections of the recipe
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSection"          
+            $ref: "#/components/schemas/RecipeSection"
         name:
           description: recipe name
           type: string
@@ -491,16 +533,16 @@ components:
       properties:
         id:
           description: id
-          type: string        
+          type: string
         title:
           description: title
-          type: string 
+          type: string
         product_url:
           description: product_url
           type: string
         usecase:
           description: usecase
-          type: string          
+          type: string
     GooglePhoto:
       description: A google photo
       type: object
@@ -519,7 +561,7 @@ components:
           type: string
         blur_hash:
           description: blur hash
-          type: string  
+          type: string
         created:
           description: when it was taken
           type: string
@@ -531,7 +573,7 @@ components:
         height:
           description: height px
           type: integer
-          format: int64                  
+          format: int64
     Meal:
       description: A google photo
       type: object
@@ -562,13 +604,13 @@ components:
         ingredients:
           description: The ingredients
           type: array
-          items:          
-            $ref: "#/components/schemas/Ingredient" 
+          items:
+            $ref: "#/components/schemas/Ingredient"
         recipes:
           description: The recipes
           type: array
-          items:          
-            $ref: "#/components/schemas/RecipeWrapper"            
+          items:
+            $ref: "#/components/schemas/RecipeWrapper"
     Error:
       type: object
       required: ["message"]
@@ -616,14 +658,14 @@ components:
       type: object
       required:
         - min
-        - max        
+        - max
       properties:
         min:
           description: The minimum amount of seconds (or the total, if not a range)
           type: integer
         max:
           description: The maximum amount of seconds (if a range)
-          type: integer          
+          type: integer
     PaginatedRecipes:
       type: object
       properties:

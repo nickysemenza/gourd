@@ -762,3 +762,78 @@ export const useConvertIngredientToRecipe = ({
       `/ingredients/${paramsInPath.ingredient_id}/convert_to_recipe`,
     { pathParams: { ingredient_id }, ...props }
   );
+
+export interface MergeIngredientsPathParams {
+  /**
+   * The id of the ingredient to merge into
+   */
+  ingredient_id: string;
+}
+
+export interface MergeIngredientsRequestBody {
+  ingredient_ids: string[];
+}
+
+export type MergeIngredientsProps = Omit<
+  MutateProps<
+    Ingredient,
+    Error,
+    void,
+    MergeIngredientsRequestBody,
+    MergeIngredientsPathParams
+  >,
+  "path" | "verb"
+> &
+  MergeIngredientsPathParams;
+
+/**
+ * Merges the provide ingredients in the body into the param
+ */
+export const MergeIngredients = ({
+  ingredient_id,
+  ...props
+}: MergeIngredientsProps) => (
+  <Mutate<
+    Ingredient,
+    Error,
+    void,
+    MergeIngredientsRequestBody,
+    MergeIngredientsPathParams
+  >
+    verb="POST"
+    path={`/ingredients/${ingredient_id}/merge`}
+    {...props}
+  />
+);
+
+export type UseMergeIngredientsProps = Omit<
+  UseMutateProps<
+    Ingredient,
+    Error,
+    void,
+    MergeIngredientsRequestBody,
+    MergeIngredientsPathParams
+  >,
+  "path" | "verb"
+> &
+  MergeIngredientsPathParams;
+
+/**
+ * Merges the provide ingredients in the body into the param
+ */
+export const useMergeIngredients = ({
+  ingredient_id,
+  ...props
+}: UseMergeIngredientsProps) =>
+  useMutate<
+    Ingredient,
+    Error,
+    void,
+    MergeIngredientsRequestBody,
+    MergeIngredientsPathParams
+  >(
+    "POST",
+    (paramsInPath: MergeIngredientsPathParams) =>
+      `/ingredients/${paramsInPath.ingredient_id}/merge`,
+    { pathParams: { ingredient_id }, ...props }
+  );

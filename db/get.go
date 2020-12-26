@@ -34,6 +34,16 @@ func (r RecipeDetails) First() *RecipeDetail {
 	return &r[0]
 }
 
+type Ingredients []Ingredient
+
+func (r Ingredients) BySameAs() map[string][]Ingredient {
+	m := make(map[string][]Ingredient)
+	for _, x := range r {
+		m[x.SameAs.ValueOrZero()] = append(m[x.SameAs.ValueOrZero()], x)
+	}
+	return m
+}
+
 // GetRecipeDetailSections finds the sections.
 func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) ([]Section, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailSections")
@@ -213,6 +223,8 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.id").
 		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section").
 		Where(sq.Eq{"ingredient": ingredient}).
+		OrderBy("name desc").
+		OrderBy("version desc").
 		ToSql()
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
@@ -401,7 +413,7 @@ func (c *Client) GetIngredients(ctx context.Context, name string, opts ...Search
 		return q
 	})
 }
-func (c *Client) GetIngrientsSameAs(ctx context.Context, parent string) ([]Ingredient, uint64, error) {
+func (c *Client) GetIngrientsSameAs(ctx context.Context, parent ...string) (Ingredients, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
