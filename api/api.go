@@ -344,35 +344,17 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
+	for _, i := range sameAs {
+		ingredientIds = append(ingredientIds, i.Id)
+	}
 	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 
-	makeDetail := func(i db.Ingredient) IngredientDetail {
-
-		// find linked ingredients
-		same := []Ingredient{}
-		for _, x := range sameAs.BySameAs()[i.Id] {
-			same = append(same, transformIngredient(x))
-		}
-
-		// find linked recipes
-		recipes := []RecipeDetail{}
-		for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
-			recipes = append(recipes, transformRecipe(x))
-		}
-		return IngredientDetail{
-			Ingredient: transformIngredient(i),
-			Children:   &same,
-			Recipes:    &recipes,
-		}
-	}
-
 	for _, i := range ing {
-
 		// assemble
-		items = append(items, makeDetail(i))
+		items = append(items, makeDetail(i, sameAs, linkedRecipes))
 	}
 	listMeta.TotalCount = int(count)
 
@@ -381,6 +363,25 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		Meta:        listMeta,
 	}
 	return c.JSON(http.StatusOK, resp)
+}
+
+func makeDetail(i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeDetails) IngredientDetail {
+	// find linked ingredients
+	same := []IngredientDetail{}
+	for _, x := range sameAs.BySameAs()[i.Id] {
+		same = append(same, makeDetail(x, sameAs, linkedRecipes))
+	}
+
+	// find linked recipes
+	recipes := []RecipeDetail{}
+	for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
+		recipes = append(recipes, transformRecipe(x))
+	}
+	return IngredientDetail{
+		Ingredient: transformIngredient(i),
+		Children:   &same,
+		Recipes:    &recipes,
+	}
 }
 
 func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) ([]GooglePhoto, []string, error) {

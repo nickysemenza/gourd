@@ -56,37 +56,43 @@ const IngredientList: React.FC = () => {
           const { ingredient, children } = original;
           return (
             <div>
-              {ingredient.name}
-              <hr />
+              {ingredient.name}{" "}
+              <Button
+                onClick={() => convertToRecipe(ingredient.id)}
+                label="Convert to Recipe"
+              />
               <ul>
                 {(children || []).map((i) => (
-                  <li>{i.name}</li>
+                  <li className="pl-6 flex">
+                    aka. <div className="italic pl-1">{i.ingredient.name}</div>
+                  </li>
                 ))}
               </ul>
             </div>
           );
         },
       },
-      {
-        Header: "Actions",
-        Cell: ({
-          row: {
-            original: { ingredient },
-          },
-        }: CellProps<i>) => (
-          <div>
-            <Button
-              onClick={() => convertToRecipe(ingredient.id)}
-              label="Convert to Recipe"
-            />
-          </div>
-        ),
-      },
+      // {
+      //   Header: "Actions",
+      //   Cell: ({
+      //     row: {
+      //       original: { ingredient },
+      //     },
+      //   }: CellProps<i>) => (
+      //     <div>
+      //       <Button
+      //         onClick={() => convertToRecipe(ingredient.id)}
+      //         label="Convert to Recipe"
+      //       />
+      //     </div>
+      //   ),
+      // },
       {
         Header: "Recipes",
         id: "recipes",
         Cell: ({ row: { original } }: CellProps<i>) => {
           const recipes = original.recipes || [];
+          const children = original.children || [];
           return (
             <div>
               <ul>
@@ -94,6 +100,19 @@ const IngredientList: React.FC = () => {
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
                     <RecipeLink recipe={r} />
                   </li>
+                ))}
+                {children.map((r) => (
+                  <div>
+                    <div className="italic">{r.ingredient.name}</div>
+                    {(r.recipes || []).map((r) => (
+                      <li
+                        className="pl-6"
+                        key={`${original.ingredient.id}@${r.name}@${r.version}`}
+                      >
+                        <RecipeLink recipe={r} />
+                      </li>
+                    ))}
+                  </div>
                 ))}
               </ul>
               {/* <Debug data={original} /> */}

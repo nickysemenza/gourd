@@ -44,10 +44,10 @@ export interface IngredientDetail {
     recipes?: Array<RecipeDetail>;
     /**
      * Ingredients that are equivalent
-     * @type {Array<Ingredient>}
+     * @type {Array<IngredientDetail>}
      * @memberof IngredientDetail
      */
-    children?: Array<Ingredient>;
+    children?: Array<IngredientDetail>;
 }
 
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
@@ -62,7 +62,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
         
         'ingredient': json['ingredient'],
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
-        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientFromJSON)),
+        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
     };
 }
 
@@ -77,7 +77,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         
         'ingredient': value.ingredient,
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
-        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientToJSON)),
+        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
     };
 }
 

@@ -70,7 +70,7 @@ type Ingredient struct {
 type IngredientDetail struct {
 
 	// Ingredients that are equivalent
-	Children *[]Ingredient `json:"children,omitempty"`
+	Children *[]IngredientDetail `json:"children,omitempty"`
 
 	// An Ingredient
 	Ingredient Ingredient `json:"ingredient"`

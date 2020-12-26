@@ -173,7 +173,7 @@ export interface IngredientDetail {
   /**
    * Ingredients that are equivalent
    */
-  children?: Ingredient[];
+  children?: IngredientDetail[];
 }
 
 /**

@@ -521,7 +521,7 @@ components:
           description: Ingredients that are equivalent
           type: array
           items:
-            $ref: "#/components/schemas/Ingredient"
+            $ref: "#/components/schemas/IngredientDetail"
     GooglePhotosAlbum:
       description: an album containing `GooglePhoto`
       type: object
