@@ -113,115 +113,124 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           const bp = Math.round((ingredient.grams / flourMass) * 100);
           const { edit } = tweaks;
           return (
-            <div className="ing-table-row" key={y}>
-              <TableInput
-                width={14}
-                data-cy="grams-input"
-                edit={edit}
-                softEdit
-                value={getIngredientValue(
-                  tweaks,
-                  x,
-                  y,
-                  ingredient.grams || 0,
-                  "grams"
-                )}
-                blur
-                highlight={isOverride(tweaks, x, y, "grams")}
-                onChange={(e) =>
-                  updateIngredient({
-                    sectionID: x,
-                    ingredientID: y,
-                    value: e,
-                    attr: "grams",
-                  })
-                }
-              />
-              <div className="flex space-x-0.5">
-                <div className="text-gray-600">g</div>
-                {showBP && (
-                  <div
-                    className={`${
-                      bp > 0 ? "text-gray-600" : "text-red-300"
-                    } italic`}
-                  >
-                    ({bp}%)
-                  </div>
-                )}
-              </div>
-              {edit ? (
-                <IngredientSearch
-                  initial={getIngredient(ingredient).name}
-                  callback={(item, kind) =>
-                    setRecipe(updateIngredientInfo(recipe, x, y, item, kind))
+            <div className="flex flex-col">
+              <div className="ing-table-row" key={y}>
+                <TableInput
+                  width={14}
+                  data-cy="grams-input"
+                  edit={edit}
+                  softEdit
+                  value={getIngredientValue(
+                    tweaks,
+                    x,
+                    y,
+                    ingredient.grams || 0,
+                    "grams"
+                  )}
+                  blur
+                  highlight={isOverride(tweaks, x, y, "grams")}
+                  onChange={(e) =>
+                    updateIngredient({
+                      sectionID: x,
+                      ingredientID: y,
+                      value: e,
+                      attr: "grams",
+                    })
                   }
                 />
-              ) : (
-                <div className="text-gray-600">
-                  {ingredient.kind === "recipe" ? (
-                    <Link
-                      to={`/recipe/${ingredient.recipe?.id}`}
-                      className="link"
+                <div className="flex space-x-0.5">
+                  <div className="text-gray-600">g</div>
+                  {showBP && (
+                    <div
+                      className={`${
+                        bp > 0 ? "text-gray-600" : "text-red-300"
+                      } italic`}
                     >
-                      {ingredient.recipe?.name}
-                    </Link>
-                  ) : (
-                    ingredient.ingredient?.name
+                      ({bp}%)
+                    </div>
                   )}
                 </div>
-              )}
-              <TableInput
-                data-cy="amount-input"
-                // width={16}
-                edit={edit}
-                softEdit
-                highlight={isOverride(tweaks, x, y, "amount")}
-                value={getIngredientValue(
-                  tweaks,
-                  x,
-                  y,
-                  ingredient.amount || 0,
-                  "amount"
+                {edit ? (
+                  <IngredientSearch
+                    initial={getIngredient(ingredient).name}
+                    callback={(item, kind) =>
+                      setRecipe(updateIngredientInfo(recipe, x, y, item, kind))
+                    }
+                  />
+                ) : (
+                  <div className="text-gray-600">
+                    {ingredient.kind === "recipe" ? (
+                      <Link
+                        to={`/recipe/${ingredient.recipe?.id}`}
+                        className="link"
+                      >
+                        {ingredient.recipe?.name}
+                      </Link>
+                    ) : (
+                      ingredient.ingredient?.name
+                    )}
+                  </div>
                 )}
-                onChange={(e) =>
-                  updateIngredient({
-                    sectionID: x,
-                    ingredientID: y,
-                    value: e,
-                    attr: "amount",
-                  })
-                }
-              />
-              <TableInput
-                data-cy="unit-input"
-                width={16}
-                edit={edit}
-                value={ingredient.unit}
-                onChange={(e) =>
-                  updateIngredient({
-                    sectionID: x,
-                    ingredientID: y,
-                    value: e,
-                    attr: "unit",
-                  })
-                }
-              />
-              <TableInput
-                data-cy="adjective-input"
-                width={16}
-                edit={edit}
-                value={ingredient.adjective}
-                onChange={(e) =>
-                  updateIngredient({
-                    sectionID: x,
-                    ingredientID: y,
-                    value: e,
-                    attr: "adjective",
-                  })
-                }
-              />
-              <div>{iActions(x, y, "ingredients")}</div>
-              {/* TODO: optional toggle */}
+                <TableInput
+                  data-cy="amount-input"
+                  // width={16}
+                  edit={edit}
+                  softEdit
+                  highlight={isOverride(tweaks, x, y, "amount")}
+                  value={getIngredientValue(
+                    tweaks,
+                    x,
+                    y,
+                    ingredient.amount || 0,
+                    "amount"
+                  )}
+                  onChange={(e) =>
+                    updateIngredient({
+                      sectionID: x,
+                      ingredientID: y,
+                      value: e,
+                      attr: "amount",
+                    })
+                  }
+                />
+                <TableInput
+                  data-cy="unit-input"
+                  width={16}
+                  edit={edit}
+                  value={ingredient.unit}
+                  onChange={(e) =>
+                    updateIngredient({
+                      sectionID: x,
+                      ingredientID: y,
+                      value: e,
+                      attr: "unit",
+                    })
+                  }
+                />
+                <div className="flex">
+                  <TableInput
+                    data-cy="adjective-input"
+                    width={16}
+                    edit={edit}
+                    value={ingredient.adjective}
+                    onChange={(e) =>
+                      updateIngredient({
+                        sectionID: x,
+                        ingredientID: y,
+                        value: e,
+                        attr: "adjective",
+                      })
+                    }
+                  />
+                </div>
+                <div>{iActions(x, y, "ingredients")}</div>
+                {/* TODO: optional toggle */}
+              </div>
+              {!!ingredient.original && (
+                <div className="italic text-xs pb-2">
+                  original: {ingredient.original}
+                </div>
+              )}
             </div>
           );
         })}

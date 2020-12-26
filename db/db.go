@@ -75,6 +75,7 @@ type SectionIngredient struct {
 	Unit      zero.String `db:"unit"`
 	Adjective zero.String `db:"adjective"`
 	Optional  zero.Bool   `db:"optional"`
+	Original  zero.String `db:"original"`
 
 	// one of the following is required for get and update:
 	RecipeId     zero.String `db:"recipe"`

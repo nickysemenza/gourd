@@ -84,6 +84,12 @@ export interface SectionIngredient {
      * @memberof SectionIngredient
      */
     optional?: boolean;
+    /**
+     * raw line item (pre-import/scrape)
+     * @type {string}
+     * @memberof SectionIngredient
+     */
+    original?: string;
 }
 
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
@@ -105,6 +111,7 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'unit': json['unit'],
         'adjective': json['adjective'],
         'optional': !exists(json, 'optional') ? undefined : json['optional'],
+        'original': !exists(json, 'original') ? undefined : json['original'],
     };
 }
 
@@ -126,6 +133,7 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'unit': value.unit,
         'adjective': value.adjective,
         'optional': value.optional,
+        'original': value.original,
     };
 }
 

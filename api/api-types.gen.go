@@ -237,6 +237,9 @@ type SectionIngredient struct {
 	// optional
 	Optional *bool `json:"optional,omitempty"`
 
+	// raw line item (pre-import/scrape)
+	Original *string `json:"original,omitempty"`
+
 	// A revision of a recipe
 	Recipe *RecipeDetail `json:"recipe,omitempty"`
 

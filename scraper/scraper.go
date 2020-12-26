@@ -18,6 +18,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/otel"
+	"gopkg.in/guregu/null.v3/zero"
 )
 
 // FetchAndTransform returns a recipe.
@@ -59,6 +60,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 			Unit:       i.Volume.Unit,
 			Adjective:  i.Modifier,
 			Grams:      i.Grams(),
+			Original:   zero.StringFrom(item).Ptr(),
 		})
 	}
 	for _, item := range recipe.RecipeInstructions {

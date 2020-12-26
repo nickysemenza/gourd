@@ -380,6 +380,9 @@ components:
         optional:
           description: optional
           type: boolean
+        original:
+          description: raw line item (pre-import/scrape)
+          type: string
     SectionInstruction:
       description: Instructions in a single section
       type: object

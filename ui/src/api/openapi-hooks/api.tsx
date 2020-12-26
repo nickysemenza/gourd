@@ -45,6 +45,10 @@ export interface SectionIngredient {
    * optional
    */
   optional?: boolean;
+  /**
+   * raw line item (pre-import/scrape)
+   */
+  original?: string;
 }
 
 /**

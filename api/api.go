@@ -100,6 +100,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 				Amount:    zero.FloatFromPtr(i.Amount),
 				Unit:      zero.StringFrom(i.Unit),
 				Adjective: zero.StringFrom(i.Adjective),
+				Original:  zero.StringFromPtr(i.Original),
 				Optional:  zero.BoolFromPtr(i.Optional),
 			}
 			switch i.Kind {
@@ -179,6 +180,7 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 				Amount:    i.Amount.Ptr(),
 				Unit:      i.Unit.String,
 				Adjective: i.Adjective.String,
+				Original:  i.Original.Ptr(),
 				Optional:  i.Optional.Ptr(),
 			}
 			if i.RawRecipe != nil {
