@@ -31,13 +31,13 @@ This is comprised mulitple components:
 
 ### todo
 
-* allow merging ingredients together
-* calculate average weights per-ingredient
-* meals w/ multiple recipes at set quantities
-* slugs for recipe urls
-* associate ingredients with fdc ids on UI
-* ingredient amounts should be generic (1-n val-unit pairs)
-* substitute ingredients
-* `$/unit` for ingredients?
-* for imported recipes, keep 'original' ingredient line items pre-parsing
-* ingredient dependency graph
+- allow merging ingredients together
+- calculate average weights per-ingredient
+- meals w/ multiple recipes at set quantities
+- slugs for recipe urls
+- associate ingredients with fdc ids on UI
+- ingredient amounts should be generic (1-n val-unit pairs)
+- substitute ingredients
+- `$/unit` for ingredients?
+- for imported recipes, keep 'original' ingredient line items pre-parsing
+- ingredient dependency graph

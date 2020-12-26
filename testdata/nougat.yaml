@@ -3,131 +3,130 @@ is_latest_version: true
 name: nougat
 quantity: 0
 sections:
-- ingredients:
-  - adjective: room temp
-    amount: 0
-    grams: 120
-    ingredient:
-      name: egg whites
-    kind: ingredient
-    optional: false
-    unit: 
-  - adjective: 
-    amount: 0
-    grams: 1
-    ingredient:
-      name: cream of tartar
-    kind: ingredient
-    optional: false
-    unit: 
-  instructions:
-  - instruction: mix until foamy, start sugar
-  duration: 
-    min: 2
-- ingredients:
-  - adjective: 
-    amount: 0
-    grams: 200
-    ingredient:
-      name: water
-    kind: ingredient
-    optional: false
-    unit: 
-  - adjective: 
-    amount: 0
-    grams: 600
-    ingredient:
-      name: sugar
-    kind: ingredient
-    optional: false
-    unit: 
-  - adjective: 
-    amount: 0
-    grams: 170
-    ingredient:
-      name: glucose
-    kind: ingredient
-    optional: false
-    unit: 
-  instructions:
-  - instruction: heat until 220F (target 293F)
-  - instruction: hold on medium
-  duration: 
-    min: 15
-- ingredients:
-  - adjective: 
-    amount: 0
-    grams: 400
-    ingredient:
-      name: honey
-    kind: ingredient
-    optional: false
-    unit: 
-  instructions:
-  - instruction: heat until 266F
-  - instruction: add to almost-soft-peaks
-  - instruction: add sugar (when it is 293F)
-  - instruction: mix on medium-high 5 minutes
-  duration: 
-    min: 10
-- ingredients:
-  - adjective: toasted
-    amount: 0
-    grams: 150
-    ingredient:
-      name: pistachio
-    kind: ingredient
-    optional: false
-    unit: 
-  - adjective: toasted
-    amount: 0
-    grams: 240
-    ingredient:
-      name: almonds
-    kind: ingredient
-    optional: false
-    unit: 
-  - grams: 220
-    ingredient:
-      name: candied orange peels
-    adjective: diced
-    kind: ingredient
-  - grams: 100
-    ingredient:
-      name: dried apricot peels
-    adjective: diced
-    kind: ingredient    
-  - grams: 40
-    ingredient:
-      name: dried ginger
-    adjective: diced
-    kind: ingredient     
-  instructions:
-  - instruction: mix with paddle, add to tray with wafer paper
-  - instruction: let cool 30m
-  duration: 
-    min: 30
-- ingredients:
-  - adjective: 
-    amount: 0
-    grams: 30
-    ingredient:
-      name: corn starch
-    kind: ingredient
-    optional: false
-    unit: 
-  - adjective: 
-    amount: 0
-    grams: 20
-    ingredient:
-      name: powdered sugar
-    kind: ingredient
-    optional: false
-    unit: 
-  instructions:
-  - instruction: for dusting tray
-  duration: 
-    min: 0
-unit: 
+  - ingredients:
+      - adjective: room temp
+        amount: 0
+        grams: 120
+        ingredient:
+          name: egg whites
+        kind: ingredient
+        optional: false
+        unit:
+      - adjective:
+        amount: 0
+        grams: 1
+        ingredient:
+          name: cream of tartar
+        kind: ingredient
+        optional: false
+        unit:
+    instructions:
+      - instruction: mix until foamy, start sugar
+    duration:
+      min: 2
+  - ingredients:
+      - adjective:
+        amount: 0
+        grams: 200
+        ingredient:
+          name: water
+        kind: ingredient
+        optional: false
+        unit:
+      - adjective:
+        amount: 0
+        grams: 600
+        ingredient:
+          name: sugar
+        kind: ingredient
+        optional: false
+        unit:
+      - adjective:
+        amount: 0
+        grams: 170
+        ingredient:
+          name: glucose
+        kind: ingredient
+        optional: false
+        unit:
+    instructions:
+      - instruction: heat until 220F (target 293F)
+      - instruction: hold on medium
+    duration:
+      min: 15
+  - ingredients:
+      - adjective:
+        amount: 0
+        grams: 400
+        ingredient:
+          name: honey
+        kind: ingredient
+        optional: false
+        unit:
+    instructions:
+      - instruction: heat until 266F
+      - instruction: add to almost-soft-peaks
+      - instruction: add sugar (when it is 293F)
+      - instruction: mix on medium-high 5 minutes
+    duration:
+      min: 10
+  - ingredients:
+      - adjective: toasted
+        amount: 0
+        grams: 150
+        ingredient:
+          name: pistachio
+        kind: ingredient
+        optional: false
+        unit:
+      - adjective: toasted
+        amount: 0
+        grams: 240
+        ingredient:
+          name: almonds
+        kind: ingredient
+        optional: false
+        unit:
+      - grams: 220
+        ingredient:
+          name: candied orange peels
+        adjective: diced
+        kind: ingredient
+      - grams: 100
+        ingredient:
+          name: dried apricot peels
+        adjective: diced
+        kind: ingredient
+      - grams: 40
+        ingredient:
+          name: dried ginger
+        adjective: diced
+        kind: ingredient
+    instructions:
+      - instruction: mix with paddle, add to tray with wafer paper
+      - instruction: let cool 30m
+    duration:
+      min: 30
+  - ingredients:
+      - adjective:
+        amount: 0
+        grams: 30
+        ingredient:
+          name: corn starch
+        kind: ingredient
+        optional: false
+        unit:
+      - adjective:
+        amount: 0
+        grams: 20
+        ingredient:
+          name: powdered sugar
+        kind: ingredient
+        optional: false
+        unit:
+    instructions:
+      - instruction: for dusting tray
+    duration:
+      min: 0
+unit:
 version: 2
-

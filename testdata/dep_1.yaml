@@ -1,14 +1,14 @@
 ---
 name: dep 2
 sections:
-- ingredients:
-  - grams: 100
-    kind: recipe
-    recipe:
-      name: dep 12
-  - grams: 200
-    ingredient:
-      name: all purpose flour
-    kind: ingredient
-  instructions:
-  - instruction: mix
+  - ingredients:
+      - grams: 100
+        kind: recipe
+        recipe:
+          name: dep 12
+      - grams: 200
+        ingredient:
+          name: all purpose flour
+        kind: ingredient
+    instructions:
+      - instruction: mix

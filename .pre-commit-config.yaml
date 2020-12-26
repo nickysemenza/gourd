@@ -3,6 +3,7 @@ repos:
     rev: "" # Use the sha or tag you want to point at
     hooks:
       - id: prettier
+        exclude: ^ui/src/api/
   - repo: https://github.com/golangci/golangci-lint
     rev: ""
     hooks:

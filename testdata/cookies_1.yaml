@@ -1,42 +1,42 @@
 name: cookies 1
 quantity: 0
-unit: ''
+unit: ""
 sections:
-- ingredients:
-  - adjective: ''
-    grams: 0
-    kind: ''
-    unit: ''
-  - adjective: eggs
-    grams: 42
-    ingredient:
-      name: eggs
-    kind: ingredient
-    unit: '2'
-  - adjective: cup
-    grams: 52
-    ingredient:
-      name: brown sugar
-    kind: ingredient
-    unit: '1'
-  instructions:
-  - instruction: ''
-  - instruction: aa
-  duration:
-    min: 33
-- ingredients:
-  - adjective: ''
-    grams: 0
-    kind: ''
-    unit: ''
-  - adjective: ''
-    grams: 52
-    ingredient:
-      name: flour
-    kind: ingredient
-    unit: ''
-  instructions:
-  - instruction: ''
-  - instruction: add flour
-  duration:
-    min: 88
+  - ingredients:
+      - adjective: ""
+        grams: 0
+        kind: ""
+        unit: ""
+      - adjective: eggs
+        grams: 42
+        ingredient:
+          name: eggs
+        kind: ingredient
+        unit: "2"
+      - adjective: cup
+        grams: 52
+        ingredient:
+          name: brown sugar
+        kind: ingredient
+        unit: "1"
+    instructions:
+      - instruction: ""
+      - instruction: aa
+    duration:
+      min: 33
+  - ingredients:
+      - adjective: ""
+        grams: 0
+        kind: ""
+        unit: ""
+      - adjective: ""
+        grams: 52
+        ingredient:
+          name: flour
+        kind: ingredient
+        unit: ""
+    instructions:
+      - instruction: ""
+      - instruction: add flour
+    duration:
+      min: 88
