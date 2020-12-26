@@ -33,15 +33,6 @@ type Client struct {
 	tracer trace.Tracer
 }
 
-func getRecipeDetailColumns() []string {
-	return []string{
-		"recipe_details.id",
-		"name", "version",
-		"equipment",
-		"source", "servings",
-		"quantity", "recipe_details.unit", "is_latest_version"}
-}
-
 // RecipeDetail represents a recipe
 type Recipe struct {
 	Id     string `db:"id"`
@@ -61,6 +52,7 @@ type RecipeDetail struct {
 	Version       int64       `db:"version"`
 	LatestVersion bool        `db:"is_latest_version"`
 	Sections      []Section
+	Ingredient    zero.String `db:"ingredient"` // sometimes, from FK
 }
 
 // Section represents a Section

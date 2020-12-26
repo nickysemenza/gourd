@@ -27,6 +27,13 @@ func (r RecipeDetails) ByRecipeId() map[string][]RecipeDetail {
 	}
 	return m
 }
+func (r RecipeDetails) ByIngredientId() map[string][]RecipeDetail {
+	m := make(map[string][]RecipeDetail)
+	for _, x := range r {
+		m[x.Ingredient.ValueOrZero()] = append(m[x.Ingredient.ValueOrZero()], x)
+	}
+	return m
+}
 func (r RecipeDetails) First() *RecipeDetail {
 	if len(r) == 0 {
 		return nil
@@ -216,10 +223,16 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 
 // GetRecipeDetailsWithIngredient gets all recipes with an ingredeitn
 // todo: consolidate into getrecipes
-func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient string) ([]RecipeDetail, error) {
+func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient ...string) (RecipeDetails, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipesWithIngredient")
 	defer span.End()
-	query, args, err := c.psql.Select(getRecipeDetailColumns()...).From(recipeDetailsTable).
+	query, args, err := c.psql.Select("recipe_details.id", "ingredient",
+		"name", "version",
+		"equipment",
+		"source", "servings",
+		"quantity",
+		"recipe_details.unit", "is_latest_version").From(recipeDetailsTable).
+		Distinct().
 		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.id").
 		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section").
 		Where(sq.Eq{"ingredient": ingredient}).
@@ -230,15 +243,16 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	r := []RecipeDetail{}
-	err = c.db.SelectContext(ctx, &r, query, args...)
+	rds := []RecipeDetail{}
+	err = c.db.SelectContext(ctx, &rds, query, args...)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to select: %w", err)
 	}
-	return r, nil
+
+	return rds, nil
 }
 
 // GetRecipeDetailByIdFull gets a recipe by Id, with all dependencies.

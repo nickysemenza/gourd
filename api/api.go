@@ -344,31 +344,35 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
+	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
 
-	for _, i := range ing {
+	makeDetail := func(i db.Ingredient) IngredientDetail {
+
 		// find linked ingredients
-
 		same := []Ingredient{}
 		for _, x := range sameAs.BySameAs()[i.Id] {
 			same = append(same, transformIngredient(x))
 		}
 
 		// find linked recipes
-		linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, i.Id)
-		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
-		}
 		recipes := []RecipeDetail{}
-		for _, x := range linkedRecipes {
+		for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
 			recipes = append(recipes, transformRecipe(x))
 		}
-
-		// assemble
-		items = append(items, IngredientDetail{
+		return IngredientDetail{
 			Ingredient: transformIngredient(i),
 			Children:   &same,
 			Recipes:    &recipes,
-		})
+		}
+	}
+
+	for _, i := range ing {
+
+		// assemble
+		items = append(items, makeDetail(i))
 	}
 	listMeta.TotalCount = int(count)
 
