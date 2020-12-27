@@ -9,8 +9,7 @@ import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
 import { useGetRecipeById, useCreateRecipes } from "../api/openapi-hooks/api";
-import { TimeRange } from "../api/openapi-fetch";
-import { formatTimeRange } from "../util";
+import { formatTimeRange, sumTimeRanges } from "../util";
 import {
   Override,
   RecipeTweaks,
@@ -82,6 +81,8 @@ const RecipeDetail: React.FC = () => {
 
   if (!recipe) return null;
 
+  const { detail } = recipe;
+
   const updateIngredient = ({
     sectionID,
     ingredientID,
@@ -122,7 +123,7 @@ const RecipeDetail: React.FC = () => {
       );
     } else {
       const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-      const { grams, amount } = recipe.detail.sections[sectionID]!.ingredients[
+      const { grams, amount } = detail.sections[sectionID]!.ingredients[
         ingredientID
       ];
 
@@ -145,12 +146,7 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const info = recipe.detail;
-  let totalDuration: TimeRange = { min: 0, max: 0 };
-  info.sections.forEach((s) => {
-    totalDuration.min += s.duration.min;
-    totalDuration.max += s.duration.max || 0;
-  });
+  const totalDuration = sumTimeRanges(detail.sections.map((s) => s.duration));
 
   return (
     <div>
@@ -159,20 +155,20 @@ const RecipeDetail: React.FC = () => {
           {edit ? (
             <input
               className="border-2 w-96"
-              value={info.name}
+              value={detail.name}
               onChange={(e) =>
                 setRecipe(updateRecipeName(recipe, e.target.value))
               }
             ></input>
           ) : (
             <h2 className="text-2xl font-bold leading-7 text-gray-900">
-              {info.name}
+              {detail.name}
             </h2>
           )}
 
           <div className="flex">
-            {info.unit !== "" && (
-              <div className="text-sm text-gray-600">Makes x {info.unit}</div>
+            {detail.unit !== "" && (
+              <div className="text-sm text-gray-600">Makes x {detail.unit}</div>
             )}
             {formatTimeRange(totalDuration)}
           </div>

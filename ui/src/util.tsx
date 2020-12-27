@@ -78,6 +78,16 @@ export const parseTimeRange = (input: string): TimeRange | null => {
   };
 };
 
+export const sumTimeRanges = (ranges: TimeRange[]): TimeRange => {
+  let totalDuration: TimeRange = { min: 0, max: 0 };
+  ranges.forEach((r) => {
+    totalDuration.min += r.min;
+    totalDuration.max += r.max || r.min; // if max is 0, it means it's a finite and not a range, so use min
+  });
+
+  return totalDuration;
+};
+
 export const Code: React.FC<{ text: string }> = ({ text }) => (
   <code className="rounded-sm px-2 py-0.5 bg-gray-100 text-red-500">
     {text}
