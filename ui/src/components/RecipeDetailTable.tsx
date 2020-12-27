@@ -11,7 +11,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { Button } from "./Button";
+import { ButtonGroup } from "./Button";
 import { DragWrapper } from "./DragDrop";
 import {
   addIngredient,
@@ -28,6 +28,7 @@ import {
   updateInstruction,
   updateTimeRange,
 } from "./RecipeEditorUtils";
+import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -63,28 +64,34 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
   const iActions = (x: number, y: number, i: I) =>
     edit && (
-      <div className="flex space-x-1">
-        <Button
-          onClick={() => {
-            setRecipe(moveI(recipe, x, y, true, i));
-          }}
-          disabled={!canMoveI(recipe, x, y, true, i)}
-          label={`up`}
-        />
-        <Button
-          onClick={() => {
-            setRecipe(moveI(recipe, x, y, false, i));
-          }}
-          disabled={!canMoveI(recipe, x, y, false, i)}
-          label={`down`}
-        />
-        <Button
-          onClick={() => {
-            setRecipe(delI(recipe, x, y, i));
-          }}
-          label={`del`}
-        />
-      </div>
+      <ButtonGroup
+        compact
+        buttons={[
+          {
+            onClick: () => {
+              setRecipe(moveI(recipe, x, y, true, i));
+            },
+            disabled: !canMoveI(recipe, x, y, true, i),
+            // text: `up`,
+            IconLeft: ArrowUp,
+          },
+          {
+            onClick: () => {
+              setRecipe(moveI(recipe, x, y, false, i));
+            },
+            disabled: !canMoveI(recipe, x, y, false, i),
+            // text: `down`,
+            IconLeft: ArrowDown,
+          },
+          {
+            onClick: () => {
+              setRecipe(delI(recipe, x, y, i));
+            },
+            // text: `del`,
+            IconLeft: XSquare,
+          },
+        ]}
+      />
     );
 
   const renderRow = (section: RecipeSection, x: number) => (

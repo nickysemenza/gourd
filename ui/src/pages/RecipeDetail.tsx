@@ -16,6 +16,8 @@ import {
   RecipeTweaks,
   updateRecipeName,
 } from "../components/RecipeEditorUtils";
+import { ButtonGroup } from "../components/Button";
+import { Edit, Eye, Save, X } from "react-feather";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -175,28 +177,27 @@ const RecipeDetail: React.FC = () => {
             {formatTimeRange(totalDuration)}
           </div>
         </div>
-        <div className="inline-flex">
-          <button
-            onClick={resetMultiplier}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-l"
-            disabled={multiplier === 0}
-          >
-            reset (<code>@{multiplier}x</code>)
-          </button>
-          <button
-            onClick={saveUpdate}
-            disabled={!edit}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4"
-          >
-            save
-          </button>
-          <button
-            onClick={toggleEdit}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-r"
-          >
-            {edit ? "view" : "edit"}
-          </button>
-        </div>
+        <ButtonGroup
+          buttons={[
+            {
+              onClick: resetMultiplier,
+              disabled: multiplier === 1,
+              text: "reset",
+              IconLeft: X,
+            },
+            {
+              onClick: saveUpdate,
+              disabled: !edit,
+              text: "save",
+              IconLeft: Save,
+            },
+            {
+              onClick: toggleEdit,
+              text: edit ? "view" : "edit",
+              IconLeft: edit ? Eye : Edit,
+            },
+          ]}
+        />
       </div>
 
       <RecipeDetailTable

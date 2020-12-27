@@ -8,8 +8,10 @@ import { useListIngredients } from "../api/openapi-hooks/api";
 import { IngredientsApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { toast } from "react-toastify";
-import { Button } from "../components/Button";
+import { ButtonGroup } from "../components/Button";
 import { RecipeLink } from "../components/Misc";
+import { PlusCircle } from "react-feather";
+import { Code } from "../util";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -40,14 +42,10 @@ const IngredientList: React.FC = () => {
 
     return [
       {
-        Header: "Id",
-        Cell: ({
-          row: {
-            original: {
-              ingredient: { id },
-            },
-          },
-        }: CellProps<i>) => <code>{id}</code>,
+        Header: "id",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          return <Code text={original.ingredient.id} />;
+        },
       },
       {
         Header: "Name",
@@ -57,9 +55,17 @@ const IngredientList: React.FC = () => {
           return (
             <div>
               {ingredient.name}{" "}
-              <Button
-                onClick={() => convertToRecipe(ingredient.id)}
-                label="Convert to Recipe"
+              <ButtonGroup
+                compact
+                buttons={[
+                  {
+                    onClick: () => {
+                      convertToRecipe(ingredient.id);
+                    },
+                    text: "Convert to Recipe",
+                    IconLeft: PlusCircle,
+                  },
+                ]}
               />
               <ul>
                 {(children || []).map((i) => (
@@ -95,7 +101,7 @@ const IngredientList: React.FC = () => {
           const children = original.children || [];
           return (
             <div>
-              <ul>
+              <ul className="list-disc list-outside pl-4">
                 {recipes.map((r) => (
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
                     <RecipeLink recipe={r} />
@@ -103,15 +109,17 @@ const IngredientList: React.FC = () => {
                 ))}
                 {children.map((r) => (
                   <div>
-                    <div className="italic">{r.ingredient.name}</div>
-                    {(r.recipes || []).map((r) => (
-                      <li
-                        className="pl-6"
-                        key={`${original.ingredient.id}@${r.name}@${r.version}`}
-                      >
-                        <RecipeLink recipe={r} />
-                      </li>
-                    ))}
+                    <li className="italic">{r.ingredient.name}</li>
+                    <ul className="list-disc list-outside pl-4">
+                      {(r.recipes || []).map((r) => (
+                        <li
+                          // className="pl-6"
+                          key={`${original.ingredient.id}@${r.name}@${r.version}`}
+                        >
+                          <RecipeLink recipe={r} />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </ul>

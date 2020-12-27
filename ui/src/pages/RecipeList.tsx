@@ -6,6 +6,7 @@ import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
 import { RecipeLink } from "../components/Misc";
+import { Code } from "../util";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -36,7 +37,9 @@ const RecipeList: React.FC = () => {
     () => [
       {
         Header: "id",
-        accessor: "id",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          return <Code text={original.id} />;
+        },
       },
       {
         Header: "Name",

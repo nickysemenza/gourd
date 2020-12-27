@@ -18,7 +18,7 @@ const NavBar: React.FC = () => {
     { title: "docs", path: "docs" },
   ];
   return (
-    <nav className="flex items-center justify-between flex-wrap bg-indigo-500 px-6 py-3">
+    <nav className="flex items-center justify-between flex-wrap bg-indigo-500 px-4 py-1 mb-2">
       <div className="flex items-center flex-shrink-0 text-white mr-1">
         <svg
           onClick={() => history.push("/")}
@@ -44,13 +44,13 @@ const NavBar: React.FC = () => {
           />
         </svg>
       </div>
-      <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
-        <div className="text-sm lg:flex-grow">
+      <div className="w-full block flex-grow md:flex md:items-center md:w-auto">
+        <div className="text-sm md:flex-grow">
           {navItems.map((item) => (
             <a
               href="#link"
               onClick={() => history.push("/" + item.path)}
-              className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4 font-medium"
+              className="block mt-4 md:inline-block md:mt-0 text-blue-200 hover:text-white mr-4 font-medium"
               key={item.path}
             >
               {item.title}

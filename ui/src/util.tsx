@@ -77,3 +77,9 @@ export const parseTimeRange = (input: string): TimeRange | null => {
     max: ((parts.length === 2 && parse(parts[1])) || 0) / 1000,
   };
 };
+
+export const Code: React.FC<{ text: string }> = ({ text }) => (
+  <code className="rounded-sm px-2 py-0.5 bg-gray-100 text-red-500">
+    {text}
+  </code>
+);

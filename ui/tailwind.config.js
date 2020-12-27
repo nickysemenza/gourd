@@ -4,7 +4,7 @@ module.exports = {
     extend: {},
   },
   variants: {
-    backgroundColor: ["responsive", "odd", "hover", "focus"],
+    backgroundColor: ["responsive", "odd", "hover", "focus", "disabled"],
     borderStyle: ["responsive", "hover", "focus"],
     borderColor: [
       "responsive",

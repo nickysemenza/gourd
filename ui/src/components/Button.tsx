@@ -1,23 +1,54 @@
 import React from "react";
+import { Icon } from "react-feather";
+
 interface ButtonProps {
+  // icons from https://feathericons.com/
+  IconLeft?: Icon;
+  IconRight?: Icon;
+  text?: string;
   onClick: () => void;
-  label: string;
-  kind?: "primary" | "secondary";
   disabled?: boolean;
 }
-export const Button: React.FC<ButtonProps> = ({
-  label,
-  onClick,
-  kind = "primary",
-  ...props
+interface ButtonGroupProps {
+  buttons: ButtonProps[];
+  compact?: boolean;
+}
+// https://tailwind-starter-kit.now.sh/docs/buttons#
+export const ButtonGroup: React.FC<ButtonGroupProps> = ({
+  buttons,
+  compact = false,
 }) => {
+  const baseStyles = `${compact ? "h-6" : "h-8"}  ${
+    compact ? "px-3" : "px-5"
+  } text-indigo-100 transition-colors duration-150
+  bg-indigo-700 focus:shadow-outline hover:bg-indigo-800
+  disabled:bg-indigo-500 inline-flex items-center`;
   return (
-    <button
-      className="px-1 py-1 text-sm text-purple-600 disabled:border-red-200 font-semibold rounded-full border border-purple-200 hover:text-white hover:bg-purple-600 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"
-      onClick={onClick}
-      {...props}
-    >
-      {label}
-    </button>
+    <div className="inline-flex" role="group" aria-label="Button group">
+      {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {
+        const iconMargins = compact ? 1 : 3;
+        const iconDim = compact ? 3 : 4;
+        return (
+          <button
+            className={`${baseStyles} ${x === 0 && "rounded-l-lg"} ${
+              x === buttons.length - 1 && "rounded-r-lg"
+            }`}
+            {...props}
+          >
+            {!!IconLeft && (
+              <IconLeft
+                className={`w-${iconDim} h-${iconDim} mr-${iconMargins}`}
+              />
+            )}
+            {text && <span>{text}</span>}
+            {!!IconRight && (
+              <IconRight
+                className={`w-${iconDim} h-${iconDim} ml-${iconMargins}`}
+              />
+            )}
+          </button>
+        );
+      })}
+    </div>
   );
 };
