@@ -93,7 +93,7 @@
     "postcss": "^8.2.1",
     "prettier": "^2.2.1",
     "redoc-cli": "^0.10.2",
-    "start-server-and-test": "^1.11.6",
+    "start-server-and-test": "^1.11.7",
     "tailwindcss": "^2.0.2"
   }
 }
