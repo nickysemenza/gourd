@@ -52,3 +52,8 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     </div>
   );
 };
+export const Pill: React.FC = ({ children }) => (
+  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-blue-200 text-blue-800 rounded-full">
+    {children}
+  </span>
+);

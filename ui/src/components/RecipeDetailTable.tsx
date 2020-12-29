@@ -11,7 +11,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { ButtonGroup } from "./Button";
+import { ButtonGroup, Pill } from "./Button";
 import { DragWrapper } from "./DragDrop";
 import {
   addIngredient,
@@ -20,6 +20,7 @@ import {
   canMoveI,
   delI,
   getIngredientValue,
+  getGlobalInstructionNumber,
   I,
   isOverride,
   moveI,
@@ -97,9 +98,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>
-        <div className="inline-block bg-blue-200 text-blue-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">
-          {String.fromCharCode(65 + x)}
-        </div>
+        <Pill>{String.fromCharCode(65 + x)}</Pill>
       </TableCell>
       <TableCell>
         <TableInput
@@ -254,7 +253,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         {/* <ol className="list-decimal list-inside"> */}
         {section.instructions.map((instruction, y) => (
           <div key={y} className="flex font-serif">
-            <div className="mr-2 w-4">{y + 1}. </div>
+            <div className="mr-4 w-4">
+              <Pill>{getGlobalInstructionNumber(recipe, x, y)}</Pill>
+            </div>
             <TableInput
               data-cy="instruction-input"
               width={72}

@@ -276,3 +276,16 @@ export const delI = (
       },
     },
   });
+
+// returns the 1-indexed count of the instruction, across all sections.
+export const getGlobalInstructionNumber = (
+  recipe: RecipeWrapper,
+  sectionIndex: number,
+  instructionIndex: number
+) =>
+  recipe.detail.sections
+    .slice(0, sectionIndex)
+    .map((x) => x.instructions.length)
+    .reduce((a, b) => a + b, 0) +
+  instructionIndex +
+  1;
