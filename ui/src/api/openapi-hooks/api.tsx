@@ -36,11 +36,11 @@ export interface SectionIngredient {
   /**
    * unit
    */
-  unit: string;
+  unit?: string;
   /**
    * adjective
    */
-  adjective: string;
+  adjective?: string;
   /**
    * optional
    */
@@ -73,7 +73,7 @@ export interface RecipeSection {
    * id
    */
   id: string;
-  duration: TimeRange;
+  duration?: TimeRange;
   /**
    * x
    */

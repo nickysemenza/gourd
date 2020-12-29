@@ -45,7 +45,7 @@ export interface RecipeSection {
      * @type {TimeRange}
      * @memberof RecipeSection
      */
-    duration: TimeRange;
+    duration?: TimeRange;
     /**
      * x
      * @type {Array<SectionInstruction>}
@@ -71,7 +71,7 @@ export function RecipeSectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'],
-        'duration': json['duration'],
+        'duration': !exists(json, 'duration') ? undefined : json['duration'],
         'instructions': ((json['instructions'] as Array<any>).map(SectionInstructionFromJSON)),
         'ingredients': ((json['ingredients'] as Array<any>).map(SectionIngredientFromJSON)),
     };

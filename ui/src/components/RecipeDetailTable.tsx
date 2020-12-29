@@ -73,7 +73,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               setRecipe(moveI(recipe, x, y, true, i));
             },
             disabled: !canMoveI(recipe, x, y, true, i),
-            // text: `up`,
             IconLeft: ArrowUp,
           },
           {
@@ -81,14 +80,12 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               setRecipe(moveI(recipe, x, y, false, i));
             },
             disabled: !canMoveI(recipe, x, y, false, i),
-            // text: `down`,
             IconLeft: ArrowDown,
           },
           {
             onClick: () => {
               setRecipe(delI(recipe, x, y, i));
             },
-            // text: `del`,
             IconLeft: XSquare,
           },
         ]}
@@ -203,7 +200,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   data-cy="unit-input"
                   width={16}
                   edit={edit}
-                  value={ingredient.unit}
+                  value={ingredient.unit || ""}
                   onChange={(e) =>
                     updateIngredient({
                       sectionID: x,
@@ -218,7 +215,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     data-cy="adjective-input"
                     width={16}
                     edit={edit}
-                    value={ingredient.adjective}
+                    value={ingredient.adjective || ""}
                     onChange={(e) =>
                       updateIngredient({
                         sectionID: x,

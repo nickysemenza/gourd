@@ -149,19 +149,21 @@ export const addSection = (recipe: RecipeWrapper) =>
 export const updateTimeRange = (
   recipe: RecipeWrapper,
   sectionID: number,
-  value: TimeRange
+  value?: TimeRange
 ) =>
-  update(recipe, {
-    detail: {
-      sections: {
-        [sectionID]: {
-          duration: {
-            $set: value,
+  !!value
+    ? update(recipe, {
+        detail: {
+          sections: {
+            [sectionID]: {
+              duration: {
+                $set: value,
+              },
+            },
           },
         },
-      },
-    },
-  });
+      })
+    : recipe;
 
 export type I = "ingredients" | "instructions";
 const calculateMoveI = (

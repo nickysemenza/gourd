@@ -146,7 +146,9 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const totalDuration = sumTimeRanges(detail.sections.map((s) => s.duration));
+  const totalDuration = sumTimeRanges(
+    detail.sections.map((s) => s.duration).filter((t) => t !== undefined)
+  );
 
   return (
     <div>

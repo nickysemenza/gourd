@@ -69,7 +69,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling convertIngredientToRecipe.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -107,7 +107,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('ingredient','Required parameter requestParameters.ingredient was null or undefined when calling createIngredients.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -144,7 +144,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * List all ingredients
      */
     async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;
@@ -194,7 +194,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('inlineObject','Required parameter requestParameters.inlineObject was null or undefined when calling mergeIngredients.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -235,7 +235,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
         }
 
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;

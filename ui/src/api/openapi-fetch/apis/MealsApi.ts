@@ -34,7 +34,7 @@ export class MealsApi extends runtime.BaseAPI {
      * List all meals
      */
     async listMealsRaw(requestParameters: MealsApiListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
-        const queryParameters: runtime.HTTPQuery = {};
+        const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
             queryParameters['offset'] = requestParameters.offset;

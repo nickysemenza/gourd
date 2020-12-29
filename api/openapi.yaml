@@ -347,8 +347,6 @@ components:
         - id
         - grams
         - kind
-        - unit
-        - adjective
       properties:
         id:
           description: id
@@ -401,7 +399,6 @@ components:
       type: object
       required:
         - id
-        - duration
         - instructions
         - ingredients
       properties:

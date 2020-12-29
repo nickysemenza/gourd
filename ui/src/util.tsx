@@ -60,7 +60,8 @@ const formatSeconds = (seconds: number) => {
   vals.push(s > 0 ? `${s} sec` : null);
   return vals.join(" ");
 };
-export const formatTimeRange = (range: TimeRange) => {
+export const formatTimeRange = (range?: TimeRange) => {
+  if (!range) return "";
   const { min, max } = range;
   let items = [formatSeconds(min)];
   if (max > 0) {
@@ -78,11 +79,13 @@ export const parseTimeRange = (input: string): TimeRange | null => {
   };
 };
 
-export const sumTimeRanges = (ranges: TimeRange[]): TimeRange => {
+export const sumTimeRanges = (ranges: (TimeRange | undefined)[]): TimeRange => {
   let totalDuration: TimeRange = { min: 0, max: 0 };
   ranges.forEach((r) => {
-    totalDuration.min += r.min;
-    totalDuration.max += r.max || r.min; // if max is 0, it means it's a finite and not a range, so use min
+    if (!!r) {
+      totalDuration.min += r.min;
+      totalDuration.max += r.max || r.min; // if max is 0, it means it's a finite and not a range, so use min
+    }
   });
 
   return totalDuration;

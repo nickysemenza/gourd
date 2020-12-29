@@ -71,13 +71,13 @@ export interface SectionIngredient {
      * @type {string}
      * @memberof SectionIngredient
      */
-    unit: string;
+    unit?: string;
     /**
      * adjective
      * @type {string}
      * @memberof SectionIngredient
      */
-    adjective: string;
+    adjective?: string;
     /**
      * optional
      * @type {boolean}
@@ -108,8 +108,8 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'ingredient': !exists(json, 'ingredient') ? undefined : json['ingredient'],
         'grams': json['grams'],
         'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'unit': json['unit'],
-        'adjective': json['adjective'],
+        'unit': !exists(json, 'unit') ? undefined : json['unit'],
+        'adjective': !exists(json, 'adjective') ? undefined : json['adjective'],
         'optional': !exists(json, 'optional') ? undefined : json['optional'],
         'original': !exists(json, 'original') ? undefined : json['original'],
     };
