@@ -53,5 +53,6 @@ services:
     ports:
       - "3001:3001"
     volumes:
+      - ./.git:/work/.git
       - ./ui/cypress:/work/cypress
       - ./ui/coverage:/work/coverage

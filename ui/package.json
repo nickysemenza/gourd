@@ -64,7 +64,7 @@
     "cy:run": "cypress run",
     "cy:open": "cypress open",
     "start:integration": "BROWSER=none PORT=3001 react-scripts -r @cypress/instrument-cra start",
-    "cy:run:integration": "cypress run",
+    "cy:run:integration": "cypress run --record --key 265312e3-7b8c-4031-ad0a-5f825b95cfce",
     "test:integration": "start-server-and-test start:integration http://localhost:3001 cy:run:integration"
   },
   "eslintConfig": {
