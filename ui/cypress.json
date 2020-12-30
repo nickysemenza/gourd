@@ -2,5 +2,9 @@
   "viewportWidth": 1600,
   "viewportHeight": 660,
   "baseUrl": "http://localhost:3000",
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
+  },
   "projectId": "hf26uf"
 }
