@@ -64,7 +64,7 @@ export const formatTimeRange = (range?: TimeRange) => {
   if (!range) return "";
   const { min, max } = range;
   let items = [formatSeconds(min)];
-  if (max > 0) {
+  if (max > 0 && max !== min) {
     items.push(" - ", formatSeconds(max));
   }
   return items.join("");

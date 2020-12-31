@@ -468,9 +468,11 @@ components:
         name:
           description: recipe name
           type: string
-        source:
-          description: book or website? deprecated?
-          type: string
+        sources:
+          description: book or websites
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSource"
         servings:
           description: num servings
           type: integer
@@ -522,6 +524,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IngredientDetail"
+    RecipeSource:
+      description: where the recipe came from (i.e. book/website)
+      type: object
+      properties:
+        url:
+          description: url
+          type: string
+        title:
+          description: title (if book)
+          type: string
+        page:
+          description: page number/section (if book)
+          type: string
     GooglePhotosAlbum:
       description: an album containing `GooglePhoto`
       type: object

@@ -167,8 +167,8 @@ type RecipeDetail struct {
 	// num servings
 	Servings *int64 `json:"servings,omitempty"`
 
-	// book or website? deprecated?
-	Source *string `json:"source,omitempty"`
+	// book or websites
+	Sources *[]RecipeSource `json:"sources,omitempty"`
 
 	// serving unit
 	Unit string `json:"unit"`
@@ -181,7 +181,7 @@ type RecipeDetail struct {
 type RecipeSection struct {
 
 	// A range of time or a specific duration of time (in seconds)
-	Duration TimeRange `json:"duration"`
+	Duration *TimeRange `json:"duration,omitempty"`
 
 	// id
 	Id string `json:"id"`
@@ -191,6 +191,19 @@ type RecipeSection struct {
 
 	// x
 	Instructions []SectionInstruction `json:"instructions"`
+}
+
+// RecipeSource defines model for RecipeSource.
+type RecipeSource struct {
+
+	// page number/section (if book)
+	Page *string `json:"page,omitempty"`
+
+	// title (if book)
+	Title *string `json:"title,omitempty"`
+
+	// url
+	Url *string `json:"url,omitempty"`
 }
 
 // RecipeWrapper defines model for RecipeWrapper.
@@ -217,7 +230,7 @@ type SearchResult struct {
 type SectionIngredient struct {
 
 	// adjective
-	Adjective string `json:"adjective"`
+	Adjective *string `json:"adjective,omitempty"`
 
 	// amount
 	Amount *float64 `json:"amount,omitempty"`
@@ -244,7 +257,7 @@ type SectionIngredient struct {
 	Recipe *RecipeDetail `json:"recipe,omitempty"`
 
 	// unit
-	Unit string `json:"unit"`
+	Unit *string `json:"unit,omitempty"`
 }
 
 // SectionInstruction defines model for SectionInstruction.

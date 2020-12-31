@@ -37,15 +37,19 @@ func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 	if err != nil {
 		panic(err)
 	}
-	return RecipeDetail{
-		Id:     dbr.Id,
-		Name:   dbr.Name,
-		Source: dbr.Source.Ptr(),
-		// TotalMinutes:    dbr.TotalMinutes.Ptr(),
+	rd := RecipeDetail{
+		Id:              dbr.Id,
+		Name:            dbr.Name,
 		Version:         &dbr.Version,
 		IsLatestVersion: &dbr.LatestVersion,
 		Sections:        sections,
 	}
+	if dbr.Source.Valid {
+		if err := json.Unmarshal([]byte(dbr.Source.String), &rd.Sources); err != nil {
+			panic(err)
+		}
+	}
+	return rd
 }
 func transformRecipes(dbr db.RecipeDetails) []RecipeDetail {
 	r := make([]RecipeDetail, len(dbr))
@@ -67,11 +71,14 @@ func transformIngredient(dbr db.Ingredient) Ingredient {
 
 func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
-		Id:     r.Detail.Id,
-		Name:   r.Detail.Name,
-		Source: zero.StringFromPtr(r.Detail.Source),
-		// TotalMinutes: zero.IntFromPtr(r.Detail.TotalMinutes),
+		Id:   r.Detail.Id,
+		Name: r.Detail.Name,
 	}
+	source, err := json.Marshal(r.Detail.Sources)
+	if err != nil {
+		return nil, err
+	}
+	dbr.Source = zero.StringFrom(string(source))
 
 	for _, s := range r.Detail.Sections {
 		if len(s.Ingredients) == 0 && len(s.Instructions) == 0 {
@@ -98,8 +105,8 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 			si := db.SectionIngredient{
 				Grams:     zero.FloatFrom(i.Grams),
 				Amount:    zero.FloatFromPtr(i.Amount),
-				Unit:      zero.StringFrom(i.Unit),
-				Adjective: zero.StringFrom(i.Adjective),
+				Unit:      zero.StringFromPtr(i.Unit),
+				Adjective: zero.StringFromPtr(i.Adjective),
 				Original:  zero.StringFromPtr(i.Original),
 				Optional:  zero.BoolFromPtr(i.Optional),
 			}
@@ -178,8 +185,8 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 				Id:        i.Id,
 				Grams:     i.Grams.Float64,
 				Amount:    i.Amount.Ptr(),
-				Unit:      i.Unit.String,
-				Adjective: i.Adjective.String,
+				Unit:      i.Unit.Ptr(),
+				Adjective: i.Adjective.Ptr(),
 				Original:  i.Original.Ptr(),
 				Optional:  i.Optional.Ptr(),
 			}

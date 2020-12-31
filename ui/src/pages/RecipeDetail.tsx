@@ -8,12 +8,17 @@ import Debug from "../components/Debug";
 import update from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
-import { useGetRecipeById, useCreateRecipes } from "../api/openapi-hooks/api";
+import {
+  useGetRecipeById,
+  useCreateRecipes,
+  RecipeSource,
+} from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {
   Override,
   RecipeTweaks,
   updateRecipeName,
+  updateRecipeSource,
 } from "../components/RecipeEditorUtils";
 import { ButtonGroup } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
@@ -150,6 +155,8 @@ const RecipeDetail: React.FC = () => {
     detail.sections.map((s) => s.duration).filter((t) => t !== undefined)
   );
 
+  const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
+
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -163,9 +170,14 @@ const RecipeDetail: React.FC = () => {
               }
             ></input>
           ) : (
-            <h2 className="text-2xl font-bold leading-7 text-gray-900">
-              {detail.name}
-            </h2>
+            <div className="text-gray-900 flex">
+              <h2 className="text-2xl font-bold leading-7 ">{detail.name}</h2>
+              {!!detail.version && (
+                <h4 className="text-small self-end pl-1">
+                  version {detail.version}
+                </h4>
+              )}
+            </div>
           )}
 
           <div className="flex">
@@ -174,28 +186,69 @@ const RecipeDetail: React.FC = () => {
             )}
             {formatTimeRange(totalDuration)}
           </div>
+          <div>
+            {(detail.sources || []).map((source, i) => (
+              <div className="flex text-gray-600 space-x-1">
+                <div className="text-xs font-bold uppercase self-center">
+                  from:
+                </div>
+                {edit ? (
+                  <div className="flex">
+                    {sourceTypes.map((key) => (
+                      <input
+                        className="border-2 w-96"
+                        value={source[key]}
+                        onChange={(e) =>
+                          setRecipe(
+                            updateRecipeSource(recipe, i, e.target.value, key)
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex space-x-1">
+                    {!!source.url && (
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-indigo-600 underline"
+                      >
+                        {source.url}
+                      </a>
+                    )}
+                    {!!source.title && <div>{source.title}</div>}
+                    {!!source.page && <div>(pg. {source.page})</div>}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-        <ButtonGroup
-          buttons={[
-            {
-              onClick: resetMultiplier,
-              disabled: multiplier === 1,
-              text: "reset",
-              IconLeft: X,
-            },
-            {
-              onClick: saveUpdate,
-              disabled: !edit,
-              text: "save",
-              IconLeft: Save,
-            },
-            {
-              onClick: toggleEdit,
-              text: edit ? "view" : "edit",
-              IconLeft: edit ? Eye : Edit,
-            },
-          ]}
-        />
+        <div className="self-end">
+          <ButtonGroup
+            buttons={[
+              {
+                onClick: resetMultiplier,
+                disabled: multiplier === 1,
+                text: "reset",
+                IconLeft: X,
+              },
+              {
+                onClick: saveUpdate,
+                disabled: !edit,
+                text: "save",
+                IconLeft: Save,
+              },
+              {
+                onClick: toggleEdit,
+                text: edit ? "view" : "edit",
+                IconLeft: edit ? Eye : Edit,
+              },
+            ]}
+          />
+        </div>
       </div>
 
       <RecipeDetailTable

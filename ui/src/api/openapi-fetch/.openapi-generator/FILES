@@ -24,6 +24,7 @@ models/PaginatedRecipes.ts
 models/Recipe.ts
 models/RecipeDetail.ts
 models/RecipeSection.ts
+models/RecipeSource.ts
 models/RecipeWrapper.ts
 models/SearchResult.ts
 models/SectionIngredient.ts

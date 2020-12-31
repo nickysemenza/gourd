@@ -18,6 +18,10 @@ import {
     RecipeSectionFromJSON,
     RecipeSectionFromJSONTyped,
     RecipeSectionToJSON,
+    RecipeSource,
+    RecipeSourceFromJSON,
+    RecipeSourceFromJSONTyped,
+    RecipeSourceToJSON,
 } from './';
 
 /**
@@ -45,11 +49,11 @@ export interface RecipeDetail {
      */
     name: string;
     /**
-     * book or website? deprecated?
-     * @type {string}
+     * book or websites
+     * @type {Array<RecipeSource>}
      * @memberof RecipeDetail
      */
-    source?: string;
+    sources?: Array<RecipeSource>;
     /**
      * num servings
      * @type {number}
@@ -95,7 +99,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'name': json['name'],
-        'source': !exists(json, 'source') ? undefined : json['source'],
+        'sources': !exists(json, 'sources') ? undefined : ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
         'unit': json['unit'],
@@ -116,7 +120,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'name': value.name,
-        'source': value.source,
+        'sources': value.sources === undefined ? undefined : ((value.sources as Array<any>).map(RecipeSourceToJSON)),
         'servings': value.servings,
         'quantity': value.quantity,
         'unit': value.unit,

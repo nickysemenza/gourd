@@ -1,4 +1,11 @@
-import { Ingredient, RecipeWrapper, TimeRange } from "../api/openapi-hooks/api";
+import {
+  Ingredient,
+  RecipeSection,
+  RecipeSource,
+  RecipeWrapper,
+  SectionIngredient,
+  TimeRange,
+} from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 export type Override = {
   sectionID: number;
@@ -14,7 +21,7 @@ export type RecipeTweaks = {
 };
 
 export type IngredientAttr = "grams" | "amount";
-export type IngredientKind = "recipe" | "ingredient";
+export type IngredientKind = SectionIngredient["kind"];
 
 export const updateIngredientInfo = (
   recipe: RecipeWrapper,
@@ -94,6 +101,16 @@ export const updateRecipeName = (recipe: RecipeWrapper, value: string) =>
     detail: { name: { $set: value } },
   });
 
+export const updateRecipeSource = (
+  recipe: RecipeWrapper,
+  index: number,
+  value: string,
+  field: keyof RecipeSource
+) =>
+  update(recipe, {
+    detail: { sources: { [index]: { [field]: { $set: value } } } },
+  });
+
 export const addInstruction = (recipe: RecipeWrapper, sectionID: number) =>
   update(recipe, {
     detail: {
@@ -165,7 +182,7 @@ export const updateTimeRange = (
       })
     : recipe;
 
-export type I = "ingredients" | "instructions";
+export type I = keyof Pick<RecipeSection, "ingredients" | "instructions">;
 const calculateMoveI = (
   recipe: RecipeWrapper,
   sectionIndex: number,

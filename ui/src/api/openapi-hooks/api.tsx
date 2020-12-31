@@ -126,9 +126,9 @@ export interface RecipeDetail {
    */
   name: string;
   /**
-   * book or website? deprecated?
+   * book or websites
    */
-  source?: string;
+  sources?: RecipeSource[];
   /**
    * num servings
    */
@@ -178,6 +178,24 @@ export interface IngredientDetail {
    * Ingredients that are equivalent
    */
   children?: IngredientDetail[];
+}
+
+/**
+ * where the recipe came from (i.e. book/website)
+ */
+export interface RecipeSource {
+  /**
+   * url
+   */
+  url?: string;
+  /**
+   * title (if book)
+   */
+  title?: string;
+  /**
+   * page number/section (if book)
+   */
+  page?: string;
 }
 
 /**

@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -57,8 +56,8 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 			Ingredient: &api.Ingredient{Id: id},
 			Kind:       "ingredient",
 			Amount:     &i.Volume.Value,
-			Unit:       i.Volume.Unit,
-			Adjective:  i.Modifier,
+			Unit:       &i.Volume.Unit,
+			Adjective:  &i.Modifier,
 			Grams:      i.Grams(),
 			Original:   zero.StringFrom(item).Ptr(),
 		})
@@ -66,21 +65,13 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 	for _, item := range recipe.RecipeInstructions {
 		section.Instructions = append(section.Instructions, api.SectionInstruction{Instruction: item.Text})
 	}
-	u, err := url.Parse(addr)
-	if err != nil {
-		return nil, err
-	}
 
-	source := fmt.Sprintf("todo: %s %s", u.Host, addr)
+	source := []api.RecipeSource{{Url: &addr}}
 	r := api.RecipeWrapper{
 		Detail: api.RecipeDetail{
 			Name:     recipe.Name,
-			Source:   &source,
+			Sources:  &source,
 			Sections: []api.RecipeSection{section},
-			// Source: &api.Source{
-			// 	Name: u.Host,
-			// 	Meta: addr,
-			// },
 		},
 	}
 	spew.Dump(r, debugMsgs)

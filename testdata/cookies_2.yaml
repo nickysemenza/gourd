@@ -2,7 +2,9 @@
 name: CS Pecan Brittle
 quantity: 0
 unit: ""
-version: 2
+sources:
+  - title: Dessert Person
+    page: "3"
 sections:
   - ingredients:
       - adjective: chopped
@@ -58,9 +60,9 @@ sections:
       min: 20
 ---
 name: CS Oat Pecan Cookies
-quantity: 0
-unit: ""
-version: 2
+sources:
+  - title: Dessert Person
+    page: "3"
 sections:
   - ingredients:
       - amount: 1

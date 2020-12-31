@@ -92,6 +92,15 @@ export interface SectionIngredient {
     original?: string;
 }
 
+/**
+* @export
+* @enum {string}
+*/
+export enum SectionIngredientKindEnum {
+    RECIPE = 'recipe',
+    INGREDIENT = 'ingredient'
+}
+
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
     return SectionIngredientFromJSONTyped(json, false);
 }
@@ -135,15 +144,6 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'optional': value.optional,
         'original': value.original,
     };
-}
-
-/**
-* @export
-* @enum {string}
-*/
-export enum SectionIngredientKindEnum {
-    RECIPE = 'recipe',
-    INGREDIENT = 'ingredient'
 }
 
 
