@@ -308,3 +308,31 @@ export const getGlobalInstructionNumber = (
     .reduce((a, b) => a + b, 0) +
   instructionIndex +
   1;
+
+export const sumIngredients = (sections: RecipeSection[]) => {
+  let recipes: Record<string, SectionIngredient[]> = {};
+  let ingredients: Record<string, SectionIngredient[]> = {};
+
+  const flatIngredients = sections
+    .map((section) => section.ingredients.map((ingredient) => ingredient))
+    .flat();
+
+  flatIngredients.forEach((i) => {
+    switch (i.kind) {
+      case "recipe":
+        const r = i;
+        if (!!r) {
+          recipes[r.id] = [...(recipes[r.id] || []), r];
+        }
+        break;
+      case "ingredient":
+        const item = i;
+        if (!!item) {
+          ingredients[item.id] = [...(ingredients[item.id] || []), item];
+        }
+        break;
+    }
+  });
+
+  return { recipes, ingredients };
+};

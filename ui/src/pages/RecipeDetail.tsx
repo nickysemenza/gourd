@@ -17,6 +17,7 @@ import { formatTimeRange, sumTimeRanges } from "../util";
 import {
   Override,
   RecipeTweaks,
+  sumIngredients,
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
@@ -260,7 +261,16 @@ const RecipeDetail: React.FC = () => {
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
-      <Debug data={{ loading, error, multiplier, override, recipe }} />
+      <Debug
+        data={{
+          loading,
+          error,
+          multiplier,
+          override,
+          recipe,
+          foo: sumIngredients(recipe.detail.sections),
+        }}
+      />
     </div>
   );
 };
