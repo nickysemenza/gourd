@@ -4,20 +4,21 @@ import { RecipeDetail } from "../api/openapi-hooks/api";
 
 export interface Props {
   recipe: RecipeDetail;
+  multiplier?: number;
 }
-export const RecipeLink: React.FC<Props> = ({ recipe }) => (
+export const RecipeLink: React.FC<Props> = ({
+  recipe: { name, version, is_latest_version, id },
+  multiplier,
+}) => (
   <div className="flex space-x-0.5">
-    <Link to={`recipe/${recipe.id}`} className="link">
+    <Link to={`recipe/${id}`} className="link">
       <div
-        className={`${
-          recipe.is_latest_version ? "text-blue-800" : "text-blue-200"
-        }`}
+        className={`${is_latest_version ? "text-blue-800" : "text-blue-200"}`}
       >
-        {recipe.name}
+        {name}
       </div>
     </Link>
-    <div>
-      <div className="flex font-mono">v{recipe.version}</div>
-    </div>
+    <div className="flex font-mono">v{version}</div>
+    {multiplier && <div className="font-mono">@{multiplier}x</div>}
   </div>
 );

@@ -7,6 +7,7 @@ import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
 import ProgressiveImage from "../components/ProgressiveImage";
+import { RecipeLink } from "../components/Misc";
 
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -49,8 +50,7 @@ const Meals: React.FC = () => {
             <div className="w-64">
               {(recipes || []).map((r) => (
                 <div className="flex">
-                  <div>{r.recipe.name}</div>
-                  <div className="font-mono">@{r.multiplier}x</div>
+                  <RecipeLink recipe={r.recipe} multiplier={r.multiplier} />
                 </div>
               ))}
               {/* {ago.format("dddd, MMMM D, YYYY h:mm A")} */}

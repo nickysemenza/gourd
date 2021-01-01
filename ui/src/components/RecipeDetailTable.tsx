@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import IngredientSearch from "./IngredientSearch";
-import { Link } from "react-router-dom";
 import { RecipeWrapper, RecipeSection } from "../api/openapi-hooks/api";
 import {
   formatText,
@@ -30,6 +29,7 @@ import {
   updateTimeRange,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
+import { RecipeLink } from "./Misc";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -162,13 +162,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   />
                 ) : (
                   <div className="text-gray-600">
-                    {ingredient.kind === "recipe" ? (
-                      <Link
-                        to={`/recipe/${ingredient.recipe?.id}`}
-                        className="link"
-                      >
-                        {ingredient.recipe?.name}
-                      </Link>
+                    {ingredient.kind === "recipe" && ingredient.recipe ? (
+                      <RecipeLink recipe={ingredient.recipe} />
                     ) : (
                       ingredient.ingredient?.name
                     )}
