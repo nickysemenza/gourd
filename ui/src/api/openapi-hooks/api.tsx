@@ -251,7 +251,7 @@ export interface GooglePhoto {
 }
 
 /**
- * A google photo
+ * A meal, which bridges recipes to photos
  */
 export interface Meal {
   /**
@@ -267,6 +267,18 @@ export interface Meal {
    */
   ate_at: string;
   photos: GooglePhoto[];
+  recipes?: MealRecipe[];
+}
+
+/**
+ * A recipe that's part of a meal (a recipe at a specific amount)
+ */
+export interface MealRecipe {
+  /**
+   * when it was taken
+   */
+  multiplier: number;
+  recipe: RecipeDetail;
 }
 
 /**

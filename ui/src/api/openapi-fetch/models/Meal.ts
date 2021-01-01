@@ -18,10 +18,14 @@ import {
     GooglePhotoFromJSON,
     GooglePhotoFromJSONTyped,
     GooglePhotoToJSON,
+    MealRecipe,
+    MealRecipeFromJSON,
+    MealRecipeFromJSONTyped,
+    MealRecipeToJSON,
 } from './';
 
 /**
- * A google photo
+ * A meal, which bridges recipes to photos
  * @export
  * @interface Meal
  */
@@ -50,6 +54,12 @@ export interface Meal {
      * @memberof Meal
      */
     photos: Array<GooglePhoto>;
+    /**
+     * 
+     * @type {Array<MealRecipe>}
+     * @memberof Meal
+     */
+    recipes?: Array<MealRecipe>;
 }
 
 export function MealFromJSON(json: any): Meal {
@@ -66,6 +76,7 @@ export function MealFromJSONTyped(json: any, ignoreDiscriminator: boolean): Meal
         'name': json['name'],
         'ateAt': (new Date(json['ate_at'])),
         'photos': ((json['photos'] as Array<any>).map(GooglePhotoFromJSON)),
+        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(MealRecipeFromJSON)),
     };
 }
 
@@ -82,6 +93,7 @@ export function MealToJSON(value?: Meal | null): any {
         'name': value.name,
         'ate_at': (value.ateAt.toISOString()),
         'photos': ((value.photos as Array<any>).map(GooglePhotoToJSON)),
+        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(MealRecipeToJSON)),
     };
 }
 

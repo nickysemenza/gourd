@@ -108,8 +108,19 @@ type Meal struct {
 	Id string `json:"id"`
 
 	// public image
-	Name   string        `json:"name"`
-	Photos []GooglePhoto `json:"photos"`
+	Name    string        `json:"name"`
+	Photos  []GooglePhoto `json:"photos"`
+	Recipes *[]MealRecipe `json:"recipes,omitempty"`
+}
+
+// MealRecipe defines model for MealRecipe.
+type MealRecipe struct {
+
+	// when it was taken
+	Multiplier float64 `json:"multiplier"`
+
+	// A revision of a recipe
+	Recipe RecipeDetail `json:"recipe"`
 }
 
 // PaginatedIngredients defines model for PaginatedIngredients.

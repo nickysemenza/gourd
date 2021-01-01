@@ -16,6 +16,7 @@ models/InlineObject.ts
 models/InlineResponse200.ts
 models/List.ts
 models/Meal.ts
+models/MealRecipe.ts
 models/ModelError.ts
 models/PaginatedIngredients.ts
 models/PaginatedMeals.ts

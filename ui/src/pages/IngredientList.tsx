@@ -147,7 +147,7 @@ const IngredientList: React.FC = () => {
       />
       <PaginatedTable
         columns={columns}
-        data={data?.ingredients || []}
+        data={ingredients}
         fetchData={fetchData}
         isLoading={false}
         totalCount={data?.meta?.total_count || 0}

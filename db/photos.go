@@ -130,12 +130,52 @@ type Meal struct {
 	Name  string    `db:"name"`
 	AteAt time.Time `db:"ate_at"`
 }
+type Meals []Meal
 
-func (c *Client) GetAllMeals(ctx context.Context) ([]Meal, error) {
+func (r Meals) MealIDs() []string {
+	m := []string{}
+	for _, x := range r {
+		m = append(m, x.ID)
+	}
+	return m
+}
+
+func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
 	q := c.psql.Select("id", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
-	var results []Meal
+	var results Meals
+	err := c.selectContext(ctx, q, &results)
+	return results, err
+}
+
+type MealRecipe struct {
+	MealID     string  `db:"meal_id"`
+	RecipeID   string  `db:"recipe_id"`
+	Multiplier float64 `db:"multiplier"`
+}
+type MealRecipes []MealRecipe
+
+func (r MealRecipes) ByMealID() map[string][]MealRecipe {
+	m := make(map[string][]MealRecipe)
+	for _, x := range r {
+		m[x.MealID] = append(m[x.MealID], x)
+	}
+	return m
+}
+func (r MealRecipes) RecipeIDs() []string {
+	m := []string{}
+	for _, x := range r {
+		m = append(m, x.RecipeID)
+	}
+	return m
+}
+
+func (c *Client) GetMealRecipes(ctx context.Context, mealID ...string) (MealRecipes, error) {
+	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	defer span.End()
+	q := c.psql.Select("*").From("meal_recipe").Where(sq.Eq{"meal_id": mealID})
+	var results MealRecipes
 	err := c.selectContext(ctx, q, &results)
 	return results, err
 }

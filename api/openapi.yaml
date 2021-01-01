@@ -590,7 +590,7 @@ components:
           type: integer
           format: int64
     Meal:
-      description: A google photo
+      description: A meal, which bridges recipes to photos
       type: object
       required:
         - id
@@ -612,6 +612,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GooglePhoto"
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealRecipe"
+    MealRecipe:
+      description: A recipe that's part of a meal (a recipe at a specific amount)
+      type: object
+      required:
+        - multiplier
+        - recipe
+      properties:
+        multiplier:
+          description: when it was taken
+          type: number
+          format: double # float64
+        recipe:
+          type: object
+          $ref: "#/components/schemas/RecipeDetail"
     SearchResult:
       description: A search result wrapper, which contains ingredients and recipes
       type: object

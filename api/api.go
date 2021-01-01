@@ -451,9 +451,32 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	mealIds := meals.MealIDs()
+	mealRecipes, err := a.DB().GetMealRecipes(ctx, mealIds...)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	recipesDetails, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": mealRecipes.RecipeIDs()})
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+	recipeDetailsById := recipesDetails.ByRecipeId()
+
 	var gphotoIDs []string
 	for _, m := range meals {
-		meal := Meal{Id: m.ID, Name: m.Name, AteAt: m.AteAt}
+		meal := Meal{Id: m.ID,
+			Name:  m.Name,
+			AteAt: m.AteAt}
+
+		mrs := []MealRecipe{}
+		for _, mr := range mealRecipes.ByMealID()[m.ID] {
+
+			test := transformRecipes(recipeDetailsById[mr.RecipeID])
+
+			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: test[0]})
+		}
+		meal.Recipes = &mrs
 
 		photos, err := a.DB().GetPhotosForMeal(ctx, m.ID)
 		if err != nil {

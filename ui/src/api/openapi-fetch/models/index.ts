@@ -7,6 +7,7 @@ export * from './InlineObject';
 export * from './InlineResponse200';
 export * from './List';
 export * from './Meal';
+export * from './MealRecipe';
 export * from './ModelError';
 export * from './PaginatedIngredients';
 export * from './PaginatedMeals';

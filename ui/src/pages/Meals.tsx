@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CellProps } from "react-table";
+import { CellProps, Column } from "react-table";
 import dayjs from "dayjs";
 import Debug from "../components/Debug";
 import { GooglePhoto, useListMeals } from "../api/openapi-hooks/api";
@@ -24,12 +24,15 @@ const Meals: React.FC = () => {
     queryParams: params,
   });
 
-  const columns = React.useMemo(
+  const meals = data?.meals || [];
+  type i = typeof meals[0];
+
+  const columns: Array<Column<i>> = React.useMemo(
     () => [
       {
         Header: "ate_at",
         accessor: "ate_at",
-        Cell: (cell: CellProps<any>) => {
+        Cell: (cell: CellProps<i>) => {
           const { ate_at } = cell.row.original;
           const ago = dayjs(ate_at);
 
@@ -37,9 +40,28 @@ const Meals: React.FC = () => {
         },
       },
       {
+        Header: "recipes",
+        accessor: "recipes",
+        Cell: (cell: CellProps<i>) => {
+          const { recipes } = cell.row.original;
+
+          return (
+            <div className="w-64">
+              {(recipes || []).map((r) => (
+                <div className="flex">
+                  <div>{r.recipe.name}</div>
+                  <div className="font-mono">@{r.multiplier}x</div>
+                </div>
+              ))}
+              {/* {ago.format("dddd, MMMM D, YYYY h:mm A")} */}
+            </div>
+          );
+        },
+      },
+      {
         Header: "Photos",
         accessor: "photos",
-        Cell: (cell: CellProps<any>) => {
+        Cell: (cell: CellProps<i>) => {
           const { photos } = cell.row.original;
           // https://developers.google.com/meals/library/guides/access-media-items#image-base-urls
           return (
@@ -67,7 +89,7 @@ const Meals: React.FC = () => {
     <div>
       <PaginatedTable
         columns={columns}
-        data={data?.meals || []}
+        data={meals}
         fetchData={fetchData}
         isLoading={false}
         totalCount={data?.meta?.total_count || 0}
