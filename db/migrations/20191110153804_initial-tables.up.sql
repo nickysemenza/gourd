@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS "recipe_section_ingredients" (
   "adjective" TEXT,
   "original" TEXT,
   "optional" boolean default false,
+  "substitutes_for" TEXT references recipe_section_ingredients(id),
   PRIMARY KEY ("id"),
   constraint check_ingredient check (
     ingredient is not null

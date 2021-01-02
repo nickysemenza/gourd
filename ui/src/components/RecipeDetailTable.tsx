@@ -1,5 +1,9 @@
 import React, { useCallback } from "react";
-import { RecipeWrapper, RecipeSection } from "../api/openapi-hooks/api";
+import {
+  RecipeWrapper,
+  RecipeSection,
+  SectionIngredient,
+} from "../api/openapi-hooks/api";
 import {
   formatText,
   formatTimeRange,
@@ -92,6 +96,165 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       />
     );
 
+  const renderIngredientItem = (
+    ingredient: SectionIngredient,
+    x: number,
+    y: number
+  ) => {
+    const bp = Math.round((ingredient.grams / flourMass) * 100);
+    const { edit } = tweaks;
+    return (
+      <div className="flex flex-col">
+        <div className="ing-table-row" key={y}>
+          <TableInput
+            width={14}
+            data-cy="grams-input"
+            edit={edit}
+            softEdit
+            value={getIngredientValue(
+              tweaks,
+              x,
+              y,
+              ingredient.grams || 0,
+              "grams"
+            )}
+            blur
+            highlight={isOverride(tweaks, x, y, "grams")}
+            onChange={(e) =>
+              updateIngredient({
+                sectionID: x,
+                ingredientID: y,
+                value: e,
+                attr: "grams",
+              })
+            }
+          />
+          <div className="flex space-x-0.5">
+            <div className="text-gray-600">g</div>
+            {showBP && (
+              <div
+                className={`${
+                  bp > 0 ? "text-gray-600" : "text-red-300"
+                } italic`}
+              >
+                ({bp}%)
+              </div>
+            )}
+          </div>
+          {edit ? (
+            <EntitySelector
+              createKind="ingredient"
+              value={{
+                value: "",
+                label: getIngredient(ingredient).name,
+                kind: "recipe",
+              }}
+              onChange={(a) => {
+                setRecipe(
+                  updateIngredientInfo(
+                    recipe,
+                    x,
+                    y,
+                    { id: a.value, name: a.label },
+                    a.kind
+                  )
+                );
+              }}
+            />
+          ) : (
+            <div className="text-gray-600">
+              {ingredient.kind === "recipe" && ingredient.recipe ? (
+                <RecipeLink recipe={ingredient.recipe} />
+              ) : (
+                ingredient.ingredient?.name
+              )}
+            </div>
+          )}
+          <TableInput
+            data-cy="amount-input"
+            // width={16}
+            edit={edit}
+            softEdit
+            highlight={isOverride(tweaks, x, y, "amount")}
+            value={getIngredientValue(
+              tweaks,
+              x,
+              y,
+              ingredient.amount || 0,
+              "amount"
+            )}
+            onChange={(e) =>
+              updateIngredient({
+                sectionID: x,
+                ingredientID: y,
+                value: e,
+                attr: "amount",
+              })
+            }
+          />
+          <TableInput
+            data-cy="unit-input"
+            width={16}
+            edit={edit}
+            value={ingredient.unit || ""}
+            onChange={(e) =>
+              updateIngredient({
+                sectionID: x,
+                ingredientID: y,
+                value: e,
+                attr: "unit",
+              })
+            }
+          />
+          <div className="flex space-x-1">
+            <TableInput
+              data-cy="adjective-input"
+              width={16}
+              edit={edit}
+              value={ingredient.adjective || ""}
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  value: e,
+                  attr: "adjective",
+                })
+              }
+            />
+            {!edit && ingredient.optional && (
+              <span className="italic">(optional)</span>
+            )}
+          </div>
+          <div>
+            {iActions(x, y, "ingredients")}
+            {edit && (
+              <label className="flex items-center ml-1">
+                <input
+                  type="checkbox"
+                  className="form-checkbox"
+                  checked={ingredient.optional}
+                  onClick={() =>
+                    updateIngredient({
+                      sectionID: x,
+                      ingredientID: y,
+                      value: ingredient.optional ? "false" : "true",
+                      attr: "optional",
+                    })
+                  }
+                />
+                <span className="ml-1">Optional</span>
+              </label>
+            )}
+          </div>
+        </div>
+        {!!ingredient.original && (
+          <div className="italic text-xs pb-2">
+            original: {ingredient.original}
+          </div>
+        )}
+      </div>
+    );
+  };
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>
@@ -100,7 +263,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       <TableCell>
         <TableInput
           width={40}
-          data-cy="grams-input"
+          data-cy="time-input"
           edit={edit}
           value={formatTimeRange(section.duration)}
           blur
@@ -113,159 +276,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       </TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => {
-          const bp = Math.round((ingredient.grams / flourMass) * 100);
-          const { edit } = tweaks;
-          return (
-            <div className="flex flex-col">
-              <div className="ing-table-row" key={y}>
-                <TableInput
-                  width={14}
-                  data-cy="grams-input"
-                  edit={edit}
-                  softEdit
-                  value={getIngredientValue(
-                    tweaks,
-                    x,
-                    y,
-                    ingredient.grams || 0,
-                    "grams"
-                  )}
-                  blur
-                  highlight={isOverride(tweaks, x, y, "grams")}
-                  onChange={(e) =>
-                    updateIngredient({
-                      sectionID: x,
-                      ingredientID: y,
-                      value: e,
-                      attr: "grams",
-                    })
-                  }
-                />
-                <div className="flex space-x-0.5">
-                  <div className="text-gray-600">g</div>
-                  {showBP && (
-                    <div
-                      className={`${
-                        bp > 0 ? "text-gray-600" : "text-red-300"
-                      } italic`}
-                    >
-                      ({bp}%)
-                    </div>
-                  )}
-                </div>
-                {edit ? (
-                  <EntitySelector
-                    createKind="ingredient"
-                    value={{
-                      value: "",
-                      label: getIngredient(ingredient).name,
-                      kind: "recipe",
-                    }}
-                    onChange={(a) => {
-                      setRecipe(
-                        updateIngredientInfo(
-                          recipe,
-                          x,
-                          y,
-                          { id: a.value, name: a.label },
-                          a.kind
-                        )
-                      );
-                    }}
-                  />
-                ) : (
-                  <div className="text-gray-600">
-                    {ingredient.kind === "recipe" && ingredient.recipe ? (
-                      <RecipeLink recipe={ingredient.recipe} />
-                    ) : (
-                      ingredient.ingredient?.name
-                    )}
-                  </div>
-                )}
-                <TableInput
-                  data-cy="amount-input"
-                  // width={16}
-                  edit={edit}
-                  softEdit
-                  highlight={isOverride(tweaks, x, y, "amount")}
-                  value={getIngredientValue(
-                    tweaks,
-                    x,
-                    y,
-                    ingredient.amount || 0,
-                    "amount"
-                  )}
-                  onChange={(e) =>
-                    updateIngredient({
-                      sectionID: x,
-                      ingredientID: y,
-                      value: e,
-                      attr: "amount",
-                    })
-                  }
-                />
-                <TableInput
-                  data-cy="unit-input"
-                  width={16}
-                  edit={edit}
-                  value={ingredient.unit || ""}
-                  onChange={(e) =>
-                    updateIngredient({
-                      sectionID: x,
-                      ingredientID: y,
-                      value: e,
-                      attr: "unit",
-                    })
-                  }
-                />
-                <div className="flex space-x-1">
-                  <TableInput
-                    data-cy="adjective-input"
-                    width={16}
-                    edit={edit}
-                    value={ingredient.adjective || ""}
-                    onChange={(e) =>
-                      updateIngredient({
-                        sectionID: x,
-                        ingredientID: y,
-                        value: e,
-                        attr: "adjective",
-                      })
-                    }
-                  />
-                  {!edit && ingredient.optional && (
-                    <span className="italic">(optional)</span>
-                  )}
-                </div>
-                <div>
-                  {iActions(x, y, "ingredients")}
-                  {edit && (
-                    <label className="flex items-center ml-1">
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={ingredient.optional}
-                        onClick={() =>
-                          updateIngredient({
-                            sectionID: x,
-                            ingredientID: y,
-                            value: ingredient.optional ? "false" : "true",
-                            attr: "optional",
-                          })
-                        }
-                      />
-                      <span className="ml-1">Optional</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-              {!!ingredient.original && (
-                <div className="italic text-xs pb-2">
-                  original: {ingredient.original}
-                </div>
-              )}
-            </div>
-          );
+          return renderIngredientItem(ingredient, x, y);
         })}
         {edit && (
           <div

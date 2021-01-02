@@ -72,6 +72,21 @@ export interface Food {
     brandedInfo?: BrandedFood;
 }
 
+/**
+* @export
+* @enum {string}
+*/
+export enum FoodDataTypeEnum {
+    FOUNDATION_FOOD = 'foundation_food',
+    SAMPLE_FOOD = 'sample_food',
+    MARKET_ACQUISITION = 'market_acquisition',
+    SURVEY_FNDDS_FOOD = 'survey_fndds_food',
+    SUB_SAMPLE_FOOD = 'sub_sample_food',
+    AGRICULTURAL_ACQUISITION = 'agricultural_acquisition',
+    SR_LEGACY_FOOD = 'sr_legacy_food',
+    BRANDED_FOOD = 'branded_food'
+}
+
 export function FoodFromJSON(json: any): Food {
     return FoodFromJSONTyped(json, false);
 }
@@ -107,21 +122,6 @@ export function FoodToJSON(value?: Food | null): any {
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
         'branded_info': value.brandedInfo,
     };
-}
-
-/**
-* @export
-* @enum {string}
-*/
-export enum FoodDataTypeEnum {
-    FOUNDATION_FOOD = 'foundation_food',
-    SAMPLE_FOOD = 'sample_food',
-    MARKET_ACQUISITION = 'market_acquisition',
-    SURVEY_FNDDS_FOOD = 'survey_fndds_food',
-    SUB_SAMPLE_FOOD = 'sub_sample_food',
-    AGRICULTURAL_ACQUISITION = 'agricultural_acquisition',
-    SR_LEGACY_FOOD = 'sr_legacy_food',
-    BRANDED_FOOD = 'branded_food'
 }
 
 

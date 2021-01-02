@@ -12,7 +12,9 @@ import (
 	"net/http"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"go.opentelemetry.io/otel"
@@ -68,7 +70,69 @@ func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{Id: dbr.Id, Name: dbr.Name}
 }
+func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {
+	si := db.SectionIngredient{
+		Id:        i.Id,
+		Grams:     zero.FloatFrom(i.Grams),
+		Amount:    zero.FloatFromPtr(i.Amount),
+		Unit:      zero.StringFromPtr(i.Unit),
+		Adjective: zero.StringFromPtr(i.Adjective),
+		Original:  zero.StringFromPtr(i.Original),
+		Optional:  zero.BoolFromPtr(i.Optional),
+	}
+	switch i.Kind {
+	case "recipe":
+		if i.Recipe == nil {
+			return nil, nil
+		}
+		var eq sq.Eq
+		id := i.Recipe.Id
+		if id == "" {
+			eq = sq.Eq{"name": i.Recipe.Name}
+		} else {
+			eq = sq.Eq{"recipe": i.Recipe.Id}
+		}
+		rs, err := a.DB().GetRecipeDetailWhere(ctx, eq)
+		if err != nil {
+			return nil, err
+		}
 
+		r := rs.First()
+		if r != nil {
+			id = r.RecipeId
+		} else {
+			r, err := a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
+			if err != nil {
+				return nil, err
+			}
+			id = r.RecipeId
+		}
+		si.RecipeId = zero.StringFrom(id)
+	case "ingredient":
+		if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
+			return nil, nil
+		}
+		id := i.Ingredient.Id
+
+		// missing id, need to find/create
+		if id == "" {
+			ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
+			if err != nil {
+				return nil, err
+			}
+			id = ing.Id
+		}
+
+		si.IngredientId = zero.StringFrom(id)
+	case "":
+		// empty table row, drop it
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("unknown kind: %s", i.Kind)
+
+	}
+	return &si, nil
+}
 func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
 		Id:   r.Detail.Id,
@@ -102,67 +166,31 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 			})
 		}
 		for _, i := range s.Ingredients {
-			si := db.SectionIngredient{
-				Grams:     zero.FloatFrom(i.Grams),
-				Amount:    zero.FloatFromPtr(i.Amount),
-				Unit:      zero.StringFromPtr(i.Unit),
-				Adjective: zero.StringFromPtr(i.Adjective),
-				Original:  zero.StringFromPtr(i.Original),
-				Optional:  zero.BoolFromPtr(i.Optional),
+			i.Id = common.UUID()
+			si, err := a.sectionIngredientTODB(ctx, i)
+			if err != nil {
+				return nil, err
 			}
-			switch i.Kind {
-			case "recipe":
-				if i.Recipe == nil {
-					continue
-				}
-				var eq sq.Eq
-				id := i.Recipe.Id
-				if id == "" {
-					eq = sq.Eq{"name": i.Recipe.Name}
-				} else {
-					eq = sq.Eq{"recipe": i.Recipe.Id}
-				}
-				rs, err := a.DB().GetRecipeDetailWhere(ctx, eq)
+			if si == nil {
+				continue
+			}
+			dbs.Ingredients = append(dbs.Ingredients, *si)
+			if i.Substitutes == nil {
+				continue
+			}
+			for _, sub := range *i.Substitutes {
+				si, err := a.sectionIngredientTODB(ctx, sub)
 				if err != nil {
 					return nil, err
 				}
-
-				r := rs.First()
-				if r != nil {
-					id = r.RecipeId
-				} else {
-					r, err := a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
-					if err != nil {
-						return nil, err
-					}
-					id = r.RecipeId
-				}
-				si.RecipeId = zero.StringFrom(id)
-			case "ingredient":
-				if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
+				if si == nil {
 					continue
 				}
-				id := i.Ingredient.Id
-
-				// missing id, need to find/create
-				if id == "" {
-					ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
-					if err != nil {
-						return nil, err
-					}
-					id = ing.Id
-				}
-
-				si.IngredientId = zero.StringFrom(id)
-			case "":
-				// empty table row, drop it
-				continue
-			default:
-				return nil, fmt.Errorf("unknown kind: %s", i.Kind)
-
+				si2 := *si
+				si2.SubsFor = zero.StringFrom(i.Id)
+				dbs.Ingredients = append(dbs.Ingredients, si2)
+				spew.Dump(si2)
 			}
-
-			dbs.Ingredients = append(dbs.Ingredients, si)
 		}
 
 		dbr.Sections = append(dbr.Sections, dbs)
@@ -175,6 +203,7 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 	s := []RecipeSection{}
 	for _, d := range dbs {
 		ing := []SectionIngredient{}
+		ingSubs := map[string][]SectionIngredient{}
 		ins := []SectionInstruction{}
 
 		for _, i := range d.Instructions {
@@ -199,7 +228,16 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 				i := transformIngredient(*i.RawIngredient)
 				item.Ingredient = &i
 			}
-			ing = append(ing, item)
+			if i.SubsFor.Valid {
+				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], item)
+			} else {
+				ing = append(ing, item)
+			}
+		}
+		for x, i := range ing {
+			if subs, ok := ingSubs[i.Id]; ok {
+				ing[x].Substitutes = &subs
+			}
 		}
 		rs := RecipeSection{
 			Id:           d.Id,
@@ -283,7 +321,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrappe
 	if err != nil {
 		return nil, err
 	}
-
+	spew.Dump(dbVersion)
 	r2, err := a.DB().InsertRecipe(ctx, dbVersion)
 	if err != nil {
 		return nil, err

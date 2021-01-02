@@ -331,6 +331,9 @@ type SectionIngredient struct {
 	// A revision of a recipe
 	Recipe *RecipeDetail `json:"recipe,omitempty"`
 
+	// x
+	Substitutes *[]SectionIngredient `json:"substitutes,omitempty"`
+
 	// unit
 	Unit *string `json:"unit,omitempty"`
 }

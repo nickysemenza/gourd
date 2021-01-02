@@ -59,7 +59,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
 	ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
-		"grams", "amount", "unit", "adjective", "optional", "original")
+		"grams", "amount", "unit", "adjective", "optional", "original", "substitutes_for")
 
 	var hasInstructions, hasIngredients bool
 	for _, s := range r.Sections {
@@ -72,7 +72,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 			hasIngredients = true
 
 			ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
-				i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional, i.Original)
+				i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional, i.Original, i.SubsFor)
 		}
 
 	}

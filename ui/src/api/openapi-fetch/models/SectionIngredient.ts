@@ -90,6 +90,21 @@ export interface SectionIngredient {
      * @memberof SectionIngredient
      */
     original?: string;
+    /**
+     * x
+     * @type {Array<SectionIngredient>}
+     * @memberof SectionIngredient
+     */
+    substitutes?: Array<SectionIngredient>;
+}
+
+/**
+* @export
+* @enum {string}
+*/
+export enum SectionIngredientKindEnum {
+    RECIPE = 'recipe',
+    INGREDIENT = 'ingredient'
 }
 
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
@@ -112,6 +127,7 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'adjective': !exists(json, 'adjective') ? undefined : json['adjective'],
         'optional': !exists(json, 'optional') ? undefined : json['optional'],
         'original': !exists(json, 'original') ? undefined : json['original'],
+        'substitutes': !exists(json, 'substitutes') ? undefined : ((json['substitutes'] as Array<any>).map(SectionIngredientFromJSON)),
     };
 }
 
@@ -134,16 +150,8 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'adjective': value.adjective,
         'optional': value.optional,
         'original': value.original,
+        'substitutes': value.substitutes === undefined ? undefined : ((value.substitutes as Array<any>).map(SectionIngredientToJSON)),
     };
-}
-
-/**
-* @export
-* @enum {string}
-*/
-export enum SectionIngredientKindEnum {
-    RECIPE = 'recipe',
-    INGREDIENT = 'ingredient'
 }
 
 

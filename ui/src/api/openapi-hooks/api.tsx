@@ -49,6 +49,10 @@ export interface SectionIngredient {
    * raw line item (pre-import/scrape)
    */
   original?: string;
+  /**
+   * x
+   */
+  substitutes?: SectionIngredient[];
 }
 
 /**

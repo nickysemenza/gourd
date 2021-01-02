@@ -408,6 +408,11 @@ components:
         original:
           description: raw line item (pre-import/scrape)
           type: string
+        substitutes:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredient"
     SectionInstruction:
       description: Instructions in a single section
       type: object

@@ -76,6 +76,7 @@ type SectionIngredient struct {
 	Adjective zero.String `db:"adjective"`
 	Optional  zero.Bool   `db:"optional"`
 	Original  zero.String `db:"original"`
+	SubsFor   zero.String `db:"substitutes_for"`
 
 	// one of the following is required for get and update:
 	RecipeId     zero.String `db:"recipe"`
@@ -140,7 +141,9 @@ func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
 		r.Sections[x].Id = common.UUID()
 		r.Sections[x].RecipeDetailId = r.Id
 		for y := range r.Sections[x].Ingredients {
-			r.Sections[x].Ingredients[y].Id = common.UUID()
+			if r.Sections[x].Ingredients[y].Id == "" {
+				r.Sections[x].Ingredients[y].Id = common.UUID()
+			}
 			r.Sections[x].Ingredients[y].SectionId = r.Sections[x].Id
 
 		}

@@ -19,7 +19,15 @@ sections:
           name: cream of tartar
         kind: ingredient
         optional: false
-        unit:
+        substitutes:
+          - adjective: zested
+            amount: 1
+            grams: 10
+            ingredient:
+              name: lemon juice
+            kind: ingredient
+            optional: false
+            unit: tsp
     instructions:
       - instruction: mix until foamy, start sugar
     duration:
