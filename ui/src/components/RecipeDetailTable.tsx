@@ -218,7 +218,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     })
                   }
                 />
-                <div className="flex">
+                <div className="flex space-x-1">
                   <TableInput
                     data-cy="adjective-input"
                     width={16}
@@ -233,9 +233,31 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                       })
                     }
                   />
+                  {!edit && ingredient.optional && (
+                    <span className="italic">(optional)</span>
+                  )}
                 </div>
-                <div>{iActions(x, y, "ingredients")}</div>
-                {/* TODO: optional toggle */}
+                <div>
+                  {iActions(x, y, "ingredients")}
+                  {edit && (
+                    <label className="flex items-center ml-1">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox"
+                        checked={ingredient.optional}
+                        onClick={() =>
+                          updateIngredient({
+                            sectionID: x,
+                            ingredientID: y,
+                            value: ingredient.optional ? "false" : "true",
+                            attr: "optional",
+                          })
+                        }
+                      />
+                      <span className="ml-1">Optional</span>
+                    </label>
+                  )}
+                </div>
               </div>
               {!!ingredient.original && (
                 <div className="italic text-xs pb-2">
