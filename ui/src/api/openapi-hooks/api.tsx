@@ -406,10 +406,12 @@ export interface FoodCategory {
  * todo
  */
 export interface BrandedFood {
-  /**
-   * Ftodo
-   */
-  todo: number;
+  brand_owner?: string;
+  ingredients?: string;
+  serving_size: number;
+  serving_size_unit: string;
+  household_serving?: string;
+  branded_food_category?: string;
 }
 
 /**

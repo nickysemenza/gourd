@@ -667,11 +667,66 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	nutrientIDs := make([]int, len(nutrientRows))
+	for x, nr := range nutrientRows {
+		nutrientIDs[x] = nr.NutrientID
+	}
+	nutrients, err := a.DB().GetNutrients(ctx, nutrientIDs...)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	nutrientsById := nutrients.ById()
+
+	fNutrients := make([]FoodNutrient, len(nutrientRows))
+	for x, nr := range nutrientRows {
+		nDetail := nutrientsById[nr.NutrientID]
+		fNutrients[x] = FoodNutrient{
+			Amount:     nr.Amount,
+			DataPoints: int(nr.DataPoints.Int64),
+			Nutrient: Nutrient{
+				Id:       nDetail.ID,
+				Name:     nDetail.Name,
+				UnitName: nDetail.UnitName,
+			},
+		}
+	}
+
 	f := Food{
 		Description: food.Description,
 		DataType:    food.DataType,
 		FdcId:       food.FdcID,
-		// CategoryId:  food.CategoryID,
+		Nutrients:   fNutrients,
 	}
+	brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
+		f.BrandedInfo = &BrandedFood{
+			BrandOwner:          brandInfo.BrandOwner,
+			BrandedFoodCategory: brandInfo.BrandedFoodCategory,
+			HouseholdServing:    brandInfo.HouseholdServing,
+			Ingredients:         brandInfo.Ingredients,
+			ServingSize:         brandInfo.ServingSize,
+			ServingSizeUnit:     brandInfo.ServingSizeUnit,
+		}
+	}
+	category, err := a.DB().GetCategory(ctx, food.CategoryID.Int64)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	if category != nil && category.Code != "" {
+		f.Category = &FoodCategory{
+			Code:        category.Code,
+			Description: category.Description,
+		}
+	}
+
 	return c.JSON(http.StatusOK, f)
 }

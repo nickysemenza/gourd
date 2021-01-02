@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"gopkg.in/guregu/null.v3/zero"
@@ -46,122 +47,123 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	).From("usda_food").Where(sq.Eq{"fdc_id": fdcID})
 
 	f := &Food{}
-
 	return f, c.getContext(ctx, q, f)
 }
 
-// //nolint: interfacer
-// func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error) {
-// 	q := c.psql.Select(
-// 		"food_category_id",
-// 		"data_type",
-// 		"description",
-// 		"fdc_id",
-// 	).From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
-// 	if foodCategoryID != nil {
-// 		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
-// 	}
-// 	if dataType != nil {
-// 		q = q.Where(sq.Eq{"data_type": dataType.String()})
-// 	}
-// 	query, args, err := q.ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType string, foodCategoryID *int) ([]Food, error) {
+	q := c.psql.Select(
+		"food_category_id",
+		"data_type",
+		"description",
+		"fdc_id",
+	).From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	if foodCategoryID != nil {
+		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
+	}
+	if dataType != "" {
+		q = q.Where(sq.Eq{"data_type": dataType})
+	}
 
-// 	res := []*model.Food{}
-// 	err = c.db.SelectContext(ctx, &res, query, args...)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return res, nil
-// }
+	res := []Food{}
 
-// func (c *Client) GetFoodNutrients(ctx context.Context, fdcID int) ([]*model.FoodNutrient, error) {
-// 	query, args, err := c.psql.Select(
-// 		"nutrient_id",
-// 		"amount",
-// 		"data_points",
-// 	).From("usda_food_nutrient").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+	if err := c.selectContext(ctx, q, &res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
 
-// 	fns := []*model.FoodNutrient{}
-// 	err = c.db.SelectContext(ctx, &fns, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	// fns2 := []*model.FoodNutrient{}
-// 	// for _, x := range fns {
-// 	// 	fns2 = append(fns2, &x)
-// 	// }
-// 	return fns, nil
-// }
+type FoodNutrient struct {
+	FdcID      int      `db:"fdc_id"`
+	NutrientID int      `json:"nutrient" db:"nutrient_id"`
+	Amount     float64  `json:"amount" db:"amount"`
+	DataPoints zero.Int `json:"data_points" db:"data_points"`
+}
+type FoodNutrients []FoodNutrient
 
-// func (c *Client) GetNutrient(ctx context.Context, nutrientID int) (*model.Nutrient, error) {
-// 	query, args, err := c.psql.Select(
-// 		"id",
-// 		"name",
-// 		"unit_name AS unitName",
-// 	).From("usda_nutrient").Where(sq.Eq{"id": nutrientID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+func (c *Client) GetFoodNutrients(ctx context.Context, fdcID ...int) (FoodNutrients, error) {
+	q := c.psql.Select(
+		"nutrient_id",
+		"amount",
+		"data_points",
+	).From("usda_food_nutrient").Where(sq.Eq{"fdc_id": fdcID})
 
-// 	x := &model.Nutrient{}
-// 	err = c.db.GetContext(ctx, x, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	return x, nil
-// }
+	fns := []FoodNutrient{}
+	err := c.selectContext(ctx, q, &fns)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
 
-// func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*model.FoodCategory, error) {
-// 	query, args, err := c.psql.Select(
-// 		"code",
-// 		"description",
-// 	).From("usda_food_category").Where(sq.Eq{"id": categoryID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+	return fns, nil
+}
 
-// 	x := &model.FoodCategory{}
-// 	err = c.db.GetContext(ctx, x, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	return x, nil
-// }
-// func (c *Client) GetBrandInfo(ctx context.Context, fdcID int) (*model.BrandedFood, error) {
-// 	query, args, err := c.psql.Select(
-// 		"brand_owner AS brandOwner",
-// 		"ingredients AS ingredients",
-// 		"serving_size AS servingSize",
-// 		"serving_size_unit AS servingSizeUnit",
-// 		"household_serving_fulltext AS householdServing",
-// 		"branded_food_category AS brandedFoodCategory",
-// 	).From("usda_branded_food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+type Nutrient struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	UnitName string `json:"unitName"`
+}
+type Nutrients []Nutrient
 
-// 	x := &model.BrandedFood{}
-// 	err = c.db.GetContext(ctx, x, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	return x, nil
-// }
+func (r Nutrients) ById() map[int]Nutrient {
+	m := make(map[int]Nutrient)
+	for _, x := range r {
+		m[x.ID] = x
+	}
+	return m
+}
+
+func (c *Client) GetNutrients(ctx context.Context, nutrientID ...int) (Nutrients, error) {
+	q := c.psql.Select("id", "name", "unit_name AS unitName").From("usda_nutrient").Where(sq.Eq{"id": nutrientID})
+
+	ns := []Nutrient{}
+	err := c.selectContext(ctx, q, &ns)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+
+	return ns, nil
+}
+
+func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*FoodCategory, error) {
+	q := c.psql.Select(
+		"code",
+		"description",
+	).From("usda_food_category").Where(sq.Eq{"id": categoryID})
+
+	x := &FoodCategory{}
+	err := c.getContext(ctx, q, x)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+	return x, nil
+}
+func (c *Client) GetBrandInfo(ctx context.Context, fdcID int) (*BrandedFood, error) {
+	q := c.psql.Select(
+		"brand_owner",
+		"ingredients",
+		"serving_size",
+		"serving_size_unit",
+		"household_serving_fulltext",
+		"branded_food_category",
+	).From("usda_branded_food").Where(sq.Eq{"fdc_id": fdcID})
+
+	x := &BrandedFood{}
+	err := c.getContext(ctx, q, x)
+	if err != nil {
+		return nil, fmt.Errorf("faileo select: %w", err)
+	}
+	return x, nil
+}
+
+type BrandedFood struct {
+	BrandOwner          *string `db:"brand_owner"`
+	Ingredients         *string `db:"ingredients"`
+	ServingSize         float64 `db:"serving_size"`
+	ServingSizeUnit     string  `db:"serving_size_unit"`
+	HouseholdServing    *string `db:"household_serving_fulltext"`
+	BrandedFoodCategory *string `db:"branded_food_category"`
+}
+
+type FoodCategory struct {
+	Code        string `json:"code"`
+	Description string `json:"description"`
+}

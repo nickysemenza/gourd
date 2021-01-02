@@ -15,9 +15,12 @@ type AuthResp struct {
 
 // BrandedFood defines model for BrandedFood.
 type BrandedFood struct {
-
-	// Ftodo
-	Todo int `json:"todo"`
+	BrandOwner          *string `json:"brand_owner,omitempty"`
+	BrandedFoodCategory *string `json:"branded_food_category,omitempty"`
+	HouseholdServing    *string `json:"household_serving,omitempty"`
+	Ingredients         *string `json:"ingredients,omitempty"`
+	ServingSize         float64 `json:"serving_size"`
+	ServingSizeUnit     string  `json:"serving_size_unit"`
 }
 
 // Error defines model for Error.

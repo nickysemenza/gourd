@@ -812,11 +812,22 @@ components:
       type: object
       description: todo
       required:
-        - todo
+        - serving_size
+        - serving_size_unit
       properties:
-        todo:
-          description: Ftodo
-          type: integer
+        brand_owner:
+          type: string
+        ingredients:
+          type: string
+        serving_size:
+          type: number
+          format: double # float64
+        serving_size_unit:
+          type: string
+        household_serving:
+          type: string
+        branded_food_category:
+          type: string
     Food:
       type: object
       description: A top level food

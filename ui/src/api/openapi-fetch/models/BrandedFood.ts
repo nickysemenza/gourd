@@ -20,11 +20,41 @@ import { exists, mapValues } from '../runtime';
  */
 export interface BrandedFood {
     /**
-     * Ftodo
+     * 
+     * @type {string}
+     * @memberof BrandedFood
+     */
+    brandOwner?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BrandedFood
+     */
+    ingredients?: string;
+    /**
+     * 
      * @type {number}
      * @memberof BrandedFood
      */
-    todo: number;
+    servingSize: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BrandedFood
+     */
+    servingSizeUnit: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BrandedFood
+     */
+    householdServing?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BrandedFood
+     */
+    brandedFoodCategory?: string;
 }
 
 export function BrandedFoodFromJSON(json: any): BrandedFood {
@@ -37,7 +67,12 @@ export function BrandedFoodFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'todo': json['todo'],
+        'brandOwner': !exists(json, 'brand_owner') ? undefined : json['brand_owner'],
+        'ingredients': !exists(json, 'ingredients') ? undefined : json['ingredients'],
+        'servingSize': json['serving_size'],
+        'servingSizeUnit': json['serving_size_unit'],
+        'householdServing': !exists(json, 'household_serving') ? undefined : json['household_serving'],
+        'brandedFoodCategory': !exists(json, 'branded_food_category') ? undefined : json['branded_food_category'],
     };
 }
 
@@ -50,7 +85,12 @@ export function BrandedFoodToJSON(value?: BrandedFood | null): any {
     }
     return {
         
-        'todo': value.todo,
+        'brand_owner': value.brandOwner,
+        'ingredients': value.ingredients,
+        'serving_size': value.servingSize,
+        'serving_size_unit': value.servingSizeUnit,
+        'household_serving': value.householdServing,
+        'branded_food_category': value.brandedFoodCategory,
     };
 }
 
