@@ -1,4 +1,8 @@
 export * from './AuthResp';
+export * from './BrandedFood';
+export * from './Food';
+export * from './FoodCategory';
+export * from './FoodNutrient';
 export * from './GooglePhoto';
 export * from './GooglePhotosAlbum';
 export * from './Ingredient';
@@ -9,6 +13,7 @@ export * from './List';
 export * from './Meal';
 export * from './MealRecipe';
 export * from './ModelError';
+export * from './Nutrient';
 export * from './PaginatedIngredients';
 export * from './PaginatedMeals';
 export * from './PaginatedPhotos';

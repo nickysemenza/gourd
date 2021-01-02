@@ -1,9 +1,17 @@
 package db
 
+import (
+	"context"
+
+	sq "github.com/Masterminds/squirrel"
+	"gopkg.in/guregu/null.v3/zero"
+)
+
 type Food struct {
-	Description string `db:"description"`
-	DataType    string `db:"data_type"`
-	FdcID       string `db:"fdc_id"`
+	Description string   `db:"description"`
+	DataType    string   `db:"data_type"`
+	FdcID       int      `db:"fdc_id"`
+	CategoryID  zero.Int `db:"food_category_id"`
 }
 
 type Foods []Food
@@ -29,27 +37,18 @@ type Foods []Food
 // 	return res, nil
 // }
 
-// func (c *Client) GetFood(ctx context.Context, fdcID int) (*model.Food, error) {
-// 	query, args, err := c.psql.Select(
-// 		"food_category_id",
-// 		"data_type",
-// 		"description",
-// 		"fdc_id",
-// 	).From("usda_food").Where(sq.Eq{"fdc_id": fdcID}).ToSql()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to build query: %w", err)
-// 	}
+func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
+	q := c.psql.Select(
+		"food_category_id",
+		"data_type",
+		"description",
+		"fdc_id",
+	).From("usda_food").Where(sq.Eq{"fdc_id": fdcID})
 
-// 	f := &model.Food{}
-// 	err = c.db.GetContext(ctx, f, query, args...)
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return nil, nil
-// 	}
-// 	if err != nil {
-// 		return nil, fmt.Errorf("failed to select: %w", err)
-// 	}
-// 	return f, nil
-// }
+	f := &Food{}
+
+	return f, c.getContext(ctx, q, f)
+}
 
 // //nolint: interfacer
 // func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType *model.FoodDataType, foodCategoryID *int) ([]*model.Food, error) {

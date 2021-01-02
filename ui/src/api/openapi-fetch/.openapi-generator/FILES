@@ -1,6 +1,7 @@
 .openapi-generator-ignore
 apis/AlbumsApi.ts
 apis/AuthenticationApi.ts
+apis/FoodApi.ts
 apis/IngredientsApi.ts
 apis/MealsApi.ts
 apis/PhotosApi.ts
@@ -8,6 +9,10 @@ apis/RecipesApi.ts
 apis/index.ts
 index.ts
 models/AuthResp.ts
+models/BrandedFood.ts
+models/Food.ts
+models/FoodCategory.ts
+models/FoodNutrient.ts
 models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts
@@ -18,6 +23,7 @@ models/List.ts
 models/Meal.ts
 models/MealRecipe.ts
 models/ModelError.ts
+models/Nutrient.ts
 models/PaginatedIngredients.ts
 models/PaginatedMeals.ts
 models/PaginatedPhotos.ts

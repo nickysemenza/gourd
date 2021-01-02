@@ -658,3 +658,20 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
 }
+
+func (a *API) GetFoodById(c echo.Context, fdcId int) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
+	defer span.End()
+
+	food, err := a.DB().GetFood(ctx, fdcId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	f := Food{
+		Description: food.Description,
+		DataType:    food.DataType,
+		FdcId:       food.FdcID,
+		// CategoryId:  food.CategoryID,
+	}
+	return c.JSON(http.StatusOK, f)
+}

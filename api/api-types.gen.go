@@ -13,9 +13,57 @@ type AuthResp struct {
 	User map[string]interface{} `json:"user"`
 }
 
+// BrandedFood defines model for BrandedFood.
+type BrandedFood struct {
+
+	// Ftodo
+	Todo int `json:"todo"`
+}
+
 // Error defines model for Error.
 type Error struct {
 	Message string `json:"message"`
+}
+
+// Food defines model for Food.
+type Food struct {
+
+	// todo
+	BrandedInfo *BrandedFood `json:"branded_info,omitempty"`
+
+	// todo
+	Category *FoodCategory `json:"category,omitempty"`
+
+	// todo
+	DataType string `json:"data_type"`
+
+	// Food description
+	Description string `json:"description"`
+
+	// FDC Id
+	FdcId int `json:"fdc_id"`
+
+	// todo
+	Nutrients []FoodNutrient `json:"nutrients"`
+}
+
+// FoodCategory defines model for FoodCategory.
+type FoodCategory struct {
+
+	// Food description
+	Code string `json:"code"`
+
+	// Food description
+	Description string `json:"description"`
+}
+
+// FoodNutrient defines model for FoodNutrient.
+type FoodNutrient struct {
+	Amount     float64 `json:"amount"`
+	DataPoints int     `json:"data_points"`
+
+	// todo
+	Nutrient Nutrient `json:"nutrient"`
 }
 
 // GooglePhoto defines model for GooglePhoto.
@@ -121,6 +169,19 @@ type MealRecipe struct {
 
 	// A revision of a recipe
 	Recipe RecipeDetail `json:"recipe"`
+}
+
+// Nutrient defines model for Nutrient.
+type Nutrient struct {
+
+	// todo
+	Id int `json:"id"`
+
+	// todo
+	Name string `json:"name"`
+
+	// todo
+	UnitName string `json:"unit_name"`
 }
 
 // PaginatedIngredients defines model for PaginatedIngredients.

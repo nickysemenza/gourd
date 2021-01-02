@@ -1,4 +1,6 @@
 import React from "react";
+import { useGetFoodById } from "../api/openapi-hooks/api";
+import Debug from "../components/Debug";
 
 const Food: React.FC = () => {
   // const [food, setFood]
@@ -15,20 +17,23 @@ const Food: React.FC = () => {
 export default Food;
 
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
+  const { data } = useGetFoodById({ fdc_id });
+  if (!data) return null;
+  const food = data;
   return (
     <div>
-      {/* <h2>{food?.description}</h2>
-      <div>{food?.dataType}</div>
+      <h2>{food?.description}</h2>
+      <div>{food?.data_type}</div>
       <div>{fdc_id}</div>
       <Debug data={food?.category} />
 
-      <table>
-        {data?.food?.nutrients
+      {/* <table>
+        {food.nutrients
           .filter((n) => n.amount > 0.1)
           .map((n) => (
             <tr>
               <td>{n.amount.toFixed(2)} </td>
-              <td>{n.nutrient.unitName} </td>
+              <td>{n.nutrient.unit_name} </td>
               <td>{n.nutrient.name} </td>
             </tr>
           ))}

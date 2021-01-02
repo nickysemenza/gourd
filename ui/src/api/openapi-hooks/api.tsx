@@ -361,6 +361,89 @@ export interface PaginatedMeals {
   meta?: List;
 }
 
+/**
+ * todo
+ */
+export interface Nutrient {
+  /**
+   * todo
+   */
+  id: number;
+  /**
+   * todo
+   */
+  name: string;
+  /**
+   * todo
+   */
+  unit_name: string;
+}
+
+/**
+ * todo
+ */
+export interface FoodNutrient {
+  nutrient: Nutrient;
+  amount: number;
+  data_points: number;
+}
+
+/**
+ * todo
+ */
+export interface FoodCategory {
+  /**
+   * Food description
+   */
+  code: string;
+  /**
+   * Food description
+   */
+  description: string;
+}
+
+/**
+ * todo
+ */
+export interface BrandedFood {
+  /**
+   * Ftodo
+   */
+  todo: number;
+}
+
+/**
+ * A top level food
+ */
+export interface Food {
+  /**
+   * FDC Id
+   */
+  fdc_id: number;
+  /**
+   * Food description
+   */
+  description: string;
+  /**
+   * todo
+   */
+  data_type:
+    | "foundation_food"
+    | "sample_food"
+    | "market_acquisition"
+    | "survey_fndds_food"
+    | "sub_sample_food"
+    | "agricultural_acquisition"
+    | "sr_legacy_food"
+    | "branded_food";
+  category?: FoodCategory;
+  /**
+   * todo
+   */
+  nutrients: FoodNutrient[];
+  branded_info?: BrandedFood;
+}
+
 export interface AuthLoginQueryParams {
   /**
    * Google code
@@ -870,4 +953,42 @@ export const useMergeIngredients = ({
     (paramsInPath: MergeIngredientsPathParams) =>
       `/ingredients/${paramsInPath.ingredient_id}/merge`,
     { pathParams: { ingredient_id }, ...props }
+  );
+
+export interface GetFoodByIdPathParams {
+  /**
+   * The fdc id
+   */
+  fdc_id: number;
+}
+
+export type GetFoodByIdProps = Omit<
+  GetProps<Food, Error, void, GetFoodByIdPathParams>,
+  "path"
+> &
+  GetFoodByIdPathParams;
+
+/**
+ * get a FDC entry by id
+ */
+export const GetFoodById = ({ fdc_id, ...props }: GetFoodByIdProps) => (
+  <Get<Food, Error, void, GetFoodByIdPathParams>
+    path={`/foods/${fdc_id}`}
+    {...props}
+  />
+);
+
+export type UseGetFoodByIdProps = Omit<
+  UseGetProps<Food, Error, void, GetFoodByIdPathParams>,
+  "path"
+> &
+  GetFoodByIdPathParams;
+
+/**
+ * get a FDC entry by id
+ */
+export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
+  useGet<Food, Error, void, GetFoodByIdPathParams>(
+    (paramsInPath: GetFoodByIdPathParams) => `/foods/${paramsInPath.fdc_id}`,
+    { pathParams: { fdc_id }, ...props }
   );

@@ -330,6 +330,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /foods/{fdc_id}:
+    get:
+      summary: get a FDC entry by id
+      operationId: get_food_by_id
+      tags:
+        - food
+      parameters:
+        - name: fdc_id
+          in: path
+          required: true
+          description: The fdc id
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -735,6 +762,104 @@ components:
             $ref: "#/components/schemas/Meal"
         meta:
           $ref: "#/components/schemas/List"
+    Nutrient:
+      type: object
+      description: todo
+      required:
+        - id
+        - name
+        - unit_name
+      properties:
+        id:
+          description: todo
+          type: integer
+        name:
+          description: todo
+          type: string
+        unit_name:
+          description: todo
+          type: string
+    FoodNutrient:
+      type: object
+      description: todo
+      required:
+        - nutrient
+        - amount
+        - data_points
+      properties:
+        nutrient:
+          type: object
+          $ref: "#/components/schemas/Nutrient"
+        amount:
+          type: number
+          format: double # float64
+        data_points:
+          type: integer
+    FoodCategory:
+      type: object
+      description: todo
+      required:
+        - code
+        - description
+      properties:
+        code:
+          description: Food description
+          type: string
+        description:
+          description: Food description
+          type: string
+    BrandedFood:
+      type: object
+      description: todo
+      required:
+        - todo
+      properties:
+        todo:
+          description: Ftodo
+          type: integer
+    Food:
+      type: object
+      description: A top level food
+      required:
+        - fdc_id
+        - description
+        - data_type
+        - nutrients
+      properties:
+        fdc_id:
+          description: FDC Id
+          type: integer
+        description:
+          description: Food description
+          type: string
+        data_type:
+          description: todo
+          type: string
+          enum:
+            [
+              foundation_food,
+              sample_food,
+              market_acquisition,
+              survey_fndds_food,
+              sub_sample_food,
+              agricultural_acquisition,
+              sr_legacy_food,
+              branded_food,
+            ]
+        category:
+          description: todo
+          type: object
+          $ref: "#/components/schemas/FoodCategory"
+        nutrients:
+          description: todo
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodNutrient"
+        branded_info:
+          description: todo
+          type: object
+          $ref: "#/components/schemas/BrandedFood"
+
   parameters:
     offsetParam:
       in: query
