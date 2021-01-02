@@ -99,13 +99,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   const renderIngredientItem = (
     ingredient: SectionIngredient,
     x: number,
-    y: number
+    y: number,
+    isSub?: boolean
   ) => {
     const bp = Math.round((ingredient.grams / flourMass) * 100);
     const { edit } = tweaks;
     return (
       <div className="flex flex-col">
-        <div className="ing-table-row" key={y}>
+        <div className={`ing-table-row ${isSub ? "ml-5" : ""}`} key={y}>
           <TableInput
             width={14}
             data-cy="grams-input"
@@ -275,9 +276,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         />
       </TableCell>
       <TableCell>
-        {section.ingredients.map((ingredient, y) => {
-          return renderIngredientItem(ingredient, x, y);
-        })}
+        {section.ingredients.map((ingredient, y) => (
+          <div>
+            {renderIngredientItem(ingredient, x, y)}{" "}
+            {(ingredient.substitutes || []).map((sub) =>
+              renderIngredientItem(sub, x, y, true)
+            )}
+          </div>
+        ))}
         {edit && (
           <div
             className="add-item"

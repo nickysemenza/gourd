@@ -18,10 +18,19 @@ import {
     Food,
     FoodFromJSON,
     FoodToJSON,
+    PaginatedFoods,
+    PaginatedFoodsFromJSON,
+    PaginatedFoodsToJSON,
 } from '../models';
 
 export interface FoodApiGetFoodByIdRequest {
     fdcId: number;
+}
+
+export interface FoodApiSearchFoodsRequest {
+    name: string;
+    offset?: number;
+    limit?: number;
 }
 
 /**
@@ -64,6 +73,56 @@ export class FoodApi extends runtime.BaseAPI {
      */
     async getFoodById(requestParameters: FoodApiGetFoodByIdRequest): Promise<Food> {
         const response = await this.getFoodByIdRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * Search foods
+     */
+    async searchFoodsRaw(requestParameters: FoodApiSearchFoodsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling searchFoods.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.name !== undefined) {
+            queryParameters['name'] = requestParameters.name;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/foods/search`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedFoodsFromJSON(jsonValue));
+    }
+
+    /**
+     * Search foods
+     */
+    async searchFoods(requestParameters: FoodApiSearchFoodsRequest): Promise<PaginatedFoods> {
+        const response = await this.searchFoodsRaw(requestParameters);
         return await response.value();
     }
 

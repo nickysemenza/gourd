@@ -705,6 +705,9 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	if food.FdcID == 0 {
+		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find food with fdc id %d", fdcId))
+	}
 	nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
@@ -767,4 +770,34 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	}
 
 	return c.JSON(http.StatusOK, f)
+}
+
+func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "SearchFoods")
+	defer span.End()
+
+	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	foods, count, err := a.Manager.DB().SearchFoods(ctx, string(params.Name), "", nil, paginationParams...)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	}
+
+	items := []Food{}
+	for _, food := range foods {
+		items = append(items, Food{
+			Description: food.Description,
+			DataType:    food.DataType,
+			FdcId:       food.FdcID,
+		})
+	}
+
+	listMeta.setTotalCount(count)
+
+	resp := PaginatedFoods{
+		Foods: &items,
+		Meta:  listMeta,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+
 }

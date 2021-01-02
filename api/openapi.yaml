@@ -356,6 +356,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /foods/search:
+    get:
+      summary: Search foods
+      operationId: search_foods
+      tags:
+        - food
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/nameParam"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFoods"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"                
 
 security:
   - bearerAuth: [] # use the same name as above
@@ -765,6 +788,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Meal"
+        meta:
+          $ref: "#/components/schemas/List"
+    PaginatedFoods:
+      type: object
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/Food"
         meta:
           $ref: "#/components/schemas/List"
     Nutrient:

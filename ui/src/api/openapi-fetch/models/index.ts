@@ -14,6 +14,7 @@ export * from './Meal';
 export * from './MealRecipe';
 export * from './ModelError';
 export * from './Nutrient';
+export * from './PaginatedFoods';
 export * from './PaginatedIngredients';
 export * from './PaginatedMeals';
 export * from './PaginatedPhotos';

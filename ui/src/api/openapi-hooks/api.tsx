@@ -365,6 +365,11 @@ export interface PaginatedMeals {
   meta?: List;
 }
 
+export interface PaginatedFoods {
+  foods?: Food[];
+  meta?: List;
+}
+
 /**
  * todo
  */
@@ -997,4 +1002,48 @@ export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
   useGet<Food, Error, void, GetFoodByIdPathParams>(
     (paramsInPath: GetFoodByIdPathParams) => `/foods/${paramsInPath.fdc_id}`,
     { pathParams: { fdc_id }, ...props }
+  );
+
+export interface SearchFoodsQueryParams {
+  /**
+   * The number of items to skip before starting to collect the result set.
+   */
+  offset?: number;
+  /**
+   * The numbers of items to return.
+   */
+  limit?: number;
+  /**
+   * The search query (name).
+   */
+  name: string;
+}
+
+export type SearchFoodsProps = Omit<
+  GetProps<PaginatedFoods, Error, SearchFoodsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Search foods
+ */
+export const SearchFoods = (props: SearchFoodsProps) => (
+  <Get<PaginatedFoods, Error, SearchFoodsQueryParams, void>
+    path={`/foods/search`}
+    {...props}
+  />
+);
+
+export type UseSearchFoodsProps = Omit<
+  UseGetProps<PaginatedFoods, Error, SearchFoodsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Search foods
+ */
+export const useSearchFoods = (props: UseSearchFoodsProps) =>
+  useGet<PaginatedFoods, Error, SearchFoodsQueryParams, void>(
+    `/foods/search`,
+    props
   );

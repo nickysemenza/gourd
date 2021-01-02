@@ -50,26 +50,40 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	return f, c.getContext(ctx, q, f)
 }
 
-func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType string, foodCategoryID *int) ([]Food, error) {
+func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
 	q := c.psql.Select(
 		"food_category_id",
 		"data_type",
 		"description",
 		"fdc_id",
-	).From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	)
+	cq := c.psql.Select("count(*)")
+	q = q.From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	cq = cq.From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+
+	q = newSearchQuery(opts...).apply(q)
+	cq = newSearchQuery(opts...).apply(cq)
+
 	if foodCategoryID != nil {
 		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
+		cq = cq.Where(sq.Eq{"food_category_id": &foodCategoryID})
 	}
 	if dataType != "" {
 		q = q.Where(sq.Eq{"data_type": dataType})
+		cq = cq.Where(sq.Eq{"data_type": dataType})
 	}
+	cq = cq.RemoveLimit().RemoveOffset()
 
 	res := []Food{}
-
 	if err := c.selectContext(ctx, q, &res); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return res, nil
+	var count uint64
+	if err := c.getContext(ctx, cq, &count); err != nil {
+		return nil, 0, err
+	}
+	return res, count, nil
+
 }
 
 type FoodNutrient struct {

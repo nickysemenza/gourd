@@ -41,9 +41,9 @@ export const parseRecipe = (text: string): RecipeWrapper | undefined => {
 export const encodeIngredient = (ingredient: SectionIngredient): string => {
   const { grams, adjective, amount, unit } = ingredient;
   let res = grams + "g";
-  if (amount !== 0 && unit !== "") res += ` (${amount} ${unit})`;
+  if (!!amount && unit !== "") res += ` (${amount} ${unit})`;
   res += ` ${getIngredient(ingredient).name}`;
-  if (adjective !== "") res += `, ${adjective}`;
+  if (!!adjective) res += `, ${adjective}`;
   return res;
 };
 

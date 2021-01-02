@@ -7,6 +7,7 @@ const Food: React.FC = () => {
   // const [food, setFood]
   return (
     <div className="grid grid-cols-5 gap-4">
+      <FoodInfo fdc_id={9999999} />
       <FoodInfo fdc_id={171047} />
       <FoodInfo fdc_id={392941} />
       <FoodInfo fdc_id={747448} />

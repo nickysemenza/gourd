@@ -187,6 +187,12 @@ type Nutrient struct {
 	UnitName string `json:"unit_name"`
 }
 
+// PaginatedFoods defines model for PaginatedFoods.
+type PaginatedFoods struct {
+	Foods *[]Food `json:"foods,omitempty"`
+	Meta  *List   `json:"meta,omitempty"`
+}
+
 // PaginatedIngredients defines model for PaginatedIngredients.
 type PaginatedIngredients struct {
 	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
@@ -372,6 +378,19 @@ type AuthLoginParams struct {
 
 	// Google code
 	Code string `json:"code"`
+}
+
+// SearchFoodsParams defines parameters for SearchFoods.
+type SearchFoodsParams struct {
+
+	// The number of items to skip before starting to collect the result set.
+	Offset *OffsetParam `json:"offset,omitempty"`
+
+	// The numbers of items to return.
+	Limit *LimitParam `json:"limit,omitempty"`
+
+	// The search query (name).
+	Name NameParam `json:"name"`
 }
 
 // ListIngredientsParams defines parameters for ListIngredients.

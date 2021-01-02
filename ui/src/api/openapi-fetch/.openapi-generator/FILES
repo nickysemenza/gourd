@@ -24,6 +24,7 @@ models/Meal.ts
 models/MealRecipe.ts
 models/ModelError.ts
 models/Nutrient.ts
+models/PaginatedFoods.ts
 models/PaginatedIngredients.ts
 models/PaginatedMeals.ts
 models/PaginatedPhotos.ts

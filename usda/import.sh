@@ -9,7 +9,11 @@ tables=(food_category food food_attribute_type acquisition_sample agricultural_a
 alias p='psql "postgresql://gourd:gourd@localhost:5555/food"'
 
 p -c "select count(*) from usda_food";
-p -c "truncate table usda_food_category cascade;"
+n=${#tables[*]}
+for (( i = n-1; i >= 0; i-- ))
+do
+    p -c "truncate table usda_${tables[i]} cascade;"
+done
 for f in ${tables[@]}; do
     echo $f
     headers=$(head -n1 $1$f.csv | tr -d '"')
