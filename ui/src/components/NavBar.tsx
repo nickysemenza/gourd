@@ -1,22 +1,10 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { navItems } from "./navItems";
 
 const NavBar: React.FC = () => {
   const history = useHistory();
-  const navItems: {
-    title: string;
-    path: string;
-  }[] = [
-    { title: "recipes", path: "recipes" },
-    { title: "ingredients", path: "ingredients" },
-    { title: "create", path: "create" },
-    { title: "food (usda)", path: "food" },
-    { title: "playground", path: "playground" },
-    { title: "photos", path: "photos" },
-    { title: "meals", path: "meals" },
-    { title: "albums", path: "albums" },
-    { title: "docs", path: "docs" },
-  ];
+
   return (
     <nav className="flex items-center justify-between flex-wrap bg-indigo-500 px-4 py-1 mb-2">
       <div className="flex items-center flex-shrink-0 text-white mr-1">
