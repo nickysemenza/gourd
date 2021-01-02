@@ -10,15 +10,24 @@ context("Basic Create, List, Edit test", () => {
   const newName = "cy-" + new Date().getTime();
 
   it("creates a new recipe", function () {
+    // https://stackoverflow.com/a/63844955
     cy.contains("create").click();
-    cy.get("input[data-cy=name-input]").first().type(newName);
-    cy.contains("Create Recipe").click();
-    // cy.contains("Recipes").click();
+    cy.get("div[data-cy=name-input]")
+      .find(".react-select__control")
+      .first()
+      .type(newName);
+
+    cy.get("div[data-cy=name-input]")
+      .find(".react-select__option") // find all options
+      .first()
+      .click(); // click on first options
+    cy.wait(1000);
+    cy.url().should("include", "/recipe/");
+    // cy.contains(`create recipe: ${newName}`).click({ force: true });
   });
   it("updates the recipe", function () {
     const newIngredient = "ingredient-" + new Date().getTime();
     cy.contains("recipes").click();
-    cy.get("[data-cy=recipe-table]").should("be.visible");
     cy.contains(newName).click();
     cy.url().should("include", "/recipe/");
 
@@ -28,7 +37,13 @@ context("Basic Create, List, Edit test", () => {
     cy.get("input[data-cy=grams-input]").first().type("{selectall}4");
     cy.get("div[data-cy=name-input]").first().type(`${newIngredient}`);
     cy.wait(500);
-    cy.contains("Create ").click();
+    cy.contains(`create ingredient: ${newIngredient}`);
+
+    cy.get("div[data-cy=name-input]")
+      .find(".react-select__option") // find all options
+      .first()
+      .click(); // click on first options
+
     // cy.get("div[data-cy=name-input]").first().type(`{enter}`);
     cy.wait(500);
     cy.contains("add instruction").click();

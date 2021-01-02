@@ -9,7 +9,7 @@ import { IngredientKind } from "./RecipeEditorUtils";
 type Option = {
   label: string;
   value: string;
-  kind?: IngredientKind;
+  kind: IngredientKind;
 };
 
 export const EntitySelector: React.FC<{
@@ -30,9 +30,15 @@ export const EntitySelector: React.FC<{
     callback: (options: Option[]) => void
   ) => {
     const res = await iApi.search({ name: inputValue });
-    const recipeOptions: Option[] = (res.recipes || []).map((r) => {
-      return { label: "[r]" + r.detail.name, value: r.id, kind: "recipe" };
-    });
+    const recipeOptions: Option[] = (res.recipes || [])
+      .filter((r) => r.detail.isLatestVersion)
+      .map((r) => {
+        return {
+          label: `[r] ${r.detail.name} (v${r.detail.version})`,
+          value: r.id,
+          kind: "recipe",
+        };
+      });
     const ingredientOptions: Option[] = (res.ingredients || []).map((i) => {
       return { label: "[i]" + i.name, value: i.id, kind: "ingredient" };
     });
@@ -70,14 +76,15 @@ export const EntitySelector: React.FC<{
               ).id;
 
         console.log(`created ${createKind} ${name} (${newEntityId})`);
-        onChange({ ...val, value: newEntityId });
+        onChange({ label: val.label, value: newEntityId, kind: createKind });
         break;
     }
   };
 
   return (
-    <div>
+    <div data-cy="name-input">
       <AsyncCreatableSelect
+        classNamePrefix="react-select"
         loadOptions={loadOptions}
         value={value}
         formatCreateLabel={(val) => `create ${createKind}: ${val}`}

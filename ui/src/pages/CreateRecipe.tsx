@@ -1,42 +1,20 @@
-import React, { useState } from "react";
-import Debug from "../components/Debug";
-import { RecipesApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
-import { blankRecipeWrapper } from "../util";
+import React from "react";
+import { EntitySelector } from "../components/EntitySelector";
+import { useHistory } from "react-router-dom";
 
 const CreateRecipe: React.FC = () => {
-  const [name, setName] = useState("");
-  const [resp, setResp] = useState<any>();
-
-  const api = new RecipesApi(getOpenapiFetchConfig());
-
-  const create = async () => {
-    const r = await api.createRecipes({
-      recipeWrapper: blankRecipeWrapper(name),
-    });
-    setResp(r);
-    // createRecipeMutation();
-  };
+  let history = useHistory();
   return (
-    <form>
-      <Debug data={{ name, resp }} />
-      <input
-        className="bg-white focus:outline-none focus:shadow-outline border border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none leading-normal"
-        placeholder="recipe name"
-        data-cy="name-input"
-        value={name}
-        onChange={(e) => {
-          setName(e.target.value);
+    <div>
+      <EntitySelector
+        createKind="recipe"
+        showKind={[]}
+        onChange={(a) => {
+          history.push(`/recipe/${a.value}`);
+          console.log(a);
         }}
       />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        type="button"
-        onClick={create}
-      >
-        Create Recipe
-      </button>
-    </form>
+    </div>
   );
 };
 

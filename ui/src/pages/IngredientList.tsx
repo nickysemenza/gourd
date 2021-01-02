@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Column, CellProps } from "react-table";
-import IngredientSearch from "../components/IngredientSearch";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
@@ -141,10 +140,6 @@ const IngredientList: React.FC = () => {
 
   return (
     <>
-      <IngredientSearch
-        initial="eg"
-        callback={(item, kind) => console.log({ item, kind })}
-      />
       <PaginatedTable
         columns={columns}
         data={ingredients}

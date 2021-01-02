@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import IngredientSearch from "./IngredientSearch";
 import { RecipeWrapper, RecipeSection } from "../api/openapi-hooks/api";
 import {
   formatText,
@@ -30,6 +29,7 @@ import {
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
+import { EntitySelector } from "./EntitySelector";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -154,11 +154,24 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   )}
                 </div>
                 {edit ? (
-                  <IngredientSearch
-                    initial={getIngredient(ingredient).name}
-                    callback={(item, kind) =>
-                      setRecipe(updateIngredientInfo(recipe, x, y, item, kind))
-                    }
+                  <EntitySelector
+                    createKind="ingredient"
+                    value={{
+                      value: "",
+                      label: getIngredient(ingredient).name,
+                      kind: "recipe",
+                    }}
+                    onChange={(a) => {
+                      setRecipe(
+                        updateIngredientInfo(
+                          recipe,
+                          x,
+                          y,
+                          { id: a.value, name: a.label },
+                          a.kind
+                        )
+                      );
+                    }}
                   />
                 ) : (
                   <div className="text-gray-600">
