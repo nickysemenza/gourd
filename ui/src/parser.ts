@@ -1,5 +1,5 @@
 import { RecipeWrapper, SectionIngredient } from "./api/openapi-hooks/api";
-import { getIngredient } from "./util";
+import { blankRecipeWrapper, getIngredient } from "./util";
 
 export const parseLine = (line: string): [number, string, string] => {
   if (line.includes(",")) {
@@ -31,19 +31,11 @@ export const parseRecipe = (text: string): RecipeWrapper | undefined => {
     };
     return si;
   });
-  const recipe: RecipeWrapper = {
-    detail: {
-      name: "",
-      id: "",
-      quantity: 0,
-      unit: "",
-      sections: [
-        { id: "", duration: { min: 0, max: 0 }, ingredients, instructions: [] },
-      ],
-    },
+  let recipe: RecipeWrapper = blankRecipeWrapper("");
+  recipe.detail.sections = [
+    { id: "", duration: { min: 0, max: 0 }, ingredients, instructions: [] },
+  ];
 
-    id: "",
-  };
   return recipe;
 };
 export const encodeIngredient = (ingredient: SectionIngredient): string => {

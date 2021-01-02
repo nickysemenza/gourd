@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import AsyncCreatableSelect from "react-select/async-creatable";
+import AsyncCreatableSelect, {
+  Props as AsyncProps,
+} from "react-select/async-creatable";
 import { Ingredient, IngredientsApi } from "../api/openapi-fetch";
 
 import { useSearch } from "../api/openapi-hooks/api";
 import { getOpenapiFetchConfig } from "../config";
-import { ActionMeta } from "react-select";
+import { ActionMeta, OptionsType, OptionTypeBase } from "react-select";
+
 import { toast } from "react-toastify";
 import { IngredientKind } from "./RecipeEditorUtils";
 
@@ -14,13 +17,17 @@ export interface Results {
 }
 
 export interface ResultItem {
-  title: string;
+  // title: string;
   id: string;
   kind: IngredientKind;
 }
 export interface ResultType {
   name: "ingredients" | "recipes";
   results: ResultItem[];
+}
+
+export interface PropsTest extends AsyncProps<OptionTypeBase, false> {
+  name: string;
 }
 
 const IngredientSearch: React.FC<{
@@ -32,11 +39,9 @@ const IngredientSearch: React.FC<{
 }> = ({ callback, initial }) => {
   const i = initial || "";
   const [value, setValue] = useState(i);
-
   const [v, setV] = useState<any>({ label: i });
 
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
-
   const { data } = useSearch({ queryParams: { name: value } });
 
   const handleCreate = async (inputValue: any) => {
@@ -65,10 +70,12 @@ const IngredientSearch: React.FC<{
     setV(newValue);
   };
 
-  const loadOptions = (inputValue: string, callback: any) => {
+  const loadOptions = (
+    inputValue: string,
+    callback: (options: OptionsType<any>) => void
+  ) => {
     setValue(inputValue || "");
-
-    callback([
+    const x = [
       ...(data?.ingredients || []).map((i) => ({
         label: i.name,
         kind: "ingredient",
@@ -79,7 +86,8 @@ const IngredientSearch: React.FC<{
         kind: "recipe",
         id: i.id,
       })),
-    ]);
+    ];
+    callback(x);
   };
 
   return (

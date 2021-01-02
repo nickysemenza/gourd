@@ -3,7 +3,7 @@ import {
   SectionIngredient,
   RecipeDetail,
 } from "./api/openapi-hooks/api";
-import { TimeRange } from "./api/openapi-fetch";
+import { RecipeWrapper, TimeRange } from "./api/openapi-fetch";
 import parse from "parse-duration";
 
 export const getIngredient = (
@@ -96,3 +96,18 @@ export const Code: React.FC<{ text: string }> = ({ text }) => (
     {text}
   </code>
 );
+
+export const blankRecipeWrapper = (
+  name: string = "",
+  id: string = ""
+): RecipeWrapper => ({
+  detail: {
+    name,
+    id: "",
+    quantity: 0,
+    unit: "",
+    sections: [],
+  },
+  id,
+});
+export const blankIngredient = (name: string): Ingredient => ({ name, id: "" });

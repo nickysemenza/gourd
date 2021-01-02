@@ -1,5 +1,7 @@
 import {
   Ingredient,
+  Meal,
+  RecipeDetail,
   RecipeSection,
   RecipeSource,
   RecipeWrapper,
@@ -296,6 +298,20 @@ export const delI = (
     },
   });
 
+export const pushMealRecipe = (
+  meals: Meal[],
+  mealIndex: number,
+  recipe: RecipeDetail
+) => {
+  // debugger;
+  return update(meals, {
+    [mealIndex]: {
+      recipes: {
+        $push: [{ multiplier: 1, recipe }],
+      },
+    },
+  });
+};
 // returns the 1-indexed count of the instruction, across all sections.
 export const getGlobalInstructionNumber = (
   recipe: RecipeWrapper,

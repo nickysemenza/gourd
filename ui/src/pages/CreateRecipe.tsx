@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Debug from "../components/Debug";
 import { RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
+import { blankRecipeWrapper } from "../util";
 
 const CreateRecipe: React.FC = () => {
   const [name, setName] = useState("");
@@ -11,10 +12,7 @@ const CreateRecipe: React.FC = () => {
 
   const create = async () => {
     const r = await api.createRecipes({
-      recipeWrapper: {
-        detail: { name, id: "", quantity: 0, unit: "", sections: [] },
-        id: "",
-      },
+      recipeWrapper: blankRecipeWrapper(name),
     });
     setResp(r);
     // createRecipeMutation();

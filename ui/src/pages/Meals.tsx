@@ -8,6 +8,8 @@ import PaginatedTable, {
 } from "../components/PaginatedTable";
 import ProgressiveImage from "../components/ProgressiveImage";
 import { RecipeLink } from "../components/Misc";
+import { EntitySelector } from "../components/EntitySelector";
+import { pushMealRecipe } from "../components/RecipeEditorUtils";
 
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -26,6 +28,10 @@ const Meals: React.FC = () => {
   });
 
   const meals = data?.meals || [];
+  const [internalVal, setVal] = React.useState(meals);
+  React.useEffect(() => {
+    setVal(data?.meals || []);
+  }, [data]);
   type i = typeof meals[0];
 
   const columns: Array<Column<i>> = React.useMemo(
@@ -48,9 +54,35 @@ const Meals: React.FC = () => {
 
           return (
             <div className="w-64">
+              <EntitySelector
+                createKind="recipe"
+                onChange={(a) => {
+                  console.log(a, cell.row.index);
+                  setVal(
+                    pushMealRecipe(internalVal, cell.row.index, {
+                      id: a.value,
+                      name: a.label,
+                      sections: [],
+                      quantity: 1,
+                      unit: "",
+                    })
+                  );
+                }}
+              />
               {(recipes || []).map((r) => (
-                <div className="flex">
+                <div className="">
                   <RecipeLink recipe={r.recipe} multiplier={r.multiplier} />
+
+                  <EntitySelector
+                    onChange={(a) => {
+                      console.log(a);
+                    }}
+                    value={{
+                      value: r.recipe.id,
+                      label: r.recipe.name,
+                      kind: "recipe",
+                    }}
+                  />
                 </div>
               ))}
               {/* {ago.format("dddd, MMMM D, YYYY h:mm A")} */}
@@ -82,14 +114,14 @@ const Meals: React.FC = () => {
         },
       },
     ],
-    []
+    [internalVal]
   );
 
   return (
     <div>
       <PaginatedTable
         columns={columns}
-        data={meals}
+        data={internalVal}
         fetchData={fetchData}
         isLoading={false}
         totalCount={data?.meta?.total_count || 0}
