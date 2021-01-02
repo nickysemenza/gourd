@@ -31,10 +31,10 @@ type Error struct {
 // Food defines model for Food.
 type Food struct {
 
-	// todo
+	// branded_food
 	BrandedInfo *BrandedFood `json:"branded_info,omitempty"`
 
-	// todo
+	// food category, set for some
 	Category *FoodCategory `json:"category,omitempty"`
 
 	// todo
@@ -190,29 +190,39 @@ type Nutrient struct {
 // PaginatedFoods defines model for PaginatedFoods.
 type PaginatedFoods struct {
 	Foods *[]Food `json:"foods,omitempty"`
-	Meta  *List   `json:"meta,omitempty"`
+
+	// A generic list (for pagination use)
+	Meta *List `json:"meta,omitempty"`
 }
 
 // PaginatedIngredients defines model for PaginatedIngredients.
 type PaginatedIngredients struct {
 	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
-	Meta        *List               `json:"meta,omitempty"`
+
+	// A generic list (for pagination use)
+	Meta *List `json:"meta,omitempty"`
 }
 
 // PaginatedMeals defines model for PaginatedMeals.
 type PaginatedMeals struct {
 	Meals *[]Meal `json:"meals,omitempty"`
-	Meta  *List   `json:"meta,omitempty"`
+
+	// A generic list (for pagination use)
+	Meta *List `json:"meta,omitempty"`
 }
 
 // PaginatedPhotos defines model for PaginatedPhotos.
 type PaginatedPhotos struct {
+
+	// A generic list (for pagination use)
 	Meta   *List          `json:"meta,omitempty"`
 	Photos *[]GooglePhoto `json:"photos,omitempty"`
 }
 
 // PaginatedRecipes defines model for PaginatedRecipes.
 type PaginatedRecipes struct {
+
+	// A generic list (for pagination use)
 	Meta    *List     `json:"meta,omitempty"`
 	Recipes *[]Recipe `json:"recipes,omitempty"`
 }
@@ -302,6 +312,9 @@ type SearchResult struct {
 
 	// The ingredients
 	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
+
+	// A generic list (for pagination use)
+	Meta *List `json:"meta,omitempty"`
 
 	// The recipes
 	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`

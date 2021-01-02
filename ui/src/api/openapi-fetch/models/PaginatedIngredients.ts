@@ -25,7 +25,7 @@ import {
 } from './';
 
 /**
- * 
+ * pages of IngredientDetail
  * @export
  * @interface PaginatedIngredients
  */

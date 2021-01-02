@@ -39,6 +39,7 @@ export interface FoodApiSearchFoodsRequest {
 export class FoodApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * get a FDC entry by id
      */
     async getFoodByIdRaw(requestParameters: FoodApiGetFoodByIdRequest): Promise<runtime.ApiResponse<Food>> {
@@ -69,6 +70,7 @@ export class FoodApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * get a FDC entry by id
      */
     async getFoodById(requestParameters: FoodApiGetFoodByIdRequest): Promise<Food> {
@@ -77,6 +79,7 @@ export class FoodApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search foods
      */
     async searchFoodsRaw(requestParameters: FoodApiSearchFoodsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
@@ -119,6 +122,7 @@ export class FoodApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search foods
      */
     async searchFoods(requestParameters: FoodApiSearchFoodsRequest): Promise<PaginatedFoods> {

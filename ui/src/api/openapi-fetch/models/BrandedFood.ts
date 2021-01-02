@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * todo
+ * branded_food
  * @export
  * @interface BrandedFood
  */

@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * todo
+ * food category, set for some
  * @export
  * @interface FoodCategory
  */

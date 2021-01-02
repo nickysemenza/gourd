@@ -26,6 +26,7 @@ import {
 export class AlbumsApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * List all albums
      */
     async listAllAlbumsRaw(): Promise<runtime.ApiResponse<InlineResponse200>> {
@@ -52,6 +53,7 @@ export class AlbumsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all albums
      */
     async listAllAlbums(): Promise<InlineResponse200> {

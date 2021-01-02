@@ -31,6 +31,7 @@ export interface MealsApiListMealsRequest {
 export class MealsApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * List all meals
      */
     async listMealsRaw(requestParameters: MealsApiListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
@@ -65,6 +66,7 @@ export class MealsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all meals
      */
     async listMeals(requestParameters: MealsApiListMealsRequest): Promise<PaginatedMeals> {

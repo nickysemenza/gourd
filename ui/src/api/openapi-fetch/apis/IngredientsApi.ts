@@ -62,6 +62,7 @@ export interface IngredientsApiSearchRequest {
 export class IngredientsApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
     async convertIngredientToRecipeRaw(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
@@ -92,6 +93,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
     async convertIngredientToRecipe(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
@@ -100,6 +102,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Create a ingredient
      */
     async createIngredientsRaw(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
@@ -133,6 +136,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Create a ingredient
      */
     async createIngredients(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<Ingredient> {
@@ -141,6 +145,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all ingredients
      */
     async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
@@ -175,6 +180,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all ingredients
      */
     async listIngredients(requestParameters: IngredientsApiListIngredientsRequest): Promise<PaginatedIngredients> {
@@ -183,6 +189,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Merges the provide ingredients in the body into the param
      */
     async mergeIngredientsRaw(requestParameters: IngredientsApiMergeIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
@@ -220,6 +227,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Merges the provide ingredients in the body into the param
      */
     async mergeIngredients(requestParameters: IngredientsApiMergeIngredientsRequest): Promise<Ingredient> {
@@ -228,6 +236,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search recipes and ingredients
      */
     async searchRaw(requestParameters: IngredientsApiSearchRequest): Promise<runtime.ApiResponse<SearchResult>> {
@@ -270,6 +279,7 @@ export class IngredientsApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search recipes and ingredients
      */
     async search(requestParameters: IngredientsApiSearchRequest): Promise<SearchResult> {

@@ -31,6 +31,7 @@ export interface PhotosApiListPhotosRequest {
 export class PhotosApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * List all photos
      */
     async listPhotosRaw(requestParameters: PhotosApiListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
@@ -65,6 +66,7 @@ export class PhotosApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all photos
      */
     async listPhotos(requestParameters: PhotosApiListPhotosRequest): Promise<PaginatedPhotos> {

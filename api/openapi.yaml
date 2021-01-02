@@ -4,6 +4,22 @@ info:
   title: Gourd Recipe Database
   license:
     name: MIT
+tags:
+  - name: recipes
+    description: Recipe operations
+  - name: authentication
+    description: authentication operations
+  - name: photos
+    description: photos operations
+  - name: albums
+    description: albums operations
+  - name: meals
+    description: meals operations
+  - name: ingredients
+    description: ingredients operations
+  - name: food
+    description: food operations
+
 servers:
   - description: test
     url: http://localhost:4242/api
@@ -41,6 +57,7 @@ paths:
   /photos:
     get:
       summary: List all photos
+      description: todo
       operationId: list_photos
       tags:
         - photos
@@ -63,6 +80,7 @@ paths:
   /albums:
     get:
       summary: List all albums
+      description: todo
       operationId: list_all_albums
       tags:
         - albums
@@ -88,6 +106,7 @@ paths:
   /search:
     get:
       summary: Search recipes and ingredients
+      description: todo
       operationId: search
       tags:
         - ingredients
@@ -112,6 +131,7 @@ paths:
   /meals:
     get:
       summary: List all meals
+      description: todo
       operationId: list_meals
       tags:
         - meals
@@ -134,6 +154,7 @@ paths:
   /ingredients:
     get:
       summary: List all ingredients
+      description: todo
       operationId: list_ingredients
       tags:
         - ingredients
@@ -160,6 +181,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Create a ingredient
+      description: todo
       operationId: create_ingredients
       tags:
         - ingredients
@@ -186,6 +208,7 @@ paths:
   /recipes:
     get:
       summary: List all recipes
+      description: todo
       operationId: list_recipes
       tags:
         - recipes
@@ -212,6 +235,7 @@ paths:
                 $ref: "#/components/schemas/Error"
     post:
       summary: Create a recipe
+      description: todo
       operationId: create_recipes
       tags:
         - recipes
@@ -238,6 +262,7 @@ paths:
   /recipes/{recipe_id}:
     get:
       summary: Info for a specific recipe
+      description: todo
       operationId: get_recipe_by_id
       tags:
         - recipes
@@ -264,6 +289,7 @@ paths:
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
       summary: Converts an ingredient to a recipe, updating all recipes depending on it.
+      description: todo
       operationId: convert_ingredient_to_recipe
       tags:
         - recipes
@@ -291,6 +317,7 @@ paths:
   /ingredients/{ingredient_id}/merge:
     post:
       summary: Merges the provide ingredients in the body into the param
+      description: todo
       operationId: merge_ingredients
       tags:
         - ingredients
@@ -333,6 +360,7 @@ paths:
   /foods/{fdc_id}:
     get:
       summary: get a FDC entry by id
+      description: todo
       operationId: get_food_by_id
       tags:
         - food
@@ -359,6 +387,7 @@ paths:
   /foods/search:
     get:
       summary: Search foods
+      description: todo
       operationId: search_foods
       tags:
         - food
@@ -378,7 +407,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"                
+                $ref: "#/components/schemas/Error"
 
 security:
   - bearerAuth: [] # use the same name as above
@@ -699,8 +728,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RecipeWrapper"
+        meta:
+          $ref: "#/components/schemas/List"
     Error:
       type: object
+      description: A generic error message
       required: ["message"]
       properties:
         message:
@@ -709,6 +741,7 @@ components:
         message: "Something went wrong"
     AuthResp:
       type: object
+      description: todo
       required:
         - user
         - jwt
@@ -719,6 +752,7 @@ components:
           type: string
     List:
       type: object
+      description: A generic list (for pagination use)
       required:
         - page_number
         - limit
@@ -756,6 +790,7 @@ components:
           type: integer
     PaginatedRecipes:
       type: object
+      description: pages of Recipe
       properties:
         recipes:
           type: array
@@ -765,6 +800,7 @@ components:
           $ref: "#/components/schemas/List"
     PaginatedIngredients:
       type: object
+      description: pages of IngredientDetail
       properties:
         ingredients:
           type: array
@@ -774,6 +810,7 @@ components:
           $ref: "#/components/schemas/List"
     PaginatedPhotos:
       type: object
+      description: pages of GooglePhoto
       properties:
         photos:
           type: array
@@ -783,6 +820,7 @@ components:
           $ref: "#/components/schemas/List"
     PaginatedMeals:
       type: object
+      description: pages of Meal
       properties:
         meals:
           type: array
@@ -792,6 +830,7 @@ components:
           $ref: "#/components/schemas/List"
     PaginatedFoods:
       type: object
+      description: pages of Food
       properties:
         foods:
           type: array
@@ -834,7 +873,7 @@ components:
           type: integer
     FoodCategory:
       type: object
-      description: todo
+      description: food category, set for some
       required:
         - code
         - description
@@ -847,7 +886,7 @@ components:
           type: string
     BrandedFood:
       type: object
-      description: todo
+      description: branded_food
       required:
         - serving_size
         - serving_size_unit

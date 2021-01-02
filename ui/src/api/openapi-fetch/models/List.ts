@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * A generic list (for pagination use)
  * @export
  * @interface List
  */

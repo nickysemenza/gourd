@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * 
+ * A generic error message
  * @export
  * @interface ModelError
  */

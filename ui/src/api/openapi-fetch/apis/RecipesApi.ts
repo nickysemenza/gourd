@@ -58,6 +58,7 @@ export interface RecipesApiSearchRequest {
 export class RecipesApi extends runtime.BaseAPI {
 
     /**
+     * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
     async convertIngredientToRecipeRaw(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
@@ -88,6 +89,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it.
      */
     async convertIngredientToRecipe(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
@@ -96,6 +98,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Create a recipe
      */
     async createRecipesRaw(requestParameters: RecipesApiCreateRecipesRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
@@ -129,6 +132,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Create a recipe
      */
     async createRecipes(requestParameters: RecipesApiCreateRecipesRequest): Promise<RecipeWrapper> {
@@ -137,6 +141,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Info for a specific recipe
      */
     async getRecipeByIdRaw(requestParameters: RecipesApiGetRecipeByIdRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
@@ -167,6 +172,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Info for a specific recipe
      */
     async getRecipeById(requestParameters: RecipesApiGetRecipeByIdRequest): Promise<RecipeWrapper> {
@@ -175,6 +181,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all recipes
      */
     async listRecipesRaw(requestParameters: RecipesApiListRecipesRequest): Promise<runtime.ApiResponse<PaginatedRecipes>> {
@@ -209,6 +216,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * List all recipes
      */
     async listRecipes(requestParameters: RecipesApiListRecipesRequest): Promise<PaginatedRecipes> {
@@ -217,6 +225,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search recipes and ingredients
      */
     async searchRaw(requestParameters: RecipesApiSearchRequest): Promise<runtime.ApiResponse<SearchResult>> {
@@ -259,6 +268,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * todo
      * Search recipes and ingredients
      */
     async search(requestParameters: RecipesApiSearchRequest): Promise<SearchResult> {

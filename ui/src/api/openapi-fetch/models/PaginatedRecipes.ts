@@ -25,7 +25,7 @@ import {
 } from './';
 
 /**
- * 
+ * pages of Recipe
  * @export
  * @interface PaginatedRecipes
  */

@@ -297,17 +297,27 @@ export interface SearchResult {
    * The recipes
    */
   recipes?: RecipeWrapper[];
+  meta?: List;
 }
 
+/**
+ * A generic error message
+ */
 export interface Error {
   message: string;
 }
 
+/**
+ * todo
+ */
 export interface AuthResp {
   user: { [key: string]: any };
   jwt: string;
 }
 
+/**
+ * A generic list (for pagination use)
+ */
 export interface List {
   /**
    * What number page this is
@@ -345,26 +355,41 @@ export interface TimeRange {
   max: number;
 }
 
+/**
+ * pages of Recipe
+ */
 export interface PaginatedRecipes {
   recipes?: Recipe[];
   meta?: List;
 }
 
+/**
+ * pages of IngredientDetail
+ */
 export interface PaginatedIngredients {
   ingredients?: IngredientDetail[];
   meta?: List;
 }
 
+/**
+ * pages of GooglePhoto
+ */
 export interface PaginatedPhotos {
   photos?: GooglePhoto[];
   meta?: List;
 }
 
+/**
+ * pages of Meal
+ */
 export interface PaginatedMeals {
   meals?: Meal[];
   meta?: List;
 }
 
+/**
+ * pages of Food
+ */
 export interface PaginatedFoods {
   foods?: Food[];
   meta?: List;
@@ -398,7 +423,7 @@ export interface FoodNutrient {
 }
 
 /**
- * todo
+ * food category, set for some
  */
 export interface FoodCategory {
   /**
@@ -412,7 +437,7 @@ export interface FoodCategory {
 }
 
 /**
- * todo
+ * branded_food
  */
 export interface BrandedFood {
   brand_owner?: string;
@@ -515,6 +540,8 @@ export type ListPhotosProps = Omit<
 
 /**
  * List all photos
+ *
+ * todo
  */
 export const ListPhotos = (props: ListPhotosProps) => (
   <Get<PaginatedPhotos, Error, ListPhotosQueryParams, void>
@@ -530,6 +557,8 @@ export type UseListPhotosProps = Omit<
 
 /**
  * List all photos
+ *
+ * todo
  */
 export const useListPhotos = (props: UseListPhotosProps) =>
   useGet<PaginatedPhotos, Error, ListPhotosQueryParams, void>(`/photos`, props);
@@ -548,6 +577,8 @@ export type ListAllAlbumsProps = Omit<
 
 /**
  * List all albums
+ *
+ * todo
  */
 export const ListAllAlbums = (props: ListAllAlbumsProps) => (
   <Get<ListAllAlbumsResponse, Error, void, void> path={`/albums`} {...props} />
@@ -560,6 +591,8 @@ export type UseListAllAlbumsProps = Omit<
 
 /**
  * List all albums
+ *
+ * todo
  */
 export const useListAllAlbums = (props: UseListAllAlbumsProps) =>
   useGet<ListAllAlbumsResponse, Error, void, void>(`/albums`, props);
@@ -586,6 +619,8 @@ export type SearchProps = Omit<
 
 /**
  * Search recipes and ingredients
+ *
+ * todo
  */
 export const Search = (props: SearchProps) => (
   <Get<SearchResult, Error, SearchQueryParams, void>
@@ -601,6 +636,8 @@ export type UseSearchProps = Omit<
 
 /**
  * Search recipes and ingredients
+ *
+ * todo
  */
 export const useSearch = (props: UseSearchProps) =>
   useGet<SearchResult, Error, SearchQueryParams, void>(`/search`, props);
@@ -623,6 +660,8 @@ export type ListMealsProps = Omit<
 
 /**
  * List all meals
+ *
+ * todo
  */
 export const ListMeals = (props: ListMealsProps) => (
   <Get<PaginatedMeals, Error, ListMealsQueryParams, void>
@@ -638,6 +677,8 @@ export type UseListMealsProps = Omit<
 
 /**
  * List all meals
+ *
+ * todo
  */
 export const useListMeals = (props: UseListMealsProps) =>
   useGet<PaginatedMeals, Error, ListMealsQueryParams, void>(`/meals`, props);
@@ -660,6 +701,8 @@ export type ListIngredientsProps = Omit<
 
 /**
  * List all ingredients
+ *
+ * todo
  */
 export const ListIngredients = (props: ListIngredientsProps) => (
   <Get<PaginatedIngredients, Error, ListIngredientsQueryParams, void>
@@ -675,6 +718,8 @@ export type UseListIngredientsProps = Omit<
 
 /**
  * List all ingredients
+ *
+ * todo
  */
 export const useListIngredients = (props: UseListIngredientsProps) =>
   useGet<PaginatedIngredients, Error, ListIngredientsQueryParams, void>(
@@ -689,6 +734,8 @@ export type CreateIngredientsProps = Omit<
 
 /**
  * Create a ingredient
+ *
+ * todo
  */
 export const CreateIngredients = (props: CreateIngredientsProps) => (
   <Mutate<Ingredient, Error, void, Ingredient, void>
@@ -705,6 +752,8 @@ export type UseCreateIngredientsProps = Omit<
 
 /**
  * Create a ingredient
+ *
+ * todo
  */
 export const useCreateIngredients = (props: UseCreateIngredientsProps) =>
   useMutate<Ingredient, Error, void, Ingredient, void>(
@@ -731,6 +780,8 @@ export type ListRecipesProps = Omit<
 
 /**
  * List all recipes
+ *
+ * todo
  */
 export const ListRecipes = (props: ListRecipesProps) => (
   <Get<PaginatedRecipes, Error, ListRecipesQueryParams, void>
@@ -746,6 +797,8 @@ export type UseListRecipesProps = Omit<
 
 /**
  * List all recipes
+ *
+ * todo
  */
 export const useListRecipes = (props: UseListRecipesProps) =>
   useGet<PaginatedRecipes, Error, ListRecipesQueryParams, void>(
@@ -760,6 +813,8 @@ export type CreateRecipesProps = Omit<
 
 /**
  * Create a recipe
+ *
+ * todo
  */
 export const CreateRecipes = (props: CreateRecipesProps) => (
   <Mutate<RecipeWrapper, Error, void, RecipeWrapper, void>
@@ -776,6 +831,8 @@ export type UseCreateRecipesProps = Omit<
 
 /**
  * Create a recipe
+ *
+ * todo
  */
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
   useMutate<RecipeWrapper, Error, void, RecipeWrapper, void>(
@@ -799,6 +856,8 @@ export type GetRecipeByIdProps = Omit<
 
 /**
  * Info for a specific recipe
+ *
+ * todo
  */
 export const GetRecipeById = ({ recipe_id, ...props }: GetRecipeByIdProps) => (
   <Get<RecipeWrapper, Error, void, GetRecipeByIdPathParams>
@@ -815,6 +874,8 @@ export type UseGetRecipeByIdProps = Omit<
 
 /**
  * Info for a specific recipe
+ *
+ * todo
  */
 export const useGetRecipeById = ({
   recipe_id,
@@ -847,6 +908,8 @@ export type ConvertIngredientToRecipeProps = Omit<
 
 /**
  * Converts an ingredient to a recipe, updating all recipes depending on it.
+ *
+ * todo
  */
 export const ConvertIngredientToRecipe = ({
   ingredient_id,
@@ -873,6 +936,8 @@ export type UseConvertIngredientToRecipeProps = Omit<
 
 /**
  * Converts an ingredient to a recipe, updating all recipes depending on it.
+ *
+ * todo
  */
 export const useConvertIngredientToRecipe = ({
   ingredient_id,
@@ -916,6 +981,8 @@ export type MergeIngredientsProps = Omit<
 
 /**
  * Merges the provide ingredients in the body into the param
+ *
+ * todo
  */
 export const MergeIngredients = ({
   ingredient_id,
@@ -948,6 +1015,8 @@ export type UseMergeIngredientsProps = Omit<
 
 /**
  * Merges the provide ingredients in the body into the param
+ *
+ * todo
  */
 export const useMergeIngredients = ({
   ingredient_id,
@@ -981,6 +1050,8 @@ export type GetFoodByIdProps = Omit<
 
 /**
  * get a FDC entry by id
+ *
+ * todo
  */
 export const GetFoodById = ({ fdc_id, ...props }: GetFoodByIdProps) => (
   <Get<Food, Error, void, GetFoodByIdPathParams>
@@ -997,6 +1068,8 @@ export type UseGetFoodByIdProps = Omit<
 
 /**
  * get a FDC entry by id
+ *
+ * todo
  */
 export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
   useGet<Food, Error, void, GetFoodByIdPathParams>(
@@ -1026,6 +1099,8 @@ export type SearchFoodsProps = Omit<
 
 /**
  * Search foods
+ *
+ * todo
  */
 export const SearchFoods = (props: SearchFoodsProps) => (
   <Get<PaginatedFoods, Error, SearchFoodsQueryParams, void>
@@ -1041,6 +1116,8 @@ export type UseSearchFoodsProps = Omit<
 
 /**
  * Search foods
+ *
+ * todo
  */
 export const useSearchFoods = (props: UseSearchFoodsProps) =>
   useGet<PaginatedFoods, Error, SearchFoodsQueryParams, void>(
