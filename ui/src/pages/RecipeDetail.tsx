@@ -5,13 +5,14 @@ import RecipeDetailTable, {
   UpdateIngredientProps,
 } from "../components/RecipeDetailTable";
 import Debug from "../components/Debug";
-import update from "immutability-helper";
+import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
 import {
   useGetRecipeById,
   useCreateRecipes,
   RecipeSource,
+  SectionIngredient,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {
@@ -92,9 +93,27 @@ const RecipeDetail: React.FC = () => {
   const updateIngredient = ({
     sectionID,
     ingredientID,
+    subIndex,
     value,
     attr,
   }: UpdateIngredientProps) => {
+    const foo: Spec<SectionIngredient> = {
+      grams: {
+        $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
+      },
+      amount: {
+        $apply: (v) => (attr === "amount" ? parseFloat(value) : v),
+      },
+      unit: {
+        $apply: (v) => (attr === "unit" ? value : v),
+      },
+      adjective: {
+        $apply: (v) => (attr === "adjective" ? value : v),
+      },
+      optional: {
+        $apply: (v) => (attr === "optional" ? value === "true" : v),
+      },
+    };
     if (edit) {
       setRecipe(
         update(recipe, {
@@ -102,25 +121,10 @@ const RecipeDetail: React.FC = () => {
             sections: {
               [sectionID]: {
                 ingredients: {
-                  [ingredientID]: {
-                    grams: {
-                      $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
-                    },
-                    amount: {
-                      $apply: (v) =>
-                        attr === "amount" ? parseFloat(value) : v,
-                    },
-                    unit: {
-                      $apply: (v) => (attr === "unit" ? value : v),
-                    },
-                    adjective: {
-                      $apply: (v) => (attr === "adjective" ? value : v),
-                    },
-                    optional: {
-                      $apply: (v) =>
-                        attr === "optional" ? value === "true" : v,
-                    },
-                  },
+                  [ingredientID]:
+                    subIndex === undefined
+                      ? foo
+                      : { substitutes: { [subIndex]: foo } },
                 },
               },
             },
@@ -129,14 +133,17 @@ const RecipeDetail: React.FC = () => {
       );
     } else {
       const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-      const { grams, amount } = detail.sections[sectionID]!.ingredients[
-        ingredientID
-      ];
+      const { grams, amount } =
+        subIndex === undefined
+          ? detail.sections[sectionID]!.ingredients[ingredientID]
+          : (detail.sections[sectionID]!.ingredients[ingredientID]
+              .substitutes || [])[subIndex];
 
       if (attr === "grams" || attr === "amount") {
         setOverride({
           sectionID,
           ingredientID,
+          subIndex,
           value: newValue,
           attr,
         });

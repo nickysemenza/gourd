@@ -12,6 +12,7 @@ import update from "immutability-helper";
 export type Override = {
   sectionID: number;
   ingredientID: number;
+  subIndex?: number;
   value: number;
   attr: IngredientAttr;
 };
@@ -61,19 +62,22 @@ export const isOverride = (
   tweaks: RecipeTweaks,
   sectionID: number,
   ingredientID: number,
+  subIndex: number | undefined,
   attr: IngredientAttr
 ) =>
   tweaks.override?.ingredientID === ingredientID &&
   tweaks.override.sectionID === sectionID &&
+  tweaks.override.subIndex === subIndex &&
   tweaks.override.attr === attr;
 export const getIngredientValue = (
   tweaks: RecipeTweaks,
   sectionID: number,
   ingredientID: number,
+  subIndex: number | undefined,
   value: number,
   attr: IngredientAttr
 ) =>
-  (isOverride(tweaks, sectionID, ingredientID, attr) &&
+  (isOverride(tweaks, sectionID, ingredientID, subIndex, attr) &&
     tweaks.override?.value) ||
   value * tweaks.multiplier;
 

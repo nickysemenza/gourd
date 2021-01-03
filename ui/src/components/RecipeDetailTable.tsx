@@ -38,6 +38,7 @@ import { EntitySelector } from "./EntitySelector";
 export interface UpdateIngredientProps {
   sectionID: number;
   ingredientID: number;
+  subIndex?: number;
   value: string;
   attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional";
 }
@@ -100,36 +101,47 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     ingredient: SectionIngredient,
     x: number,
     y: number,
-    isSub?: boolean
+    subIndex?: number
   ) => {
     const bp = Math.round((ingredient.grams / flourMass) * 100);
     const { edit } = tweaks;
+    const isSub = subIndex !== undefined;
     return (
       <div className="flex flex-col">
-        <div className={`ing-table-row ${isSub ? "ml-5" : ""}`} key={y}>
-          <TableInput
-            width={14}
-            data-cy="grams-input"
-            edit={edit}
-            softEdit
-            value={getIngredientValue(
-              tweaks,
-              x,
-              y,
-              ingredient.grams || 0,
-              "grams"
+        <div className={`ing-table-row`} key={y}>
+          <div className="flex space-x-0.5">
+            {isSub && (
+              <div className="text-sm uppercase self-center text-gray-900">
+                or
+              </div>
             )}
-            blur
-            highlight={isOverride(tweaks, x, y, "grams")}
-            onChange={(e) =>
-              updateIngredient({
-                sectionID: x,
-                ingredientID: y,
-                value: e,
-                attr: "grams",
-              })
-            }
-          />
+
+            <TableInput
+              width={14}
+              data-cy="grams-input"
+              edit={edit}
+              softEdit
+              value={getIngredientValue(
+                tweaks,
+                x,
+                y,
+                subIndex,
+                ingredient.grams || 0,
+                "grams"
+              )}
+              blur
+              highlight={isOverride(tweaks, x, y, subIndex, "grams")}
+              onChange={(e) =>
+                updateIngredient({
+                  sectionID: x,
+                  ingredientID: y,
+                  subIndex,
+                  value: e,
+                  attr: "grams",
+                })
+              }
+            />
+          </div>
           <div className="flex space-x-0.5">
             <div className="text-gray-600">g</div>
             {showBP && (
@@ -176,11 +188,12 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             // width={16}
             edit={edit}
             softEdit
-            highlight={isOverride(tweaks, x, y, "amount")}
+            highlight={isOverride(tweaks, x, y, subIndex, "amount")}
             value={getIngredientValue(
               tweaks,
               x,
               y,
+              subIndex,
               ingredient.amount || 0,
               "amount"
             )}
@@ -188,6 +201,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               updateIngredient({
                 sectionID: x,
                 ingredientID: y,
+                subIndex,
                 value: e,
                 attr: "amount",
               })
@@ -202,6 +216,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               updateIngredient({
                 sectionID: x,
                 ingredientID: y,
+                subIndex,
                 value: e,
                 attr: "unit",
               })
@@ -217,6 +232,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 updateIngredient({
                   sectionID: x,
                   ingredientID: y,
+                  subIndex,
                   value: e,
                   attr: "adjective",
                 })
@@ -227,8 +243,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
-            {iActions(x, y, "ingredients")}
-            {edit && (
+            {!isSub && iActions(x, y, "ingredients")}
+            {!isSub && edit && (
               <label className="flex items-center ml-1">
                 <input
                   type="checkbox"
@@ -238,6 +254,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     updateIngredient({
                       sectionID: x,
                       ingredientID: y,
+                      subIndex,
                       value: ingredient.optional ? "false" : "true",
                       attr: "optional",
                     })
@@ -279,8 +296,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         {section.ingredients.map((ingredient, y) => (
           <div>
             {renderIngredientItem(ingredient, x, y)}{" "}
-            {(ingredient.substitutes || []).map((sub) =>
-              renderIngredientItem(sub, x, y, true)
+            {(ingredient.substitutes || []).map((sub, z) =>
+              renderIngredientItem(sub, x, y, z)
             )}
           </div>
         ))}
