@@ -13,6 +13,7 @@ models/BrandedFood.ts
 models/Food.ts
 models/FoodCategory.ts
 models/FoodNutrient.ts
+models/FoodPortion.ts
 models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts

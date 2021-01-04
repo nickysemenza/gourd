@@ -48,6 +48,9 @@ type Food struct {
 
 	// todo
 	Nutrients []FoodNutrient `json:"nutrients"`
+
+	// portion datapoints
+	Portions *[]FoodPortion `json:"portions,omitempty"`
 }
 
 // FoodCategory defines model for FoodCategory.
@@ -67,6 +70,15 @@ type FoodNutrient struct {
 
 	// todo
 	Nutrient Nutrient `json:"nutrient"`
+}
+
+// FoodPortion defines model for FoodPortion.
+type FoodPortion struct {
+	Amount             float64 `json:"amount"`
+	GramWeight         float64 `json:"gram_weight"`
+	Id                 int     `json:"id"`
+	Modifier           string  `json:"modifier"`
+	PortionDescription string  `json:"portion_description"`
 }
 
 // GooglePhoto defines model for GooglePhoto.

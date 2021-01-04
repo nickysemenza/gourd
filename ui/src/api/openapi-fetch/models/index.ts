@@ -3,6 +3,7 @@ export * from './BrandedFood';
 export * from './Food';
 export * from './FoodCategory';
 export * from './FoodNutrient';
+export * from './FoodPortion';
 export * from './GooglePhoto';
 export * from './GooglePhotosAlbum';
 export * from './Ingredient';

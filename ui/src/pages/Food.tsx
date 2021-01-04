@@ -21,7 +21,7 @@ export default Food;
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
   const { data } = useGetFoodById({ fdc_id });
   if (!data) return null;
-  const { category, branded_info, ...food } = data;
+  const { category, branded_info, portions, ...food } = data;
   return (
     <div>
       <h2 className="font-bold text-l">{food.description}</h2>
@@ -31,7 +31,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
       <div>
         <Code text={fdc_id} />
       </div>
-      <Debug data={{ category, branded_info }} />
+      <Debug data={{ category, branded_info, portions }} />
 
       <table>
         {food.nutrients

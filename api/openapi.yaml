@@ -904,6 +904,28 @@ components:
           type: string
         branded_food_category:
           type: string
+    FoodPortion:
+      type: object
+      description: food_portion
+      required:
+        - id
+        - amount
+        - portion_description
+        - modifier
+        - gram_weight
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+          format: double # float64
+        portion_description:
+          type: string
+        modifier:
+          type: string
+        gram_weight:
+          type: number
+          format: double # float64
     Food:
       type: object
       description: A top level food
@@ -942,6 +964,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FoodNutrient"
+        portions:
+          description: portion datapoints
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodPortion"
         branded_info:
           description: todo
           type: object

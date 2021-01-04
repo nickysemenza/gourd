@@ -26,6 +26,10 @@ import {
     FoodNutrientFromJSON,
     FoodNutrientFromJSONTyped,
     FoodNutrientToJSON,
+    FoodPortion,
+    FoodPortionFromJSON,
+    FoodPortionFromJSONTyped,
+    FoodPortionToJSON,
 } from './';
 
 /**
@@ -65,6 +69,12 @@ export interface Food {
      */
     nutrients: Array<FoodNutrient>;
     /**
+     * portion datapoints
+     * @type {Array<FoodPortion>}
+     * @memberof Food
+     */
+    portions?: Array<FoodPortion>;
+    /**
      * 
      * @type {BrandedFood}
      * @memberof Food
@@ -102,6 +112,7 @@ export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food
         'dataType': json['data_type'],
         'category': !exists(json, 'category') ? undefined : json['category'],
         'nutrients': ((json['nutrients'] as Array<any>).map(FoodNutrientFromJSON)),
+        'portions': !exists(json, 'portions') ? undefined : ((json['portions'] as Array<any>).map(FoodPortionFromJSON)),
         'brandedInfo': !exists(json, 'branded_info') ? undefined : json['branded_info'],
     };
 }
@@ -120,6 +131,7 @@ export function FoodToJSON(value?: Food | null): any {
         'data_type': value.dataType,
         'category': value.category,
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
+        'portions': value.portions === undefined ? undefined : ((value.portions as Array<any>).map(FoodPortionToJSON)),
         'branded_info': value.brandedInfo,
     };
 }

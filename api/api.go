@@ -769,6 +769,25 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 		}
 	}
 
+	portions, err := a.DB().GetFoodPortions(ctx, fdcId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	apiPortions := make([]FoodPortion, 0)
+	if portionsById, ok := portions.ByFdcId()[fdcId]; ok {
+
+		for _, p := range portionsById {
+			apiPortions = append(apiPortions, FoodPortion{
+				Amount:             p.Amount.Float64,
+				GramWeight:         p.GramWeight,
+				Id:                 p.Id,
+				Modifier:           p.Modifier.String,
+				PortionDescription: p.PortionDescription.String,
+			})
+		}
+	}
+	f.Portions = &apiPortions
+
 	return c.JSON(http.StatusOK, f)
 }
 

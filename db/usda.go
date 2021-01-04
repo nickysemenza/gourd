@@ -17,27 +17,6 @@ type Food struct {
 
 type Foods []Food
 
-// func (e Foods) String(i int) string {
-// 	return e[i].Description
-// }
-
-// func (e Foods) Len() int {
-// 	return len(e)
-// }
-
-// func (c *Client) GetFoods(ctx context.Context) (Foods, error) {
-// 	query, args, err := c.psql.Select("description, data_type, fdc_id").From("usda_food").ToSql()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var res Foods
-// 	err = c.db.SelectContext(ctx, &res, query, args...)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return res, nil
-// }
-
 func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	q := c.psql.Select(
 		"food_category_id",
@@ -180,4 +159,35 @@ type BrandedFood struct {
 type FoodCategory struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
+}
+
+type FoodPortion struct {
+	Id                 int         `db:"id"`
+	FdcID              int         `db:"fdc_id"`
+	Amount             zero.Float  `db:"amount"`
+	GramWeight         float64     `db:"gram_weight"`
+	Modifier           zero.String `db:"modifier"`
+	PortionDescription zero.String `db:"portion_description"`
+}
+type FoodPortions []FoodPortion
+
+func (r FoodPortions) ByFdcId() map[int][]FoodPortion {
+	m := make(map[int][]FoodPortion)
+	for _, x := range r {
+		m[x.FdcID] = append(m[x.FdcID], x)
+	}
+	return m
+}
+
+func (c *Client) GetFoodPortions(ctx context.Context, fdcId ...int) (FoodPortions, error) {
+	q := c.psql.Select("id", "fdc_id", "amount", "portion_description", "modifier", "gram_weight").
+		From("usda_food_portion").Where(sq.Eq{"fdc_id": fdcId})
+
+	ns := []FoodPortion{}
+	err := c.selectContext(ctx, q, &ns)
+	if err != nil {
+		return nil, fmt.Errorf("failed to select: %w", err)
+	}
+
+	return ns, nil
 }

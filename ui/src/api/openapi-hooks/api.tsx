@@ -449,6 +449,17 @@ export interface BrandedFood {
 }
 
 /**
+ * food_portion
+ */
+export interface FoodPortion {
+  id: number;
+  amount: number;
+  portion_description: string;
+  modifier: string;
+  gram_weight: number;
+}
+
+/**
  * A top level food
  */
 export interface Food {
@@ -477,6 +488,10 @@ export interface Food {
    * todo
    */
   nutrients: FoodNutrient[];
+  /**
+   * portion datapoints
+   */
+  portions?: FoodPortion[];
   branded_info?: BrandedFood;
 }
 
