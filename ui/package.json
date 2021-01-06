@@ -85,7 +85,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "^3.8.8",
     "@openapitools/openapi-generator-cli": "^2.1.16",
-    "autoprefixer": "^10.1.0",
+    "autoprefixer": "^10.2.0",
     "chokidar-cli": "^2.1.0",
     "cypress": "^6.2.1",
     "cypress-terminal-report": "^2.4.0",
