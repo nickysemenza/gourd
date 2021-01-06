@@ -13433,10 +13433,10 @@ react-google-login@^5.2.2:
     "@types/react" "*"
     prop-types "^15.6.0"
 
-react-hotkeys-hook@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-3.0.0.tgz#e6d10b43e9e296b9f57de1c4fdfc99cc8a3c980d"
-  integrity sha512-+REGVOXPfdENyALHIrEkLBSc4DvKXUtW9eNLZwtotrcucUCySNqiH8NfXPpTAX2LUR8kB9rv7j453HoXD2e5oA==
+react-hotkeys-hook@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-3.0.2.tgz#2dd6f202b2178cda70b9714e0bc60e1030785a3b"
+  integrity sha512-m34awOc6KQFgi9/TT0HNBXh8x+2AroPdhw8VPOAM33m4JHPjySlUlZCmXtPRuz7QYrW3yN7F6vHQGlxcQVh4tw==
   dependencies:
     hotkeys-js "3.8.1"
 
