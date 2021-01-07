@@ -1,5 +1,8 @@
 openapi: "3.0.0"
 info:
+  contact:
+    email: n@nickysemenza.com
+  description: API for https://github.com/nickysemenza/gourd
   version: 1.0.0
   title: Gourd Recipe Database
   license:
@@ -435,10 +438,8 @@ components:
           type: string
           enum: [recipe, ingredient]
         recipe:
-          type: object
           $ref: "#/components/schemas/RecipeDetail"
         ingredient:
-          type: object
           $ref: "#/components/schemas/Ingredient"
         grams:
           description: weight in grams
@@ -490,8 +491,6 @@ components:
           description: id
           type: string
         duration:
-          description: How long the step takes, approximately
-          type: object
           $ref: "#/components/schemas/TimeRange"
         instructions:
           description: x
@@ -514,7 +513,6 @@ components:
           description: id
           type: string
         detail:
-          description: The recipe
           $ref: "#/components/schemas/RecipeDetail"
     Recipe:
       description: A recipe with subcomponents
@@ -595,8 +593,6 @@ components:
         - ingredient
       properties:
         ingredient:
-          description: the ingredient
-          type: object
           $ref: "#/components/schemas/Ingredient"
         recipes:
           description: Recipes referencing this ingredient
@@ -712,7 +708,6 @@ components:
           type: number
           format: double # float64
         recipe:
-          type: object
           $ref: "#/components/schemas/RecipeDetail"
     SearchResult:
       description: A search result wrapper, which contains ingredients and recipes
@@ -864,7 +859,6 @@ components:
         - data_points
       properties:
         nutrient:
-          type: object
           $ref: "#/components/schemas/Nutrient"
         amount:
           type: number
@@ -956,8 +950,6 @@ components:
               branded_food,
             ]
         category:
-          description: todo
-          type: object
           $ref: "#/components/schemas/FoodCategory"
         nutrients:
           description: todo
@@ -970,8 +962,6 @@ components:
           items:
             $ref: "#/components/schemas/FoodPortion"
         branded_info:
-          description: todo
-          type: object
           $ref: "#/components/schemas/BrandedFood"
 
   parameters:
