@@ -1,0 +1,42 @@
+name: Go
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  golangci:
+    name: golang lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
+          version: v1.33
+  build:
+    # https://github.com/golangci/golangci-lint-action
+    name: Go ${{ matrix.go }} test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.14", "1.13", "1.15"]
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: go get -v -t -d ./...
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v -race -cover ./...

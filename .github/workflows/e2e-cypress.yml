@@ -2,6 +2,7 @@ name: e2e-cypress
 on: push
 jobs:
   test:
+    name: e2e Cypress Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
