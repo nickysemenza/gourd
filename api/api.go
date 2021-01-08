@@ -480,24 +480,17 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
-	ctx := c.Request().Context()
-
+func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 	items := []Meal{}
-
-	meals, err := a.DB().GetAllMeals(ctx)
-	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
-	}
 	mealIds := meals.MealIDs()
 	mealRecipes, err := a.DB().GetMealRecipes(ctx, mealIds...)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
 
 	recipesDetails, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": mealRecipes.RecipeIDs()})
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return nil, err
 	}
 	recipeDetailsById := recipesDetails.ByRecipeId()
 
@@ -518,12 +511,12 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 
 		photos, err := a.DB().GetPhotosForMeal(ctx, m.ID)
 		if err != nil {
-			return sendErr(c, http.StatusInternalServerError, err)
+			return nil, err
 		}
 
 		photos2, gIDs, err := a.fromDBPhoto(ctx, photos, false)
 		if err != nil {
-			return sendErr(c, http.StatusInternalServerError, err)
+			return nil, err
 		}
 		meal.Photos = photos2
 		gphotoIDs = append(gphotoIDs, gIDs...)
@@ -532,7 +525,7 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	}
 	urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
 	for x, item := range items {
 		for y, photo := range item.Photos {
@@ -545,11 +538,62 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 			items[x].Photos[y].Height = val.MediaMetadata.Height
 		}
 	}
+	return items, nil
+}
+func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "ListMeals")
+	defer span.End()
+
+	meals, err := a.DB().GetAllMeals(ctx)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	items, err := a.GetMealInfo(ctx, meals)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
 
 	resp := PaginatedMeals{
 		Meals: &items,
 	}
 	return c.JSON(http.StatusOK, resp)
+}
+
+func (a *API) GetMealById(c echo.Context, mealId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "GetMealById")
+	defer span.End()
+
+	meal, err := a.DB().GetMealById(ctx, mealId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	items, err := a.GetMealInfo(ctx, []db.Meal{*meal})
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, items[0])
+}
+func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "UpdateRecipesForMeal")
+	defer span.End()
+
+	var r MealRecipeUpdate
+	if err := c.Bind(&r); err != nil {
+		err = fmt.Errorf("invalid format for input: %w", err)
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+	switch r.Action {
+	case "add":
+		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, r.Multiplier)
+		if err != nil {
+			return sendErr(c, http.StatusInternalServerError, err)
+		}
+		return a.GetMealById(c, mealId)
+	default:
+		return sendErr(c, http.StatusBadRequest, fmt.Errorf("unknown action %s", r.Action))
+	}
+
 }
 func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
 	ctx := c.Request().Context()

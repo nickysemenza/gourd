@@ -23,6 +23,7 @@ models/InlineResponse200.ts
 models/List.ts
 models/Meal.ts
 models/MealRecipe.ts
+models/MealRecipeUpdate.ts
 models/ModelError.ts
 models/Nutrient.ts
 models/PaginatedFoods.ts

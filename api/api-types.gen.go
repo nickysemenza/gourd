@@ -186,6 +186,19 @@ type MealRecipe struct {
 	Recipe RecipeDetail `json:"recipe"`
 }
 
+// MealRecipeUpdate defines model for MealRecipeUpdate.
+type MealRecipeUpdate struct {
+
+	// todo
+	Action string `json:"action"`
+
+	// multiplier
+	Multiplier float64 `json:"multiplier"`
+
+	// Recipe Id
+	RecipeId string `json:"recipe_id"`
+}
+
 // Nutrient defines model for Nutrient.
 type Nutrient struct {
 
@@ -446,6 +459,9 @@ type ListMealsParams struct {
 	Limit *LimitParam `json:"limit,omitempty"`
 }
 
+// UpdateRecipesForMealJSONBody defines parameters for UpdateRecipesForMeal.
+type UpdateRecipesForMealJSONBody MealRecipeUpdate
+
 // ListPhotosParams defines parameters for ListPhotos.
 type ListPhotosParams struct {
 
@@ -487,6 +503,9 @@ type CreateIngredientsJSONRequestBody CreateIngredientsJSONBody
 
 // MergeIngredientsRequestBody defines body for MergeIngredients for application/json ContentType.
 type MergeIngredientsJSONRequestBody MergeIngredientsJSONBody
+
+// UpdateRecipesForMealRequestBody defines body for UpdateRecipesForMeal for application/json ContentType.
+type UpdateRecipesForMealJSONRequestBody UpdateRecipesForMealJSONBody
 
 // CreateRecipesRequestBody defines body for CreateRecipes for application/json ContentType.
 type CreateRecipesJSONRequestBody CreateRecipesJSONBody

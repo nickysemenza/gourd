@@ -38,7 +38,7 @@ const RecipeList: React.FC = () => {
       {
         Header: "id",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          return <Code text={original.id} />;
+          return <Code>{original.id} </Code>;
         },
       },
       {

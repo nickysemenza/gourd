@@ -495,6 +495,24 @@ export interface Food {
   branded_info?: BrandedFood;
 }
 
+/**
+ * an update to the recipes on a mea
+ */
+export interface MealRecipeUpdate {
+  /**
+   * Recipe Id
+   */
+  recipe_id: string;
+  /**
+   * multiplier
+   */
+  multiplier: number;
+  /**
+   * todo
+   */
+  action: "add" | "remove";
+}
+
 export interface AuthLoginQueryParams {
   /**
    * Google code
@@ -697,6 +715,117 @@ export type UseListMealsProps = Omit<
  */
 export const useListMeals = (props: UseListMealsProps) =>
   useGet<PaginatedMeals, Error, ListMealsQueryParams, void>(`/meals`, props);
+
+export interface GetMealByIdPathParams {
+  /**
+   * The id of the meal to retrieve
+   */
+  meal_id: string;
+}
+
+export type GetMealByIdProps = Omit<
+  GetProps<Meal, Error, void, GetMealByIdPathParams>,
+  "path"
+> &
+  GetMealByIdPathParams;
+
+/**
+ * Info for a specific meal
+ *
+ * todo
+ */
+export const GetMealById = ({ meal_id, ...props }: GetMealByIdProps) => (
+  <Get<Meal, Error, void, GetMealByIdPathParams>
+    path={`/meals/${meal_id}`}
+    {...props}
+  />
+);
+
+export type UseGetMealByIdProps = Omit<
+  UseGetProps<Meal, Error, void, GetMealByIdPathParams>,
+  "path"
+> &
+  GetMealByIdPathParams;
+
+/**
+ * Info for a specific meal
+ *
+ * todo
+ */
+export const useGetMealById = ({ meal_id, ...props }: UseGetMealByIdProps) =>
+  useGet<Meal, Error, void, GetMealByIdPathParams>(
+    (paramsInPath: GetMealByIdPathParams) => `/meals/${paramsInPath.meal_id}`,
+    { pathParams: { meal_id }, ...props }
+  );
+
+export interface UpdateRecipesForMealPathParams {
+  /**
+   * The id of the meal to retrieve
+   */
+  meal_id: string;
+}
+
+export type UpdateRecipesForMealProps = Omit<
+  MutateProps<
+    Meal,
+    Error,
+    void,
+    MealRecipeUpdate,
+    UpdateRecipesForMealPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdateRecipesForMealPathParams;
+
+/**
+ * Update the recipes associated with a given meal
+ *
+ * todo
+ */
+export const UpdateRecipesForMeal = ({
+  meal_id,
+  ...props
+}: UpdateRecipesForMealProps) => (
+  <Mutate<Meal, Error, void, MealRecipeUpdate, UpdateRecipesForMealPathParams>
+    verb="PATCH"
+    path={`/meals/${meal_id}/recipes`}
+    {...props}
+  />
+);
+
+export type UseUpdateRecipesForMealProps = Omit<
+  UseMutateProps<
+    Meal,
+    Error,
+    void,
+    MealRecipeUpdate,
+    UpdateRecipesForMealPathParams
+  >,
+  "path" | "verb"
+> &
+  UpdateRecipesForMealPathParams;
+
+/**
+ * Update the recipes associated with a given meal
+ *
+ * todo
+ */
+export const useUpdateRecipesForMeal = ({
+  meal_id,
+  ...props
+}: UseUpdateRecipesForMealProps) =>
+  useMutate<
+    Meal,
+    Error,
+    void,
+    MealRecipeUpdate,
+    UpdateRecipesForMealPathParams
+  >(
+    "PATCH",
+    (paramsInPath: UpdateRecipesForMealPathParams) =>
+      `/meals/${paramsInPath.meal_id}/recipes`,
+    { pathParams: { meal_id }, ...props }
+  );
 
 export interface ListIngredientsQueryParams {
   /**

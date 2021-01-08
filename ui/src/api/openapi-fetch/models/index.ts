@@ -13,6 +13,7 @@ export * from './InlineResponse200';
 export * from './List';
 export * from './Meal';
 export * from './MealRecipe';
+export * from './MealRecipeUpdate';
 export * from './ModelError';
 export * from './Nutrient';
 export * from './PaginatedFoods';

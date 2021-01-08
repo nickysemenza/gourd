@@ -17,10 +17,12 @@ export const EntitySelector: React.FC<{
   onChange: (value: Option) => void;
   createKind?: IngredientKind;
   showKind?: IngredientKind[];
+  placeholder?: string;
 }> = ({
   value,
   onChange,
   createKind = "ingredient",
+  placeholder = "Pick a Recipe/Ingredient...",
   showKind = ["ingredient", "recipe"],
 }) => {
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
@@ -68,7 +70,7 @@ export const EntitySelector: React.FC<{
                 await rApi.createRecipes({
                   recipeWrapper: blankRecipeWrapper(name),
                 })
-              ).detail.id
+              ).id
             : (
                 await iApi.createIngredients({
                   ingredient: blankIngredient(name),
@@ -84,6 +86,7 @@ export const EntitySelector: React.FC<{
   return (
     <div data-cy="name-input">
       <AsyncCreatableSelect
+        placeholder={placeholder}
         classNamePrefix="react-select"
         loadOptions={loadOptions}
         value={value}

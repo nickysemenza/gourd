@@ -149,6 +149,27 @@ func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 	return results, err
 }
 
+func (c *Client) GetMealById(ctx context.Context, id string) (*Meal, error) {
+	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	defer span.End()
+	q := c.psql.Select("id", "name", "ate_at").From("meals")
+	var result Meal
+	err := c.getContext(ctx, q, &result)
+	return &result, err
+}
+
+func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, multiplier float64) error {
+	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	defer span.End()
+
+	c.psql.Insert("meals")
+	q := c.psql.Insert("meal_recipe").Columns("meal_id", "recipe_id", "multiplier").
+		Values(mealId, recipeId, multiplier).
+		Suffix("ON CONFLICT (recipe_id,meal_id) DO UPDATE SET multiplier = ?", multiplier)
+	_, err := c.execContext(ctx, q)
+	return err
+}
+
 type MealRecipe struct {
 	MealID     string  `db:"meal_id"`
 	RecipeID   string  `db:"recipe_id"`

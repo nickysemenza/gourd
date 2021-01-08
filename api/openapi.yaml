@@ -154,6 +154,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /meals/{meal_id}:
+    get:
+      summary: Info for a specific meal
+      description: todo
+      operationId: get_meal_by_id
+      tags:
+        - meals
+      parameters:
+        - name: meal_id
+          in: path
+          required: true
+          description: The id of the meal to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /meals/{meal_id}/recipes:
+    patch:
+      summary: Update the recipes associated with a given meal
+      description: todo
+      operationId: update_recipes_for_meal
+      tags:
+        - meals
+      parameters:
+        - name: meal_id
+          in: path
+          required: true
+          description: The id of the meal to retrieve
+          schema:
+            type: string
+      requestBody:
+        description: Creates a ingredient by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealRecipeUpdate"
+      responses:
+        "200":
+          description: Newly updated meal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients:
     get:
       summary: List all ingredients
@@ -963,7 +1024,26 @@ components:
             $ref: "#/components/schemas/FoodPortion"
         branded_info:
           $ref: "#/components/schemas/BrandedFood"
-
+    MealRecipeUpdate:
+      type: object
+      description: an update to the recipes on a mea
+      required:
+        - recipe_id
+        - multiplier
+        - action
+      properties:
+        recipe_id:
+          description: Recipe Id
+          type: string
+        multiplier:
+          description: multiplier
+          type: number
+          format: double # float64
+          minimum: 0
+        action:
+          description: todo
+          type: string
+          enum: [add, remove]
   parameters:
     offsetParam:
       in: query

@@ -10,7 +10,8 @@ import ProgressiveImage from "../components/ProgressiveImage";
 import { RecipeLink } from "../components/Misc";
 import { EntitySelector } from "../components/EntitySelector";
 import { pushMealRecipe } from "../components/RecipeEditorUtils";
-
+import { getOpenapiFetchConfig } from "../config";
+import { MealRecipeUpdateActionEnum, MealsApi } from "../api/openapi-fetch";
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
     offset: 0,
@@ -34,8 +35,9 @@ const Meals: React.FC = () => {
   }, [data]);
   type i = typeof meals[0];
 
-  const columns: Array<Column<i>> = React.useMemo(
-    () => [
+  const columns: Array<Column<i>> = React.useMemo(() => {
+    const mApi = new MealsApi(getOpenapiFetchConfig());
+    return [
       {
         Header: "ate_at",
         accessor: "ate_at",
@@ -56,8 +58,19 @@ const Meals: React.FC = () => {
             <div className="w-64">
               <EntitySelector
                 createKind="recipe"
-                onChange={(a) => {
+                showKind={["recipe"]}
+                placeholder="Pick a Recipe..."
+                onChange={async (a) => {
                   console.log(a, cell.row.index);
+                  let res = await mApi.updateRecipesForMeal({
+                    mealId: cell.row.original.id,
+                    mealRecipeUpdate: {
+                      multiplier: 1.0,
+                      action: MealRecipeUpdateActionEnum.ADD,
+                      recipeId: a.value,
+                    },
+                  });
+                  console.log({ res });
                   setVal(
                     pushMealRecipe(internalVal, cell.row.index, {
                       id: a.value,
@@ -72,17 +85,6 @@ const Meals: React.FC = () => {
               {(recipes || []).map((r) => (
                 <div className="">
                   <RecipeLink recipe={r.recipe} multiplier={r.multiplier} />
-
-                  <EntitySelector
-                    onChange={(a) => {
-                      console.log(a);
-                    }}
-                    value={{
-                      value: r.recipe.id,
-                      label: r.recipe.name,
-                      kind: "recipe",
-                    }}
-                  />
                 </div>
               ))}
               {/* {ago.format("dddd, MMMM D, YYYY h:mm A")} */}
@@ -113,9 +115,8 @@ const Meals: React.FC = () => {
           );
         },
       },
-    ],
-    [internalVal]
-  );
+    ];
+  }, [internalVal]);
 
   return (
     <div>

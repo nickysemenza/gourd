@@ -91,9 +91,9 @@ export const sumTimeRanges = (ranges: (TimeRange | undefined)[]): TimeRange => {
   return totalDuration;
 };
 
-export const Code: React.FC<{ text: string | number }> = ({ text }) => (
+export const Code: React.FC = ({ children }) => (
   <code className="rounded-sm px-2 py-0.5 bg-gray-100 text-red-500">
-    {text}
+    {children}
   </code>
 );
 

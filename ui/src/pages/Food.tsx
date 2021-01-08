@@ -26,10 +26,10 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
     <div>
       <h2 className="font-bold text-l">{food.description}</h2>
       <div>
-        <Code text={food.data_type} />
+        <Code>{food.data_type}</Code>
       </div>
       <div>
-        <Code text={fdc_id} />
+        <Code>{fdc_id}</Code>
       </div>
       <Debug data={{ category, branded_info, portions }} />
 

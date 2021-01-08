@@ -3,6 +3,7 @@ import { CellProps } from "react-table";
 import Debug from "../components/Debug";
 import { useListAllAlbums } from "../api/openapi-hooks/api";
 import PaginatedTable from "../components/PaginatedTable";
+import { Code } from "../util";
 
 const Albums: React.FC = () => {
   const { data, error } = useListAllAlbums({});
@@ -30,7 +31,7 @@ const Albums: React.FC = () => {
         accessor: "id",
         Cell: (cell: CellProps<any>) => {
           const { id } = cell.row.original;
-          return <div>{id}</div>;
+          return <Code>{id}</Code>;
         },
       },
     ],

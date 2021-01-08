@@ -42,9 +42,9 @@ const IngredientList: React.FC = () => {
     return [
       {
         Header: "id",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          return <Code text={original.ingredient.id} />;
-        },
+        Cell: ({ row: { original } }: CellProps<i>) => (
+          <Code>{original.ingredient.id}</Code>
+        ),
       },
       {
         Header: "Name",
