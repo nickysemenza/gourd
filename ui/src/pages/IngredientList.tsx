@@ -11,6 +11,7 @@ import { ButtonGroup } from "../components/Button";
 import { RecipeLink } from "../components/Misc";
 import { PlusCircle } from "react-feather";
 import { Code } from "../util";
+import FoodSearch from "../components/FoodSearch";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -38,6 +39,13 @@ const IngredientList: React.FC = () => {
       let res = await iApi.convertIngredientToRecipe({ ingredientId: id });
       toast.success(`created recipe ${res.id} for ${res.name}`);
     };
+    const linkFoodToIngredient = async (
+      ingredientId: string,
+      fdcId: number
+    ) => {
+      await iApi.associateFoodWithIngredient({ ingredientId, fdcId });
+      toast.success(`linked ${ingredientId} to food ${fdcId}`);
+    };
 
     return [
       {
@@ -50,10 +58,10 @@ const IngredientList: React.FC = () => {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { ingredient, children } = original;
+          const { ingredient, children, food } = original;
           return (
-            <div>
-              {ingredient.name}{" "}
+            <div className="flex flex-col w-64">
+              {ingredient.name}
               <ButtonGroup
                 compact
                 buttons={[
@@ -61,7 +69,7 @@ const IngredientList: React.FC = () => {
                     onClick: () => {
                       convertToRecipe(ingredient.id);
                     },
-                    text: "Convert to Recipe",
+                    text: "make Recipe",
                     IconLeft: PlusCircle,
                   },
                 ]}
@@ -73,25 +81,12 @@ const IngredientList: React.FC = () => {
                   </li>
                 ))}
               </ul>
+              <div>fdc: {!!food ? food.description : "n/a"}</div>
             </div>
           );
         },
       },
-      // {
-      //   Header: "Actions",
-      //   Cell: ({
-      //     row: {
-      //       original: { ingredient },
-      //     },
-      //   }: CellProps<i>) => (
-      //     <div>
-      //       <Button
-      //         onClick={() => convertToRecipe(ingredient.id)}
-      //         label="Convert to Recipe"
-      //       />
-      //     </div>
-      //   ),
-      // },
+
       {
         Header: "Recipes",
         id: "recipes",
@@ -127,14 +122,21 @@ const IngredientList: React.FC = () => {
           );
         },
       },
-      // {
-      //   Header: "USDA food",
-      //   // accessor: "name",
-      //   Cell: ({ row: { original } }: CellProps<i>) => {
-      //     const { usdaFood } = original;
-      //     return <div>{usdaFood?.description}</div>;
-      //   },
-      // },
+      {
+        Header: "USDA Food",
+        id: "food",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          return (
+            <FoodSearch
+              name={original.ingredient.name}
+              highlightId={original.food?.fdc_id}
+              onLink={(fdcId: number) => {
+                linkFoodToIngredient(original.ingredient.id, fdcId);
+              }}
+            />
+          );
+        },
+      },
     ];
   }, []);
 

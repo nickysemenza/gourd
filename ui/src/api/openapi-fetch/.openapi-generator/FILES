@@ -2,6 +2,7 @@
 apis/AlbumsApi.ts
 apis/AuthenticationApi.ts
 apis/FoodApi.ts
+apis/FoodsApi.ts
 apis/IngredientsApi.ts
 apis/MealsApi.ts
 apis/PhotosApi.ts

@@ -32,6 +32,11 @@ import {
     SearchResultToJSON,
 } from '../models';
 
+export interface IngredientsApiAssociateFoodWithIngredientRequest {
+    ingredientId: string;
+    fdcId: number;
+}
+
 export interface IngredientsApiConvertIngredientToRecipeRequest {
     ingredientId: string;
 }
@@ -60,6 +65,54 @@ export interface IngredientsApiSearchRequest {
  * 
  */
 export class IngredientsApi extends runtime.BaseAPI {
+
+    /**
+     * todo
+     * Assosiates a food with a given ingredient
+     */
+    async associateFoodWithIngredientRaw(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
+        if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
+            throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling associateFoodWithIngredient.');
+        }
+
+        if (requestParameters.fdcId === null || requestParameters.fdcId === undefined) {
+            throw new runtime.RequiredError('fdcId','Required parameter requestParameters.fdcId was null or undefined when calling associateFoodWithIngredient.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.fdcId !== undefined) {
+            queryParameters['fdc_id'] = requestParameters.fdcId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/ingredients/{ingredient_id}/associate_food`.replace(`{${"ingredient_id"}}`, encodeURIComponent(String(requestParameters.ingredientId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * Assosiates a food with a given ingredient
+     */
+    async associateFoodWithIngredient(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest): Promise<RecipeDetail> {
+        const response = await this.associateFoodWithIngredientRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * todo

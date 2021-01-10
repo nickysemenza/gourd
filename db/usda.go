@@ -51,6 +51,7 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType s
 		q = q.Where(sq.Eq{"data_type": dataType})
 		cq = cq.Where(sq.Eq{"data_type": dataType})
 	}
+	q = q.OrderBy("fdc_id DESC")
 	cq = cq.RemoveLimit().RemoveOffset()
 
 	res := []Food{}
@@ -190,4 +191,9 @@ func (c *Client) GetFoodPortions(ctx context.Context, fdcId ...int) (FoodPortion
 	}
 
 	return ns, nil
+}
+func (c *Client) AssociateFoodWithIngredient(ctx context.Context, ingredient string, fdcId int) error {
+	q := c.psql.Update("ingredients").Set("fdc_id", fdcId).Where(sq.Eq{"id": ingredient})
+	_, err := c.execContext(ctx, q)
+	return err
 }

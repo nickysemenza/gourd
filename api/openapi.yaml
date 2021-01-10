@@ -378,6 +378,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/associate_food:
+    post:
+      summary: Assosiates a food with a given ingredient
+      description: todo
+      operationId: associate_food_with_ingredient
+      tags:
+        - foods
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient
+          schema:
+            type: string
+        - name: fdc_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The FDC id of the food to link to the ingredient
+      responses:
+        "201":
+          description: Newly converted recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients/{ingredient_id}/merge:
     post:
       summary: Merges the provide ingredients in the body into the param
@@ -665,6 +700,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IngredientDetail"
+        food:
+          $ref: "#/components/schemas/Food"
     RecipeSource:
       description: where the recipe came from (i.e. book/website)
       type: object

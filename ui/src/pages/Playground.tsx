@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { useGet } from "restful-react";
-import { PaginatedIngredients, IngredientsApi } from "../api/openapi-fetch";
-import { useListIngredients } from "../api/openapi-hooks/api";
-import Debug from "../components/Debug";
+import { PaginatedRecipes, RecipesApi } from "../api/openapi-fetch";
+import RecipeDiff from "../components/RecipeDiff";
 import { getAPIURL, getOpenapiFetchConfig } from "../config";
 
 const Playground: React.FC = () => {
   const url = getAPIURL();
-  const foo = useListIngredients({});
-  const bar = useGet({ path: url + "/ingredients?limit=5&offset=10" });
-  const [r2, setR2] = useState<PaginatedIngredients>();
+  const [r2, setR2] = useState<PaginatedRecipes>();
 
   useEffect(() => {
     const fetchData = async () => {
-      const bar = new IngredientsApi(getOpenapiFetchConfig());
-      const result = await bar.listIngredients({});
+      const bar = new RecipesApi(getOpenapiFetchConfig());
+      const result = await bar.listRecipes({});
       setR2(result);
     };
 
     fetchData();
   }, [url]);
 
+  if (!r2 || !r2.recipes) return null;
   return (
     <div className="grid grid-cols-2 gap-4">
-      <Debug data={{ foo, r: foo.data, bar }} />
-      <Debug data={{ r2 }} />
+      <RecipeDiff details={r2.recipes[0].versions} />
     </div>
   );
 };

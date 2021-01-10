@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    Food,
+    FoodFromJSON,
+    FoodFromJSONTyped,
+    FoodToJSON,
     Ingredient,
     IngredientFromJSON,
     IngredientFromJSONTyped,
@@ -48,6 +52,12 @@ export interface IngredientDetail {
      * @memberof IngredientDetail
      */
     children?: Array<IngredientDetail>;
+    /**
+     * 
+     * @type {Food}
+     * @memberof IngredientDetail
+     */
+    food?: Food;
 }
 
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
@@ -63,6 +73,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
         'ingredient': IngredientFromJSON(json['ingredient']),
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
+        'food': !exists(json, 'food') ? undefined : FoodFromJSON(json['food']),
     };
 }
 
@@ -78,6 +89,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         'ingredient': IngredientToJSON(value.ingredient),
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
+        'food': FoodToJSON(value.food),
     };
 }
 

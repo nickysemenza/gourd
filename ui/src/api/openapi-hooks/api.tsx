@@ -182,6 +182,7 @@ export interface IngredientDetail {
    * Ingredients that are equivalent
    */
   children?: IngredientDetail[];
+  food?: Food;
 }
 
 /**
@@ -1097,6 +1098,88 @@ export const useConvertIngredientToRecipe = ({
     "POST",
     (paramsInPath: ConvertIngredientToRecipePathParams) =>
       `/ingredients/${paramsInPath.ingredient_id}/convert_to_recipe`,
+    { pathParams: { ingredient_id }, ...props }
+  );
+
+export interface AssociateFoodWithIngredientQueryParams {
+  /**
+   * The FDC id of the food to link to the ingredient
+   */
+  fdc_id: number;
+}
+
+export interface AssociateFoodWithIngredientPathParams {
+  /**
+   * The id of the ingredient
+   */
+  ingredient_id: string;
+}
+
+export type AssociateFoodWithIngredientProps = Omit<
+  MutateProps<
+    RecipeDetail,
+    Error,
+    AssociateFoodWithIngredientQueryParams,
+    void,
+    AssociateFoodWithIngredientPathParams
+  >,
+  "path" | "verb"
+> &
+  AssociateFoodWithIngredientPathParams;
+
+/**
+ * Assosiates a food with a given ingredient
+ *
+ * todo
+ */
+export const AssociateFoodWithIngredient = ({
+  ingredient_id,
+  ...props
+}: AssociateFoodWithIngredientProps) => (
+  <Mutate<
+    RecipeDetail,
+    Error,
+    AssociateFoodWithIngredientQueryParams,
+    void,
+    AssociateFoodWithIngredientPathParams
+  >
+    verb="POST"
+    path={`/ingredients/${ingredient_id}/associate_food`}
+    {...props}
+  />
+);
+
+export type UseAssociateFoodWithIngredientProps = Omit<
+  UseMutateProps<
+    RecipeDetail,
+    Error,
+    AssociateFoodWithIngredientQueryParams,
+    void,
+    AssociateFoodWithIngredientPathParams
+  >,
+  "path" | "verb"
+> &
+  AssociateFoodWithIngredientPathParams;
+
+/**
+ * Assosiates a food with a given ingredient
+ *
+ * todo
+ */
+export const useAssociateFoodWithIngredient = ({
+  ingredient_id,
+  ...props
+}: UseAssociateFoodWithIngredientProps) =>
+  useMutate<
+    RecipeDetail,
+    Error,
+    AssociateFoodWithIngredientQueryParams,
+    void,
+    AssociateFoodWithIngredientPathParams
+  >(
+    "POST",
+    (paramsInPath: AssociateFoodWithIngredientPathParams) =>
+      `/ingredients/${paramsInPath.ingredient_id}/associate_food`,
     { pathParams: { ingredient_id }, ...props }
   );
 

@@ -401,7 +401,15 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 
 	for _, i := range ing {
 		// assemble
-		items = append(items, makeDetail(i, sameAs, linkedRecipes))
+		detail := makeDetail(i, sameAs, linkedRecipes)
+		if i.FdcID.Valid {
+			food, err := a.getFoodById(ctx, int(i.FdcID.Int64))
+			if err != nil {
+				return sendErr(c, http.StatusBadRequest, err)
+			}
+			detail.Food = food
+		}
+		items = append(items, detail)
 	}
 	listMeta.TotalCount = int(count)
 
@@ -424,11 +432,14 @@ func makeDetail(i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeD
 	for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
 		recipes = append(recipes, transformRecipe(x))
 	}
-	return IngredientDetail{
+
+	detail := IngredientDetail{
 		Ingredient: transformIngredient(i),
 		Children:   &same,
 		Recipes:    &recipes,
 	}
+
+	return detail
 }
 
 func (a *API) fromDBPhoto(ctx context.Context, photos []db.Photo, getURLs bool) ([]GooglePhoto, []string, error) {
@@ -741,20 +752,11 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
 }
 
-func (a *API) GetFoodById(c echo.Context, fdcId int) error {
-	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
-	defer span.End()
-
-	food, err := a.DB().GetFood(ctx, fdcId)
-	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
-	}
-	if food.FdcID == 0 {
-		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find food with fdc id %d", fdcId))
-	}
+func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
+	fdcId := f.FdcId
 	nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return err
 	}
 
 	nutrientIDs := make([]int, len(nutrientRows))
@@ -763,7 +765,7 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	}
 	nutrients, err := a.DB().GetNutrients(ctx, nutrientIDs...)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return err
 	}
 
 	nutrientsById := nutrients.ById()
@@ -782,15 +784,10 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 		}
 	}
 
-	f := Food{
-		Description: food.Description,
-		DataType:    food.DataType,
-		FdcId:       food.FdcID,
-		Nutrients:   fNutrients,
-	}
+	f.Nutrients = fNutrients
 	brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return err
 	}
 	if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
 		f.BrandedInfo = &BrandedFood{
@@ -802,9 +799,9 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 			ServingSizeUnit:     brandInfo.ServingSizeUnit,
 		}
 	}
-	category, err := a.DB().GetCategory(ctx, food.CategoryID.Int64)
+	category, err := a.DB().GetCategory(ctx, categoryId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return err
 	}
 	if category != nil && category.Code != "" {
 		f.Category = &FoodCategory{
@@ -815,7 +812,7 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 
 	portions, err := a.DB().GetFoodPortions(ctx, fdcId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return err
 	}
 	apiPortions := make([]FoodPortion, 0)
 	if portionsById, ok := portions.ByFdcId()[fdcId]; ok {
@@ -831,8 +828,36 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 		}
 	}
 	f.Portions = &apiPortions
+	return nil
+}
+func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
+	food, err := a.DB().GetFood(ctx, fdcId)
+	if err != nil {
+		return nil, err
+	}
+	if food.FdcID == 0 {
+		return nil, fmt.Errorf("could not find food with fdc id %d", fdcId)
+	}
 
-	return c.JSON(http.StatusOK, f)
+	f := Food{
+		Description: food.Description,
+		DataType:    food.DataType,
+		FdcId:       food.FdcID,
+	}
+
+	err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
+	return &f, err
+}
+func (a *API) GetFoodById(c echo.Context, fdcId int) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
+	defer span.End()
+
+	f, err := a.getFoodById(ctx, fdcId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, *f)
 }
 
 func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
@@ -845,13 +870,19 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
 
-	items := []Food{}
-	for _, food := range foods {
-		items = append(items, Food{
+	items := make([]Food, len(foods))
+	for x, food := range foods {
+		f := Food{
 			Description: food.Description,
 			DataType:    food.DataType,
 			FdcId:       food.FdcID,
-		})
+			Nutrients:   make([]FoodNutrient, 0),
+		}
+		err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
+		if err != nil {
+			return sendErr(c, http.StatusInternalServerError, err)
+		}
+		items[x] = f
 	}
 
 	listMeta.setTotalCount(count)
@@ -863,4 +894,14 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 
 	return c.JSON(http.StatusOK, resp)
 
+}
+
+func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, params AssociateFoodWithIngredientParams) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "AssociateFoodWithIngredient")
+	defer span.End()
+	err := a.Manager.DB().AssociateFoodWithIngredient(ctx, ingredientId, params.FdcId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	}
+	return c.JSON(http.StatusCreated, nil)
 }

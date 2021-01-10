@@ -261,15 +261,6 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 	defer span.End()
 	topLevelDetail := sq.Eq{"id": detailId}
 
-	// rs, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": id})
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// if len(rs) != 1 {
-	// 	return nil, fmt.Errorf("failed to find 1 recipe detail with id %s, found %d", id, len(rs))
-	// }
-	// r := rs[0]
-
 	sections, err := c.GetRecipeDetailSections(ctx, detailId)
 	if err != nil {
 		return nil, err
@@ -308,11 +299,6 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 			}
 			if i.RecipeId.String != "" {
 				recipeIds = append(recipeIds, i.RecipeId.String)
-				// rec, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": i.RecipeId.String})
-				// if err != nil {
-				// 	return nil, err
-				// }
-				// sections[x].Ingredients[y].RawRecipe = &rec[0]
 			}
 		}
 	}

@@ -135,6 +135,9 @@ type IngredientDetail struct {
 	// Ingredients that are equivalent
 	Children *[]IngredientDetail `json:"children,omitempty"`
 
+	// A top level food
+	Food *Food `json:"food,omitempty"`
+
 	// An Ingredient
 	Ingredient Ingredient `json:"ingredient"`
 
@@ -443,6 +446,13 @@ type ListIngredientsParams struct {
 
 // CreateIngredientsJSONBody defines parameters for CreateIngredients.
 type CreateIngredientsJSONBody Ingredient
+
+// AssociateFoodWithIngredientParams defines parameters for AssociateFoodWithIngredient.
+type AssociateFoodWithIngredientParams struct {
+
+	// The FDC id of the food to link to the ingredient
+	FdcId int `json:"fdc_id"`
+}
 
 // MergeIngredientsJSONBody defines parameters for MergeIngredients.
 type MergeIngredientsJSONBody struct {
