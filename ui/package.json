@@ -83,7 +83,7 @@
     ]
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.9.0",
+    "@cypress/code-coverage": "^3.9.1",
     "@openapitools/openapi-generator-cli": "^2.1.16",
     "autoprefixer": "^10.2.0",
     "chokidar-cli": "^2.1.0",
