@@ -97,6 +97,9 @@ export interface RecipeWrapper {
    */
   id: string;
   detail: RecipeDetail;
+  food_hints?: {
+    [key: string]: Food;
+  };
 }
 
 /**

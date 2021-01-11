@@ -348,7 +348,30 @@ func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	if r == nil {
 		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 	}
-	return c.JSON(http.StatusOK, transformRecipeFull(r))
+	apiR := transformRecipeFull(r)
+	foodById := make(map[string]interface{})
+
+	for _, rs := range apiR.Detail.Sections {
+		for _, si := range rs.Ingredients {
+			if si.Ingredient != nil && si.Ingredient.FdcId != nil {
+				id := *si.Ingredient.FdcId
+				idStr := fmt.Sprint(id)
+				if _, ok := foodById[idStr]; ok {
+					continue
+				}
+				food, err := a.getFoodById(ctx, int(id))
+				if err != nil {
+					return sendErr(c, http.StatusBadRequest, err)
+				}
+				if food == nil {
+					continue
+				}
+				foodById[idStr] = *food
+			}
+		}
+	}
+	apiR.FoodHints = &foodById
+	return c.JSON(http.StatusOK, apiR)
 }
 
 func (a *API) CreateIngredients(c echo.Context) error {

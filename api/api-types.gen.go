@@ -332,7 +332,8 @@ type RecipeSource struct {
 type RecipeWrapper struct {
 
 	// A revision of a recipe
-	Detail RecipeDetail `json:"detail"`
+	Detail    RecipeDetail            `json:"detail"`
+	FoodHints *map[string]interface{} `json:"food_hints,omitempty"`
 
 	// id
 	Id string `json:"id"`

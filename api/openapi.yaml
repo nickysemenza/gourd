@@ -610,6 +610,10 @@ components:
           type: string
         detail:
           $ref: "#/components/schemas/RecipeDetail"
+        food_hints:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/Food"
     Recipe:
       description: A recipe with subcomponents
       type: object
