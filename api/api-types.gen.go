@@ -122,6 +122,9 @@ type GooglePhotosAlbum struct {
 // Ingredient defines model for Ingredient.
 type Ingredient struct {
 
+	// FDC id equivalent to this ingredient
+	FdcId *int64 `json:"fdc_id,omitempty"`
+
 	// id
 	Id string `json:"id"`
 

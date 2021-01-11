@@ -31,6 +31,12 @@ export interface Ingredient {
      * @memberof Ingredient
      */
     name: string;
+    /**
+     * FDC id equivalent to this ingredient
+     * @type {number}
+     * @memberof Ingredient
+     */
+    fdcId?: number;
 }
 
 export function IngredientFromJSON(json: any): Ingredient {
@@ -45,6 +51,7 @@ export function IngredientFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'id': json['id'],
         'name': json['name'],
+        'fdcId': !exists(json, 'fdc_id') ? undefined : json['fdc_id'],
     };
 }
 
@@ -59,6 +66,7 @@ export function IngredientToJSON(value?: Ingredient | null): any {
         
         'id': value.id,
         'name': value.name,
+        'fdc_id': value.fdcId,
     };
 }
 

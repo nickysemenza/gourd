@@ -68,7 +68,10 @@ func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
 	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
-	return Ingredient{Id: dbr.Id, Name: dbr.Name}
+	return Ingredient{Id: dbr.Id,
+		Name:  dbr.Name,
+		FdcId: dbr.FdcID.Ptr(),
+	}
 }
 func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {
 	si := db.SectionIngredient{

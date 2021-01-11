@@ -682,6 +682,10 @@ components:
         name:
           description: Ingredient name
           type: string
+        fdc_id:
+          description: FDC id equivalent to this ingredient
+          type: integer
+          format: int64
     IngredientDetail:
       description: "An Ingredient"
       type: object
