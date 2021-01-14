@@ -34,10 +34,10 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.15.1
-	go.opentelemetry.io/otel v0.15.0
+	go.opentelemetry.io/otel v0.16.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.15.0
-	go.opentelemetry.io/otel/exporters/trace/jaeger v0.15.0
-	go.opentelemetry.io/otel/sdk v0.15.0
+	go.opentelemetry.io/otel/exporters/trace/jaeger v0.16.0
+	go.opentelemetry.io/otel/sdk v0.16.0
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/tools v0.0.0-20201211025543-abf6a1d87e11
 	google.golang.org/api v0.36.0
