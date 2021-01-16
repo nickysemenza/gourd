@@ -3,7 +3,7 @@ module github.com/nickysemenza/gourd
 go 1.14
 
 require (
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.13.1-0.20201210214614-d8551be9a708
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.15.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/buckket/go-blurhash v1.1.0
