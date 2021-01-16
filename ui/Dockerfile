@@ -1,4 +1,4 @@
-FROM cypress/included:4.5.0
+FROM cypress/included:4.12.1
 # replace this with your application's default port
 WORKDIR /work
 COPY yarn.lock .
