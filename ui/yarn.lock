@@ -2356,10 +2356,10 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.1.16":
-  version "2.1.16"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.1.16.tgz#72756fa5d2f4f752732ce8304ef2a50b0925283d"
-  integrity sha512-szYtAj9lrlSwpTFddvp3d4OhtkswpSd29fcJBy5eJU1j/Zq+EjDPRjgB2o7jQ98VK+mV6oFaMHMhFLH06gXKeg==
+"@openapitools/openapi-generator-cli@2.1.17":
+  version "2.1.17"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.1.17.tgz#01db731b5d9ea088ef874cc52e81ada212800338"
+  integrity sha512-y6UhhYsvJ/Y8z60i5BlCXXtLaz342O3nf25f1VARZvmdjMWIzAI2rimyT5VuIm2GO73hahUrNv6mGt8MGH3oVA==
   dependencies:
     "@nestjs/common" "7.6.5"
     "@nestjs/core" "7.6.5"
