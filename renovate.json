@@ -6,5 +6,8 @@
       "automerge": true
     }
   ],
-  "prHourlyLimit": 5
+  "prHourlyLimit": 5,
+  "timezone": "America/Los_Angeles",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dashboard"
 }
