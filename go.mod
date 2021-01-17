@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.15.0
 	github.com/Masterminds/squirrel v1.5.0
-	github.com/PuerkitoBio/goquery v1.6.0
+	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.2.0
 	github.com/cosmtrek/air v1.15.1
