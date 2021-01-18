@@ -42,6 +42,5 @@ require (
 	golang.org/x/tools v0.0.0-20210115202250-e0d201561e39
 	google.golang.org/api v0.36.0
 	gopkg.in/guregu/null.v3 v3.5.0
-	gopkg.in/guregu/null.v4 v4.0.0
 	sigs.k8s.io/yaml v1.2.0
 )
