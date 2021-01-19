@@ -29,7 +29,7 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	return f, c.getContext(ctx, q, f)
 }
 
-func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
+func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
 	q := c.psql.Select(
 		"food_category_id",
 		"data_type",
@@ -47,11 +47,11 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType s
 		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
 		cq = cq.Where(sq.Eq{"food_category_id": &foodCategoryID})
 	}
-	if dataType != "" {
+	if len(dataType) > 0 {
 		q = q.Where(sq.Eq{"data_type": dataType})
 		cq = cq.Where(sq.Eq{"data_type": dataType})
 	}
-	q = q.OrderBy("fdc_id DESC")
+	q = q.OrderBy("length(description) ASC", "fdc_id DESC")
 	cq = cq.RemoveLimit().RemoveOffset()
 
 	res := []Food{}

@@ -22,6 +22,10 @@ import {
     FoodCategoryFromJSON,
     FoodCategoryFromJSONTyped,
     FoodCategoryToJSON,
+    FoodDataType,
+    FoodDataTypeFromJSON,
+    FoodDataTypeFromJSONTyped,
+    FoodDataTypeToJSON,
     FoodNutrient,
     FoodNutrientFromJSON,
     FoodNutrientFromJSONTyped,
@@ -51,11 +55,11 @@ export interface Food {
      */
     description: string;
     /**
-     * todo
-     * @type {string}
+     * 
+     * @type {FoodDataType}
      * @memberof Food
      */
-    dataType: FoodDataTypeEnum;
+    dataType: FoodDataType;
     /**
      * 
      * @type {FoodCategory}
@@ -82,21 +86,6 @@ export interface Food {
     brandedInfo?: BrandedFood;
 }
 
-/**
-* @export
-* @enum {string}
-*/
-export enum FoodDataTypeEnum {
-    FOUNDATION_FOOD = 'foundation_food',
-    SAMPLE_FOOD = 'sample_food',
-    MARKET_ACQUISITION = 'market_acquisition',
-    SURVEY_FNDDS_FOOD = 'survey_fndds_food',
-    SUB_SAMPLE_FOOD = 'sub_sample_food',
-    AGRICULTURAL_ACQUISITION = 'agricultural_acquisition',
-    SR_LEGACY_FOOD = 'sr_legacy_food',
-    BRANDED_FOOD = 'branded_food'
-}
-
 export function FoodFromJSON(json: any): Food {
     return FoodFromJSONTyped(json, false);
 }
@@ -109,7 +98,7 @@ export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food
         
         'fdcId': json['fdc_id'],
         'description': json['description'],
-        'dataType': json['data_type'],
+        'dataType': FoodDataTypeFromJSON(json['data_type']),
         'category': !exists(json, 'category') ? undefined : FoodCategoryFromJSON(json['category']),
         'nutrients': ((json['nutrients'] as Array<any>).map(FoodNutrientFromJSON)),
         'portions': !exists(json, 'portions') ? undefined : ((json['portions'] as Array<any>).map(FoodPortionFromJSON)),
@@ -128,7 +117,7 @@ export function FoodToJSON(value?: Food | null): any {
         
         'fdc_id': value.fdcId,
         'description': value.description,
-        'data_type': value.dataType,
+        'data_type': FoodDataTypeToJSON(value.dataType),
         'category': FoodCategoryToJSON(value.category),
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
         'portions': value.portions === undefined ? undefined : ((value.portions as Array<any>).map(FoodPortionToJSON)),

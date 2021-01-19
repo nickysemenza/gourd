@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
 	"github.com/nickysemenza/gourd/scraper"
@@ -96,6 +97,27 @@ func init() {
 					return err
 				}
 				_, err = s.APIManager.CreateRecipe(ctx, r)
+				return err
+			},
+		},
+		&cobra.Command{
+			Use:   "load-ingredients [file]",
+			Short: "Load ingredient -> fdc mappings from afile",
+			Args:  cobra.MinimumNArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				s, err := makeServer()
+				if err != nil {
+					return err
+				}
+				ctx := context.Background()
+
+				mappings, err := api.IngredientMappingFromFile(ctx, strings.Join(args, ""))
+				if err != nil {
+					return err
+				}
+				spew.Dump(mappings)
+
+				err = s.APIManager.LoadIngredientMappings(ctx, mappings)
 				return err
 			},
 		},

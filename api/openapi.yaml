@@ -494,6 +494,14 @@ paths:
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/nameParam"
+        - name: data_types
+          in: query
+          required: true
+          description: The data types
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/FoodDataType"
       responses:
         "200":
           description: Search results
@@ -1043,18 +1051,7 @@ components:
           type: string
         data_type:
           description: todo
-          type: string
-          enum:
-            [
-              foundation_food,
-              sample_food,
-              market_acquisition,
-              survey_fndds_food,
-              sub_sample_food,
-              agricultural_acquisition,
-              sr_legacy_food,
-              branded_food,
-            ]
+          $ref: "#/components/schemas/FoodDataType"
         category:
           $ref: "#/components/schemas/FoodCategory"
         nutrients:
@@ -1089,6 +1086,19 @@ components:
           description: todo
           type: string
           enum: [add, remove]
+    FoodDataType:
+      type: string
+      enum:
+        [
+          foundation_food,
+          sample_food,
+          market_acquisition,
+          survey_fndds_food,
+          sub_sample_food,
+          agricultural_acquisition,
+          sr_legacy_food,
+          branded_food,
+        ]
   parameters:
     offsetParam:
       in: query

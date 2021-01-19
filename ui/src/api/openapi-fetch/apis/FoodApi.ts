@@ -18,6 +18,9 @@ import {
     Food,
     FoodFromJSON,
     FoodToJSON,
+    FoodDataType,
+    FoodDataTypeFromJSON,
+    FoodDataTypeToJSON,
     PaginatedFoods,
     PaginatedFoodsFromJSON,
     PaginatedFoodsToJSON,
@@ -29,6 +32,7 @@ export interface FoodApiGetFoodByIdRequest {
 
 export interface FoodApiSearchFoodsRequest {
     name: string;
+    dataTypes: Array<FoodDataType>;
     offset?: number;
     limit?: number;
 }
@@ -87,6 +91,10 @@ export class FoodApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling searchFoods.');
         }
 
+        if (requestParameters.dataTypes === null || requestParameters.dataTypes === undefined) {
+            throw new runtime.RequiredError('dataTypes','Required parameter requestParameters.dataTypes was null or undefined when calling searchFoods.');
+        }
+
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -99,6 +107,10 @@ export class FoodApi extends runtime.BaseAPI {
 
         if (requestParameters.name !== undefined) {
             queryParameters['name'] = requestParameters.name;
+        }
+
+        if (requestParameters.dataTypes) {
+            queryParameters['data_types'] = requestParameters.dataTypes;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

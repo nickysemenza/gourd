@@ -479,18 +479,7 @@ export interface Food {
    * Food description
    */
   description: string;
-  /**
-   * todo
-   */
-  data_type:
-    | "foundation_food"
-    | "sample_food"
-    | "market_acquisition"
-    | "survey_fndds_food"
-    | "sub_sample_food"
-    | "agricultural_acquisition"
-    | "sr_legacy_food"
-    | "branded_food";
+  data_type: FoodDataType;
   category?: FoodCategory;
   /**
    * todo
@@ -520,6 +509,16 @@ export interface MealRecipeUpdate {
    */
   action: "add" | "remove";
 }
+
+export type FoodDataType =
+  | "foundation_food"
+  | "sample_food"
+  | "market_acquisition"
+  | "survey_fndds_food"
+  | "sub_sample_food"
+  | "agricultural_acquisition"
+  | "sr_legacy_food"
+  | "branded_food";
 
 export interface AuthLoginQueryParams {
   /**
@@ -1324,6 +1323,10 @@ export interface SearchFoodsQueryParams {
    * The search query (name).
    */
   name: string;
+  /**
+   * The data types
+   */
+  data_types: FoodDataType[];
 }
 
 export type SearchFoodsProps = Omit<

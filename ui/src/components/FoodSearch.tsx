@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { PaginatedFoods, FoodApi } from "../api/openapi-fetch";
+import { PaginatedFoods, FoodApi, FoodDataType } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
@@ -15,7 +15,14 @@ const FoodSearch: React.FC<{
   useEffect(() => {
     const fetchData = async () => {
       const bar = new FoodApi(getOpenapiFetchConfig());
-      const result = await bar.searchFoods({ name, limit: 5 });
+      const result = await bar.searchFoods({
+        name,
+        limit: 5,
+        dataTypes: [
+          // FoodDataType.BRANDED_FOOD,
+          // FoodDataType.FOUNDATION_FOOD,
+        ],
+      });
       setFoods(result);
     };
 
@@ -36,6 +43,14 @@ const FoodSearch: React.FC<{
               key={`${name}@${r.fdcId}`}
             >
               <Code>{r.fdcId}</Code>
+              <a
+                href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdcId}/nutrients`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm pr-1"
+              >
+                (view)
+              </a>
               <div className="flex">
                 <div className="">{r.description}</div>{" "}
                 <Code>{r.dataType}</Code>

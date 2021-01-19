@@ -2,6 +2,7 @@ export * from './AuthResp';
 export * from './BrandedFood';
 export * from './Food';
 export * from './FoodCategory';
+export * from './FoodDataType';
 export * from './FoodNutrient';
 export * from './FoodPortion';
 export * from './GooglePhoto';

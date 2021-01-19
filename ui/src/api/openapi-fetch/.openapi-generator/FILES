@@ -13,6 +13,7 @@ models/AuthResp.ts
 models/BrandedFood.ts
 models/Food.ts
 models/FoodCategory.ts
+models/FoodDataType.ts
 models/FoodNutrient.ts
 models/FoodPortion.ts
 models/GooglePhoto.ts

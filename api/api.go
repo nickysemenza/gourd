@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"net/http"
 
@@ -867,7 +868,7 @@ func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
 
 	f := Food{
 		Description: food.Description,
-		DataType:    food.DataType,
+		DataType:    FoodDataType(food.DataType),
 		FdcId:       food.FdcID,
 	}
 
@@ -891,7 +892,13 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	defer span.End()
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	foods, count, err := a.Manager.DB().SearchFoods(ctx, string(params.Name), "", nil, paginationParams...)
+	dataTypes := []string{}
+	for _, x := range params.DataTypes {
+		if x != "" {
+			dataTypes = append(dataTypes, string(x))
+		}
+	}
+	foods, count, err := a.Manager.DB().SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
@@ -900,7 +907,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	for x, food := range foods {
 		f := Food{
 			Description: food.Description,
-			DataType:    food.DataType,
+			DataType:    FoodDataType(food.DataType),
 			FdcId:       food.FdcID,
 			Nutrients:   make([]FoodNutrient, 0),
 		}
@@ -930,4 +937,21 @@ func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, p
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
 	return c.JSON(http.StatusCreated, nil)
+}
+
+func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMapping) error {
+	for _, m := range mapping {
+
+		ing, err := a.DB().IngredientByName(ctx, m.Name)
+		if err != nil {
+			return err
+		}
+
+		err = a.Manager.DB().AssociateFoodWithIngredient(ctx, ing.Id, m.FdcID)
+		if err != nil {
+			return err
+		}
+		log.Printf("associated %d wit %s", m.FdcID, ing.Id)
+	}
+	return nil
 }

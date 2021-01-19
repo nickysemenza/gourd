@@ -6,6 +6,8 @@
 set -euf -o pipefail
 tables=(food_category food food_attribute_type acquisition_sample agricultural_acquisition branded_food food_attribute food_nutrient_conversion_factor food_calorie_conversion_factor food_component nutrient food_nutrient_source food_nutrient_derivation food_nutrient measure_unit food_portion food_protein_conversion_factor foundation_food input_food lab_method lab_method_code lab_method_nutrient market_acquisition nutrient_incoming_name retention_factor sample_food sr_legacy_food sub_sample_food sub_sample_result wweia_food_category survey_fndds_food)
 
+start_time="$(date -u +%s)"
+
 alias p='psql "postgresql://gourd:gourd@localhost:5555/food"'
 
 p -c "select count(*) from usda_food";
@@ -22,4 +24,8 @@ for f in ${tables[@]}; do
     p -c "\copy usda_$f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
 done
 
-rm "*.csv"
+rm *.csv
+
+end_time="$(date -u +%s)"
+elapsed="$(($end_time-$start_time))"
+echo "Total of $elapsed seconds elapsed for USDA import"

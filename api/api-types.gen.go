@@ -36,9 +36,7 @@ type Food struct {
 
 	// food category, set for some
 	Category *FoodCategory `json:"category,omitempty"`
-
-	// todo
-	DataType string `json:"data_type"`
+	DataType FoodDataType  `json:"data_type"`
 
 	// Food description
 	Description string `json:"description"`
@@ -62,6 +60,21 @@ type FoodCategory struct {
 	// Food description
 	Description string `json:"description"`
 }
+
+// FoodDataType defines model for FoodDataType.
+type FoodDataType string
+
+// List of FoodDataType
+const (
+	FoodDataType_agricultural_acquisition FoodDataType = "agricultural_acquisition"
+	FoodDataType_branded_food             FoodDataType = "branded_food"
+	FoodDataType_foundation_food          FoodDataType = "foundation_food"
+	FoodDataType_market_acquisition       FoodDataType = "market_acquisition"
+	FoodDataType_sample_food              FoodDataType = "sample_food"
+	FoodDataType_sr_legacy_food           FoodDataType = "sr_legacy_food"
+	FoodDataType_sub_sample_food          FoodDataType = "sub_sample_food"
+	FoodDataType_survey_fndds_food        FoodDataType = "survey_fndds_food"
+)
 
 // FoodNutrient defines model for FoodNutrient.
 type FoodNutrient struct {
@@ -436,6 +449,9 @@ type SearchFoodsParams struct {
 
 	// The search query (name).
 	Name NameParam `json:"name"`
+
+	// The data types
+	DataTypes []FoodDataType `json:"data_types"`
 }
 
 // ListIngredientsParams defines parameters for ListIngredients.
