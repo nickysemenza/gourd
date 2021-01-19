@@ -30,6 +30,7 @@ import {
   updateIngredientInfo,
   updateInstruction,
   updateTimeRange,
+  getCal,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -243,6 +244,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
+            <div>{getCal(ingredient, recipe.food_hints)} kcal</div>
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (
               <label className="flex items-center ml-1">

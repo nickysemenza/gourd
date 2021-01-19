@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { PaginatedFoods, FoodApi, FoodDataType } from "../api/openapi-fetch";
+import { PaginatedFoods, FoodApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
+import { getCalories2 } from "./RecipeEditorUtils";
 
 const FoodSearch: React.FC<{
   name: string;
@@ -62,7 +63,7 @@ const FoodSearch: React.FC<{
               <div className="font-bold flex">portions:</div>
               <Code>{r.portions?.length}</Code>
               <div className="font-bold flex ml-1">nutrition:</div>
-              <Code>{r.nutrients.length}</Code>
+              <div>{`${getCalories2(r)} kcal/100g`}</div>
               {/* </div> */}
               <div></div>
               {onLink !== undefined && (
