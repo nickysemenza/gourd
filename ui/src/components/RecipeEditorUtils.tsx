@@ -1,4 +1,5 @@
 import {
+  Food,
   Ingredient,
   Meal,
   RecipeDetail,
@@ -9,6 +10,7 @@ import {
   TimeRange,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
+import { Food as Food2 } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -355,4 +357,28 @@ export const sumIngredients = (sections: RecipeSection[]) => {
   });
 
   return { recipes, ingredients };
+};
+
+export const getCalories = (food: Food) => {
+  const first = food.nutrients.find((n) => n.nutrient.unit_name === "KCAL");
+  return (!!first && first.amount) || 0;
+};
+export const getCalories2 = (food: Food2) => {
+  const first = food.nutrients.find((n) => n.nutrient.unitName === "KCAL");
+  return (!!first && first.amount) || 0;
+};
+
+export const getCal = (
+  ingredient: SectionIngredient,
+  hints: RecipeWrapper["food_hints"]
+) => {
+  const fdc_id = ingredient.ingredient?.fdc_id;
+  if (fdc_id !== undefined) {
+    const hint = hints && hints[fdc_id];
+    if (hint !== undefined) {
+      const scalingFactor = ingredient.grams / 100;
+      return Math.round(getCalories(hint) * scalingFactor);
+    }
+  }
+  return 0;
 };

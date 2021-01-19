@@ -16,6 +16,7 @@ import {
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {
+  getCalories,
   Override,
   RecipeTweaks,
   sumIngredients,
@@ -165,6 +166,30 @@ const RecipeDetail: React.FC = () => {
 
   const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
 
+  console.group("nutrients");
+  const ingredientsSum = sumIngredients(recipe.detail.sections);
+  const uniqIng = ingredientsSum.ingredients;
+  let totalCal = 0;
+  Object.keys(uniqIng).forEach((k) => {
+    uniqIng[k].forEach((si) => {
+      const fdc_id = si.ingredient?.fdc_id;
+      if (fdc_id !== undefined) {
+        const hint = recipe.food_hints && recipe.food_hints[fdc_id];
+        if (hint !== undefined) {
+          const scalingFactor = si.grams / 100;
+          const cal = getCalories(hint) * scalingFactor;
+          totalCal += cal;
+          console.log(
+            `${si.ingredient?.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
+            cal
+          );
+        }
+      }
+    });
+  });
+  console.log("TOTAL", totalCal);
+  console.groupEnd();
+
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -265,9 +290,20 @@ const RecipeDetail: React.FC = () => {
         recipe={recipe}
         setRecipe={setRecipe}
       />
+      <h1>totals</h1>
+      <div>calories: {totalCal}</div>
+      <div>
+        grams:{" "}
+        {recipe.detail.sections
+          .map((section) => section.ingredients.map((ingredient) => ingredient))
+          .flat()
+          .map((si) => si.grams)
+          .reduce((a, b) => a + b, 0)}
+      </div>
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
+
       <Debug
         data={{
           loading,
@@ -275,7 +311,7 @@ const RecipeDetail: React.FC = () => {
           multiplier,
           override,
           recipe,
-          foo: sumIngredients(recipe.detail.sections),
+          foo: ingredientsSum,
         }}
       />
     </div>
