@@ -15,7 +15,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/getkin/kin-openapi v0.36.0
 	github.com/getsentry/sentry-go v0.9.0
-	github.com/gofrs/uuid v3.4.0+incompatible
+	github.com/gofrs/uuid/v4 v4.0.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golangci/golangci-lint v1.35.2
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
