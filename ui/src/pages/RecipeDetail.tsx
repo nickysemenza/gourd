@@ -25,6 +25,7 @@ import {
 } from "../components/RecipeEditorUtils";
 import { ButtonGroup } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
+import { singular } from "pluralize";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -305,12 +306,12 @@ const RecipeDetail: React.FC = () => {
       <div>
         calories: {totalCal}
         {quantity > 0 &&
-          ` (${Math.round(totalCal / quantity)} per ${unit})`}{" "}
+          ` (${Math.round(totalCal / quantity)} per ${singular(unit)})`}
       </div>
       <div>
         grams: {totalGrams}
         {totalGrams > 0 &&
-          ` (${Math.round(totalGrams / quantity)} per ${unit})`}{" "}
+          ` (${Math.round(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
