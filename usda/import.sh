@@ -22,9 +22,8 @@ for f in ${tables[@]}; do
     tmp="$f:tmp"
     sed 's/""/NULL/g' $1$f.csv > $tmp.csv
     p -c "\copy usda_$f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
+    rm $tmp.csv
 done
-
-rm *.csv
 
 end_time="$(date -u +%s)"
 elapsed="$(($end_time-$start_time))"
