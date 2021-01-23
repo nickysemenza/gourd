@@ -45,6 +45,9 @@ func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 		Name:            dbr.Name,
 		Version:         &dbr.Version,
 		IsLatestVersion: &dbr.LatestVersion,
+		Quantity:        dbr.Quantity.Int64,
+		Servings:        &dbr.Servings.Int64,
+		Unit:            dbr.Unit.String,
 		Sections:        sections,
 	}
 	if dbr.Source.Valid {
@@ -325,7 +328,6 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrappe
 	if err != nil {
 		return nil, err
 	}
-	spew.Dump(dbVersion)
 	r2, err := a.DB().InsertRecipe(ctx, dbVersion)
 	if err != nil {
 		return nil, err

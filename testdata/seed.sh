@@ -5,3 +5,6 @@
 ./bin/gourd scrape http://www.seriouseats.com/recipes/2011/08/grilled-naan-recipe.html
 ./bin/gourd import testdata/cookies_2.yaml
 ./bin/gourd import testdata/cookies_1.yaml
+
+./usda/import.sh ~/Downloads/FoodData_Central_csv_2020-04-29/
+./bin/gourd load-ingredients testdata/ingredient_fdc_mapping.yaml

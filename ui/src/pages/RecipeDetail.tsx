@@ -90,6 +90,7 @@ const RecipeDetail: React.FC = () => {
   if (!recipe) return null;
 
   const { detail } = recipe;
+  const { quantity, unit } = detail;
 
   const updateIngredient = ({
     sectionID,
@@ -190,6 +191,12 @@ const RecipeDetail: React.FC = () => {
   console.log("TOTAL", totalCal);
   console.groupEnd();
 
+  const totalGrams = recipe.detail.sections
+    .map((section) => section.ingredients.map((ingredient) => ingredient))
+    .flat()
+    .map((si) => si.grams)
+    .reduce((a, b) => a + b, 0);
+
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -213,11 +220,15 @@ const RecipeDetail: React.FC = () => {
             </div>
           )}
 
-          <div className="flex">
+          <div className="flex flex-col">
             {detail.unit !== "" && (
-              <div className="text-sm text-gray-600">Makes x {detail.unit}</div>
+              <div className="text-sm text-gray-600">
+                Makes {detail.quantity} {detail.unit}
+              </div>
             )}
-            {formatTimeRange(totalDuration)}
+            <div className="text-sm">
+              Takes {formatTimeRange(totalDuration)}
+            </div>
           </div>
           <div>
             {(detail.sources || []).map((source, i) => (
@@ -259,7 +270,7 @@ const RecipeDetail: React.FC = () => {
             ))}
           </div>
         </div>
-        <div className="self-end">
+        <div className="self-start">
           <ButtonGroup
             buttons={[
               {
@@ -291,14 +302,15 @@ const RecipeDetail: React.FC = () => {
         setRecipe={setRecipe}
       />
       <h1>totals</h1>
-      <div>calories: {totalCal}</div>
       <div>
-        grams:{" "}
-        {recipe.detail.sections
-          .map((section) => section.ingredients.map((ingredient) => ingredient))
-          .flat()
-          .map((si) => si.grams)
-          .reduce((a, b) => a + b, 0)}
+        calories: {totalCal}
+        {quantity > 0 &&
+          ` (${Math.round(totalCal / quantity)} per ${unit})`}{" "}
+      </div>
+      <div>
+        grams: {totalGrams}
+        {totalGrams > 0 &&
+          ` (${Math.round(totalGrams / quantity)} per ${unit})`}{" "}
       </div>
       <h2>raw</h2>
       <pre>{encodeRecipe(recipe)}</pre>
