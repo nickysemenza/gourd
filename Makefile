@@ -97,3 +97,6 @@ get-detail/%:
 	curl -s http://localhost:4242/api/recipes/$(@F) | jq '.detail | del(.. | .id?)' > tmp1
 	dyff yaml tmp1 | pbcopy
 	rm tmp1
+
+seed-testdata: bin/gourd
+	./testdata/seed.sh

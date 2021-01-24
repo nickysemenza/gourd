@@ -60,8 +60,8 @@ const FoodSearch: React.FC<{
                 <div className="italic">{r.brandedInfo.brandOwner}</div>
               )}
               {/* <div className="flex"> */}
-              <div className="font-bold flex">portions:</div>
-              <Code>{r.portions?.length}</Code>
+              <div className="font-bold flex">nutrients:</div>
+              <Code>{r.nutrients?.length}</Code>
               <div className="font-bold flex ml-1">nutrition:</div>
               <div>{`${getCalories2(r)} kcal/100g`}</div>
               {/* </div> */}

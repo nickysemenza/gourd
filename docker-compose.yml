@@ -56,3 +56,13 @@ services:
       - ./.git:/work/.git
       - ./ui/cypress:/work/cypress
       - ./ui/coverage:/work/coverage
+
+  usda:
+    build:
+      context: usda
+    depends_on:
+      - gourd
+      - db
+    environment:
+      DB_DSN: postgresql://gourd:gourd@db:5432/food
+      CI: "true"

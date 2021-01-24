@@ -1,0 +1,87 @@
+---
+is_latest_version: true
+name: Chefsteps Waffles
+quantity: 14
+sections:
+  - duration:
+      max: 0
+      min: 60
+    ingredients:
+      - amount: 0
+        grams: 350
+        ingredient:
+          fdc_id: 532183
+          name: pastry flour
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 50
+        ingredient:
+          name: diastatic malt powder
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 7
+        ingredient:
+          fdc_id: 368813
+          name: active dry yeast
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 5
+        ingredient:
+          fdc_id: 777534
+          name: granulated sugar
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 3.5
+        ingredient:
+          fdc_id: 705264
+          name: kosher salt
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 2
+        ingredient:
+          fdc_id: 741258
+          name: baking soda
+        kind: ingredient
+        optional: false
+    instructions: []
+  - duration:
+      max: 0
+      min: 300
+    ingredients:
+      - amount: 0
+        grams: 620
+        ingredient:
+          fdc_id: 726156
+          name: milk
+        kind: ingredient
+        optional: false
+      - amount: 0
+        grams: 115
+        ingredient:
+          fdc_id: 798135
+          name: unsalted butter
+        kind: ingredient
+        optional: false
+    instructions: []
+  - duration:
+      max: 0
+      min: 60
+    ingredients:
+      - amount: 0
+        grams: 100
+        ingredient:
+          fdc_id: 748967
+          name: eggs
+        kind: ingredient
+        optional: false
+    instructions: []
+servings: 0
+sources:
+  - url: https://www.chefsteps.com/activities/crispy-yeasted-waffles
+unit: waffles
+version: 2
