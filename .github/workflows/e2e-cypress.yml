@@ -7,9 +7,20 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: build e2e docker-compose
-        run: docker-compose build
+        run: docker-compose build --parallel
+      - name: run usda import
+        run: docker-compose run usda
+      - name: seed db with testdata
+        env:
+          DB_HOST: db
+          DB_PORT: 5432
+        run: make seed-testdata
+
       - name: run e2e
         run: docker-compose run ui
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v1
       - name: Archive cypress results
         uses: actions/upload-artifact@v2
         with:

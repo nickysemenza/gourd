@@ -7,3 +7,4 @@ tmp/
 usda/FoodData_Central*
 config.toml
 coverage*
+*.zip
