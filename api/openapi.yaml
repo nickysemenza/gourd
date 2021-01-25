@@ -483,6 +483,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}:
+    get:
+      summary: Get a specific ingredient
+      description: todo
+      operationId: get_ingredient_by_id
+      tags:
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient to get into
+          schema:
+            type: string
+      responses:
+        "200":
+          description: An ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngredientDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /foods/search:
     get:
       summary: Search foods

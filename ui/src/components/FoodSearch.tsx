@@ -37,22 +37,25 @@ const FoodSearch: React.FC<{
         {(foods.foods || []).map((r) => {
           const isHighlighted = highlightId === r.fdcId;
           return (
-            <li
+            <div
+              style={{ gridTemplateColumns: "5rem 15rem 5rem 5rem 5rem 5rem" }}
               className={`border ${
                 isHighlighted ? "border-red-600 " : "border-indigo-600"
-              } ${isHighlighted && "bg-indigo-200"} flex`}
+              } ${isHighlighted && "bg-indigo-200"} grid`}
               key={`${name}@${r.fdcId}`}
             >
-              <Code>{r.fdcId}</Code>
-              <a
-                href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdcId}/nutrients`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm pr-1"
-              >
-                (view)
-              </a>
-              <div className="flex">
+              <div className="flex flex-col">
+                <Code>{r.fdcId}</Code>
+                <a
+                  href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdcId}/nutrients`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm pr-1"
+                >
+                  (view)
+                </a>
+              </div>
+              <div className="flex flex-col">
                 <div className="">{r.description}</div>{" "}
                 <Code>{r.dataType}</Code>
               </div>
@@ -60,12 +63,15 @@ const FoodSearch: React.FC<{
                 <div className="italic">{r.brandedInfo.brandOwner}</div>
               )}
               {/* <div className="flex"> */}
-              <div className="font-bold flex">nutrients:</div>
-              <Code>{r.nutrients?.length}</Code>
-              <div className="font-bold flex ml-1">nutrition:</div>
-              <div>{`${getCalories2(r)} kcal/100g`}</div>
+              <div className="flex flex-col">
+                <div className="font-bold flex">nutrients:</div>
+                <Code>{r.nutrients?.length}</Code>
+              </div>
+              <div className="flex flex-col">
+                <div className="font-bold flex ml-1">nutrition:</div>
+                <div>{`${getCalories2(r)} kcal/100g`}</div>
+              </div>
               {/* </div> */}
-              <div></div>
               {onLink !== undefined && (
                 <ButtonGroup
                   compact
@@ -81,7 +87,7 @@ const FoodSearch: React.FC<{
                   ]}
                 />
               )}
-            </li>
+            </div>
           );
         })}
       </ul>

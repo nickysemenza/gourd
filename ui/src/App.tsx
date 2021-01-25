@@ -26,6 +26,7 @@ import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import IngredientDetail from "./pages/IngredientDetail";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -65,6 +66,9 @@ function App() {
               </Route>
               <Route path="/recipes">
                 <RecipeList />
+              </Route>
+              <Route path="/ingredients/:id">
+                <IngredientDetail />
               </Route>
               <Route path="/ingredients">
                 <IngredientList />

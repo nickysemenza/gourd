@@ -18,6 +18,9 @@ import {
     Ingredient,
     IngredientFromJSON,
     IngredientToJSON,
+    IngredientDetail,
+    IngredientDetailFromJSON,
+    IngredientDetailToJSON,
     InlineObject,
     InlineObjectFromJSON,
     InlineObjectToJSON,
@@ -43,6 +46,10 @@ export interface IngredientsApiConvertIngredientToRecipeRequest {
 
 export interface IngredientsApiCreateIngredientsRequest {
     ingredient: Ingredient;
+}
+
+export interface IngredientsApiGetIngredientByIdRequest {
+    ingredientId: string;
 }
 
 export interface IngredientsApiListIngredientsRequest {
@@ -194,6 +201,46 @@ export class IngredientsApi extends runtime.BaseAPI {
      */
     async createIngredients(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<Ingredient> {
         const response = await this.createIngredientsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * Get a specific ingredient
+     */
+    async getIngredientByIdRaw(requestParameters: IngredientsApiGetIngredientByIdRequest): Promise<runtime.ApiResponse<IngredientDetail>> {
+        if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
+            throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling getIngredientById.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/ingredients/{ingredient_id}`.replace(`{${"ingredient_id"}}`, encodeURIComponent(String(requestParameters.ingredientId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => IngredientDetailFromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * Get a specific ingredient
+     */
+    async getIngredientById(requestParameters: IngredientsApiGetIngredientByIdRequest): Promise<IngredientDetail> {
+        const response = await this.getIngredientByIdRaw(requestParameters);
         return await response.value();
     }
 

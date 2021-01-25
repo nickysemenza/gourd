@@ -398,19 +398,11 @@ func (a *API) IngredientIdByName(ctx context.Context, name, kind string) (string
 	}
 	return ing.Id, nil
 }
-func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
-	ctx := c.Request().Context()
-
+func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) ([]IngredientDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "ListIngredients")
 	defer span.End()
 
 	items := []IngredientDetail{}
-
-	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", paginationParams...)
-	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
-	}
 	var ingredientIds []string
 	for _, i := range ing {
 		ingredientIds = append(ingredientIds, i.Id)
@@ -418,14 +410,14 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 
 	sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, ingredientIds...)
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return nil, err
 	}
 	for _, i := range sameAs {
 		ingredientIds = append(ingredientIds, i.Id)
 	}
 	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return nil, err
 	}
 
 	for _, i := range ing {
@@ -434,12 +426,31 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		if i.FdcID.Valid {
 			food, err := a.getFoodById(ctx, int(i.FdcID.Int64))
 			if err != nil {
-				return sendErr(c, http.StatusBadRequest, err)
+				return nil, err
 			}
 			detail.Food = food
 		}
 		items = append(items, detail)
 	}
+	return items, nil
+}
+func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
+	ctx := c.Request().Context()
+
+	ctx, span := a.tracer.Start(ctx, "ListIngredients")
+	defer span.End()
+
+	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", paginationParams...)
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
+	items, err := a.addDetailsToIngredients(ctx, ing)
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
 	listMeta.TotalCount = int(count)
 
 	resp := PaginatedIngredients{
@@ -782,6 +793,8 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 }
 
 func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
+	ctx, span := a.tracer.Start(ctx, "addDetailToFood")
+	defer span.End()
 	fdcId := f.FdcId
 	nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
 	if err != nil {
@@ -860,6 +873,8 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 	return nil
 }
 func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
+	ctx, span := a.tracer.Start(ctx, "getFoodById")
+	defer span.End()
 	food, err := a.DB().GetFood(ctx, fdcId)
 	if err != nil {
 		return nil, err
@@ -956,4 +971,22 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 		log.Printf("associated %d wit %s", m.FdcID, ing.Id)
 	}
 	return nil
+}
+
+func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "GetIngredientById")
+	defer span.End()
+
+	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	if ing == nil {
+		return sendErr(c, http.StatusNotFound, fmt.Errorf("no ingredient with id %s", ingredientId))
+	}
+	foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*ing})
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, foo[0])
 }

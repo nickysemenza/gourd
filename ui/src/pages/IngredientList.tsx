@@ -12,6 +12,7 @@ import { RecipeLink } from "../components/Misc";
 import { PlusCircle } from "react-feather";
 import { Code } from "../util";
 import FoodSearch from "../components/FoodSearch";
+import { Link } from "react-router-dom";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -82,6 +83,9 @@ const IngredientList: React.FC = () => {
                 ))}
               </ul>
               <div>fdc: {!!food ? food.description : "n/a"}</div>
+              <Link to={`/ingredients/${ingredient.id}`} className="link">
+                <div className="text-blue-800">view</div>
+              </Link>
             </div>
           );
         },
