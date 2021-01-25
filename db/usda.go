@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	sq "github.com/Masterminds/squirrel"
 	"gopkg.in/guregu/null.v3/zero"
@@ -18,6 +19,8 @@ type Food struct {
 type Foods []Food
 
 func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
+	ctx, span := c.tracer.Start(ctx, "GetFood")
+	defer span.End()
 	q := c.psql.Select(
 		"food_category_id",
 		"data_type",
@@ -30,6 +33,8 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 }
 
 func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "SearchFoods")
+	defer span.End()
 	q := c.psql.Select(
 		"food_category_id",
 		"data_type",
@@ -55,13 +60,32 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType [
 	cq = cq.RemoveLimit().RemoveOffset()
 
 	res := []Food{}
-	if err := c.selectContext(ctx, q, &res); err != nil {
-		return nil, 0, err
-	}
 	var count uint64
-	if err := c.getContext(ctx, cq, &count); err != nil {
-		return nil, 0, err
+
+	numQueries := 2
+	var wg sync.WaitGroup
+	wg.Add(numQueries)
+	errs := make(chan error, numQueries)
+
+	go func() {
+		if err := c.selectContext(ctx, q, &res); err != nil {
+			errs <- err
+		}
+		wg.Done()
+	}()
+	go func() {
+		if err := c.getContext(ctx, cq, &count); err != nil {
+			errs <- err
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	close(errs)
+	if len(errs) > 0 {
+		return nil, 0, <-errs
 	}
+
 	return res, count, nil
 
 }
@@ -75,6 +99,8 @@ type FoodNutrient struct {
 type FoodNutrients []FoodNutrient
 
 func (c *Client) GetFoodNutrients(ctx context.Context, fdcID ...int) (FoodNutrients, error) {
+	ctx, span := c.tracer.Start(ctx, "GetFoodNutrients")
+	defer span.End()
 	q := c.psql.Select(
 		"nutrient_id",
 		"amount",
@@ -106,6 +132,9 @@ func (r Nutrients) ById() map[int]Nutrient {
 }
 
 func (c *Client) GetNutrients(ctx context.Context, nutrientID ...int) (Nutrients, error) {
+	ctx, span := c.tracer.Start(ctx, "GetNutrients")
+	defer span.End()
+
 	q := c.psql.Select("id", "name", "unit_name AS unitName").From("usda_nutrient").Where(sq.Eq{"id": nutrientID})
 
 	ns := []Nutrient{}
@@ -118,6 +147,9 @@ func (c *Client) GetNutrients(ctx context.Context, nutrientID ...int) (Nutrients
 }
 
 func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*FoodCategory, error) {
+	ctx, span := c.tracer.Start(ctx, "GetCategory")
+	defer span.End()
+
 	q := c.psql.Select(
 		"code",
 		"description",
@@ -131,6 +163,9 @@ func (c *Client) GetCategory(ctx context.Context, categoryID int64) (*FoodCatego
 	return x, nil
 }
 func (c *Client) GetBrandInfo(ctx context.Context, fdcID int) (*BrandedFood, error) {
+	ctx, span := c.tracer.Start(ctx, "GetBrandInfo")
+	defer span.End()
+
 	q := c.psql.Select(
 		"brand_owner",
 		"ingredients",
@@ -181,6 +216,9 @@ func (r FoodPortions) ByFdcId() map[int][]FoodPortion {
 }
 
 func (c *Client) GetFoodPortions(ctx context.Context, fdcId ...int) (FoodPortions, error) {
+	ctx, span := c.tracer.Start(ctx, "GetFoodPortions")
+	defer span.End()
+
 	q := c.psql.Select("id", "fdc_id", "amount", "portion_description", "modifier", "gram_weight").
 		From("usda_food_portion").Where(sq.Eq{"fdc_id": fdcId})
 
@@ -193,6 +231,9 @@ func (c *Client) GetFoodPortions(ctx context.Context, fdcId ...int) (FoodPortion
 	return ns, nil
 }
 func (c *Client) AssociateFoodWithIngredient(ctx context.Context, ingredient string, fdcId int) error {
+	ctx, span := c.tracer.Start(ctx, "AssociateFoodWithIngredient")
+	defer span.End()
+
 	q := c.psql.Update("ingredients").Set("fdc_id", fdcId).Where(sq.Eq{"id": ingredient})
 	_, err := c.execContext(ctx, q)
 	return err

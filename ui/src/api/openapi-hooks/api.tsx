@@ -1310,6 +1310,55 @@ export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
     { pathParams: { fdc_id }, ...props }
   );
 
+export interface GetIngredientByIdPathParams {
+  /**
+   * The id of the ingredient to get into
+   */
+  ingredient_id: string;
+}
+
+export type GetIngredientByIdProps = Omit<
+  GetProps<IngredientDetail, Error, void, GetIngredientByIdPathParams>,
+  "path"
+> &
+  GetIngredientByIdPathParams;
+
+/**
+ * Get a specific ingredient
+ *
+ * todo
+ */
+export const GetIngredientById = ({
+  ingredient_id,
+  ...props
+}: GetIngredientByIdProps) => (
+  <Get<IngredientDetail, Error, void, GetIngredientByIdPathParams>
+    path={`/ingredients/${ingredient_id}`}
+    {...props}
+  />
+);
+
+export type UseGetIngredientByIdProps = Omit<
+  UseGetProps<IngredientDetail, Error, void, GetIngredientByIdPathParams>,
+  "path"
+> &
+  GetIngredientByIdPathParams;
+
+/**
+ * Get a specific ingredient
+ *
+ * todo
+ */
+export const useGetIngredientById = ({
+  ingredient_id,
+  ...props
+}: UseGetIngredientByIdProps) =>
+  useGet<IngredientDetail, Error, void, GetIngredientByIdPathParams>(
+    (paramsInPath: GetIngredientByIdPathParams) =>
+      `/ingredients/${paramsInPath.ingredient_id}`,
+    { pathParams: { ingredient_id }, ...props }
+  );
+
 export interface SearchFoodsQueryParams {
   /**
    * The number of items to skip before starting to collect the result set.
