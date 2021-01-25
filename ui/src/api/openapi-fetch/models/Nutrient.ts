@@ -36,7 +36,7 @@ export interface Nutrient {
      * @type {string}
      * @memberof Nutrient
      */
-    unitName: string;
+    unit_name: string;
 }
 
 export function NutrientFromJSON(json: any): Nutrient {
@@ -51,7 +51,7 @@ export function NutrientFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         
         'id': json['id'],
         'name': json['name'],
-        'unitName': json['unit_name'],
+        'unit_name': json['unit_name'],
     };
 }
 
@@ -66,7 +66,7 @@ export function NutrientToJSON(value?: Nutrient | null): any {
         
         'id': value.id,
         'name': value.name,
-        'unit_name': value.unitName,
+        'unit_name': value.unit_name,
     };
 }
 

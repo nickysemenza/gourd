@@ -24,7 +24,7 @@ export interface BrandedFood {
      * @type {string}
      * @memberof BrandedFood
      */
-    brandOwner?: string;
+    brand_owner?: string;
     /**
      * 
      * @type {string}
@@ -36,25 +36,25 @@ export interface BrandedFood {
      * @type {number}
      * @memberof BrandedFood
      */
-    servingSize: number;
+    serving_size: number;
     /**
      * 
      * @type {string}
      * @memberof BrandedFood
      */
-    servingSizeUnit: string;
+    serving_size_unit: string;
     /**
      * 
      * @type {string}
      * @memberof BrandedFood
      */
-    householdServing?: string;
+    household_serving?: string;
     /**
      * 
      * @type {string}
      * @memberof BrandedFood
      */
-    brandedFoodCategory?: string;
+    branded_food_category?: string;
 }
 
 export function BrandedFoodFromJSON(json: any): BrandedFood {
@@ -67,12 +67,12 @@ export function BrandedFoodFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'brandOwner': !exists(json, 'brand_owner') ? undefined : json['brand_owner'],
+        'brand_owner': !exists(json, 'brand_owner') ? undefined : json['brand_owner'],
         'ingredients': !exists(json, 'ingredients') ? undefined : json['ingredients'],
-        'servingSize': json['serving_size'],
-        'servingSizeUnit': json['serving_size_unit'],
-        'householdServing': !exists(json, 'household_serving') ? undefined : json['household_serving'],
-        'brandedFoodCategory': !exists(json, 'branded_food_category') ? undefined : json['branded_food_category'],
+        'serving_size': json['serving_size'],
+        'serving_size_unit': json['serving_size_unit'],
+        'household_serving': !exists(json, 'household_serving') ? undefined : json['household_serving'],
+        'branded_food_category': !exists(json, 'branded_food_category') ? undefined : json['branded_food_category'],
     };
 }
 
@@ -85,12 +85,12 @@ export function BrandedFoodToJSON(value?: BrandedFood | null): any {
     }
     return {
         
-        'brand_owner': value.brandOwner,
+        'brand_owner': value.brand_owner,
         'ingredients': value.ingredients,
-        'serving_size': value.servingSize,
-        'serving_size_unit': value.servingSizeUnit,
-        'household_serving': value.householdServing,
-        'branded_food_category': value.brandedFoodCategory,
+        'serving_size': value.serving_size,
+        'serving_size_unit': value.serving_size_unit,
+        'household_serving': value.household_serving,
+        'branded_food_category': value.branded_food_category,
     };
 }
 

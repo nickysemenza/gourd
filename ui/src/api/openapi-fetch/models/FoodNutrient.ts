@@ -43,7 +43,7 @@ export interface FoodNutrient {
      * @type {number}
      * @memberof FoodNutrient
      */
-    dataPoints: number;
+    data_points: number;
 }
 
 export function FoodNutrientFromJSON(json: any): FoodNutrient {
@@ -58,7 +58,7 @@ export function FoodNutrientFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'nutrient': NutrientFromJSON(json['nutrient']),
         'amount': json['amount'],
-        'dataPoints': json['data_points'],
+        'data_points': json['data_points'],
     };
 }
 
@@ -73,7 +73,7 @@ export function FoodNutrientToJSON(value?: FoodNutrient | null): any {
         
         'nutrient': NutrientToJSON(value.nutrient),
         'amount': value.amount,
-        'data_points': value.dataPoints,
+        'data_points': value.data_points,
     };
 }
 

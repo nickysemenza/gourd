@@ -10,7 +10,6 @@ import {
   TimeRange,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
-import { Food as Food2 } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -361,10 +360,6 @@ export const sumIngredients = (sections: RecipeSection[]) => {
 
 export const getCalories = (food: Food) => {
   const first = food.nutrients.find((n) => n.nutrient.unit_name === "KCAL");
-  return (!!first && first.amount) || 0;
-};
-export const getCalories2 = (food: Food2) => {
-  const first = food.nutrients.find((n) => n.nutrient.unitName === "KCAL");
   return (!!first && first.amount) || 0;
 };
 

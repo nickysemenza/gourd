@@ -24,7 +24,7 @@ export interface InlineObject {
      * @type {Array<string>}
      * @memberof InlineObject
      */
-    ingredientIds: Array<string>;
+    ingredient_ids: Array<string>;
 }
 
 export function InlineObjectFromJSON(json: any): InlineObject {
@@ -37,7 +37,7 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'ingredientIds': json['ingredient_ids'],
+        'ingredient_ids': json['ingredient_ids'],
     };
 }
 
@@ -50,7 +50,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
     }
     return {
         
-        'ingredient_ids': value.ingredientIds,
+        'ingredient_ids': value.ingredient_ids,
     };
 }
 
