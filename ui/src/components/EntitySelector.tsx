@@ -33,7 +33,7 @@ export const EntitySelector: React.FC<{
   ) => {
     const res = await iApi.search({ name: inputValue });
     const recipeOptions: Option[] = (res.recipes || [])
-      .filter((r) => r.detail.isLatestVersion)
+      .filter((r) => r.detail.is_latest_version)
       .map((r) => {
         return {
           label: `[r] ${r.detail.name} (v${r.detail.version})`,

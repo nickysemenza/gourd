@@ -523,7 +523,7 @@ paths:
         - $ref: "#/components/parameters/nameParam"
         - name: data_types
           in: query
-          required: true
+          required: false
           description: The data types
           schema:
             type: array

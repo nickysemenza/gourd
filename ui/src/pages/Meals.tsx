@@ -67,7 +67,7 @@ const Meals: React.FC = () => {
                     mealRecipeUpdate: {
                       multiplier: 1.0,
                       action: MealRecipeUpdateActionEnum.ADD,
-                      recipeId: a.value,
+                      recipe_id: a.value,
                     },
                   });
                   console.log({ res });

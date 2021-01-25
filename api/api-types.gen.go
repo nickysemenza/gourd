@@ -451,7 +451,7 @@ type SearchFoodsParams struct {
 	Name NameParam `json:"name"`
 
 	// The data types
-	DataTypes []FoodDataType `json:"data_types"`
+	DataTypes *[]FoodDataType `json:"data_types,omitempty"`
 }
 
 // ListIngredientsParams defines parameters for ListIngredients.

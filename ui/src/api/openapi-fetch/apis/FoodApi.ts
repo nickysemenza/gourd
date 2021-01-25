@@ -32,9 +32,9 @@ export interface FoodApiGetFoodByIdRequest {
 
 export interface FoodApiSearchFoodsRequest {
     name: string;
-    dataTypes: Array<FoodDataType>;
     offset?: number;
     limit?: number;
+    dataTypes?: Array<FoodDataType>;
 }
 
 /**
@@ -89,10 +89,6 @@ export class FoodApi extends runtime.BaseAPI {
     async searchFoodsRaw(requestParameters: FoodApiSearchFoodsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling searchFoods.');
-        }
-
-        if (requestParameters.dataTypes === null || requestParameters.dataTypes === undefined) {
-            throw new runtime.RequiredError('dataTypes','Required parameter requestParameters.dataTypes was null or undefined when calling searchFoods.');
         }
 
         const queryParameters: any = {};
