@@ -1375,7 +1375,7 @@ export interface SearchFoodsQueryParams {
   /**
    * The data types
    */
-  data_types: FoodDataType[];
+  data_types?: FoodDataType[];
 }
 
 export type SearchFoodsProps = Omit<

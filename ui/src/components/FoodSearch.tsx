@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { PaginatedFoods, FoodApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
+import { useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
 import { getCalories } from "./RecipeEditorUtils";
@@ -9,32 +8,49 @@ import { getCalories } from "./RecipeEditorUtils";
 const FoodSearch: React.FC<{
   name: string;
   highlightId?: number;
+  limit?: number;
+  enableSearch?: boolean;
   onLink?: (fdc_id: number) => void;
-}> = ({ name, highlightId, onLink }) => {
-  const [foods, setFoods] = useState<PaginatedFoods>();
+}> = ({ name, highlightId, onLink, limit = 5, enableSearch = false }) => {
+  const [ingredientName, setIngredientName] = useState(name);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const bar = new FoodApi(getOpenapiFetchConfig());
-      const result = await bar.searchFoods({
-        name,
-        limit: 5,
-        dataTypes: [
-          // FoodDataType.BRANDED_FOOD,
-          // FoodDataType.FOUNDATION_FOOD,
-        ],
-      });
-      setFoods(result);
-    };
-
-    fetchData();
+    setIngredientName(name);
   }, [name]);
 
-  if (!foods || !foods.foods) return null;
+  const { loading, data: foods } = useSearchFoods({
+    queryParams: {
+      name: ingredientName,
+      limit,
+      data_types: [
+        "foundation_food",
+        "sample_food",
+        "market_acquisition",
+        "survey_fndds_food",
+        "sub_sample_food",
+        "agricultural_acquisition",
+        "sr_legacy_food",
+        "branded_food",
+      ],
+    },
+  });
+
+  const items = foods?.foods || [];
   return (
     <div className="">
       <ul className="list-disc list-outside pl-4">
-        {(foods.foods || []).map((r) => {
+        {loading && <div className="w-full">loading...</div>}
+        {enableSearch && (
+          <div className="w-full">
+            <input
+              value={ingredientName}
+              onChange={(e) => {
+                setIngredientName(e.target.value);
+              }}
+            />
+          </div>
+        )}
+        {(items || []).map((r) => {
           const isHighlighted = highlightId === r.fdc_id;
           return (
             <div

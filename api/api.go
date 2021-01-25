@@ -910,9 +910,11 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
 	dataTypes := []string{}
-	for _, x := range params.DataTypes {
-		if x != "" {
-			dataTypes = append(dataTypes, string(x))
+	if params.DataTypes != nil {
+		for _, x := range *params.DataTypes {
+			if x != "" {
+				dataTypes = append(dataTypes, string(x))
+			}
 		}
 	}
 	foods, count, err := a.Manager.DB().SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
