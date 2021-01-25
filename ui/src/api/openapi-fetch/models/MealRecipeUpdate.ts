@@ -24,7 +24,7 @@ export interface MealRecipeUpdate {
      * @type {string}
      * @memberof MealRecipeUpdate
      */
-    recipeId: string;
+    recipe_id: string;
     /**
      * multiplier
      * @type {number}
@@ -58,7 +58,7 @@ export function MealRecipeUpdateFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'recipeId': json['recipe_id'],
+        'recipe_id': json['recipe_id'],
         'multiplier': json['multiplier'],
         'action': json['action'],
     };
@@ -73,7 +73,7 @@ export function MealRecipeUpdateToJSON(value?: MealRecipeUpdate | null): any {
     }
     return {
         
-        'recipe_id': value.recipeId,
+        'recipe_id': value.recipe_id,
         'multiplier': value.multiplier,
         'action': value.action,
     };

@@ -83,7 +83,7 @@ export interface RecipeDetail {
      * @type {boolean}
      * @memberof RecipeDetail
      */
-    isLatestVersion?: boolean;
+    is_latest_version?: boolean;
 }
 
 export function RecipeDetailFromJSON(json: any): RecipeDetail {
@@ -104,7 +104,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'quantity': json['quantity'],
         'unit': json['unit'],
         'version': !exists(json, 'version') ? undefined : json['version'],
-        'isLatestVersion': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
+        'is_latest_version': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
     };
 }
 
@@ -125,7 +125,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'quantity': value.quantity,
         'unit': value.unit,
         'version': value.version,
-        'is_latest_version': value.isLatestVersion,
+        'is_latest_version': value.is_latest_version,
     };
 }
 

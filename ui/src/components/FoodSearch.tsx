@@ -4,12 +4,12 @@ import { PaginatedFoods, FoodApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
-import { getCalories2 } from "./RecipeEditorUtils";
+import { getCalories } from "./RecipeEditorUtils";
 
 const FoodSearch: React.FC<{
   name: string;
   highlightId?: number;
-  onLink?: (fdcId: number) => void;
+  onLink?: (fdc_id: number) => void;
 }> = ({ name, highlightId, onLink }) => {
   const [foods, setFoods] = useState<PaginatedFoods>();
 
@@ -35,19 +35,19 @@ const FoodSearch: React.FC<{
     <div className="">
       <ul className="list-disc list-outside pl-4">
         {(foods.foods || []).map((r) => {
-          const isHighlighted = highlightId === r.fdcId;
+          const isHighlighted = highlightId === r.fdc_id;
           return (
             <div
               style={{ gridTemplateColumns: "5rem 15rem 5rem 5rem 5rem 5rem" }}
               className={`border ${
                 isHighlighted ? "border-red-600 " : "border-indigo-600"
               } ${isHighlighted && "bg-indigo-200"} grid`}
-              key={`${name}@${r.fdcId}`}
+              key={`${name}@${r.fdc_id}`}
             >
               <div className="flex flex-col">
-                <Code>{r.fdcId}</Code>
+                <Code>{r.fdc_id}</Code>
                 <a
-                  href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdcId}/nutrients`}
+                  href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdc_id}/nutrients`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm pr-1"
@@ -57,10 +57,10 @@ const FoodSearch: React.FC<{
               </div>
               <div className="flex flex-col">
                 <div className="">{r.description}</div>{" "}
-                <Code>{r.dataType}</Code>
+                <Code>{r.data_type}</Code>
               </div>
-              {!!r.brandedInfo && (
-                <div className="italic">{r.brandedInfo.brandOwner}</div>
+              {!!r.branded_info && (
+                <div className="italic">{r.branded_info.brand_owner}</div>
               )}
               {/* <div className="flex"> */}
               <div className="flex flex-col">
@@ -69,7 +69,7 @@ const FoodSearch: React.FC<{
               </div>
               <div className="flex flex-col">
                 <div className="font-bold flex ml-1">nutrition:</div>
-                <div>{`${getCalories2(r)} kcal/100g`}</div>
+                <div>{`${getCalories(r)} kcal/100g`}</div>
               </div>
               {/* </div> */}
               {onLink !== undefined && (
@@ -78,7 +78,7 @@ const FoodSearch: React.FC<{
                   buttons={[
                     {
                       onClick: () => {
-                        onLink(r.fdcId);
+                        onLink(r.fdc_id);
                       },
                       text: "link",
                       disabled: isHighlighted,

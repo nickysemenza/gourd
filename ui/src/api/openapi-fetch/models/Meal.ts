@@ -47,7 +47,7 @@ export interface Meal {
      * @type {Date}
      * @memberof Meal
      */
-    ateAt: Date;
+    ate_at: Date;
     /**
      * 
      * @type {Array<GooglePhoto>}
@@ -74,7 +74,7 @@ export function MealFromJSONTyped(json: any, ignoreDiscriminator: boolean): Meal
         
         'id': json['id'],
         'name': json['name'],
-        'ateAt': (new Date(json['ate_at'])),
+        'ate_at': (new Date(json['ate_at'])),
         'photos': ((json['photos'] as Array<any>).map(GooglePhotoFromJSON)),
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(MealRecipeFromJSON)),
     };
@@ -91,7 +91,7 @@ export function MealToJSON(value?: Meal | null): any {
         
         'id': value.id,
         'name': value.name,
-        'ate_at': (value.ateAt.toISOString()),
+        'ate_at': (value.ate_at.toISOString()),
         'photos': ((value.photos as Array<any>).map(GooglePhotoToJSON)),
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(MealRecipeToJSON)),
     };

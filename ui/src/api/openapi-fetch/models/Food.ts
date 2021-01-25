@@ -47,7 +47,7 @@ export interface Food {
      * @type {number}
      * @memberof Food
      */
-    fdcId: number;
+    fdc_id: number;
     /**
      * Food description
      * @type {string}
@@ -59,7 +59,7 @@ export interface Food {
      * @type {FoodDataType}
      * @memberof Food
      */
-    dataType: FoodDataType;
+    data_type: FoodDataType;
     /**
      * 
      * @type {FoodCategory}
@@ -83,7 +83,7 @@ export interface Food {
      * @type {BrandedFood}
      * @memberof Food
      */
-    brandedInfo?: BrandedFood;
+    branded_info?: BrandedFood;
 }
 
 export function FoodFromJSON(json: any): Food {
@@ -96,13 +96,13 @@ export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food
     }
     return {
         
-        'fdcId': json['fdc_id'],
+        'fdc_id': json['fdc_id'],
         'description': json['description'],
-        'dataType': FoodDataTypeFromJSON(json['data_type']),
+        'data_type': FoodDataTypeFromJSON(json['data_type']),
         'category': !exists(json, 'category') ? undefined : FoodCategoryFromJSON(json['category']),
         'nutrients': ((json['nutrients'] as Array<any>).map(FoodNutrientFromJSON)),
         'portions': !exists(json, 'portions') ? undefined : ((json['portions'] as Array<any>).map(FoodPortionFromJSON)),
-        'brandedInfo': !exists(json, 'branded_info') ? undefined : BrandedFoodFromJSON(json['branded_info']),
+        'branded_info': !exists(json, 'branded_info') ? undefined : BrandedFoodFromJSON(json['branded_info']),
     };
 }
 
@@ -115,13 +115,13 @@ export function FoodToJSON(value?: Food | null): any {
     }
     return {
         
-        'fdc_id': value.fdcId,
+        'fdc_id': value.fdc_id,
         'description': value.description,
-        'data_type': FoodDataTypeToJSON(value.dataType),
+        'data_type': FoodDataTypeToJSON(value.data_type),
         'category': FoodCategoryToJSON(value.category),
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
         'portions': value.portions === undefined ? undefined : ((value.portions as Array<any>).map(FoodPortionToJSON)),
-        'branded_info': BrandedFoodToJSON(value.brandedInfo),
+        'branded_info': BrandedFoodToJSON(value.branded_info),
     };
 }
 

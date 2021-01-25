@@ -47,7 +47,7 @@ export interface RecipeWrapper {
      * @type {{ [key: string]: Food; }}
      * @memberof RecipeWrapper
      */
-    foodHints?: { [key: string]: Food; };
+    food_hints?: { [key: string]: Food; };
 }
 
 export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
@@ -62,7 +62,7 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'],
         'detail': RecipeDetailFromJSON(json['detail']),
-        'foodHints': !exists(json, 'food_hints') ? undefined : (mapValues(json['food_hints'], FoodFromJSON)),
+        'food_hints': !exists(json, 'food_hints') ? undefined : (mapValues(json['food_hints'], FoodFromJSON)),
     };
 }
 
@@ -77,7 +77,7 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         
         'id': value.id,
         'detail': RecipeDetailToJSON(value.detail),
-        'food_hints': value.foodHints === undefined ? undefined : (mapValues(value.foodHints, FoodToJSON)),
+        'food_hints': value.food_hints === undefined ? undefined : (mapValues(value.food_hints, FoodToJSON)),
     };
 }
 

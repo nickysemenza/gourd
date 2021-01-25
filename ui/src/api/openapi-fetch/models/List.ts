@@ -24,7 +24,7 @@ export interface List {
      * @type {number}
      * @memberof List
      */
-    pageNumber: number;
+    page_number: number;
     /**
      * How many items were requested for this page
      * @type {number}
@@ -42,13 +42,13 @@ export interface List {
      * @type {number}
      * @memberof List
      */
-    totalCount: number;
+    total_count: number;
     /**
      * Total number of pages available
      * @type {number}
      * @memberof List
      */
-    pageCount: number;
+    page_count: number;
 }
 
 export function ListFromJSON(json: any): List {
@@ -61,11 +61,11 @@ export function ListFromJSONTyped(json: any, ignoreDiscriminator: boolean): List
     }
     return {
         
-        'pageNumber': json['page_number'],
+        'page_number': json['page_number'],
         'limit': json['limit'],
         'offset': json['offset'],
-        'totalCount': json['total_count'],
-        'pageCount': json['page_count'],
+        'total_count': json['total_count'],
+        'page_count': json['page_count'],
     };
 }
 
@@ -78,11 +78,11 @@ export function ListToJSON(value?: List | null): any {
     }
     return {
         
-        'page_number': value.pageNumber,
+        'page_number': value.page_number,
         'limit': value.limit,
         'offset': value.offset,
-        'total_count': value.totalCount,
-        'page_count': value.pageCount,
+        'total_count': value.total_count,
+        'page_count': value.page_count,
     };
 }
 

@@ -36,7 +36,7 @@ export interface GooglePhotosAlbum {
      * @type {string}
      * @memberof GooglePhotosAlbum
      */
-    productUrl: string;
+    product_url: string;
     /**
      * usecase
      * @type {string}
@@ -57,7 +57,7 @@ export function GooglePhotosAlbumFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'id': json['id'],
         'title': json['title'],
-        'productUrl': json['product_url'],
+        'product_url': json['product_url'],
         'usecase': json['usecase'],
     };
 }
@@ -73,7 +73,7 @@ export function GooglePhotosAlbumToJSON(value?: GooglePhotosAlbum | null): any {
         
         'id': value.id,
         'title': value.title,
-        'product_url': value.productUrl,
+        'product_url': value.product_url,
         'usecase': value.usecase,
     };
 }

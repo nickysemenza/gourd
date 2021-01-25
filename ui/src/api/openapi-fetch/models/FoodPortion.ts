@@ -36,7 +36,7 @@ export interface FoodPortion {
      * @type {string}
      * @memberof FoodPortion
      */
-    portionDescription: string;
+    portion_description: string;
     /**
      * 
      * @type {string}
@@ -48,7 +48,7 @@ export interface FoodPortion {
      * @type {number}
      * @memberof FoodPortion
      */
-    gramWeight: number;
+    gram_weight: number;
 }
 
 export function FoodPortionFromJSON(json: any): FoodPortion {
@@ -63,9 +63,9 @@ export function FoodPortionFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'amount': json['amount'],
-        'portionDescription': json['portion_description'],
+        'portion_description': json['portion_description'],
         'modifier': json['modifier'],
-        'gramWeight': json['gram_weight'],
+        'gram_weight': json['gram_weight'],
     };
 }
 
@@ -80,9 +80,9 @@ export function FoodPortionToJSON(value?: FoodPortion | null): any {
         
         'id': value.id,
         'amount': value.amount,
-        'portion_description': value.portionDescription,
+        'portion_description': value.portion_description,
         'modifier': value.modifier,
-        'gram_weight': value.gramWeight,
+        'gram_weight': value.gram_weight,
     };
 }
 
