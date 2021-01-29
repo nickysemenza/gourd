@@ -40,7 +40,7 @@ require (
 	go.opentelemetry.io/otel/sdk v0.15.0
 	golang.org/x/oauth2 v0.0.0-20210126194326-f9ce19ea3013
 	golang.org/x/tools v0.1.0
-	google.golang.org/api v0.37.0
+	google.golang.org/api v0.38.0
 	gopkg.in/guregu/null.v3 v3.5.0
 	sigs.k8s.io/yaml v1.2.0
 )
