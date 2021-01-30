@@ -10,10 +10,10 @@ require (
 	github.com/charmbracelet/glamour v0.2.0
 	github.com/cosmtrek/air v1.15.1
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepmap/oapi-codegen v1.4.2
+	github.com/deepmap/oapi-codegen v1.5.0
 	github.com/dgraph-io/ristretto v0.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/getkin/kin-openapi v0.36.0
+	github.com/getkin/kin-openapi v0.37.0
 	github.com/getsentry/sentry-go v0.9.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
