@@ -42,8 +42,9 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType [
 		"fdc_id",
 	)
 	cq := c.psql.Select("count(*)")
-	q = q.From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
-	cq = cq.From("usda_food").Where(sq.ILike{"description": fmt.Sprintf("%%%s%%", searchQuery)})
+	w := `description ILIKE '%' || $1 || '%'`
+	q = q.From("usda_food").Where(w, searchQuery)
+	cq = cq.From("usda_food").Where(w, searchQuery)
 
 	q = newSearchQuery(opts...).apply(q)
 	cq = newSearchQuery(opts...).apply(cq)

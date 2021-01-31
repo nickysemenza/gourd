@@ -68,6 +68,8 @@ docker-push: docker-build
 
 dev-db:
 	pgcli postgres://gourd:gourd@localhost:5555/food
+dev-db-stats:
+	docker logs gourd_db_1 2>&1 | pgbadger - --prefix '%t [%p]:[%l] user=%u, db=%d'
 new-migrate/%: bin/migrate
 	mkdir -p db/migrations
 	./bin/migrate create -dir db/migrations -ext sql $(@F)

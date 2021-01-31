@@ -11,6 +11,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"sync"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
@@ -795,52 +796,67 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
 	ctx, span := a.tracer.Start(ctx, "addDetailToFood")
 	defer span.End()
+
+	fatalErrors := make(chan error)
+	wgDone := make(chan bool)
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
 	fdcId := f.FdcId
-	nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
-	if err != nil {
-		return err
-	}
 
-	nutrientIDs := make([]int, len(nutrientRows))
-	for x, nr := range nutrientRows {
-		nutrientIDs[x] = nr.NutrientID
-	}
-	nutrients, err := a.DB().GetNutrients(ctx, nutrientIDs...)
-	if err != nil {
-		return err
-	}
-
-	nutrientsById := nutrients.ById()
-
-	fNutrients := make([]FoodNutrient, len(nutrientRows))
-	for x, nr := range nutrientRows {
-		nDetail := nutrientsById[nr.NutrientID]
-		fNutrients[x] = FoodNutrient{
-			Amount:     nr.Amount,
-			DataPoints: int(nr.DataPoints.Int64),
-			Nutrient: Nutrient{
-				Id:       nDetail.ID,
-				Name:     nDetail.Name,
-				UnitName: nDetail.UnitName,
-			},
+	fNutrients := make([]FoodNutrient, 0)
+	go func() {
+		nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
+		if err != nil {
+			fatalErrors <- err
 		}
-	}
 
-	f.Nutrients = fNutrients
-	brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
-	if err != nil {
-		return err
-	}
-	if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
-		f.BrandedInfo = &BrandedFood{
-			BrandOwner:          brandInfo.BrandOwner,
-			BrandedFoodCategory: brandInfo.BrandedFoodCategory,
-			HouseholdServing:    brandInfo.HouseholdServing,
-			Ingredients:         brandInfo.Ingredients,
-			ServingSize:         brandInfo.ServingSize,
-			ServingSizeUnit:     brandInfo.ServingSizeUnit,
+		nutrientIDs := make([]int, len(nutrientRows))
+		for x, nr := range nutrientRows {
+			nutrientIDs[x] = nr.NutrientID
 		}
-	}
+		nutrients, err := a.DB().GetNutrients(ctx, nutrientIDs...)
+		if err != nil {
+			fatalErrors <- err
+		}
+
+		nutrientsById := nutrients.ById()
+
+		for _, nr := range nutrientRows {
+			nDetail := nutrientsById[nr.NutrientID]
+			fNutrients = append(fNutrients, FoodNutrient{
+				Amount:     nr.Amount,
+				DataPoints: int(nr.DataPoints.Int64),
+				Nutrient: Nutrient{
+					Id:       nDetail.ID,
+					Name:     nDetail.Name,
+					UnitName: nDetail.UnitName,
+				},
+			})
+		}
+		wg.Done()
+	}()
+
+	var brandInfoRes BrandedFood
+
+	go func() {
+		brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
+		if err != nil {
+			fatalErrors <- err
+		}
+		if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
+			brandInfoRes = BrandedFood{
+				BrandOwner:          brandInfo.BrandOwner,
+				BrandedFoodCategory: brandInfo.BrandedFoodCategory,
+				HouseholdServing:    brandInfo.HouseholdServing,
+				Ingredients:         brandInfo.Ingredients,
+				ServingSize:         brandInfo.ServingSize,
+				ServingSizeUnit:     brandInfo.ServingSizeUnit,
+			}
+		}
+		wg.Done()
+	}()
 	category, err := a.DB().GetCategory(ctx, categoryId)
 	if err != nil {
 		return err
@@ -852,24 +868,46 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 		}
 	}
 
-	portions, err := a.DB().GetFoodPortions(ctx, fdcId)
-	if err != nil {
-		return err
-	}
 	apiPortions := make([]FoodPortion, 0)
-	if portionsById, ok := portions.ByFdcId()[fdcId]; ok {
-
-		for _, p := range portionsById {
-			apiPortions = append(apiPortions, FoodPortion{
-				Amount:             p.Amount.Float64,
-				GramWeight:         p.GramWeight,
-				Id:                 p.Id,
-				Modifier:           p.Modifier.String,
-				PortionDescription: p.PortionDescription.String,
-			})
+	go func() {
+		portions, err := a.DB().GetFoodPortions(ctx, fdcId)
+		if err != nil {
+			fatalErrors <- err
 		}
+
+		if portionsById, ok := portions.ByFdcId()[fdcId]; ok {
+
+			for _, p := range portionsById {
+				apiPortions = append(apiPortions, FoodPortion{
+					Amount:             p.Amount.Float64,
+					GramWeight:         p.GramWeight,
+					Id:                 p.Id,
+					Modifier:           p.Modifier.String,
+					PortionDescription: p.PortionDescription.String,
+				})
+			}
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	// Wait until either WaitGroup is done or an error is received through the channel
+	select {
+	case <-wgDone:
+		// carry on
+		break
+	case err := <-fatalErrors:
+		close(fatalErrors)
+		return fmt.Errorf("err on chann: %w", err)
 	}
+	f.Nutrients = fNutrients
 	f.Portions = &apiPortions
+	f.BrandedInfo = &brandInfoRes
+
 	return nil
 }
 func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
@@ -923,18 +961,41 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	}
 
 	items := make([]Food, len(foods))
-	for x, food := range foods {
-		f := Food{
-			Description: food.Description,
-			DataType:    FoodDataType(food.DataType),
-			FdcId:       food.FdcID,
-			Nutrients:   make([]FoodNutrient, 0),
-		}
-		err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
-		if err != nil {
-			return sendErr(c, http.StatusInternalServerError, err)
-		}
-		items[x] = f
+	var wg sync.WaitGroup
+	fatalErrors := make(chan error)
+	wgDone := make(chan bool)
+
+	for x := range foods {
+		wg.Add(1)
+		go func(i int) {
+			food := foods[i]
+			f := Food{
+				Description: food.Description,
+				DataType:    FoodDataType(food.DataType),
+				FdcId:       food.FdcID,
+				Nutrients:   make([]FoodNutrient, 0),
+			}
+			err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
+			if err != nil {
+				fatalErrors <- err
+			}
+			items[i] = f
+			wg.Done()
+		}(x)
+	}
+	go func() {
+		wg.Wait()
+		close(wgDone)
+	}()
+
+	// Wait until either WaitGroup is done or an error is received through the channel
+	select {
+	case <-wgDone:
+		// carry on
+		break
+	case err := <-fatalErrors:
+		close(fatalErrors)
+		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
 	listMeta.setTotalCount(count)
