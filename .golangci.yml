@@ -6,9 +6,10 @@ linters:
     - sqlclosecheck
     - misspell
     - noctx
-    - gomnd
     - gocritic
     - bodyclose
   presets:
     - bugs
     - unused
+  disable:
+    - gomnd
