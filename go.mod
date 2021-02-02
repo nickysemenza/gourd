@@ -3,7 +3,7 @@ module github.com/nickysemenza/gourd
 go 1.14
 
 require (
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.15.0
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.16.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/buckket/go-blurhash v1.1.0
@@ -34,10 +34,10 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.15.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.15.1
-	go.opentelemetry.io/otel v0.15.0
+	go.opentelemetry.io/otel v0.16.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.15.0
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.15.0
-	go.opentelemetry.io/otel/sdk v0.15.0
+	go.opentelemetry.io/otel/sdk v0.16.0
 	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.38.0
