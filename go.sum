@@ -181,6 +181,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/deepmap/oapi-codegen v1.5.0 h1:A/ZkNJH3WDWLZwVegxlYF/eJV4/cF7U4B8v9IYyrtFI=
 github.com/deepmap/oapi-codegen v1.5.0/go.mod h1:Eb1vtV3f58zvm37CJV4UAQ1bECb0fgAVvTdonC1ftJg=
+github.com/deepmap/oapi-codegen v1.5.1 h1:Xx8/OynzWhQeKFWr182hg6Ja2evS1gcqdja7qMn05yU=
+github.com/deepmap/oapi-codegen v1.5.1/go.mod h1:Eb1vtV3f58zvm37CJV4UAQ1bECb0fgAVvTdonC1ftJg=
 github.com/denis-tingajkin/go-header v0.4.2 h1:jEeSF4sdv8/3cT/WY8AgDHUoItNSoEZ7qg9dX7pc218=
 github.com/denis-tingajkin/go-header v0.4.2/go.mod h1:eLRHAVXzE5atsKAnNRDB90WHCFFnBUn4RN0nRcs1LJA=
 github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec h1:NfhRXXFDPxcF5Cwo06DzeIaE7uuJtAUhsDwH3LNsjos=
@@ -1109,6 +1111,7 @@ golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5/go.mod h1:KelEdhl1UZF7XfJ
 golang.org/x/oauth2 v0.0.0-20210126194326-f9ce19ea3013 h1:55H5j7lotzuFCEOKDsMch+fRNUQ9DgtyHOUP31FNqKc=
 golang.org/x/oauth2 v0.0.0-20210126194326-f9ce19ea3013/go.mod h1:KelEdhl1UZF7XfJ4dDtk6s++YSgaE7mD/BuKKDLBl4A=
 golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c/go.mod h1:KelEdhl1UZF7XfJ4dDtk6s++YSgaE7mD/BuKKDLBl4A=
+golang.org/x/oauth2 v0.0.0-20210210192628-66670185b0cd h1:2arJsLyTCJGek+eeptQ3z49Rqndm0f+zvvpwNIXWNIA=
 golang.org/x/oauth2 v0.0.0-20210210192628-66670185b0cd/go.mod h1:KelEdhl1UZF7XfJ4dDtk6s++YSgaE7mD/BuKKDLBl4A=
 golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
