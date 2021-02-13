@@ -41,6 +41,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210210192628-66670185b0cd
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.40.0
-	gopkg.in/guregu/null.v3 v3.5.0
+	gopkg.in/guregu/null/v4.v3 v4.0.0
 	sigs.k8s.io/yaml v1.2.0
 )
