@@ -15,6 +15,7 @@ models/Food.ts
 models/FoodCategory.ts
 models/FoodDataType.ts
 models/FoodNutrient.ts
+models/FoodNutrientUnit.ts
 models/FoodPortion.ts
 models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts

@@ -26,6 +26,7 @@ import {
 import { ButtonGroup } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
+import Nutrition from "../components/Nutrition";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -172,17 +173,40 @@ const RecipeDetail: React.FC = () => {
   const ingredientsSum = sumIngredients(recipe.detail.sections);
   const uniqIng = ingredientsSum.ingredients;
   let totalCal = 0;
+
+  let ingredientsWithNutrients: Array<{
+    ingredient: string;
+    nutrients: Map<string, number>;
+  }> = [];
+  const totalNutrients = new Map<string, number>();
+  // const foo = [];
   Object.keys(uniqIng).forEach((k) => {
     uniqIng[k].forEach((si) => {
-      const fdc_id = si.ingredient?.fdc_id;
+      if (si.ingredient === undefined) return;
+      const fdc_id = si.ingredient.fdc_id;
       if (fdc_id !== undefined) {
         const hint = recipe.food_hints && recipe.food_hints[fdc_id];
         if (hint !== undefined) {
           const scalingFactor = si.grams / 100;
           const cal = getCalories(hint) * scalingFactor;
+          const ingNutrients = new Map<string, number>();
+          hint.nutrients.forEach((n) => {
+            const { name, unit_name } = n.nutrient;
+            const label = `${name} (${unit_name})`;
+            if (n.amount <= 0) return;
+            totalNutrients.set(
+              label,
+              n.amount * scalingFactor + (totalNutrients.get(label) || 0)
+            );
+            ingNutrients.set(label, n.amount * scalingFactor);
+          });
+          ingredientsWithNutrients.push({
+            ingredient: si.ingredient.name,
+            nutrients: ingNutrients,
+          });
           totalCal += cal;
           console.log(
-            `${si.ingredient?.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
+            `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
             cal
           );
         }
@@ -190,6 +214,7 @@ const RecipeDetail: React.FC = () => {
     });
   });
   console.log("TOTAL", totalCal);
+  console.log("foo", totalNutrients, ingredientsWithNutrients);
   console.groupEnd();
 
   const totalGrams = recipe.detail.sections
@@ -317,6 +342,10 @@ const RecipeDetail: React.FC = () => {
       <pre>{encodeRecipe(recipe)}</pre>
       <h2>meals</h2>
 
+      <Nutrition
+        items={ingredientsWithNutrients}
+        h={[...totalNutrients.keys()]}
+      />
       <Debug
         data={{
           loading,

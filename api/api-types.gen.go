@@ -85,6 +85,21 @@ type FoodNutrient struct {
 	Nutrient Nutrient `json:"nutrient"`
 }
 
+// FoodNutrientUnit defines model for FoodNutrientUnit.
+type FoodNutrientUnit string
+
+// List of FoodNutrientUnit
+const (
+	FoodNutrientUnit_G      FoodNutrientUnit = "G"
+	FoodNutrientUnit_IU     FoodNutrientUnit = "IU"
+	FoodNutrientUnit_KCAL   FoodNutrientUnit = "KCAL"
+	FoodNutrientUnit_MG     FoodNutrientUnit = "MG"
+	FoodNutrientUnit_MG_ATE FoodNutrientUnit = "MG_ATE"
+	FoodNutrientUnit_SP_GR  FoodNutrientUnit = "SP_GR"
+	FoodNutrientUnit_UG     FoodNutrientUnit = "UG"
+	FoodNutrientUnit_kJ     FoodNutrientUnit = "kJ"
+)
+
 // FoodPortion defines model for FoodPortion.
 type FoodPortion struct {
 	Amount             float64 `json:"amount"`
@@ -225,10 +240,8 @@ type Nutrient struct {
 	Id int `json:"id"`
 
 	// todo
-	Name string `json:"name"`
-
-	// todo
-	UnitName string `json:"unit_name"`
+	Name     string           `json:"name"`
+	UnitName FoodNutrientUnit `json:"unit_name"`
 }
 
 // PaginatedFoods defines model for PaginatedFoods.

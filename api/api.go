@@ -831,7 +831,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 				Nutrient: Nutrient{
 					Id:       nDetail.ID,
 					Name:     nDetail.Name,
-					UnitName: nDetail.UnitName,
+					UnitName: FoodNutrientUnit(nDetail.UnitName),
 				},
 			})
 		}
