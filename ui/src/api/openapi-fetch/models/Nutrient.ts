@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    FoodNutrientUnit,
+    FoodNutrientUnitFromJSON,
+    FoodNutrientUnitFromJSONTyped,
+    FoodNutrientUnitToJSON,
+} from './';
+
 /**
  * todo
  * @export
@@ -32,11 +39,11 @@ export interface Nutrient {
      */
     name: string;
     /**
-     * todo
-     * @type {string}
+     * 
+     * @type {FoodNutrientUnit}
      * @memberof Nutrient
      */
-    unit_name: string;
+    unit_name: FoodNutrientUnit;
 }
 
 export function NutrientFromJSON(json: any): Nutrient {
@@ -51,7 +58,7 @@ export function NutrientFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         
         'id': json['id'],
         'name': json['name'],
-        'unit_name': json['unit_name'],
+        'unit_name': FoodNutrientUnitFromJSON(json['unit_name']),
     };
 }
 
@@ -66,7 +73,7 @@ export function NutrientToJSON(value?: Nutrient | null): any {
         
         'id': value.id,
         'name': value.name,
-        'unit_name': value.unit_name,
+        'unit_name': FoodNutrientUnitToJSON(value.unit_name),
     };
 }
 

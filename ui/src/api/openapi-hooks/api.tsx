@@ -415,10 +415,7 @@ export interface Nutrient {
    * todo
    */
   name: string;
-  /**
-   * todo
-   */
-  unit_name: string;
+  unit_name: FoodNutrientUnit;
 }
 
 /**
@@ -519,6 +516,16 @@ export type FoodDataType =
   | "agricultural_acquisition"
   | "sr_legacy_food"
   | "branded_food";
+
+export type FoodNutrientUnit =
+  | "UG"
+  | "G"
+  | "IU"
+  | "kJ"
+  | "KCAL"
+  | "MG"
+  | "MG_ATE"
+  | "SP_GR";
 
 export interface AuthLoginQueryParams {
   /**

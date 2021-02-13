@@ -990,7 +990,7 @@ components:
           type: string
         unit_name:
           description: todo
-          type: string
+          $ref: "#/components/schemas/FoodNutrientUnit"
     FoodNutrient:
       type: object
       description: todo
@@ -1126,6 +1126,9 @@ components:
           sr_legacy_food,
           branded_food,
         ]
+    FoodNutrientUnit:
+      type: string
+      enum: [UG, G, IU, kJ, KCAL, MG, MG_ATE, SP_GR]
   parameters:
     offsetParam:
       in: query

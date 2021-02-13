@@ -4,6 +4,7 @@ export * from './Food';
 export * from './FoodCategory';
 export * from './FoodDataType';
 export * from './FoodNutrient';
+export * from './FoodNutrientUnit';
 export * from './FoodPortion';
 export * from './GooglePhoto';
 export * from './GooglePhotosAlbum';
