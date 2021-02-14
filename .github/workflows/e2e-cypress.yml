@@ -21,7 +21,7 @@ jobs:
         run: docker-compose run ui
       - name: Dump docker logs on failure
         if: failure()
-        uses: jwalton/gh-docker-logs@v1
+        uses: jwalton/gh-docker-logs@v2
       - name: Archive cypress results
         uses: actions/upload-artifact@v2
         with:
