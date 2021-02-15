@@ -14522,6 +14522,36 @@ redoc@2.0.0-rc.49:
     tslib "^2.0.0"
     url-template "^2.0.8"
 
+redoc@2.0.0-rc.50:
+  version "2.0.0-rc.50"
+  resolved "https://registry.yarnpkg.com/redoc/-/redoc-2.0.0-rc.50.tgz#9206bf577327d149cf04c1b8c16f41e08f9cb6c5"
+  integrity sha512-SngLJr1YEDWIfp3YGBax8H8HQQ/gIqmf9YEmWsMACbAevsf7rt2tkTwALdjOf1pD27bVYfbZm1nud0QenoXsng==
+  dependencies:
+    "@redocly/react-dropdown-aria" "^2.0.11"
+    "@types/node" "^13.11.1"
+    classnames "^2.2.6"
+    decko "^1.2.0"
+    dompurify "^2.0.12"
+    eventemitter3 "^4.0.4"
+    json-pointer "^0.6.0"
+    json-schema-ref-parser "^6.1.0"
+    lunr "2.3.8"
+    mark.js "^8.11.1"
+    marked "^0.7.0"
+    memoize-one "~5.1.1"
+    mobx-react "^7.0.5"
+    openapi-sampler "^1.0.0-beta.18"
+    perfect-scrollbar "^1.4.0"
+    polished "^3.6.5"
+    prismjs "^1.22.0"
+    prop-types "^15.7.2"
+    react-tabs "^3.1.1"
+    slugify "^1.4.4"
+    stickyfill "^1.1.1"
+    swagger2openapi "^6.2.1"
+    tslib "^2.0.0"
+    url-template "^2.0.8"
+
 reduce-css-calc@^2.1.8:
   version "2.1.8"
   resolved "https://registry.yarnpkg.com/reduce-css-calc/-/reduce-css-calc-2.1.8.tgz#7ef8761a28d614980dc0c982f772c93f7a99de03"
