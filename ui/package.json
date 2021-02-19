@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.1.1",
     "@cypress/instrument-cra": "1.4.0",
     "@sentry/browser": "6.2.0",
     "@testing-library/jest-dom": "5.11.9",
@@ -27,8 +28,8 @@
     "immutability-helper": "3.1.1",
     "jwt-decode": "3.1.2",
     "parse-duration": "0.4.4",
+    "pluralize": "^8.0.0",
     "query-string": "6.14.0",
-    "pluralize": "8.0.0",
     "react": "17.0.1",
     "react-blurhash": "0.1.3",
     "react-cookie": "4.0.3",
@@ -46,9 +47,11 @@
     "react-toastify": "7.0.3",
     "redoc": "2.0.0-rc.50",
     "restful-react": "15.2.0",
+    "gourd_rs": "file:../rust/pkg",
     "styled-components": "5.2.1",
     "typescript": "4.1.5",
-    "universal-cookie": "4.0.4"
+    "universal-cookie": "4.0.4",
+    "wasm-loader": "^1.3.0"
   },
   "scripts": {
     "build:tailwind": "tailwind build src/tailwind.css -o src/tailwind.output.css",
@@ -56,7 +59,7 @@
     "prebuild": "run-s build:tailwind",
     "start": "npm-run-all build:tailwind --parallel watch:tailwind start:react",
     "x": "x",
-    "start:react": "REACT_APP_API_URL=http://localhost:4242 react-scripts -r @cypress/instrument-cra start",
+    "start:react": "REACT_APP_API_URL=http://localhost:4242 craco -r @cypress/instrument-cra start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

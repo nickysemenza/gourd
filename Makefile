@@ -78,7 +78,10 @@ migrate: bin/migrate
 migrate-down: bin/migrate
 	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
 
+generate: generate-rust generate-openapi
 
+generate-rust:
+	cd rust && wasm-pack build
 
 validate-openapi:
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
