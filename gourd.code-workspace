@@ -4,6 +4,9 @@
       "path": "ui"
     },
     {
+      "path": "rust"
+    },
+    {
       // https://code.visualstudio.com/docs/editor/multi-root-workspaces
       "name": "go",
       "path": "."
