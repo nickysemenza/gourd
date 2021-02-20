@@ -1,11 +1,18 @@
+FROM rust:1.50 as builder
+WORKDIR /work/rust
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+COPY rust/ .
+RUN pwd && ls
+RUN wasm-pack build
+
 FROM cypress/included:4.12.1
-# replace this with your application's default port
-WORKDIR /work
-COPY yarn.lock .
-COPY package.json .
+COPY --from=builder /work/rust/pkg /work/rust/pkg
+WORKDIR /work/ui
+COPY ui/yarn.lock .
+COPY ui/package.json .
 RUN yarn
 
-COPY . .
+COPY ui/ .
 ENV CYPRESS_BASE_URL=http://localhost:3001
 ENV REACT_APP_API_URL=http://gourd:4242
 EXPOSE 3001

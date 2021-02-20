@@ -70,34 +70,6 @@ jobs:
           file: /tmp/artifacts/coverage-full.txt
       - store_artifacts:
           path: /tmp/artifacts
-  build_ui:
-    docker:
-      - image: node:12
-    working_directory: ~/work
-    steps:
-      - checkout
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ checksum "ui/yarn.lock" }}
-      - run:
-          name: Install Dependencies
-          command: yarn install --frozen-lockfile
-          working_directory: ./ui
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "ui/yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
-      - run:
-          name: test
-          command: yarn coverage:unit
-          working_directory: ./ui
-      - codecov/upload:
-          file: ui/coverage/unit/coverage-final.json
-      - store_artifacts:
-          path: ui/coverage
-          destination: raw-ui-unit-test-coverage
   test_e2e:
     machine:
       docker_layer_caching: false
@@ -126,6 +98,5 @@ workflows:
   version: 2
   build_fullstack:
     jobs:
-      - build_ui
       - build_backend
       - test_e2e

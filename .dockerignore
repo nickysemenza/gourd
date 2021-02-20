@@ -1,3 +1,5 @@
 vendor/
-ui/*
+ui/node_modules/*
 bin/*
+rust/target/*
+rust/pkg/*

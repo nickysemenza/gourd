@@ -13,8 +13,8 @@ const Playground: React.FC = () => {
   useEffect(() => {
     if (!instance) return;
     instance.greet();
-    console.log(instance.parse2("2 cups flour, sifted"));
-    console.log(instance.parse3("2 cups flour, sifted"));
+    console.log(instance.parse("2 cups (240g) flour, sifted"));
+    console.log(instance.parse3("2 cups (240g) flour, sifted"));
     // greet();
     // parse("2 cups flour");
   }, [instance]);
