@@ -31,13 +31,14 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.22.6
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.16.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.17.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.16.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.16.0
-	go.opentelemetry.io/otel v0.16.0
+	go.opentelemetry.io/otel v0.17.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.16.0
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.16.0
 	go.opentelemetry.io/otel/sdk v0.16.0
+	go.opentelemetry.io/otel/trace v0.17.0
 	golang.org/x/oauth2 v0.0.0-20210220000619-9bb904979d93
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.40.0
