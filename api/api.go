@@ -21,7 +21,7 @@ import (
 	"github.com/nickysemenza/gourd/manager"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 type API struct {

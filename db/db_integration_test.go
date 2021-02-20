@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 //nolint: funlen

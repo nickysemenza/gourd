@@ -17,7 +17,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/otel"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 // FetchAndTransform returns a recipe.

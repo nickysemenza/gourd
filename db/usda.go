@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	sq "github.com/Masterminds/squirrel"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 type Food struct {

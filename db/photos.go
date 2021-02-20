@@ -9,7 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/common"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (c *Client) GetKV(ctx context.Context, key string) (string, error) {

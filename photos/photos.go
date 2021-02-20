@@ -18,7 +18,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
-	"gopkg.in/guregu/null.v3/zero"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
