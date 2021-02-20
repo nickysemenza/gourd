@@ -27,6 +27,7 @@ import { ButtonGroup } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
+import { useWasm } from "../wasm";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -34,6 +35,8 @@ const RecipeDetail: React.FC = () => {
   const { loading, error, data } = useGetRecipeById({
     recipe_id: id || "",
   });
+
+  const w = useWasm();
 
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<Override>();
@@ -339,7 +342,7 @@ const RecipeDetail: React.FC = () => {
           ` (${Math.round(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <h2>raw</h2>
-      <pre>{encodeRecipe(recipe)}</pre>
+      <pre>{w && encodeRecipe(recipe, w)}</pre>
       <h2>meals</h2>
 
       <Nutrition

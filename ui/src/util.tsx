@@ -18,7 +18,8 @@ export const getIngredient = (
 };
 
 export const formatText = (text: React.ReactText) => {
-  const re = /[\d]* ?F/g;
+  // regexr.com/5mt55
+  const re = /[\d]+ ?F/g;
 
   if (typeof text === "number") {
     return text;

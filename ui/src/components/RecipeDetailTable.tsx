@@ -35,6 +35,7 @@ import {
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
+import { useWasm } from "../wasm";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -68,6 +69,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     0
   );
   const showBP = flourMass > 0;
+
+  const instance = useWasm();
 
   const iActions = (x: number, y: number, i: I) =>
     edit && (
@@ -269,7 +272,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         </div>
         {!!ingredient.original && (
           <div className="italic text-xs pb-2">
-            original: {ingredient.original}
+            original: {ingredient.original} (
+            {instance && instance.parse(ingredient.original)})
           </div>
         )}
       </div>
