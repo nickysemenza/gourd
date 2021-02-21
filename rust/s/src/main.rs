@@ -2,8 +2,15 @@ use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, H
 use actix_web_opentelemetry::RequestTracing;
 use futures::StreamExt;
 use json_example::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
-use opentelemetry::global;
-use opentelemetry::sdk::trace::{self, Sampler};
+use opentelemetry::{
+    global,
+    sdk::{
+        propagation::TraceContextPropagator,
+        trace::{self, Sampler},
+    },
+    trace::Tracer,
+};
+use opentelemetry::{trace::get_active_span, KeyValue};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -73,12 +80,14 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
-    let tracer = opentelemetry::sdk::export::trace::stdout::new_pipeline()
-        .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
-        .install();
-    println!("tracer: {:?}", tracer);
+    // let tracer = opentelemetry::sdk::export::trace::stdout::new_pipeline()
+    //     .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
+    //     .install();
+    // println!("tracer: {:?}", tracer);
 
     // global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
+    // not jaeger, this one: https://github.com/openebs/Mayastor/blob/master/control-plane/rest/service/src/main.rs#L64
+    global::set_text_map_propagator(TraceContextPropagator::new());
     let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
         .with_service_name("actix_server")
         .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
@@ -111,12 +120,16 @@ fn is_gram(a: &ingredient::Amount) -> bool {
     a.unit == "g" || a.unit == "grams"
 }
 fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
-    let i = ingredient::from_str(s, true)?;
+    global::tracer("my-component").start("parse_ingredient");
 
-    let grams: f64 = match i.amounts.iter().find(|&x| is_gram(x)) {
-        Some(g) => g.value.into(),
-        None => 0.0,
-    };
+    get_active_span(|span| {
+        span.add_event(
+            "parse".to_string(),
+            vec![KeyValue::new("ingredient", s.to_string())],
+        );
+    });
+
+    let i = ingredient::from_str(s, true)?;
 
     let (unit, amount) = match i.amounts.iter().find(|&x| !is_gram(x)) {
         Some(i) => (Some(i.unit.clone()), Some(i.value as f64)),
@@ -128,7 +141,14 @@ fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
         amount,
         adjective: i.modifier,
         ingredient: Some(Ingredient::new("".to_string(), i.name)),
-        ..SectionIngredient::new("".to_string(), Kind::Ingredient, grams)
+        ..SectionIngredient::new(
+            "".to_string(),
+            Kind::Ingredient,
+            match i.amounts.iter().find(|&x| is_gram(x)) {
+                Some(g) => g.value.into(),
+                None => 0.0,
+            },
+        )
     })
 }
 

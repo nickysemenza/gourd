@@ -13,6 +13,7 @@ import (
 
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
@@ -42,6 +43,7 @@ func initTracer() error {
 			}),
 			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
 		)
+		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 		return err
 	}
 
