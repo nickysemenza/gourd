@@ -1,6 +1,6 @@
 use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use futures::StreamExt;
-use json_example::models::{section_ingredient::Kind, SectionIngredient};
+use json_example::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,6 +18,21 @@ async fn index(item: web::Json<MyObj>) -> HttpResponse {
         Kind::Ingredient,
         0.0,
     ));
+
+    HttpResponse::Ok().json(foo.0) // <- send response
+}
+
+#[derive(Deserialize)]
+struct Info {
+    text: String,
+}
+
+async fn parser(info: web::Query<Info>) -> HttpResponse {
+    let i = parse_ingredient(&info.text);
+    if i.is_err() {
+        return HttpResponse::BadRequest().finish();
+    }
+    let foo = web::Json(i.unwrap());
 
     HttpResponse::Ok().json(foo.0) // <- send response
 }
@@ -61,6 +76,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .data(web::JsonConfig::default().limit(4096)) // <- limit size of the payload (global configuration)
             .service(web::resource("/extractor").route(web::post().to(index)))
+            .service(web::resource("/parse").route(web::get().to(parser)))
             .service(
                 web::resource("/extractor2")
                     .data(web::JsonConfig::default().limit(1024)) // <- limit size of the payload (resource level)
@@ -72,6 +88,31 @@ async fn main() -> std::io::Result<()> {
     .bind("127.0.0.1:8080")?
     .run()
     .await
+}
+
+fn is_gram(a: &ingredient::Amount) -> bool {
+    a.unit == "g" || a.unit == "grams"
+}
+fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
+    let i = ingredient::from_str(s, true)?;
+
+    let grams: f64 = match i.amounts.iter().find(|&x| is_gram(x)) {
+        Some(g) => g.value.into(),
+        None => 0.0,
+    };
+
+    let (unit, amount) = match i.amounts.iter().find(|&x| !is_gram(x)) {
+        Some(i) => (Some(i.unit.clone()), Some(i.value as f64)),
+        None => (None, None),
+    };
+
+    Ok(SectionIngredient {
+        unit,
+        amount,
+        adjective: i.modifier,
+        ingredient: Some(Ingredient::new("".to_string(), i.name)),
+        ..SectionIngredient::new("".to_string(), Kind::Ingredient, grams)
+    })
 }
 
 #[cfg(test)]
@@ -102,7 +143,37 @@ mod tests {
             _ => panic!("Response error"),
         };
 
-        assert_eq!(response_body, r##"{"name":"my-name","number":43}"##);
+        assert_eq!(
+            response_body,
+            r##"{"id":"","kind":"ingredient","grams":0.0}"##
+        );
+
+        Ok(())
+    }
+    #[actix_rt::test]
+    async fn test_parse() -> Result<(), Error> {
+        let mut app = test::init_service(
+            App::new().service(web::resource("/parse").route(web::get().to(parser))),
+        )
+        .await;
+
+        let req = test::TestRequest::get()
+            .uri("/parse?text=1%20cup%20(120%20grams)%20flour,%20lighty%20sifted")
+            .param("text", "1 cup flour")
+            .to_request();
+        let resp = app.call(req).await.unwrap();
+
+        assert_eq!(resp.status(), http::StatusCode::OK);
+
+        let response_body = match resp.response().body().as_ref() {
+            Some(actix_web::body::Body::Bytes(bytes)) => bytes,
+            _ => panic!("Response error"),
+        };
+
+        assert_eq!(
+            response_body,
+            r##"{"id":"","kind":"ingredient","ingredient":{"id":"","name":"flour"},"grams":120.0,"amount":1.0,"unit":"cup","adjective":"lighty sifted"}"##
+        );
 
         Ok(())
     }
