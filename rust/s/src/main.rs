@@ -1,6 +1,9 @@
 use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_web_opentelemetry::RequestTracing;
 use futures::StreamExt;
 use json_example::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
+use opentelemetry::global;
+use opentelemetry::sdk::trace::{self, Sampler};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -70,8 +73,22 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=info");
     env_logger::init();
 
+    let tracer = opentelemetry::sdk::export::trace::stdout::new_pipeline()
+        .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
+        .install();
+    println!("tracer: {:?}", tracer);
+
+    // global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
+    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+        .with_service_name("actix_server")
+        .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
+        .install()
+        .expect("pipeline install error");
+    println!("tracer: {:?}", tracer);
+
     HttpServer::new(|| {
         App::new()
+            .wrap(RequestTracing::new())
             // enable logger
             .wrap(middleware::Logger::default())
             .data(web::JsonConfig::default().limit(4096)) // <- limit size of the payload (global configuration)

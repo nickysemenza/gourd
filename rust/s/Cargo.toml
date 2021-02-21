@@ -13,6 +13,9 @@ serde_json = "1.0"
 serde_derive = "^1.0"
 url = "1.5"
 ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
+actix-web-opentelemetry = "0.10.0"
+opentelemetry-jaeger = "0.11.0"
+opentelemetry = "0.12.0"
 
 [dev-dependencies]
 actix-rt = "1"
