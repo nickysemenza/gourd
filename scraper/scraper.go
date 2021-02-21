@@ -14,6 +14,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/parser"
+	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/otel"
@@ -38,6 +39,14 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 	section := api.RecipeSection{}
 
 	for _, item := range recipe.RecipeIngredient {
+
+		apiIngredient := api.SectionIngredient{}
+		err = rs_client.ParseIngredient(ctx, item, &apiIngredient)
+		if err != nil {
+			return nil, err
+		}
+		section.Ingredients = append(section.Ingredients, apiIngredient)
+
 		i, err := parser.Parse(ctx, item)
 		if err != nil {
 			msg := fmt.Sprintf("failed to parse: %s", err)
