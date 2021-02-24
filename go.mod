@@ -30,7 +30,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	go.opencensus.io v0.22.6
+	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.17.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.17.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.17.0
