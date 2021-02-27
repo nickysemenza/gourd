@@ -89,6 +89,8 @@ generate-openapi: validate-openapi
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
+	openapi-generator generate -i api/openapi.yaml -o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
+
 
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher

@@ -1,7 +1,7 @@
 use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_opentelemetry::RequestTracing;
 use futures::StreamExt;
-use json_example::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
+use openapi::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
 use opentelemetry::{
     global,
     sdk::{
@@ -38,7 +38,16 @@ struct Info {
 }
 
 async fn parser(info: web::Query<Info>) -> HttpResponse {
-    let i = parse_ingredient(&info.text);
+    global::tracer("my-component").start("parser");
+
+    get_active_span(|span| {
+        span.add_event(
+            "parse".to_string(),
+            vec![KeyValue::new("ingredient", info.text.to_string())],
+        );
+    });
+
+    let i = gourd_common::parse_ingredient(&info.text);
     if i.is_err() {
         return HttpResponse::BadRequest().finish();
     }
@@ -116,41 +125,41 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-fn is_gram(a: &ingredient::Amount) -> bool {
-    a.unit == "g" || a.unit == "grams"
-}
-fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
-    global::tracer("my-component").start("parse_ingredient");
+// fn is_gram(a: &ingredient::Amount) -> bool {
+//     a.unit == "g" || a.unit == "grams"
+// }
+// fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
+//     global::tracer("my-component").start("parse_ingredient");
 
-    get_active_span(|span| {
-        span.add_event(
-            "parse".to_string(),
-            vec![KeyValue::new("ingredient", s.to_string())],
-        );
-    });
+//     get_active_span(|span| {
+//         span.add_event(
+//             "parse".to_string(),
+//             vec![KeyValue::new("ingredient", s.to_string())],
+//         );
+//     });
 
-    let i = ingredient::from_str(s, true)?;
+//     let i = ingredient::from_str(s, true)?;
 
-    let (unit, amount) = match i.amounts.iter().find(|&x| !is_gram(x)) {
-        Some(i) => (Some(i.unit.clone()), Some(i.value as f64)),
-        None => (None, None),
-    };
+//     let (unit, amount) = match i.amounts.iter().find(|&x| !is_gram(x)) {
+//         Some(i) => (Some(i.unit.clone()), Some(i.value as f64)),
+//         None => (None, None),
+//     };
 
-    Ok(SectionIngredient {
-        unit,
-        amount,
-        adjective: i.modifier,
-        ingredient: Some(Ingredient::new("".to_string(), i.name)),
-        ..SectionIngredient::new(
-            "".to_string(),
-            Kind::Ingredient,
-            match i.amounts.iter().find(|&x| is_gram(x)) {
-                Some(g) => g.value.into(),
-                None => 0.0,
-            },
-        )
-    })
-}
+//     Ok(SectionIngredient {
+//         unit,
+//         amount,
+//         adjective: i.modifier,
+//         ingredient: Some(Ingredient::new("".to_string(), i.name)),
+//         ..SectionIngredient::new(
+//             "".to_string(),
+//             Kind::Ingredient,
+//             match i.amounts.iter().find(|&x| is_gram(x)) {
+//                 Some(g) => g.value.into(),
+//                 None => 0.0,
+//             },
+//         )
+//     })
+// }
 
 #[cfg(test)]
 mod tests {

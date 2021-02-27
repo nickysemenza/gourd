@@ -65,6 +65,13 @@ pub fn parse3(input: &str) -> JsValue {
 }
 
 #[wasm_bindgen]
+pub fn parse4(input: &str) -> JsValue {
+    let si = gourd_common::parse_ingredient(input).unwrap();
+    JsValue::from_serde(&si).unwrap()
+}
+
+
+#[wasm_bindgen]
 pub fn format_ingredient(val: &JsValue) -> String {
     let i: ingredient::Ingredient = val.into_serde().unwrap();
     return i.to_string();
