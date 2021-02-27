@@ -1,7 +1,7 @@
 use actix_web::{error, middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_opentelemetry::RequestTracing;
 use futures::StreamExt;
-use openapi::models::{section_ingredient::Kind, Ingredient, SectionIngredient};
+use openapi::models::{section_ingredient::Kind, SectionIngredient};
 use opentelemetry::{
     global,
     sdk::{
