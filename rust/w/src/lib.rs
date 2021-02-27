@@ -1,5 +1,7 @@
 mod utils;
 
+use gourd_common::sum_ingredients;
+use openapi::models::RecipeDetail;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -8,15 +10,15 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[wasm_bindgen]
-extern "C" {
-    fn alert(s: &str);
-}
+// #[wasm_bindgen]
+// extern "C" {
+//     fn alert(s: &str);
+// }
 
-#[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, gourd!");
-}
+// #[wasm_bindgen]
+// pub fn greet() {
+//     alert("Hello, gourd!");
+// }
 
 #[wasm_bindgen]
 pub fn parse(input: &str) -> String {
@@ -52,10 +54,16 @@ interface Ingredient {
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen()]
-    pub type ITextStyle;
-    #[wasm_bindgen(typescript_type = "-1 | 0 | 1")]
+    #[wasm_bindgen(typescript_type = "Ingredient")]
+    pub type IIngredient;
+    #[wasm_bindgen(typescript_type = "Ingredient")]
     type Foo;
+}
+
+#[wasm_bindgen]
+pub fn parse2(input: &str) -> Result<IIngredient, JsValue> {
+    let i = ingredient::from_str(input, true).unwrap();
+    Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
 #[wasm_bindgen]
@@ -70,11 +78,17 @@ pub fn parse4(input: &str) -> JsValue {
     JsValue::from_serde(&si).unwrap()
 }
 
-
 #[wasm_bindgen]
-pub fn format_ingredient(val: &JsValue) -> String {
+pub fn format_ingredient(val: &IIngredient) -> String {
     let i: ingredient::Ingredient = val.into_serde().unwrap();
     return i.to_string();
+}
+
+#[wasm_bindgen]
+pub fn sum_ingr(recipe_detail: &JsValue) -> JsValue {
+    let r: RecipeDetail = recipe_detail.into_serde().unwrap();
+    let res = sum_ingredients(r);
+    JsValue::from_serde(&res).unwrap()
 }
 
 // #[wasm_bindgen]

@@ -14,6 +14,7 @@ default = ["console_error_panic_hook"]
 wasm-bindgen = { version = "0.2.71", features = ["serde-serialize"] }
 ingredient = "0.1.2"
 gourd_common = {path = "../common"}
+openapi = {path = "../openapi"}
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
