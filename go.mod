@@ -17,7 +17,7 @@ require (
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
-	github.com/golangci/golangci-lint v1.37.1
+	github.com/golangci/golangci-lint v1.38.0
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/jmoiron/sqlx v1.3.1
