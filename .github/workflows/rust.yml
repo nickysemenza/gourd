@@ -1,0 +1,19 @@
+on: [push]
+
+name: rust build + test
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose
+        working-directory: rust/common
+      - name: Run tests
+        run: cargo test --verbose
+        working-directory: rust/common

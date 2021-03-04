@@ -11,7 +11,11 @@
   fdc_id: 748967
 - name: all purpose flour
   fdc_id: 804415
+- name: flour
+  fdc_id: 804415
 - name: kosher salt
+  fdc_id: 705264
+- name: salt
   fdc_id: 705264
 - name: unsalted butter
   fdc_id: 798135
@@ -29,3 +33,5 @@
   fdc_id: 368813
 - name: pastry flour
   fdc_id: 532183
+- name: brown sugar
+  fdc_id: 577990
