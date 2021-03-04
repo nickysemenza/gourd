@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 
 import { useParams } from "react-router-dom";
 import RecipeDetailTable, {
   UpdateIngredientProps,
 } from "../components/RecipeDetailTable";
-import Debug from "../components/Debug";
 import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import { encodeRecipe } from "../parser";
@@ -27,16 +26,16 @@ import { ButtonGroup } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
-import { useWasm } from "../wasm";
+import { WasmContext } from "../wasm";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
 
-  const { loading, error, data } = useGetRecipeById({
+  const { error, data } = useGetRecipeById({
     recipe_id: id || "",
   });
 
-  const w = useWasm();
+  const w = useContext(WasmContext);
 
   const [multiplier, setMultiplier] = useState(1.0);
   const [override, setOverride] = useState<Override>();
@@ -261,7 +260,7 @@ const RecipeDetail: React.FC = () => {
           </div>
           <div>
             {(detail.sources || []).map((source, i) => (
-              <div className="flex text-gray-600 space-x-1">
+              <div className="flex text-gray-600 space-x-1" key={i}>
                 <div className="text-xs font-bold uppercase self-center">
                   from:
                 </div>
@@ -349,7 +348,7 @@ const RecipeDetail: React.FC = () => {
         items={ingredientsWithNutrients}
         h={[...totalNutrients.keys()]}
       />
-      <Debug
+      {/* <Debug
         data={{
           loading,
           error,
@@ -358,7 +357,7 @@ const RecipeDetail: React.FC = () => {
           recipe,
           foo: ingredientsSum,
         }}
-      />
+      /> */}
     </div>
   );
 };

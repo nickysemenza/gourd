@@ -27,6 +27,7 @@ import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import IngredientDetail from "./pages/IngredientDetail";
+import { WasmContextProvider } from "./wasm";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -56,50 +57,52 @@ function App() {
         onRequest={onAPIRequest}
         onError={onAPIError}
       >
-        <Router>
-          <ToastContainer position="bottom-right" />
-          <NavBar />
-          <div className="lg:container lg:mx-auto">
-            <Switch>
-              <Route path="/recipe/:id">
-                <RecipeDetail />
-              </Route>
-              <Route path="/recipes">
-                <RecipeList />
-              </Route>
-              <Route path="/ingredients/:id">
-                <IngredientDetail />
-              </Route>
-              <Route path="/ingredients">
-                <IngredientList />
-              </Route>
-              <Route path="/create">
-                <CreateRecipe />
-              </Route>
-              <Route path="/food">
-                <Food />
-              </Route>
-              <Route path="/docs">
-                <Docs />
-              </Route>
-              <Route path="/playground">
-                <Playground />
-              </Route>
-              <PrivateRoute path="/photos">
-                <Photos />
-              </PrivateRoute>
-              <PrivateRoute path="/meals">
-                <Meals />
-              </PrivateRoute>
-              <PrivateRoute path="/albums">
-                <Albums />
-              </PrivateRoute>
-              <Route path="/">
-                <Test />
-              </Route>
-            </Switch>
-          </div>
-        </Router>
+        <WasmContextProvider>
+          <Router>
+            <ToastContainer position="bottom-right" />
+            <NavBar />
+            <div className="lg:container lg:mx-auto">
+              <Switch>
+                <Route path="/recipe/:id">
+                  <RecipeDetail />
+                </Route>
+                <Route path="/recipes">
+                  <RecipeList />
+                </Route>
+                <Route path="/ingredients/:id">
+                  <IngredientDetail />
+                </Route>
+                <Route path="/ingredients">
+                  <IngredientList />
+                </Route>
+                <Route path="/create">
+                  <CreateRecipe />
+                </Route>
+                <Route path="/food">
+                  <Food />
+                </Route>
+                <Route path="/docs">
+                  <Docs />
+                </Route>
+                <Route path="/playground">
+                  <Playground />
+                </Route>
+                <PrivateRoute path="/photos">
+                  <Photos />
+                </PrivateRoute>
+                <PrivateRoute path="/meals">
+                  <Meals />
+                </PrivateRoute>
+                <PrivateRoute path="/albums">
+                  <Albums />
+                </PrivateRoute>
+                <Route path="/">
+                  <Test />
+                </Route>
+              </Switch>
+            </div>
+          </Router>
+        </WasmContextProvider>
 
         <hr />
       </RestfulProvider>

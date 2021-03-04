@@ -28,5 +28,5 @@ export const encodeRecipe = (recipe: RecipeWrapper, w: wasm): string =>
             .map((i) => encodeIngredient(i, w.format_ingredient))
             .join("\n")
         )
-        .join("\n")
+        .join("\n\n")
     : "";

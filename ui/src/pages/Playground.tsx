@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PaginatedRecipes, RecipesApi } from "../api/openapi-fetch";
 import RecipeDiff from "../components/RecipeDiff";
 import { getAPIURL, getOpenapiFetchConfig } from "../config";
-import { useWasm } from "../wasm";
+import { WasmContext } from "../wasm";
 
 const Playground: React.FC = () => {
   const url = getAPIURL();
   const [r2, setR2] = useState<PaginatedRecipes>();
 
-  const instance = useWasm();
+  const instance = useContext(WasmContext);
 
   useEffect(() => {
     if (!instance) return;
