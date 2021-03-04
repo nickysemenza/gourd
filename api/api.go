@@ -902,7 +902,9 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 		break
 	case err := <-fatalErrors:
 		close(fatalErrors)
-		return fmt.Errorf("err on chann: %w", err)
+		err = fmt.Errorf("err on chann: %w", err)
+		log.Print(err)
+		return err
 	}
 	f.Nutrients = fNutrients
 	f.Portions = &apiPortions
