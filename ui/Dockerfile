@@ -2,11 +2,12 @@ FROM rust:1.50 as builder
 WORKDIR /work/rust
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 COPY rust/ .
+WORKDIR /work/rust/w
 RUN pwd && ls
 RUN wasm-pack build
 
 FROM cypress/included:4.12.1
-COPY --from=builder /work/rust/pkg /work/rust/pkg
+COPY --from=builder /work/rust/w/pkg /work/rust/w/pkg
 WORKDIR /work/ui
 COPY ui/yarn.lock .
 COPY ui/package.json .

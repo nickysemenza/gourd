@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import {
   RecipeWrapper,
   RecipeSection,
@@ -35,7 +35,7 @@ import {
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
-import { useWasm } from "../wasm";
+import { WasmContext } from "../wasm";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -70,7 +70,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   );
   const showBP = flourMass > 0;
 
-  const instance = useWasm();
+  const instance = useContext(WasmContext);
 
   const iActions = (x: number, y: number, i: I) =>
     edit && (
@@ -300,7 +300,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       </TableCell>
       <TableCell>
         {section.ingredients.map((ingredient, y) => (
-          <div>
+          <div key={y}>
             {renderIngredientItem(ingredient, x, y)}{" "}
             {(ingredient.substitutes || []).map((sub, z) =>
               renderIngredientItem(sub, x, y, z)

@@ -30,6 +30,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
         const iconDim = compact ? 3 : 4;
         return (
           <button
+            key={x}
             className={`${baseStyles} ${x === 0 && "rounded-l-lg"} ${
               x === buttons.length - 1 && "rounded-r-lg"
             }`}

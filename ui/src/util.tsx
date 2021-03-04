@@ -37,7 +37,7 @@ export const formatText = (text: React.ReactText) => {
     const matchEnd = matchStart + match[0].length;
     pairs.push(text.substring(lastProcessed, matchStart));
     pairs.push(
-      <code className="text-red-800 mx-1">
+      <code className="text-red-800 mx-1" key={matchStart}>
         {text.substring(matchStart, matchEnd)}
       </code>
     );
