@@ -189,6 +189,24 @@ export const updateTimeRange = (
       })
     : recipe;
 
+export const replaceIngredients = (
+  recipe: RecipeWrapper,
+  ings: SectionIngredient[]
+) =>
+  update(recipe, {
+    detail: {
+      sections: {
+        $set: [
+          {
+            id: "",
+            duration: { min: 0, max: 0 },
+            ingredients: ings,
+            instructions: [],
+          },
+        ],
+      },
+    },
+  });
 export type I = keyof Pick<RecipeSection, "ingredients" | "instructions">;
 const calculateMoveI = (
   recipe: RecipeWrapper,

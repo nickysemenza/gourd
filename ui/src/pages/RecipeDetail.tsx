@@ -18,6 +18,7 @@ import {
   getCalories,
   Override,
   RecipeTweaks,
+  replaceIngredients,
   sumIngredients,
   updateRecipeName,
   updateRecipeSource,
@@ -27,6 +28,7 @@ import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
+import InstructionsListParser from "../components/InstructionsListParser";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -328,6 +330,11 @@ const RecipeDetail: React.FC = () => {
         updateIngredient={updateIngredient}
         recipe={recipe}
         setRecipe={setRecipe}
+      />
+      <InstructionsListParser
+        setSectionIngredients={(ings) => {
+          setRecipe(replaceIngredients(recipe, ings));
+        }}
       />
       <h1>totals</h1>
       <div>

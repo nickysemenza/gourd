@@ -901,7 +901,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 		// carry on
 		break
 	case err := <-fatalErrors:
-		close(fatalErrors)
+		// close(fatalErrors)
 		err = fmt.Errorf("err on chann: %w", err)
 		log.Print(err)
 		return err
@@ -996,7 +996,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 		// carry on
 		break
 	case err := <-fatalErrors:
-		close(fatalErrors)
+		// close(fatalErrors)
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
 

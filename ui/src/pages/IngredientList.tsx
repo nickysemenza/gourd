@@ -9,7 +9,7 @@ import { getOpenapiFetchConfig } from "../config";
 import { toast } from "react-toastify";
 import { ButtonGroup } from "../components/Button";
 import { RecipeLink } from "../components/Misc";
-import { PlusCircle } from "react-feather";
+import { AlertTriangle, PlusCircle } from "react-feather";
 import { Code } from "../util";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
@@ -30,7 +30,12 @@ const IngredientList: React.FC = () => {
     queryParams: params,
   });
 
-  const ingredients = data?.ingredients || [];
+  const [onlyMissingFDC, setOnlyMissingFDC] = useState(false);
+
+  const ingredients = (data?.ingredients || []).filter((i) =>
+    onlyMissingFDC ? !i.food : true
+  );
+
   type i = typeof ingredients[0];
 
   const columns: Array<Column<i>> = React.useMemo(() => {
@@ -132,6 +137,7 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           return (
             <FoodSearch
+              enableSearch={onlyMissingFDC}
               name={original.ingredient.name}
               highlightId={original.food?.fdc_id}
               onLink={(fdcId: number) => {
@@ -142,10 +148,22 @@ const IngredientList: React.FC = () => {
         },
       },
     ];
-  }, []);
+  }, [onlyMissingFDC]);
 
   return (
     <>
+      <ButtonGroup
+        compact
+        buttons={[
+          {
+            text: onlyMissingFDC ? "show all" : "only show missing FDC",
+            onClick: () => {
+              setOnlyMissingFDC(!onlyMissingFDC);
+            },
+            IconLeft: AlertTriangle,
+          },
+        ]}
+      />
       <PaginatedTable
         columns={columns}
         data={ingredients}

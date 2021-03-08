@@ -43,6 +43,7 @@ const FoodSearch: React.FC<{
         {enableSearch && (
           <div className="w-full">
             <input
+              className="border-2 border-gray-300"
               value={ingredientName}
               onChange={(e) => {
                 setIngredientName(e.target.value);
