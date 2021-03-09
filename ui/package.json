@@ -86,7 +86,7 @@
     "@cypress/instrument-cra": "1.4.0",
     "@testing-library/jest-dom": "5.11.9",
     "@testing-library/react": "11.2.5",
-    "@testing-library/user-event": "12.8.1",
+    "@testing-library/user-event": "12.8.3",
     "autoprefixer": "10.2.5",
     "chokidar-cli": "2.1.0",
     "cypress": "6.6.0",
