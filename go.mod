@@ -22,7 +22,7 @@ require (
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/jmoiron/sqlx v1.3.1
 	github.com/kjk/notionapi v0.0.0-20201230072046-b69038831038
-	github.com/labstack/echo/v4 v4.2.0
+	github.com/labstack/echo/v4 v4.2.1
 	github.com/lib/pq v1.9.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/ory/go-acc v0.2.6
