@@ -17,7 +17,7 @@ import (
 	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -79,7 +79,7 @@ func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.Me
 	for _, b := range batchResult.MediaItemResults {
 		items = append(items, b.MediaItem)
 	}
-	span.SetAttributes(label.Any("result-raw", batchResult))
+	span.SetAttributes(attribute.Any("result-raw", batchResult))
 
 	return items, nil
 }

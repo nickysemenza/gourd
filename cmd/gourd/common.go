@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
 
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
-	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/propagation"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
@@ -37,8 +37,8 @@ func initTracer() error {
 			jaeger.WithCollectorEndpoint(endpoint),
 			jaeger.WithProcess(jaeger.Process{
 				ServiceName: "gourd",
-				Tags: []label.KeyValue{
-					label.String("exporter", "jaeger"),
+				Tags: []attribute.KeyValue{
+					attribute.String("exporter", "jaeger"),
 				},
 			}),
 			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),

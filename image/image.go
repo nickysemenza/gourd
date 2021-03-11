@@ -12,7 +12,7 @@ import (
 
 	"github.com/buckket/go-blurhash"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 const aspectWidth = 4
@@ -47,7 +47,7 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}
-	span.SetAttributes(label.String("image.format", format))
+	span.SetAttributes(attribute.String("image.format", format))
 	return m, err
 
 }

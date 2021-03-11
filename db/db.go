@@ -11,7 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/nickysemenza/gourd/common"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -221,6 +221,6 @@ func (c *Client) execTx(ctx context.Context, tx *sql.Tx, q sq.Sqlizer) (sql.Resu
 	if err != nil {
 		return nil, err
 	}
-	span.SetAttributes(label.Int64("rows_affected", rows))
+	span.SetAttributes(attribute.Int64("rows_affected", rows))
 	return res, nil
 }

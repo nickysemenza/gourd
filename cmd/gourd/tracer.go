@@ -7,7 +7,7 @@ import (
 
 	"github.com/luna-duclos/instrumentedsql"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -47,7 +47,7 @@ func (s span) NewChild(name string) instrumentedsql.Span {
 }
 
 func (s span) SetLabel(k, v string) {
-	s.parent.SetAttributes(label.Key(k).String(v))
+	s.parent.SetAttributes(attribute.Key(k).String(v))
 }
 
 func (s span) SetError(err error) {
