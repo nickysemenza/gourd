@@ -8,12 +8,14 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        crate: ["rust/common", "rust/w", "rust/s"]
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: cargo build ${{ matrix.crate }}
         run: cargo build --verbose
-        working-directory: rust/common
-      - name: Run tests
+        working-directory: ${{ matrix.crate }}
+      - name: cargo test
         run: cargo test --verbose
-        working-directory: rust/common
+        working-directory: ${{ matrix.crate }}

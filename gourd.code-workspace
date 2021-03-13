@@ -37,7 +37,19 @@
     "go.buildFlags": [
       "-tags", "integration"
   ],
-    "typescript.tsdk": "ui/node_modules/typescript/lib"
+    "typescript.tsdk": "ui/node_modules/typescript/lib",
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5555,
+        "driver": "PostgreSQL",
+        "name": "gourd",
+        "database": "food",
+        "username": "gourd",
+        "password": "gourd"
+      }
+    ]
     
   }
 }

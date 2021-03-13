@@ -4,7 +4,7 @@ use crate::routes::parser;
 use actix_web::web::Data;
 use actix_web::{dev::Server, web};
 use actix_web::{App, HttpServer};
-// use actix_web_opentelemetry::RequestTracing;
+use actix_web_opentelemetry::RequestTracing;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::net::TcpListener;
@@ -39,6 +39,7 @@ impl Application {
         let port = listener.local_addr().unwrap().port();
         let server = run(listener, connection_pool)?;
 
+        println!("running on http://{}", address);
         Ok(Self { port, server })
     }
 
@@ -68,7 +69,7 @@ fn run(
     // let email_client = Data::new(email_client);
     let server = HttpServer::new(move || {
         App::new()
-            // .wrap(RequestTracing::new())
+            .wrap(RequestTracing::new())
             .route("/parse", web::get().to(parser))
             .service(web::resource("/parse2").route(web::get().to(parser::index)))
             .app_data(db_pool.clone())
