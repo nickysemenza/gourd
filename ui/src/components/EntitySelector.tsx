@@ -70,7 +70,7 @@ export const EntitySelector: React.FC<{
                 await rApi.createRecipes({
                   recipeWrapper: blankRecipeWrapper(name),
                 })
-              ).id
+              ).detail.id
             : (
                 await iApi.createIngredients({
                   ingredient: blankIngredient(name),

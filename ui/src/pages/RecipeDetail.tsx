@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import RecipeDetailTable, {
   UpdateIngredientProps,
 } from "../components/RecipeDetailTable";
@@ -32,7 +32,7 @@ import InstructionsListParser from "../components/InstructionsListParser";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
-
+  let history = useHistory();
   const { error, data } = useGetRecipeById({
     recipe_id: id || "",
   });
@@ -57,7 +57,11 @@ const RecipeDetail: React.FC = () => {
     setEdit(!edit);
   };
   const saveUpdate = async () => {
-    recipe && post(recipe);
+    if (recipe) {
+      const updated = await post(recipe);
+      setEdit(false);
+      history.push(`/recipe/${updated.detail.id}`);
+    }
   };
 
   useHotkeys("e", () => {
@@ -334,6 +338,7 @@ const RecipeDetail: React.FC = () => {
       <InstructionsListParser
         setSectionIngredients={(ings) => {
           setRecipe(replaceIngredients(recipe, ings));
+          setEdit(true);
         }}
       />
       <h1>totals</h1>
