@@ -1,6 +1,6 @@
 module github.com/nickysemenza/gourd
 
-go 1.14
+go 1.16
 
 require (
 	cloud.google.com/go v0.79.0 // indirect
@@ -23,7 +23,6 @@ require (
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golangci/golangci-lint v1.38.0
-	github.com/google/goterm v0.0.0-20190703233501-fc88cf888a3f // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
 	github.com/gphotosuploader/googlemirror v0.5.0
@@ -37,10 +36,7 @@ require (
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
-	github.com/muesli/reflow v0.2.0 // indirect
-	github.com/muesli/termenv v0.7.4 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/ory/go-acc v0.2.6
 	github.com/prometheus/common v0.18.0 // indirect
