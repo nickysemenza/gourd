@@ -31,33 +31,21 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	f := &Food{}
 	return f, c.getContext(ctx, q, f)
 }
-
-func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
-	ctx, span := c.tracer.Start(ctx, "SearchFoods")
+func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, count bool) sq.SelectBuilder) ([]Food, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "getFoods")
 	defer span.End()
+
 	q := c.psql.Select(
 		"food_category_id",
 		"data_type",
 		"description",
 		"fdc_id",
-	)
-	cq := c.psql.Select("count(*)")
-	w := `description ILIKE '%' || $1 || '%'`
-	q = q.From("usda_food").Where(w, searchQuery)
-	cq = cq.From("usda_food").Where(w, searchQuery)
+	).From("usda_food")
+	cq := c.psql.Select("count(*)").From("usda_food")
 
-	q = newSearchQuery(opts...).apply(q)
-	cq = newSearchQuery(opts...).apply(cq)
+	q = addons(q, false)
+	cq = addons(cq, true)
 
-	if foodCategoryID != nil {
-		q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
-		cq = cq.Where(sq.Eq{"food_category_id": &foodCategoryID})
-	}
-	if len(dataType) > 0 {
-		q = q.Where(sq.Eq{"data_type": dataType})
-		cq = cq.Where(sq.Eq{"data_type": dataType})
-	}
-	q = q.OrderBy("length(description) ASC", "fdc_id DESC")
 	cq = cq.RemoveLimit().RemoveOffset()
 
 	res := []Food{}
@@ -88,7 +76,38 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType [
 	}
 
 	return res, count, nil
+}
+func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+	defer span.End()
+	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
+		w := `description ILIKE '%' || $1 || '%'`
 
+		q = q.Where(w, searchQuery)
+		q = newSearchQuery(opts...).apply(q)
+
+		if foodCategoryID != nil {
+			q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
+		}
+		if len(dataType) > 0 {
+			q = q.Where(sq.Eq{"data_type": dataType})
+		}
+		if !count {
+			q = q.OrderBy("length(description) ASC", "fdc_id DESC")
+		}
+		return q
+	})
+}
+func (c *Client) FoodsByIds(ctx context.Context, ids []int) ([]Food, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+	defer span.End()
+	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
+		q = q.Where(sq.Eq{"fdc_id": ids})
+		if !count {
+			q = q.OrderBy("fdc_id DESC")
+		}
+		return q
+	})
 }
 
 type FoodNutrient struct {

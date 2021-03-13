@@ -9,6 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dgraph-io/ristretto"
 	"github.com/jmoiron/sqlx"
+	servertiming "github.com/mitchellh/go-server-timing"
 	"github.com/nickysemenza/gourd/common"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -173,6 +174,9 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 	ctx, span := c.tracer.Start(ctx, "selectContext")
 	defer span.End()
 
+	timing := servertiming.FromContext(ctx)
+	defer timing.NewMetric("selectContext").Start().Stop()
+
 	query, args, err := q.ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
@@ -186,6 +190,11 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 
 // nolint: unparam
 func (c *Client) execContext(ctx context.Context, q sq.Sqlizer) (sql.Result, error) {
+	ctx, span := c.tracer.Start(ctx, "execContext")
+	defer span.End()
+
+	timing := servertiming.FromContext(ctx)
+	defer timing.NewMetric("execContext").Start().Stop()
 
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {

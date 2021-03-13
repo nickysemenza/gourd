@@ -3,6 +3,7 @@ import {
   RecipeWrapper,
   RecipeSection,
   SectionIngredient,
+  Food,
 } from "../api/openapi-hooks/api";
 import {
   formatText,
@@ -31,6 +32,7 @@ import {
   updateInstruction,
   updateTimeRange,
   getCal,
+  FoodsById,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -50,12 +52,14 @@ export interface TableProps {
   updateIngredient: (i: UpdateIngredientProps) => void;
   setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
   tweaks: RecipeTweaks;
+  hints: FoodsById;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
   setRecipe,
   tweaks,
+  hints,
 }) => {
   const { edit } = tweaks;
   const { sections } = recipe.detail;
@@ -247,7 +251,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
-            <div>{getCal(ingredient, recipe.food_hints)} kcal</div>
+            <div>{getCal(ingredient, hints)} kcal</div>
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (
               <label className="flex items-center ml-1">

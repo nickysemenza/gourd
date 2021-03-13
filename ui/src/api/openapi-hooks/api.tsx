@@ -11,6 +11,7 @@ import {
   useMutate,
   UseMutateProps,
 } from "restful-react";
+export const SPEC_VERSION = "1.0.0";
 /**
  * Ingredients in a single section
  */
@@ -97,9 +98,6 @@ export interface RecipeWrapper {
    */
   id: string;
   detail: RecipeDetail;
-  food_hints?: {
-    [key: string]: Food;
-  };
 }
 
 /**
@@ -305,7 +303,7 @@ export interface SearchResult {
    * The recipes
    */
   recipes?: RecipeWrapper[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -326,7 +324,7 @@ export interface AuthResp {
 /**
  * A generic list (for pagination use)
  */
-export interface List {
+export interface Items {
   /**
    * What number page this is
    */
@@ -368,7 +366,7 @@ export interface TimeRange {
  */
 export interface PaginatedRecipes {
   recipes?: Recipe[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -376,7 +374,7 @@ export interface PaginatedRecipes {
  */
 export interface PaginatedIngredients {
   ingredients?: IngredientDetail[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -384,7 +382,7 @@ export interface PaginatedIngredients {
  */
 export interface PaginatedPhotos {
   photos?: GooglePhoto[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -392,7 +390,7 @@ export interface PaginatedPhotos {
  */
 export interface PaginatedMeals {
   meals?: Meal[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -400,7 +398,7 @@ export interface PaginatedMeals {
  */
 export interface PaginatedFoods {
   foods?: Food[];
-  meta?: List;
+  meta?: Items;
 }
 
 /**
@@ -1415,5 +1413,45 @@ export type UseSearchFoodsProps = Omit<
 export const useSearchFoods = (props: UseSearchFoodsProps) =>
   useGet<PaginatedFoods, Error, SearchFoodsQueryParams, void>(
     `/foods/search`,
+    props
+  );
+
+export interface GetFoodsByIdsQueryParams {
+  /**
+   * ids
+   */
+  fdc_id: number[];
+}
+
+export type GetFoodsByIdsProps = Omit<
+  GetProps<PaginatedFoods, unknown, GetFoodsByIdsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Get foods
+ *
+ * get foods by ids
+ */
+export const GetFoodsByIds = (props: GetFoodsByIdsProps) => (
+  <Get<PaginatedFoods, unknown, GetFoodsByIdsQueryParams, void>
+    path={`/foods/bulk`}
+    {...props}
+  />
+);
+
+export type UseGetFoodsByIdsProps = Omit<
+  UseGetProps<PaginatedFoods, unknown, GetFoodsByIdsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Get foods
+ *
+ * get foods by ids
+ */
+export const useGetFoodsByIds = (props: UseGetFoodsByIdsProps) =>
+  useGet<PaginatedFoods, unknown, GetFoodsByIdsQueryParams, void>(
+    `/foods/bulk`,
     props
   );

@@ -27,6 +27,10 @@ export type RecipeTweaks = {
 export type IngredientAttr = "grams" | "amount";
 export type IngredientKind = SectionIngredient["kind"];
 
+export type FoodsById = {
+  [key: number]: Food;
+};
+
 export const updateIngredientInfo = (
   recipe: RecipeWrapper,
   sectionID: number,
@@ -381,13 +385,10 @@ export const getCalories = (food: Food) => {
   return (!!first && first.amount) || 0;
 };
 
-export const getCal = (
-  ingredient: SectionIngredient,
-  hints: RecipeWrapper["food_hints"]
-) => {
+export const getCal = (ingredient: SectionIngredient, hints: FoodsById) => {
   const fdc_id = ingredient.ingredient?.fdc_id;
   if (fdc_id !== undefined) {
-    const hint = hints && hints[fdc_id];
+    const hint = hints[fdc_id];
     if (hint !== undefined) {
       const scalingFactor = ingredient.grams / 100;
       return Math.round(getCalories(hint) * scalingFactor);

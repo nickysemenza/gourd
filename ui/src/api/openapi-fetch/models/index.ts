@@ -12,7 +12,7 @@ export * from './Ingredient';
 export * from './IngredientDetail';
 export * from './InlineObject';
 export * from './InlineResponse200';
-export * from './List';
+export * from './Items';
 export * from './Meal';
 export * from './MealRecipe';
 export * from './MealRecipeUpdate';

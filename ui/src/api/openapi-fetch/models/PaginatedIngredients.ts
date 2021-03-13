@@ -18,10 +18,10 @@ import {
     IngredientDetailFromJSON,
     IngredientDetailFromJSONTyped,
     IngredientDetailToJSON,
-    List,
-    ListFromJSON,
-    ListFromJSONTyped,
-    ListToJSON,
+    Items,
+    ItemsFromJSON,
+    ItemsFromJSONTyped,
+    ItemsToJSON,
 } from './';
 
 /**
@@ -38,10 +38,10 @@ export interface PaginatedIngredients {
     ingredients?: Array<IngredientDetail>;
     /**
      * 
-     * @type {List}
+     * @type {Items}
      * @memberof PaginatedIngredients
      */
-    meta?: List;
+    meta?: Items;
 }
 
 export function PaginatedIngredientsFromJSON(json: any): PaginatedIngredients {
@@ -55,7 +55,7 @@ export function PaginatedIngredientsFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientDetailFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
+        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
     };
 }
 
@@ -69,7 +69,7 @@ export function PaginatedIngredientsToJSON(value?: PaginatedIngredients | null):
     return {
         
         'ingredients': value.ingredients === undefined ? undefined : ((value.ingredients as Array<any>).map(IngredientDetailToJSON)),
-        'meta': ListToJSON(value.meta),
+        'meta': ItemsToJSON(value.meta),
     };
 }
 

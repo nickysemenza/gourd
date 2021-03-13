@@ -12,9 +12,12 @@ import {
   useCreateRecipes,
   RecipeSource,
   SectionIngredient,
+  useGetFoodsByIds,
+  Food,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {
+  FoodsById,
   getCalories,
   Override,
   RecipeTweaks,
@@ -50,6 +53,33 @@ const RecipeDetail: React.FC = () => {
       // setRecipe(data);
     },
   });
+
+  const fdc_ids = (recipe ? recipe.detail.sections : [])
+    .map((section) =>
+      section.ingredients
+        .map((ingredient) => ingredient.ingredient?.fdc_id || 0)
+        .filter((id) => id !== 0)
+    )
+    .flat();
+  const { data: foods } = useGetFoodsByIds({
+    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
+    queryParams: {
+      fdc_id: [...fdc_ids, 0],
+    },
+    // lazy: true,
+  });
+  // useEffect(() => {
+  //   if (fdc_ids.length > 0) {
+  //     refetch();
+  //   }
+  // });
+
+  console.log(foods);
+  //https://stackoverflow.com/a/26265095
+  const hints: FoodsById = Object.assign(
+    {},
+    ...(foods?.foods || []).map((s) => ({ [s.fdc_id]: s }))
+  );
 
   const resetMultiplier = () => setMultiplier(1);
   const toggleEdit = () => {
@@ -193,7 +223,7 @@ const RecipeDetail: React.FC = () => {
       if (si.ingredient === undefined) return;
       const fdc_id = si.ingredient.fdc_id;
       if (fdc_id !== undefined) {
-        const hint = recipe.food_hints && recipe.food_hints[fdc_id];
+        const hint = hints[fdc_id];
         if (hint !== undefined) {
           const scalingFactor = si.grams / 100;
           const cal = getCalories(hint) * scalingFactor;
@@ -330,6 +360,7 @@ const RecipeDetail: React.FC = () => {
       </div>
 
       <RecipeDetailTable
+        hints={hints}
         tweaks={tweaks}
         updateIngredient={updateIngredient}
         recipe={recipe}

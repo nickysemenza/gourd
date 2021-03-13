@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    List,
-    ListFromJSON,
-    ListFromJSONTyped,
-    ListToJSON,
+    Items,
+    ItemsFromJSON,
+    ItemsFromJSONTyped,
+    ItemsToJSON,
     Meal,
     MealFromJSON,
     MealFromJSONTyped,
@@ -38,10 +38,10 @@ export interface PaginatedMeals {
     meals?: Array<Meal>;
     /**
      * 
-     * @type {List}
+     * @type {Items}
      * @memberof PaginatedMeals
      */
-    meta?: List;
+    meta?: Items;
 }
 
 export function PaginatedMealsFromJSON(json: any): PaginatedMeals {
@@ -55,7 +55,7 @@ export function PaginatedMealsFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'meals': !exists(json, 'meals') ? undefined : ((json['meals'] as Array<any>).map(MealFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
+        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
     };
 }
 
@@ -69,7 +69,7 @@ export function PaginatedMealsToJSON(value?: PaginatedMeals | null): any {
     return {
         
         'meals': value.meals === undefined ? undefined : ((value.meals as Array<any>).map(MealToJSON)),
-        'meta': ListToJSON(value.meta),
+        'meta': ItemsToJSON(value.meta),
     };
 }
 

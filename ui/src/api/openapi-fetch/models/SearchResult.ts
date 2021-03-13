@@ -18,10 +18,10 @@ import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    List,
-    ListFromJSON,
-    ListFromJSONTyped,
-    ListToJSON,
+    Items,
+    ItemsFromJSON,
+    ItemsFromJSONTyped,
+    ItemsToJSON,
     RecipeWrapper,
     RecipeWrapperFromJSON,
     RecipeWrapperFromJSONTyped,
@@ -48,10 +48,10 @@ export interface SearchResult {
     recipes?: Array<RecipeWrapper>;
     /**
      * 
-     * @type {List}
+     * @type {Items}
      * @memberof SearchResult
      */
-    meta?: List;
+    meta?: Items;
 }
 
 export function SearchResultFromJSON(json: any): SearchResult {
@@ -66,7 +66,7 @@ export function SearchResultFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientFromJSON)),
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeWrapperFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
+        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
     };
 }
 
@@ -81,7 +81,7 @@ export function SearchResultToJSON(value?: SearchResult | null): any {
         
         'ingredients': value.ingredients === undefined ? undefined : ((value.ingredients as Array<any>).map(IngredientToJSON)),
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeWrapperToJSON)),
-        'meta': ListToJSON(value.meta),
+        'meta': ItemsToJSON(value.meta),
     };
 }
 

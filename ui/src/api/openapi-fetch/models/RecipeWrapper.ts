@@ -14,10 +14,6 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    Food,
-    FoodFromJSON,
-    FoodFromJSONTyped,
-    FoodToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
@@ -42,12 +38,6 @@ export interface RecipeWrapper {
      * @memberof RecipeWrapper
      */
     detail: RecipeDetail;
-    /**
-     * 
-     * @type {{ [key: string]: Food; }}
-     * @memberof RecipeWrapper
-     */
-    food_hints?: { [key: string]: Food; };
 }
 
 export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
@@ -62,7 +52,6 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'],
         'detail': RecipeDetailFromJSON(json['detail']),
-        'food_hints': !exists(json, 'food_hints') ? undefined : (mapValues(json['food_hints'], FoodFromJSON)),
     };
 }
 
@@ -77,7 +66,6 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         
         'id': value.id,
         'detail': RecipeDetailToJSON(value.detail),
-        'food_hints': value.food_hints === undefined ? undefined : (mapValues(value.food_hints, FoodToJSON)),
     };
 }
 

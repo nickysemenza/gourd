@@ -16,46 +16,46 @@ import { exists, mapValues } from '../runtime';
 /**
  * A generic list (for pagination use)
  * @export
- * @interface List
+ * @interface Items
  */
-export interface List {
+export interface Items {
     /**
      * What number page this is
      * @type {number}
-     * @memberof List
+     * @memberof Items
      */
     page_number: number;
     /**
      * How many items were requested for this page
      * @type {number}
-     * @memberof List
+     * @memberof Items
      */
     limit: number;
     /**
      * todo
      * @type {number}
-     * @memberof List
+     * @memberof Items
      */
     offset: number;
     /**
      * Total number of items across all pages
      * @type {number}
-     * @memberof List
+     * @memberof Items
      */
     total_count: number;
     /**
      * Total number of pages available
      * @type {number}
-     * @memberof List
+     * @memberof Items
      */
     page_count: number;
 }
 
-export function ListFromJSON(json: any): List {
-    return ListFromJSONTyped(json, false);
+export function ItemsFromJSON(json: any): Items {
+    return ItemsFromJSONTyped(json, false);
 }
 
-export function ListFromJSONTyped(json: any, ignoreDiscriminator: boolean): List {
+export function ItemsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Items {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -69,7 +69,7 @@ export function ListFromJSONTyped(json: any, ignoreDiscriminator: boolean): List
     };
 }
 
-export function ListToJSON(value?: List | null): any {
+export function ItemsToJSON(value?: Items | null): any {
     if (value === undefined) {
         return undefined;
     }

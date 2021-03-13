@@ -176,8 +176,8 @@ type IngredientDetail struct {
 	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
 }
 
-// List defines model for List.
-type List struct {
+// Items defines model for Items.
+type Items struct {
 
 	// How many items were requested for this page
 	Limit int `json:"limit"`
@@ -249,7 +249,7 @@ type PaginatedFoods struct {
 	Foods *[]Food `json:"foods,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *List `json:"meta,omitempty"`
+	Meta *Items `json:"meta,omitempty"`
 }
 
 // PaginatedIngredients defines model for PaginatedIngredients.
@@ -257,7 +257,7 @@ type PaginatedIngredients struct {
 	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *List `json:"meta,omitempty"`
+	Meta *Items `json:"meta,omitempty"`
 }
 
 // PaginatedMeals defines model for PaginatedMeals.
@@ -265,14 +265,14 @@ type PaginatedMeals struct {
 	Meals *[]Meal `json:"meals,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *List `json:"meta,omitempty"`
+	Meta *Items `json:"meta,omitempty"`
 }
 
 // PaginatedPhotos defines model for PaginatedPhotos.
 type PaginatedPhotos struct {
 
 	// A generic list (for pagination use)
-	Meta   *List          `json:"meta,omitempty"`
+	Meta   *Items         `json:"meta,omitempty"`
 	Photos *[]GooglePhoto `json:"photos,omitempty"`
 }
 
@@ -280,7 +280,7 @@ type PaginatedPhotos struct {
 type PaginatedRecipes struct {
 
 	// A generic list (for pagination use)
-	Meta    *List     `json:"meta,omitempty"`
+	Meta    *Items    `json:"meta,omitempty"`
 	Recipes *[]Recipe `json:"recipes,omitempty"`
 }
 
@@ -358,8 +358,7 @@ type RecipeSource struct {
 type RecipeWrapper struct {
 
 	// A revision of a recipe
-	Detail    RecipeDetail            `json:"detail"`
-	FoodHints *map[string]interface{} `json:"food_hints,omitempty"`
+	Detail RecipeDetail `json:"detail"`
 
 	// id
 	Id string `json:"id"`
@@ -372,7 +371,7 @@ type SearchResult struct {
 	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *List `json:"meta,omitempty"`
+	Meta *Items `json:"meta,omitempty"`
 
 	// The recipes
 	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
@@ -449,6 +448,13 @@ type AuthLoginParams struct {
 
 	// Google code
 	Code string `json:"code"`
+}
+
+// GetFoodsByIdsParams defines parameters for GetFoodsByIds.
+type GetFoodsByIdsParams struct {
+
+	// ids
+	FdcId []int `json:"fdc_id"`
 }
 
 // SearchFoodsParams defines parameters for SearchFoods.

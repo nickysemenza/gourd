@@ -19,8 +19,6 @@ pub struct RecipeWrapper {
     pub id: String,
     #[serde(rename = "detail")]
     pub detail: crate::models::RecipeDetail,
-    #[serde(rename = "food_hints", skip_serializing_if = "Option::is_none")]
-    pub food_hints: Option<::std::collections::HashMap<String, crate::models::Food>>,
 }
 
 impl RecipeWrapper {
@@ -29,7 +27,6 @@ impl RecipeWrapper {
         RecipeWrapper {
             id,
             detail,
-            food_hints: None,
         }
     }
 }

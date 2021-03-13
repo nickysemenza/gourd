@@ -30,6 +30,10 @@ export interface FoodApiGetFoodByIdRequest {
     fdcId: number;
 }
 
+export interface FoodApiGetFoodsByIdsRequest {
+    fdcId: Array<number>;
+}
+
 export interface FoodApiSearchFoodsRequest {
     name: string;
     offset?: number;
@@ -79,6 +83,50 @@ export class FoodApi extends runtime.BaseAPI {
      */
     async getFoodById(requestParameters: FoodApiGetFoodByIdRequest): Promise<Food> {
         const response = await this.getFoodByIdRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * get foods by ids
+     * Get foods
+     */
+    async getFoodsByIdsRaw(requestParameters: FoodApiGetFoodsByIdsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
+        if (requestParameters.fdcId === null || requestParameters.fdcId === undefined) {
+            throw new runtime.RequiredError('fdcId','Required parameter requestParameters.fdcId was null or undefined when calling getFoodsByIds.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.fdcId) {
+            queryParameters['fdc_id'] = requestParameters.fdcId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/foods/bulk`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedFoodsFromJSON(jsonValue));
+    }
+
+    /**
+     * get foods by ids
+     * Get foods
+     */
+    async getFoodsByIds(requestParameters: FoodApiGetFoodsByIdsRequest): Promise<PaginatedFoods> {
+        const response = await this.getFoodsByIdsRaw(requestParameters);
         return await response.value();
     }
 

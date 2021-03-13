@@ -542,7 +542,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
+  /foods/bulk:
+    get:
+      summary: Get foods
+      description: get foods by ids
+      operationId: get_foods_by_ids
+      tags:
+        - food
+      parameters:
+        - name: fdc_id
+          in: query
+          required: true
+          description: ids
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFoods"
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -645,10 +667,6 @@ components:
           type: string
         detail:
           $ref: "#/components/schemas/RecipeDetail"
-        food_hints:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/Food"
     Recipe:
       description: A recipe with subcomponents
       type: object

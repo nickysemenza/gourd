@@ -18,10 +18,10 @@ import {
     GooglePhotoFromJSON,
     GooglePhotoFromJSONTyped,
     GooglePhotoToJSON,
-    List,
-    ListFromJSON,
-    ListFromJSONTyped,
-    ListToJSON,
+    Items,
+    ItemsFromJSON,
+    ItemsFromJSONTyped,
+    ItemsToJSON,
 } from './';
 
 /**
@@ -38,10 +38,10 @@ export interface PaginatedPhotos {
     photos?: Array<GooglePhoto>;
     /**
      * 
-     * @type {List}
+     * @type {Items}
      * @memberof PaginatedPhotos
      */
-    meta?: List;
+    meta?: Items;
 }
 
 export function PaginatedPhotosFromJSON(json: any): PaginatedPhotos {
@@ -55,7 +55,7 @@ export function PaginatedPhotosFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'photos': !exists(json, 'photos') ? undefined : ((json['photos'] as Array<any>).map(GooglePhotoFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ListFromJSON(json['meta']),
+        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
     };
 }
 
@@ -69,7 +69,7 @@ export function PaginatedPhotosToJSON(value?: PaginatedPhotos | null): any {
     return {
         
         'photos': value.photos === undefined ? undefined : ((value.photos as Array<any>).map(GooglePhotoToJSON)),
-        'meta': ListToJSON(value.meta),
+        'meta': ItemsToJSON(value.meta),
     };
 }
 

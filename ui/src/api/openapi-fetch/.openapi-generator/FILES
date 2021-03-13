@@ -23,7 +23,7 @@ models/Ingredient.ts
 models/IngredientDetail.ts
 models/InlineObject.ts
 models/InlineResponse200.ts
-models/List.ts
+models/Items.ts
 models/Meal.ts
 models/MealRecipe.ts
 models/MealRecipeUpdate.ts

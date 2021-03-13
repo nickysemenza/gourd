@@ -261,7 +261,7 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 	return s, nil
 }
 
-// List all recipes
+// Items all recipes
 // (GET /recipes)
 func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx := c.Request().Context()
@@ -353,28 +353,7 @@ func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 	}
 	apiR := transformRecipeFull(r)
-	foodById := make(map[string]interface{})
 
-	for _, rs := range apiR.Detail.Sections {
-		for _, si := range rs.Ingredients {
-			if si.Ingredient != nil && si.Ingredient.FdcId != nil {
-				id := *si.Ingredient.FdcId
-				idStr := fmt.Sprint(id)
-				if _, ok := foodById[idStr]; ok {
-					continue
-				}
-				food, err := a.getFoodById(ctx, int(id))
-				if err != nil {
-					return sendErr(c, http.StatusBadRequest, err)
-				}
-				if food == nil {
-					continue
-				}
-				foodById[idStr] = *food
-			}
-		}
-	}
-	apiR.FoodHints = &foodById
 	return c.JSON(http.StatusOK, apiR)
 }
 
@@ -661,7 +640,7 @@ func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
+func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *Items) {
 	offset := 0
 	limit := 20
 	if o != nil {
@@ -670,10 +649,10 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *List) {
 	if l != nil {
 		limit = int(*l)
 	}
-	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, &List{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
+	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, &Items{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
 }
 
-func (l *List) setTotalCount(count uint64) {
+func (l *Items) setTotalCount(count uint64) {
 	c := int(count)
 	l.TotalCount = c
 	l.PageCount = int(math.Ceil(float64(c) / float64(l.Limit)))
@@ -943,7 +922,28 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 
 	return c.JSON(http.StatusOK, *f)
 }
+func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodsByIds")
+	defer span.End()
 
+	foods, count, err := a.Manager.DB().FoodsByIds(ctx, params.FdcId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	}
+	listMeta := &Items{PageCount: 1}
+	listMeta.setTotalCount(count)
+	// spew.Dump(foods, count)
+	items, err := a.buildPaginatedFood(ctx, foods)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	resp := PaginatedFoods{
+		Foods: &items,
+		Meta:  listMeta,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+}
 func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "SearchFoods")
 	defer span.End()
@@ -961,7 +961,22 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
+	listMeta.setTotalCount(count)
 
+	items, err := a.buildPaginatedFood(ctx, foods)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	resp := PaginatedFoods{
+		Foods: &items,
+		Meta:  listMeta,
+	}
+
+	return c.JSON(http.StatusOK, resp)
+
+}
+
+func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, error) {
 	items := make([]Food, len(foods))
 	var wg sync.WaitGroup
 	fatalErrors := make(chan error)
@@ -977,7 +992,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 				FdcId:       food.FdcID,
 				Nutrients:   make([]FoodNutrient, 0),
 			}
-			err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
+			err := a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
 			if err != nil {
 				fatalErrors <- err
 			}
@@ -997,17 +1012,10 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 		break
 	case err := <-fatalErrors:
 		// close(fatalErrors)
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
 
-	listMeta.setTotalCount(count)
-
-	resp := PaginatedFoods{
-		Foods: &items,
-		Meta:  listMeta,
-	}
-
-	return c.JSON(http.StatusOK, resp)
+	return items, nil
 
 }
 

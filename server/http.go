@@ -11,6 +11,7 @@ import (
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	servertiming "github.com/mitchellh/go-server-timing"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
@@ -43,8 +44,9 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(middleware.CORS())
 	r.Use(middleware.Logger())
 	r.Use(middleware.RequestID())
+	r.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
 	r.Use(middleware.Recover())
-	r.Use(sentryecho.New(sentryecho.Options{}))
+	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
 
 	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
