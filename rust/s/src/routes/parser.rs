@@ -83,20 +83,18 @@ pub struct SI {
 }
 
 pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
-    //todo: make sqlx work in CI
-    // let res = sqlx::query_as!(
-    //     SI,
-    //     r#"
-    // select * from recipe_section_ingredients;
-    //         "#,
-    // )
-    // .fetch_all(pool)
-    // .await?;
+    let res = sqlx::query_as!(
+        SI,
+        r#"
+    select * from recipe_section_ingredients;
+            "#,
+    )
+    .fetch_all(pool)
+    .await?;
 
     // dbg!(res);
     // let res2 = res.unwrap();
-    // Ok(res)
-    Ok(vec![])
+    Ok(res)
 }
 
 #[cfg(test)]

@@ -1,0 +1,87 @@
+{
+  "db": "PostgreSQL",
+  "8f5868c6b278e931f05d81ffc3380cf525e5ebe0f22294544689c7bb06274a04": {
+    "query": "\n    select * from recipe_section_ingredients;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 1,
+          "name": "section",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "sort",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "ingredient",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 4,
+          "name": "recipe",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "grams",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 6,
+          "name": "amount",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 7,
+          "name": "unit",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 8,
+          "name": "adjective",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 9,
+          "name": "original",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 10,
+          "name": "optional",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "substitutes_for",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  }
+}

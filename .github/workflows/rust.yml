@@ -4,6 +4,7 @@ name: rust build + test
 
 env:
   CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true # https://github.com/launchbadge/sqlx/tree/master/sqlx-cli#force-building-in-offline-mode
 
 jobs:
   test:
