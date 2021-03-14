@@ -33,4 +33,4 @@ gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
 
 [dev-dependencies]
-actix-rt = "1"
+actix-rt = "2"
