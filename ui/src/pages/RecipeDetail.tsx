@@ -13,7 +13,6 @@ import {
   RecipeSource,
   SectionIngredient,
   useGetFoodsByIds,
-  Food,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {

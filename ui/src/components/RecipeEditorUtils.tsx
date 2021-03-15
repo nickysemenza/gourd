@@ -38,7 +38,7 @@ export const updateIngredientInfo = (
   ingredient: Ingredient,
   kind: IngredientKind
 ) => {
-  const { id, name } = ingredient;
+  const { id, name, fdc_id } = ingredient;
   return update(recipe, {
     detail: {
       sections: {
@@ -52,7 +52,7 @@ export const updateIngredientInfo = (
                     : undefined,
               },
               ingredient: {
-                $set: kind === "ingredient" ? { id, name } : undefined,
+                $set: kind === "ingredient" ? { id, name, fdc_id } : undefined,
               },
               kind: { $set: kind },
             },

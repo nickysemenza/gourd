@@ -107,3 +107,6 @@ get-detail/%:
 
 seed-testdata: bin/gourd
 	./testdata/seed.sh
+
+rs: 
+	cd rust/s && cargo sqlx prepare -- --bin gourd

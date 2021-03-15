@@ -3,7 +3,6 @@ import {
   RecipeWrapper,
   RecipeSection,
   SectionIngredient,
-  Food,
 } from "../api/openapi-hooks/api";
 import {
   formatText,
@@ -34,7 +33,7 @@ import {
   getCal,
   FoodsById,
 } from "./RecipeEditorUtils";
-import { ArrowDown, ArrowUp, XSquare } from "react-feather";
+import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
@@ -169,6 +168,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 value: "",
                 label: getIngredient(ingredient).name,
                 kind: "recipe",
+                fdc_id: undefined,
               }}
               onChange={(a) => {
                 setRecipe(
@@ -176,7 +176,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     recipe,
                     x,
                     y,
-                    { id: a.value, name: a.label },
+                    { id: a.value, name: a.label, fdc_id: a.fdc_id },
                     a.kind
                   )
                 );
@@ -312,12 +312,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           </div>
         ))}
         {edit && (
-          <div
-            className="add-item"
-            onClick={() => setRecipe(addIngredient(recipe, x))}
-          >
-            add ingredient
-          </div>
+          <ButtonGroup
+            compact
+            buttons={[
+              {
+                onClick: () => {
+                  setRecipe(addIngredient(recipe, x));
+                },
+                text: "add ingredient",
+                IconLeft: PlusCircle,
+              },
+            ]}
+          />
         )}
       </TableCell>
       <TableCell>
@@ -342,12 +348,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         ))}
         {/* </ol> */}
         {edit && (
-          <div
-            className="add-item"
-            onClick={() => setRecipe(addInstruction(recipe, x))}
-          >
-            add instruction
-          </div>
+          <ButtonGroup
+            compact
+            buttons={[
+              {
+                onClick: () => {
+                  setRecipe(addInstruction(recipe, x));
+                },
+                text: "add instruction",
+                IconLeft: PlusCircle,
+              },
+            ]}
+          />
         )}
       </TableCell>
     </TableRow>
@@ -404,12 +416,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           </DragWrapper>
         ))}
         {edit && (
-          <div
-            className="add-item"
-            onClick={() => setRecipe(addSection(recipe))}
-          >
-            add section
-          </div>
+          <ButtonGroup
+            compact
+            buttons={[
+              {
+                onClick: () => {
+                  setRecipe(addSection(recipe));
+                },
+                text: "add section",
+                IconLeft: PlusCircle,
+              },
+            ]}
+          />
         )}
       </div>
     </DndProvider>

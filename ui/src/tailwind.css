@@ -19,10 +19,3 @@
   /* section, minutes, ing-table-row, instructions */
   grid-template-columns: 0.5fr 2fr 8fr 4fr;
 }
-
-.add-item {
-  @apply text-gray-800;
-  @apply font-light;
-  @apply uppercase;
-  @apply text-xs;
-}

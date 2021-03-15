@@ -1,5 +1,5 @@
 import React from "react";
-import { ActionMeta, ValueType } from "react-select";
+import { ActionMeta, NamedProps, Styles, ValueType } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
@@ -10,6 +10,7 @@ type Option = {
   label: string;
   value: string;
   kind: IngredientKind;
+  fdc_id: number | undefined;
 };
 
 export const EntitySelector: React.FC<{
@@ -39,10 +40,16 @@ export const EntitySelector: React.FC<{
           label: `[r] ${r.detail.name} (v${r.detail.version})`,
           value: r.id,
           kind: "recipe",
+          fdc_id: undefined,
         };
       });
     const ingredientOptions: Option[] = (res.ingredients || []).map((i) => {
-      return { label: "[i]" + i.name, value: i.id, kind: "ingredient" };
+      return {
+        label: "[i]" + i.name,
+        value: i.id,
+        kind: "ingredient",
+        fdc_id: i.fdc_id,
+      };
     });
     callback([
       ...(showKind.includes("ingredient") ? ingredientOptions : []),
@@ -78,14 +85,53 @@ export const EntitySelector: React.FC<{
               ).id;
 
         console.log(`created ${createKind} ${name} (${newEntityId})`);
-        onChange({ label: val.label, value: newEntityId, kind: createKind });
+        onChange({
+          label: val.label,
+          value: newEntityId,
+          kind: createKind,
+          fdc_id: undefined,
+        });
         break;
     }
+  };
+
+  const customStyles: Partial<Styles<Option, false>> = {
+    // option: (provided, state) => ({
+    //   ...provided,
+    //   borderBottom: "1px dotted pink",
+    //   color: state.isSelected ? "red" : "blue",
+    //   padding: 20,
+    // }),
+    control: (base) => ({
+      ...base,
+      height: 20,
+      minHeight: 20,
+    }),
+    // singleValue: (provided, state) => {
+    //   const opacity = state.isDisabled ? 0.5 : 1;
+    //   const transition = "opacity 300ms";
+
+    //   return { ...provided, opacity, transition };
+    // },
+    valueContainer: (provided, state) => {
+      return { ...provided, height: 20, padding: "2px" };
+    },
+    dropdownIndicator: (provided, state) => {
+      return { ...provided, padding: "2px" };
+    },
+    indicatorsContainer: (provided, state) => ({
+      ...provided,
+      height: "20px",
+    }),
+    indicatorSeparator: (state) => ({
+      display: "none",
+    }),
   };
 
   return (
     <div data-cy="name-input">
       <AsyncCreatableSelect
+        styles={customStyles}
         placeholder={placeholder}
         classNamePrefix="react-select"
         loadOptions={loadOptions}

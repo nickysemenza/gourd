@@ -18,9 +18,9 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   buttons,
   compact = false,
 }) => {
-  const baseStyles = `${compact ? "h-6" : "h-8"}  ${
-    compact ? "px-3" : "px-5"
-  } text-indigo-100 transition-colors duration-150
+  const baseStyles = `${compact ? "h-5" : "h-8"}  ${
+    compact ? "px-2" : "px-5"
+  } text-indigo-100 transition-colors duration-150 text-sm
   bg-indigo-700 focus:shadow-outline hover:bg-indigo-800
   disabled:bg-indigo-500 inline-flex items-center`;
   return (
@@ -38,13 +38,17 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
           >
             {!!IconLeft && (
               <IconLeft
-                className={`w-${iconDim} h-${iconDim} mr-${iconMargins}`}
+                className={`w-${iconDim} h-${iconDim} mr-${
+                  text ? iconMargins : 0
+                }`}
               />
             )}
             {text && <span>{text}</span>}
             {!!IconRight && (
               <IconRight
-                className={`w-${iconDim} h-${iconDim} ml-${iconMargins}`}
+                className={`w-${iconDim} h-${iconDim} ml-${
+                  text ? iconMargins : 0
+                }`}
               />
             )}
           </button>
