@@ -12655,10 +12655,10 @@ parse-asn1@^5.0.0, parse-asn1@^5.1.5:
     pbkdf2 "^3.0.3"
     safe-buffer "^5.1.1"
 
-parse-duration@0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-0.5.0.tgz#8cc541d8ddf1c5e0a91d1dd68556e724b343347f"
-  integrity sha512-0vlaFFx+zIG817aq6QI1QW8Mq3bvjlePtnM7h6n9l5vW2gZrYTGwObzpzQYaFErYDhZCj6R4ycp++DTkloPt3Q==
+parse-duration@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/parse-duration/-/parse-duration-1.0.0.tgz#8605651745f61088f6fb14045c887526c291858c"
+  integrity sha512-X4kUkCTHU1N/kEbwK9FpUJ0UZQa90VzeczfS704frR30gljxDG0pSziws06XlK+CGRSo/1wtG1mFIdBFQTMQNw==
 
 parse-json@^2.2.0:
   version "2.2.0"
