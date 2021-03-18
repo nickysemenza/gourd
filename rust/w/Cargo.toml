@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = { version = "0.2.71", features = ["serde-serialize"] }
+wasm-bindgen = { version = "0.2.72", features = ["serde-serialize"] }
 ingredient = "0.1.2"
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
