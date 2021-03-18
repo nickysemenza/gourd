@@ -13,7 +13,7 @@ require (
 	github.com/charmbracelet/glamour v0.2.1-0.20201227140546-4292a2106d74
 	github.com/cosmtrek/air v1.15.1
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepmap/oapi-codegen v1.5.1
+	github.com/deepmap/oapi-codegen v1.5.2
 	github.com/dgraph-io/ristretto v0.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.4.0 // indirect
