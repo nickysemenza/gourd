@@ -214,6 +214,8 @@ github.com/deepmap/oapi-codegen v1.5.2 h1:TYWQF96C7KEtBZYRs0ta2qIzpnIkcBITEu/le8
 github.com/deepmap/oapi-codegen v1.5.2/go.mod h1:kByj5PFf36L/gegSgLW8fB//ZwFF0MHTVu3kw4iVr6M=
 github.com/deepmap/oapi-codegen v1.5.3 h1:uKuzHo8GalBk1HHxzyhx8zEwPFvNi4iWNtqGTajjAXg=
 github.com/deepmap/oapi-codegen v1.5.3/go.mod h1:kByj5PFf36L/gegSgLW8fB//ZwFF0MHTVu3kw4iVr6M=
+github.com/deepmap/oapi-codegen v1.5.4 h1:dW5FRh+l44j+/RdCeDz8ZmlLvkafPBvuS9/MiBBmqfo=
+github.com/deepmap/oapi-codegen v1.5.4/go.mod h1:kByj5PFf36L/gegSgLW8fB//ZwFF0MHTVu3kw4iVr6M=
 github.com/denis-tingajkin/go-header v0.4.2 h1:jEeSF4sdv8/3cT/WY8AgDHUoItNSoEZ7qg9dX7pc218=
 github.com/denis-tingajkin/go-header v0.4.2/go.mod h1:eLRHAVXzE5atsKAnNRDB90WHCFFnBUn4RN0nRcs1LJA=
 github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec h1:NfhRXXFDPxcF5Cwo06DzeIaE7uuJtAUhsDwH3LNsjos=
