@@ -11,6 +11,7 @@
   fdc_id: 748967
 - name: all purpose flour
   fdc_id: 804415
+  aliases: ["flour", "all-purpose flour", "AP flour"]
 - name: flour
   fdc_id: 804415
 - name: kosher salt

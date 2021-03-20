@@ -328,6 +328,9 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 		for y, i := range sections[x].Ingredients {
 			if i.IngredientId.String != "" {
 				res := ingredientsById[i.IngredientId.String]
+				if err := c.FillFdcIdFromParentIfNcessary(ctx, &res); err != nil {
+					return nil, err
+				}
 				sections[x].Ingredients[y].RawIngredient = &res
 			}
 			if i.RecipeId.String != "" {
@@ -339,6 +342,17 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 	r.Sections = sections
 
 	return &r, nil
+}
+func (c *Client) FillFdcIdFromParentIfNcessary(ctx context.Context, i *Ingredient) error {
+	if !i.FdcID.Valid && i.SameAs.Valid {
+		// grab fdc_id from parent (todo: optimize this)
+		parent, err := c.GetIngredientById(ctx, i.SameAs.String)
+		if err != nil {
+			return err
+		}
+		i.FdcID = parent.FdcID
+	}
+	return nil
 }
 func (c *Client) getIngredients(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Ingredient, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "getIngredients")

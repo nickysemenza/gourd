@@ -158,6 +158,9 @@ type Ingredient struct {
 
 	// Ingredient name
 	Name string `json:"name"`
+
+	// ingredient ID for a similar (likely a different spelling)
+	SameAs *string `json:"same_as,omitempty"`
 }
 
 // IngredientDetail defines model for IngredientDetail.

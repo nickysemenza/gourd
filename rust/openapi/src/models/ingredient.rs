@@ -20,6 +20,9 @@ pub struct Ingredient {
     /// Ingredient name
     #[serde(rename = "name")]
     pub name: String,
+    /// ingredient ID for a similar (likely a different spelling)
+    #[serde(rename = "same_as", skip_serializing_if = "Option::is_none")]
+    pub same_as: Option<String>,
     /// FDC id equivalent to this ingredient
     #[serde(rename = "fdc_id", skip_serializing_if = "Option::is_none")]
     pub fdc_id: Option<i64>,
@@ -31,6 +34,7 @@ impl Ingredient {
         Ingredient {
             id,
             name,
+            same_as: None,
             fdc_id: None,
         }
     }

@@ -73,9 +73,11 @@ func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
 	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
-	return Ingredient{Id: dbr.Id,
-		Name:  dbr.Name,
-		FdcId: dbr.FdcID.Ptr(),
+	return Ingredient{
+		Id:     dbr.Id,
+		Name:   dbr.Name,
+		FdcId:  dbr.FdcID.Ptr(),
+		SameAs: dbr.SameAs.Ptr(),
 	}
 }
 func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {
@@ -1042,6 +1044,19 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 		log.Printf("associated %d with %s", m.FdcID, ing.Id)
+
+		sameAsIds := []string{}
+		for _, alias := range m.Aliases {
+			ing, err := a.DB().IngredientByName(ctx, alias)
+			if err != nil {
+				return err
+			}
+			sameAsIds = append(sameAsIds, ing.Id)
+		}
+		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, sameAsIds)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

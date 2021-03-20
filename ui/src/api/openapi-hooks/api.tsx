@@ -169,6 +169,10 @@ export interface Ingredient {
    */
   name: string;
   /**
+   * ingredient ID for a similar (likely a different spelling)
+   */
+  same_as?: string;
+  /**
    * FDC id equivalent to this ingredient
    */
   fdc_id?: number;

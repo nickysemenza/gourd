@@ -239,7 +239,7 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 // MergeIngredients sets the provided ingredients `same_as` to the first one.
 // TODO: prevent cyclic loop?
 func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids []string) error {
-	ctx, span := c.tracer.Start(ctx, "IngredientToRecipe")
+	ctx, span := c.tracer.Start(ctx, "MergeIngredients")
 	defer span.End()
 
 	tx, err := c.db.BeginTx(ctx, nil)
