@@ -1,5 +1,5 @@
 import React from "react";
-import { ActionMeta, NamedProps, Styles, ValueType } from "react-select";
+import { ActionMeta, Styles, ValueType } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";

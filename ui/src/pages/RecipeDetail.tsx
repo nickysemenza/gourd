@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-
-import { useHistory, useParams } from "react-router-dom";
+import queryString from "query-string";
+import { useHistory, useLocation, useParams } from "react-router-dom";
 import RecipeDetailTable, {
   UpdateIngredientProps,
 } from "../components/RecipeDetailTable";
@@ -35,13 +35,16 @@ import InstructionsListParser from "../components/InstructionsListParser";
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
   let history = useHistory();
+  const { search } = useLocation();
+  const values = queryString.parse(search) as { multiplier?: string };
   const { error, data } = useGetRecipeById({
     recipe_id: id || "",
   });
 
   const w = useContext(WasmContext);
 
-  const [multiplier, setMultiplier] = useState(1.0);
+  const [multiplier, _setMultiplier] = useState(1.0);
+  const [multiplierTouched, setMultiplierTouched] = useState(false);
   const [override, setOverride] = useState<Override>();
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
@@ -67,20 +70,41 @@ const RecipeDetail: React.FC = () => {
     },
     // lazy: true,
   });
-  // useEffect(() => {
-  //   if (fdc_ids.length > 0) {
-  //     refetch();
-  //   }
-  // });
 
-  console.log(foods);
+  // on the (usually just first) load, seed multiplier state with the value from the URL
+  // once the multipler has been 'touched', stop seeding from the URL,
+  // and instead seed the URL based on state
+  const multiplierParam =
+    (!!values.multiplier && parseFloat(values.multiplier)) || 0;
+  useEffect(() => {
+    if (
+      multiplierParam !== multiplier &&
+      multiplierParam !== 0 &&
+      !multiplierTouched
+    ) {
+      _setMultiplier(multiplierParam);
+      history.push(
+        `/recipe/${id}?${queryString.stringify({
+          multiplier: multiplierParam,
+        })}`
+      );
+    }
+  }, [id, history, multiplier, multiplierParam, multiplierTouched]);
+
+  // wrapper to set touched, and sync the state
+  const setMultiplierW = (m: number) => {
+    setMultiplierTouched(true);
+    _setMultiplier(m);
+    history.push(`/recipe/${id}?${queryString.stringify({ multiplier: m })}`);
+  };
+  // console.log(foods);
   //https://stackoverflow.com/a/26265095
   const hints: FoodsById = Object.assign(
     {},
     ...(foods?.foods || []).map((s) => ({ [s.fdc_id]: s }))
   );
 
-  const resetMultiplier = () => setMultiplier(1);
+  const resetMultiplier = () => setMultiplierW(1);
   const toggleEdit = () => {
     resetMultiplier();
     setEdit(!edit);
@@ -89,7 +113,9 @@ const RecipeDetail: React.FC = () => {
     if (recipe) {
       const updated = await post(recipe);
       setEdit(false);
-      history.push(`/recipe/${updated.detail.id}`);
+      history.push(
+        `/recipe/${updated.detail.id}?${queryString.stringify(values)}`
+      );
     }
   };
 
@@ -189,7 +215,7 @@ const RecipeDetail: React.FC = () => {
           attr,
         });
 
-        setMultiplier(
+        setMultiplierW(
           Math.round(
             (newValue / (attr === "grams" ? grams : amount || 0) +
               Number.EPSILON) *
