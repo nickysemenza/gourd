@@ -112,3 +112,5 @@ export const blankRecipeWrapper = (
   id,
 });
 export const blankIngredient = (name: string): Ingredient => ({ name, id: "" });
+
+export const scaledRound = (x: number) => x.toFixed(x < 10 ? 2 : 0);

@@ -1,7 +1,7 @@
 import React from "react";
 import { useGetFoodById } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
-import { Code } from "../util";
+import { Code, scaledRound } from "../util";
 
 const Food: React.FC = () => {
   // const [food, setFood]
@@ -38,7 +38,7 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
           .filter((n) => n.amount > 0.1)
           .map((n) => (
             <tr>
-              <td>{n.amount.toFixed(2)} </td>
+              <td>{scaledRound(n.amount)} </td>
               <td>{n.nutrient.unit_name} </td>
               <td>{n.nutrient.name} </td>
             </tr>

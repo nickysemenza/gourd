@@ -14,11 +14,12 @@ import {
   SectionIngredient,
   useGetFoodsByIds,
 } from "../api/openapi-hooks/api";
-import { formatTimeRange, sumTimeRanges } from "../util";
+import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
 import {
   calCalc,
   countTotalGrams,
   FoodsById,
+  getFDCIds,
   Override,
   RecipeTweaks,
   replaceIngredients,
@@ -56,17 +57,10 @@ const RecipeDetail: React.FC = () => {
     },
   });
 
-  const fdc_ids = (recipe ? recipe.detail.sections : [])
-    .map((section) =>
-      section.ingredients
-        .map((ingredient) => ingredient.ingredient?.fdc_id || 0)
-        .filter((id) => id !== 0)
-    )
-    .flat();
   const { data: foods } = useGetFoodsByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
-      fdc_id: [...fdc_ids, 0],
+      fdc_id: [...getFDCIds(recipe ? recipe.detail.sections : []), 0],
     },
     // lazy: true,
   });
@@ -354,13 +348,13 @@ const RecipeDetail: React.FC = () => {
         calories: {totalCal}
         {totalCal > 0 &&
           quantity > 0 &&
-          ` (${Math.round(totalCal / quantity)} per ${singular(unit)})`}
+          ` (${scaledRound(totalCal / quantity)} per ${singular(unit)})`}
       </div>
       <div>
         grams: {totalGrams}
         {totalGrams > 0 &&
           quantity > 0 &&
-          ` (${Math.round(totalGrams / quantity)} per ${singular(unit)})`}
+          ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
       <pre>{w && encodeRecipe(recipe, w)}</pre>

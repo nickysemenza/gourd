@@ -334,8 +334,13 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 				sections[x].Ingredients[y].RawIngredient = &res
 			}
 			if i.RecipeId.String != "" {
-				res := recipesUsed[i.RecipeId.String]
-				sections[x].Ingredients[y].RawRecipe = &res[0]
+				a, err := c.GetRecipeDetailByIdFull(ctx, recipesUsed[i.RecipeId.String][0].Id)
+				if err != nil {
+					return nil, err
+				}
+				sections[x].Ingredients[y].RawRecipe = a
+				// res :=
+				// sections[x].Ingredients[y].RawRecipe = &res[0]
 			}
 		}
 	}

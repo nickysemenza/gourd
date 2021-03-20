@@ -10,6 +10,7 @@ import {
   TimeRange,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
+import { scaledRound } from "../util";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -370,7 +371,8 @@ export const sumIngredients = (sections: RecipeSection[]) => {
       case "recipe":
         const r = i;
         if (!!r) {
-          recipes[r.id] = [...(recipes[r.id] || []), r];
+          //todo: don't group by recipe/ingredient
+          ingredients[r.id] = [...(ingredients[r.id] || []), r];
         }
         break;
       case "ingredient":
@@ -395,15 +397,23 @@ export const getCal = (
   hints: FoodsById,
   multiplier: number
 ) => {
+  if (!!ingredient.recipe) {
+    return scaledRound(
+      //todo: multiplier for recipes is wrong, needs to be based on amount of target recipe used
+      calCalc(ingredient.recipe.sections, hints, 0.1).totalCal
+    );
+  }
   const fdc_id = ingredient.ingredient?.fdc_id;
   if (fdc_id !== undefined) {
     const hint = hints[fdc_id];
     if (hint !== undefined) {
       const scalingFactor = ingredient.grams / 100;
-      return Math.round(getCalories(hint) * scalingFactor * multiplier);
+      return scalingFactor === 0
+        ? "n/a"
+        : scaledRound(getCalories(hint) * scalingFactor * multiplier);
     }
   }
-  return 0;
+  return "n/a";
 };
 
 export const calCalc = (
@@ -424,34 +434,45 @@ export const calCalc = (
   // const foo = [];
   Object.keys(uniqIng).forEach((k) => {
     uniqIng[k].forEach((si) => {
-      if (si.ingredient === undefined) return;
-      const fdc_id = si.ingredient.fdc_id;
-      if (fdc_id !== undefined) {
-        const hint = hints[fdc_id];
-        if (hint !== undefined) {
-          const scalingFactor = (si.grams / 100) * multiplier;
-          const cal = getCalories(hint) * scalingFactor;
-          const ingNutrients = new Map<string, number>();
-          hint.nutrients.forEach((n) => {
-            const { name, unit_name } = n.nutrient;
-            const label = `${name} (${unit_name})`;
-            if (n.amount <= 0) return;
-            totalNutrients.set(
-              label,
-              n.amount * scalingFactor + (totalNutrients.get(label) || 0)
+      if (!!si.ingredient) {
+        const fdc_id = si.ingredient.fdc_id;
+        if (fdc_id !== undefined) {
+          const hint = hints[fdc_id];
+          if (hint !== undefined) {
+            const scalingFactor = (si.grams / 100) * multiplier;
+            const cal = getCalories(hint) * scalingFactor;
+            const ingNutrients = new Map<string, number>();
+            hint.nutrients.forEach((n) => {
+              const { name, unit_name } = n.nutrient;
+              const label = `${name} (${unit_name})`;
+              if (n.amount <= 0) return;
+              totalNutrients.set(
+                label,
+                n.amount * scalingFactor + (totalNutrients.get(label) || 0)
+              );
+              ingNutrients.set(label, n.amount * scalingFactor);
+            });
+            ingredientsWithNutrients.push({
+              ingredient: si.ingredient.name,
+              nutrients: ingNutrients,
+            });
+            totalCal += cal;
+            console.log(
+              `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
+              cal
             );
-            ingNutrients.set(label, n.amount * scalingFactor);
-          });
-          ingredientsWithNutrients.push({
-            ingredient: si.ingredient.name,
-            nutrients: ingNutrients,
-          });
-          totalCal += cal;
-          console.log(
-            `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
-            cal
-          );
+          }
         }
+      }
+      if (!!si.recipe) {
+        console.log("recursive calCalc");
+        const {
+          totalCal: totalCalSub,
+          // ingredientsWithNutrients: ingredientsWithNutrientsSub,
+          // totalNutrients: totalNutrientsSub,
+          //todo: multiplier for recipes is wrong, needs to be based on amount of target recipe used
+        } = calCalc(si.recipe.sections, hints, 0.1);
+        totalCal += totalCalSub;
       }
     });
   });
@@ -460,3 +481,21 @@ export const calCalc = (
   console.groupEnd();
   return { totalCal, ingredientsWithNutrients, totalNutrients };
 };
+
+export const getFDCIds = (sections: RecipeSection[]): number[] =>
+  sections
+    .map((section) =>
+      section.ingredients
+        .map((ingredient) => {
+          if (!!ingredient.ingredient) {
+            return [ingredient.ingredient.fdc_id || 0];
+          } else if (!!ingredient.recipe) {
+            return getFDCIds(ingredient.recipe.sections);
+          } else {
+            return [0];
+          }
+        })
+        .flat()
+        .filter((id) => id !== 0)
+    )
+    .flat();

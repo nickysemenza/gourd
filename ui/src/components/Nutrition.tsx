@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MinusCircle, PlusCircle } from "react-feather";
 import { CellProps, Column } from "react-table";
+import { scaledRound } from "../util";
 import { ButtonGroup } from "./Button";
 import PaginatedTable from "./PaginatedTable";
 
@@ -19,7 +20,7 @@ const Nutrient: React.FC<{
       Header: n,
       Cell: ({ row: { original } }: CellProps<i>) => {
         const val = original.nutrients.get(n);
-        return val ? Math.round(val) : "";
+        return val ? scaledRound(val) : "";
       },
     };
     return res;
