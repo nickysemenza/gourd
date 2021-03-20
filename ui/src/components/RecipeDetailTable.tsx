@@ -124,7 +124,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
 
             <TableInput
-              width={14}
+              width={"full"}
               data-cy="grams-input"
               edit={edit}
               softEdit
@@ -193,7 +193,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           )}
           <TableInput
             data-cy="amount-input"
-            // width={16}
+            width={"full"}
             edit={edit}
             softEdit
             highlight={isOverride(tweaks, x, y, subIndex, "amount")}
@@ -217,7 +217,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           />
           <TableInput
             data-cy="unit-input"
-            width={16}
+            width={"full"}
             edit={edit}
             value={ingredient.unit || ""}
             onChange={(e) =>
@@ -233,7 +233,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <div className="flex space-x-1">
             <TableInput
               data-cy="adjective-input"
-              width={16}
+              width={"full"}
               edit={edit}
               value={ingredient.adjective || ""}
               onChange={(e) =>
@@ -460,7 +460,7 @@ type TableInputProps = {
   edit: boolean;
   softEdit?: boolean;
   value: string | number;
-  width?: number;
+  width?: number | "full";
   highlight?: boolean;
   onChange: (event: string) => void;
 } & TallOrBlur;

@@ -3,7 +3,6 @@ module github.com/nickysemenza/gourd
 go 1.16
 
 require (
-	cloud.google.com/go v0.79.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.18.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
@@ -60,7 +59,6 @@ require (
 	go.opentelemetry.io/otel/trace v0.18.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
-	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.42.0
 	gopkg.in/guregu/null.v4 v4.0.0

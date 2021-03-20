@@ -1041,7 +1041,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 		if err != nil {
 			return err
 		}
-		log.Printf("associated %d wit %s", m.FdcID, ing.Id)
+		log.Printf("associated %d with %s", m.FdcID, ing.Id)
 	}
 	return nil
 }

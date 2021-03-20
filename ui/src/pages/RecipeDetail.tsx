@@ -371,20 +371,22 @@ const RecipeDetail: React.FC = () => {
           setEdit(true);
         }}
       />
-      <h1>totals</h1>
+      <p className="text-lg font-bold">totals</p>
       <div>
         calories: {totalCal}
-        {quantity > 0 &&
+        {totalCal > 0 &&
+          quantity > 0 &&
           ` (${Math.round(totalCal / quantity)} per ${singular(unit)})`}
       </div>
       <div>
         grams: {totalGrams}
         {totalGrams > 0 &&
+          quantity > 0 &&
           ` (${Math.round(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
-      <h2>raw</h2>
+      <p className="text-lg font-bold">raw</p>
       <pre>{w && encodeRecipe(recipe, w)}</pre>
-      <h2>meals</h2>
+      <p className="text-lg font-bold">meals</p>
 
       <Nutrition
         items={ingredientsWithNutrients}
