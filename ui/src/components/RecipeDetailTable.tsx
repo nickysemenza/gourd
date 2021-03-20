@@ -251,7 +251,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
-            <div>{getCal(ingredient, hints)} kcal</div>
+            <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div>
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (
               <label className="flex items-center ml-1">

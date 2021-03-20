@@ -16,12 +16,12 @@ import {
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, sumTimeRanges } from "../util";
 import {
+  calCalc,
+  countTotalGrams,
   FoodsById,
-  getCalories,
   Override,
   RecipeTweaks,
   replaceIngredients,
-  sumIngredients,
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
@@ -43,7 +43,7 @@ const RecipeDetail: React.FC = () => {
 
   const w = useContext(WasmContext);
 
-  const [multiplier, _setMultiplier] = useState(1.0);
+  const [multiplier, setMultiplier] = useState(1.0);
   const [multiplierTouched, setMultiplierTouched] = useState(false);
   const [override, setOverride] = useState<Override>();
   const [edit, setEdit] = useState(false);
@@ -82,7 +82,7 @@ const RecipeDetail: React.FC = () => {
       multiplierParam !== 0 &&
       !multiplierTouched
     ) {
-      _setMultiplier(multiplierParam);
+      setMultiplier(multiplierParam);
       history.push(
         `/recipe/${id}?${queryString.stringify({
           multiplier: multiplierParam,
@@ -94,10 +94,10 @@ const RecipeDetail: React.FC = () => {
   // wrapper to set touched, and sync the state
   const setMultiplierW = (m: number) => {
     setMultiplierTouched(true);
-    _setMultiplier(m);
+    setMultiplier(m);
     history.push(`/recipe/${id}?${queryString.stringify({ multiplier: m })}`);
   };
-  // console.log(foods);
+
   //https://stackoverflow.com/a/26265095
   const hints: FoodsById = Object.assign(
     {},
@@ -232,60 +232,12 @@ const RecipeDetail: React.FC = () => {
 
   const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
 
-  console.group("nutrients");
-  const ingredientsSum = sumIngredients(recipe.detail.sections);
-  const uniqIng = ingredientsSum.ingredients;
-  let totalCal = 0;
-
-  let ingredientsWithNutrients: Array<{
-    ingredient: string;
-    nutrients: Map<string, number>;
-  }> = [];
-  const totalNutrients = new Map<string, number>();
-  // const foo = [];
-  Object.keys(uniqIng).forEach((k) => {
-    uniqIng[k].forEach((si) => {
-      if (si.ingredient === undefined) return;
-      const fdc_id = si.ingredient.fdc_id;
-      if (fdc_id !== undefined) {
-        const hint = hints[fdc_id];
-        if (hint !== undefined) {
-          const scalingFactor = si.grams / 100;
-          const cal = getCalories(hint) * scalingFactor;
-          const ingNutrients = new Map<string, number>();
-          hint.nutrients.forEach((n) => {
-            const { name, unit_name } = n.nutrient;
-            const label = `${name} (${unit_name})`;
-            if (n.amount <= 0) return;
-            totalNutrients.set(
-              label,
-              n.amount * scalingFactor + (totalNutrients.get(label) || 0)
-            );
-            ingNutrients.set(label, n.amount * scalingFactor);
-          });
-          ingredientsWithNutrients.push({
-            ingredient: si.ingredient.name,
-            nutrients: ingNutrients,
-          });
-          totalCal += cal;
-          console.log(
-            `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
-            cal
-          );
-        }
-      }
-    });
-  });
-  console.log("TOTAL", totalCal);
-  console.log("foo", totalNutrients, ingredientsWithNutrients);
-  console.groupEnd();
-
-  const totalGrams = recipe.detail.sections
-    .map((section) => section.ingredients.map((ingredient) => ingredient))
-    .flat()
-    .map((si) => si.grams)
-    .reduce((a, b) => a + b, 0);
-
+  const { totalCal, ingredientsWithNutrients, totalNutrients } = calCalc(
+    recipe.detail.sections,
+    hints,
+    multiplier
+  );
+  const totalGrams = countTotalGrams(recipe.detail.sections);
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -418,16 +370,6 @@ const RecipeDetail: React.FC = () => {
         items={ingredientsWithNutrients}
         h={[...totalNutrients.keys()]}
       />
-      {/* <Debug
-        data={{
-          loading,
-          error,
-          multiplier,
-          override,
-          recipe,
-          foo: ingredientsSum,
-        }}
-      /> */}
     </div>
   );
 };

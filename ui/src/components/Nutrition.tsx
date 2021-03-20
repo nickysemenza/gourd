@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { MinusCircle, PlusCircle } from "react-feather";
 import { CellProps, Column } from "react-table";
+import { ButtonGroup } from "./Button";
 import PaginatedTable from "./PaginatedTable";
 
 const Nutrient: React.FC<{
@@ -9,6 +11,7 @@ const Nutrient: React.FC<{
     nutrients: Map<string, number>;
   }>;
 }> = ({ items, h }) => {
+  const [show, setShow] = useState(false);
   type i = typeof items[0];
 
   const foo = h.map((n) => {
@@ -53,14 +56,28 @@ const Nutrient: React.FC<{
 
   return (
     <div>
-      <PaginatedTable
-        columns={columns}
-        data={items}
-        fetchData={() => {}}
-        isLoading={false}
-        totalCount={0}
-        pageCount={1}
+      <ButtonGroup
+        // compact
+        buttons={[
+          {
+            onClick: () => {
+              setShow(!show);
+            },
+            text: `${show ? "hide" : "show"}`,
+            IconLeft: show ? MinusCircle : PlusCircle,
+          },
+        ]}
       />
+      {show && (
+        <PaginatedTable
+          columns={columns}
+          data={items}
+          fetchData={() => {}}
+          isLoading={false}
+          totalCount={0}
+          pageCount={1}
+        />
+      )}
     </div>
   );
 };

@@ -352,15 +352,20 @@ export const getGlobalInstructionNumber = (
   instructionIndex +
   1;
 
+export const flatIngredients = (sections: RecipeSection[]) =>
+  sections
+    .map((section) => section.ingredients.map((ingredient) => ingredient))
+    .flat();
+
+export const countTotalGrams = (sections: RecipeSection[]) =>
+  flatIngredients(sections)
+    .map((si) => si.grams)
+    .reduce((a, b) => a + b, 0);
 export const sumIngredients = (sections: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
   let ingredients: Record<string, SectionIngredient[]> = {};
 
-  const flatIngredients = sections
-    .map((section) => section.ingredients.map((ingredient) => ingredient))
-    .flat();
-
-  flatIngredients.forEach((i) => {
+  flatIngredients(sections).forEach((i) => {
     switch (i.kind) {
       case "recipe":
         const r = i;
@@ -385,14 +390,73 @@ export const getCalories = (food: Food) => {
   return (!!first && first.amount) || 0;
 };
 
-export const getCal = (ingredient: SectionIngredient, hints: FoodsById) => {
+export const getCal = (
+  ingredient: SectionIngredient,
+  hints: FoodsById,
+  multiplier: number
+) => {
   const fdc_id = ingredient.ingredient?.fdc_id;
   if (fdc_id !== undefined) {
     const hint = hints[fdc_id];
     if (hint !== undefined) {
       const scalingFactor = ingredient.grams / 100;
-      return Math.round(getCalories(hint) * scalingFactor);
+      return Math.round(getCalories(hint) * scalingFactor * multiplier);
     }
   }
   return 0;
+};
+
+export const calCalc = (
+  sections: RecipeSection[],
+  hints: FoodsById,
+  multiplier: number
+) => {
+  console.group("nutrients");
+  const ingredientsSum = sumIngredients(sections);
+  const uniqIng = ingredientsSum.ingredients;
+  let totalCal = 0;
+
+  let ingredientsWithNutrients: Array<{
+    ingredient: string;
+    nutrients: Map<string, number>;
+  }> = [];
+  const totalNutrients = new Map<string, number>();
+  // const foo = [];
+  Object.keys(uniqIng).forEach((k) => {
+    uniqIng[k].forEach((si) => {
+      if (si.ingredient === undefined) return;
+      const fdc_id = si.ingredient.fdc_id;
+      if (fdc_id !== undefined) {
+        const hint = hints[fdc_id];
+        if (hint !== undefined) {
+          const scalingFactor = (si.grams / 100) * multiplier;
+          const cal = getCalories(hint) * scalingFactor;
+          const ingNutrients = new Map<string, number>();
+          hint.nutrients.forEach((n) => {
+            const { name, unit_name } = n.nutrient;
+            const label = `${name} (${unit_name})`;
+            if (n.amount <= 0) return;
+            totalNutrients.set(
+              label,
+              n.amount * scalingFactor + (totalNutrients.get(label) || 0)
+            );
+            ingNutrients.set(label, n.amount * scalingFactor);
+          });
+          ingredientsWithNutrients.push({
+            ingredient: si.ingredient.name,
+            nutrients: ingNutrients,
+          });
+          totalCal += cal;
+          console.log(
+            `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
+            cal
+          );
+        }
+      }
+    });
+  });
+  console.log("TOTAL", totalCal);
+  console.log("foo", totalNutrients, ingredientsWithNutrients);
+  console.groupEnd();
+  return { totalCal, ingredientsWithNutrients, totalNutrients };
 };
