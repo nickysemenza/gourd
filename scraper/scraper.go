@@ -13,9 +13,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/parser"
 	"github.com/nickysemenza/gourd/rs_client"
-	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/otel"
 	"gopkg.in/guregu/null.v4/zero"
@@ -49,29 +47,29 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 		}
 		section.Ingredients = append(section.Ingredients, apiIngredient)
 
-		i, err := parser.Parse(ctx, item)
-		if err != nil {
-			msg := fmt.Sprintf("failed to parse: %s", err)
-			log.Errorf(msg)
-			debugMsgs = append(debugMsgs, msg)
-			continue
-		}
-		debugMsgs = append(debugMsgs, i.ToString())
-		fmt.Println(i.ToString())
-		id, err := ingredientToId(ctx, i.Name, "ingredient")
-		if err != nil {
-			return nil, fmt.Errorf("failed to map ingredient %s to id: %w", i.Name, err)
-		}
-		spew.Dump(id)
-		section.Ingredients = append(section.Ingredients, api.SectionIngredient{
-			Ingredient: &api.Ingredient{Id: id},
-			Kind:       "ingredient",
-			Amount:     &i.Volume.Value,
-			Unit:       &i.Volume.Unit,
-			Adjective:  &i.Modifier,
-			Grams:      i.Grams(),
-			Original:   zero.StringFrom(item).Ptr(),
-		})
+		// i, err := parser.Parse(ctx, item)
+		// if err != nil {
+		// 	msg := fmt.Sprintf("failed to parse: %s", err)
+		// 	log.Errorf(msg)
+		// 	debugMsgs = append(debugMsgs, msg)
+		// 	continue
+		// }
+		// debugMsgs = append(debugMsgs, i.ToString())
+		// fmt.Println(i.ToString())
+		// id, err := ingredientToId(ctx, i.Name, "ingredient")
+		// if err != nil {
+		// 	return nil, fmt.Errorf("failed to map ingredient %s to id: %w", i.Name, err)
+		// }
+		// spew.Dump(id)
+		// section.Ingredients = append(section.Ingredients, api.SectionIngredient{
+		// 	Ingredient: &api.Ingredient{Id: id},
+		// 	Kind:       "ingredient",
+		// 	Amount:     &i.Volume.Value,
+		// 	Unit:       &i.Volume.Unit,
+		// 	Adjective:  &i.Modifier,
+		// 	Grams:      i.Grams(),
+		// 	Original:   zero.StringFrom(item).Ptr(),
+		// })
 	}
 	for _, item := range recipe.RecipeInstructions {
 		section.Instructions = append(section.Instructions, api.SectionInstruction{Instruction: item.Text})

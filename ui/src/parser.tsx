@@ -10,9 +10,9 @@ export const encodeIngredient = (
   const { grams, adjective, amount, unit } = ingredient;
   let i: Ingredient = {
     name: getIngredient(ingredient).name,
-    modifier: adjective || "",
+    modifier: adjective,
     amounts: [
-      { value: grams, unit: "grams" },
+      ...(grams !== 0 ? [{ value: grams, unit: "g" }] : []),
       ...(amount && amount !== 0 && unit ? [{ value: amount, unit }] : []),
     ],
   };

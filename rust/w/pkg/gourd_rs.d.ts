@@ -33,7 +33,7 @@ export function sum_ingr(recipe_detail: any): any;
 
 interface Ingredient {
     amounts: Amount[];
-    modifier: string;
+    modifier?: string;
     name: string;
   }
   

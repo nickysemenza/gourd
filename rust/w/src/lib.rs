@@ -42,7 +42,7 @@ pub fn parse(input: &str) -> String {
 const ITEXT_STYLE: &'static str = r#"
 interface Ingredient {
     amounts: Amount[];
-    modifier: string;
+    modifier?: string;
     name: string;
   }
   

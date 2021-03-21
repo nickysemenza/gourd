@@ -110,3 +110,8 @@ seed-testdata: bin/gourd
 
 rs: 
 	cd rust/s && cargo sqlx prepare -- --bin gourd
+
+
+wasm-dev: 
+	cd rust/w && wasm-pack build
+	cp -r rust/w/pkg/ ui/node_modules/gourd_rs/
