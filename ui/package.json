@@ -84,7 +84,7 @@
     "@cypress/code-coverage": "3.9.2",
     "@openapitools/openapi-generator-cli": "2.2.3",
     "@cypress/instrument-cra": "1.4.0",
-    "@testing-library/jest-dom": "5.11.9",
+    "@testing-library/jest-dom": "5.11.10",
     "@testing-library/react": "11.2.5",
     "@testing-library/user-event": "13.0.15",
     "autoprefixer": "10.2.5",
