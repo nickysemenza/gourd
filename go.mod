@@ -21,7 +21,7 @@ require (
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
-	github.com/golangci/golangci-lint v1.38.0
+	github.com/golangci/golangci-lint v1.39.0
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
 	github.com/gphotosuploader/googlemirror v0.5.0
