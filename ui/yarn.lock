@@ -9368,10 +9368,10 @@ human-signals@^1.1.1:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-1.1.1.tgz#c5b1cd14f50aeae09ab6c59fe63ba3395fe4dfa3"
   integrity sha512-SEQu7vl8KjNL2eoGBLF3+wAjpsNfA9XMlXAYj/3EdaNfAlxKthD1xjEQfGOUhllCGGJVNY34bRr6lPINhNjyZw==
 
-ibm-openapi-validator@0.38.0:
-  version "0.38.0"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.38.0.tgz#62ec0b5158ef8058c8835d26fe82a474b26a7a5e"
-  integrity sha512-c4X7HsKqQ4nIKkm6DqI9zWWuGy3L6Z+MzrLD6J5gPMGNEdXTYKFrbywc24ZDUodCdlEI8R7G2GWhtXhJmstT3w==
+ibm-openapi-validator@0.39.0:
+  version "0.39.0"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.39.0.tgz#95699cb8cf582ee110b3d23fa02b97c49ce5a45d"
+  integrity sha512-A74658b1y/qUvKzRYeMe3X/AASdiUHI7IHZAmPuypfPWHHuZBhq1oxPQTO6nCJCVIVfV8jdwssgwoFb2DzgHfQ==
   dependencies:
     "@stoplight/spectral" "^5.8.1"
     chalk "^4.1.0"
