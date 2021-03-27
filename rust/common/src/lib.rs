@@ -50,6 +50,10 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
     let i = dbg!(ingredient::from_str(s, true))?;
     Ok(section_ingredient_from_parsed(i))
 }
+pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
+    let i = dbg!(ingredient::parse_amount(s))?;
+    Ok(i)
+}
 pub fn get_grams(r: RecipeDetail) -> f64 {
     r.sections.iter().fold(0.0, |acc, s| {
         acc + s.ingredients.iter().fold(0.0, |acc, i| acc + i.grams)

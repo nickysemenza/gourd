@@ -11,10 +11,17 @@ import (
 	"go.opentelemetry.io/otel"
 )
 
-func ParseIngredient(ctx context.Context, ingredient string, target interface{}) error {
+type parseMethod string
+
+const (
+	Ingredient parseMethod = "parse"
+	Amount     parseMethod = "parse_amount"
+)
+
+func Parse(ctx context.Context, text string, kind parseMethod, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "ParseIngredient")
 	defer span.End()
-	url := fmt.Sprintf("http://localhost:8080/parse?text=%s", url.QueryEscape(ingredient))
+	url := fmt.Sprintf("http://localhost:8080/%s?text=%s", kind, url.QueryEscape(text))
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
 

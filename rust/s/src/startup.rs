@@ -71,6 +71,7 @@ fn run(
         App::new()
             .wrap(RequestTracing::new())
             .route("/parse", web::get().to(parser))
+            .route("/parse_amount", web::get().to(parser::amount_parser))
             .service(web::resource("/parse2").route(web::get().to(parser::index)))
             .app_data(db_pool.clone())
         // .app_data(email_client.clone())

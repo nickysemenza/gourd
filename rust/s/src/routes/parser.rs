@@ -65,6 +65,24 @@ pub async fn parser(info: web::Query<Info>) -> HttpResponse {
 
     HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
 }
+pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
+    global::tracer("my-component").start("amount_parser");
+
+    get_active_span(|span| {
+        span.add_event(
+            "amount_parse".to_string(),
+            vec![KeyValue::new("line", info.text.to_string())],
+        );
+    });
+
+    let i = gourd_common::parse_amount(&info.text);
+    if i.is_err() {
+        return HttpResponse::BadRequest().finish();
+    }
+    let foo = web::Json(i.unwrap());
+
+    HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SI {

@@ -41,7 +41,7 @@ func FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx
 		apiIngredient := api.SectionIngredient{
 			Original: zero.StringFrom(item).Ptr(),
 		}
-		err = rs_client.ParseIngredient(ctx, item, &apiIngredient)
+		err = rs_client.Parse(ctx, item, rs_client.Ingredient, &apiIngredient)
 		if err != nil {
 			return nil, err
 		}
