@@ -2,28 +2,53 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{section_ingredient::Kind, Ingredient, RecipeDetail, SectionIngredient};
 
-pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
-    let i = ingredient::from_str(s, true)?;
+fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredient {
+    let mut grams = 0.0;
+    let mut oz = 0.0;
+    let mut ml = 0.0;
+    let mut unit: Option<String> = None;
+    let mut amount: Option<f64> = None;
 
-    let (unit, amount) = match i.amounts.iter().find(|&x| !is_gram(x)) {
-        Some(i) => (Some(i.unit.clone()), Some(i.value as f64)),
-        None => (None, None),
-    };
+    for x in i.amounts.iter() {
+        if is_gram(x) {
+            grams = x.value.into();
+        } else if is_oz(x) {
+            oz = x.value.into();
+        } else if is_ml(x) {
+            ml = x.value.into();
+        } else {
+            unit = Some(x.unit.clone());
+            amount = Some(x.value as f64);
+        }
+    }
 
-    Ok(SectionIngredient {
+    // if grams are absent, try converting oz
+    if grams == 0.0 && oz != 0.0 {
+        grams = ((oz * 28.35) as f64).round();
+    } else if unit.is_none() && oz != 0.0 {
+        unit = Some("oz".to_string());
+        amount = Some(oz);
+    }
+
+    // if grams are absent, try using mL
+    if grams == 0.0 && ml != 0.0 {
+        grams = ml
+    } else if unit.is_none() && ml != 0.0 {
+        unit = Some("ml".to_string());
+        amount = Some(ml);
+    }
+
+    return SectionIngredient {
         unit,
         amount,
         adjective: i.modifier,
         ingredient: Some(Ingredient::new("".to_string(), i.name)),
-        ..SectionIngredient::new(
-            "".to_string(),
-            Kind::Ingredient,
-            match i.amounts.iter().find(|&x| is_gram(x)) {
-                Some(g) => g.value.into(),
-                None => 0.0,
-            },
-        )
-    })
+        ..SectionIngredient::new("".to_string(), Kind::Ingredient, grams)
+    };
+}
+pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
+    let i = dbg!(ingredient::from_str(s, true))?;
+    Ok(section_ingredient_from_parsed(i))
 }
 pub fn get_grams(r: RecipeDetail) -> f64 {
     r.sections.iter().fold(0.0, |acc, s| {
@@ -64,7 +89,13 @@ pub fn sum_ingredients(
 }
 
 fn is_gram(a: &ingredient::Amount) -> bool {
-    a.unit == "g" || a.unit == "grams"
+    a.unit == "g" || a.unit == "gram" || a.unit == "grams"
+}
+fn is_oz(a: &ingredient::Amount) -> bool {
+    a.unit == "oz" || a.unit == "ounce" || a.unit == "ounces"
+}
+fn is_ml(a: &ingredient::Amount) -> bool {
+    a.unit == "ml" || a.unit == "mL"
 }
 
 #[cfg(test)]
@@ -75,7 +106,39 @@ mod tests {
     };
 
     #[test]
-    fn it_works() {
+    fn test_from_parsed() {
+        assert_eq!(
+            parse_ingredient("118 grams / 0.5 cups water").unwrap(),
+            SectionIngredient {
+                amount: Some(0.5),
+                unit: Some("cups".to_string()),
+                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 118.0)
+            }
+        );
+        // ml is parsed as grams if not present
+        assert_eq!(
+            parse_ingredient("118 ml / 0.5 cups water").unwrap(),
+            SectionIngredient {
+                amount: Some(0.5),
+                unit: Some("cups".to_string()),
+                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 118.0)
+            }
+        );
+        assert_eq!(
+            parse_ingredient("4 oz / 1/2 cup water").unwrap(),
+            SectionIngredient {
+                amount: Some(0.5),
+                unit: Some("cup".to_string()),
+                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 113.0)
+            }
+        );
+    }
+
+    #[test]
+    fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
             ingredient: Some(Ingredient::new("a".to_string(), "foo".to_string())),
             ..SectionIngredient::new("".to_string(), Kind::Ingredient, 12.0)

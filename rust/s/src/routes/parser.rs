@@ -5,38 +5,38 @@ use opentelemetry::{trace::get_active_span, KeyValue};
 use serde::{Deserialize, Serialize};
 use sqlx::{types::BigDecimal, PgPool};
 
+fn si_to_api(r: SI) -> SectionIngredient {
+    SectionIngredient {
+        kind: if r.ingredient.is_some() {
+            Kind::Ingredient
+        } else {
+            Kind::Recipe
+        },
+        // section: r.section,
+        id: r.id,
+        // sort: r.sort,
+        ingredient: None,
+        recipe: None,
+        amount: match r.amount {
+            Some(f) => bigdecimal::ToPrimitive::to_f64(&f),
+            None => None,
+        },
+        unit: r.unit,
+        grams: match r.grams {
+            Some(f) => bigdecimal::ToPrimitive::to_f64(&f).unwrap_or_default(),
+            None => 0.0,
+        },
+        adjective: r.adjective,
+        optional: r.optional,
+        original: r.original,
+        substitutes: None,
+        // substitutes_for: r.substitutes_for,
+    }
+}
 /// This handler uses json extractor
 pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
     let rows = get_test(&pool).await.unwrap();
-    let data: Vec<SectionIngredient> = rows
-        .into_iter()
-        .map(|r| SectionIngredient {
-            kind: if r.ingredient.is_some() {
-                Kind::Ingredient
-            } else {
-                Kind::Recipe
-            },
-            // section: r.section,
-            id: r.id,
-            // sort: r.sort,
-            ingredient: None,
-            recipe: None,
-            amount: match r.amount {
-                Some(f) => bigdecimal::ToPrimitive::to_f64(&f),
-                None => None,
-            },
-            unit: r.unit,
-            grams: match r.grams {
-                Some(f) => bigdecimal::ToPrimitive::to_f64(&f).unwrap_or_default(),
-                None => 0.0,
-            },
-            adjective: r.adjective,
-            optional: r.optional,
-            original: r.original,
-            substitutes: None,
-            // substitutes_for: r.substitutes_for,
-        })
-        .collect();
+    let data: Vec<SectionIngredient> = rows.into_iter().map(|r| si_to_api(r)).collect();
     // dbg!(a);
 
     HttpResponse::Ok().json(actix_web::web::Json(data)) // <- send response
@@ -105,7 +105,7 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_parse() -> Result<(), Error> {
-        let mut app = test::init_service(
+        let app = test::init_service(
             App::new().service(web::resource("/parse").route(web::get().to(parser))),
         )
         .await;
