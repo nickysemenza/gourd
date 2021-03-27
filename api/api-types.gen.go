@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+// Amount defines model for Amount.
+type Amount struct {
+
+	// unit
+	Unit string `json:"unit"`
+
+	// value
+	Value float64 `json:"value"`
+}
+
 // AuthResp defines model for AuthResp.
 type AuthResp struct {
 	Jwt  string                 `json:"jwt"`
@@ -177,6 +187,9 @@ type IngredientDetail struct {
 
 	// Recipes referencing this ingredient
 	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
+
+	// mappings of equivalent units
+	UnitMappings *[]UnitMapping `json:"unit_mappings,omitempty"`
 }
 
 // Items defines model for Items.
@@ -435,6 +448,19 @@ type TimeRange struct {
 
 	// The minimum amount of seconds (or the total, if not a range)
 	Min int `json:"min"`
+}
+
+// UnitMapping defines model for UnitMapping.
+type UnitMapping struct {
+
+	// amount and unit
+	A Amount `json:"a"`
+
+	// amount and unit
+	B Amount `json:"b"`
+
+	// source of the mapping
+	Source string `json:"source"`
 }
 
 // LimitParam defines model for limitParam.

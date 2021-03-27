@@ -192,6 +192,36 @@ export interface IngredientDetail {
    */
   children?: IngredientDetail[];
   food?: Food;
+  /**
+   * mappings of equivalent units
+   */
+  unit_mappings?: UnitMapping[];
+}
+
+/**
+ * mappings
+ */
+export interface UnitMapping {
+  a: Amount;
+  b: Amount;
+  /**
+   * source of the mapping
+   */
+  source: string;
+}
+
+/**
+ * amount and unit
+ */
+export interface Amount {
+  /**
+   * unit
+   */
+  unit: string;
+  /**
+   * value
+   */
+  value: number;
 }
 
 /**

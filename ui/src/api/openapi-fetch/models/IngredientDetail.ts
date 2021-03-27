@@ -26,6 +26,10 @@ import {
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
+    UnitMapping,
+    UnitMappingFromJSON,
+    UnitMappingFromJSONTyped,
+    UnitMappingToJSON,
 } from './';
 
 /**
@@ -58,6 +62,12 @@ export interface IngredientDetail {
      * @memberof IngredientDetail
      */
     food?: Food;
+    /**
+     * mappings of equivalent units
+     * @type {Array<UnitMapping>}
+     * @memberof IngredientDetail
+     */
+    unit_mappings?: Array<UnitMapping>;
 }
 
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
@@ -74,6 +84,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
         'food': !exists(json, 'food') ? undefined : FoodFromJSON(json['food']),
+        'unit_mappings': !exists(json, 'unit_mappings') ? undefined : ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
 
@@ -90,6 +101,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
         'food': FoodToJSON(value.food),
+        'unit_mappings': value.unit_mappings === undefined ? undefined : ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
 

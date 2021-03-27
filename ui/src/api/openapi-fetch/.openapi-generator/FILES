@@ -9,6 +9,7 @@ apis/PhotosApi.ts
 apis/RecipesApi.ts
 apis/index.ts
 index.ts
+models/Amount.ts
 models/AuthResp.ts
 models/BrandedFood.ts
 models/Food.ts
@@ -43,5 +44,6 @@ models/SearchResult.ts
 models/SectionIngredient.ts
 models/SectionInstruction.ts
 models/TimeRange.ts
+models/UnitMapping.ts
 models/index.ts
 runtime.ts

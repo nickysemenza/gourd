@@ -6,6 +6,7 @@ git_push.sh
 src/apis/configuration.rs
 src/apis/mod.rs
 src/lib.rs
+src/models/amount.rs
 src/models/auth_resp.rs
 src/models/branded_food.rs
 src/models/error.rs
@@ -41,3 +42,4 @@ src/models/search_result.rs
 src/models/section_ingredient.rs
 src/models/section_instruction.rs
 src/models/time_range.rs
+src/models/unit_mapping.rs

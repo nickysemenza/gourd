@@ -766,6 +766,40 @@ components:
             $ref: "#/components/schemas/IngredientDetail"
         food:
           $ref: "#/components/schemas/Food"
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
+    UnitMapping:
+      description: mappings
+      type: object
+      required:
+        - a
+        - b
+        - source
+      properties:
+        a:
+          $ref: "#/components/schemas/Amount"
+        b:
+          $ref: "#/components/schemas/Amount"
+        source:
+          description: source of the mapping
+          type: string
+    Amount:
+      description: amount and unit
+      type: object
+      required:
+        - unit
+        - value
+      properties:
+        unit:
+          description: unit
+          type: string
+        value:
+          description: value
+          type: number
+          format: double # float64
     RecipeSource:
       description: where the recipe came from (i.e. book/website)
       type: object

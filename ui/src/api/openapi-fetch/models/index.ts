@@ -1,3 +1,4 @@
+export * from './Amount';
 export * from './AuthResp';
 export * from './BrandedFood';
 export * from './Food';
@@ -32,3 +33,4 @@ export * from './SearchResult';
 export * from './SectionIngredient';
 export * from './SectionInstruction';
 export * from './TimeRange';
+export * from './UnitMapping';

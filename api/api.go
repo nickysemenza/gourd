@@ -19,6 +19,7 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
@@ -411,6 +412,19 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 				return nil, err
 			}
 			detail.Food = food
+
+			// todo: store these in DB instead of inline parsing
+			if food.BrandedInfo.HouseholdServing != nil {
+				var res []Amount
+				err = rs_client.Parse(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
+				if err == nil && len(res) > 0 {
+					detail.UnitMappings = &[]UnitMapping{{
+						Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
+						res[0],
+						"fdc"}}
+				}
+
+			}
 		}
 		items = append(items, detail)
 	}

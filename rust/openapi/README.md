@@ -27,6 +27,7 @@ All URIs are relative to _http://localhost:4242/api_
 
 ## Documentation For Models
 
+- [Amount](docs/Amount.md)
 - [AuthResp](docs/AuthResp.md)
 - [BrandedFood](docs/BrandedFood.md)
 - [Error](docs/Error.md)
@@ -61,6 +62,7 @@ All URIs are relative to _http://localhost:4242/api_
 - [SectionIngredient](docs/SectionIngredient.md)
 - [SectionInstruction](docs/SectionInstruction.md)
 - [TimeRange](docs/TimeRange.md)
+- [UnitMapping](docs/UnitMapping.md)
 
 To get access to the crate's generated documentation, use:
 

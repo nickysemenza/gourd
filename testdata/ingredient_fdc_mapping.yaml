@@ -16,8 +16,7 @@
   fdc_id: 804415
 - name: kosher salt
   fdc_id: 705264
-- name: salt
-  fdc_id: 705264
+  aliases: ["salt", "Coarse sea salt"]
 - name: unsalted butter
   fdc_id: 798135
 - name: vanilla extract
@@ -28,13 +27,16 @@
   fdc_id: 496879
 - name: baking soda
   fdc_id: 741258
+- name: baking powdered
+  fdc_id: 600789
 - name: milk
   fdc_id: 726156
 - name: active dry yeast
   fdc_id: 368813
 - name: pastry flour
   fdc_id: 532183
-- name: brown sugar
+- name: dark brown sugar
+  aliases: ["brown sugar"]
   fdc_id: 577990
 - name: oats
   fdc_id: 538678
@@ -42,3 +44,19 @@
   fdc_id: 562568
 - name: hazelnuts
   fdc_id: 478317
+- name: semisweet chocolate
+  fdc_id: 415501
+- name: sesame oil
+  fdc_id: 516949
+- name: green onion
+  fdc_id: 795983
+  aliases: ["scallions"]
+- name: soy sauce
+  fdc_id: 774134
+  aliases: ["light soy sauce"]
+- name: bread flour
+  fdc_id: 558694
+- name: cornmeal
+  fdc_id: 519412
+- name: blueberries
+  fdc_id: 732876
