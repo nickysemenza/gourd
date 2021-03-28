@@ -64,7 +64,7 @@ const IngredientList: React.FC = () => {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { ingredient, children, food } = original;
+          const { ingredient, children, food, unit_mappings } = original;
           return (
             <div className="flex flex-col w-64">
               {ingredient.name}
@@ -91,6 +91,15 @@ const IngredientList: React.FC = () => {
               <Link to={`/ingredients/${ingredient.id}`} className="link">
                 <div className="text-blue-800">view</div>
               </Link>
+              <ul>
+                {unit_mappings &&
+                  unit_mappings.map((m) => (
+                    <li>
+                      {m.a.value} {m.a.unit} = {m.b.value} {m.b.unit} (
+                      {m.source}){" "}
+                    </li>
+                  ))}
+              </ul>
             </div>
           );
         },

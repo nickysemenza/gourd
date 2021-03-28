@@ -19,7 +19,7 @@ const (
 )
 
 func Parse(ctx context.Context, text string, kind parseMethod, target interface{}) error {
-	ctx, span := otel.Tracer("rs_client").Start(ctx, "ParseIngredient")
+	ctx, span := otel.Tracer("rs_client").Start(ctx, "Parse")
 	defer span.End()
 	url := fmt.Sprintf("http://localhost:8080/%s?text=%s", kind, url.QueryEscape(text))
 

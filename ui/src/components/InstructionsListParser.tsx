@@ -20,15 +20,16 @@ const InstructionsListParser: React.FC<{
 
   const a = foo(sections, instance, true);
   const b = foo(sections, instance, false);
-  const si =
-    a.length > 0 &&
-    a[0].length > 0 &&
-    b.length > 0 &&
-    b[0].length > 0 &&
-    a[0][0].grams === 0 &&
-    b[0][0].grams !== 0
-      ? b
-      : a;
+  // const si =
+  //   a.length > 0 &&
+  //   a[0].length > 0 &&
+  //   b.length > 0 &&
+  //   b[0].length > 0 &&
+  //   a[0][0].grams === 0 &&
+  //   b[0][0].grams !== 0
+  //     ? b
+  //     : a;
+  const si = b;
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">

@@ -21,6 +21,7 @@ import (
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -382,7 +383,7 @@ func (a *API) IngredientIdByName(ctx context.Context, name, kind string) (string
 	return ing.Id, nil
 }
 func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) ([]IngredientDetail, error) {
-	ctx, span := a.tracer.Start(ctx, "ListIngredients")
+	ctx, span := a.tracer.Start(ctx, "addDetailsToIngredients")
 	defer span.End()
 
 	items := []IngredientDetail{}
@@ -405,6 +406,8 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	for _, i := range ing {
 		// assemble
+		ctx, span2 := a.tracer.Start(ctx, "addDetailsToIngredients: enhance w/ fdc")
+		defer span2.End()
 		detail := makeDetail(i, sameAs, linkedRecipes)
 		if i.FdcID.Valid {
 			food, err := a.getFoodById(ctx, int(i.FdcID.Int64))
@@ -412,6 +415,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 				return nil, err
 			}
 			detail.Food = food
+			span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
 
 			// todo: store these in DB instead of inline parsing
 			if food.BrandedInfo.HouseholdServing != nil {
@@ -427,6 +431,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 			}
 		}
 		items = append(items, detail)
+		span.End()
 	}
 	return items, nil
 }

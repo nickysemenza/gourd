@@ -13,10 +13,10 @@ async fn main() -> std::io::Result<()> {
     // global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
     // not jaeger, this one: https://github.com/openebs/Mayastor/blob/master/control-plane/rest/service/src/main.rs#L64
     global::set_text_map_propagator(TraceContextPropagator::new());
-    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+    let tracer = opentelemetry_jaeger::new_pipeline()
         .with_service_name("actix_server")
-        .with_trace_config(trace::config().with_default_sampler(Sampler::AlwaysOn))
-        .install()
+        .with_trace_config(trace::config().with_sampler(Sampler::AlwaysOn))
+        .install_simple()
         .expect("pipeline install error");
     println!("tracer: {:?}", tracer);
 
