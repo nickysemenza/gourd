@@ -81,7 +81,7 @@
     ]
   },
   "devDependencies": {
-    "@cypress/code-coverage": "3.9.3",
+    "@cypress/code-coverage": "3.9.4",
     "@openapitools/openapi-generator-cli": "2.2.3",
     "@cypress/instrument-cra": "1.4.0",
     "@testing-library/jest-dom": "5.11.10",
