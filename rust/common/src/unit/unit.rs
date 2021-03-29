@@ -1,4 +1,5 @@
 #[derive(Clone, PartialEq, PartialOrd, Debug, Default)]
+
 pub struct Measurement(String, f32);
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub enum Measure {
@@ -26,7 +27,7 @@ pub enum Unit {
     Quart,
     FluidOunce,
     Ounce,
-    Other,
+    Other(String),
 }
 
 impl Unit {
@@ -46,8 +47,24 @@ impl Unit {
             "q" | "quart" => Self::Quart,
             "fl oz" | "fluid oz" => Self::FluidOunce,
 
-            _ => Self::Other,
+            _ => Self::Other(s.to_string()),
         }
+    }
+    pub fn to_str(self) -> String {
+        match self {
+            Unit::Gram => "g",
+            Unit::Kilogram => "kg",
+            Unit::Liter => "l",
+            Unit::Milliliter => "ml",
+            Unit::Teaspoon => "tsp",
+            Unit::Tablespoon => "tbsp",
+            Unit::Cup => "cup",
+            Unit::Quart => "quart",
+            Unit::FluidOunce => "fl oz",
+            Unit::Ounce => "oz",
+            Unit::Other(s) => return s,
+        }
+        .to_string()
     }
 }
 
@@ -80,7 +97,7 @@ impl Measure {
             Unit::Quart => Self::Teaspoon(m.1 * CUP_TO_QUART * TSP_TO_CUP),
             Unit::FluidOunce => Self::Teaspoon(m.1 * TSP_TO_FL_OZ),
 
-            Unit::Other => Self::Other(m),
+            Unit::Other(_) => Self::Other(m),
         };
     }
     pub fn kind(self) -> MeasureKind {
@@ -92,32 +109,30 @@ impl Measure {
     }
 
     pub fn normalize(self) -> Measurement {
-        return match self {
-            Measure::Other(m) => m,
+        let (m, u, f) = match self {
+            Measure::Other(m) => (m.1, Unit::Other(m.0), 1.0),
             Measure::Grams(m) => {
                 if m < 1000.0 {
-                    return Measurement("grams".to_string(), m);
+                    (m, Unit::Gram, 1.0)
                 } else {
-                    return Measurement("kg".to_string(), m / G_TO_K);
+                    (m, Unit::Kilogram, G_TO_K)
                 }
             }
             Measure::Ml(m) => {
                 if m < 1000.0 {
-                    return Measurement("ml".to_string(), m);
+                    (m, Unit::Milliliter, 1.0)
                 } else {
-                    return Measurement("l".to_string(), m / G_TO_K);
+                    (m, Unit::Liter, G_TO_K)
                 }
             }
-            Measure::Teaspoon(m) => {
-                let (a, b) = match m {
-                    m if { m < 3.0 } => ("tsp", m),
-                    m if { m < 12.0 } => ("tbsp", m / TSP_TO_TBSP),
-                    m if { m < CUP_TO_QUART * TSP_TO_CUP } => ("cup", m / (TSP_TO_CUP)),
-                    _ => ("tsp", m),
-                };
-                return Measurement(a.to_string(), b);
-            }
+            Measure::Teaspoon(m) => match m {
+                m if { m < 3.0 } => (m, Unit::Teaspoon, 1.0),
+                m if { m < 12.0 } => (m, Unit::Tablespoon, TSP_TO_TBSP),
+                m if { m < CUP_TO_QUART * TSP_TO_CUP } => (m, Unit::Cup, TSP_TO_CUP),
+                _ => (m, Unit::Teaspoon, 1.0),
+            },
         };
+        return Measurement(u.to_str(), m / f);
     }
 
     // Err("todo".to_string())
@@ -138,11 +153,15 @@ mod tests {
         assert_eq!(m1.normalize(), Measurement("cup".to_string(), 1.0));
         assert_eq!(
             Measure::from_string("25.2 grams".to_string()).normalize(),
-            Measurement("grams".to_string(), 25.2)
+            Measurement("g".to_string(), 25.2)
         );
         assert_eq!(
             Measure::from_string("2500.2 grams".to_string()).normalize(),
             Measurement("kg".to_string(), 2.5002)
+        );
+        assert_eq!(
+            Measure::from_string("12 foo".to_string()).normalize(),
+            Measurement("foo".to_string(), 12.0)
         );
     }
 }
