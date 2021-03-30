@@ -41,7 +41,7 @@
     "redoc": "2.0.0-rc.50",
     "restful-react": "15.3.0",
     "gourd_rs": "file:../rust/w/pkg",
-    "styled-components": "5.2.1",
+    "styled-components": "5.2.2",
     "typescript": "4.2.3",
     "universal-cookie": "4.0.4",
     "wasm-loader": "1.3.0"
