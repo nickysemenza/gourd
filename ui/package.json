@@ -39,7 +39,7 @@
     "react-table": "7.6.3",
     "react-toastify": "7.0.3",
     "redoc": "2.0.0-rc.50",
-    "restful-react": "15.3.0",
+    "restful-react": "15.4.0",
     "gourd_rs": "file:../rust/w/pkg",
     "styled-components": "5.2.2",
     "typescript": "4.2.3",
