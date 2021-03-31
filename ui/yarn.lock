@@ -14919,10 +14919,10 @@ responselike@^1.0.2:
   dependencies:
     lowercase-keys "^1.0.0"
 
-restful-react@15.3.0:
-  version "15.3.0"
-  resolved "https://registry.yarnpkg.com/restful-react/-/restful-react-15.3.0.tgz#1faf02a356ff8c3d321e412b34901bdd145039e6"
-  integrity sha512-FrvvwUIxu104kWDAXW+eGA4O1+BVkXYaNQunLyuOdMzhwpP4TipOfNkFDA250qnqhv8hBAQ1UgZAJLumC2sl7g==
+restful-react@15.4.0:
+  version "15.4.0"
+  resolved "https://registry.yarnpkg.com/restful-react/-/restful-react-15.4.0.tgz#bc87fe62379467baddad5be5c803e2a70dd282ef"
+  integrity sha512-ibi+Lunw3KoWVsE+eSQ9De9NPmk/hLCYmHn8az0QIBm00z+WG16KhHwlTard1BjJRkXdPY64gg1HzCHToy9zFg==
   dependencies:
     case "^1.6.2"
     chalk "^3.0.0"
@@ -14938,7 +14938,7 @@ restful-react@15.3.0:
     request "^2.88.0"
     slash "^3.0.0"
     swagger2openapi "^5.3.2"
-    tslib "^1.10.0"
+    tslib "^2.1.0"
     url "^0.11.0"
 
 restore-cursor@^1.0.1:
