@@ -140,9 +140,6 @@ impl Measure {
                     m.0.clone().normalize().0.clone(),
                     m.0.clone().normalize().1 / m.1.clone().normalize().1 * self.clone().1,
                 );
-                // Measure::Cent(m.0/m.1)
-                // let a_n = m.0.as_bare();
-                // let b_n = m.1.as_bare();
             }
             if a == curr_kind && b == target {
                 dbg!(m);
@@ -150,8 +147,6 @@ impl Measure {
                     dbg!(m.1.clone().normalize()).0.clone(),
                     m.1.clone().normalize().1 / dbg!(m.0.clone().normalize()).1 * self.clone().1,
                 );
-                // let a_n = m.0.as_bare();
-                // let b_n = m.1.as_bare();
             }
         }
 
