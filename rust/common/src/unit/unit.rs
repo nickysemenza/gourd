@@ -95,24 +95,22 @@ impl Measure {
     pub fn normalize(self) -> Measure {
         let m = self.clone();
         let foo = match self.0 {
-            Unit::Gram => (Unit::Gram, m.1),
+            Unit::Teaspoon | Unit::Milliliter | Unit::Gram | Unit::Cent | Unit::Other(_) => {
+                return m
+            }
+
             Unit::Kilogram => (Unit::Gram, m.1 * G_TO_K),
 
             Unit::Ounce => (Unit::Gram, m.1 * GRAM_TO_OZ),
 
-            Unit::Milliliter => (Unit::Milliliter, m.1),
             Unit::Liter => (Unit::Milliliter, m.1 * G_TO_K),
 
-            Unit::Teaspoon => (Unit::Teaspoon, m.1),
             Unit::Tablespoon => (Unit::Teaspoon, m.1 * TSP_TO_TBSP),
             Unit::Cup => (Unit::Teaspoon, m.1 * TSP_TO_CUP),
             Unit::Quart => (Unit::Teaspoon, m.1 * CUP_TO_QUART * TSP_TO_CUP),
             Unit::FluidOunce => (Unit::Teaspoon, m.1 * TSP_TO_FL_OZ),
 
-            Unit::Cent => (Unit::Cent, m.1),
             Unit::Dollar => (Unit::Cent, m.1 * 100.0),
-
-            Unit::Other(x) => (Unit::Other(x), m.1),
         };
         return Measure(foo.0, foo.1);
     }
