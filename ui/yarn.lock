@@ -6790,10 +6790,10 @@ cyclist@^1.0.1:
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
 
-cypress-terminal-report@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/cypress-terminal-report/-/cypress-terminal-report-3.0.2.tgz#a6f414947c5cd5c701e861692cc5b74c775d4a99"
-  integrity sha512-i5AidWIubPs7x3F7JTHeJcDshvvUpPmwDcK8Nk65reIqa44UnaZg4/DDLb6EeniJEl8NE6jwe/7LNOrlXZJjKg==
+cypress-terminal-report@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/cypress-terminal-report/-/cypress-terminal-report-3.0.3.tgz#6eeaaa93e7153cbcb443f3fb99124018bcf58cf0"
+  integrity sha512-X0QBAbh3oSsviCiKS9sOllNXJd8rhnjOMA9WfEl5m53jSsuGPSRbOCPx/kPi07NTuY55aFkhU+Bpm1lgaq2OJg==
   dependencies:
     chalk "^3.0.0"
     fs-extra "^9.0.1"
