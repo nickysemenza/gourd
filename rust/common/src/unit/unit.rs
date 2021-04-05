@@ -1,5 +1,16 @@
-#[derive(Clone, PartialEq, PartialOrd, Debug, Default)]
-pub struct BareMeasurement(String, f32);
+use serde::{Deserialize, Serialize};
+
+#[derive(Clone, PartialEq, PartialOrd, Debug, Default, Serialize, Deserialize)]
+pub struct BareMeasurement {
+    unit: String,
+    value: f32,
+}
+
+impl BareMeasurement {
+    pub fn new(unit: String, value: f32) -> BareMeasurement {
+        BareMeasurement { unit, value }
+    }
+}
 
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct Measure(Unit, f32);
@@ -90,7 +101,7 @@ const GRAM_TO_OZ: f32 = 28.3495;
 impl Measure {
     pub fn from_string(s: String) -> Measure {
         let a = ingredient::parse_amount(s.as_str()).unwrap()[0].clone();
-        return Measure::parse(BareMeasurement(a.unit, a.value));
+        Measure::parse(BareMeasurement::new(a.unit, a.value))
     }
     pub fn normalize(self) -> Measure {
         let m = self.clone();
@@ -115,7 +126,7 @@ impl Measure {
         return Measure(foo.0, foo.1);
     }
     pub fn parse(m: BareMeasurement) -> Measure {
-        let foo = Measure(Unit::from_str(singular(m.0.as_ref()).as_ref()), m.1).normalize();
+        let foo = Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize();
         return Measure(foo.0, foo.1);
     }
     pub fn kind(self) -> MeasureKind {
@@ -124,31 +135,35 @@ impl Measure {
             Unit::Cent => MeasureKind::Money,
             Unit::Teaspoon | Unit::Milliliter => MeasureKind::Volume,
 
-            Unit::Other(_) | _ => MeasureKind::Other,
+            Unit::Other(_) => MeasureKind::Other,
+            _ => panic!("unit not normalized: {:?}", self),
         };
     }
 
-    pub fn convert(self, target: MeasureKind, mappings: Vec<(Measure, Measure)>) -> Measure {
+    pub fn convert(
+        self,
+        target: MeasureKind,
+        mappings: Vec<(Measure, Measure)>,
+    ) -> Option<Measure> {
         let curr_kind = self.clone().kind();
-        // let inp = self.as_bare();
         for m in mappings.iter() {
-            let (a, b) = (m.0.clone().kind(), m.1.clone().kind());
-            if a == target && b == curr_kind {
-                return Measure(
+            let (kind_a, kind_b) = (m.0.clone().kind(), m.1.clone().kind());
+            if kind_a == target && kind_b == curr_kind {
+                return Some(Measure(
                     m.0.clone().normalize().0.clone(),
                     m.0.clone().normalize().1 / m.1.clone().normalize().1 * self.clone().1,
-                );
-            }
-            if a == curr_kind && b == target {
+                ));
+            } else if kind_a == curr_kind && kind_b == target {
                 dbg!(m);
-                return Measure(
-                    dbg!(m.1.clone().normalize()).0.clone(),
+                return Some(Measure(
+                    m.1.clone().normalize().0.clone(),
                     m.1.clone().normalize().1 / dbg!(m.0.clone().normalize()).1 * self.clone().1,
-                );
+                ));
             }
         }
 
-        Measure(Unit::Other("foo".to_string()), 1.0)
+        None
+        // Measure(Unit::Other("foo".to_string()), 1.0)
     }
     pub fn as_bare(self) -> BareMeasurement {
         let m = self.1;
@@ -176,9 +191,9 @@ impl Measure {
 
             Unit::Cent => (m, Unit::Cent, 1.0),
             Unit::Other(o) => (m, Unit::Other(o), 1.0),
-            _ => (m, Unit::Other("".to_string()), 1.0),
+            _ => panic!("unit not normalized: {:?}", self),
         };
-        return BareMeasurement(u.to_str(), val / f);
+        return BareMeasurement::new(u.to_str(), val / f);
     }
 
     // Err("todo".to_string())
@@ -196,18 +211,18 @@ mod tests {
         // let m1 = Measure::parse(Measurement("Tbsp".to_string(), 16.0));
         let m1 = Measure::from_string("16 tbsp".to_string());
         assert_eq!(m1, Measure(Unit::Teaspoon, 48.0));
-        assert_eq!(m1.as_bare(), BareMeasurement("cup".to_string(), 1.0));
+        assert_eq!(m1.as_bare(), BareMeasurement::new("cup".to_string(), 1.0));
         assert_eq!(
             Measure::from_string("25.2 grams".to_string()).as_bare(),
-            BareMeasurement("g".to_string(), 25.2)
+            BareMeasurement::new("g".to_string(), 25.2)
         );
         assert_eq!(
             Measure::from_string("2500.2 grams".to_string()).as_bare(),
-            BareMeasurement("kg".to_string(), 2.5002)
+            BareMeasurement::new("kg".to_string(), 2.5002)
         );
         assert_eq!(
             Measure::from_string("12 foo".to_string()).as_bare(),
-            BareMeasurement("foo".to_string(), 12.0)
+            BareMeasurement::new("foo".to_string(), 12.0)
         );
     }
 
@@ -220,7 +235,7 @@ mod tests {
         );
         assert_eq!(
             Measure::from_string("2 dollars".to_string()),
-            m.convert(MeasureKind::Money, vec![tbsp_dollars])
+            m.convert(MeasureKind::Money, vec![tbsp_dollars]).unwrap()
         );
     }
 }
