@@ -16,7 +16,7 @@
     "@types/react-select": "3.1.2",
     "@types/react-table": "7.0.29",
     "blurhash": "1.1.3",
-    "core-js": "3.10.0",
+    "core-js": "3.10.1",
     "dayjs": "1.10.4",
     "immutability-helper": "3.1.1",
     "jwt-decode": "3.1.2",
