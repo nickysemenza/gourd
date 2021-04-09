@@ -38,7 +38,7 @@
     "react-select": "4.0.2",
     "react-table": "7.6.3",
     "react-toastify": "7.0.3",
-    "redoc": "2.0.0-rc.51",
+    "redoc": "2.0.0-rc.52",
     "restful-react": "15.4.1",
     "gourd_rs": "file:../rust/w/pkg",
     "styled-components": "5.2.3",
