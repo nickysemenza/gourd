@@ -9,7 +9,7 @@ require (
 	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/charmbracelet/glamour v0.2.1-0.20201227140546-4292a2106d74
+	github.com/charmbracelet/glamour v0.3.0
 	github.com/cosmtrek/air v1.15.1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.6.0
@@ -47,7 +47,6 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	github.com/yuin/goldmark v1.3.2 // indirect
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.18.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.18.0
