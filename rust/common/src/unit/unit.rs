@@ -103,33 +103,32 @@ impl Measure {
         let a = ingredient::parse_amount(s.as_str()).unwrap()[0].clone();
         Measure::parse(BareMeasurement::new(a.unit, a.value))
     }
-    pub fn normalize(self) -> Measure {
-        let m = self.clone();
+    pub fn normalize(&self) -> Measure {
         let foo = match self.0 {
             Unit::Teaspoon | Unit::Milliliter | Unit::Gram | Unit::Cent | Unit::Other(_) => {
-                return m
+                return self.clone()
             }
 
-            Unit::Kilogram => (Unit::Gram, m.1 * G_TO_K),
+            Unit::Kilogram => (Unit::Gram, self.1 * G_TO_K),
 
-            Unit::Ounce => (Unit::Gram, m.1 * GRAM_TO_OZ),
+            Unit::Ounce => (Unit::Gram, self.1 * GRAM_TO_OZ),
 
-            Unit::Liter => (Unit::Milliliter, m.1 * G_TO_K),
+            Unit::Liter => (Unit::Milliliter, self.1 * G_TO_K),
 
-            Unit::Tablespoon => (Unit::Teaspoon, m.1 * TSP_TO_TBSP),
-            Unit::Cup => (Unit::Teaspoon, m.1 * TSP_TO_CUP),
-            Unit::Quart => (Unit::Teaspoon, m.1 * CUP_TO_QUART * TSP_TO_CUP),
-            Unit::FluidOunce => (Unit::Teaspoon, m.1 * TSP_TO_FL_OZ),
+            Unit::Tablespoon => (Unit::Teaspoon, self.1 * TSP_TO_TBSP),
+            Unit::Cup => (Unit::Teaspoon, self.1 * TSP_TO_CUP),
+            Unit::Quart => (Unit::Teaspoon, self.1 * CUP_TO_QUART * TSP_TO_CUP),
+            Unit::FluidOunce => (Unit::Teaspoon, self.1 * TSP_TO_FL_OZ),
 
-            Unit::Dollar => (Unit::Cent, m.1 * 100.0),
+            Unit::Dollar => (Unit::Cent, self.1 * 100.0),
         };
         return Measure(foo.0, foo.1);
     }
     pub fn parse(m: BareMeasurement) -> Measure {
-        let foo = Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize();
-        return Measure(foo.0, foo.1);
+        Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
+        // return Measure(foo.0, foo.1);
     }
-    pub fn kind(self) -> MeasureKind {
+    pub fn kind(&self) -> MeasureKind {
         return match self.0 {
             Unit::Gram => MeasureKind::Weight,
             Unit::Cent => MeasureKind::Money,
@@ -141,29 +140,22 @@ impl Measure {
     }
 
     pub fn convert(
-        self,
+        &self,
         target: MeasureKind,
         mappings: Vec<(Measure, Measure)>,
     ) -> Option<Measure> {
-        let curr_kind = self.clone().kind();
-        for m in mappings.iter() {
-            let (kind_a, kind_b) = (m.0.clone().kind(), m.1.clone().kind());
+        let curr_kind = self.kind();
+        for (m_a, m_b) in mappings.into_iter() {
+            let a = m_a.clone().normalize();
+            let b = m_b.clone().normalize();
+            let (kind_a, kind_b) = (a.kind(), b.kind());
             if kind_a == target && kind_b == curr_kind {
-                return Some(Measure(
-                    m.0.clone().normalize().0.clone(),
-                    m.0.clone().normalize().1 / m.1.clone().normalize().1 * self.clone().1,
-                ));
+                return Some(Measure(a.0, a.1 / b.1 * self.1));
             } else if kind_a == curr_kind && kind_b == target {
-                dbg!(m);
-                return Some(Measure(
-                    m.1.clone().normalize().0.clone(),
-                    m.1.clone().normalize().1 / dbg!(m.0.clone().normalize()).1 * self.clone().1,
-                ));
+                return Some(Measure(b.0, b.1 / a.1 * self.1));
             }
         }
-
         None
-        // Measure(Unit::Other("foo".to_string()), 1.0)
     }
     pub fn as_bare(self) -> BareMeasurement {
         let m = self.1;
@@ -235,7 +227,12 @@ mod tests {
         );
         assert_eq!(
             Measure::from_string("2 dollars".to_string()),
-            m.convert(MeasureKind::Money, vec![tbsp_dollars]).unwrap()
+            m.convert(MeasureKind::Money, vec![tbsp_dollars.clone()])
+                .unwrap()
         );
+
+        assert!(m
+            .convert(MeasureKind::Volume, vec![tbsp_dollars.clone()])
+            .is_none());
     }
 }

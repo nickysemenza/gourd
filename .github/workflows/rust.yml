@@ -30,9 +30,13 @@ jobs:
         uses: codecov/codecov-action@v1.2.2
         with:
           directory: ${{ matrix.crate }}
+          path_to_write_report: ${{ matrix.crate }}/codecov_report.txt
+          flags: ${{ matrix.crate }}
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
-          name: code-coverage-report
-          path: ${{ matrix.crate }}/cobertura.xml
+          name: code-coverage-report-${{ matrix.crate }}
+          path: |
+            ${{ matrix.crate }}/target/tarpaulin/coverage.json
+            ${{ matrix.crate }}/codecov_report.txt
