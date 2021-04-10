@@ -6,7 +6,6 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.18.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
-	github.com/alecthomas/chroma v0.8.2 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.3.0
@@ -19,7 +18,6 @@ require (
 	github.com/getkin/kin-openapi v0.53.0
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/go-openapi/swag v0.19.14 // indirect
-	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golangci/golangci-lint v1.39.0
 	github.com/google/uuid v1.2.0 // indirect
@@ -30,14 +28,11 @@ require (
 	github.com/kjk/notionapi v0.0.0-20210408231951-e31c3d030a7f
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/lib/pq v1.10.0
-	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
-	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/ory/go-acc v0.2.6
 	github.com/prometheus/common v0.18.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
@@ -56,7 +51,6 @@ require (
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.18.0
 	go.opentelemetry.io/otel/sdk v0.18.0
 	go.opentelemetry.io/otel/trace v0.18.0
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.44.0

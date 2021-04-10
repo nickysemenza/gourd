@@ -32,8 +32,8 @@ func TestAPI(t *testing.T) {
 	require := require.New(t)
 
 	e, _ := makeHandler(t)
-	rName := fmt.Sprintf("recipe-%s", common.UUID())
-	iName := fmt.Sprintf("ing-%s", common.UUID())
+	rName := fmt.Sprintf("recipe-%s", common.ID(""))
+	iName := fmt.Sprintf("ing-%s", common.ID(""))
 
 	newIngredient := Ingredient{Name: iName}
 
@@ -131,8 +131,8 @@ func TestSearches(t *testing.T) {
 	ctx := context.Background()
 	e, api := makeHandler(t)
 
-	rName := fmt.Sprintf("recipe-%s", common.UUID())
-	iName := fmt.Sprintf("ing-%s", common.UUID())
+	rName := fmt.Sprintf("recipe-%s", common.ID(""))
+	iName := fmt.Sprintf("ing-%s", common.ID(""))
 	err := api.CreateRecipeDetails(ctx, RecipeDetail{
 		Name:     rName,
 		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &Ingredient{Name: iName}}}}},

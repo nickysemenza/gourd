@@ -139,17 +139,17 @@ func ConnnectionString(host, user, password, dbname string, port int64) string {
 // AssignIds adds ids where missing.
 func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
 	for x := range r.Sections {
-		r.Sections[x].Id = common.UUID()
+		r.Sections[x].Id = common.ID("s")
 		r.Sections[x].RecipeDetailId = r.Id
 		for y := range r.Sections[x].Ingredients {
 			if r.Sections[x].Ingredients[y].Id == "" {
-				r.Sections[x].Ingredients[y].Id = common.UUID()
+				r.Sections[x].Ingredients[y].Id = common.ID("si")
 			}
 			r.Sections[x].Ingredients[y].SectionId = r.Sections[x].Id
 
 		}
 		for y := range r.Sections[x].Instructions {
-			r.Sections[x].Instructions[y].Id = common.UUID()
+			r.Sections[x].Instructions[y].Id = common.ID("si")
 			r.Sections[x].Instructions[y].SectionId = r.Sections[x].Id
 		}
 	}

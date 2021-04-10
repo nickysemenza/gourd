@@ -178,7 +178,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 			})
 		}
 		for _, i := range s.Ingredients {
-			i.Id = common.UUID()
+			i.Id = common.ID("ing")
 			si, err := a.sectionIngredientTODB(ctx, i)
 			if err != nil {
 				return nil, err

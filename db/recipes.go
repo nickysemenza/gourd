@@ -18,7 +18,7 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
 	WHERE lower(name) = lower($1) LIMIT 1`, name)
 	if errors.Is(err, sql.ErrNoRows) {
-		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (id, name) VALUES ($1, $2)`, common.UUID(), name)
+		_, err = c.db.ExecContext(ctx, `INSERT INTO ingredients (id, name) VALUES ($1, $2)`, common.ID("i"), name)
 		if err != nil {
 			return nil, err
 		}
@@ -118,10 +118,10 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		parentID = latestVersion.First().RecipeId
 	}
 	r.Version = version
-	r.Id = common.UUID()
+	r.Id = common.ID("rd")
 
 	if parentID == "" {
-		parentID = common.UUID()
+		parentID = common.ID("r")
 		_, err = c.execTx(ctx, tx, c.psql.Insert(recipesTable).Columns("id").Values(parentID))
 		if err != nil {
 			return nil, fmt.Errorf("failed to insert parent recipe: %w", err)
@@ -141,7 +141,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	if r.Id == "" {
 		// todo? needed?
-		r.Id = common.UUID()
+		r.Id = common.ID("rd")
 	}
 	log.Println("inserting", r.Id, r.Name)
 
