@@ -17,21 +17,21 @@ const Graph: React.FC = () => {
       return {
         source: d.ingredient_name,
         target: d.recipe_name,
-        value: d.ingredient_kind === "ingredient" ? 1 : 4,
+        value: d.ingredient_kind === "ingredient" ? 1 : 40,
       };
     }),
     nodes: [
       ...data.items.map((d) => ({
         id: d.ingredient_name,
         raw_id: d.ingredient_id,
-        raw_kind: "ingredient",
-        group: 1,
+        raw_kind: d.ingredient_kind,
+        group: d.ingredient_kind === "ingredient" ? 1 : 4,
       })),
       ...data.items.map((d) => ({
         id: d.recipe_name,
         raw_id: d.recipe_id,
         raw_kind: "recipe",
-        group: 3,
+        group: 30,
       })),
     ].filter(
       (thing, index, self) => index === self.findIndex((t) => t.id === thing.id)
