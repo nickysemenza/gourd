@@ -20,8 +20,10 @@ src/models/google_photo.rs
 src/models/google_photos_album.rs
 src/models/ingredient.rs
 src/models/ingredient_detail.rs
+src/models/ingredient_kind.rs
 src/models/inline_object.rs
 src/models/inline_response_200.rs
+src/models/inline_response_200_1.rs
 src/models/items.rs
 src/models/meal.rs
 src/models/meal_recipe.rs
@@ -34,6 +36,7 @@ src/models/paginated_meals.rs
 src/models/paginated_photos.rs
 src/models/paginated_recipes.rs
 src/models/recipe.rs
+src/models/recipe_dependency.rs
 src/models/recipe_detail.rs
 src/models/recipe_section.rs
 src/models/recipe_source.rs

@@ -3,9 +3,11 @@ apis/AlbumsApi.ts
 apis/AuthenticationApi.ts
 apis/FoodApi.ts
 apis/FoodsApi.ts
+apis/IngredientApi.ts
 apis/IngredientsApi.ts
 apis/MealsApi.ts
 apis/PhotosApi.ts
+apis/RecipeApi.ts
 apis/RecipesApi.ts
 apis/index.ts
 index.ts
@@ -22,8 +24,10 @@ models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
+models/IngredientKind.ts
 models/InlineObject.ts
 models/InlineResponse200.ts
+models/InlineResponse2001.ts
 models/Items.ts
 models/Meal.ts
 models/MealRecipe.ts
@@ -36,6 +40,7 @@ models/PaginatedMeals.ts
 models/PaginatedPhotos.ts
 models/PaginatedRecipes.ts
 models/Recipe.ts
+models/RecipeDependency.ts
 models/RecipeDetail.ts
 models/RecipeSection.ts
 models/RecipeSource.ts

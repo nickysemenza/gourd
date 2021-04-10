@@ -104,6 +104,14 @@ type Ingredient struct {
 	SameAs zero.String `db:"same_as"`
 }
 
+type RecipeIngredientDependency struct {
+	RecipeName     string `db:"recipe_name"`
+	RecipeId       string `db:"recipe_id"`
+	IngredientName string `db:"ingredient_name"`
+	IngredientId   string `db:"ingredient_id"`
+	IngredientKind string `db:"ingredient_kind"`
+}
+
 // New creates a new Client.
 func New(dbConn *sql.DB) (*Client, error) {
 	dbx := sqlx.NewDb(dbConn, "postgres")

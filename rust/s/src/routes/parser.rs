@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use openapi::models::{section_ingredient::Kind, SectionIngredient};
+use openapi::models::{IngredientKind, SectionIngredient};
 use opentelemetry::{global, trace::Tracer};
 use opentelemetry::{trace::get_active_span, KeyValue};
 use serde::{Deserialize, Serialize};
@@ -8,9 +8,9 @@ use sqlx::{types::BigDecimal, PgPool};
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
         kind: if r.ingredient.is_some() {
-            Kind::Ingredient
+            IngredientKind::Ingredient
         } else {
-            Kind::Recipe
+            IngredientKind::Recipe
         },
         // section: r.section,
         id: r.id,

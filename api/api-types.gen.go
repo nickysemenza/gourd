@@ -192,6 +192,15 @@ type IngredientDetail struct {
 	UnitMappings *[]UnitMapping `json:"unit_mappings,omitempty"`
 }
 
+// IngredientKind defines model for IngredientKind.
+type IngredientKind string
+
+// List of IngredientKind
+const (
+	IngredientKind_ingredient IngredientKind = "ingredient"
+	IngredientKind_recipe     IngredientKind = "recipe"
+)
+
 // Items defines model for Items.
 type Items struct {
 
@@ -310,6 +319,23 @@ type Recipe struct {
 	Versions []RecipeDetail `json:"versions"`
 }
 
+// RecipeDependency defines model for RecipeDependency.
+type RecipeDependency struct {
+
+	// id
+	IngredientId   string         `json:"ingredient_id"`
+	IngredientKind IngredientKind `json:"ingredient_kind"`
+
+	// id
+	IngredientName string `json:"ingredient_name"`
+
+	// recipe_id
+	RecipeId string `json:"recipe_id"`
+
+	// id
+	RecipeName string `json:"recipe_name"`
+}
+
 // RecipeDetail defines model for RecipeDetail.
 type RecipeDetail struct {
 
@@ -409,10 +435,8 @@ type SectionIngredient struct {
 	Id string `json:"id"`
 
 	// An Ingredient
-	Ingredient *Ingredient `json:"ingredient,omitempty"`
-
-	// what kind of ingredient
-	Kind string `json:"kind"`
+	Ingredient *Ingredient    `json:"ingredient,omitempty"`
+	Kind       IngredientKind `json:"kind"`
 
 	// optional
 	Optional *bool `json:"optional,omitempty"`

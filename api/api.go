@@ -93,7 +93,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 		Optional:  zero.BoolFromPtr(i.Optional),
 	}
 	switch i.Kind {
-	case "recipe":
+	case IngredientKind_recipe:
 		if i.Recipe == nil {
 			return nil, nil
 		}
@@ -120,7 +120,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 			id = r.RecipeId
 		}
 		si.RecipeId = zero.StringFrom(id)
-	case "ingredient":
+	case IngredientKind_ingredient:
 		if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
 			return nil, nil
 		}
@@ -1096,4 +1096,29 @@ func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
 	return c.JSON(http.StatusOK, foo[0])
+}
+
+type Test2 struct {
+	Items []RecipeDependency `json:"items,omitempty"`
+}
+
+func (a *API) RecipeDependencies(c echo.Context) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "RecipeDependencies")
+	defer span.End()
+
+	res := []RecipeDependency{}
+	dbRows, err := a.DB().RecipeIngredientDependencies(ctx)
+	for _, r := range dbRows {
+		res = append(res, RecipeDependency{
+			IngredientId:   r.IngredientId,
+			IngredientKind: IngredientKind(r.IngredientKind),
+			IngredientName: r.IngredientName,
+			RecipeId:       r.RecipeId,
+			RecipeName:     r.RecipeName,
+		})
+	}
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, Test2{res})
 }

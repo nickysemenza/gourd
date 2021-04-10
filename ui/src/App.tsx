@@ -28,6 +28,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import IngredientDetail from "./pages/IngredientDetail";
 import { WasmContextProvider } from "./wasm";
+import Graph from "./pages/Graph";
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (
@@ -86,6 +87,9 @@ function App() {
                 </Route>
                 <Route path="/playground">
                   <Playground />
+                </Route>
+                <Route path="/graph">
+                  <Graph />
                 </Route>
                 <PrivateRoute path="/photos">
                   <Photos />

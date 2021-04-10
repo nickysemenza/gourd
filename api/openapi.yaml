@@ -565,6 +565,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedFoods"
+  /data/recipe_dependencies:
+    get:
+      summary: Get foods
+      description: recipe dependencies
+      operationId: recipe_dependencies
+      tags:
+        - recipe
+        - ingredient
+      responses:
+        "200":
+          description: All dependencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RecipeDependency"
+                    description: all
 security:
   - bearerAuth: [] # use the same name as above
 components:
@@ -588,8 +609,7 @@ components:
           type: string
         kind:
           description: what kind of ingredient
-          type: string
-          enum: [recipe, ingredient]
+          $ref: "#/components/schemas/IngredientKind"
         recipe:
           $ref: "#/components/schemas/RecipeDetail"
         ingredient:
@@ -1184,6 +1204,34 @@ components:
     FoodNutrientUnit:
       type: string
       enum: [UG, G, IU, kJ, KCAL, MG, MG_ATE, SP_GR]
+    IngredientKind:
+      type: string
+      enum: [ingredient, recipe]
+    RecipeDependency:
+      description: node?
+      type: object
+      required:
+        - recipe_id
+        - recipe_name
+        - ingredient_id
+        - ingredient_name
+        - ingredient_kind
+      properties:
+        recipe_id:
+          description: recipe_id
+          type: string
+        recipe_name:
+          description: id
+          type: string
+        ingredient_id:
+          description: id
+          type: string
+        ingredient_name:
+          description: id
+          type: string
+        ingredient_kind:
+          description: what kind of ingredient
+          $ref: "#/components/schemas/IngredientKind"
   parameters:
     offsetParam:
       in: query

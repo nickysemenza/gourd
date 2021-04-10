@@ -17,9 +17,8 @@ pub struct SectionIngredient {
     /// id
     #[serde(rename = "id")]
     pub id: String,
-    /// what kind of ingredient
     #[serde(rename = "kind")]
-    pub kind: Kind,
+    pub kind: crate::models::IngredientKind,
     #[serde(rename = "recipe", skip_serializing_if = "Option::is_none")]
     pub recipe: Option<crate::models::RecipeDetail>,
     #[serde(rename = "ingredient", skip_serializing_if = "Option::is_none")]
@@ -49,7 +48,7 @@ pub struct SectionIngredient {
 
 impl SectionIngredient {
     /// Ingredients in a single section
-    pub fn new(id: String, kind: Kind, grams: f64) -> SectionIngredient {
+    pub fn new(id: String, kind: crate::models::IngredientKind, grams: f64) -> SectionIngredient {
         SectionIngredient {
             id,
             kind,
@@ -66,12 +65,4 @@ impl SectionIngredient {
     }
 }
 
-/// what kind of ingredient
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub enum Kind {
-    #[serde(rename = "recipe")]
-    Recipe,
-    #[serde(rename = "ingredient")]
-    Ingredient,
-}
 

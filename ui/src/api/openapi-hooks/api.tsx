@@ -20,10 +20,7 @@ export interface SectionIngredient {
    * id
    */
   id: string;
-  /**
-   * what kind of ingredient
-   */
-  kind: "recipe" | "ingredient";
+  kind: IngredientKind;
   recipe?: RecipeDetail;
   ingredient?: Ingredient;
   /**
@@ -558,6 +555,31 @@ export type FoodNutrientUnit =
   | "MG"
   | "MG_ATE"
   | "SP_GR";
+
+export type IngredientKind = "ingredient" | "recipe";
+
+/**
+ * node?
+ */
+export interface RecipeDependency {
+  /**
+   * recipe_id
+   */
+  recipe_id: string;
+  /**
+   * id
+   */
+  recipe_name: string;
+  /**
+   * id
+   */
+  ingredient_id: string;
+  /**
+   * id
+   */
+  ingredient_name: string;
+  ingredient_kind: IngredientKind;
+}
 
 export interface AuthLoginQueryParams {
   /**
@@ -1487,5 +1509,45 @@ export type UseGetFoodsByIdsProps = Omit<
 export const useGetFoodsByIds = (props: UseGetFoodsByIdsProps) =>
   useGet<PaginatedFoods, unknown, GetFoodsByIdsQueryParams, void>(
     `/foods/bulk`,
+    props
+  );
+
+export interface RecipeDependenciesResponse {
+  /**
+   * all
+   */
+  items?: RecipeDependency[];
+}
+
+export type RecipeDependenciesProps = Omit<
+  GetProps<RecipeDependenciesResponse, unknown, void, void>,
+  "path"
+>;
+
+/**
+ * Get foods
+ *
+ * recipe dependencies
+ */
+export const RecipeDependencies = (props: RecipeDependenciesProps) => (
+  <Get<RecipeDependenciesResponse, unknown, void, void>
+    path={`/data/recipe_dependencies`}
+    {...props}
+  />
+);
+
+export type UseRecipeDependenciesProps = Omit<
+  UseGetProps<RecipeDependenciesResponse, unknown, void, void>,
+  "path"
+>;
+
+/**
+ * Get foods
+ *
+ * recipe dependencies
+ */
+export const useRecipeDependencies = (props: UseRecipeDependenciesProps) =>
+  useGet<RecipeDependenciesResponse, unknown, void, void>(
+    `/data/recipe_dependencies`,
     props
   );

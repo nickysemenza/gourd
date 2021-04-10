@@ -1,6 +1,6 @@
 use std::collections::{hash_map::Entry, HashMap};
 
-use openapi::models::{section_ingredient::Kind, Ingredient, RecipeDetail, SectionIngredient};
+use openapi::models::{Ingredient, IngredientKind, RecipeDetail, SectionIngredient};
 
 pub mod unit;
 fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredient {
@@ -44,7 +44,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredien
         amount,
         adjective: i.modifier,
         ingredient: Some(Ingredient::new("".to_string(), i.name)),
-        ..SectionIngredient::new("".to_string(), Kind::Ingredient, grams)
+        ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, grams)
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
@@ -78,8 +78,8 @@ pub fn sum_ingredients(
 
     flat_ingredients.iter().for_each(|i| {
         let (k, m) = match i.kind {
-            Kind::Recipe => (i.recipe.as_ref().unwrap().id.clone(), &mut recipes),
-            Kind::Ingredient => (i.ingredient.as_ref().unwrap().id.clone(), &mut ing),
+            IngredientKind::Recipe => (i.recipe.as_ref().unwrap().id.clone(), &mut recipes),
+            IngredientKind::Ingredient => (i.ingredient.as_ref().unwrap().id.clone(), &mut ing),
         };
         match m.entry(k) {
             Entry::Vacant(e) => {
@@ -106,9 +106,7 @@ fn is_ml(a: &ingredient::Amount) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use openapi::models::{
-        section_ingredient::Kind, RecipeDetail, RecipeSection, SectionIngredient,
-    };
+    use openapi::models::{IngredientKind, RecipeDetail, RecipeSection, SectionIngredient};
 
     #[test]
     fn test_from_parsed() {
@@ -118,7 +116,7 @@ mod tests {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
                 ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
-                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 118.0)
+                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
             }
         );
         // ml is parsed as grams if not present
@@ -128,7 +126,7 @@ mod tests {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
                 ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
-                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 118.0)
+                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
             }
         );
         assert_eq!(
@@ -137,7 +135,7 @@ mod tests {
                 amount: Some(0.5),
                 unit: Some("cup".to_string()),
                 ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
-                ..SectionIngredient::new("".to_string(), Kind::Ingredient, 113.0)
+                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 113.0)
             }
         );
     }
@@ -146,15 +144,15 @@ mod tests {
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
             ingredient: Some(Ingredient::new("a".to_string(), "foo".to_string())),
-            ..SectionIngredient::new("".to_string(), Kind::Ingredient, 12.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Ingredient::new("b".to_string(), "bar".to_string())),
-            ..SectionIngredient::new("".to_string(), Kind::Ingredient, 14.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Ingredient::new("b".to_string(), "bar".to_string())),
-            ..SectionIngredient::new("".to_string(), Kind::Ingredient, 2.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
         };
         let r = RecipeDetail::new(
             "".to_string(),

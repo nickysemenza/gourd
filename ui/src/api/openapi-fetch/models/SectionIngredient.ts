@@ -18,6 +18,10 @@ import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
+    IngredientKind,
+    IngredientKindFromJSON,
+    IngredientKindFromJSONTyped,
+    IngredientKindToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
@@ -37,11 +41,11 @@ export interface SectionIngredient {
      */
     id: string;
     /**
-     * what kind of ingredient
-     * @type {string}
+     * 
+     * @type {IngredientKind}
      * @memberof SectionIngredient
      */
-    kind: SectionIngredientKindEnum;
+    kind: IngredientKind;
     /**
      * 
      * @type {RecipeDetail}
@@ -98,15 +102,6 @@ export interface SectionIngredient {
     substitutes?: Array<SectionIngredient>;
 }
 
-/**
-* @export
-* @enum {string}
-*/
-export enum SectionIngredientKindEnum {
-    RECIPE = 'recipe',
-    INGREDIENT = 'ingredient'
-}
-
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
     return SectionIngredientFromJSONTyped(json, false);
 }
@@ -118,7 +113,7 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'id': json['id'],
-        'kind': json['kind'],
+        'kind': IngredientKindFromJSON(json['kind']),
         'recipe': !exists(json, 'recipe') ? undefined : RecipeDetailFromJSON(json['recipe']),
         'ingredient': !exists(json, 'ingredient') ? undefined : IngredientFromJSON(json['ingredient']),
         'grams': json['grams'],
@@ -141,7 +136,7 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
     return {
         
         'id': value.id,
-        'kind': value.kind,
+        'kind': IngredientKindToJSON(value.kind),
         'recipe': RecipeDetailToJSON(value.recipe),
         'ingredient': IngredientToJSON(value.ingredient),
         'grams': value.grams,

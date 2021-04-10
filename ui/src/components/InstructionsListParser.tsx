@@ -1,9 +1,6 @@
 import React, { useContext, useState } from "react";
 import { PlusCircle } from "react-feather";
-import {
-  SectionIngredient,
-  SectionIngredientKindEnum,
-} from "../api/openapi-fetch";
+import { IngredientKind, SectionIngredient } from "../api/openapi-fetch";
 import { blankIngredient } from "../util";
 import { wasm, WasmContext } from "../wasm";
 import { ButtonGroup } from "./Button";
@@ -92,7 +89,7 @@ const foo = (sections: string[], instance: wasm, doubles: boolean) => {
             .shift()?.value || 0,
         amount: other?.value || undefined,
         unit: other?.unit || undefined,
-        kind: SectionIngredientKindEnum.INGREDIENT,
+        kind: IngredientKind.INGREDIENT,
         ingredient: blankIngredient(res.name),
       };
       return si;
