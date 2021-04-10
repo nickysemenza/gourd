@@ -10,3 +10,4 @@ edition = "2018"
 
 openapi = {path = "../openapi"}
 ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
+serde = { version = "1.0", features = ["derive"] }
