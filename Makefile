@@ -81,7 +81,7 @@ migrate-down: bin/migrate
 generate: generate-rust generate-openapi
 
 generate-rust:
-	cd rust && wasm-pack build
+	cd rust/w && wasm-pack build
 
 validate-openapi:
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
@@ -112,6 +112,5 @@ rs:
 	cd rust/s && cargo sqlx prepare -- --bin gourd
 
 
-wasm-dev: 
-	cd rust/w && wasm-pack build
+wasm-dev: generate-rust
 	cp -r rust/w/pkg/ ui/node_modules/gourd_rs/

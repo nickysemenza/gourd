@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PaginatedRecipes, RecipesApi } from "../api/openapi-fetch";
+import { UnitConversionRequest } from "../api/openapi-fetch/models/UnitConversionRequest";
 import RecipeDiff from "../components/RecipeDiff";
 import { getAPIURL, getOpenapiFetchConfig } from "../config";
 import { WasmContext } from "../wasm";
@@ -15,6 +16,31 @@ const Playground: React.FC = () => {
     console.log("parse", instance.parse("2 cups (240g) flour, sifted"));
     console.log("parse3", instance.parse3("2 cups (240g) flour, sifted"));
     console.log("parse4", instance.parse4("2 cups (240g) flour, sifted"));
+    // ingredients.forEach((i) => {
+    let foo: UnitConversionRequest = {
+      unit_mappings: [
+        {
+          a: {
+            unit: "lb",
+            value: 240,
+          },
+          b: {
+            unit: "gram",
+            value: 1,
+          },
+          source: "fdc",
+        },
+      ],
+      input: [{ unit: "grams", value: 100 }],
+    };
+    console.time("dolla");
+    try {
+      let res = instance.dolla(foo);
+      console.log("dolla", res);
+    } catch (e) {
+      console.error({ e });
+    }
+    console.timeEnd("dolla");
     // greet();
     // parse("2 cups flour");
   }, [instance]);

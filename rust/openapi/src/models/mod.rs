@@ -74,5 +74,7 @@ pub mod section_instruction;
 pub use self::section_instruction::SectionInstruction;
 pub mod time_range;
 pub use self::time_range::TimeRange;
+pub mod unit_conversion_request;
+pub use self::unit_conversion_request::UnitConversionRequest;
 pub mod unit_mapping;
 pub use self::unit_mapping::UnitMapping;

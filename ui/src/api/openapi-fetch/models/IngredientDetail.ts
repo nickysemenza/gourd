@@ -49,13 +49,13 @@ export interface IngredientDetail {
      * @type {Array<RecipeDetail>}
      * @memberof IngredientDetail
      */
-    recipes?: Array<RecipeDetail>;
+    recipes: Array<RecipeDetail>;
     /**
      * Ingredients that are equivalent
      * @type {Array<IngredientDetail>}
      * @memberof IngredientDetail
      */
-    children?: Array<IngredientDetail>;
+    children: Array<IngredientDetail>;
     /**
      * 
      * @type {Food}
@@ -67,7 +67,7 @@ export interface IngredientDetail {
      * @type {Array<UnitMapping>}
      * @memberof IngredientDetail
      */
-    unit_mappings?: Array<UnitMapping>;
+    unit_mappings: Array<UnitMapping>;
 }
 
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
@@ -81,10 +81,10 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'ingredient': IngredientFromJSON(json['ingredient']),
-        'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
-        'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
+        'recipes': ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
+        'children': ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
         'food': !exists(json, 'food') ? undefined : FoodFromJSON(json['food']),
-        'unit_mappings': !exists(json, 'unit_mappings') ? undefined : ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
+        'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
 
@@ -98,10 +98,10 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
     return {
         
         'ingredient': IngredientToJSON(value.ingredient),
-        'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
-        'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
+        'recipes': ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
+        'children': ((value.children as Array<any>).map(IngredientDetailToJSON)),
         'food': FoodToJSON(value.food),
-        'unit_mappings': value.unit_mappings === undefined ? undefined : ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
+        'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
 

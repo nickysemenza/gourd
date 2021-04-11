@@ -45,4 +45,5 @@ src/models/search_result.rs
 src/models/section_ingredient.rs
 src/models/section_instruction.rs
 src/models/time_range.rs
+src/models/unit_conversion_request.rs
 src/models/unit_mapping.rs

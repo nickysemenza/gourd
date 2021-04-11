@@ -177,7 +177,7 @@ type Ingredient struct {
 type IngredientDetail struct {
 
 	// Ingredients that are equivalent
-	Children *[]IngredientDetail `json:"children,omitempty"`
+	Children []IngredientDetail `json:"children"`
 
 	// A top level food
 	Food *Food `json:"food,omitempty"`
@@ -186,10 +186,10 @@ type IngredientDetail struct {
 	Ingredient Ingredient `json:"ingredient"`
 
 	// Recipes referencing this ingredient
-	Recipes *[]RecipeDetail `json:"recipes,omitempty"`
+	Recipes []RecipeDetail `json:"recipes"`
 
 	// mappings of equivalent units
-	UnitMappings *[]UnitMapping `json:"unit_mappings,omitempty"`
+	UnitMappings []UnitMapping `json:"unit_mappings"`
 }
 
 // IngredientKind defines model for IngredientKind.

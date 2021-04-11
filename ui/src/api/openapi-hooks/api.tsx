@@ -183,16 +183,16 @@ export interface IngredientDetail {
   /**
    * Recipes referencing this ingredient
    */
-  recipes?: RecipeDetail[];
+  recipes: RecipeDetail[];
   /**
    * Ingredients that are equivalent
    */
-  children?: IngredientDetail[];
+  children: IngredientDetail[];
   food?: Food;
   /**
    * mappings of equivalent units
    */
-  unit_mappings?: UnitMapping[];
+  unit_mappings: UnitMapping[];
 }
 
 /**
@@ -579,6 +579,17 @@ export interface RecipeDependency {
    */
   ingredient_name: string;
   ingredient_kind: IngredientKind;
+}
+
+export interface UnitConversionRequest {
+  /**
+   * multiple amounts to try
+   */
+  input: Amount[];
+  /**
+   * mappings of equivalent units
+   */
+  unit_mappings: UnitMapping[];
 }
 
 export interface AuthLoginQueryParams {

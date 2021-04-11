@@ -36,4 +36,5 @@ export * from './SearchResult';
 export * from './SectionIngredient';
 export * from './SectionInstruction';
 export * from './TimeRange';
+export * from './UnitConversionRequest';
 export * from './UnitMapping';

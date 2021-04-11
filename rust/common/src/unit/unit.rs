@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, PartialEq, PartialOrd, Debug, Default, Serialize, Deserialize)]
 pub struct BareMeasurement {
-    unit: String,
-    value: f32,
+    pub unit: String,
+    pub value: f32,
 }
 
 impl BareMeasurement {
@@ -43,6 +43,7 @@ pub enum Unit {
     Quart,
     FluidOunce,
     Ounce,
+    Pound,
     Cent,
     Dollar,
     Other(String),
@@ -55,6 +56,7 @@ impl Unit {
             "kilogram" | "kg" => Self::Kilogram,
 
             "oz" | "ounce" => Self::Ounce,
+            "lb" | "pound" => Self::Pound,
 
             "ml" => Self::Milliliter,
             "l" => Self::Liter,
@@ -82,6 +84,7 @@ impl Unit {
             Unit::Quart => "quart",
             Unit::FluidOunce => "fl oz",
             Unit::Ounce => "oz",
+            Unit::Pound => "lb",
             Unit::Cent => "cent",
             Unit::Dollar => "$",
             Unit::Other(s) => return s,
@@ -97,6 +100,8 @@ const G_TO_K: f32 = 1000.0;
 const CUP_TO_QUART: f32 = 4.0;
 const TSP_TO_CUP: f32 = 48.0;
 const GRAM_TO_OZ: f32 = 28.3495;
+const OZ_TO_LB: f32 = 16.0;
+const CENTS_TO_DOLLAR: f32 = 100.0;
 
 impl Measure {
     pub fn from_string(s: String) -> Measure {
@@ -112,6 +117,7 @@ impl Measure {
             Unit::Kilogram => (Unit::Gram, self.1 * G_TO_K),
 
             Unit::Ounce => (Unit::Gram, self.1 * GRAM_TO_OZ),
+            Unit::Pound => (Unit::Gram, self.1 * GRAM_TO_OZ * OZ_TO_LB),
 
             Unit::Liter => (Unit::Milliliter, self.1 * G_TO_K),
 
@@ -120,7 +126,7 @@ impl Measure {
             Unit::Quart => (Unit::Teaspoon, self.1 * CUP_TO_QUART * TSP_TO_CUP),
             Unit::FluidOunce => (Unit::Teaspoon, self.1 * TSP_TO_FL_OZ),
 
-            Unit::Dollar => (Unit::Cent, self.1 * 100.0),
+            Unit::Dollar => (Unit::Cent, self.1 * CENTS_TO_DOLLAR),
         };
         return Measure(foo.0, foo.1);
     }
@@ -181,7 +187,10 @@ impl Measure {
                 _ => (m, Unit::Teaspoon, 1.0),
             },
 
-            Unit::Cent => (m, Unit::Cent, 1.0),
+            Unit::Cent => match m {
+                m if { m < CENTS_TO_DOLLAR } => (m, Unit::Cent, 1.0),
+                _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
+            },
             Unit::Other(o) => (m, Unit::Other(o), 1.0),
             _ => panic!("unit not normalized: {:?}", self),
         };
@@ -234,5 +243,51 @@ mod tests {
         assert!(m
             .convert(MeasureKind::Volume, vec![tbsp_dollars.clone()])
             .is_none());
+    }
+    #[test]
+    fn test_convert_lb() {
+        let grams_dollars = (
+            Measure::from_string("1 gram".to_string()),
+            Measure::from_string("1 dollar".to_string()),
+        );
+        assert_eq!(
+            Measure::from_string("2 dollars".to_string()),
+            Measure::from_string("2 grams".to_string())
+                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
+        );
+        assert_eq!(
+            Measure::from_string("56.699 dollars".to_string()),
+            Measure::from_string("2 oz".to_string())
+                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
+        );
+        assert_eq!(
+            Measure::from_string("226.796 dollars".to_string()),
+            Measure::from_string(".5 lb".to_string())
+                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
+        );
+        assert_eq!(
+            Measure::from_string("453.592 dollars".to_string()),
+            Measure::from_string("1 lb".to_string())
+                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
+        );
+    }
+    #[test]
+    fn test_convert_other() {
+        assert_eq!(
+            Measure::from_string("10.000001 cents".to_string()),
+            Measure::from_string("1 egg".to_string())
+                .convert(
+                    MeasureKind::Money,
+                    vec![(
+                        Measure::from_string("12 eggs".to_string()),
+                        Measure::from_string("1.20 dollar".to_string()),
+                    )]
+                )
+                .unwrap()
+        );
     }
 }

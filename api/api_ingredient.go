@@ -53,12 +53,29 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	if err != nil {
 		return nil, err
 	}
+	unitMappings, err := a.Manager.DB().GetIngredientUnits(ctx, ingredientIds)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, i := range ing {
 		// assemble
 		ctx, span2 := a.tracer.Start(ctx, "addDetailsToIngredients: enhance w/ fdc")
 		defer span2.End()
 		detail := makeDetail(i, sameAs, linkedRecipes)
+
+		for _, x := range append(sameAs.IdsBySameAs(i.Id), i.Id) {
+			if val, ok := unitMappings[x]; ok {
+				for _, m := range val {
+					detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
+						Amount{Unit: m.UnitA, Value: m.AmountA},
+						Amount{Unit: m.UnitB, Value: m.AmountB},
+						fmt.Sprintf("%s (%s)", m.Source, x),
+					})
+				}
+			}
+		}
+
 		if i.FdcID.Valid {
 			food, err := a.getFoodById(ctx, int(i.FdcID.Int64))
 			if err != nil {
@@ -72,10 +89,10 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 				var res []Amount
 				err = rs_client.Parse(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
 				if err == nil && len(res) > 0 {
-					detail.UnitMappings = &[]UnitMapping{{
+					detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
 						Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
 						res[0],
-						"fdc"}}
+						"fdc"})
 				}
 
 			}
@@ -125,9 +142,10 @@ func makeDetail(i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeD
 	}
 
 	detail := IngredientDetail{
-		Ingredient: transformIngredient(i),
-		Children:   &same,
-		Recipes:    &recipes,
+		Ingredient:   transformIngredient(i),
+		Children:     same,
+		Recipes:      recipes,
+		UnitMappings: []UnitMapping{},
 	}
 
 	return detail

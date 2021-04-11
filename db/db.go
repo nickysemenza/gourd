@@ -112,6 +112,16 @@ type RecipeIngredientDependency struct {
 	IngredientKind string `db:"ingredient_kind"`
 }
 
+type IngredientUnitMapping struct {
+	Id           int64   `db:"id"`
+	IngredientId string  `db:"ingredient"`
+	UnitA        string  `db:"unit_a"`
+	AmountA      float64 `db:"amount_a"`
+	UnitB        string  `db:"unit_b"`
+	AmountB      float64 `db:"amount_b"`
+	Source       string  `db:"source"`
+}
+
 // New creates a new Client.
 func New(dbConn *sql.DB) (*Client, error) {
 	dbx := sqlx.NewDb(dbConn, "postgres")

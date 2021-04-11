@@ -49,6 +49,7 @@ models/SearchResult.ts
 models/SectionIngredient.ts
 models/SectionInstruction.ts
 models/TimeRange.ts
+models/UnitConversionRequest.ts
 models/UnitMapping.ts
 models/index.ts
 runtime.ts

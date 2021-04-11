@@ -50,6 +50,15 @@ func (r Ingredients) BySameAs() map[string][]Ingredient {
 	}
 	return m
 }
+func (r Ingredients) IdsBySameAs(id string) []string {
+	m := []string{}
+	if x, ok := r.BySameAs()[id]; ok {
+		for _, y := range x {
+			m = append(m, y.Id)
+		}
+	}
+	return m
+}
 
 // GetRecipeDetailSections finds the sections.
 func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) ([]Section, error) {
@@ -455,3 +464,18 @@ func (c *Client) GetIngrientsSameAs(ctx context.Context, parent ...string) (Ingr
 // 	}
 // 	return res, nil
 // }
+
+func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) (map[string][]IngredientUnitMapping, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngredientUnits")
+	defer span.End()
+	var res []IngredientUnitMapping
+	if err := c.selectContext(ctx, c.psql.Select("*").From("ingredient_units").Where(sq.Eq{"ingredient": ingredient}), &res); err != nil {
+		return nil, err
+	}
+	byId := make(map[string][]IngredientUnitMapping)
+	for _, i := range res {
+		byId[i.IngredientId] = append(byId[i.IngredientId], i)
+	}
+	return byId, nil
+
+}

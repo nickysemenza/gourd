@@ -65,6 +65,7 @@ All URIs are relative to _http://localhost:4242/api_
 - [SectionIngredient](docs/SectionIngredient.md)
 - [SectionInstruction](docs/SectionInstruction.md)
 - [TimeRange](docs/TimeRange.md)
+- [UnitConversionRequest](docs/UnitConversionRequest.md)
 - [UnitMapping](docs/UnitMapping.md)
 
 To get access to the crate's generated documentation, use:

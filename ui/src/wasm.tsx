@@ -24,12 +24,10 @@ export const WasmContextProvider: React.FC = ({ children }) => {
   const [state, setState] = useState<wasm>();
   useEffect(() => {
     const fetchWasm = async () => {
-      const startTime = new Date().getMilliseconds();
+      console.time("wasm-load");
       const wasm = await import("gourd_rs");
       setState(wasm);
-      const endTime = new Date().getMilliseconds();
-      const delta = endTime - startTime;
-      console.info(`loaded wasm in ${delta}ms`);
+      console.timeEnd("wasm-load");
     };
     fetchWasm();
   }, []);

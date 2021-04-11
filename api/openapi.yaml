@@ -771,6 +771,9 @@ components:
       type: object
       required:
         - ingredient
+        - recipes
+        - children
+        - unit_mappings
       properties:
         ingredient:
           $ref: "#/components/schemas/Ingredient"
@@ -1232,6 +1235,22 @@ components:
         ingredient_kind:
           description: what kind of ingredient
           $ref: "#/components/schemas/IngredientKind"
+    UnitConversionRequest:
+      type: object
+      required:
+        - input
+        - unit_mappings
+      properties:
+        input:
+          description: multiple amounts to try
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
   parameters:
     offsetParam:
       in: query

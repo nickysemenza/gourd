@@ -1,7 +1,7 @@
 mod utils;
 
-use gourd_common::sum_ingredients;
-use openapi::models::RecipeDetail;
+use gourd_common::{convert_to_dollars, sum_ingredients};
+use openapi::models::{RecipeDetail, UnitConversionRequest};
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -56,8 +56,8 @@ interface Ingredient {
 extern "C" {
     #[wasm_bindgen(typescript_type = "Ingredient")]
     pub type IIngredient;
-    #[wasm_bindgen(typescript_type = "Ingredient")]
-    type Foo;
+    #[wasm_bindgen(typescript_type = "Amount")]
+    pub type IAmount;
 }
 
 #[wasm_bindgen]
@@ -89,6 +89,16 @@ pub fn sum_ingr(recipe_detail: &JsValue) -> JsValue {
     let r: RecipeDetail = recipe_detail.into_serde().unwrap();
     let res = sum_ingredients(r);
     JsValue::from_serde(&res).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
+    utils::set_panic_hook();
+    let req: UnitConversionRequest = conversion_request.into_serde().unwrap();
+    return match convert_to_dollars(req) {
+        Some(a) => Ok(JsValue::from_serde(&a).unwrap().into()),
+        None => Err(JsValue::from_str("no parse result")),
+    };
 }
 
 // #[wasm_bindgen]

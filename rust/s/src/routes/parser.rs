@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse};
+use gourd_common::convert_to_dollars;
 use openapi::models::{IngredientKind, SectionIngredient};
 use opentelemetry::{global, trace::Tracer};
 use opentelemetry::{trace::get_active_span, KeyValue};
@@ -81,7 +82,10 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     }
     let foo = web::Json(i.unwrap());
 
-    HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
+    HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
+}
+pub async fn convert(r: web::Json<openapi::models::UnitConversionRequest>) -> HttpResponse {
+    HttpResponse::Ok().json(convert_to_dollars(r.0))
 }
 
 #[derive(Debug, Clone, Serialize)]

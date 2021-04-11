@@ -201,6 +201,19 @@ export function sum_ingr(recipe_detail) {
     }
 }
 
+/**
+* @param {any} conversion_request
+* @returns {Amount}
+*/
+export function dolla(conversion_request) {
+    try {
+        var ret = wasm.dolla(addBorrowedObject(conversion_request));
+        return takeObject(ret);
+    } finally {
+        heap[stack_pointer++] = undefined;
+    }
+}
+
 export const __wbindgen_json_parse = function(arg0, arg1) {
     var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
     return addHeapObject(ret);
@@ -213,6 +226,11 @@ export const __wbindgen_json_serialize = function(arg0, arg1) {
     var len0 = WASM_VECTOR_LEN;
     getInt32Memory0()[arg0 / 4 + 1] = len0;
     getInt32Memory0()[arg0 / 4 + 0] = ptr0;
+};
+
+export const __wbindgen_string_new = function(arg0, arg1) {
+    var ret = getStringFromWasm0(arg0, arg1);
+    return addHeapObject(ret);
 };
 
 export const __wbg_new_59cb74e423758ede = function() {
@@ -242,5 +260,9 @@ export const __wbindgen_object_drop_ref = function(arg0) {
 
 export const __wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm0(arg0, arg1));
+};
+
+export const __wbindgen_rethrow = function(arg0) {
+    throw takeObject(arg0);
 };
 

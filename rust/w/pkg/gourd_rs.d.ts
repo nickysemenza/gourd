@@ -30,6 +30,11 @@ export function format_ingredient(val: Ingredient): string;
 * @returns {any}
 */
 export function sum_ingr(recipe_detail: any): any;
+/**
+* @param {any} conversion_request
+* @returns {Amount}
+*/
+export function dolla(conversion_request: any): Amount;
 
 interface Ingredient {
     amounts: Amount[];
