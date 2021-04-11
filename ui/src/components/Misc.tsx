@@ -11,7 +11,7 @@ export const RecipeLink: React.FC<Props> = ({
   multiplier,
 }) => (
   <div className="flex space-x-0.5">
-    <Link to={`/recipe/${id}`} className="link">
+    <Link to={`/recipe/${id}?multiplier=${multiplier || 1}`} className="link">
       <div
         className={`${is_latest_version ? "text-blue-800" : "text-blue-200"}`}
       >
