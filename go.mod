@@ -51,7 +51,7 @@ require (
 	go.opentelemetry.io/otel/exporters/trace/jaeger v0.18.0
 	go.opentelemetry.io/otel/sdk v0.18.0
 	go.opentelemetry.io/otel/trace v0.18.0
-	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
+	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
 	golang.org/x/tools v0.1.0
 	google.golang.org/api v0.44.0
 	gopkg.in/guregu/null.v4 v4.0.0
