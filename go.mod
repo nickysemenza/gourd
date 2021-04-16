@@ -25,7 +25,7 @@ require (
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.3
-	github.com/kjk/notionapi v0.0.0-20210408231951-e31c3d030a7f
+	github.com/kjk/notionapi v0.0.0-20210416062710-878a08dbe82d
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/lib/pq v1.10.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
