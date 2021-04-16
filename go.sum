@@ -675,6 +675,8 @@ github.com/kjk/atomicfile v0.0.0-20190916063300-2d5c7d7d05bf/go.mod h1:+YlBbo63A
 github.com/kjk/caching_http_client v0.0.0-20190810075619-06ff809674f7/go.mod h1:uZMXWOA3unK8KYdy6aBIel64MMqZwsRFRKIvgSadLAU=
 github.com/kjk/notionapi v0.0.0-20210408231951-e31c3d030a7f h1:8x/vW/HKGHnKSzMaC6gOagw6qkDm7EWYbmH47gIb3BA=
 github.com/kjk/notionapi v0.0.0-20210408231951-e31c3d030a7f/go.mod h1:TN6VHOLMXTSoGSaXDKTqvw5Aos628adXJAXSKvjTTRI=
+github.com/kjk/notionapi v0.0.0-20210416062710-878a08dbe82d h1:4+AFba27kE3/3HuFn9WbMCGbGHBHS4PxGKs0a60ytaI=
+github.com/kjk/notionapi v0.0.0-20210416062710-878a08dbe82d/go.mod h1:TN6VHOLMXTSoGSaXDKTqvw5Aos628adXJAXSKvjTTRI=
 github.com/kjk/siser v0.0.0-20190801014033-b3367920d7f2/go.mod h1:5VyY+9nF1wpSfWAIM/mIrd0fZCiA/6IK6CSf3PnjfMA=
 github.com/kjk/u v0.0.0-20191229080709-d1ac8976d53f/go.mod h1:5DUexog+kFLzpHxAQ7R9Of0N8DdhUjbpWGgnc41TMK4=
 github.com/klauspost/compress v1.8.2/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
