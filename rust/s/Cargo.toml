@@ -23,7 +23,7 @@ ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch 
 actix-web-opentelemetry = "0.11.0-beta.3"
 opentelemetry-jaeger = "0.12.1"
 opentelemetry = "0.13.0"
-sqlx = { version = "0.5.1", default-features = false, features = [ "runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate", "offline","bigdecimal"] }
+sqlx = { version = "0.5.2", default-features = false, features = [ "runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate", "offline","bigdecimal"] }
 serde-aux = "1.1.0"
 config = { version = "0.11.0", default-features = false, features = ["yaml"] }
 bigdecimal = { version = "0.2.0", features = ["serde"] }
