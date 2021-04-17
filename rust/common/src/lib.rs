@@ -1,8 +1,10 @@
 use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
-    Amount, Ingredient, IngredientKind, RecipeDetail, SectionIngredient, UnitConversionRequest,
+    unit_conversion_request::Target, Amount, Ingredient, IngredientKind, RecipeDetail,
+    SectionIngredient, UnitConversionRequest,
 };
+use unit::MeasureKind;
 
 pub mod unit;
 fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredient {
@@ -105,7 +107,7 @@ fn is_ml(a: &ingredient::Amount) -> bool {
     a.unit == "ml" || a.unit == "mL"
 }
 
-pub fn convert_to_dollars(req: UnitConversionRequest) -> Option<Amount> {
+pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     let equivalencies: Vec<(unit::Measure, unit::Measure)> = req
         .unit_mappings
         .iter()
@@ -116,8 +118,13 @@ pub fn convert_to_dollars(req: UnitConversionRequest) -> Option<Amount> {
             );
         })
         .collect();
-    let foo =
-        amount_to_measure(req.input[0].clone()).convert(unit::MeasureKind::Money, equivalencies);
+    let target = match req.target.unwrap_or(Target::Other) {
+        Target::Weight => MeasureKind::Weight,
+        Target::Volume => MeasureKind::Volume,
+        Target::Money => MeasureKind::Money,
+        Target::Other => MeasureKind::Other,
+    };
+    let foo = amount_to_measure(req.input[0].clone()).convert(target, equivalencies);
     // return foo.and_then(measure_to_amount);
     // return None;
     return match foo {

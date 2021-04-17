@@ -1,6 +1,6 @@
 mod utils;
 
-use gourd_common::{convert_to_dollars, sum_ingredients};
+use gourd_common::{convert_to, sum_ingredients};
 use openapi::models::{RecipeDetail, UnitConversionRequest};
 use wasm_bindgen::prelude::*;
 
@@ -95,7 +95,7 @@ pub fn sum_ingr(recipe_detail: &JsValue) -> JsValue {
 pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
     utils::set_panic_hook();
     let req: UnitConversionRequest = conversion_request.into_serde().unwrap();
-    return match convert_to_dollars(req) {
+    return match convert_to(req) {
         Some(a) => Ok(JsValue::from_serde(&a).unwrap().into()),
         None => Err(JsValue::from_str("no parse result")),
     };

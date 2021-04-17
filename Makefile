@@ -33,6 +33,8 @@ dev-air: bin/air
 	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
 dev-ui:
 	cd ui && yarn run start
+dev-rs:
+	cd rust/s && cargo watch -x run
 
 bin/air:
 	@mkdir -p $(dir $@)
@@ -78,14 +80,11 @@ migrate: bin/migrate
 migrate-down: bin/migrate
 	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
 
-generate: generate-rust generate-openapi
 
-generate-rust:
-	cd rust/w && wasm-pack build
 
-validate-openapi:
+validate-openapi: api/openapi.yaml
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
-generate-openapi: validate-openapi
+generate-openapi: validate-openapi api/openapi.yaml
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
@@ -112,5 +111,9 @@ rs:
 	cd rust/s && cargo sqlx prepare -- --bin gourd
 
 
+generate-rust:
+	cd rust/w && wasm-pack build
 wasm-dev: generate-rust
 	cp -r rust/w/pkg/ ui/node_modules/gourd_rs/
+
+generate: generate-rust generate-openapi

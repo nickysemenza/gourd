@@ -582,6 +582,7 @@ export interface RecipeDependency {
 }
 
 export interface UnitConversionRequest {
+  target?: "weight" | "volume" | "money" | "other";
   /**
    * multiple amounts to try
    */

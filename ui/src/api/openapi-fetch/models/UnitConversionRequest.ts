@@ -31,6 +31,12 @@ import {
  */
 export interface UnitConversionRequest {
     /**
+     * 
+     * @type {string}
+     * @memberof UnitConversionRequest
+     */
+    target?: UnitConversionRequestTargetEnum;
+    /**
      * multiple amounts to try
      * @type {Array<Amount>}
      * @memberof UnitConversionRequest
@@ -44,6 +50,17 @@ export interface UnitConversionRequest {
     unit_mappings: Array<UnitMapping>;
 }
 
+/**
+* @export
+* @enum {string}
+*/
+export enum UnitConversionRequestTargetEnum {
+    WEIGHT = 'weight',
+    VOLUME = 'volume',
+    MONEY = 'money',
+    OTHER = 'other'
+}
+
 export function UnitConversionRequestFromJSON(json: any): UnitConversionRequest {
     return UnitConversionRequestFromJSONTyped(json, false);
 }
@@ -54,6 +71,7 @@ export function UnitConversionRequestFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'target': !exists(json, 'target') ? undefined : json['target'],
         'input': ((json['input'] as Array<any>).map(AmountFromJSON)),
         'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
@@ -68,6 +86,7 @@ export function UnitConversionRequestToJSON(value?: UnitConversionRequest | null
     }
     return {
         
+        'target': value.target,
         'input': ((value.input as Array<any>).map(AmountToJSON)),
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };

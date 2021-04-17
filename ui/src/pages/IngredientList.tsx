@@ -72,10 +72,11 @@ const IngredientList: React.FC = () => {
                 compact
                 buttons={[
                   {
+                    disabled: ingredient.fdc_id != null,
                     onClick: () => {
                       convertToRecipe(ingredient.id);
                     },
-                    text: "make Recipe",
+                    text: "convert to recipe",
                     IconLeft: PlusCircle,
                   },
                 ]}

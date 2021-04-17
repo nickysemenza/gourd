@@ -15,21 +15,22 @@ impl BareMeasurement {
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct Measure(Unit, f32);
 
-// #[derive(Clone, PartialEq, PartialOrd, Debug)]
-// pub enum Measure {
-//     Other(BareMeasurement),
-//     Grams(f32),
-//     Ml(f32),
-//     Teaspoon(f32),
-//     Cent(f32),
-// }
-
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub enum MeasureKind {
     Weight,
     Volume,
     Money,
     Other,
+}
+impl MeasureKind {
+    pub fn from_str(s: &str) -> Self {
+        match s {
+            "weight" => Self::Weight,
+            "volume" => Self::Volume,
+            "money" => Self::Money,
+            _ => Self::Other,
+        }
+    }
 }
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub enum Unit {

@@ -1241,6 +1241,9 @@ components:
         - input
         - unit_mappings
       properties:
+        target:
+          type: string
+          enum: [weight, volume, money, other]
         input:
           description: multiple amounts to try
           type: array

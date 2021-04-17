@@ -13,6 +13,8 @@
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UnitConversionRequest {
+    #[serde(rename = "target", skip_serializing_if = "Option::is_none")]
+    pub target: Option<Target>,
     /// multiple amounts to try
     #[serde(rename = "input")]
     pub input: Vec<crate::models::Amount>,
@@ -24,10 +26,23 @@ pub struct UnitConversionRequest {
 impl UnitConversionRequest {
     pub fn new(input: Vec<crate::models::Amount>, unit_mappings: Vec<crate::models::UnitMapping>) -> UnitConversionRequest {
         UnitConversionRequest {
+            target: None,
             input,
             unit_mappings,
         }
     }
 }
 
+/// 
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+pub enum Target {
+    #[serde(rename = "weight")]
+    Weight,
+    #[serde(rename = "volume")]
+    Volume,
+    #[serde(rename = "money")]
+    Money,
+    #[serde(rename = "other")]
+    Other,
+}
 
