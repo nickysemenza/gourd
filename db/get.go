@@ -429,7 +429,7 @@ func newSearchQuery(opts ...SearchOption) *SearchQuery {
 }
 
 // GetIngredients returns all ingredients.
-func (c *Client) GetIngredients(ctx context.Context, name string, opts ...SearchOption) ([]Ingredient, uint64, error) {
+func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, opts ...SearchOption) ([]Ingredient, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngredients")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
@@ -437,6 +437,8 @@ func (c *Client) GetIngredients(ctx context.Context, name string, opts ...Search
 		q = newSearchQuery(opts...).apply(q)
 		if name != "" {
 			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", name)})
+		} else if len(ids) != 0 {
+			return q.Where(sq.Eq{"id": ids})
 		}
 		return q
 	})

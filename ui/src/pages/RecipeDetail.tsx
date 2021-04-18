@@ -13,13 +13,16 @@ import {
   RecipeSource,
   SectionIngredient,
   useGetFoodsByIds,
+  useListIngredients,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
 import {
   calCalc,
   countTotalGrams,
+  flatIngredients,
   FoodsById,
   getFDCIds,
+  IngDetailsById,
   Override,
   RecipeTweaks,
   replaceIngredients,
@@ -65,6 +68,19 @@ const RecipeDetail: React.FC = () => {
     // lazy: true,
   });
 
+  const { data: ingredientDetails } = useListIngredients({
+    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
+    queryParams: {
+      ingredient_id: [
+        ...flatIngredients(recipe?.detail.sections || []).map(
+          (i) => i.ingredient?.id || ""
+        ),
+        "",
+      ],
+    },
+    // lazy: true,
+  });
+
   // on the (usually just first) load, seed multiplier state with the value from the URL
   // once the multipler has been 'touched', stop seeding from the URL,
   // and instead seed the URL based on state
@@ -96,6 +112,12 @@ const RecipeDetail: React.FC = () => {
   const hints: FoodsById = Object.assign(
     {},
     ...(foods?.foods || []).map((s) => ({ [s.fdc_id]: s }))
+  );
+  const ing_hints: IngDetailsById = Object.assign(
+    {},
+    ...(ingredientDetails?.ingredients || []).map((s) => ({
+      [s.ingredient.id]: s,
+    }))
   );
 
   const resetMultiplier = () => setMultiplierW(1);
@@ -332,6 +354,7 @@ const RecipeDetail: React.FC = () => {
 
       <RecipeDetailTable
         hints={hints}
+        ing_hints={ing_hints}
         tweaks={tweaks}
         updateIngredient={updateIngredient}
         recipe={recipe}

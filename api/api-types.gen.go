@@ -537,6 +537,9 @@ type ListIngredientsParams struct {
 
 	// The numbers of items to return.
 	Limit *LimitParam `json:"limit,omitempty"`
+
+	// ids
+	IngredientId *[]string `json:"ingredient_id,omitempty"`
 }
 
 // CreateIngredientsJSONBody defines parameters for CreateIngredients.

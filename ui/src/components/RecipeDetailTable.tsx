@@ -4,7 +4,12 @@ import {
   RecipeSection,
   SectionIngredient,
 } from "../api/openapi-hooks/api";
-import { formatTimeRange, getIngredient, parseTimeRange } from "../util";
+import {
+  formatTimeRange,
+  getIngredient,
+  parseTimeRange,
+  scaledRound,
+} from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -27,12 +32,16 @@ import {
   updateTimeRange,
   getCal,
   FoodsById,
+  IngDetailsById,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
 import { TableInput } from "./Input";
+import { try_convert } from "./UnitConvertDemo";
+import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
+import Debug from "./Debug";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -48,6 +57,7 @@ export interface TableProps {
   setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
   tweaks: RecipeTweaks;
   hints: FoodsById;
+  ing_hints: IngDetailsById;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
@@ -55,6 +65,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   setRecipe,
   tweaks,
   hints,
+  ing_hints,
 }) => {
   const { edit } = tweaks;
   const { sections } = recipe.detail;
@@ -118,7 +129,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 or
               </div>
             )}
-
             <TableInput
               width={"full"}
               data-cy="grams-input"
@@ -144,6 +154,25 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 })
               }
             />
+            {instance &&
+              ing_hints[ingredient?.ingredient?.id || ""] !== undefined &&
+              ingredient.unit &&
+              ingredient.amount &&
+              scaledRound(
+                try_convert(
+                  instance,
+                  ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
+                  [{ unit: ingredient.unit, value: ingredient.amount }],
+                  UnitConversionRequestTargetEnum.WEIGHT
+                )?.value ||
+                  try_convert(
+                    instance,
+                    ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
+                    [{ unit: ingredient.unit, value: ingredient.amount }],
+                    UnitConversionRequestTargetEnum.VOLUME
+                  )?.value ||
+                  0
+              )}
           </div>
           <div className="flex space-x-0.5">
             <div className="text-gray-600">g</div>

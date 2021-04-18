@@ -420,7 +420,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
-	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name))
+	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name), nil)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}

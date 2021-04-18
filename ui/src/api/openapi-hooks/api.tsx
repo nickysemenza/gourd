@@ -920,6 +920,10 @@ export interface ListIngredientsQueryParams {
    * The numbers of items to return.
    */
   limit?: number;
+  /**
+   * ids
+   */
+  ingredient_id?: string[];
 }
 
 export type ListIngredientsProps = Omit<

@@ -152,7 +152,11 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	defer span.End()
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", paginationParams...)
+	var ids []string
+	if params.IngredientId != nil {
+		ids = *params.IngredientId
+	}
+	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", ids, paginationParams...)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}

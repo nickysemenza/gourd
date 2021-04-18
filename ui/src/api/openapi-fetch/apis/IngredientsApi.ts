@@ -55,6 +55,7 @@ export interface IngredientsApiGetIngredientByIdRequest {
 export interface IngredientsApiListIngredientsRequest {
     offset?: number;
     limit?: number;
+    ingredientId?: Array<string>;
 }
 
 export interface IngredientsApiMergeIngredientsRequest {
@@ -257,6 +258,10 @@ export class IngredientsApi extends runtime.BaseAPI {
 
         if (requestParameters.limit !== undefined) {
             queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.ingredientId) {
+            queryParameters['ingredient_id'] = requestParameters.ingredientId;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

@@ -1,6 +1,7 @@
 import {
   Food,
   Ingredient,
+  IngredientDetail,
   Meal,
   RecipeDetail,
   RecipeSection,
@@ -30,6 +31,9 @@ export type IngredientKind = SectionIngredient["kind"];
 
 export type FoodsById = {
   [key: number]: Food;
+};
+export type IngDetailsById = {
+  [key: string]: IngredientDetail;
 };
 
 export const updateIngredientInfo = (
