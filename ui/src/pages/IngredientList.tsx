@@ -8,7 +8,7 @@ import { IngredientsApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { toast } from "react-toastify";
 import { ButtonGroup } from "../components/Button";
-import { RecipeLink } from "../components/Misc";
+import { RecipeLink, UnitMappingList } from "../components/Misc";
 import { AlertTriangle, PlusCircle } from "react-feather";
 import { Code } from "../util";
 import FoodSearch from "../components/FoodSearch";
@@ -92,15 +92,7 @@ const IngredientList: React.FC = () => {
               <Link to={`/ingredients/${ingredient.id}`} className="link">
                 <div className="text-blue-800">view</div>
               </Link>
-              <ul>
-                {unit_mappings &&
-                  unit_mappings.map((m) => (
-                    <li>
-                      {m.a.value} {m.a.unit} = {m.b.value} {m.b.unit} (
-                      {m.source}){" "}
-                    </li>
-                  ))}
-              </ul>
+              <UnitMappingList unit_mappings={unit_mappings} />
             </div>
           );
         },

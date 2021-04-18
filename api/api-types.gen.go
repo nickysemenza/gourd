@@ -59,6 +59,9 @@ type Food struct {
 
 	// portion datapoints
 	Portions *[]FoodPortion `json:"portions,omitempty"`
+
+	// mappings of equivalent units
+	UnitMappings []UnitMapping `json:"unit_mappings"`
 }
 
 // FoodCategory defines model for FoodCategory.

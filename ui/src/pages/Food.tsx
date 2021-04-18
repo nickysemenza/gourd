@@ -7,7 +7,7 @@ const Food: React.FC = () => {
   // const [food, setFood]
   return (
     <div className="grid grid-cols-5 gap-4">
-      <FoodInfo fdc_id={9999999} />
+      {/* <FoodInfo fdc_id={9999999} /> */}
       <FoodInfo fdc_id={171047} />
       <FoodInfo fdc_id={392941} />
       <FoodInfo fdc_id={747448} />
@@ -21,20 +21,28 @@ export default Food;
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
   const { data } = useGetFoodById({ fdc_id });
   if (!data) return null;
-  const { category, branded_info, portions, ...food } = data;
+  const {
+    category,
+    branded_info,
+    portions,
+    description,
+    data_type,
+    nutrients,
+    unit_mappings,
+  } = data;
   return (
     <div>
-      <h2 className="font-bold text-l">{food.description}</h2>
+      <h2 className="font-bold text-l">{description}</h2>
       <div>
-        <Code>{food.data_type}</Code>
+        <Code>{data_type}</Code>
       </div>
       <div>
         <Code>{fdc_id}</Code>
       </div>
-      <Debug data={{ category, branded_info, portions }} />
+      <Debug data={{ category, branded_info, portions, unit_mappings }} />
 
       <table>
-        {food.nutrients
+        {nutrients
           .filter((n) => n.amount > 0.1)
           .map((n) => (
             <tr>

@@ -32,11 +32,14 @@ pub struct Food {
     pub portions: Option<Vec<crate::models::FoodPortion>>,
     #[serde(rename = "branded_info", skip_serializing_if = "Option::is_none")]
     pub branded_info: Option<crate::models::BrandedFood>,
+    /// mappings of equivalent units
+    #[serde(rename = "unit_mappings")]
+    pub unit_mappings: Vec<crate::models::UnitMapping>,
 }
 
 impl Food {
     /// A top level food
-    pub fn new(fdc_id: i32, description: String, data_type: crate::models::FoodDataType, nutrients: Vec<crate::models::FoodNutrient>) -> Food {
+    pub fn new(fdc_id: i32, description: String, data_type: crate::models::FoodDataType, nutrients: Vec<crate::models::FoodNutrient>, unit_mappings: Vec<crate::models::UnitMapping>) -> Food {
         Food {
             fdc_id,
             description,
@@ -45,6 +48,7 @@ impl Food {
             nutrients,
             portions: None,
             branded_info: None,
+            unit_mappings,
         }
     }
 }

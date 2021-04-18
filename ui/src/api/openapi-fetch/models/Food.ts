@@ -34,6 +34,10 @@ import {
     FoodPortionFromJSON,
     FoodPortionFromJSONTyped,
     FoodPortionToJSON,
+    UnitMapping,
+    UnitMappingFromJSON,
+    UnitMappingFromJSONTyped,
+    UnitMappingToJSON,
 } from './';
 
 /**
@@ -84,6 +88,12 @@ export interface Food {
      * @memberof Food
      */
     branded_info?: BrandedFood;
+    /**
+     * mappings of equivalent units
+     * @type {Array<UnitMapping>}
+     * @memberof Food
+     */
+    unit_mappings: Array<UnitMapping>;
 }
 
 export function FoodFromJSON(json: any): Food {
@@ -103,6 +113,7 @@ export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food
         'nutrients': ((json['nutrients'] as Array<any>).map(FoodNutrientFromJSON)),
         'portions': !exists(json, 'portions') ? undefined : ((json['portions'] as Array<any>).map(FoodPortionFromJSON)),
         'branded_info': !exists(json, 'branded_info') ? undefined : BrandedFoodFromJSON(json['branded_info']),
+        'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
 
@@ -122,6 +133,7 @@ export function FoodToJSON(value?: Food | null): any {
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
         'portions': value.portions === undefined ? undefined : ((value.portions as Array<any>).map(FoodPortionToJSON)),
         'branded_info': BrandedFoodToJSON(value.branded_info),
+        'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
 

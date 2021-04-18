@@ -3,6 +3,7 @@ import { PlusCircle } from "react-feather";
 import { useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
+import { UnitMappingList } from "./Misc";
 import { getCalories } from "./RecipeEditorUtils";
 
 const FoodSearch: React.FC<{
@@ -55,7 +56,7 @@ const FoodSearch: React.FC<{
           const isHighlighted = highlightId === r.fdc_id;
           return (
             <div
-              style={{ gridTemplateColumns: "5rem 15rem 5rem 5rem 5rem 5rem" }}
+              style={{ gridTemplateColumns: "5rem 20rem 15rem 5rem" }}
               className={`border ${
                 isHighlighted ? "border-red-600 " : "border-indigo-600"
               } ${isHighlighted && "bg-indigo-200"} grid`}
@@ -69,41 +70,42 @@ const FoodSearch: React.FC<{
                   rel="noopener noreferrer"
                   className="text-sm pr-1"
                 >
-                  (view)
+                  (view @ usda)
                 </a>
+                {onLink !== undefined && (
+                  <ButtonGroup
+                    compact
+                    buttons={[
+                      {
+                        onClick: () => {
+                          onLink(r.fdc_id);
+                        },
+                        text: "link",
+                        disabled: isHighlighted,
+                        IconLeft: PlusCircle,
+                      },
+                    ]}
+                  />
+                )}
               </div>
               <div className="flex flex-col">
                 <div className="">{r.description}</div>{" "}
                 <Code>{r.data_type}</Code>
+                <UnitMappingList unit_mappings={r.unit_mappings} />
               </div>
               {!!r.branded_info && (
-                <div className="italic">{r.branded_info.brand_owner}</div>
+                <div className="italic">
+                  {r.branded_info.brand_owner} <br />
+                  {r.branded_info.branded_food_category}
+                </div>
               )}
               {/* <div className="flex"> */}
               <div className="flex flex-col">
                 <div className="font-bold flex">nutrients:</div>
                 <Code>{r.nutrients?.length}</Code>
-              </div>
-              <div className="flex flex-col">
-                <div className="font-bold flex ml-1">nutrition:</div>
-                <div>{`${getCalories(r)} kcal/100g`}</div>
+                <div>{`${getCalories(r)} kcal = 100g`}</div>
               </div>
               {/* </div> */}
-              {onLink !== undefined && (
-                <ButtonGroup
-                  compact
-                  buttons={[
-                    {
-                      onClick: () => {
-                        onLink(r.fdc_id);
-                      },
-                      text: "link",
-                      disabled: isHighlighted,
-                      IconLeft: PlusCircle,
-                    },
-                  ]}
-                />
-              )}
             </div>
           );
         })}

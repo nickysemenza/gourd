@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/rs_client"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -84,23 +85,65 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 			detail.Food = food
 			span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
 
-			// todo: store these in DB instead of inline parsing
-			if food.BrandedInfo.HouseholdServing != nil {
-				var res []Amount
-				err = rs_client.Parse(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
-				if err == nil && len(res) > 0 {
-					detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
-						Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
-						res[0],
-						"fdc"})
-				}
-
+			m, err := UnitMappingsFromFood(ctx, food)
+			if err != nil {
+				return nil, err
 			}
+			detail.UnitMappings = append(detail.UnitMappings, m...)
+
 		}
+
 		items = append(items, detail)
 		span.End()
 	}
 	return items, nil
+}
+func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
+	// todo: store these in DB instead of inline parsing ?
+	m := []UnitMapping{}
+	if food.BrandedInfo.HouseholdServing != nil {
+		var res []Amount
+		err := rs_client.Parse(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
+		if err != nil {
+			return nil, err
+		}
+		if len(res) > 0 {
+			m = append(m, UnitMapping{
+				Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
+				res[0],
+				"fdc hs"})
+		}
+	}
+	if food.Portions != nil {
+		for _, p := range *food.Portions {
+
+			if p.PortionDescription != "" {
+				var res []Amount
+				err := rs_client.Parse(ctx, p.PortionDescription, rs_client.Amount, &res)
+				if err != nil {
+					err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
+					log.Error(err)
+					continue
+					// return nil, err
+				}
+				if len(res) == 0 {
+					continue
+				}
+				m = append(m, UnitMapping{
+					res[0],
+					Amount{Unit: "grams", Value: p.GramWeight},
+					"fdc p1"})
+			} else {
+				m = append(m, UnitMapping{
+					Amount{Unit: p.Modifier, Value: p.Amount},
+					Amount{Unit: "grams", Value: p.GramWeight},
+					"fdc p2"})
+			}
+
+		}
+	}
+	return m, nil
+
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
 	ctx := c.Request().Context()

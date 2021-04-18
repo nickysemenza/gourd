@@ -3,12 +3,12 @@ package api
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
+	log "github.com/sirupsen/logrus"
 )
 
 func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
@@ -127,6 +127,11 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 	f.Nutrients = fNutrients
 	f.Portions = &apiPortions
 	f.BrandedInfo = &brandInfoRes
+	m, err := UnitMappingsFromFood(ctx, f)
+	if err != nil {
+		return err
+	}
+	f.UnitMappings = append(f.UnitMappings, m...)
 
 	return nil
 }

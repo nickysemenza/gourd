@@ -516,6 +516,10 @@ export interface Food {
    */
   portions?: FoodPortion[];
   branded_info?: BrandedFood;
+  /**
+   * mappings of equivalent units
+   */
+  unit_mappings: UnitMapping[];
 }
 
 /**

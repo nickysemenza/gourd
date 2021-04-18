@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/nickysemenza/gourd/common"
+	log "github.com/sirupsen/logrus"
 )
 
 // IngredientByName retrieves an ingredient by name, creating it if it does not exist.
