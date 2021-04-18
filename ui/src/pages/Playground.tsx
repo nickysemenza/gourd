@@ -17,6 +17,7 @@ const Playground: React.FC = () => {
   useEffect(() => {
     if (!instance) return;
     console.log({ parse: instance.parse("2 cups (240g) flour, sifted") });
+    console.log({ parse2: instance.parse2("2 cups (240g) flour, sifted") });
     console.log({ parse3: instance.parse3("2 cups (240g) flour, sifted") });
     console.log({ parse4: instance.parse4("2 cups (240g) flour, sifted") });
     // ingredients.forEach((i) => {

@@ -214,6 +214,17 @@ export function dolla(conversion_request) {
     }
 }
 
+/**
+* @param {string} input
+* @returns {Amount[]}
+*/
+export function parse_amount(input) {
+    var ptr0 = passStringToWasm0(input, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    var ret = wasm.parse_amount(ptr0, len0);
+    return takeObject(ret);
+}
+
 export const __wbindgen_json_parse = function(arg0, arg1) {
     var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
     return addHeapObject(ret);

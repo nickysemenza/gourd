@@ -35,6 +35,11 @@ export function sum_ingr(recipe_detail: any): any;
 * @returns {Amount}
 */
 export function dolla(conversion_request: any): Amount;
+/**
+* @param {string} input
+* @returns {Amount[]}
+*/
+export function parse_amount(input: string): Amount[];
 
 interface Ingredient {
     amounts: Amount[];

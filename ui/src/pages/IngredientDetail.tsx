@@ -5,6 +5,7 @@ import { IngredientsApi } from "../api/openapi-fetch";
 import { useGetIngredientById } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
 import FoodSearch from "../components/FoodSearch";
+import { UnitConvertDemo } from "../components/UnitConvertDemo";
 import { getOpenapiFetchConfig } from "../config";
 
 const IngredientDetail: React.FC = () => {
@@ -30,6 +31,7 @@ const IngredientDetail: React.FC = () => {
       <h2>{id}</h2>
       <div className="flex flex-row">
         <div>
+          <UnitConvertDemo detail={data} />
           <Debug data={data} />
         </div>
         <div>

@@ -58,6 +58,8 @@ extern "C" {
     pub type IIngredient;
     #[wasm_bindgen(typescript_type = "Amount")]
     pub type IAmount;
+    #[wasm_bindgen(typescript_type = "Amount[]")]
+    pub type IAmounts;
 }
 
 #[wasm_bindgen]
@@ -99,6 +101,13 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
         Some(a) => Ok(JsValue::from_serde(&a).unwrap().into()),
         None => Err(JsValue::from_str("no parse result")),
     };
+}
+
+#[wasm_bindgen]
+pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
+    utils::set_panic_hook();
+    let i = ingredient::parse_amount(input).unwrap();
+    Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
 // #[wasm_bindgen]
