@@ -55,12 +55,6 @@ const IngredientList: React.FC = () => {
 
     return [
       {
-        Header: "id",
-        Cell: ({ row: { original } }: CellProps<i>) => (
-          <Code>{original.ingredient.id}</Code>
-        ),
-      },
-      {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
@@ -68,6 +62,7 @@ const IngredientList: React.FC = () => {
           return (
             <div className="flex flex-col w-64">
               {ingredient.name}
+              <Code>{original.ingredient.id}</Code>
               <ButtonGroup
                 compact
                 buttons={[
@@ -105,7 +100,7 @@ const IngredientList: React.FC = () => {
           const recipes = original.recipes || [];
           const children = original.children || [];
           return (
-            <div>
+            <div className="w-64">
               <ul className="list-disc list-outside pl-4">
                 {recipes.map((r) => (
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>

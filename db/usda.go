@@ -35,10 +35,12 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, count bool) sq.SelectBuilder) ([]Food, uint64, error) {
 
 	favoriteBrands := []string{
+		// brands
 		"Guittard Chocolate Co.",
 		"Bob's Red Mill Natural Foods, Inc.",
 		"The King Arthur Flour Company, Inc.",
 
+		// stores
 		"'Whole Foods Market, Inc.",
 		"WHOLE FOODS MARKET",
 		"TRADER JOE'S",
@@ -61,7 +63,7 @@ func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, c
 	).From("usda_food").
 		LeftJoin("usda_branded_food	on usda_food.fdc_id = usda_branded_food.fdc_id").
 		OrderBy(fmt.Sprintf(`array_position(array['%s'], brand_owner)`, strings.Join(favoriteBrands, "','"))).
-		OrderBy("length(ingredients) asc")
+		OrderBy("length(ingredients) asc") // shorter ingredient list = more likely to be 'pure'
 
 	cq := c.psql.Select("count(*)").From("usda_food")
 

@@ -20,6 +20,7 @@ pub enum MeasureKind {
     Weight,
     Volume,
     Money,
+    Calories,
     Other,
 }
 impl MeasureKind {
@@ -28,6 +29,7 @@ impl MeasureKind {
             "weight" => Self::Weight,
             "volume" => Self::Volume,
             "money" => Self::Money,
+            "calories" => Self::Calories,
             _ => Self::Other,
         }
     }
@@ -47,6 +49,7 @@ pub enum Unit {
     Pound,
     Cent,
     Dollar,
+    KCal,
     Other(String),
 }
 
@@ -70,6 +73,8 @@ impl Unit {
 
             "dollar" | "$" => Self::Dollar,
             "cent" => Self::Cent,
+
+            "calorie" | "cal" | "kcal" => Self::KCal,
             _ => Self::Other(s.to_string()),
         }
     }
@@ -88,6 +93,7 @@ impl Unit {
             Unit::Pound => "lb",
             Unit::Cent => "cent",
             Unit::Dollar => "$",
+            Unit::KCal => "kcal",
             Unit::Other(s) => return s,
         }
         .to_string()
@@ -111,9 +117,12 @@ impl Measure {
     }
     pub fn normalize(&self) -> Measure {
         let foo = match self.0 {
-            Unit::Teaspoon | Unit::Milliliter | Unit::Gram | Unit::Cent | Unit::Other(_) => {
-                return self.clone()
-            }
+            Unit::Teaspoon
+            | Unit::Milliliter
+            | Unit::Gram
+            | Unit::Cent
+            | Unit::KCal
+            | Unit::Other(_) => return self.clone(),
 
             Unit::Kilogram => (Unit::Gram, self.1 * G_TO_K),
 
@@ -141,8 +150,17 @@ impl Measure {
             Unit::Cent => MeasureKind::Money,
             Unit::Teaspoon | Unit::Milliliter => MeasureKind::Volume,
 
+            Unit::KCal => MeasureKind::Calories,
             Unit::Other(_) => MeasureKind::Other,
-            _ => panic!("unit not normalized: {:?}", self),
+            Unit::Kilogram
+            | Unit::Liter
+            | Unit::Tablespoon
+            | Unit::Cup
+            | Unit::Quart
+            | Unit::FluidOunce
+            | Unit::Ounce
+            | Unit::Pound
+            | Unit::Dollar => panic!("unit not normalized: {:?}", self),
         };
     }
 

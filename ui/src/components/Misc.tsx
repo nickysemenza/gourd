@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { RecipeDetail, UnitMapping } from "../api/openapi-hooks/api";
+import { scaledRound } from "../util";
 
 export interface Props {
   recipe: RecipeDetail;
@@ -26,12 +27,22 @@ export const RecipeLink: React.FC<Props> = ({
 export const UnitMappingList: React.FC<{ unit_mappings: UnitMapping[] }> = ({
   unit_mappings,
 }) => (
-  <ul>
+  <div className="w-60">
     {unit_mappings &&
       unit_mappings.map((m) => (
-        <li>
-          {m.a.value} {m.a.unit} = {m.b.value} {m.b.unit} ({m.source})
-        </li>
+        <div
+          style={{ gridTemplateColumns: "8fr 1fr 8fr 5fr" }}
+          className="grid text-sm text-gray-700"
+        >
+          <p className="text-left">
+            {scaledRound(m.a.value)} {m.a.unit}
+          </p>
+          <p className="text-center">=</p>
+          <p className="text-left">
+            {scaledRound(m.b.value)} {m.b.unit}
+          </p>
+          <p className="text-xs">({m.source})</p>
+        </div>
       ))}
-  </ul>
+  </div>
 );

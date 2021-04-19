@@ -4,7 +4,6 @@ import { useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
 import { UnitMappingList } from "./Misc";
-import { getCalories } from "./RecipeEditorUtils";
 
 const FoodSearch: React.FC<{
   name: string;
@@ -56,21 +55,21 @@ const FoodSearch: React.FC<{
           const isHighlighted = highlightId === r.fdc_id;
           return (
             <div
-              style={{ gridTemplateColumns: "5rem 20rem 15rem 5rem" }}
+              style={{ gridTemplateColumns: "5rem 20rem 15rem" }}
               className={`border ${
                 isHighlighted ? "border-red-600 " : "border-indigo-600"
-              } ${isHighlighted && "bg-indigo-200"} grid`}
+              } ${isHighlighted && "bg-indigo-200"} grid p-1`}
               key={`${name}@${r.fdc_id}`}
             >
-              <div className="flex flex-col">
+              <div className="flex flex-col p-1">
                 <Code>{r.fdc_id}</Code>
                 <a
                   href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdc_id}/nutrients`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm pr-1"
+                  className="text-sm pr-1 underline text-blue-800"
                 >
-                  (view @ usda)
+                  view
                 </a>
                 {onLink !== undefined && (
                   <ButtonGroup
@@ -90,8 +89,9 @@ const FoodSearch: React.FC<{
               </div>
               <div className="flex flex-col">
                 <div className="">{r.description}</div>{" "}
-                <Code>{r.data_type}</Code>
+                <p className="font-mono text-xs text-gray-500">{r.data_type}</p>
                 <UnitMappingList unit_mappings={r.unit_mappings} />
+                <p className="text-sm">{r.nutrients?.length} nutrients</p>
               </div>
               {!!r.branded_info && (
                 <div>
@@ -102,13 +102,6 @@ const FoodSearch: React.FC<{
                   <p className="text-xs">{r.branded_info.ingredients}</p>
                 </div>
               )}
-              {/* <div className="flex"> */}
-              <div className="flex flex-col">
-                <div className="font-bold flex">nutrients:</div>
-                <Code>{r.nutrients?.length}</Code>
-                <div>{`${getCalories(r)} kcal = 100g`}</div>
-              </div>
-              {/* </div> */}
             </div>
           );
         })}

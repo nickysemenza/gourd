@@ -15,6 +15,13 @@
         unit: stick
         value: 1
       source: yaml
+    - a:
+        unit: g
+        value: 452
+      b:
+        unit: dollars
+        value: 7.99
+      source: yaml
 
 - name: eggs
   fdc_id: 748967
