@@ -73,7 +73,7 @@ const RecipeDetail: React.FC = () => {
     queryParams: {
       ingredient_id: [
         ...flatIngredients(recipe?.detail.sections || []).map(
-          (i) => i.ingredient?.id || ""
+          (i) => i.ingredient?.same_as || i.ingredient?.id || ""
         ),
         "",
       ],

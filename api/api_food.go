@@ -299,6 +299,21 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 		if err != nil {
 			return err
 		}
+
+		for _, u := range m.UnitMappings {
+			u := db.IngredientUnitMapping{
+				IngredientId: ing.Id,
+				UnitA:        u.A.Unit,
+				AmountA:      u.A.Value,
+				UnitB:        u.B.Unit,
+				AmountB:      u.B.Value,
+				Source:       u.Source,
+			}
+			err = a.Manager.DB().AddIngredientUnit(ctx, u)
+			if err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }

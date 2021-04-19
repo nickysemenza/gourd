@@ -23,10 +23,13 @@ export const encodeIngredient = (
 export const encodeRecipe = (recipe: RecipeWrapper, w: wasm): string =>
   recipe && recipe.detail.sections
     ? recipe.detail.sections
-        .map((section) =>
-          section.ingredients
-            .map((i) => encodeIngredient(i, w.format_ingredient))
-            .join("\n")
+        .map(
+          (section) =>
+            `${section.ingredients
+              .map((i) => encodeIngredient(i, w.format_ingredient))
+              .join("\n")}\n${section.instructions
+              .map((i) => ";" + i.instruction)
+              .join("\n")}`
         )
         .join("\n\n")
     : "";

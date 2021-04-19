@@ -7,6 +7,15 @@
   fdc_id: 170489
 - name: butter
   fdc_id: 719780
+  unit_mappings:
+    - a:
+        unit: g
+        value: 113
+      b:
+        unit: stick
+        value: 1
+      source: yaml
+
 - name: eggs
   fdc_id: 748967
 - name: all purpose flour

@@ -154,20 +154,32 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               }
             />
             {instance &&
-              ing_hints[ingredient?.ingredient?.id || ""] !== undefined &&
+              ing_hints[
+                ingredient?.ingredient?.same_as ||
+                  ingredient?.ingredient?.id ||
+                  ""
+              ] !== undefined &&
               ingredient.unit &&
               ingredient.amount &&
               scaledRound(
                 try_convert(
                   instance,
-                  ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
+                  ing_hints[
+                    ingredient?.ingredient?.same_as ||
+                      ingredient?.ingredient?.id ||
+                      ""
+                  ].unit_mappings,
                   [{ unit: ingredient.unit, value: ingredient.amount }],
                   UnitConversionRequestTargetEnum.WEIGHT,
                   ingredient.ingredient?.name
                 )?.value ||
                   try_convert(
                     instance,
-                    ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
+                    ing_hints[
+                      ingredient?.ingredient?.same_as ||
+                        ingredient?.ingredient?.id ||
+                        ""
+                    ].unit_mappings,
                     [{ unit: ingredient.unit, value: ingredient.amount }],
                     UnitConversionRequestTargetEnum.VOLUME,
                     ingredient.ingredient?.name

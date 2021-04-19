@@ -76,9 +76,10 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, erro
 }
 
 type IngredientMapping struct {
-	Name    string   `json:"name"`
-	FdcID   int      `json:"fdc_id"`
-	Aliases []string `json:"aliases"`
+	Name         string        `json:"name"`
+	FdcID        int           `json:"fdc_id"`
+	Aliases      []string      `json:"aliases"`
+	UnitMappings []UnitMapping `json:"unit_mappings"`
 }
 
 // IngredientMapping is todo
