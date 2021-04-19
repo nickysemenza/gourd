@@ -210,8 +210,18 @@ impl Measure {
                 m if { m < CENTS_TO_DOLLAR } => (m, Unit::Cent, 1.0),
                 _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
             },
+            Unit::KCal => (m, Unit::KCal, 1.0),
+
             Unit::Other(o) => (m, Unit::Other(o), 1.0),
-            _ => panic!("unit not normalized: {:?}", self),
+            Unit::Kilogram
+            | Unit::Liter
+            | Unit::Tablespoon
+            | Unit::Cup
+            | Unit::Quart
+            | Unit::FluidOunce
+            | Unit::Ounce
+            | Unit::Pound
+            | Unit::Dollar => panic!("unit not normalized: {:?}", self),
         };
         return BareMeasurement::new(u.to_str(), val / f);
     }
@@ -305,6 +315,27 @@ mod tests {
                         Measure::from_string("12 eggs".to_string()),
                         Measure::from_string("1.20 dollar".to_string()),
                     )]
+                )
+                .unwrap()
+        );
+    }
+    #[test]
+    fn test_convert_kcal() {
+        assert_eq!(
+            Measure::from_string("200 kcal".to_string()),
+            Measure::from_string("100 g".to_string())
+                .convert(
+                    MeasureKind::Calories,
+                    vec![
+                        (
+                            Measure::from_string("20 cups".to_string()),
+                            Measure::from_string("40 grams".to_string()),
+                        ),
+                        (
+                            Measure::from_string("20 grams".to_string()),
+                            Measure::from_string("40 kcal".to_string()),
+                        )
+                    ]
                 )
                 .unwrap()
         );

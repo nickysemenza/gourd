@@ -12,6 +12,9 @@ import {
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 import { scaledRound } from "../util";
+import { wasm } from "../wasm";
+import { try_convert } from "./UnitConvertDemo";
+import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -79,7 +82,7 @@ export const isOverride = (
   tweaks.override.sectionID === sectionID &&
   tweaks.override.subIndex === subIndex &&
   tweaks.override.attr === attr;
-export const getIngredientValue = (
+export const adjustIngredientValue = (
   tweaks: RecipeTweaks,
   sectionID: number,
   ingredientID: number,
@@ -379,30 +382,6 @@ export const getCalories = (food: Food) => {
   return (!!first && first.amount) || 0;
 };
 
-export const getCal = (
-  ingredient: SectionIngredient,
-  hints: FoodsById,
-  multiplier: number
-) => {
-  if (!!ingredient.recipe) {
-    return scaledRound(
-      //todo: multiplier for recipes is wrong, needs to be based on amount of target recipe used
-      calCalc(ingredient.recipe.sections, hints, 0.1).totalCal
-    );
-  }
-  const fdc_id = ingredient.ingredient?.fdc_id;
-  if (fdc_id !== undefined) {
-    const hint = hints[fdc_id];
-    if (hint !== undefined) {
-      const scalingFactor = ingredient.grams / 100;
-      return scalingFactor === 0
-        ? "n/a"
-        : scaledRound(getCalories(hint) * scalingFactor * multiplier);
-    }
-  }
-  return "n/a";
-};
-
 export const calCalc = (
   sections: RecipeSection[],
   hints: FoodsById,
@@ -486,3 +465,60 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
         .filter((id) => id !== 0)
     )
     .flat();
+
+export const inferGrams = (
+  instance: wasm,
+  ingredient: SectionIngredient,
+  ing_hints: IngDetailsById
+): number | undefined => {
+  const ingredientId =
+    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
+  const hint = ing_hints[ingredientId];
+  if (!hint) return undefined;
+  let { unit, amount } = ingredient;
+  if (!unit || !amount || unit === "" || amount === 0) return undefined;
+
+  const targets = [
+    UnitConversionRequestTargetEnum.WEIGHT,
+    UnitConversionRequestTargetEnum.VOLUME,
+  ];
+  let res = targets.map(
+    (t) =>
+      try_convert(
+        instance,
+        hint.unit_mappings,
+        [{ unit: unit || "", value: amount || 0 }],
+        t,
+        ingredient.ingredient?.name
+      )?.value
+  );
+  return res.find((x) => x !== undefined && x !== 0);
+};
+
+export const getCal2 = (
+  instance: wasm,
+  ingredient: SectionIngredient,
+  ing_hints: IngDetailsById,
+  multiplier: number,
+  to:
+    | UnitConversionRequestTargetEnum.CALORIES
+    | UnitConversionRequestTargetEnum.MONEY
+): string => {
+  const ingredientId =
+    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
+  const hint = ing_hints[ingredientId];
+  if (!hint) return "n/a";
+  const grams =
+    ingredient.grams === 0
+      ? inferGrams(instance, ingredient, ing_hints)
+      : ingredient.grams;
+  if (grams === 0) return "n/a";
+  const kcal = try_convert(
+    instance,
+    hint.unit_mappings,
+    [{ unit: "grams", value: grams || 0 }],
+    to,
+    ingredient.ingredient?.name
+  )?.value;
+  return scaledRound((kcal || 0) * multiplier);
+};

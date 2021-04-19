@@ -1,5 +1,5 @@
 import React from "react";
-import { formatText } from "../util";
+import { formatText, scaledRound } from "../util";
 
 // <input> can't do onBlur?
 export type TallOrBlur =
@@ -16,6 +16,7 @@ export type TableInputProps = {
   edit: boolean;
   softEdit?: boolean;
   value: string | number;
+  pValue?: number;
   width?: number | "full";
   highlight?: boolean;
   onChange: (event: string) => void;
@@ -29,10 +30,14 @@ export const TableInput: React.FC<TableInputProps> = ({
   blur = false,
   highlight = false,
   value,
+  pValue,
   onChange,
   ...props
 }) => {
-  const controlledVal = value.toString();
+  const controlledVal = (
+    (!edit && pValue && scaledRound(pValue)) ||
+    value
+  ).toString();
   const [internalVal, setVal] = React.useState(controlledVal);
   React.useEffect(() => {
     setVal(controlledVal);
@@ -75,7 +80,7 @@ export const TableInput: React.FC<TableInputProps> = ({
         onChange={oC}
         onBlur={oB}
         className={className}
-        disabled={!edit && controlledVal === "0"}
+        disabled={!edit && (controlledVal === "0" || !!pValue)}
       />
     )
   ) : (

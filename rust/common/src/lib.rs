@@ -122,6 +122,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
         Target::Weight => MeasureKind::Weight,
         Target::Volume => MeasureKind::Volume,
         Target::Money => MeasureKind::Money,
+        Target::Calories => MeasureKind::Calories,
         Target::Other => MeasureKind::Other,
     };
     let foo = amount_to_measure(req.input[0].clone()).convert(target, equivalencies);

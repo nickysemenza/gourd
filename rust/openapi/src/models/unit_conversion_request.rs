@@ -42,6 +42,8 @@ pub enum Target {
     Volume,
     #[serde(rename = "money")]
     Money,
+    #[serde(rename = "calories")]
+    Calories,
     #[serde(rename = "other")]
     Other,
 }

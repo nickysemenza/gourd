@@ -58,6 +58,7 @@ export enum UnitConversionRequestTargetEnum {
     WEIGHT = 'weight',
     VOLUME = 'volume',
     MONEY = 'money',
+    CALORIES = 'calories',
     OTHER = 'other'
 }
 

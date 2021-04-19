@@ -93,7 +93,7 @@ export const sumTimeRanges = (ranges: (TimeRange | undefined)[]): TimeRange => {
 };
 
 export const Code: React.FC = ({ children }) => (
-  <code className="rounded-sm px-2 py-0.5 bg-gray-100 text-red-500 h-6 flex w-100">
+  <code className="rounded-sm px-2 py-0.5 bg-gray-100 text-red-500 h-6 flex text-sm font-bold w-min">
     {children}
   </code>
 );

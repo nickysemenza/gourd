@@ -21,7 +21,7 @@ import {
   addSection,
   canMoveI,
   delI,
-  getIngredientValue,
+  adjustIngredientValue,
   getGlobalInstructionNumber,
   I,
   isOverride,
@@ -30,16 +30,16 @@ import {
   updateIngredientInfo,
   updateInstruction,
   updateTimeRange,
-  getCal,
   FoodsById,
   IngDetailsById,
+  inferGrams,
+  getCal2,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
 import { TableInput } from "./Input";
-import { try_convert } from "./UnitConvertDemo";
 import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
 
 export interface UpdateIngredientProps {
@@ -133,7 +133,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               data-cy="grams-input"
               edit={edit}
               softEdit
-              value={getIngredientValue(
+              value={adjustIngredientValue(
                 tweaks,
                 x,
                 y,
@@ -141,6 +141,12 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 ingredient.grams || 0,
                 "grams"
               )}
+              pValue={
+                instance &&
+                inferGrams(instance, ingredient, ing_hints) &&
+                tweaks.multiplier *
+                  (inferGrams(instance, ingredient, ing_hints) || 0)
+              }
               blur
               highlight={isOverride(tweaks, x, y, subIndex, "grams")}
               onChange={(e) =>
@@ -153,39 +159,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 })
               }
             />
-            {instance &&
-              ing_hints[
-                ingredient?.ingredient?.same_as ||
-                  ingredient?.ingredient?.id ||
-                  ""
-              ] !== undefined &&
-              ingredient.unit &&
-              ingredient.amount &&
-              scaledRound(
-                try_convert(
-                  instance,
-                  ing_hints[
-                    ingredient?.ingredient?.same_as ||
-                      ingredient?.ingredient?.id ||
-                      ""
-                  ].unit_mappings,
-                  [{ unit: ingredient.unit, value: ingredient.amount }],
-                  UnitConversionRequestTargetEnum.WEIGHT,
-                  ingredient.ingredient?.name
-                )?.value ||
-                  try_convert(
-                    instance,
-                    ing_hints[
-                      ingredient?.ingredient?.same_as ||
-                        ingredient?.ingredient?.id ||
-                        ""
-                    ].unit_mappings,
-                    [{ unit: ingredient.unit, value: ingredient.amount }],
-                    UnitConversionRequestTargetEnum.VOLUME,
-                    ingredient.ingredient?.name
-                  )?.value ||
-                  0
-              )}
+            {/* {instance &&
+              inferGrams(instance, ingredient, ing_hints) &&
+              scaledRound(inferGrams(instance, ingredient, ing_hints) || 0)} */}
           </div>
           <div className="flex space-x-0.5">
             <div className="text-gray-600">g</div>
@@ -235,7 +211,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             edit={edit}
             softEdit
             highlight={isOverride(tweaks, x, y, subIndex, "amount")}
-            value={getIngredientValue(
+            value={adjustIngredientValue(
               tweaks,
               x,
               y,
@@ -289,7 +265,28 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
-            <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div>
+            {/* <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div> */}
+            <div>
+              {instance &&
+                getCal2(
+                  instance,
+                  ingredient,
+                  ing_hints,
+                  tweaks.multiplier,
+                  UnitConversionRequestTargetEnum.CALORIES
+                )}
+              kcal
+            </div>
+            {/* <div>
+              $
+              {instance &&
+                getCal2(
+                  instance,
+                  ingredient,
+                  ing_hints,
+                  UnitConversionRequestTargetEnum.MONEY
+                )}
+            </div> */}
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (
               <label className="flex items-center ml-1">
