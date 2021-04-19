@@ -2,7 +2,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
     unit_conversion_request::Target, Amount, Ingredient, IngredientKind, RecipeDetail,
-    SectionIngredient, UnitConversionRequest,
+    RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest,
 };
 use unit::MeasureKind;
 
@@ -139,11 +139,152 @@ pub fn measure_to_amount(m: unit::Measure) -> Amount {
     let m1 = dbg!(m.as_bare());
     Amount::new(m1.unit, m1.value.into())
 }
+pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
+    let mut amounts = vec![];
+    if s.grams > 0.0 {
+        amounts.push(ingredient::Amount {
+            unit: "g".to_string(),
+            value: s.grams as f32,
+        })
+    }
+    if s.amount.is_some() && s.unit.is_some() {
+        amounts.push(ingredient::Amount {
+            unit: s.unit.unwrap(),
+            value: s.amount.unwrap() as f32,
+        })
+    }
+    return ingredient::Ingredient {
+        name: s.ingredient.unwrap().name,
+        modifier: s.adjective,
+        amounts,
+    };
+}
+pub fn encode_recipe(r: RecipeDetail) -> String {
+    let mut res = String::new();
+    for s in r.sections.iter() {
+        for ing in s.ingredients.clone().into_iter() {
+            res.push_str(format!("{}\n", si_to_ingredient(ing).to_string()).as_str());
+        }
+        for ins in s.instructions.iter() {
+            res.push_str(format!(";{}\n", ins.instruction).as_str());
+        }
+        res.push('\n');
+    }
+    return res.trim_end().to_string();
+    // return res;
+}
+pub fn decode_recipe(r: String) -> RecipeDetail {
+    let raw_sections: Vec<&str> = r.split("\n\n").collect();
+
+    let sections = dbg!(raw_sections)
+        .into_iter()
+        .map(|s| {
+            let mut instructions = vec![];
+            let mut ingredients = vec![];
+            let lines: Vec<&str> = s.split("\n").collect();
+            for line in lines.into_iter() {
+                match dbg!(line).strip_prefix(";") {
+                    Some(i) => {
+                        instructions.push(SectionInstruction::new("".to_string(), i.to_string()))
+                    }
+
+                    None => ingredients.push(parse_ingredient(line).unwrap()),
+                };
+            }
+            RecipeSection::new("".to_string(), instructions, ingredients)
+        })
+        .collect();
+
+    RecipeDetail::new("".to_string(), sections, "".to_string(), 0, "".to_string())
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use openapi::models::{IngredientKind, RecipeDetail, RecipeSection, SectionIngredient};
+    use openapi::models::{
+        IngredientKind, RecipeDetail, RecipeSection, SectionIngredient, SectionInstruction,
+    };
+
+    #[test]
+    fn test_encode() {
+        let si_1 = SectionIngredient {
+            ingredient: Some(Ingredient::new("".to_string(), "foo".to_string())),
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
+        };
+        let si_2 = SectionIngredient {
+            ingredient: Some(Ingredient::new("".to_string(), "bar".to_string())),
+            amount: Some(1.5),
+            unit: Some("cups".to_string()),
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
+        };
+        let si_3 = SectionIngredient {
+            ingredient: Some(Ingredient::new("".to_string(), "bar".to_string())),
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
+        };
+        let r = RecipeDetail::new(
+            "".to_string(),
+            vec![
+                RecipeSection::new(
+                    "".to_string(),
+                    vec![SectionInstruction::new("".to_string(), "inst1".to_string())],
+                    vec![si_1.clone(), si_2.clone(), si_3.clone()],
+                ),
+                RecipeSection::new(
+                    "".to_string(),
+                    vec![
+                        SectionInstruction::new("".to_string(), "inst2".to_string()),
+                        SectionInstruction::new("".to_string(), "inst3".to_string()),
+                    ],
+                    vec![si_3.clone()],
+                ),
+            ],
+            "".to_string(),
+            0,
+            "".to_string(),
+        );
+        let raw = "12 g foo
+14 g / 1.5 cups bar
+2 g bar
+;inst1
+
+2 g bar
+;inst2
+;inst3";
+        assert_eq!(encode_recipe(r.clone()), raw);
+        let decoded = decode_recipe(raw.to_string());
+        assert_eq!(dbg!(decoded), dbg!(r));
+    }
+    #[test]
+    fn test_encode_decode() {
+        let r = "113 g / 1 stick butter
+;brown, add to mixer
+
+113 g / 1 stick butter, cold
+;add  to mixer with hot brown butter, 
+;let cool
+
+150 g / 75 cups brown sugar
+100 g / 5 cups sugar
+;add to butters, cream
+
+100 g / 2 large eggs, cold
+13 g / 1 tbsp vanilla extract
+;add to sugar/butter, mix
+
+100 g / 0.5 recipe CS Pecan Brittle
+100 g / 1 cup oats
+173 g / 1.3 cup flour
+6 g / 2 tsp salt
+6 g / 1 tsp baking soda
+;food processor until combined
+;add to mixer
+
+100 g / 0.5 recipe CS Pecan Brittle
+100 g / 1 cup oats
+;add to mixer";
+        let recipe = decode_recipe(r.to_string());
+        assert_eq!(r, encode_recipe(recipe));
+    }
 
     #[test]
     fn test_from_parsed() {

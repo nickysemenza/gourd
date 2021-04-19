@@ -34,3 +34,7 @@ openapi = {path = "../openapi"}
 
 [dev-dependencies]
 actix-rt = "1"
+
+[profile.dev]
+split-debuginfo = "unpacked"
+# https://www.reddit.com/r/rust/comments/msymvm/reducing_rust_incremental_compilation_times_on/
