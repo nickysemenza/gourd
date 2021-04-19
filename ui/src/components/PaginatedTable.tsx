@@ -60,7 +60,7 @@ const PaginatedTable = <T extends object>({
   return (
     <div>
       <table
-        className="table-auto border-collapse border-1 border-gray-500"
+        className="table-auto border-collapse border-1 border-gray-500 w-full"
         {...getTableProps()}
         data-cy="recipe-table"
       >

@@ -78,7 +78,7 @@ const IngredientList: React.FC = () => {
               />
               <ul>
                 {(children || []).map((i) => (
-                  <li className="pl-6 flex">
+                  <li className="pl-6 flex" key={i.ingredient.id}>
                     aka. <div className="italic pl-1">{i.ingredient.name}</div>
                   </li>
                 ))}
@@ -108,7 +108,7 @@ const IngredientList: React.FC = () => {
                   </li>
                 ))}
                 {children.map((r) => (
-                  <div>
+                  <div key={`${r.ingredient.id}`}>
                     <li className="italic">{r.ingredient.name}</li>
                     <ul className="list-disc list-outside pl-4">
                       {(r.recipes || []).map((r) => (
@@ -140,6 +140,7 @@ const IngredientList: React.FC = () => {
               onLink={(fdcId: number) => {
                 linkFoodToIngredient(original.ingredient.id, fdcId);
               }}
+              addon={original.food}
             />
           );
         },

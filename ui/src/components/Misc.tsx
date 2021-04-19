@@ -29,19 +29,20 @@ export const UnitMappingList: React.FC<{ unit_mappings: UnitMapping[] }> = ({
 }) => (
   <div className="w-60">
     {unit_mappings &&
-      unit_mappings.map((m) => (
+      unit_mappings.map((m, x) => (
         <div
-          style={{ gridTemplateColumns: "8fr 1fr 8fr 5fr" }}
-          className="grid text-sm text-gray-700"
+          key={x}
+          // style={{ gridTemplateColumns: "7fr 1fr 8fr 4fr" }}
+          className="flex text-sm text-gray-700"
         >
-          <p className="text-left">
+          <p>
             {scaledRound(m.a.value)} {m.a.unit}
           </p>
-          <p className="text-center">=</p>
-          <p className="text-left">
+          <p className="text-center px-1">=</p>
+          <p>
             {scaledRound(m.b.value)} {m.b.unit}
           </p>
-          <p className="text-xs">({m.source})</p>
+          <p className="text-xs pl-1">{m.source}</p>
         </div>
       ))}
   </div>
