@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 
 	sq "github.com/Masterminds/squirrel"
@@ -32,6 +33,23 @@ func (c *Client) GetFood(ctx context.Context, fdcID int) (*Food, error) {
 	return f, c.getContext(ctx, q, f)
 }
 func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, count bool) sq.SelectBuilder) ([]Food, uint64, error) {
+
+	favoriteBrands := []string{
+		"Guittard Chocolate Co.",
+		"Bob's Red Mill Natural Foods, Inc.",
+		"The King Arthur Flour Company, Inc.",
+
+		"'Whole Foods Market, Inc.",
+		"WHOLE FOODS MARKET",
+		"TRADER JOE'S",
+		"Target Stores",
+		"Kikkoman Sales USA, Inc.",
+	}
+	for x := range favoriteBrands {
+		// escape single quote
+		favoriteBrands[x] = strings.ReplaceAll(favoriteBrands[x], "'", "''")
+	}
+
 	ctx, span := c.tracer.Start(ctx, "getFoods")
 	defer span.End()
 
@@ -39,8 +57,12 @@ func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, c
 		"food_category_id",
 		"data_type",
 		"description",
-		"fdc_id",
-	).From("usda_food")
+		"usda_food.fdc_id as fdc_id",
+	).From("usda_food").
+		LeftJoin("usda_branded_food	on usda_food.fdc_id = usda_branded_food.fdc_id").
+		OrderBy(fmt.Sprintf(`array_position(array['%s'], brand_owner)`, strings.Join(favoriteBrands, "','"))).
+		OrderBy("length(ingredients) asc")
+
 	cq := c.psql.Select("count(*)").From("usda_food")
 
 	q = addons(q, false)
@@ -99,12 +121,12 @@ func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType [
 	})
 }
 func (c *Client) FoodsByIds(ctx context.Context, ids []int) ([]Food, uint64, error) {
-	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+	ctx, span := c.tracer.Start(ctx, "FoodsByIds")
 	defer span.End()
 	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
-		q = q.Where(sq.Eq{"fdc_id": ids})
+		q = q.Where(sq.Eq{"usda_food.fdc_id": ids})
 		if !count {
-			q = q.OrderBy("fdc_id DESC")
+			q = q.OrderBy("usda_food.fdc_id DESC")
 		}
 		return q
 	})

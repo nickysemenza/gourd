@@ -1,5 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { Logo } from "./Logo";
 import { navItems } from "./navItems";
 
 const NavBar: React.FC = () => {
@@ -8,6 +9,7 @@ const NavBar: React.FC = () => {
   return (
     <nav className="flex items-center justify-between flex-wrap bg-indigo-500 px-4 py-1 mb-2">
       <div className="flex items-center flex-shrink-0 text-white mr-1">
+        <Logo />
         <svg
           onClick={() => history.push("/")}
           width="158"

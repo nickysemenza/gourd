@@ -56,7 +56,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 		wg.Done()
 	}()
 
-	var brandInfoRes BrandedFood
+	var brandInfoRes *BrandedFood
 
 	go func() {
 		brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
@@ -64,7 +64,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 			fatalErrors <- err
 		}
 		if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
-			brandInfoRes = BrandedFood{
+			brandInfoRes = &BrandedFood{
 				BrandOwner:          brandInfo.BrandOwner,
 				BrandedFoodCategory: brandInfo.BrandedFoodCategory,
 				HouseholdServing:    brandInfo.HouseholdServing,
@@ -126,7 +126,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 	}
 	f.Nutrients = fNutrients
 	f.Portions = &apiPortions
-	f.BrandedInfo = &brandInfoRes
+	f.BrandedInfo = brandInfoRes
 	m, err := UnitMappingsFromFood(ctx, f)
 	if err != nil {
 		return err

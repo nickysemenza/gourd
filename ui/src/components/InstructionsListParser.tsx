@@ -15,7 +15,7 @@ const InstructionsListParser: React.FC<{
 
   if (!instance) return null;
 
-  const a = foo(sections, instance, true);
+  // const a = foo(sections, instance, true);
   const b = foo(sections, instance, false);
   // const si =
   //   a.length > 0 &&

@@ -94,9 +94,12 @@ const FoodSearch: React.FC<{
                 <UnitMappingList unit_mappings={r.unit_mappings} />
               </div>
               {!!r.branded_info && (
-                <div className="italic">
+                <div>
                   {r.branded_info.brand_owner} <br />
-                  {r.branded_info.branded_food_category}
+                  <p className="text-sm italic">
+                    {r.branded_info.branded_food_category}
+                  </p>
+                  <p className="text-xs">{r.branded_info.ingredients}</p>
                 </div>
               )}
               {/* <div className="flex"> */}

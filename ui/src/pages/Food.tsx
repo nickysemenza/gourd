@@ -1,6 +1,7 @@
 import React from "react";
 import { useGetFoodById } from "../api/openapi-hooks/api";
 import Debug from "../components/Debug";
+import { UnitMappingList } from "../components/Misc";
 import { Code, scaledRound } from "../util";
 
 const Food: React.FC = () => {
@@ -39,7 +40,8 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
       <div>
         <Code>{fdc_id}</Code>
       </div>
-      <Debug data={{ category, branded_info, portions, unit_mappings }} />
+      <UnitMappingList unit_mappings={unit_mappings} />
+      <Debug data={{ category, branded_info, portions }} />
 
       <table>
         {nutrients

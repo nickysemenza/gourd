@@ -101,7 +101,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
 	// todo: store these in DB instead of inline parsing ?
 	m := []UnitMapping{}
-	if food.BrandedInfo.HouseholdServing != nil {
+	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
 		var res []Amount
 		err := rs_client.Parse(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
 		if err != nil {

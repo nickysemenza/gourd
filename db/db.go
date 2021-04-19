@@ -184,6 +184,8 @@ func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interf
 	}
 	err = c.db.GetContext(ctx, dest, query, args...)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		span.RecordError(err)
+
 		return fmt.Errorf("failed to GetContext: (%s %s) %w", query, args, err)
 	}
 	return nil
@@ -201,6 +203,8 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 	}
 	err = c.db.SelectContext(ctx, dest, query, args...)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		span.RecordError(err)
+
 		return fmt.Errorf("failed to SelectContext: %w", err)
 	}
 	return nil
@@ -216,16 +220,19 @@ func (c *Client) execContext(ctx context.Context, q sq.Sqlizer) (sql.Result, err
 
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	res, err := c.execTx(ctx, tx, q)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	return res, nil
@@ -237,15 +244,18 @@ func (c *Client) execTx(ctx context.Context, tx *sql.Tx, q sq.Sqlizer) (sql.Resu
 
 	query, args, err := q.ToSql()
 	if err != nil {
+		span.RecordError(err)
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
 
 	res, err := tx.ExecContext(ctx, query, args...)
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	rows, err := res.RowsAffected()
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 	span.SetAttributes(attribute.Int64("rows_affected", rows))

@@ -58,17 +58,20 @@ export const try_convert = (
   instance: wasm,
   unit_mappings: UnitMapping[],
   input: Amount[],
-  target: UnitConversionRequestTargetEnum
+  target: UnitConversionRequestTargetEnum,
+  msg?: string
 ): Amount | undefined => {
   let foo: UnitConversionRequest = {
     target,
     unit_mappings,
     input,
   };
+  let result: Amount | undefined = undefined;
   try {
-    return instance.dolla(foo);
+    result = instance.dolla(foo);
   } catch (e) {
     console.error({ e });
-    return undefined;
   }
+  console.log(msg, { input, target, unit_mappings, result });
+  return result;
 };

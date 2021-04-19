@@ -41,7 +41,6 @@ import { WasmContext } from "../wasm";
 import { TableInput } from "./Input";
 import { try_convert } from "./UnitConvertDemo";
 import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
-import Debug from "./Debug";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -163,13 +162,15 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   instance,
                   ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
                   [{ unit: ingredient.unit, value: ingredient.amount }],
-                  UnitConversionRequestTargetEnum.WEIGHT
+                  UnitConversionRequestTargetEnum.WEIGHT,
+                  ingredient.ingredient?.name
                 )?.value ||
                   try_convert(
                     instance,
                     ing_hints[ingredient?.ingredient?.id || ""].unit_mappings,
                     [{ unit: ingredient.unit, value: ingredient.amount }],
-                    UnitConversionRequestTargetEnum.VOLUME
+                    UnitConversionRequestTargetEnum.VOLUME,
+                    ingredient.ingredient?.name
                   )?.value ||
                   0
               )}
