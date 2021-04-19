@@ -40,6 +40,16 @@ export function dolla(conversion_request: any): Amount;
 * @returns {Amount[]}
 */
 export function parse_amount(input: string): Amount[];
+/**
+* @param {any} recipe_detail
+* @returns {string}
+*/
+export function encode_recipe_text(recipe_detail: any): string;
+/**
+* @param {string} r
+* @returns {any}
+*/
+export function decode_recipe_text(r: string): any;
 
 interface Ingredient {
     amounts: Amount[];

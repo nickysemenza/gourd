@@ -1,32 +1,23 @@
 import React, { useContext, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { IngredientKind, SectionIngredient } from "../api/openapi-fetch";
+import {
+  IngredientKind,
+  RecipeDetail,
+  SectionIngredient,
+} from "../api/openapi-fetch";
 import { blankIngredient } from "../util";
 import { wasm, WasmContext } from "../wasm";
 import { ButtonGroup } from "./Button";
 
 const InstructionsListParser: React.FC<{
-  setSectionIngredients: (si: SectionIngredient[][]) => void;
-}> = ({ setSectionIngredients }) => {
+  setDetail: (d: RecipeDetail) => void;
+}> = ({ setDetail }) => {
   const instance = useContext(WasmContext);
   const [area, setArea] = useState("");
 
-  const sections = area.split("\n\n");
-
   if (!instance) return null;
 
-  // const a = foo(sections, instance, true);
-  const b = foo(sections, instance, false);
-  // const si =
-  //   a.length > 0 &&
-  //   a[0].length > 0 &&
-  //   b.length > 0 &&
-  //   b[0].length > 0 &&
-  //   a[0][0].grams === 0 &&
-  //   b[0][0].grams !== 0
-  //     ? b
-  //     : a;
-  const si = b;
+  const si = instance.decode_recipe_text(area) as RecipeDetail;
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">
@@ -46,7 +37,7 @@ const InstructionsListParser: React.FC<{
           buttons={[
             {
               onClick: () => {
-                setSectionIngredients(si);
+                setDetail(si);
               },
               text: "inject ingredients",
               IconLeft: PlusCircle,

@@ -225,6 +225,35 @@ export function parse_amount(input) {
     return takeObject(ret);
 }
 
+/**
+* @param {any} recipe_detail
+* @returns {string}
+*/
+export function encode_recipe_text(recipe_detail) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.encode_recipe_text(retptr, addBorrowedObject(recipe_detail));
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        heap[stack_pointer++] = undefined;
+        wasm.__wbindgen_free(r0, r1);
+    }
+}
+
+/**
+* @param {string} r
+* @returns {any}
+*/
+export function decode_recipe_text(r) {
+    var ptr0 = passStringToWasm0(r, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    var ret = wasm.decode_recipe_text(ptr0, len0);
+    return takeObject(ret);
+}
+
 export const __wbindgen_json_parse = function(arg0, arg1) {
     var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
     return addHeapObject(ret);

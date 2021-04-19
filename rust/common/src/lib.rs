@@ -153,8 +153,15 @@ pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
             value: s.amount.unwrap() as f32,
         })
     }
+    let mut name = String::new();
+    if s.ingredient.is_some() {
+        name = s.ingredient.unwrap().name;
+    }
+    if s.recipe.is_some() {
+        name = s.recipe.unwrap().name;
+    }
     return ingredient::Ingredient {
-        name: s.ingredient.unwrap().name,
+        name,
         modifier: s.adjective,
         amounts,
     };

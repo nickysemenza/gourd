@@ -110,6 +110,21 @@ pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
+// pub fn decode_recipe(input: &str)
+#[wasm_bindgen]
+pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
+    utils::set_panic_hook();
+    let r: RecipeDetail = recipe_detail.into_serde().unwrap();
+    gourd_common::encode_recipe(r)
+}
+
+#[wasm_bindgen]
+pub fn decode_recipe_text(r: String) -> JsValue {
+    utils::set_panic_hook();
+    let detail = gourd_common::decode_recipe(r);
+    JsValue::from_serde(&detail).unwrap()
+}
+
 // #[wasm_bindgen]
 // pub fn parse2(input: &str) -> Ingredient {
 //     ingredient(input).unwrap();

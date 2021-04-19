@@ -67,11 +67,12 @@ export const try_convert = (
     input,
   };
   let result: Amount | undefined = undefined;
+  let err;
   try {
     result = instance.dolla(foo);
   } catch (e) {
-    console.error({ e });
+    err = e;
   }
-  console.log(msg, { input, target, unit_mappings, result });
+  console.log(msg, { input, target, unit_mappings, result, err });
   return result;
 };

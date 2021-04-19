@@ -6,7 +6,6 @@ import RecipeDetailTable, {
 } from "../components/RecipeDetailTable";
 import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
-import { encodeRecipe } from "../parser";
 import {
   useGetRecipeById,
   useCreateRecipes,
@@ -25,7 +24,7 @@ import {
   IngDetailsById,
   Override,
   RecipeTweaks,
-  replaceIngredients,
+  setDetail,
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
@@ -361,8 +360,8 @@ const RecipeDetail: React.FC = () => {
         setRecipe={setRecipe}
       />
       <InstructionsListParser
-        setSectionIngredients={(ings) => {
-          setRecipe(replaceIngredients(recipe, ings));
+        setDetail={(s) => {
+          setRecipe(setDetail(recipe, s));
           setEdit(true);
         }}
       />
@@ -380,7 +379,7 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      <pre>{w && encodeRecipe(recipe, w)}</pre>
+      <pre>{w && w.encode_recipe_text(recipe.detail)}</pre>
       <p className="text-lg font-bold">meals</p>
 
       <Nutrition

@@ -178,7 +178,8 @@ export const addSection = (recipe: RecipeWrapper) =>
       },
     },
   });
-
+export const setDetail = (recipe: RecipeWrapper, detail: RecipeDetail) =>
+  update(recipe, { detail: { $set: detail } });
 export const updateTimeRange = (
   recipe: RecipeWrapper,
   sectionID: number,
@@ -198,24 +199,6 @@ export const updateTimeRange = (
       })
     : recipe;
 
-export const replaceIngredients = (
-  recipe: RecipeWrapper,
-  ings: SectionIngredient[][]
-) => {
-  let sections: RecipeSection[] = ings.map((s) => {
-    return {
-      id: "",
-      duration: { min: 0, max: 0 },
-      ingredients: s,
-      instructions: [],
-    };
-  });
-  return update(recipe, {
-    detail: {
-      sections: { $set: sections },
-    },
-  });
-};
 export type I = keyof Pick<RecipeSection, "ingredients" | "instructions">;
 const calculateMoveI = (
   recipe: RecipeWrapper,
