@@ -2,9 +2,11 @@
 
 **Go**(lang) **U**niversal **R**ecipe **D**atabase
 
-Before modern technology, people would use hollowed out gourds as food storage containers.
+> etymology: Before modern technology, people would use hollowed out gourds as food storage containers.
 
 ---
+
+Gourd is a recipe database that can be used for meal planning and generating ingredient lists.
 
 ## this project is a WIP
 
@@ -17,25 +19,15 @@ Before modern technology, people would use hollowed out gourds as food storage c
 
 This is comprised mulitple components:
 
-1. **parser** for extracting structured information from freetext ingredient line items.
-   - e.g. `1 1/2 cups flour (180g), sifted` will be parsed into `ingredient: flour`, `cup:1.5`, `grams:180`, `modifier:sifted`.
-   - This allows for recipes to be scaled up and down, and for ingredients to be tied together.
-2. **scraper** for saving recipes from websites (nytimes, seriouseats) for later analysis.
+1. **api** OpenAPI 3.0 REST API, defined in `api/openapi.yaml`
+1. **ui** in React + Typescript, using generated openapi clients
+1. **scraper** for saving recipes from websites (nytimes, seriouseats) for later analysis.
    - This currently works on websites using `json+ld` with [the appropriate schema](https://schema.org/Recipe)
-3. **usda** is used for mapping ingredients to their USDA database equivalent, which has very detailed nutrition information
+1. **parser** for extracting structured information from freetext ingredient line items.
+   - e.g. `1 1/2 cups flour (180g), sifted` will be parsed into `{ingredient: flour, amount: 1.5, unit: cup, modifier: sifted`.
+   - This leverages [nickysemenza/ingredient-parser](https://github.com/nickysemenza/ingredient-parser) and is exposed to the UI via WebAssembly.
+1. **usda** is used for mapping ingredients to their USDA database equivalent, which has very detailed nutrition information
    - e.g. [plain strawberries](https://fdc.nal.usda.gov/fdc-app.html#/food-details/747448/nutrients) or [C&H brown sugar](https://fdc.nal.usda.gov/fdc-app.html#/food-details/392083/nutrients)
-4. **ui** for viewing/editing/creating recipes.
-5. **cli** for interacting with the server instead of the API
-6. **server** for exposing rest api
-7. **notion** for extracting images from my Notion food log.
-
-### todo
-
-- calculate average weights per-ingredient
-- meals w/ multiple recipes at set quantities
-- slugs for recipe urls
-- associate ingredients with fdc ids on UI
-- ingredient amounts should be generic (1-n val-unit pairs)
-- substitute ingredients
-- `$/unit` for ingredients?
-- ingredient dependency graph
+   - This dataset also contains the imperial to metric mappings (e.g. the data from the back of the flour bag that says `1/4 cup = 30 grams`)
+1. **cli** for interacting with the api instead using the UI
+   - this is used for importing/exporting recipes, as well as loading metadata

@@ -6,6 +6,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.18.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
+	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.3.0
@@ -25,7 +26,6 @@ require (
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.3
-	github.com/kjk/notionapi v0.0.0-20210416062710-878a08dbe82d
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/lib/pq v1.10.0
 	github.com/luna-duclos/instrumentedsql v1.1.3

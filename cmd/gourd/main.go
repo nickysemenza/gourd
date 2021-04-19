@@ -9,7 +9,6 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/parser"
 	"github.com/nickysemenza/gourd/scraper"
 	"github.com/spf13/cobra"
 )
@@ -67,20 +66,7 @@ func init() {
 				return nil
 			},
 		},
-		&cobra.Command{
-			Use:   "ingredient-parse [ingredient]",
-			Short: "parse an ingredient",
-			Args:  cobra.MinimumNArgs(1),
-			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := context.Background()
-				ingredient, err := parser.Parse(ctx, strings.Join(args, " "))
-				if err != nil {
-					return err
-				}
-				fmt.Println(ingredient.ToString())
-				return nil
-			},
-		},
+
 		&cobra.Command{
 			Use:   "scrape [url]",
 			Short: "scrape a recipe",

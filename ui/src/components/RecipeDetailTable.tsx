@@ -4,12 +4,7 @@ import {
   RecipeSection,
   SectionIngredient,
 } from "../api/openapi-hooks/api";
-import {
-  formatTimeRange,
-  getIngredient,
-  parseTimeRange,
-  scaledRound,
-} from "../util";
+import { formatTimeRange, getIngredient, parseTimeRange } from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
