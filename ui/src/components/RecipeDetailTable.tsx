@@ -29,6 +29,7 @@ import {
   IngDetailsById,
   inferGrams,
   getCal2,
+  getHint,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -36,6 +37,7 @@ import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
 import { TableInput } from "./Input";
 import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
+import IngredientPopover from "./IngredientPopover";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -114,6 +116,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     const bp = Math.round((ingredient.grams / flourMass) * 100);
     const { edit } = tweaks;
     const isSub = subIndex !== undefined;
+    const hint = getHint(ingredient, ing_hints);
     return (
       <div className="flex flex-col">
         <div className={`ing-table-row`} key={y}>
@@ -196,7 +199,10 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               {ingredient.kind === "recipe" && ingredient.recipe ? (
                 <RecipeLink recipe={ingredient.recipe} />
               ) : (
-                ingredient.ingredient?.name
+                <div className="flex justify-between pr-1">
+                  {ingredient.ingredient?.name}
+                  {hint && <IngredientPopover detail={hint} />}
+                </div>
               )}
             </div>
           )}
@@ -317,8 +323,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     <TableRow key={x}>
       <TableCell>
         <Pill>{String.fromCharCode(65 + x)}</Pill>
-      </TableCell>
-      <TableCell>
         <TableInput
           width={40}
           data-cy="time-input"
@@ -421,7 +425,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       <div className="border-gray-900 shadow-xl bg-gray-100">
         <TableRow header>
           <TableCell></TableCell>
-          <TableCell>Time</TableCell>
           <TableCell>
             <div className="ing-table-row font-mono">
               <div>x</div>

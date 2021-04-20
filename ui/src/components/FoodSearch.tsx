@@ -79,61 +79,12 @@ const FoodSearch: React.FC<{
         {items.map((r, x) => {
           const isHighlighted = highlightId === r.fdc_id;
           return (
-            <div
-              style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
-              className={`border ${
-                isHighlighted ? "border-red-600 " : "border-indigo-600"
-              } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
-              key={`${name}@${r.fdc_id}@${x}`}
-            >
-              <div className="flex flex-col p-1">
-                <Code>{r.fdc_id}</Code>
-                <a
-                  href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${r.fdc_id}/nutrients`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm pr-1 underline text-blue-800"
-                >
-                  view
-                </a>
-                {onLink !== undefined && (
-                  <ButtonGroup
-                    compact
-                    buttons={[
-                      {
-                        onClick: () => {
-                          onLink(r.fdc_id);
-                        },
-                        text: "link",
-                        disabled: isHighlighted,
-                        IconLeft: PlusCircle,
-                      },
-                    ]}
-                  />
-                )}
-              </div>
-              <div className="flex flex-col p-1">
-                <div className="">{r.description}</div>{" "}
-                <div className="flex justify-between">
-                  <p className="font-mono text-xs text-gray-500">
-                    {r.data_type}
-                  </p>
-                  <p className="text-sm">{r.nutrients?.length} nutrients</p>
-                </div>
-                <UnitMappingList unit_mappings={r.unit_mappings} />
-              </div>
-              {!!r.branded_info && (
-                <div>
-                  {r.branded_info.brand_owner} <br />
-                  <p className="text-sm italic">
-                    {r.branded_info.branded_food_category}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {r.branded_info.ingredients}
-                  </p>
-                </div>
-              )}
-            </div>
+            <FoodRow
+              food={r}
+              isHighlighted={isHighlighted}
+              onLink={onLink}
+              x={x}
+            />
           );
         })}
       </ul>
@@ -141,4 +92,63 @@ const FoodSearch: React.FC<{
     </div>
   );
 };
+export const FoodRow: React.FC<{
+  food: Food;
+  isHighlighted?: boolean;
+  x?: number;
+  onLink?: (fdc_id: number) => void;
+}> = ({ food, isHighlighted = false, x = 0, onLink }) => (
+  <div
+    style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
+    className={`border ${
+      isHighlighted ? "border-red-600 " : "border-indigo-600"
+    } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
+    key={`${food.fdc_id}@${x}`}
+  >
+    <div className="flex flex-col p-1">
+      <Code>{food.fdc_id}</Code>
+      <a
+        href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdc_id}/nutrients`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm pr-1 underline text-blue-800"
+      >
+        view
+      </a>
+      {onLink !== undefined && (
+        <ButtonGroup
+          compact
+          buttons={[
+            {
+              onClick: () => {
+                onLink(food.fdc_id);
+              },
+              text: "link",
+              disabled: isHighlighted,
+              IconLeft: PlusCircle,
+            },
+          ]}
+        />
+      )}
+    </div>
+    <div className="flex flex-col p-1">
+      <div className="">{food.description}</div>{" "}
+      <div className="flex justify-between">
+        <p className="font-mono text-xs text-gray-500">{food.data_type}</p>
+        <p className="text-sm">{food.nutrients?.length} nutrients</p>
+      </div>
+      <UnitMappingList unit_mappings={food.unit_mappings} />
+    </div>
+    {!!food.branded_info && (
+      <div>
+        {food.branded_info.brand_owner} <br />
+        <p className="text-sm italic">
+          {food.branded_info.branded_food_category}
+        </p>
+        <p className="text-xs text-gray-500">{food.branded_info.ingredients}</p>
+      </div>
+    )}
+  </div>
+);
+
 export default FoodSearch;

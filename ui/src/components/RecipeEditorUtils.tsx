@@ -465,15 +465,21 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
         .filter((id) => id !== 0)
     )
     .flat();
-
+export const getHint = (
+  ingredient: SectionIngredient,
+  ing_hints: IngDetailsById
+): IngredientDetail | undefined => {
+  const ingredientId =
+    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
+  const hint = ing_hints[ingredientId];
+  return !!hint ? hint : undefined;
+};
 export const inferGrams = (
   instance: wasm,
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById
 ): number | undefined => {
-  const ingredientId =
-    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
-  const hint = ing_hints[ingredientId];
+  const hint = getHint(ingredient, ing_hints);
   if (!hint) return undefined;
   let { unit, amount } = ingredient;
   if (!unit || !amount || unit === "" || amount === 0) return undefined;
@@ -504,9 +510,7 @@ export const getCal2 = (
     | UnitConversionRequestTargetEnum.CALORIES
     | UnitConversionRequestTargetEnum.MONEY
 ): string => {
-  const ingredientId =
-    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
-  const hint = ing_hints[ingredientId];
+  const hint = getHint(ingredient, ing_hints);
   if (!hint) return "n/a";
   const grams =
     ingredient.grams === 0
