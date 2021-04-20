@@ -9,32 +9,28 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        crate: ["common", "w", "s"]
     steps:
       - uses: actions/checkout@v2
-      - name: cargo build rust/${{ matrix.crate }}
+      - name: cargo build
         run: cargo build --verbose
-        working-directory: rust/${{ matrix.crate }}
+        working-directory: rust
       - name: cargo test
         run: cargo test --verbose
-        working-directory: rust/${{ matrix.crate }}
+        working-directory: rust
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
         with:
-          args: -t 120 --manifest-path rust/${{ matrix.crate }}/Cargo.toml --output-dir rust/${{ matrix.crate }}/.cov --out Xml -- --test-threads 1
+          args: -t 120 --manifest-path rust/Cargo.toml --output-dir rust/.cov --out Xml -- --test-threads 1
           version: "0.15.0"
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v1.4.1
         with:
-          directory: rust/${{ matrix.crate }}/.cov
-          path_to_write_report: rust/${{ matrix.crate }}/.cov/codecov_report.txt
-          flags: ${{ matrix.crate }}
+          directory: rust/.cov
+          path_to_write_report: rust/.cov/codecov_report.txt
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:
-          name: code-coverage-report-${{ matrix.crate }}
-          path: rust/${{ matrix.crate }}/.cov
+          name: code-coverage-report-
+          path: rust/.cov

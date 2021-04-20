@@ -1,0 +1,16 @@
+[workspace]
+
+members = [
+    "w",
+    "s",
+    "common",
+    "openapi",
+]
+
+[profile.dev]
+split-debuginfo = "unpacked"
+# https://www.reddit.com/r/rust/comments/msymvm/reducing_rust_incremental_compilation_times_on/
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"

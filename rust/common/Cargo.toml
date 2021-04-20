@@ -13,6 +13,3 @@ ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch 
 serde = { version = "1.0", features = ["derive"] }
 
 
-[profile.dev]
-split-debuginfo = "unpacked"
-# https://www.reddit.com/r/rust/comments/msymvm/reducing_rust_incremental_compilation_times_on/

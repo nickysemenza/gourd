@@ -34,7 +34,7 @@ dev-air: bin/air
 dev-ui:
 	cd ui && yarn run start
 dev-rs:
-	cd rust/s && cargo watch -x run
+	cd rust && cargo watch -x run -p s
 
 bin/air:
 	@mkdir -p $(dir $@)
@@ -112,7 +112,7 @@ rs:
 
 
 generate-rust:
-	cd rust/w && wasm-pack build
+	cd rust && wasm-pack build w
 wasm-dev: generate-rust
 	cp -r rust/w/pkg/ ui/node_modules/gourd_rs/
 
