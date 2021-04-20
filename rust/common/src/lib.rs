@@ -125,10 +125,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
         Target::Calories => MeasureKind::Calories,
         Target::Other => MeasureKind::Other,
     };
-    let foo = amount_to_measure(req.input[0].clone()).convert(target, equivalencies);
-    // return foo.and_then(measure_to_amount);
-    // return None;
-    return match foo {
+    return match amount_to_measure(req.input[0].clone()).convert(target, equivalencies) {
         Some(a) => Some(measure_to_amount(a)),
         None => None,
     };

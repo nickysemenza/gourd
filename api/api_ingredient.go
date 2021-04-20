@@ -37,7 +37,6 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	ctx, span := a.tracer.Start(ctx, "addDetailsToIngredients")
 	defer span.End()
 
-	items := []IngredientDetail{}
 	var ingredientIds []string
 	for _, i := range ing {
 		ingredientIds = append(ingredientIds, i.Id)
@@ -59,7 +58,8 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 		return nil, err
 	}
 
-	for _, i := range ing {
+	items := make([]IngredientDetail, len(ing))
+	for x, i := range ing {
 		// assemble
 		ctx, span2 := a.tracer.Start(ctx, "addDetailsToIngredients: enhance w/ fdc")
 		defer span2.End()
@@ -83,7 +83,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 				return nil, err
 			}
 			detail.Food = food
-			span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
+			span2.SetAttributes(attribute.Int("fdc_id", food.FdcId))
 
 			m, err := UnitMappingsFromFood(ctx, food)
 			if err != nil {
@@ -93,8 +93,8 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 		}
 
-		items = append(items, detail)
-		span.End()
+		items[x] = detail
+		span2.End()
 	}
 	return items, nil
 }
