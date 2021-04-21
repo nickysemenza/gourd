@@ -3128,15 +3128,15 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.2.5":
-  version "2.2.5"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.2.5.tgz#363611ae37d21fabf15ed297dfd5fe82a013faba"
-  integrity sha512-8eTiw9U5PWYZx41RDIrJ6iZ4XCteD6ljupbJS6/ichZEUwa1Pv78y14QSLVfky+1KpJsq/RlqrgjnPm6yMHo6g==
+"@openapitools/openapi-generator-cli@2.2.6":
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.2.6.tgz#024314000616895edeada87ddf98d53ba8e1e4f0"
+  integrity sha512-TFKHY1lcknzg6IhPe9f8wWUO11PeKBPnrM40jZjZNUHlQRvh7WLsW6vNlbGcm78eBYTcyY0cKqr1QXUpB9Ez2Q==
   dependencies:
     "@nestjs/common" "7.6.15"
     "@nestjs/core" "7.6.15"
     "@nuxtjs/opencollective" "0.3.2"
-    chalk "4.1.0"
+    chalk "4.1.1"
     commander "6.2.1"
     compare-versions "3.6.0"
     concurrently "5.3.0"
@@ -5786,6 +5786,14 @@ chalk@4.1.0, chalk@^4.0.0, chalk@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.0.tgz#4e14870a618d9e2edd97dd8345fd9d9dc315646a"
   integrity sha512-qwx12AxXe2Q5xQ43Ac//I6v5aXTipYrSESdOgzrN+9XjgEpyjpKuvSGaN4qE93f7TQTlerQQ8S+EQ0EyDoVL1A==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
+chalk@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.1.tgz#c80b3fab28bf6371e6863325eee67e618b77e6ad"
+  integrity sha512-diHzdDKxcU+bAsUboHLPEDQiw0qEe0qd7SYUn3HgcFlWgbDcfLGswOHYeGrHKzG9z6UYf01d9VFMfZxPM1xZSg==
   dependencies:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
