@@ -167,7 +167,7 @@ const RecipeDetail: React.FC = () => {
     );
   }
 
-  if (!recipe) return null;
+  if (!recipe || !w) return null;
 
   const { detail } = recipe;
   const { quantity, unit } = detail;
@@ -252,7 +252,7 @@ const RecipeDetail: React.FC = () => {
     hints,
     multiplier
   );
-  const totalGrams = countTotalGrams(recipe.detail.sections);
+  const totalGrams = countTotalGrams(recipe.detail.sections, w, ing_hints);
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -379,7 +379,7 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      <pre>{w && w.encode_recipe_text(recipe.detail)}</pre>
+      <pre>{w.encode_recipe_text(recipe.detail)}</pre>
       <p className="text-lg font-bold">meals</p>
 
       <Nutrition

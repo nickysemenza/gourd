@@ -12,14 +12,14 @@ const Playground: React.FC = () => {
   const url = getAPIURL();
   const [r2, setR2] = useState<PaginatedRecipes>();
 
-  const instance = useContext(WasmContext);
+  const w = useContext(WasmContext);
 
   useEffect(() => {
-    if (!instance) return;
-    console.log({ parse: instance.parse("2 cups (240g) flour, sifted") });
-    console.log({ parse2: instance.parse2("2 cups (240g) flour, sifted") });
-    console.log({ parse3: instance.parse3("2 cups (240g) flour, sifted") });
-    console.log({ parse4: instance.parse4("2 cups (240g) flour, sifted") });
+    if (!w) return;
+    console.log({ parse: w.parse("2 cups (240g) flour, sifted") });
+    console.log({ parse2: w.parse2("2 cups (240g) flour, sifted") });
+    console.log({ parse3: w.parse3("2 cups (240g) flour, sifted") });
+    console.log({ parse4: w.parse4("2 cups (240g) flour, sifted") });
     // ingredients.forEach((i) => {
     let foo: UnitConversionRequest = {
       target: UnitConversionRequestTargetEnum.MONEY,
@@ -57,15 +57,15 @@ const Playground: React.FC = () => {
     };
     console.time("dolla");
     try {
-      console.log("dolla", instance.dolla(foo));
-      console.log("dolla2", instance.dolla(foo2));
+      console.log("dolla", w.dolla(foo));
+      console.log("dolla2", w.dolla(foo2));
     } catch (e) {
       console.error({ e });
     }
     console.timeEnd("dolla");
     // greet();
     // parse("2 cups flour");
-  }, [instance]);
+  }, [w]);
 
   useEffect(() => {
     const fetchData = async () => {

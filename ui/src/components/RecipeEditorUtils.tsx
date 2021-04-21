@@ -348,10 +348,15 @@ export const flatIngredients = (sections: RecipeSection[]) =>
     .map((section) => section.ingredients.map((ingredient) => ingredient))
     .flat();
 
-export const countTotalGrams = (sections: RecipeSection[]) =>
+export const countTotalGrams = (
+  sections: RecipeSection[],
+  w: wasm,
+  ing_hints: IngDetailsById
+) =>
   flatIngredients(sections)
-    .map((si) => si.grams)
+    .map((si) => getGrams(w, si, ing_hints) || 0)
     .reduce((a, b) => a + b, 0);
+
 export const sumIngredients = (sections: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
   let ingredients: Record<string, SectionIngredient[]> = {};
@@ -475,7 +480,7 @@ export const getHint = (
   return !!hint ? hint : undefined;
 };
 export const inferGrams = (
-  instance: wasm,
+  w: wasm,
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById
 ): number | undefined => {
@@ -491,7 +496,7 @@ export const inferGrams = (
   let res = targets.map(
     (t) =>
       try_convert(
-        instance,
+        w,
         hint.unit_mappings,
         [{ unit: unit || "", value: amount || 0 }],
         t,
@@ -501,8 +506,16 @@ export const inferGrams = (
   return res.find((x) => x !== undefined && x !== 0);
 };
 
+const getGrams = (
+  w: wasm,
+  ingredient: SectionIngredient,
+  ing_hints: IngDetailsById
+) =>
+  ingredient.grams === 0
+    ? inferGrams(w, ingredient, ing_hints)
+    : ingredient.grams;
 export const getCal2 = (
-  instance: wasm,
+  w: wasm,
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById,
   multiplier: number,
@@ -512,13 +525,10 @@ export const getCal2 = (
 ): string => {
   const hint = getHint(ingredient, ing_hints);
   if (!hint) return "n/a";
-  const grams =
-    ingredient.grams === 0
-      ? inferGrams(instance, ingredient, ing_hints)
-      : ingredient.grams;
+  const grams = getGrams(w, ingredient, ing_hints);
   if (grams === 0) return "n/a";
   const kcal = try_convert(
-    instance,
+    w,
     hint.unit_mappings,
     [{ unit: "grams", value: grams || 0 }],
     to,

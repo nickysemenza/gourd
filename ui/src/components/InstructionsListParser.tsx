@@ -7,12 +7,12 @@ import { ButtonGroup } from "./Button";
 const InstructionsListParser: React.FC<{
   setDetail: (d: RecipeDetail) => void;
 }> = ({ setDetail }) => {
-  const instance = useContext(WasmContext);
+  const w = useContext(WasmContext);
   const [area, setArea] = useState("");
 
-  if (!instance) return null;
+  if (!w) return null;
 
-  const si = instance.decode_recipe_text(area) as RecipeDetail;
+  const si = w.decode_recipe_text(area) as RecipeDetail;
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">

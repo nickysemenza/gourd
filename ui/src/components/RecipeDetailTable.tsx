@@ -76,7 +76,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   );
   const showBP = flourMass > 0;
 
-  const instance = useContext(WasmContext);
+  const w = useContext(WasmContext);
 
   const iActions = (x: number, y: number, i: I) =>
     edit && (
@@ -140,10 +140,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 "grams"
               )}
               pValue={
-                instance &&
-                inferGrams(instance, ingredient, ing_hints) &&
-                tweaks.multiplier *
-                  (inferGrams(instance, ingredient, ing_hints) || 0)
+                w &&
+                inferGrams(w, ingredient, ing_hints) &&
+                tweaks.multiplier * (inferGrams(w, ingredient, ing_hints) || 0)
               }
               blur
               highlight={isOverride(tweaks, x, y, subIndex, "grams")}
@@ -157,9 +156,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 })
               }
             />
-            {/* {instance &&
-              inferGrams(instance, ingredient, ing_hints) &&
-              scaledRound(inferGrams(instance, ingredient, ing_hints) || 0)} */}
+            {/* {w &&
+              inferGrams(w, ingredient, ing_hints) &&
+              scaledRound(inferGrams(w, ingredient, ing_hints) || 0)} */}
           </div>
           <div className="flex space-x-0.5">
             <div className="text-gray-600">g</div>
@@ -268,9 +267,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <div>
             {/* <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div> */}
             <div>
-              {instance &&
+              {w &&
                 getCal2(
-                  instance,
+                  w,
                   ingredient,
                   ing_hints,
                   tweaks.multiplier,
@@ -280,9 +279,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             </div>
             {/* <div>
               $
-              {instance &&
+              {w &&
                 getCal2(
-                  instance,
+                  w,
                   ingredient,
                   ing_hints,
                   UnitConversionRequestTargetEnum.MONEY
@@ -312,8 +311,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         </div>
         {!!ingredient.original && (
           <div className="italic text-xs pb-2">
-            original: {ingredient.original} (
-            {instance && instance.parse(ingredient.original)})
+            original: {ingredient.original} ({w && w.parse(ingredient.original)}
+            )
           </div>
         )}
       </div>

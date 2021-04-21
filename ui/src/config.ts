@@ -44,7 +44,8 @@ export const onAPIError = (
 ) => {
   console.log(err);
   const apiErr: Error = err.data;
-  toast.error(`${err.message} ${apiErr.message}`);
+  const traceId = response?.headers.get("x-request-id");
+  toast.error(`${err.message} ${apiErr.message} ${traceId}`);
 };
 
 export const parseJWT = (): JWT | undefined => {

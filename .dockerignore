@@ -1,5 +1,12 @@
-vendor/
+vendor/*
 ui/node_modules/*
 bin/*
 rust/target/*
 rust/pkg/*
+rust/**/target/*
+rust/w/target
+openapi/
+.terraform/*
+usda/*
+.git/*
+ui/build

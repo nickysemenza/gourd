@@ -15,21 +15,21 @@ import { TableInput } from "./Input";
 type UnitConvertDemoProps = { detail: IngredientDetail };
 export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {
   const [input, setInput] = React.useState("1 cup");
-  const instance = useContext(WasmContext);
+  const w = useContext(WasmContext);
 
-  if (!instance) return <div />;
+  if (!w) return <div />;
 
   let result: Amount | undefined = undefined;
   try {
-    const ing = instance.parse_amount(input);
+    const ing = w.parse_amount(input);
     // let foo: UnitConversionRequest = {
     //   target: UnitConversionRequestTargetEnum.WEIGHT,
     //   unit_mappings: detail.unit_mappings,
     //   input: ing,
     // };
-    // result = instance.dolla(foo);
+    // result = w.dolla(foo);
     result = try_convert(
-      instance,
+      w,
       detail.unit_mappings,
       ing,
       UnitConversionRequestTargetEnum.WEIGHT
@@ -55,7 +55,7 @@ export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {
 };
 
 export const try_convert = (
-  instance: wasm,
+  w: wasm,
   unit_mappings: UnitMapping[],
   input: Amount[],
   target: UnitConversionRequestTargetEnum,
@@ -69,7 +69,7 @@ export const try_convert = (
   let result: Amount | undefined = undefined;
   let err;
   try {
-    result = instance.dolla(foo);
+    result = w.dolla(foo);
   } catch (e) {
     console.error(e);
     err = e;

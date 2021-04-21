@@ -2,21 +2,21 @@ FROM rust:1.51 as builder
 WORKDIR /work/rust
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 COPY rust/ .
-WORKDIR /work/rust/w
+WORKDIR /work/rust
 RUN pwd && ls
-RUN wasm-pack build
+RUN wasm-pack build w
 
-FROM cypress/included:4.12.1
+# Stage 1 - the build process
+FROM node:buster-slim as build-deps
 COPY --from=builder /work/rust/w/pkg /work/rust/w/pkg
 WORKDIR /work/ui
-COPY ui/yarn.lock .
-COPY ui/package.json .
+COPY ui/package.json ui/yarn.lock ./
 RUN yarn
+COPY ui ./
+RUN yarn build
 
-COPY ui/ .
-ENV CYPRESS_BASE_URL=http://localhost:3001
-ENV REACT_APP_API_URL=http://gourd:4242
-EXPOSE 3001
-RUN pwd
-RUN ls
-ENTRYPOINT [ "./ci.sh" ]
+# Stage 2 - the production environment
+FROM nginx:1.12-alpine
+COPY --from=build-deps /work/ui/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

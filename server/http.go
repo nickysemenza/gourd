@@ -47,6 +47,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
 	r.Use(middleware.Recover())
 	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
+	r.Use(TraceIDHeader)
 
 	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
@@ -176,5 +177,17 @@ func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 	}
 	if _, err := w.Write(body); err != nil {
 		panic(err)
+	}
+}
+
+func TraceIDHeader(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+		sc := trace.SpanContextFromContext(ctx)
+		if sc.IsValid() {
+
+			c.Response().Header().Set(echo.HeaderXRequestID, sc.TraceID.String())
+		}
+		return next(c)
 	}
 }

@@ -3,7 +3,6 @@ import { RecipeDetail } from "../api/openapi-fetch";
 import { useGetRecipeById } from "../api/openapi-hooks/api";
 import { WasmContext } from "../wasm";
 import Debug from "./Debug";
-import { sumIngredients } from "./RecipeEditorUtils";
 import ReactDiffViewer from "react-diff-viewer";
 
 const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {

@@ -53,7 +53,7 @@ services:
   ui:
     build:
       context: .
-      dockerfile: ui/Dockerfile
+      dockerfile: ui/Dockerfile.ci
     stdin_open: true
     depends_on:
       - gourd
