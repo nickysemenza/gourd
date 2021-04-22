@@ -27,7 +27,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.3
 	github.com/labstack/echo/v4 v4.2.2
-	github.com/lib/pq v1.10.0
+	github.com/lib/pq v1.10.1
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
