@@ -5132,10 +5132,10 @@ better-ajv-errors@^0.6.1, better-ajv-errors@^0.6.7:
     jsonpointer "^4.0.1"
     leven "^3.1.0"
 
-bezier-js@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/bezier-js/-/bezier-js-4.0.3.tgz#9e076d66f609bca9fc08dd22201596d52d3cc49d"
-  integrity sha512-w85AFcZ7EkszFgxuHYQ2/BI2G7H5bEotZD9vcg8+Hx4S8zF2odJBoFSFvGbcFDH5ScSxG27/IhW03SigVmkXNQ==
+bezier-js@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/bezier-js/-/bezier-js-4.1.0.tgz#e635ae258485b57ac2079a3650387b33c2d76abc"
+  integrity sha512-PVJPqmSLmwW1Yw4/M11NPKZT2kPVq4yUNaCow0P/p40DfEdr2nQJ10sOQkPjSpYDzFX1Xswd+pdC3pl/ul38qQ==
 
 bfj@^7.0.2:
   version "7.0.2"
@@ -7064,15 +7064,15 @@ d3-scale-chromatic@^2.0.0:
     d3-color "1 - 2"
     d3-interpolate "1 - 2"
 
-d3-scale@^3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-3.2.4.tgz#13d758d7cf4e4f1fc40196a63597d01f3ed81765"
-  integrity sha512-PG6gtpbPCFqKbvdBEswQcJcTzHC8VEd/XzezF5e68KlkT4/ggELw/nR1tv863jY6ufKTvDlzCMZvhe06codbbA==
+d3-scale@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/d3-scale/-/d3-scale-3.3.0.tgz#28c600b29f47e5b9cd2df9749c206727966203f3"
+  integrity sha512-1JGp44NQCt5d1g+Yy+GeOnZP7xHo0ii8zsQp6PGzd+C1/dl0KGsp9A7Mxwp+1D1o4unbTTxVdU/ZOIEBoeZPbQ==
   dependencies:
     d3-array "^2.3.0"
     d3-format "1 - 2"
     d3-interpolate "1.2.0 - 2"
-    d3-time "1 - 2"
+    d3-time "^2.1.1"
     d3-time-format "2 - 3"
 
 d3-selection@2, d3-selection@^2.0.0:
@@ -7087,7 +7087,7 @@ d3-selection@2, d3-selection@^2.0.0:
   dependencies:
     d3-time "1 - 2"
 
-"d3-time@1 - 2":
+"d3-time@1 - 2", d3-time@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-2.1.1.tgz#e9d8a8a88691f4548e68ca085e5ff956724a6682"
   integrity sha512-/eIQe/eR4kCQwq7yxi7z4c6qEXf2IYGcjoWB5OOQy4Tq9Uv39/947qlDcN2TLkiTzQWzvnsuYPB9TrWaNfipKQ==
@@ -8827,19 +8827,19 @@ for-in@^1.0.2:
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
   integrity sha1-gQaNKVqBQuwKxybG4iAMMPttXoA=
 
-force-graph@^1.40.0:
-  version "1.40.0"
-  resolved "https://registry.yarnpkg.com/force-graph/-/force-graph-1.40.0.tgz#ea51efb274f73556ac22af20d29f01d5b5b565f8"
-  integrity sha512-5pVmDayO6q6fv22R0tdcnUiXtEnOfezVowwlZ3M2rAspO/v2epwWCEn6lc7YZP7PzIlD6ZRpy7L2b57Dl/dZ5g==
+force-graph@^1.40.2:
+  version "1.40.2"
+  resolved "https://registry.yarnpkg.com/force-graph/-/force-graph-1.40.2.tgz#e29c6635f8b81306ec6b776f6f3a57e8ee4d370f"
+  integrity sha512-FVkDjWrPFSMovnmEu+ok5ZphJMRdUIXNPurMRM/yL64oFfs+RMra7oqr1kDsTZrHe50g51zlQady5gULI0g+iw==
   dependencies:
     "@tweenjs/tween.js" "^18.6.4"
     accessor-fn "^1.3.0"
-    bezier-js "^4.0.3"
+    bezier-js "^4.1.0"
     canvas-color-tracker "^1.1.4"
     d3-array "^2.12.1"
     d3-drag "^2.0.0"
     d3-force-3d "^2.3.2"
-    d3-scale "^3.2.4"
+    d3-scale "^3.3.0"
     d3-scale-chromatic "^2.0.0"
     d3-selection "^2.0.0"
     d3-zoom "^2.0.0"
@@ -14586,12 +14586,12 @@ react-feather@2.0.9:
   dependencies:
     prop-types "^15.7.2"
 
-react-force-graph-2d@1.23.0:
-  version "1.23.0"
-  resolved "https://registry.yarnpkg.com/react-force-graph-2d/-/react-force-graph-2d-1.23.0.tgz#64784151b089ac9f854818ad4eebb1483518edf1"
-  integrity sha512-Oj0tpDZ80pxWlp+abIjyyot8lMrjwrzTp7SBSWcaeJqJSu7l4zAfJZ1IW/+sdclj5INPr00BbtjHwQ18rtZ+FA==
+react-force-graph-2d@1.23.2:
+  version "1.23.2"
+  resolved "https://registry.yarnpkg.com/react-force-graph-2d/-/react-force-graph-2d-1.23.2.tgz#9588346a639390a37e067d290f79690e621943d3"
+  integrity sha512-SzQaTKmCZm492ptxNSvjnNLxRquEJm84CB2ZRRpsJUXCNvW5jaiO6YMUZtAOcJ4UQlZBh3ad+CJm+rX8rpRO8w==
   dependencies:
-    force-graph "^1.40.0"
+    force-graph "^1.40.2"
     prop-types "^15.7.2"
     react-kapsule "^2.2.1"
 
