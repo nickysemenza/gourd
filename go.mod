@@ -3,7 +3,7 @@ module github.com/nickysemenza/gourd
 go 1.16
 
 require (
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.18.0
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.20.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
