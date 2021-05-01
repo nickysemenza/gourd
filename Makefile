@@ -5,6 +5,8 @@ VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(
 GCP_PROJECT := cloudrun1-278204
 GCR_IMAGE := gcr.io/$(GCP_PROJECT)/gourd-backend:$(VERSION)
 
+DSN := postgres://gourd:gourd@localhost:5555/food?sslmode=disable
+
 deploy: deploy-image deploy-run
 deploy-image:
 	echo "building $(GCR_IMAGE)"
@@ -69,16 +71,16 @@ docker-push: docker-build
 	docker push $(IMAGE):latest
 
 dev-db:
-	pgcli postgres://gourd:gourd@localhost:5555/food
+	pgcli $(DSN)
 dev-db-stats:
 	docker logs gourd_db_1 2>&1 | pgbadger - --prefix '%t [%p]:[%l] user=%u, db=%d'
 new-migrate/%: bin/migrate
 	mkdir -p db/migrations
 	./bin/migrate create -dir db/migrations -ext sql $(@F)
 migrate: bin/migrate
-	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable up
+	./bin/migrate -source file://db/migrations -database $(DSN) up
 migrate-down: bin/migrate
-	./bin/migrate -source file://db/migrations -database postgres://gourd:gourd@localhost:5555/food?sslmode=disable down
+	./bin/migrate -source file://db/migrations -database $(DSN) down
 
 
 
@@ -106,6 +108,11 @@ get-detail/%:
 
 seed-testdata: bin/gourd
 	./testdata/seed.sh
+
+devdata: seed-testdata
+	./usda/import.sh ~/Downloads/FoodData_Central_csv_2020-04-29/
+	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food');"
+	./bin/gourd sync
 
 rs: 
 	cd rust/s && cargo sqlx prepare -- --bin gourd

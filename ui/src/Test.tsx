@@ -3,25 +3,17 @@ import Login from "./components/Login";
 
 const Test: React.FC = () => {
   return (
-    <div>
-      {/* https://mertjf.github.io/tailblocks/ */}
-      <section className="text-gray-700 body-font">
-        <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-col text-center w-full mb-20">
-            <h2 className="text-xs text-blue-500 tracking-widest font-medium title-font mb-1">
-              Go Universal Recipe Database
-            </h2>
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
-              gourd
-            </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-              Nicky's Recipe Database
-            </p>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Gourd Recipe Database
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            <Login />
+          </p>
         </div>
-      </section>
-
-      <Login />
+      </div>
     </div>
   );
 };

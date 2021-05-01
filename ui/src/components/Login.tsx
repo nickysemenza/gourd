@@ -14,13 +14,13 @@ import {
   getOpenapiFetchConfig,
   isLoggedIn,
 } from "../config";
-import Debug from "./Debug";
 
 const Login: React.FC = () => {
   const api = new AuthenticationApi(getOpenapiFetchConfig());
-  const [cookies, setCookie] = useCookies(["cookie-name"]);
-
-  const [auth, setAuth] = useState<AuthResp>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_cookies, setCookie] = useCookies(["cookie-name"]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_auth, setAuth] = useState<AuthResp>();
 
   const onSuccess = async (
     response: GoogleLoginResponse | GoogleLoginResponseOffline
@@ -70,7 +70,7 @@ const Login: React.FC = () => {
       ) : (
         <button>logged in as {getName()}</button>
       )}
-      <Debug data={{ auth, cookies }} />
+      {/* <Debug data={{ auth, cookies }} /> */}
     </div>
   );
 };
