@@ -1,5 +1,6 @@
 {
   "extends": ["config:base"],
+  "enabledManagers": ["dockerfile"],
   "packageRules": [
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],
