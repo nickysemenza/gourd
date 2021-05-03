@@ -2,7 +2,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
     unit_conversion_request::Target, Amount, Ingredient, IngredientKind, RecipeDetail,
-    RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest,
+    RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest, UnitMapping,
 };
 use unit::MeasureKind;
 
@@ -106,18 +106,18 @@ fn is_oz(a: &ingredient::Amount) -> bool {
 fn is_ml(a: &ingredient::Amount) -> bool {
     a.unit == "ml" || a.unit == "mL"
 }
-
-pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
-    let equivalencies: Vec<(unit::Measure, unit::Measure)> = req
-        .unit_mappings
-        .iter()
+pub fn parse_unit_mappings(um: Vec<UnitMapping>) -> Vec<(unit::Measure, unit::Measure)> {
+    um.iter()
         .map(|u| {
             return (
                 amount_to_measure(u.a.clone()),
                 amount_to_measure(u.b.clone()),
             );
         })
-        .collect();
+        .collect()
+}
+pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
+    let equivalencies = parse_unit_mappings(req.unit_mappings);
     let target = match req.target.unwrap_or(Target::Other) {
         Target::Weight => MeasureKind::Weight,
         Target::Volume => MeasureKind::Volume,

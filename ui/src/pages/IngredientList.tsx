@@ -87,7 +87,7 @@ const IngredientList: React.FC = () => {
               <Link to={`/ingredients/${ingredient.id}`} className="link">
                 <div className="text-blue-800">view</div>
               </Link>
-              <UnitMappingList unit_mappings={unit_mappings} />
+              <UnitMappingList unit_mappings={unit_mappings} includeDot />
             </div>
           );
         },

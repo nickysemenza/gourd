@@ -1,3 +1,6 @@
+use std::fmt;
+
+use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, PartialEq, PartialOrd, Debug, Default, Serialize, Deserialize)]
@@ -34,7 +37,7 @@ impl MeasureKind {
         }
     }
 }
-#[derive(Clone, PartialEq, PartialOrd, Debug)]
+#[derive(Clone, PartialEq, PartialOrd, Debug, Eq, Hash)]
 pub enum Unit {
     Gram,
     Kilogram,
@@ -99,6 +102,41 @@ impl Unit {
         .to_string()
     }
 }
+pub fn unit_from_measurekind(m: MeasureKind) -> Unit {
+    return match m {
+        MeasureKind::Weight => Unit::Gram,
+        MeasureKind::Volume => Unit::Milliliter,
+        MeasureKind::Money => Unit::Cent,
+        MeasureKind::Calories => Unit::KCal,
+        MeasureKind::Other => Unit::Other("".to_string()),
+    };
+}
+impl fmt::Display for Unit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> Graph<Unit, f32> {
+    let mut g = Graph::<Unit, f32>::new();
+
+    for (m_a, m_b) in mappings.into_iter() {
+        let n_a = g
+            .node_indices()
+            .find(|i| g[*i] == m_a.0)
+            .unwrap_or_else(|| g.add_node(m_a.0.clone()));
+        let n_b = g
+            .node_indices()
+            .find(|i| g[*i] == m_b.0)
+            .unwrap_or_else(|| g.add_node(m_b.0.clone()));
+        let _c1 = g.add_edge(n_a, n_b, m_b.1 / m_a.1);
+        let _c2 = g.add_edge(n_b, n_a, m_a.1 / m_b.1);
+    }
+    return g;
+}
+pub fn print_graph(g: Graph<Unit, f32>) -> String {
+    return format!("{}", petgraph::dot::Dot::new(&g));
+}
 
 // multiplication factors
 const TSP_TO_TBSP: f32 = 3.0;
@@ -142,7 +180,6 @@ impl Measure {
     }
     pub fn parse(m: BareMeasurement) -> Measure {
         Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
-        // return Measure(foo.0, foo.1);
     }
     pub fn kind(&self) -> MeasureKind {
         return match self.0 {
@@ -169,19 +206,34 @@ impl Measure {
         target: MeasureKind,
         mappings: Vec<(Measure, Measure)>,
     ) -> Option<Measure> {
-        let curr_kind = self.kind();
-        for (m_a, m_b) in mappings.into_iter() {
-            let a = m_a.clone().normalize();
-            let b = m_b.clone().normalize();
-            let (kind_a, kind_b) = (a.kind(), b.kind());
-            if kind_a == target && kind_b == curr_kind {
-                return Some(Measure(a.0, a.1 / b.1 * self.1));
-            } else if kind_a == curr_kind && kind_b == target {
-                return Some(Measure(b.0, b.1 / a.1 * self.1));
-            }
+        let g = make_graph(mappings);
+        println!("{}", petgraph::dot::Dot::new(&g));
+
+        let unit_a = self.0.clone();
+        let unit_b = unit_from_measurekind(target);
+
+        let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
+        let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
+
+        println!("calculating {:?} to {:?}", n_a, n_b);
+        if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
+            return None;
+        };
+
+        let steps =
+            petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
+                .unwrap()
+                .1;
+        let mut res: f32 = self.1;
+        for x in 0..steps.len() - 1 {
+            let edge = g
+                .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
+                .unwrap();
+            res *= g.edge_weight(edge).unwrap();
         }
-        None
+        return Some(Measure(unit_b, res));
     }
+
     pub fn as_bare(self) -> BareMeasurement {
         let m = self.1;
         let (val, u, f) = match self.0 {
@@ -225,8 +277,6 @@ impl Measure {
         };
         return BareMeasurement::new(u.to_str(), val / f);
     }
-
-    // Err("todo".to_string())
 }
 pub fn singular(s: &str) -> String {
     s.strip_suffix("s").unwrap_or(s).to_lowercase()
@@ -238,7 +288,6 @@ mod tests {
     use super::*;
     #[test]
     fn test_measure() {
-        // let m1 = Measure::parse(Measurement("Tbsp".to_string(), 16.0));
         let m1 = Measure::from_string("16 tbsp".to_string());
         assert_eq!(m1, Measure(Unit::Teaspoon, 48.0));
         assert_eq!(m1.as_bare(), BareMeasurement::new("cup".to_string(), 1.0));
@@ -315,6 +364,45 @@ mod tests {
                         Measure::from_string("12 eggs".to_string()),
                         Measure::from_string("1.20 dollar".to_string()),
                     )]
+                )
+                .unwrap()
+        );
+    }
+    #[test]
+    fn test_convert_transitive() {
+        assert_eq!(
+            Measure::from_string("1 cent".to_string()),
+            Measure::from_string("1 grams".to_string())
+                .convert(
+                    MeasureKind::Money,
+                    vec![
+                        (
+                            Measure::from_string("1 cent".to_string()),
+                            Measure::from_string("1 tsp".to_string()),
+                        ),
+                        (
+                            Measure::from_string("1 grams".to_string()),
+                            Measure::from_string("1 tsp".to_string()),
+                        ),
+                    ]
+                )
+                .unwrap()
+        );
+        assert_eq!(
+            Measure::from_string("1 dollar".to_string()),
+            Measure::from_string("1 grams".to_string())
+                .convert(
+                    MeasureKind::Money,
+                    vec![
+                        (
+                            Measure::from_string("1 dollar".to_string()),
+                            Measure::from_string("1 cup".to_string()),
+                        ),
+                        (
+                            Measure::from_string("1 grams".to_string()),
+                            Measure::from_string("1 cup".to_string()),
+                        ),
+                    ]
                 )
                 .unwrap()
         );

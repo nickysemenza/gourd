@@ -50,6 +50,11 @@ export function encode_recipe_text(recipe_detail: any): string;
 * @returns {any}
 */
 export function decode_recipe_text(r: string): any;
+/**
+* @param {any} conversion_request
+* @returns {string}
+*/
+export function make_dag(conversion_request: any): string;
 
 interface Ingredient {
     amounts: Amount[];

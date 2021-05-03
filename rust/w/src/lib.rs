@@ -1,6 +1,9 @@
 mod utils;
 
-use gourd_common::{convert_to, sum_ingredients};
+use gourd_common::{
+    convert_to, parse_unit_mappings, sum_ingredients,
+    unit::{make_graph, print_graph},
+};
 use openapi::models::{RecipeDetail, UnitConversionRequest};
 use wasm_bindgen::prelude::*;
 
@@ -123,6 +126,16 @@ pub fn decode_recipe_text(r: String) -> JsValue {
     utils::set_panic_hook();
     let detail = gourd_common::decode_recipe(r);
     JsValue::from_serde(&detail).unwrap()
+}
+
+#[wasm_bindgen]
+pub fn make_dag(conversion_request: &JsValue) -> String {
+    utils::set_panic_hook();
+    let req: UnitConversionRequest = conversion_request.into_serde().unwrap();
+
+    let equivalencies = parse_unit_mappings(req.unit_mappings);
+    let g = make_graph(equivalencies);
+    return print_graph(g);
 }
 
 // #[wasm_bindgen]
