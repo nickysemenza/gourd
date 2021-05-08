@@ -5,9 +5,7 @@ go 1.16
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v0.18.0
 	github.com/Masterminds/squirrel v1.5.0
-	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
-	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.3.0
 	github.com/cosmtrek/air v1.26.0
@@ -44,7 +42,6 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.18.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.18.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.18.0
 	go.opentelemetry.io/otel v0.18.0
 	go.opentelemetry.io/otel/exporters/metric/prometheus v0.18.0

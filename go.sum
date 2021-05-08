@@ -81,8 +81,6 @@ github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/OpenPeeDeeP/depguard v1.0.1 h1:VlW4R6jmBIv3/u1JNlawEvJMM4J+dPORPaZasQee8Us=
 github.com/OpenPeeDeeP/depguard v1.0.1/go.mod h1:xsIw86fROiiwelg+jB2uM9PiKihMMmUx/1V+TNhjQvM=
-github.com/PuerkitoBio/goquery v1.6.1 h1:FgjbQZKl5HTmcn4sKBgvx8vv63nhyhIpv7lJpFGCWpk=
-github.com/PuerkitoBio/goquery v1.6.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/Shopify/goreferrer v0.0.0-20181106222321-ec9c9a553398/go.mod h1:a1uqRtAwp2Xwc6WNPJEufxJ7fx3npB4UV/JOLmbu5I0=
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
@@ -108,9 +106,6 @@ github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d/go.mod h1:rBZYJk5
 github.com/alexkohler/prealloc v1.0.0 h1:Hbq0/3fJPQhNkN0dR95AVrr6R7tou91y0uHG5pOcUuw=
 github.com/alexkohler/prealloc v1.0.0/go.mod h1:VetnK3dIgFBBKmg0YnD9F9x6Icjd+9cvfHR56wJVlKE=
 github.com/andybalholm/brotli v1.0.0/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
-github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
-github.com/andybalholm/cascadia v1.2.0 h1:vuRCkM5Ozh/BfmsaTm26kbjm0mIOM3yS5Ek/F5h18aE=
-github.com/andybalholm/cascadia v1.2.0/go.mod h1:YCyR8vOZT9aZ1CHEd8ap0gMVm2aFgxBp0T0eFw1RUQY=
 github.com/antihax/optional v0.0.0-20180407024304-ca021399b1a6/go.mod h1:V8iCPQYkqmusNa815XgQio277wI47sdRh1dUOLdyC6Q=
 github.com/aokoli/goutils v1.0.1/go.mod h1:SijmP0QR8LtwsmDs8Yii5Z/S4trXFGFC2oO5g9DP+DQ=
 github.com/apache/arrow/go/arrow v0.0.0-20200601151325-b2287a20f230 h1:5ultmol0yeX75oh1hY78uAFn3dupBQ/QUNxERCkiaUQ=
@@ -1166,8 +1161,6 @@ go.opentelemetry.io/contrib v0.18.0 h1:uqBh0brileIvG6luvBjdxzoFL8lxDGuhxJWsvK3Bv
 go.opentelemetry.io/contrib v0.18.0/go.mod h1:G/EtFaa6qaN7+LxqfIAT3GiZa7Wv5DTBUzl5H4LY0Kc=
 go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.18.0 h1:8MSfRBvIVxxEwL7hb4x+v5r6P1x36RQd2SdTEi6hunw=
 go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.18.0/go.mod h1:1NTIs2kxkbgcQj6yscmkK+pwmeXNHdr9IgZTlfOzsQQ=
-go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.18.0 h1:Qc7uU8GzpQ0Gak2oOmEcpiL9uRaVhatxkE1EzNhJW00=
-go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.18.0/go.mod h1:iK1G0FgHurSJ/aYLg5LpnPI0pqdanM73S3dhyDp0Lk4=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.18.0 h1:VbYXJBtSTHjzNc4gHVD3tkg7xfb6UpCf7DWjF0QlSy4=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.18.0/go.mod h1:yZmHqsWTuj4VkXk9JuAs1nRw502/7LPK+QfVEHXtUts=
 go.opentelemetry.io/contrib/propagators v0.18.0 h1:9LxmzJYs2T4LhbzlFeOTN5h96t2I7K2Jher9gNNPnJc=

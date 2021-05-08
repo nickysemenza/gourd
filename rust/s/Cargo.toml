@@ -29,8 +29,13 @@ config = { version = "0.11.0", default-features = false, features = ["yaml"] }
 bigdecimal = { version = "0.2.0", features = ["serde"] }
 
 
+
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
+
+[dependencies.pyo3]
+version = "0.13.2"
+features = ["auto-initialize"]
 
 [dev-dependencies]
 actix-rt = "1"

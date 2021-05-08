@@ -15,10 +15,11 @@ type parseMethod string
 
 const (
 	Ingredient parseMethod = "parse"
+	Scrape     parseMethod = "scrape"
 	Amount     parseMethod = "parse_amount"
 )
 
-func Parse(ctx context.Context, text string, kind parseMethod, target interface{}) error {
+func Call(ctx context.Context, text string, kind parseMethod, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Parse")
 	defer span.End()
 	url := fmt.Sprintf("http://localhost:8080/%s?text=%s", kind, url.QueryEscape(text))

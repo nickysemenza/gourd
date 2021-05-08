@@ -7,7 +7,7 @@ use openapi::models::{
 use unit::MeasureKind;
 
 pub mod unit;
-fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredient {
+fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> SectionIngredient {
     let mut grams = 0.0;
     let mut oz = 0.0;
     let mut ml = 0.0;
@@ -48,12 +48,13 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient) -> SectionIngredien
         amount,
         adjective: i.modifier,
         ingredient: Some(Ingredient::new("".to_string(), i.name)),
+        original: Some(original.to_string()),
         ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, grams)
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
     let i = dbg!(ingredient::from_str(s, true))?;
-    Ok(section_ingredient_from_parsed(i))
+    Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
     let i = dbg!(ingredient::parse_amount(s))?;

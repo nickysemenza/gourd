@@ -1,8 +1,8 @@
 use crate::configuration::{DatabaseSettings, Settings};
 // use crate::email_clhealth_checkient::EmailClient;
 use crate::routes::parser;
-use actix_web::web::Data;
 use actix_web::{dev::Server, web};
+use actix_web::{middleware::Logger, web::Data};
 use actix_web::{App, HttpServer};
 use actix_web_opentelemetry::RequestTracing;
 use sqlx::postgres::PgPoolOptions;
@@ -69,10 +69,12 @@ fn run(
     // let email_client = Data::new(email_client);
     let server = HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .wrap(RequestTracing::new())
             .route("/parse", web::get().to(parser))
             .route("/parse_amount", web::get().to(parser::amount_parser))
             .route("/convert", web::post().to(parser::convert))
+            .route("/scrape", web::get().to(parser::scrape))
             .service(web::resource("/parse2").route(web::get().to(parser::index)))
             .app_data(db_pool.clone())
         // .app_data(email_client.clone())

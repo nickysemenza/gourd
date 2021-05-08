@@ -1,8 +1,12 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::convert_to;
-use openapi::models::{IngredientKind, SectionIngredient};
+use openapi::models::{
+    IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
+    SectionInstruction,
+};
 use opentelemetry::{global, trace::Tracer};
 use opentelemetry::{trace::get_active_span, KeyValue};
+use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
 use sqlx::{types::BigDecimal, PgPool};
 
@@ -117,6 +121,69 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     // dbg!(res);
     // let res2 = res.unwrap();
     Ok(res)
+}
+
+pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
+    global::tracer("my-component").start("scraper");
+
+    get_active_span(|span| {
+        span.add_event(
+            "parse".to_string(),
+            vec![KeyValue::new("ingredient", info.text.to_string())],
+        );
+    });
+
+    let mut sc_result: (Vec<String>, String, String) = (vec![], "".to_string(), "".to_string());
+    Python::with_gil(|py| {
+        let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
+
+        dbg!(syspath);
+        let activators = PyModule::from_code(
+            py,
+            r#"
+from recipe_scrapers import scrape_me            
+def sc(x):
+    res = scrape_me(x)
+    return res.ingredients(), res.instructions(), res.title()
+            "#,
+            "recipe_scrape.py",
+            "recipe_scrape",
+        )
+        .unwrap();
+
+        dbg!(activators);
+        sc_result = activators
+            .getattr("sc")
+            .unwrap()
+            .call1((info.text.clone(),))
+            .unwrap()
+            .extract()
+            .unwrap();
+    });
+    let sections = vec![RecipeSection::new(
+        "".to_string(),
+        sc_result
+            .1
+            .split('\n')
+            .map(|x| SectionInstruction::new("".to_string(), x.to_string()))
+            .collect(),
+        sc_result
+            .0
+            .iter()
+            .map(|x| {
+                let _x = 1;
+                gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredient::new(
+                    "".to_string(),
+                    IngredientKind::Ingredient,
+                    0.0,
+                ))
+            })
+            .collect(),
+    )];
+    let detail = RecipeDetail::new("".to_string(), sections, sc_result.2, 0, "".to_string());
+    let res = RecipeWrapper::new("".to_string(), detail);
+
+    HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
 }
 
 #[cfg(test)]
