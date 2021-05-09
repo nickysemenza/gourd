@@ -357,6 +357,25 @@ export const countTotalGrams = (
     .map((si) => getGrams(w, si, ing_hints) || 0)
     .reduce((a, b) => a + b, 0);
 
+export const countTotalDollars = (
+  sections: RecipeSection[],
+  w: wasm,
+  ing_hints: IngDetailsById
+) =>
+  flatIngredients(sections)
+    .map(
+      (si) =>
+        getCal2(
+          w,
+          si,
+          ing_hints,
+          // tweaks.multiplier,
+          1,
+          UnitConversionRequestTargetEnum.MONEY
+        ) || 0
+    )
+    .reduce((a, b) => a + b, 0);
+
 export const sumIngredients = (sections: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
   let ingredients: Record<string, SectionIngredient[]> = {};
@@ -522,11 +541,11 @@ export const getCal2 = (
   to:
     | UnitConversionRequestTargetEnum.CALORIES
     | UnitConversionRequestTargetEnum.MONEY
-): string => {
+): number | undefined => {
   const hint = getHint(ingredient, ing_hints);
-  if (!hint) return "n/a";
+  if (!hint) return undefined;
   const grams = getGrams(w, ingredient, ing_hints);
-  if (grams === 0) return "n/a";
+  if (grams === 0) return undefined;
   const kcal = try_convert(
     w,
     hint.unit_mappings,
@@ -534,5 +553,8 @@ export const getCal2 = (
     to,
     ingredient.ingredient?.name
   )?.value;
-  return scaledRound((kcal || 0) * multiplier);
+  if (to === UnitConversionRequestTargetEnum.MONEY) {
+    multiplier /= 100;
+  }
+  return kcal ? kcal * multiplier : undefined;
 };

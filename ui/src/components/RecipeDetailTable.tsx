@@ -4,7 +4,12 @@ import {
   RecipeSection,
   SectionIngredient,
 } from "../api/openapi-hooks/api";
-import { formatTimeRange, getIngredient, parseTimeRange } from "../util";
+import {
+  formatTimeRange,
+  getIngredient,
+  parseTimeRange,
+  scaledRound,
+} from "../util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -117,6 +122,26 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     const { edit } = tweaks;
     const isSub = subIndex !== undefined;
     const hint = getHint(ingredient, ing_hints);
+
+    const kcal =
+      w &&
+      getCal2(
+        w,
+        ingredient,
+        ing_hints,
+        tweaks.multiplier,
+        UnitConversionRequestTargetEnum.CALORIES
+      );
+    const cents =
+      w &&
+      getCal2(
+        w,
+        ingredient,
+        ing_hints,
+        tweaks.multiplier,
+        UnitConversionRequestTargetEnum.MONEY
+      );
+
     return (
       <div className="flex flex-col">
         <div className={`ing-table-row`} key={y}>
@@ -267,15 +292,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <div>
             {/* <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div> */}
             <div>
-              {w &&
-                getCal2(
-                  w,
-                  ingredient,
-                  ing_hints,
-                  tweaks.multiplier,
-                  UnitConversionRequestTargetEnum.CALORIES
-                )}
-              kcal
+              {kcal ? scaledRound(kcal) : "n/a"}
+              kcal ${cents ? scaledRound(cents) : "n/a"}
             </div>
             {/* <div>
               $

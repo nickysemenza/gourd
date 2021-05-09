@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/labstack/echo/v4"
@@ -285,7 +286,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 		if err != nil {
 			return err
 		}
-		log.Printf("associated %d with %s", m.FdcID, ing.Id)
+		log.Printf("loaded %s (%v), fdc: %d=>%s, %d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcID, ing.Id, len(m.UnitMappings))
 
 		sameAsIds := []string{}
 		for _, alias := range m.Aliases {

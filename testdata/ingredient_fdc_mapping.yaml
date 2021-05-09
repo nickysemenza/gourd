@@ -1,12 +1,37 @@
 ---
 - name: buttermilk
   fdc_id: 454974
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 32
+      b:
+        unit: dollars
+        value: 3
+      source: wf
 - name: sugar
   fdc_id: 746784
+  aliases: ["granulated sugar"]
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 3
+      b:
+        unit: dollars
+        value: 3
+      source: wf
+    - a:
+        unit: gram
+        value: 200
+      b:
+        unit: cup
+        value: 1
+      source: n/a
 - name: delicata squash
   fdc_id: 170489
 - name: butter
   fdc_id: 719780
+  aliases: ["unsalted butter"]
   unit_mappings:
     - a:
         unit: g
@@ -25,41 +50,146 @@
 
 - name: eggs
   fdc_id: 748967
+  unit_mappings:
+    - a:
+        unit: whole
+        value: 12
+      b:
+        unit: dollars
+        value: 3
+      source: wf
+    - a:
+        unit: whole without shell
+        value: 1
+      b:
+        unit: whole
+        value: 1
+    - a:
+        unit: large
+        value: 1
+      b:
+        unit: whole
+        value: 1
+      source: wf
 - name: all purpose flour
   fdc_id: 804415
   aliases: ["flour", "all-purpose flour", "AP flour"]
-- name: flour
-  fdc_id: 804415
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 5
+      b:
+        unit: dollars
+        value: 6
+      source: wf
 - name: kosher salt
   fdc_id: 705264
   aliases: ["salt", "Coarse sea salt"]
-- name: unsalted butter
-  fdc_id: 798135
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 3
+      b:
+        unit: dollars
+        value: 5
+      source: wf
 - name: vanilla extract
   fdc_id: 173471
-- name: granulated sugar
-  fdc_id: 777534
+  aliases: ["vanilla"]
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 8
+      b:
+        unit: dollars
+        value: 9
+      source: tjs
 - name: water
   fdc_id: 496879
 - name: baking soda
   fdc_id: 741258
-- name: baking powdered
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 8
+      b:
+        unit: dollars
+        value: 2
+      source: tjs
+- name: baking powder
   fdc_id: 600789
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 8
+      b:
+        unit: dollars
+        value: 2
+      source: tjs
 - name: milk
   fdc_id: 726156
+  aliases: ["whole milk"]
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 32
+      b:
+        unit: dollars
+        value: 2
+      source: wf
 - name: active dry yeast
   fdc_id: 368813
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 1
+      b:
+        unit: dollars
+        value: 7
+      source: amazon
 - name: pastry flour
   fdc_id: 532183
 - name: dark brown sugar
   aliases: ["brown sugar"]
   fdc_id: 577990
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 2
+      b:
+        unit: dollars
+        value: 2.5
+      source: wf
 - name: oats
   fdc_id: 538678
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 1
+      b:
+        unit: dollars
+        value: 3
+      source: tjs
 - name: pecans
   fdc_id: 562568
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 1
+      b:
+        unit: dollars
+        value: 5
+      source: tjs
 - name: hazelnuts
   fdc_id: 478317
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 1
+      b:
+        unit: dollars
+        value: 7
+      source: tjs
 - name: semisweet chocolate
   fdc_id: 415501
 - name: sesame oil
