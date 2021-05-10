@@ -33,15 +33,14 @@ import {
   FoodsById,
   IngDetailsById,
   inferGrams,
-  getCal2,
   getHint,
+  getStats,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
 import { TableInput } from "./Input";
-import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
 import IngredientPopover from "./IngredientPopover";
 
 export interface UpdateIngredientProps {
@@ -123,25 +122,16 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     const isSub = subIndex !== undefined;
     const hint = getHint(ingredient, ing_hints);
 
-    const kcal =
-      w &&
-      getCal2(
-        w,
-        ingredient,
-        ing_hints,
-        tweaks.multiplier,
-        UnitConversionRequestTargetEnum.CALORIES
-      );
-    const cents =
-      w &&
-      getCal2(
-        w,
-        ingredient,
-        ing_hints,
-        tweaks.multiplier,
-        UnitConversionRequestTargetEnum.MONEY
-      );
+    if (!w) return <div>loading...</div>;
 
+    const { kcal, dollars } = getStats(
+      w,
+      ingredient,
+      ing_hints,
+      tweaks.multiplier
+    );
+
+    const placeholderGrams = w && inferGrams(w, ingredient, ing_hints);
     return (
       <div className="flex flex-col">
         <div className={`ing-table-row`} key={y}>
@@ -164,11 +154,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 ingredient.grams || 0,
                 "grams"
               )}
-              pValue={
-                w &&
-                inferGrams(w, ingredient, ing_hints) &&
-                tweaks.multiplier * (inferGrams(w, ingredient, ing_hints) || 0)
-              }
+              pValue={placeholderGrams && tweaks.multiplier * placeholderGrams}
               blur
               highlight={isOverride(tweaks, x, y, subIndex, "grams")}
               onChange={(e) =>
@@ -181,9 +167,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 })
               }
             />
-            {/* {w &&
-              inferGrams(w, ingredient, ing_hints) &&
-              scaledRound(inferGrams(w, ingredient, ing_hints) || 0)} */}
           </div>
           <div className="flex space-x-0.5">
             <div className="text-gray-600">g</div>
@@ -293,18 +276,9 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             {/* <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div> */}
             <div>
               {kcal ? scaledRound(kcal) : "n/a"}
-              kcal ${cents ? scaledRound(cents) : "n/a"}
+              kcal ${dollars ? scaledRound(dollars) : "n/a"}
             </div>
-            {/* <div>
-              $
-              {w &&
-                getCal2(
-                  w,
-                  ingredient,
-                  ing_hints,
-                  UnitConversionRequestTargetEnum.MONEY
-                )}
-            </div> */}
+
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (
               <label className="flex items-center ml-1">

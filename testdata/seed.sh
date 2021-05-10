@@ -8,5 +8,6 @@
 ./bin/gourd scrape https://cooking.nytimes.com/recipes/1018177-cornmeal-blueberry-pancakes
 ./bin/gourd import testdata/cookies_2.yaml
 ./bin/gourd import testdata/cookies_1.yaml
+./bin/gourd import testdata/dep_1.yaml
 
 ./bin/gourd load-ingredients testdata/ingredient_fdc_mapping.yaml

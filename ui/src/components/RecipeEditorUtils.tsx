@@ -11,7 +11,6 @@ import {
   TimeRange,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
-import { scaledRound } from "../util";
 import { wasm } from "../wasm";
 import { try_convert } from "./UnitConvertDemo";
 import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
@@ -348,33 +347,56 @@ export const flatIngredients = (sections: RecipeSection[]) =>
     .map((section) => section.ingredients.map((ingredient) => ingredient))
     .flat();
 
-export const countTotalGrams = (
+export type Stats = {
+  grams?: number;
+  dollars?: number;
+  kcal?: number;
+};
+const sumStats = (a: Stats, b: Stats) => {
+  a.grams = (a.grams || 0) + (b.grams || 0);
+  a.dollars = (a.dollars || 0) + (b.dollars || 0);
+  a.kcal = (a.kcal || 0) + (b.kcal || 0);
+  return a;
+};
+export const getStats = (
+  w: wasm,
+  si: SectionIngredient,
+  ing_hints: IngDetailsById,
+  multiplier: number
+): Stats => {
+  return {
+    grams: getGrams(w, si, ing_hints),
+    dollars: w_convert(
+      w,
+      si,
+      ing_hints,
+      multiplier,
+      UnitConversionRequestTargetEnum.MONEY
+    ),
+    kcal: w_convert(
+      w,
+      si,
+      ing_hints,
+      multiplier,
+      UnitConversionRequestTargetEnum.CALORIES
+    ),
+  };
+};
+export const countTotals = (
   sections: RecipeSection[],
   w: wasm,
   ing_hints: IngDetailsById
 ) =>
   flatIngredients(sections)
-    .map((si) => getGrams(w, si, ing_hints) || 0)
-    .reduce((a, b) => a + b, 0);
-
-export const countTotalDollars = (
-  sections: RecipeSection[],
-  w: wasm,
-  ing_hints: IngDetailsById
-) =>
-  flatIngredients(sections)
-    .map(
-      (si) =>
-        getCal2(
-          w,
-          si,
-          ing_hints,
-          // tweaks.multiplier,
-          1,
-          UnitConversionRequestTargetEnum.MONEY
-        ) || 0
+    .map((si) =>
+      getStats(
+        w,
+        si,
+        ing_hints,
+        1 //todo
+      )
     )
-    .reduce((a, b) => a + b, 0);
+    .reduce((a, b) => sumStats(a, b), { grams: 0, dollars: 0 });
 
 export const sumIngredients = (sections: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
@@ -533,7 +555,7 @@ const getGrams = (
   ingredient.grams === 0
     ? inferGrams(w, ingredient, ing_hints)
     : ingredient.grams;
-export const getCal2 = (
+const w_convert = (
   w: wasm,
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById,
@@ -542,6 +564,7 @@ export const getCal2 = (
     | UnitConversionRequestTargetEnum.CALORIES
     | UnitConversionRequestTargetEnum.MONEY
 ): number | undefined => {
+  console.info("w_convert", ingredient);
   const hint = getHint(ingredient, ing_hints);
   if (!hint) return undefined;
   const grams = getGrams(w, ingredient, ing_hints);

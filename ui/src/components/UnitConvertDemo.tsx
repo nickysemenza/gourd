@@ -74,6 +74,12 @@ export const try_convert = (
     console.error(e);
     err = e;
   }
-  console.log(msg, { input, target, unit_mappings, result, err });
+  console.log("try_convert:" + msg, {
+    input,
+    target,
+    unit_mappings,
+    result,
+    err,
+  });
   return result;
 };

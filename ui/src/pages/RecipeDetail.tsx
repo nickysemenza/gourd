@@ -17,8 +17,7 @@ import {
 import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
 import {
   calCalc,
-  countTotalDollars,
-  countTotalGrams,
+  countTotals,
   flatIngredients,
   FoodsById,
   getFDCIds,
@@ -253,8 +252,11 @@ const RecipeDetail: React.FC = () => {
     hints,
     multiplier
   );
-  const totalGrams = countTotalGrams(recipe.detail.sections, w, ing_hints);
-  const totalDollars = countTotalDollars(recipe.detail.sections, w, ing_hints);
+  const {
+    grams: totalGrams,
+    dollars: totalDollars,
+    kcal: totalKCal,
+  } = countTotals(recipe.detail.sections, w, ing_hints);
   return (
     <div>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
@@ -375,14 +377,20 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalCal / quantity)} per ${singular(unit)})`}
       </div>
       <div>
+        kcal: {totalKCal}
+        {totalKCal &&
+          quantity > 0 &&
+          ` (${scaledRound(totalKCal / quantity)} per ${singular(unit)})`}
+      </div>
+      <div>
         dollars: {totalDollars}
-        {totalDollars > 0 &&
+        {totalDollars &&
           quantity > 0 &&
           ` (${scaledRound(totalDollars / quantity)} per ${singular(unit)})`}
       </div>
       <div>
         grams: {totalGrams}
-        {totalGrams > 0 &&
+        {totalGrams &&
           quantity > 0 &&
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>

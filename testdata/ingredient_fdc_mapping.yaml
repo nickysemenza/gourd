@@ -192,6 +192,14 @@
       source: tjs
 - name: semisweet chocolate
   fdc_id: 415501
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 12
+      b:
+        unit: dollars
+        value: 4.79
+      source: wf guittard
 - name: sesame oil
   fdc_id: 516949
 - name: green onion
