@@ -15,7 +15,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/exporters/metric/prometheus"
 	"go.opentelemetry.io/otel/trace"
 
@@ -146,11 +145,11 @@ func wrapHandler(h http.Handler) http.Handler {
 			spew.Dump("extracted span", sc2)
 		}
 
-		h2 := otelhttp.NewHandler(h, "server",
-			otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-			// otelhttp.WithSpanOptions(opts...),
-		)
-		h2.ServeHTTP(w, r) // call original
+		// h2 := otelhttp.NewHandler(h, "server",
+		// 	otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+		// 	// otelhttp.WithSpanOptions(opts...),
+		// )
+		h.ServeHTTP(w, r) // call original
 	})
 }
 

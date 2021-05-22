@@ -588,7 +588,7 @@ const w_convert = (
     | UnitConversionRequestTargetEnum.CALORIES
     | UnitConversionRequestTargetEnum.MONEY
 ): number | undefined => {
-  console.info("w_convert", ingredient);
+  // console.info("w_convert", ingredient);
   const hint = getHint(ingredient, ing_hints);
   if (!hint) return undefined;
   const grams = getGrams(w, ingredient, ing_hints);

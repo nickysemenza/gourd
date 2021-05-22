@@ -71,15 +71,15 @@ export const try_convert = (
   try {
     result = w.dolla(foo);
   } catch (e) {
-    console.error(e);
+    console.error(e, { input, target, unit_mappings });
     err = e;
   }
-  console.log("try_convert:" + msg, {
-    input,
-    target,
-    unit_mappings,
-    result,
-    err,
-  });
+  // console.log("try_convert:" + msg, {
+  //   input,
+  //   target,
+  //   unit_mappings,
+  //   result,
+  //   err,
+  // });
   return result;
 };
