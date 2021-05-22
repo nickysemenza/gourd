@@ -342,9 +342,18 @@ export const getGlobalInstructionNumber = (
   instructionIndex +
   1;
 
-export const flatIngredients = (sections: RecipeSection[]) =>
+export const flatIngredients = (
+  sections: RecipeSection[]
+): SectionIngredient[] =>
   sections
-    .map((section) => section.ingredients.map((ingredient) => ingredient))
+    .map((section) =>
+      section.ingredients
+        .map((ingredient) => [
+          ingredient,
+          ...flatIngredients(ingredient.recipe?.sections || []),
+        ])
+        .flat()
+    )
     .flat();
 
 export type Stats = {
@@ -358,14 +367,29 @@ const sumStats = (a: Stats, b: Stats) => {
   a.kcal = (a.kcal || 0) + (b.kcal || 0);
   return a;
 };
+const scaleStats = (a: Stats, amount: number) => {
+  a.grams = (a.grams || 0) * amount;
+  a.dollars = (a.dollars || 0) * amount;
+  a.kcal = (a.kcal || 0) * amount;
+  return a;
+};
 export const getStats = (
   w: wasm,
   si: SectionIngredient,
   ing_hints: IngDetailsById,
   multiplier: number
 ): Stats => {
+  const grams = getGrams(w, si, ing_hints);
+  if (si.kind === "recipe") {
+    console.log("foo", si);
+    const total = countTotals(si.recipe?.sections || [], w, ing_hints);
+    return scaleStats(
+      total,
+      total.grams && grams ? (grams / total.grams) * multiplier : 1
+    );
+  }
   return {
-    grams: getGrams(w, si, ing_hints),
+    grams,
     dollars: w_convert(
       w,
       si,
@@ -569,15 +593,12 @@ const w_convert = (
   if (!hint) return undefined;
   const grams = getGrams(w, ingredient, ing_hints);
   if (grams === 0) return undefined;
-  const kcal = try_convert(
+  const val = try_convert(
     w,
     hint.unit_mappings,
     [{ unit: "grams", value: grams || 0 }],
     to,
     ingredient.ingredient?.name
   )?.value;
-  if (to === UnitConversionRequestTargetEnum.MONEY) {
-    multiplier /= 100;
-  }
-  return kcal ? kcal * multiplier : undefined;
+  return val ? val * multiplier : undefined;
 };

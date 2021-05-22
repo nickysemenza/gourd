@@ -259,7 +259,8 @@ impl Measure {
             },
 
             Unit::Cent => match m {
-                m if { m < CENTS_TO_DOLLAR } => (m, Unit::Cent, 1.0),
+                // m if { m < CENTS_TO_DOLLAR } => (m, Unit::Cent, 1.0),
+                // _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
                 _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
             },
             Unit::KCal => (m, Unit::KCal, 1.0),
