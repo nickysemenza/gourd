@@ -128,6 +128,7 @@ const RecipeDetail: React.FC = () => {
     if (recipe) {
       const updated = await post(recipe);
       setEdit(false);
+      console.log({ updated });
       history.push(
         `/recipe/${updated.detail.id}?${queryString.stringify(values)}`
       );

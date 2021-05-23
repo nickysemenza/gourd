@@ -78,7 +78,7 @@ jobs:
       - checkout
       - run:
           command: docker-compose build
-          no_output_timeout: 3m
+          no_output_timeout: 10m
       - run:
           command: docker-compose run ui
           no_output_timeout: 3m

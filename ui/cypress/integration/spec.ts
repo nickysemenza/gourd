@@ -52,6 +52,7 @@ context("Basic Create, List, Edit test", () => {
     cy.contains("add instruction").click();
     cy.get("textarea[data-cy=instruction-input]").first().type("mix");
     cy.contains("save").click();
+    cy.wait(500);
     cy.contains("ingredients").click();
     cy.reload();
     cy.contains(newIngredient);
