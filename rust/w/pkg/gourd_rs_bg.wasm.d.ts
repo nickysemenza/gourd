@@ -10,6 +10,7 @@ export function sum_ingr(a: number): number;
 export function dolla(a: number): number;
 export function parse_amount(a: number, b: number): number;
 export function encode_recipe_text(a: number, b: number): void;
+export function encode_recipe_to_compact_json(a: number): number;
 export function decode_recipe_text(a: number, b: number): number;
 export function make_dag(a: number, b: number): void;
 export function __wbindgen_malloc(a: number): number;

@@ -6,6 +6,9 @@ use openapi::models::{
 };
 use unit::MeasureKind;
 
+#[macro_use]
+extern crate serde;
+
 pub mod unit;
 fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> SectionIngredient {
     let mut grams = 0.0;
@@ -165,19 +168,45 @@ pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
         amounts,
     };
 }
-pub fn encode_recipe(r: RecipeDetail) -> String {
-    let mut res = String::new();
+#[derive(Serialize, Deserialize)]
+pub enum CompactRecipeLine {
+    Ing(ingredient::Ingredient),
+    Ins(String),
+}
+#[derive(Serialize, Deserialize)]
+pub struct CompactRecipe(Vec<Vec<CompactRecipeLine>>);
+
+pub fn compact_recipe(r: RecipeDetail) -> CompactRecipe {
+    let mut sections = Vec::new();
     for s in r.sections.iter() {
+        let mut sec = Vec::new();
         for ing in s.ingredients.clone().into_iter() {
-            res.push_str(format!("{}\n", si_to_ingredient(ing).to_string()).as_str());
+            sec.push(CompactRecipeLine::Ing(si_to_ingredient(ing)));
         }
         for ins in s.instructions.iter() {
-            res.push_str(format!(";{}\n", ins.instruction).as_str());
+            sec.push(CompactRecipeLine::Ins(ins.instruction.clone()));
+        }
+        sections.push(sec);
+    }
+    return CompactRecipe(sections);
+}
+
+pub fn encode_recipe(r: RecipeDetail) -> String {
+    let mut res = String::new();
+    for s in compact_recipe(r).0.into_iter() {
+        for i in s.into_iter() {
+            res.push_str(
+                match i {
+                    CompactRecipeLine::Ing(ing) => ing.to_string(),
+                    CompactRecipeLine::Ins(ins) => format!(";{}", ins),
+                }
+                .as_str(),
+            );
+            res.push('\n');
         }
         res.push('\n');
     }
     return res.trim_end().to_string();
-    // return res;
 }
 pub fn decode_recipe(r: String) -> RecipeDetail {
     let raw_sections: Vec<&str> = r.split("\n\n").collect();

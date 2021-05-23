@@ -53,6 +53,11 @@ interface Ingredient {
     unit: string;
     value: number;
   }
+
+  interface CompactR {
+    Ing?: Ingredient;
+    Ins?: string;
+  }
 "#;
 
 #[wasm_bindgen]
@@ -63,6 +68,8 @@ extern "C" {
     pub type IAmount;
     #[wasm_bindgen(typescript_type = "Amount[]")]
     pub type IAmounts;
+    #[wasm_bindgen(typescript_type = "CompactR[][]")]
+    pub type ICompactR;
 }
 
 #[wasm_bindgen]
@@ -119,6 +126,13 @@ pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
     utils::set_panic_hook();
     let r: RecipeDetail = recipe_detail.into_serde().unwrap();
     gourd_common::encode_recipe(r)
+}
+#[wasm_bindgen]
+pub fn encode_recipe_to_compact_json(recipe_detail: &JsValue) -> ICompactR {
+    utils::set_panic_hook();
+    let r: RecipeDetail = recipe_detail.into_serde().unwrap();
+    let c = gourd_common::compact_recipe(r);
+    JsValue::from_serde(&c).unwrap().into()
 }
 
 #[wasm_bindgen]

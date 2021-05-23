@@ -244,6 +244,19 @@ export function encode_recipe_text(recipe_detail) {
 }
 
 /**
+* @param {any} recipe_detail
+* @returns {CompactR[][]}
+*/
+export function encode_recipe_to_compact_json(recipe_detail) {
+    try {
+        var ret = wasm.encode_recipe_to_compact_json(addBorrowedObject(recipe_detail));
+        return takeObject(ret);
+    } finally {
+        heap[stack_pointer++] = undefined;
+    }
+}
+
+/**
 * @param {string} r
 * @returns {any}
 */

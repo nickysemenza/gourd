@@ -133,6 +133,9 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 		return err
 	}
 	f.UnitMappings = append(f.UnitMappings, m...)
+	if len(f.UnitMappings) == 0 {
+		f.UnitMappings = []UnitMapping{}
+	}
 
 	return nil
 }

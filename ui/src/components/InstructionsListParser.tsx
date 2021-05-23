@@ -3,6 +3,7 @@ import { PlusCircle } from "react-feather";
 import { RecipeDetail } from "../api/openapi-fetch";
 import { WasmContext } from "../wasm";
 import { ButtonGroup } from "./Button";
+import Debug from "./Debug";
 
 const InstructionsListParser: React.FC<{
   setDetail: (d: RecipeDetail) => void;
@@ -13,6 +14,8 @@ const InstructionsListParser: React.FC<{
   if (!w) return null;
 
   const si = w.decode_recipe_text(area) as RecipeDetail;
+  const si2 = w.encode_recipe_to_compact_json(si);
+  console.log(JSON.stringify(si2));
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">
@@ -23,19 +26,57 @@ const InstructionsListParser: React.FC<{
             setArea(e.target.value);
           }}
         />
+        <div>
+          <div className="flex flex-col">
+            {si2.map((sec) => (
+              <>
+                {sec.map((line) => (
+                  <>
+                    {line.Ins && (
+                      <div className="text-gray-600 italic">{line.Ins}</div>
+                    )}
+                    {line.Ing && (
+                      <div className="flex">
+                        {line.Ing.amounts.map((a, x, z) => (
+                          <>
+                            <div className="text-purple-800 px-1">
+                              {a.value}
+                            </div>
+                            <div className="text-pink-800 pr-1">{a.unit}</div>
+                            {x < z.length - 1 && <>/</>}
+                          </>
+                        ))}
 
-        <ButtonGroup
-          compact
-          buttons={[
-            {
-              onClick: () => {
-                setDetail(si);
+                        <div className="text-green-800">{line.Ing.name}</div>
+                        {line.Ing.modifier && (
+                          <>
+                            ,
+                            <div className="text-yellow-400 pl-1">
+                              {line.Ing.modifier}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </>
+                ))}
+                <div>&nbsp;</div>
+              </>
+            ))}
+          </div>
+          <ButtonGroup
+            compact
+            buttons={[
+              {
+                onClick: () => {
+                  setDetail(si);
+                },
+                text: "inject ingredients",
+                IconLeft: PlusCircle,
               },
-              text: "inject ingredients",
-              IconLeft: PlusCircle,
-            },
-          ]}
-        />
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

@@ -46,6 +46,11 @@ export function parse_amount(input: string): Amount[];
 */
 export function encode_recipe_text(recipe_detail: any): string;
 /**
+* @param {any} recipe_detail
+* @returns {CompactR[][]}
+*/
+export function encode_recipe_to_compact_json(recipe_detail: any): CompactR[][];
+/**
 * @param {string} r
 * @returns {any}
 */
@@ -65,6 +70,11 @@ interface Ingredient {
   interface Amount {
     unit: string;
     value: number;
+  }
+
+  interface CompactR {
+    Ing?: Ingredient;
+    Ins?: string;
   }
 
 
