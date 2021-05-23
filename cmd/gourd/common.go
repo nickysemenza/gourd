@@ -59,7 +59,7 @@ func setupEnv() {
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
 	viper.SetDefault("PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "30s")
-	viper.SetDefault("SENTRY_DSN", "https://8220ab8a2b3d4c3c9cf7f636ec183c7a@o83311.ingest.sentry.io/5298706")
+	viper.SetDefault("SENTRY_DSN", "https://6a67b0ba96a744d2877fc1b21984aa18@o83311.ingest.sentry.io/5778936")
 
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
 	viper.SetDefault("BYPASS_AUTH", false)

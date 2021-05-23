@@ -67,7 +67,7 @@ context("smoke tests", () => {
     navItems.forEach((item) => {
       cy.contains(item.title).click();
       cy.wait(500);
-      cy.url().should("include", "/" + item.path);
+      cy.url().should("include", item.path);
     });
   });
   // more examples

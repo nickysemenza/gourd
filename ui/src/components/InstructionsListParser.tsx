@@ -3,7 +3,6 @@ import { PlusCircle } from "react-feather";
 import { RecipeDetail } from "../api/openapi-fetch";
 import { WasmContext } from "../wasm";
 import { ButtonGroup } from "./Button";
-import Debug from "./Debug";
 
 const InstructionsListParser: React.FC<{
   setDetail: (d: RecipeDetail) => void;
@@ -15,7 +14,6 @@ const InstructionsListParser: React.FC<{
 
   const si = w.decode_recipe_text(area) as RecipeDetail;
   const si2 = w.encode_recipe_to_compact_json(si);
-  console.log(JSON.stringify(si2));
   return (
     <div>
       <div className="grid grid-cols-2 gap-4">

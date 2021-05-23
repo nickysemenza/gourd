@@ -6,6 +6,8 @@
     "@craco/craco": "6.1.1",
     "@headlessui/react": "^1.0.0",
     "@sentry/browser": "6.2.5",
+    "@sentry/react": "^6.4.1",
+    "@sentry/tracing": "^6.4.1",
     "@types/jest": "26.0.22",
     "@types/jwt-decode": "3.1.0",
     "@types/node": "14.14.41",
