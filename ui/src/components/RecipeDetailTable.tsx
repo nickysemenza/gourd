@@ -35,6 +35,7 @@ import {
   inferGrams,
   getHint,
   getStats,
+  totalFlourMass,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -69,15 +70,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 }) => {
   const { edit } = tweaks;
   const { sections } = recipe.detail;
-  // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
-  const flourMass = (sections || []).reduce(
-    (acc, section) =>
-      acc +
-      section.ingredients
-        .filter((item) => item.ingredient?.name.includes("flour"))
-        .reduce((acc, ingredient) => acc + ingredient?.grams, 0),
-    0
-  );
+  const flourMass = totalFlourMass(sections || []);
   const showBP = flourMass > 0;
 
   const w = useContext(WasmContext);

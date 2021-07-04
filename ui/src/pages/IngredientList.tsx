@@ -13,6 +13,7 @@ import { AlertTriangle, PlusCircle } from "react-feather";
 import { Code } from "../util";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const IngredientList: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -113,7 +114,6 @@ const IngredientList: React.FC = () => {
                     <ul className="list-disc list-outside pl-4">
                       {(r.recipes || []).map((r) => (
                         <li
-                          // className="pl-6"
                           key={`${original.ingredient.id}@${r.name}@${r.version}`}
                         >
                           <RecipeLink recipe={r} />
@@ -123,7 +123,6 @@ const IngredientList: React.FC = () => {
                   </div>
                 ))}
               </ul>
-              {/* <Debug data={original} /> */}
             </div>
           );
         },
@@ -150,6 +149,9 @@ const IngredientList: React.FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>ingredients | gourd</title>
+      </Helmet>
       <ButtonGroup
         compact
         buttons={[

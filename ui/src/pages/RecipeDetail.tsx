@@ -34,6 +34,7 @@ import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
 import InstructionsListParser from "../components/InstructionsListParser";
+import { Helmet } from "react-helmet";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -260,6 +261,9 @@ const RecipeDetail: React.FC = () => {
   } = countTotals(recipe.detail.sections, w, ing_hints);
   return (
     <div>
+      <Helmet>
+        <title>{recipe.detail.name} | gourd</title>
+      </Helmet>
       <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
         <div>
           {edit ? (

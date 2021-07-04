@@ -17,8 +17,11 @@ export const RecipeLink: React.FC<Props> = ({
   recipe: { name, version, is_latest_version, id },
   multiplier,
 }) => (
-  <div className="flex space-x-0.5">
-    <Link to={`/recipe/${id}?multiplier=${multiplier || 1}`} className="link">
+  <div className="inline-flex">
+    <Link
+      to={`/recipe/${id}?multiplier=${multiplier || 1}`}
+      className="link flex pr-0.5"
+    >
       <div
         className={`${is_latest_version ? "text-blue-800" : "text-blue-200"}`}
       >

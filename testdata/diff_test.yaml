@@ -1,0 +1,58 @@
+name: difftest-1
+quantity: 0
+unit: ""
+sections:
+  - ingredients:
+      - adjective: eggs
+        grams: 50
+        ingredient:
+          name: eggs
+        kind: ingredient
+        unit: "2"
+      - adjective:
+        grams: 100
+        ingredient:
+          name: sugar
+        kind: ingredient
+        unit: "cup"
+        amount: 0.5
+  - ingredients:
+      - adjective: ""
+        grams: 200
+        ingredient:
+          name: flour
+        kind: ingredient
+        unit: ""
+---
+name: difftest-2
+quantity: 0
+unit: ""
+sections:
+  - ingredients:
+      - adjective: eggs
+        grams: 100
+        ingredient:
+          name: eggs
+        kind: ingredient
+        unit: "4"
+      - adjective:
+        grams: 100
+        ingredient:
+          name: granulated sugar
+        kind: ingredient
+        unit: "cup"
+        amount: 0.5
+  - ingredients:
+      - adjective: ""
+        grams: 200
+        ingredient:
+          name: flour
+        kind: ingredient
+        unit: ""
+  - ingredients:
+      - adjective: ""
+        grams: 20
+        ingredient:
+          name: salt
+        kind: ingredient
+        unit: ""

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
 import { PaginatedRecipes, RecipesApi } from "../api/openapi-fetch";
 import {
   UnitConversionRequest,
@@ -80,6 +81,9 @@ const Playground: React.FC = () => {
   if (!r2 || !r2.recipes) return null;
   return (
     <div className="grid grid-cols-2 gap-4">
+      <Helmet>
+        <title>playground | gourd</title>
+      </Helmet>
       <RecipeDiff details={r2.recipes[0].versions} />
     </div>
   );

@@ -7,6 +7,7 @@ import PaginatedTable, {
 } from "../components/PaginatedTable";
 import { RecipeLink } from "../components/Misc";
 import { Code } from "../util";
+import { Helmet } from "react-helmet";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -76,6 +77,9 @@ const RecipeList: React.FC = () => {
 
   return (
     <div>
+      <Helmet>
+        <title>recipes | gourd</title>
+      </Helmet>
       <PaginatedTable
         columns={columns}
         data={data?.recipes || []}

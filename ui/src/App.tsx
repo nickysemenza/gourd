@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 
 import Test from "./Test";
 import RecipeList from "./pages/RecipeList";
@@ -60,6 +61,9 @@ function App() {
       >
         <WasmContextProvider>
           <Router>
+            <Helmet>
+              <title>gourd</title>
+            </Helmet>
             <ToastContainer position="bottom-right" />
             <NavBar />
             <div className="lg:container lg:mx-auto">

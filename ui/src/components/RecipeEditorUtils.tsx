@@ -602,3 +602,14 @@ const w_convert = (
   )?.value;
   return val ? val * multiplier : undefined;
 };
+
+// for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
+export const totalFlourMass = (sections: RecipeSection[]) =>
+  (sections || []).reduce(
+    (acc, section) =>
+      acc +
+      section.ingredients
+        .filter((item) => item.ingredient?.name.includes("flour"))
+        .reduce((acc, ingredient) => acc + ingredient?.grams, 0),
+    0
+  );
