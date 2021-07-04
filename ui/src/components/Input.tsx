@@ -35,7 +35,7 @@ export const TableInput: React.FC<TableInputProps> = ({
   ...props
 }) => {
   const controlledVal = (
-    (!edit && pValue && scaledRound(pValue)) ||
+    (!edit && pValue && scaledRound(pValue) && !value) ||
     value
   ).toString();
   const [internalVal, setVal] = React.useState(controlledVal);

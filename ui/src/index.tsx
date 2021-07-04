@@ -6,7 +6,8 @@ import * as Sentry from "@sentry/browser";
 
 Sentry.init({
   dsn:
-    "https://524a2909a2ca439e8ed52b705ba1b9ca@o83311.ingest.sentry.io/5298728",
+    "https://6a67b0ba96a744d2877fc1b21984aa18@o83311.ingest.sentry.io/5778936",
+  tracesSampleRate: 1.0,
 });
 
 ReactDOM.render(
