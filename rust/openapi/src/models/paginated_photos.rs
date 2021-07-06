@@ -17,7 +17,7 @@ pub struct PaginatedPhotos {
     #[serde(rename = "photos", skip_serializing_if = "Option::is_none")]
     pub photos: Option<Vec<crate::models::GooglePhoto>>,
     #[serde(rename = "meta", skip_serializing_if = "Option::is_none")]
-    pub meta: Option<crate::models::Items>,
+    pub meta: Option<Box<crate::models::Items>>,
 }
 
 impl PaginatedPhotos {

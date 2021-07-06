@@ -15,7 +15,7 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct IngredientDetail {
     #[serde(rename = "ingredient")]
-    pub ingredient: crate::models::Ingredient,
+    pub ingredient: Box<crate::models::Ingredient>,
     /// Recipes referencing this ingredient
     #[serde(rename = "recipes")]
     pub recipes: Vec<crate::models::RecipeDetail>,
@@ -23,7 +23,7 @@ pub struct IngredientDetail {
     #[serde(rename = "children")]
     pub children: Vec<crate::models::IngredientDetail>,
     #[serde(rename = "food", skip_serializing_if = "Option::is_none")]
-    pub food: Option<crate::models::Food>,
+    pub food: Option<Box<crate::models::Food>>,
     /// mappings of equivalent units
     #[serde(rename = "unit_mappings")]
     pub unit_mappings: Vec<crate::models::UnitMapping>,
@@ -33,7 +33,7 @@ impl IngredientDetail {
     /// An Ingredient
     pub fn new(ingredient: crate::models::Ingredient, recipes: Vec<crate::models::RecipeDetail>, children: Vec<crate::models::IngredientDetail>, unit_mappings: Vec<crate::models::UnitMapping>) -> IngredientDetail {
         IngredientDetail {
-            ingredient,
+            ingredient: Box::new(ingredient),
             recipes,
             children,
             food: None,

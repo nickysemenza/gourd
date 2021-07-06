@@ -20,9 +20,9 @@ pub struct SectionIngredient {
     #[serde(rename = "kind")]
     pub kind: crate::models::IngredientKind,
     #[serde(rename = "recipe", skip_serializing_if = "Option::is_none")]
-    pub recipe: Option<crate::models::RecipeDetail>,
+    pub recipe: Option<Box<crate::models::RecipeDetail>>,
     #[serde(rename = "ingredient", skip_serializing_if = "Option::is_none")]
-    pub ingredient: Option<crate::models::Ingredient>,
+    pub ingredient: Option<Box<crate::models::Ingredient>>,
     /// weight in grams
     #[serde(rename = "grams")]
     pub grams: f64,

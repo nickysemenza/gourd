@@ -31,6 +31,21 @@ pub enum FoodDataType {
 
 }
 
+impl ToString for FoodDataType {
+    fn to_string(&self) -> String {
+        match self {
+            Self::FoundationFood => String::from("foundation_food"),
+            Self::SampleFood => String::from("sample_food"),
+            Self::MarketAcquisition => String::from("market_acquisition"),
+            Self::SurveyFnddsFood => String::from("survey_fndds_food"),
+            Self::SubSampleFood => String::from("sub_sample_food"),
+            Self::AgriculturalAcquisition => String::from("agricultural_acquisition"),
+            Self::SrLegacyFood => String::from("sr_legacy_food"),
+            Self::BrandedFood => String::from("branded_food"),
+        }
+    }
+}
+
 
 
 

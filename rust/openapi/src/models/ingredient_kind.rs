@@ -19,6 +19,15 @@ pub enum IngredientKind {
 
 }
 
+impl ToString for IngredientKind {
+    fn to_string(&self) -> String {
+        match self {
+            Self::Ingredient => String::from("ingredient"),
+            Self::Recipe => String::from("recipe"),
+        }
+    }
+}
+
 
 
 

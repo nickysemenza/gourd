@@ -25,6 +25,7 @@ export * from './PaginatedFoods';
 export * from './PaginatedIngredients';
 export * from './PaginatedMeals';
 export * from './PaginatedPhotos';
+export * from './PaginatedRecipeWrappers';
 export * from './PaginatedRecipes';
 export * from './Recipe';
 export * from './RecipeDependency';

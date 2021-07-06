@@ -356,6 +356,26 @@ func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	return c.JSON(http.StatusOK, apiR)
 }
 
+func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) error {
+
+	ctx := c.Request().Context()
+	list := []RecipeWrapper{}
+
+	for _, recipeId := range params.RecipeId {
+		r, err := a.Manager.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
+		if r == nil {
+			return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
+		}
+		apiR := transformRecipeFull(r)
+		list = append(list, *apiR)
+	}
+	result := PaginatedRecipeWrappers{Recipes: &list}
+	return c.JSON(http.StatusOK, result)
+}
+
 func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
 	ctx := c.Request().Context()
 	jwt, rawUser, err := a.Manager.ProcessGoogleAuth(ctx, params.Code)

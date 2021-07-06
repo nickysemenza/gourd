@@ -23,7 +23,7 @@ pub struct Food {
     #[serde(rename = "data_type")]
     pub data_type: crate::models::FoodDataType,
     #[serde(rename = "category", skip_serializing_if = "Option::is_none")]
-    pub category: Option<crate::models::FoodCategory>,
+    pub category: Option<Box<crate::models::FoodCategory>>,
     /// todo
     #[serde(rename = "nutrients")]
     pub nutrients: Vec<crate::models::FoodNutrient>,
@@ -31,7 +31,7 @@ pub struct Food {
     #[serde(rename = "portions", skip_serializing_if = "Option::is_none")]
     pub portions: Option<Vec<crate::models::FoodPortion>>,
     #[serde(rename = "branded_info", skip_serializing_if = "Option::is_none")]
-    pub branded_info: Option<crate::models::BrandedFood>,
+    pub branded_info: Option<Box<crate::models::BrandedFood>>,
     /// mappings of equivalent units
     #[serde(rename = "unit_mappings")]
     pub unit_mappings: Vec<crate::models::UnitMapping>,

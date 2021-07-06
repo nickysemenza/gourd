@@ -18,7 +18,7 @@ pub struct RecipeSection {
     #[serde(rename = "id")]
     pub id: String,
     #[serde(rename = "duration", skip_serializing_if = "Option::is_none")]
-    pub duration: Option<crate::models::TimeRange>,
+    pub duration: Option<Box<crate::models::TimeRange>>,
     /// x
     #[serde(rename = "instructions")]
     pub instructions: Vec<crate::models::SectionInstruction>,

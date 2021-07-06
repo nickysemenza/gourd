@@ -358,6 +358,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /recipes/bulk:
+    get:
+      summary: Get recipes
+      description: get recipes by ids
+      operationId: get_recipes_by_ids
+      tags:
+        - recipe
+      parameters:
+        - name: recipe_id
+          in: query
+          required: true
+          description: detail ids
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: bulk results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRecipeWrappers"
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
       summary: Converts an ingredient to a recipe, updating all recipes depending on it.
@@ -1018,6 +1041,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Recipe"
+        meta:
+          $ref: "#/components/schemas/Items"
+    PaginatedRecipeWrappers:
+      type: object
+      description: pages of Recipe
+      properties:
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeWrapper"
         meta:
           $ref: "#/components/schemas/Items"
     PaginatedIngredients:

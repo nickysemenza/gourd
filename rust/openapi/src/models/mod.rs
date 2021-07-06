@@ -52,6 +52,8 @@ pub mod paginated_meals;
 pub use self::paginated_meals::PaginatedMeals;
 pub mod paginated_photos;
 pub use self::paginated_photos::PaginatedPhotos;
+pub mod paginated_recipe_wrappers;
+pub use self::paginated_recipe_wrappers::PaginatedRecipeWrappers;
 pub mod paginated_recipes;
 pub use self::paginated_recipes::PaginatedRecipes;
 pub mod recipe;

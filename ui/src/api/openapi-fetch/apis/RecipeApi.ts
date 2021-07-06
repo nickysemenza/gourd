@@ -18,12 +18,63 @@ import {
     InlineResponse2001,
     InlineResponse2001FromJSON,
     InlineResponse2001ToJSON,
+    PaginatedRecipeWrappers,
+    PaginatedRecipeWrappersFromJSON,
+    PaginatedRecipeWrappersToJSON,
 } from '../models';
+
+export interface RecipeApiGetRecipesByIdsRequest {
+    recipeId: Array<string>;
+}
 
 /**
  * 
  */
 export class RecipeApi extends runtime.BaseAPI {
+
+    /**
+     * get recipes by ids
+     * Get recipes
+     */
+    async getRecipesByIdsRaw(requestParameters: RecipeApiGetRecipesByIdsRequest): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
+        if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
+            throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getRecipesByIds.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.recipeId) {
+            queryParameters['recipe_id'] = requestParameters.recipeId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = typeof token === 'function' ? token("bearerAuth", []) : token;
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/recipes/bulk`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipeWrappersFromJSON(jsonValue));
+    }
+
+    /**
+     * get recipes by ids
+     * Get recipes
+     */
+    async getRecipesByIds(requestParameters: RecipeApiGetRecipesByIdsRequest): Promise<PaginatedRecipeWrappers> {
+        const response = await this.getRecipesByIdsRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * recipe dependencies

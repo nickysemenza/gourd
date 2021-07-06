@@ -21,7 +21,7 @@ pub struct SearchResult {
     #[serde(rename = "recipes", skip_serializing_if = "Option::is_none")]
     pub recipes: Option<Vec<crate::models::RecipeWrapper>>,
     #[serde(rename = "meta", skip_serializing_if = "Option::is_none")]
-    pub meta: Option<crate::models::Items>,
+    pub meta: Option<Box<crate::models::Items>>,
 }
 
 impl SearchResult {

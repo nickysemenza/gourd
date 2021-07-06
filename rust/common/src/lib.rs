@@ -50,7 +50,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
         unit,
         amount,
         adjective: i.modifier,
-        ingredient: Some(Ingredient::new("".to_string(), i.name)),
+        ingredient: Some(Box::new(Ingredient::new("".to_string(), i.name))),
         original: Some(original.to_string()),
         ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, grams)
     };
@@ -114,8 +114,8 @@ pub fn parse_unit_mappings(um: Vec<UnitMapping>) -> Vec<(unit::Measure, unit::Me
     um.iter()
         .map(|u| {
             return (
-                amount_to_measure(u.a.clone()),
-                amount_to_measure(u.b.clone()),
+                amount_to_measure(*u.a.clone()),
+                amount_to_measure(*u.b.clone()),
             );
         })
         .collect()
@@ -243,17 +243,17 @@ mod tests {
     #[test]
     fn test_encode() {
         let si_1 = SectionIngredient {
-            ingredient: Some(Ingredient::new("".to_string(), "foo".to_string())),
+            ingredient: Some(Box::new(Ingredient::new("".to_string(), "foo".to_string()))),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
         };
         let si_2 = SectionIngredient {
-            ingredient: Some(Ingredient::new("".to_string(), "bar".to_string())),
+            ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
             amount: Some(1.5),
             unit: Some("cups".to_string()),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
         };
         let si_3 = SectionIngredient {
-            ingredient: Some(Ingredient::new("".to_string(), "bar".to_string())),
+            ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
         };
         let r = RecipeDetail::new(
@@ -328,7 +328,10 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
-                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ingredient: Some(Box::new(Ingredient::new(
+                    "".to_string(),
+                    "water".to_string()
+                ))),
                 ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
             }
         );
@@ -338,7 +341,10 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
-                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ingredient: Some(Box::new(Ingredient::new(
+                    "".to_string(),
+                    "water".to_string()
+                ))),
                 ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
             }
         );
@@ -347,7 +353,10 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cup".to_string()),
-                ingredient: Some(Ingredient::new("".to_string(), "water".to_string())),
+                ingredient: Some(Box::new(Ingredient::new(
+                    "".to_string(),
+                    "water".to_string()
+                ))),
                 ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 113.0)
             }
         );
@@ -356,15 +365,24 @@ mod tests {
     #[test]
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
-            ingredient: Some(Ingredient::new("a".to_string(), "foo".to_string())),
+            ingredient: Some(Box::new(Ingredient::new(
+                "a".to_string(),
+                "foo".to_string(),
+            ))),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
         };
         let si_2 = SectionIngredient {
-            ingredient: Some(Ingredient::new("b".to_string(), "bar".to_string())),
+            ingredient: Some(Box::new(Ingredient::new(
+                "b".to_string(),
+                "bar".to_string(),
+            ))),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
         };
         let si_3 = SectionIngredient {
-            ingredient: Some(Ingredient::new("b".to_string(), "bar".to_string())),
+            ingredient: Some(Box::new(Ingredient::new(
+                "b".to_string(),
+                "bar".to_string(),
+            ))),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
         };
         let r = RecipeDetail::new(

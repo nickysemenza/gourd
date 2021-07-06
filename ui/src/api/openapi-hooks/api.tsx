@@ -401,6 +401,14 @@ export interface PaginatedRecipes {
 }
 
 /**
+ * pages of Recipe
+ */
+export interface PaginatedRecipeWrappers {
+  recipes?: RecipeWrapper[];
+  meta?: Items;
+}
+
+/**
  * pages of IngredientDetail
  */
 export interface PaginatedIngredients {
@@ -1117,6 +1125,51 @@ export const useGetRecipeById = ({
     (paramsInPath: GetRecipeByIdPathParams) =>
       `/recipes/${paramsInPath.recipe_id}`,
     { pathParams: { recipe_id }, ...props }
+  );
+
+export interface GetRecipesByIdsQueryParams {
+  /**
+   * detail ids
+   */
+  recipe_id: string[];
+}
+
+export type GetRecipesByIdsProps = Omit<
+  GetProps<PaginatedRecipeWrappers, unknown, GetRecipesByIdsQueryParams, void>,
+  "path"
+>;
+
+/**
+ * Get recipes
+ *
+ * get recipes by ids
+ */
+export const GetRecipesByIds = (props: GetRecipesByIdsProps) => (
+  <Get<PaginatedRecipeWrappers, unknown, GetRecipesByIdsQueryParams, void>
+    path={`/recipes/bulk`}
+    {...props}
+  />
+);
+
+export type UseGetRecipesByIdsProps = Omit<
+  UseGetProps<
+    PaginatedRecipeWrappers,
+    unknown,
+    GetRecipesByIdsQueryParams,
+    void
+  >,
+  "path"
+>;
+
+/**
+ * Get recipes
+ *
+ * get recipes by ids
+ */
+export const useGetRecipesByIds = (props: UseGetRecipesByIdsProps) =>
+  useGet<PaginatedRecipeWrappers, unknown, GetRecipesByIdsQueryParams, void>(
+    `/recipes/bulk`,
+    props
   );
 
 export interface ConvertIngredientToRecipePathParams {

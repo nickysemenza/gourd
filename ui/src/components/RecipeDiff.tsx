@@ -1,28 +1,46 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { RecipeDetail } from "../api/openapi-fetch";
 import {
   SectionIngredient,
   useGetRecipeById,
   useListIngredients,
+  useGetRecipesByIds,
 } from "../api/openapi-hooks/api";
 import { WasmContext } from "../wasm";
 import Debug from "./Debug";
 import ReactDiffViewer from "react-diff-viewer";
 import {
   flatIngredients,
+  inferGrams,
   IngDetailsById,
   totalFlourMass,
 } from "./RecipeEditorUtils";
+import { EntitySelector } from "./EntitySelector";
+import update from "immutability-helper";
+import { RecipeLink } from "./Misc";
+import { scaledRound } from "../util";
 
 const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   const w = useContext(WasmContext);
-  const { data: r1 } = useGetRecipeById({
-    recipe_id: "rd_d041e06b",
+
+  const [ids, setIds] = useState(["rd_d041e06b", "rd_3f5f67df", ""]);
+  // const { data: r1 } = useGetRecipeById({
+  //   recipe_id: ids[0],
+  // });
+  // const { data: r2 } = useGetRecipeById({
+  //   recipe_id: ids[1],
+  // });
+  // const recipes = !r1 || !r2 || !w ? [] : [r1, r2];
+
+  const { data } = useGetRecipesByIds({
+    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
+    queryParams: {
+      recipe_id: ids,
+    },
+    // lazy: true,
   });
-  const { data: r2 } = useGetRecipeById({
-    recipe_id: "rd_3f5f67df",
-  });
-  const recipes = !r1 || !r2 || !w ? [] : [r1, r2];
+
+  const recipes = data?.recipes || [];
   // let d1 = details[0];
 
   const recipesIngredients = recipes.map((r) =>
@@ -69,31 +87,51 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   );
 
   return (
-    <div>
-      DIFF
+    <div className="flex">
       <table className="table-auto border-collapse border-1 border-gray-500 w-full">
         <thead>
+          <tr>
+            <th className="border border-gray-400">aa</th>
+            {ids.map((id, i) => (
+              <th className="border border-gray-400">
+                <EntitySelector
+                  showKind={["recipe"]}
+                  placeholder={ids[i] || `"Pick a Recipe..."`}
+                  onChange={async (a) => {
+                    console.log(a);
+                    setIds(update(ids, { [i]: { $set: a.rd || "" } }));
+                  }}
+                />
+              </th>
+            ))}
+          </tr>
           <td>aa</td>
           {recipes.map((r) => (
-            <td>{r.detail.name}</td>
+            <td className="border border-gray-400">
+              <RecipeLink recipe={r.detail} />
+            </td>
           ))}
         </thead>
         <tbody>
           {Object.keys(byId).map((eachId) => (
             <tr>
-              <td>
-                {eachId} {ing_hints[eachId]?.ingredient.name}{" "}
+              <td className="border border-gray-400">
+                {/* {eachId} */}
+                {ing_hints[eachId]?.ingredient.name}
               </td>
-              {byId[eachId].map((r, x) => {
-                if (!r) {
-                  return null;
+              {byId[eachId].map((si, x) => {
+                if (!si) {
+                  return <td className="border border-gray-400"></td>;
                 }
-                const bp = Math.round(
-                  (r.grams / totalFlourMass(recipes[x].detail.sections)) * 100
+                const grams =
+                  si.grams || (w && inferGrams(w, si, ing_hints)) || 0;
+                const bp = scaledRound(
+                  (grams / totalFlourMass(recipes[x].detail.sections)) * 100
                 );
                 return (
-                  <td>
-                    {r?.grams || "0"} BP: {bp}
+                  <td className="border border-gray-400">
+                    {/* {r?.grams || "0"} BP: {bp} */}
+                    {bp}%
                   </td>
                 );
               })}
@@ -101,16 +139,6 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
           ))}
         </tbody>
       </table>
-      <Debug data={{ r1, r2, byId, ing_hints }} />
-      {/* <pre>{w.encode_recipe_text(r1.detail)}</pre> */}
-      {/* <pre>{w.encode_recipe_text(r2.detail)}</pre> */}
-      {/* <ReactDiffViewer
-        leftTitle={`${r1.detail.id} - v${r1.detail.version}`}
-        rightTitle={`${r2.detail.id} - v${r2.detail.version}`}
-        oldValue={w.encode_recipe_text(r1.detail)}
-        newValue={w.encode_recipe_text(r2.detail)}
-        splitView={true}
-      /> */}
     </div>
   );
 };

@@ -18,7 +18,7 @@ pub struct MealRecipe {
     #[serde(rename = "multiplier")]
     pub multiplier: f64,
     #[serde(rename = "recipe")]
-    pub recipe: crate::models::RecipeDetail,
+    pub recipe: Box<crate::models::RecipeDetail>,
 }
 
 impl MealRecipe {
@@ -26,7 +26,7 @@ impl MealRecipe {
     pub fn new(multiplier: f64, recipe: crate::models::RecipeDetail) -> MealRecipe {
         MealRecipe {
             multiplier,
-            recipe,
+            recipe: Box::new(recipe),
         }
     }
 }

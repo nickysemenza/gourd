@@ -15,9 +15,9 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UnitMapping {
     #[serde(rename = "a")]
-    pub a: crate::models::Amount,
+    pub a: Box<crate::models::Amount>,
     #[serde(rename = "b")]
-    pub b: crate::models::Amount,
+    pub b: Box<crate::models::Amount>,
     /// source of the mapping
     #[serde(rename = "source")]
     pub source: String,
@@ -27,8 +27,8 @@ impl UnitMapping {
     /// mappings
     pub fn new(a: crate::models::Amount, b: crate::models::Amount, source: String) -> UnitMapping {
         UnitMapping {
-            a,
-            b,
+            a: Box::new(a),
+            b: Box::new(b),
             source,
         }
     }

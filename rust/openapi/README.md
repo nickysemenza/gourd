@@ -55,6 +55,7 @@ Class | Method | HTTP request | Description
  - [PaginatedIngredients](docs/PaginatedIngredients.md)
  - [PaginatedMeals](docs/PaginatedMeals.md)
  - [PaginatedPhotos](docs/PaginatedPhotos.md)
+ - [PaginatedRecipeWrappers](docs/PaginatedRecipeWrappers.md)
  - [PaginatedRecipes](docs/PaginatedRecipes.md)
  - [Recipe](docs/Recipe.md)
  - [RecipeDependency](docs/RecipeDependency.md)

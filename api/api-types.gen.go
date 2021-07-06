@@ -304,6 +304,14 @@ type PaginatedPhotos struct {
 	Photos *[]GooglePhoto `json:"photos,omitempty"`
 }
 
+// PaginatedRecipeWrappers defines model for PaginatedRecipeWrappers.
+type PaginatedRecipeWrappers struct {
+
+	// A generic list (for pagination use)
+	Meta    *Items           `json:"meta,omitempty"`
+	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
+}
+
 // PaginatedRecipes defines model for PaginatedRecipes.
 type PaginatedRecipes struct {
 
@@ -592,6 +600,13 @@ type ListRecipesParams struct {
 
 // CreateRecipesJSONBody defines parameters for CreateRecipes.
 type CreateRecipesJSONBody RecipeWrapper
+
+// GetRecipesByIdsParams defines parameters for GetRecipesByIds.
+type GetRecipesByIdsParams struct {
+
+	// detail ids
+	RecipeId []string `json:"recipe_id"`
+}
 
 // SearchParams defines parameters for Search.
 type SearchParams struct {

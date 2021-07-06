@@ -17,7 +17,7 @@ pub struct PaginatedIngredients {
     #[serde(rename = "ingredients", skip_serializing_if = "Option::is_none")]
     pub ingredients: Option<Vec<crate::models::IngredientDetail>>,
     #[serde(rename = "meta", skip_serializing_if = "Option::is_none")]
-    pub meta: Option<crate::models::Items>,
+    pub meta: Option<Box<crate::models::Items>>,
 }
 
 impl PaginatedIngredients {

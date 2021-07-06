@@ -31,6 +31,21 @@ pub enum FoodNutrientUnit {
 
 }
 
+impl ToString for FoodNutrientUnit {
+    fn to_string(&self) -> String {
+        match self {
+            Self::UG => String::from("UG"),
+            Self::G => String::from("G"),
+            Self::IU => String::from("IU"),
+            Self::KJ => String::from("kJ"),
+            Self::KCAL => String::from("KCAL"),
+            Self::MG => String::from("MG"),
+            Self::MGATE => String::from("MG_ATE"),
+            Self::SPGR => String::from("SP_GR"),
+        }
+    }
+}
+
 
 
 

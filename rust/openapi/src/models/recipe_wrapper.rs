@@ -18,7 +18,7 @@ pub struct RecipeWrapper {
     #[serde(rename = "id")]
     pub id: String,
     #[serde(rename = "detail")]
-    pub detail: crate::models::RecipeDetail,
+    pub detail: Box<crate::models::RecipeDetail>,
 }
 
 impl RecipeWrapper {
@@ -26,7 +26,7 @@ impl RecipeWrapper {
     pub fn new(id: String, detail: crate::models::RecipeDetail) -> RecipeWrapper {
         RecipeWrapper {
             id,
-            detail,
+            detail: Box::new(detail),
         }
     }
 }

@@ -15,7 +15,7 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct FoodNutrient {
     #[serde(rename = "nutrient")]
-    pub nutrient: crate::models::Nutrient,
+    pub nutrient: Box<crate::models::Nutrient>,
     #[serde(rename = "amount")]
     pub amount: f64,
     #[serde(rename = "data_points")]
@@ -26,7 +26,7 @@ impl FoodNutrient {
     /// todo
     pub fn new(nutrient: crate::models::Nutrient, amount: f64, data_points: i32) -> FoodNutrient {
         FoodNutrient {
-            nutrient,
+            nutrient: Box::new(nutrient),
             amount,
             data_points,
         }

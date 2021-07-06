@@ -11,6 +11,7 @@ type Option = {
   value: string;
   kind: IngredientKind;
   fdc_id: number | undefined;
+  rd?: string;
 };
 
 export const EntitySelector: React.FC<{
@@ -41,6 +42,7 @@ export const EntitySelector: React.FC<{
           value: r.id,
           kind: "recipe",
           fdc_id: undefined,
+          rd: r.detail.id,
         };
       });
     const ingredientOptions: Option[] = (res.ingredients || []).map((i) => {
