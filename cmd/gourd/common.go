@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
 
+	jaegerp "go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	"go.opentelemetry.io/otel/propagation"
@@ -43,7 +44,7 @@ func initTracer() error {
 			}),
 			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
 		)
-		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}, jaegerp.Jaeger{}))
 		return err
 	}
 

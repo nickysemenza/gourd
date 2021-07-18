@@ -21,7 +21,13 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import { getAPIURL, isLoggedIn, onAPIRequest, onAPIError } from "./config";
+import {
+  getAPIURL,
+  isLoggedIn,
+  onAPIRequest,
+  onAPIError,
+  getBaseURL,
+} from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
@@ -30,6 +36,49 @@ import { ToastContainer } from "react-toastify";
 import IngredientDetail from "./pages/IngredientDetail";
 import { WasmContextProvider } from "./wasm";
 import Graph from "./pages/Graph";
+import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
+
+import { WebTracerProvider } from "@opentelemetry/web";
+import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
+import {
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+} from "@opentelemetry/tracing";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { B3Propagator } from "@opentelemetry/propagator-b3";
+import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
+import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+
+const exporter = new CollectorTraceExporter({
+  // url: "http://localhost:55681/v1/traces",
+  // serviceName: "auto-instrumentations-web",
+});
+
+const provider = new WebTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [
+    new FetchInstrumentation({
+      propagateTraceHeaderCorsUrls: /.+/,
+    }),
+    // getWebAutoInstrumentations({
+    //   // load custom configuration for xml-http-request instrumentation
+    //   "@opentelemetry/instrumentation-xml-http-request": {
+    //     clearTimingResources: true,
+    //   },
+    // }),
+  ],
+});
+provider.register({
+  contextManager: new ZoneContextManager(),
+  // propagator: new B3Propagator(),
+  propagator: new JaegerPropagator(),
+});
+
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (

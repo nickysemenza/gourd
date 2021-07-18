@@ -34,6 +34,28 @@ services:
       - 14268:14268
       - 9411:9411
     image: "jaegertracing/all-in-one:latest"
+  # Collector
+  collector:
+    image: otel/opentelemetry-collector:0.25.0
+    command: ["--config=/conf/collector-config.yaml", "--log-level=DEBUG"]
+    volumes:
+      - ./collector-config.yaml:/conf/collector-config.yaml
+    ports:
+      - "9464:9464"
+      - "4317:4317"
+      - "55680:55680"
+      - "55681:55681"
+    depends_on:
+      - jaeger
+
+  # Prometheus
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
   gourd:
     build:
       context: .
