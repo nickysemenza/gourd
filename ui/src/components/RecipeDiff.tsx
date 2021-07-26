@@ -19,18 +19,15 @@ import { EntitySelector } from "./EntitySelector";
 import update from "immutability-helper";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
+import { useLocation } from "react-router-dom";
+import queryString from "query-string";
 
 const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   const w = useContext(WasmContext);
 
-  const [ids, setIds] = useState(["rd_d041e06b", "rd_3f5f67df", ""]);
-  // const { data: r1 } = useGetRecipeById({
-  //   recipe_id: ids[0],
-  // });
-  // const { data: r2 } = useGetRecipeById({
-  //   recipe_id: ids[1],
-  // });
-  // const recipes = !r1 || !r2 || !w ? [] : [r1, r2];
+  // const [ids, setIds] = useState(["rd_d041e06b", "rd_3f5f67df", ""]);
+  const url = queryString.parse(useLocation().search).recipes;
+  const ids = url ? (Array.isArray(url) ? url : [url]) : [];
 
   const { data } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
@@ -99,7 +96,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
                   placeholder={ids[i] || `"Pick a Recipe..."`}
                   onChange={async (a) => {
                     console.log(a);
-                    setIds(update(ids, { [i]: { $set: a.rd || "" } }));
+                    // setIds(update(ids, { [i]: { $set: a.rd || "" } }));
                   }}
                 />
               </th>

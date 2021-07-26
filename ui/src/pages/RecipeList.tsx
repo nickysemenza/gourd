@@ -8,6 +8,9 @@ import PaginatedTable, {
 import { RecipeLink } from "../components/Misc";
 import { Code } from "../util";
 import { Helmet } from "react-helmet";
+import update from "immutability-helper";
+import { Link } from "react-router-dom";
+import queryString from "query-string";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -15,7 +18,7 @@ const RecipeList: React.FC = () => {
   //   () => queryString.stringify(params as any),
   //   [params]
   // );
-
+  const [checked, setChecked] = useState(new Set<string>());
   let initialParams: PaginationParameters = {
     offset: 0,
     limit: 2,
@@ -54,6 +57,21 @@ const RecipeList: React.FC = () => {
                   <li>
                     <div className="flex">
                       <RecipeLink recipe={i} />
+                      <input
+                        type="checkbox"
+                        className="form-checkbox"
+                        checked={checked.has(i.id)}
+                        onClick={() =>
+                          setChecked(
+                            update(
+                              checked,
+                              checked.has(i.id)
+                                ? { $remove: [i.id] }
+                                : { $add: [i.id] }
+                            )
+                          )
+                        }
+                      />
                     </div>
                   </li>
                 ))}
@@ -72,7 +90,7 @@ const RecipeList: React.FC = () => {
       //   ),
       // },
     ],
-    []
+    [checked]
   );
 
   return (
@@ -88,6 +106,17 @@ const RecipeList: React.FC = () => {
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />
+      {checked.size > 0 && (
+        <>
+          <Link
+            to={`/playground?${queryString.stringify({
+              recipes: [...checked.keys()],
+            })}`}
+          >
+            Compare {checked.size} recipes
+          </Link>
+        </>
+      )}
       <Debug data={{ error }} />
     </div>
   );
