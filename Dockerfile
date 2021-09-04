@@ -12,7 +12,7 @@ COPY . .
 RUN make bin/gourd
 
 # FROM debian:buster
-FROM alpine:20210212
+FROM alpine:20210804
 RUN apk add --no-cache ca-certificates
 # https://stackoverflow.com/a/35613430/1374045
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
