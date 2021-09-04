@@ -50,7 +50,7 @@ func (s *Server) Run(_ context.Context) error {
 
 	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
 	if err != nil {
-		return nil
+		return err
 	}
 
 	skipper := func(c echo.Context) bool {

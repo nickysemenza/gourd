@@ -1,6 +1,6 @@
 {
   "extends": ["config:base"],
-  "enabledManagers": ["dockerfile"],
+  "enabledManagers": ["dockerfile", "github-actions", "docker-compose"],
   "packageRules": [
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],

@@ -13,3 +13,9 @@ linters:
     - unused
   disable:
     - gomnd
+run:
+  timeout: 3m
+
+  skip-dirs:
+    - ui
+    - rust
