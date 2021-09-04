@@ -189,32 +189,37 @@ def sc(x):
 #[cfg(test)]
 mod tests {
     use super::*;
-    use actix_web::{dev::Service, Error};
-    use actix_web::{http, test, web, App};
+    use actix_web::Error;
+    use actix_web::{test, web, App};
 
     #[actix_rt::test]
     async fn test_parse() -> Result<(), Error> {
-        let app = test::init_service(
+        let mut app = test::init_service(
             App::new().service(web::resource("/parse").route(web::get().to(parser))),
         )
         .await;
 
         let req = test::TestRequest::get()
-            .uri("/parse?text=1%20cup%20(120%20grams)%20flour,%20lighty%20sifted")
+            .uri("/parse?text=1%20cup%20(120%20grams)%20flour,%20lightly%20sifted")
             .param("text", "1 cup flour")
             .to_request();
-        let resp = app.call(req).await.unwrap();
+        // let resp = app.call(req).await.unwrap();
 
-        assert_eq!(resp.status(), http::StatusCode::OK);
+        let resp = test::call_service(&mut app, req).await;
+        assert!(resp.status().is_success());
 
-        let response_body = match resp.response().body().as_ref() {
-            Some(actix_web::body::Body::Bytes(bytes)) => bytes,
+        // assert_eq!(resp.status(), http::StatusCode::OK);
+
+        let response_body: String = match resp.into_body() {
+            actix_web::body::AnyBody::Bytes(bytes) => {
+                std::str::from_utf8(&bytes).unwrap().to_string()
+            }
             _ => panic!("Response error"),
         };
 
         assert_eq!(
             response_body,
-            r##"{"id":"","kind":"ingredient","ingredient":{"id":"","name":"flour"},"grams":120.0,"amount":1.0,"unit":"cup","adjective":"lighty sifted"}"##
+            r##"{"id":"","kind":"ingredient","ingredient":{"id":"","name":"flour"},"grams":120.0,"amount":1.0,"unit":"cup","adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
         );
 
         Ok(())

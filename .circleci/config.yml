@@ -3,12 +3,12 @@
 # Check https://circleci.com/docs/2.0/language-go/ for more details
 version: 2.1
 orbs:
-  codecov: codecov/codecov@1.1.5
+  codecov: codecov/codecov@3.0.0
 jobs:
   build_backend:
     docker:
       # specify the version
-      - image: circleci/golang:1.16
+      - image: circleci/golang:1.17
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: gourd
