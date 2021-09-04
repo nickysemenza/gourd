@@ -244,16 +244,19 @@ mod tests {
     fn test_encode() {
         let si_1 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "foo".to_string()))),
+            original: Some("12 g foo".to_string()),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
             amount: Some(1.5),
             unit: Some("cups".to_string()),
+            original: Some("14 g / 1.5 cups bar".to_string()),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
+            original: Some("2 g bar".to_string()),
             ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
         };
         let r = RecipeDetail::new(
@@ -328,6 +331,7 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
+                original: Some("118 grams / 0.5 cups water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()
@@ -341,6 +345,7 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cups".to_string()),
+                original: Some("118 ml / 0.5 cups water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()
@@ -353,6 +358,7 @@ mod tests {
             SectionIngredient {
                 amount: Some(0.5),
                 unit: Some("cup".to_string()),
+                original: Some("4 oz / 1/2 cup water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()

@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v2.5.2
         with:
-          version: v1.33
+          version: latest
   build:
     # https://github.com/golangci/golangci-lint-action
     name: Go ${{ matrix.go }} test
