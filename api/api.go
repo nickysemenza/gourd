@@ -84,6 +84,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 		Adjective: zero.StringFromPtr(i.Adjective),
 		Original:  zero.StringFromPtr(i.Original),
 		Optional:  zero.BoolFromPtr(i.Optional),
+		Amounts:   []db.Amount{},
 	}
 	for _, amt := range i.Amounts {
 		si.Amounts = append(si.Amounts, db.Amount{
@@ -226,6 +227,7 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 				Adjective: i.Adjective.Ptr(),
 				Original:  i.Original.Ptr(),
 				Optional:  i.Optional.Ptr(),
+				Amounts:   []Amount{},
 			}
 			for _, amt := range i.Amounts {
 				item.Amounts = append(item.Amounts, Amount{Unit: amt.Unit, Value: amt.Value})

@@ -47,11 +47,9 @@ type Amounts []Amount
 func (a *Amounts) Scan(val interface{}) error {
 	switch v := val.(type) {
 	case []byte:
-		json.Unmarshal(v, &a)
-		return nil
+		return json.Unmarshal(v, &a)
 	case string:
-		json.Unmarshal([]byte(v), &a)
-		return nil
+		return json.Unmarshal([]byte(v), &a)
 	default:
 		return fmt.Errorf("Unsupported type: %T", v)
 	}

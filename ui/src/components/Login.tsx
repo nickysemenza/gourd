@@ -18,7 +18,7 @@ import {
 const Login: React.FC = () => {
   const api = new AuthenticationApi(getOpenapiFetchConfig());
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_cookies, setCookie] = useCookies(["cookie-name"]);
+  const [_cookies, setCookie] = useCookies([COOKIE_NAME]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_auth, setAuth] = useState<AuthResp>();
 

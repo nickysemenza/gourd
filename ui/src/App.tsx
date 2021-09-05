@@ -46,6 +46,10 @@ diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const exporter = new CollectorTraceExporter({
   url: "http://localhost:4318/v1/traces",
+  // https://github.com/open-telemetry/opentelemetry-js/issues/2321#issuecomment-889861080
+  headers: {
+    "Content-Type": "application/json",
+  },
   // serviceName: "auto-instrumentations-web",
 });
 
