@@ -45,7 +45,7 @@ import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const exporter = new CollectorTraceExporter({
-  // url: "http://localhost:55681/v1/traces",
+  url: "http://localhost:4318/v1/traces",
   // serviceName: "auto-instrumentations-web",
 });
 

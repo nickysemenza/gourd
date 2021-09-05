@@ -13,3 +13,6 @@ ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch 
 serde = { version = "1.0", features = ["derive"] }
 petgraph = "0.5.1"
 
+
+[dev-dependencies]
+pretty_assertions = "0.7.2"
