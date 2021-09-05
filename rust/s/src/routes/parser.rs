@@ -1,14 +1,14 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::convert_to;
 use openapi::models::{
-    IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
+    Amount, IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
     SectionInstruction,
 };
 use opentelemetry::{global, trace::Tracer};
 use opentelemetry::{trace::get_active_span, KeyValue};
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
-use sqlx::{types::BigDecimal, PgPool};
+use sqlx::PgPool;
 
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
@@ -22,15 +22,14 @@ fn si_to_api(r: SI) -> SectionIngredient {
         // sort: r.sort,
         ingredient: None,
         recipe: None,
-        amount: match r.amount {
-            Some(f) => bigdecimal::ToPrimitive::to_f64(&f),
-            None => None,
-        },
-        unit: r.unit,
-        grams: match r.grams {
-            Some(f) => bigdecimal::ToPrimitive::to_f64(&f).unwrap_or_default(),
-            None => 0.0,
-        },
+        amounts: r
+            .amounts
+            .iter()
+            .map(|a| Amount {
+                unit: a.unit.clone(),
+                value: a.value,
+            })
+            .collect(),
         adjective: r.adjective,
         optional: r.optional,
         original: r.original,
@@ -99,9 +98,7 @@ pub struct SI {
     sort: Option<i32>,
     ingredient: Option<String>,
     recipe: Option<String>,
-    amount: Option<BigDecimal>,
-    unit: Option<String>,
-    grams: Option<BigDecimal>,
+    amounts: sqlx::types::Json<Vec<Amount>>,
     adjective: Option<String>,
     optional: Option<bool>,
     original: Option<String>,
@@ -112,7 +109,8 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     let res = sqlx::query_as!(
         SI,
         r#"
-    select * from recipe_section_ingredients;
+    select section, id, sort, ingredient, recipe, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
+     adjective, optional, original, substitutes_for from recipe_section_ingredients;
             "#,
     )
     .fetch_all(pool)
@@ -120,7 +118,7 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
 
     // dbg!(res);
     // let res2 = res.unwrap();
-    Ok(res)
+    Ok(dbg!(res))
 }
 
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
@@ -175,7 +173,7 @@ def sc(x):
                 gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredient::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
-                    0.0,
+                    vec![],
                 ))
             })
             .collect(),

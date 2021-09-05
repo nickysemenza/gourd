@@ -13,7 +13,7 @@ import {
 import update from "immutability-helper";
 import { wasm } from "../wasm";
 import { try_convert } from "./UnitConvertDemo";
-import { UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
+import { Amount, UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -151,11 +151,9 @@ export const addIngredient = (recipe: RecipeWrapper, sectionID: number) =>
             $push: [
               {
                 id: "",
-                grams: 1,
                 kind: "ingredient",
                 // info: { name: "", id: "", __typename: "Ingredient" },
-                amount: 0,
-                unit: "",
+                amounts: [],
                 adjective: "",
                 optional: false,
               },
@@ -475,7 +473,7 @@ export const calCalc = (
         if (fdc_id !== undefined) {
           const hint = hints[fdc_id];
           if (hint !== undefined) {
-            const scalingFactor = (si.grams / 100) * multiplier;
+            const scalingFactor = (getGramsFromSI(si) / 100) * multiplier;
             const cal = getCalories(hint) * scalingFactor;
             const ingNutrients = new Map<string, number>();
             hint.nutrients.forEach((n) => {
@@ -494,7 +492,9 @@ export const calCalc = (
             });
             totalCal += cal;
             console.log(
-              `${si.ingredient.name}: ${si.grams}g = ${scalingFactor}x of ${hint.description}`,
+              `${si.ingredient.name}: ${getGramsFromSI(
+                si
+              )}g = ${scalingFactor}x of ${hint.description}`,
               cal
             );
           }
@@ -544,6 +544,7 @@ export const getHint = (
   const hint = ing_hints[ingredientId];
   return !!hint ? hint : undefined;
 };
+// TODO: move this to backend
 export const inferGrams = (
   w: wasm,
   ingredient: SectionIngredient,
@@ -551,34 +552,44 @@ export const inferGrams = (
 ): number | undefined => {
   const hint = getHint(ingredient, ing_hints);
   if (!hint) return undefined;
-  let { unit, amount } = ingredient;
-  if (!unit || !amount || unit === "" || amount === 0) return undefined;
+  return (
+    ingredient.amounts
+      .filter((a) => !isGram(a))
+      .map(({ unit, value }) => {
+        if (!unit || !value || unit === "" || value === 0) return undefined;
 
-  const targets = [
-    UnitConversionRequestTargetEnum.WEIGHT,
-    UnitConversionRequestTargetEnum.VOLUME,
-  ];
-  let res = targets.map(
-    (t) =>
-      try_convert(
-        w,
-        hint.unit_mappings,
-        [{ unit: unit || "", value: amount || 0 }],
-        t,
-        ingredient.ingredient?.name
-      )?.value
+        const targets = [
+          UnitConversionRequestTargetEnum.WEIGHT,
+          UnitConversionRequestTargetEnum.VOLUME,
+        ];
+        let res = targets.map(
+          (t) =>
+            try_convert(
+              w,
+              hint.unit_mappings,
+              [{ unit: unit || "", value: value || 0 }],
+              t,
+              ingredient.ingredient?.name
+            )?.value
+        );
+        return res.find((x) => x !== undefined && x !== 0);
+      })
+      .filter((x) => x !== undefined)
+      .pop() || 0
   );
-  return res.find((x) => x !== undefined && x !== 0);
 };
-
+export const isGram = (a: Amount) =>
+  a.unit === "grams" || a.unit === "gram" || a.unit === "g";
+export const getGramsFromSI = (si: SectionIngredient) =>
+  (si.amounts.filter((a) => isGram(a)).pop() || { value: 0 }).value;
 const getGrams = (
   w: wasm,
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById
-) =>
-  ingredient.grams === 0
-    ? inferGrams(w, ingredient, ing_hints)
-    : ingredient.grams;
+) => {
+  const grams = getGramsFromSI(ingredient);
+  return grams || inferGrams(w, ingredient, ing_hints);
+};
 const w_convert = (
   w: wasm,
   ingredient: SectionIngredient,
@@ -609,7 +620,7 @@ export const totalFlourMass = (sections: RecipeSection[]) =>
     (acc, section) =>
       acc +
       section.ingredients
-        .filter((item) => item.ingredient?.name.includes("flour"))
-        .reduce((acc, ingredient) => acc + ingredient?.grams, 0),
+        .filter((item) => item.ingredient?.name.toLowerCase().includes("flour"))
+        .reduce((acc, ingredient) => acc + getGramsFromSI(ingredient), 0),
     0
   );

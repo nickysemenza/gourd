@@ -23,15 +23,9 @@ pub struct SectionIngredient {
     pub recipe: Option<Box<crate::models::RecipeDetail>>,
     #[serde(rename = "ingredient", skip_serializing_if = "Option::is_none")]
     pub ingredient: Option<Box<crate::models::Ingredient>>,
-    /// weight in grams
-    #[serde(rename = "grams")]
-    pub grams: f64,
-    /// amount
-    #[serde(rename = "amount", skip_serializing_if = "Option::is_none")]
-    pub amount: Option<f64>,
-    /// unit
-    #[serde(rename = "unit", skip_serializing_if = "Option::is_none")]
-    pub unit: Option<String>,
+    /// the various measures
+    #[serde(rename = "amounts")]
+    pub amounts: Vec<crate::models::Amount>,
     /// adjective
     #[serde(rename = "adjective", skip_serializing_if = "Option::is_none")]
     pub adjective: Option<String>,
@@ -48,15 +42,13 @@ pub struct SectionIngredient {
 
 impl SectionIngredient {
     /// Ingredients in a single section
-    pub fn new(id: String, kind: crate::models::IngredientKind, grams: f64) -> SectionIngredient {
+    pub fn new(id: String, kind: crate::models::IngredientKind, amounts: Vec<crate::models::Amount>) -> SectionIngredient {
         SectionIngredient {
             id,
             kind,
             recipe: None,
             ingredient: None,
-            grams,
-            amount: None,
-            unit: None,
+            amounts,
             adjective: None,
             optional: None,
             original: None,

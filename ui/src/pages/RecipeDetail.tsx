@@ -13,6 +13,7 @@ import {
   SectionIngredient,
   useGetFoodsByIds,
   useListIngredients,
+  Amount,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
 import {
@@ -22,6 +23,7 @@ import {
   FoodsById,
   getFDCIds,
   IngDetailsById,
+  isGram,
   Override,
   RecipeTweaks,
   setDetail,
@@ -127,6 +129,7 @@ const RecipeDetail: React.FC = () => {
   };
   const saveUpdate = async () => {
     if (recipe) {
+      console.log({ recipe });
       const updated = await post(recipe);
       setEdit(false);
       console.log({ updated });
@@ -180,16 +183,23 @@ const RecipeDetail: React.FC = () => {
     subIndex,
     value,
     attr,
+    amountIndex,
   }: UpdateIngredientProps) => {
     const foo: Spec<SectionIngredient> = {
-      grams: {
-        $apply: (v) => (attr === "grams" ? parseFloat(value) : v),
-      },
-      amount: {
-        $apply: (v) => (attr === "amount" ? parseFloat(value) : v),
-      },
-      unit: {
-        $apply: (v) => (attr === "unit" ? value : v),
+      amounts: {
+        $apply: (v: Amount[]) => {
+          if (amountIndex && amountIndex > 0) {
+            switch (attr) {
+              case "grams":
+              case "amount":
+                v[amountIndex].value = parseFloat(value);
+                break;
+              case "unit":
+                v[amountIndex].unit = value;
+            }
+          }
+          return v;
+        },
       },
       adjective: {
         $apply: (v) => (attr === "adjective" ? value : v),
@@ -217,7 +227,7 @@ const RecipeDetail: React.FC = () => {
       );
     } else {
       const newValue = parseFloat(value.endsWith(".") ? value + "0" : value);
-      const { grams, amount } =
+      const { amounts } =
         subIndex === undefined
           ? detail.sections[sectionID]!.ingredients[ingredientID]
           : (detail.sections[sectionID]!.ingredients[ingredientID]
@@ -234,7 +244,9 @@ const RecipeDetail: React.FC = () => {
 
         setMultiplierW(
           Math.round(
-            (newValue / (attr === "grams" ? grams : amount || 0) +
+            (newValue /
+              (amounts.filter((x) => isGram(x) === (attr === "grams")).pop()
+                ?.value || 0) +
               Number.EPSILON) *
               100
           ) / 100
@@ -400,7 +412,7 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      <pre>{w.encode_recipe_text(recipe.detail)}</pre>
+      {/* <pre>{w.encode_recipe_text(recipe.detail)}</pre> */}
       <p className="text-lg font-bold">meals</p>
 
       <Nutrition

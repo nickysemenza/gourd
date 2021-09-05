@@ -1,22 +1,19 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { RecipeDetail } from "../api/openapi-fetch";
 import {
   SectionIngredient,
-  useGetRecipeById,
   useListIngredients,
   useGetRecipesByIds,
 } from "../api/openapi-hooks/api";
 import { WasmContext } from "../wasm";
-import Debug from "./Debug";
-import ReactDiffViewer from "react-diff-viewer";
 import {
   flatIngredients,
+  getGramsFromSI,
   inferGrams,
   IngDetailsById,
   totalFlourMass,
 } from "./RecipeEditorUtils";
 import { EntitySelector } from "./EntitySelector";
-import update from "immutability-helper";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { useLocation } from "react-router-dom";
@@ -121,16 +118,13 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
                   return <td className="border border-gray-400"></td>;
                 }
                 const grams =
-                  si.grams || (w && inferGrams(w, si, ing_hints)) || 0;
+                  getGramsFromSI(si) ||
+                  (w && inferGrams(w, si, ing_hints)) ||
+                  0;
                 const bp = scaledRound(
                   (grams / totalFlourMass(recipes[x].detail.sections)) * 100
                 );
-                return (
-                  <td className="border border-gray-400">
-                    {/* {r?.grams || "0"} BP: {bp} */}
-                    {bp}%
-                  </td>
-                );
+                return <td className="border border-gray-400">{bp}%</td>;
               })}
             </tr>
           ))}

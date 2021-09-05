@@ -77,7 +77,7 @@ func TestAPI(t *testing.T) {
 			Detail: RecipeDetail{Name: rName,
 				Sections: []RecipeSection{{Duration: &TimeRange{Min: 3},
 					Instructions: []SectionInstruction{{Instruction: "mix"}},
-					Ingredients:  []SectionIngredient{{Grams: w, Ingredient: &newIngredient, Kind: "ingredient"}},
+					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &newIngredient, Kind: "ingredient"}},
 				}}},
 		}
 		resultRecipe := makeRecipe(newRecipe)
@@ -87,9 +87,9 @@ func TestAPI(t *testing.T) {
 
 		newRecipe.Detail.Name += "sub"
 		newRecipe.Detail.Sections[0].Ingredients = append(newRecipe.Detail.Sections[0].Ingredients, SectionIngredient{
-			Grams:  w,
-			Recipe: &RecipeDetail{Id: resultRecipe.Id},
-			Kind:   "recipe"})
+			Amounts: []Amount{{Unit: "grams", Value: w}},
+			Recipe:  &RecipeDetail{Id: resultRecipe.Id},
+			Kind:    "recipe"})
 		makeRecipe(newRecipe)
 
 	}

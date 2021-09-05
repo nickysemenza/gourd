@@ -3,13 +3,17 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/common"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // IngredientByName retrieves an ingredient by name, creating it if it does not exist.
@@ -59,7 +63,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
 	ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
-		"grams", "amount", "unit", "adjective", "optional", "original", "substitutes_for")
+		"amounts", "adjective", "optional", "original", "substitutes_for")
 
 	var hasInstructions, hasIngredients bool
 	for _, s := range r.Sections {
@@ -71,8 +75,13 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		for _, i := range s.Ingredients {
 			hasIngredients = true
 
+			amounts, err := json.Marshal(i.Amounts)
+			if err != nil {
+				return fmt.Errorf("failed to insert sections: %w", err)
+			}
+			spew.Dump(amounts)
 			ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
-				i.Grams, i.Amount, i.Unit, i.Adjective, i.Optional, i.Original, i.SubsFor)
+				string(amounts), i.Adjective, i.Optional, i.Original, i.SubsFor)
 		}
 
 	}
@@ -166,6 +175,8 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 func (c *Client) InsertRecipe(ctx context.Context, r *RecipeDetail) (*RecipeDetail, error) {
 	ctx, span := c.tracer.Start(ctx, "InsertRecipe")
 	defer span.End()
+
+	span.AddEvent("got detail", trace.WithAttributes(attribute.String("id", r.Id), attribute.String("recipe", spew.Sdump(r))))
 
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {

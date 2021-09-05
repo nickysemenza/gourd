@@ -21,13 +21,7 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import {
-  getAPIURL,
-  isLoggedIn,
-  onAPIRequest,
-  onAPIError,
-  getBaseURL,
-} from "./config";
+import { getAPIURL, isLoggedIn, onAPIRequest, onAPIError } from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
@@ -46,7 +40,6 @@ import {
 } from "@opentelemetry/tracing";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
-import { B3Propagator } from "@opentelemetry/propagator-b3";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);

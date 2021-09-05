@@ -17,6 +17,7 @@ import (
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -80,12 +81,15 @@ func transformIngredient(dbr db.Ingredient) Ingredient {
 func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {
 	si := db.SectionIngredient{
 		Id:        i.Id,
-		Grams:     zero.FloatFrom(i.Grams),
-		Amount:    zero.FloatFromPtr(i.Amount),
-		Unit:      zero.StringFromPtr(i.Unit),
 		Adjective: zero.StringFromPtr(i.Adjective),
 		Original:  zero.StringFromPtr(i.Original),
 		Optional:  zero.BoolFromPtr(i.Optional),
+	}
+	for _, amt := range i.Amounts {
+		si.Amounts = append(si.Amounts, db.Amount{
+			Unit:  amt.Unit,
+			Value: amt.Value,
+		})
 	}
 	switch i.Kind {
 	case IngredientKind_recipe:
@@ -219,12 +223,12 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 		for _, i := range d.Ingredients {
 			item := SectionIngredient{
 				Id:        i.Id,
-				Grams:     i.Grams.Float64,
-				Amount:    i.Amount.Ptr(),
-				Unit:      i.Unit.Ptr(),
 				Adjective: i.Adjective.Ptr(),
 				Original:  i.Original.Ptr(),
 				Optional:  i.Optional.Ptr(),
+			}
+			for _, amt := range i.Amounts {
+				item.Amounts = append(item.Amounts, Amount{Unit: amt.Unit, Value: amt.Value})
 			}
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
@@ -324,6 +328,10 @@ func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetail) 
 	return nil
 }
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrapper, error) {
+	ctx, span := a.tracer.Start(ctx, "CreateRecipe")
+	defer span.End()
+
+	span.AddEvent("got wrapper", trace.WithAttributes(attribute.String("id", r.Id), attribute.String("recipe", spew.Sdump(r))))
 	dbVersion, err := a.recipeWrappertoDB(ctx, r)
 	if err != nil {
 		return nil, err

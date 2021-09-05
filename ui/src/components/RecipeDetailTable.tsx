@@ -36,6 +36,8 @@ import {
   getHint,
   getStats,
   totalFlourMass,
+  getGramsFromSI,
+  isGram,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -50,6 +52,7 @@ export interface UpdateIngredientProps {
   subIndex?: number;
   value: string;
   attr: "grams" | "name" | "amount" | "unit" | "adjective" | "optional";
+  amountIndex?: number;
 }
 
 export interface TableProps {
@@ -110,7 +113,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
     y: number,
     subIndex?: number
   ) => {
-    const bp = Math.round((ingredient.grams / flourMass) * 100);
+    const bp = Math.round((getGramsFromSI(ingredient) / flourMass) * 100);
     const { edit } = tweaks;
     const isSub = subIndex !== undefined;
     const hint = getHint(ingredient, ing_hints);
@@ -124,6 +127,16 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       tweaks.multiplier
     );
 
+    let ingIndex = -1;
+    let gramIndex = -1;
+    ingredient.amounts.forEach((a, i) => {
+      if (gramIndex === -1 && isGram(a)) {
+        gramIndex = i;
+      }
+      if (ingIndex === -1 && !isGram(a)) {
+        ingIndex = i;
+      }
+    });
     const placeholderGrams = w && inferGrams(w, ingredient, ing_hints);
     return (
       <div className="flex flex-col">
@@ -144,7 +157,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 x,
                 y,
                 subIndex,
-                ingredient.grams || 0,
+                gramIndex === -1 ? 0 : ingredient.amounts[gramIndex].value,
                 "grams"
               )}
               pValue={placeholderGrams && tweaks.multiplier * placeholderGrams}
@@ -157,6 +170,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                   subIndex,
                   value: e,
                   attr: "grams",
+                  amountIndex: gramIndex,
                 })
               }
             />
@@ -217,7 +231,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               x,
               y,
               subIndex,
-              ingredient.amount || 0,
+              ingIndex === -1 ? 0 : ingredient.amounts[ingIndex].value,
               "amount"
             )}
             onChange={(e) =>
@@ -227,6 +241,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 subIndex,
                 value: e,
                 attr: "amount",
+                amountIndex: ingIndex,
               })
             }
           />
@@ -234,7 +249,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             data-cy="unit-input"
             width={"full"}
             edit={edit}
-            value={ingredient.unit || ""}
+            value={ingIndex === -1 ? "" : ingredient.amounts[ingIndex].unit}
             onChange={(e) =>
               updateIngredient({
                 sectionID: x,
@@ -242,6 +257,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 subIndex,
                 value: e,
                 attr: "unit",
+                amountIndex: ingIndex,
               })
             }
           />

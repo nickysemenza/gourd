@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    Amount,
+    AmountFromJSON,
+    AmountFromJSONTyped,
+    AmountToJSON,
     Ingredient,
     IngredientFromJSON,
     IngredientFromJSONTyped,
@@ -59,23 +63,11 @@ export interface SectionIngredient {
      */
     ingredient?: Ingredient;
     /**
-     * weight in grams
-     * @type {number}
+     * the various measures
+     * @type {Array<Amount>}
      * @memberof SectionIngredient
      */
-    grams: number;
-    /**
-     * amount
-     * @type {number}
-     * @memberof SectionIngredient
-     */
-    amount?: number;
-    /**
-     * unit
-     * @type {string}
-     * @memberof SectionIngredient
-     */
-    unit?: string;
+    amounts: Array<Amount>;
     /**
      * adjective
      * @type {string}
@@ -116,9 +108,7 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'kind': IngredientKindFromJSON(json['kind']),
         'recipe': !exists(json, 'recipe') ? undefined : RecipeDetailFromJSON(json['recipe']),
         'ingredient': !exists(json, 'ingredient') ? undefined : IngredientFromJSON(json['ingredient']),
-        'grams': json['grams'],
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'unit': !exists(json, 'unit') ? undefined : json['unit'],
+        'amounts': ((json['amounts'] as Array<any>).map(AmountFromJSON)),
         'adjective': !exists(json, 'adjective') ? undefined : json['adjective'],
         'optional': !exists(json, 'optional') ? undefined : json['optional'],
         'original': !exists(json, 'original') ? undefined : json['original'],
@@ -139,9 +129,7 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'kind': IngredientKindToJSON(value.kind),
         'recipe': RecipeDetailToJSON(value.recipe),
         'ingredient': IngredientToJSON(value.ingredient),
-        'grams': value.grams,
-        'amount': value.amount,
-        'unit': value.unit,
+        'amounts': ((value.amounts as Array<any>).map(AmountToJSON)),
         'adjective': value.adjective,
         'optional': value.optional,
         'original': value.original,

@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -40,6 +42,32 @@ type Recipe struct {
 	Detail RecipeDetail
 }
 
+type Amounts []Amount
+
+func (a *Amounts) Scan(val interface{}) error {
+	switch v := val.(type) {
+	case []byte:
+		json.Unmarshal(v, &a)
+		return nil
+	case string:
+		json.Unmarshal([]byte(v), &a)
+		return nil
+	default:
+		return fmt.Errorf("Unsupported type: %T", v)
+	}
+}
+func (a Amounts) Value() (driver.Value, error) {
+	if a == nil {
+		return []byte("[]"), nil
+	}
+	return json.Marshal(&a)
+}
+
+type Amount struct {
+	Unit  string  `json:"unit"`
+	Value float64 `json:"value"`
+}
+
 // RecipeDetail represents a recipe
 type RecipeDetail struct {
 	Id            string      `db:"id"`
@@ -71,9 +99,7 @@ type SectionIngredient struct {
 	Id        string      `db:"id"`
 	SectionId string      `db:"section"`
 	Sort      zero.Int    `db:"sort"`
-	Grams     zero.Float  `db:"grams"`
-	Amount    zero.Float  `db:"amount"`
-	Unit      zero.String `db:"unit"`
+	Amounts   Amounts     `db:"amounts"`
 	Adjective zero.String `db:"adjective"`
 	Optional  zero.Bool   `db:"optional"`
 	Original  zero.String `db:"original"`

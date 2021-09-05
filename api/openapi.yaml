@@ -1,4 +1,4 @@
-openapi: "3.0.0"
+openapi: "3.1.0"
 info:
   contact:
     email: n@nickysemenza.com
@@ -632,7 +632,7 @@ components:
       type: object
       required:
         - id
-        - grams
+        - amounts
         - kind
       properties:
         id:
@@ -645,17 +645,11 @@ components:
           $ref: "#/components/schemas/RecipeDetail"
         ingredient:
           $ref: "#/components/schemas/Ingredient"
-        grams:
-          description: weight in grams
-          type: number
-          format: double # float64
-        amount:
-          description: amount
-          type: number
-          format: double # float64
-        unit:
-          description: unit
-          type: string
+        amounts:
+          description: the various measures
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
         adjective:
           description: adjective
           type: string

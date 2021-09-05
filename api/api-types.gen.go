@@ -436,11 +436,8 @@ type SectionIngredient struct {
 	// adjective
 	Adjective *string `json:"adjective,omitempty"`
 
-	// amount
-	Amount *float64 `json:"amount,omitempty"`
-
-	// weight in grams
-	Grams float64 `json:"grams"`
+	// the various measures
+	Amounts []Amount `json:"amounts"`
 
 	// id
 	Id string `json:"id"`
@@ -460,9 +457,6 @@ type SectionIngredient struct {
 
 	// x
 	Substitutes *[]SectionIngredient `json:"substitutes,omitempty"`
-
-	// unit
-	Unit *string `json:"unit,omitempty"`
 }
 
 // SectionInstruction defines model for SectionInstruction.

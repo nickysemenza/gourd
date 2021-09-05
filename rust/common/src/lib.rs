@@ -17,8 +17,9 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
     let mut unit: Option<String> = None;
     let mut amount: Option<f64> = None;
 
+    let mut amounts: Vec<Amount> = Vec::new();
     for x in i.amounts.iter() {
-        if is_gram(x) {
+        if is_gram(x.unit.clone()) {
             grams = x.value.into();
         } else if is_oz(x) {
             oz = x.value.into();
@@ -28,31 +29,33 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
             unit = Some(x.unit.clone());
             amount = Some(x.value as f64);
         }
+        amounts.push(Amount {
+            unit: unit.clone().unwrap_or("unknown".to_string()),
+            value: amount.unwrap_or(0.0),
+        });
     }
 
     // if grams are absent, try converting oz
     if grams == 0.0 && oz != 0.0 {
         grams = ((oz * 28.35) as f64).round();
-    } else if unit.is_none() && oz != 0.0 {
-        unit = Some("oz".to_string());
-        amount = Some(oz);
     }
 
-    // if grams are absent, try using mL
+    // // if grams are absent, try using mL
     if grams == 0.0 && ml != 0.0 {
         grams = ml
-    } else if unit.is_none() && ml != 0.0 {
-        unit = Some("ml".to_string());
-        amount = Some(ml);
+    }
+    if grams != 0.0 {
+        amounts.push(Amount {
+            unit: unit.clone().unwrap_or("unknown".to_string()),
+            value: amount.unwrap_or(0.0),
+        });
     }
 
     return SectionIngredient {
-        unit,
-        amount,
         adjective: i.modifier,
         ingredient: Some(Box::new(Ingredient::new("".to_string(), i.name))),
         original: Some(original.to_string()),
-        ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, grams)
+        ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, amounts)
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
@@ -63,9 +66,20 @@ pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
     let i = dbg!(ingredient::parse_amount(s))?;
     Ok(i)
 }
+fn get_grams_si(si: SectionIngredient) -> f64 {
+    for x in si.amounts.iter() {
+        if is_gram(x.unit.clone()) {
+            return x.value;
+        }
+    }
+    return 0.0;
+}
 pub fn get_grams(r: RecipeDetail) -> f64 {
     r.sections.iter().fold(0.0, |acc, s| {
-        acc + s.ingredients.iter().fold(0.0, |acc, i| acc + i.grams)
+        acc + s
+            .ingredients
+            .iter()
+            .fold(0.0, |acc, i| acc + get_grams_si(i.clone()))
     })
 }
 
@@ -101,8 +115,8 @@ pub fn sum_ingredients(
     (recipes, ing)
 }
 
-fn is_gram(a: &ingredient::Amount) -> bool {
-    a.unit == "g" || a.unit == "gram" || a.unit == "grams"
+fn is_gram(unit: String) -> bool {
+    unit == "g" || unit == "gram" || unit == "grams"
 }
 fn is_oz(a: &ingredient::Amount) -> bool {
     a.unit == "oz" || a.unit == "ounce" || a.unit == "ounces"
@@ -143,18 +157,10 @@ pub fn measure_to_amount(m: unit::Measure) -> Amount {
 }
 pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
     let mut amounts = vec![];
-    if s.grams > 0.0 {
-        amounts.push(ingredient::Amount {
-            unit: "g".to_string(),
-            value: s.grams as f32,
-        })
+    for a in s.amounts.iter() {
+        amounts.push(ingredient::Amount::new(&a.unit, a.value as f32));
     }
-    if s.amount.is_some() && s.unit.is_some() {
-        amounts.push(ingredient::Amount {
-            unit: s.unit.unwrap(),
-            value: s.amount.unwrap() as f32,
-        })
-    }
+
     let mut name = String::new();
     if s.ingredient.is_some() {
         name = s.ingredient.unwrap().name;
@@ -245,19 +251,19 @@ mod tests {
         let si_1 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "foo".to_string()))),
             original: Some("12 g foo".to_string()),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, vec![])
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
-            amount: Some(1.5),
-            unit: Some("cups".to_string()),
+            // amount: Some(1.5),
+            // unit: Some("cups".to_string()),
             original: Some("14 g / 1.5 cups bar".to_string()),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, vec![])
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
             original: Some("2 g bar".to_string()),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
+            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, vec![])
         };
         let r = RecipeDetail::new(
             "".to_string(),
@@ -329,41 +335,74 @@ mod tests {
         assert_eq!(
             parse_ingredient("118 grams / 0.5 cups water").unwrap(),
             SectionIngredient {
-                amount: Some(0.5),
-                unit: Some("cups".to_string()),
                 original: Some("118 grams / 0.5 cups water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()
                 ))),
-                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
+                ..SectionIngredient::new(
+                    "".to_string(),
+                    IngredientKind::Ingredient,
+                    vec![
+                        Amount {
+                            unit: "grams".to_string(),
+                            value: 118.0
+                        },
+                        Amount {
+                            unit: "cups".to_string(),
+                            value: 0.5
+                        }
+                    ]
+                )
             }
         );
         // ml is parsed as grams if not present
         assert_eq!(
             parse_ingredient("118 ml / 0.5 cups water").unwrap(),
             SectionIngredient {
-                amount: Some(0.5),
-                unit: Some("cups".to_string()),
                 original: Some("118 ml / 0.5 cups water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()
                 ))),
-                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 118.0)
+                ..SectionIngredient::new(
+                    "".to_string(),
+                    IngredientKind::Ingredient,
+                    vec![
+                        Amount {
+                            unit: "grams".to_string(),
+                            value: 118.0
+                        },
+                        Amount {
+                            unit: "cups".to_string(),
+                            value: 0.5
+                        }
+                    ]
+                )
             }
         );
         assert_eq!(
             parse_ingredient("4 oz / 1/2 cup water").unwrap(),
             SectionIngredient {
-                amount: Some(0.5),
-                unit: Some("cup".to_string()),
                 original: Some("4 oz / 1/2 cup water".to_string()),
                 ingredient: Some(Box::new(Ingredient::new(
                     "".to_string(),
                     "water".to_string()
                 ))),
-                ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 113.0)
+                ..SectionIngredient::new(
+                    "".to_string(),
+                    IngredientKind::Ingredient,
+                    vec![
+                        Amount {
+                            unit: "grams".to_string(),
+                            value: 113.0
+                        },
+                        Amount {
+                            unit: "cups".to_string(),
+                            value: 0.5
+                        }
+                    ]
+                )
             }
         );
     }
@@ -375,21 +414,42 @@ mod tests {
                 "a".to_string(),
                 "foo".to_string(),
             ))),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 12.0)
+            ..SectionIngredient::new(
+                "".to_string(),
+                IngredientKind::Ingredient,
+                vec![Amount {
+                    unit: "grams".to_string(),
+                    value: 12.0,
+                }],
+            )
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new(
                 "b".to_string(),
                 "bar".to_string(),
             ))),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 14.0)
+            ..SectionIngredient::new(
+                "".to_string(),
+                IngredientKind::Ingredient,
+                vec![Amount {
+                    unit: "grams".to_string(),
+                    value: 14.0,
+                }],
+            )
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Box::new(Ingredient::new(
                 "b".to_string(),
                 "bar".to_string(),
             ))),
-            ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, 2.0)
+            ..SectionIngredient::new(
+                "".to_string(),
+                IngredientKind::Ingredient,
+                vec![Amount {
+                    unit: "grams".to_string(),
+                    value: 2.0,
+                }],
+            )
         };
         let r = RecipeDetail::new(
             "".to_string(),

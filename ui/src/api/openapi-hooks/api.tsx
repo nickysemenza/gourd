@@ -24,17 +24,9 @@ export interface SectionIngredient {
   recipe?: RecipeDetail;
   ingredient?: Ingredient;
   /**
-   * weight in grams
+   * the various measures
    */
-  grams: number;
-  /**
-   * amount
-   */
-  amount?: number;
-  /**
-   * unit
-   */
-  unit?: string;
+  amounts: Amount[];
   /**
    * adjective
    */
