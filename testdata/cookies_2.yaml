@@ -8,52 +8,65 @@ sources:
 sections:
   - ingredients:
       - adjective: chopped
-        amount: 1.25
-        grams: 142
+        amounts:
+          - value: 1.25
+            unit: cups
+          - unit: grams
+            value: 142
         ingredient:
           name: pecans
         kind: ingredient
-        unit: cups
     instructions:
       - instruction: toast pecans for 10 minutes @ 350
     duration:
       min: 900
   - ingredients:
-      - amount: 0.75
-        grams: 150
+      - amounts:
+          - value: 0.75
+            unit: cups
+          - unit: grams
+            value: 150
         ingredient:
           name: sugar
         kind: ingredient
-        unit: cups
-      - amount: 0.5
-        grams: 57
+      - amounts:
+          - value: 0.5
+            unit: stick
+          - unit: grams
+            value: 57
         ingredient:
           name: butter
         kind: ingredient
-        unit: stick
-      - amount: 2
-        grams: 28
+      - amounts:
+          - value: 2
+            unit: tbsp
+          - unit: grams
+            value: 28
         ingredient:
           name: water
         kind: ingredient
-        unit: tbsp
     instructions:
       - instruction: melt, cook for 10 minutes with minimal stirring
     duration:
       min: 60
   - ingredients:
-      - amount: 0.5
-        grams: 3
+      - amounts:
+          - value: 0.5
+            unit: tsp
+          - unit: grams
+            value: 3
         ingredient:
           name: baking soda
         kind: ingredient
-        unit: tsp
-      - amount: 0.5
-        grams: 1.5
+      - amounts:
+          - value: 0.5
+            unit: tsp
+          - unit: grams
+            value: 1.5
         ingredient:
           name: salt
         kind: ingredient
-        unit: tsp
+
     instructions:
       - instruction: add salt/BS/pecans, pour onto parchment to cool
     duration:
@@ -65,20 +78,25 @@ sources:
     page: "3"
 sections:
   - ingredients:
-      - amount: 1
-        grams: 113
+      - amounts:
+          - value: 1
+            unit: stick
+          - unit: grams
+            value: 113
         ingredient:
           name: butter
         kind: ingredient
-        unit: stick
+
     instructions:
       - instruction: brown, add to mixer
     duration:
       min: 600
   - ingredients:
       - adjective: cold
-        amount: 1
-        grams: 113
+        amounts:
+          - value: 1
+          - unit: grams
+            value: 113
         ingredient:
           name: butter
         kind: ingredient
@@ -89,89 +107,113 @@ sections:
     duration:
       min: 1800
   - ingredients:
-      - amount: 75
-        grams: 150
+      - amounts:
+          - value: 75
+            unit: cups
+          - unit: grams
+            value: 150
         ingredient:
           name: brown sugar
         kind: ingredient
-        unit: cups
-      - amount: 5
-        grams: 100
+      - amounts:
+          - value: 5
+            unit: cups
+          - unit: grams
+            value: 100
         ingredient:
           name: sugar
         kind: ingredient
-        unit: cups
     instructions:
       - instruction: add to butters, cream
     duration:
       min: 180
   - ingredients:
-      - amount: 2
-        grams: 100
+      - amounts:
+          - value: 2
+            unit: large
+          - unit: grams
+            value: 100
         ingredient:
           name: eggs
         kind: ingredient
-        unit: large
         adjective: cold
-      - amount: 1
-        grams: 13
+      - amounts:
+          - value: 1
+            unit: tbsp
+          - unit: grams
+            value: 13
         ingredient:
           name: vanilla extract
         kind: ingredient
-        unit: tbsp
+
     instructions:
       - instruction: add to sugar/butter, mix
     duration:
       min: 120
   - ingredients:
-      - amount: 0.5
+      - amounts:
+          - value: 0.5
+            unit: "recipe"
         grams: 100
         kind: recipe
         recipe:
           name: CS Pecan Brittle
-        unit: "recipe"
-      - amount: 1
-        grams: 100
+
+      - amounts:
+          - value: 1
+            unit: cup
+          - unit: grams
+            value: 100
         ingredient:
           name: oats
         kind: ingredient
-        unit: cup
-      - amount: 1.3
-        grams: 173
+      - amounts:
+          - value: 1.3
+            unit: cup
+          - unit: grams
+            value: 173
         ingredient:
           name: flour
         kind: ingredient
-        unit: cup
-      - amount: 2
-        grams: 6
+      - amounts:
+          - value: 2
+            unit: tsp
+          - unit: grams
+            value: 6
         ingredient:
           name: salt
         kind: ingredient
-        unit: tsp
-      - amount: 1
-        grams: 6
+      - amounts:
+          - value: 1
+            unit: tsp
+          - unit: grams
+            value: 6
         ingredient:
           name: baking soda
         kind: ingredient
-        unit: tsp
     instructions:
       - instruction: food processor until combined
       - instruction: add to mixer
     duration:
       min: 120
   - ingredients:
-      - amount: 0.5
-        grams: 100
+      - amounts:
+          - value: 0.5
+            unit: "recipe"
+          - unit: grams
+            value: 100
         kind: recipe
         recipe:
           name: CS Pecan Brittle
         unit: "recipe"
-      - amount: 1
-        grams: 100
+      - amounts:
+          - value: 1
+            unit: cup
+          - unit: grams
+            value: 100
         ingredient:
           name: oats
         kind: ingredient
-        unit: cup
     instructions:
       - instruction: add to mixer
     duration:

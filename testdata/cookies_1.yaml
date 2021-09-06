@@ -3,18 +3,18 @@ quantity: 0
 unit: ""
 sections:
   - ingredients:
-      - adjective: ""
-        grams: 0
-        kind: ""
-        unit: ""
       - adjective: eggs
-        grams: 42
+        amounts:
+          - unit: grams
+            value: 42
         ingredient:
           name: eggs
         kind: ingredient
         unit: "2"
       - adjective: cup
-        grams: 52
+        amounts:
+          - unit: grams
+            value: 52
         ingredient:
           name: brown sugar
         kind: ingredient
@@ -26,11 +26,9 @@ sections:
       min: 33
   - ingredients:
       - adjective: ""
-        grams: 0
-        kind: ""
-        unit: ""
-      - adjective: ""
-        grams: 52
+        amounts:
+          - unit: grams
+            value: 52
         ingredient:
           name: flour
         kind: ingredient

@@ -5,10 +5,14 @@
   "sections": [
     {
       "ingredients": [
-        { "adjective": "", "grams": 0, "kind": "", "unit": "" },
         {
           "adjective": "eggs",
-          "grams": 42,
+          "amounts": [
+            {
+              "unit": "grams",
+              "value": 42
+            }
+          ],
           "ingredient": {
             "name": "eggs"
           },
@@ -17,7 +21,12 @@
         },
         {
           "adjective": "cup",
-          "grams": 52,
+          "amounts": [
+            {
+              "unit": "grams",
+              "value": 52
+            }
+          ],
           "ingredient": {
             "name": "brown sugar"
           },
@@ -25,15 +34,28 @@
           "unit": "1"
         }
       ],
-      "instructions": [{ "instruction": "" }, { "instruction": "aa" }],
-      "duration": { "min": 33 }
+      "instructions": [
+        {
+          "instruction": ""
+        },
+        {
+          "instruction": "aa"
+        }
+      ],
+      "duration": {
+        "min": 33
+      }
     },
     {
       "ingredients": [
-        { "adjective": "", "grams": 0, "kind": "", "unit": "" },
         {
           "adjective": "",
-          "grams": 52,
+          "amounts": [
+            {
+              "unit": "grams",
+              "value": 52
+            }
+          ],
           "ingredient": {
             "name": "flour"
           },
@@ -42,12 +64,16 @@
         }
       ],
       "instructions": [
-        { "instruction": "" },
+        {
+          "instruction": ""
+        },
         {
           "instruction": "add flour"
         }
       ],
-      "duration": { "min": 88 }
+      "duration": {
+        "min": 88
+      }
     }
   ]
 }

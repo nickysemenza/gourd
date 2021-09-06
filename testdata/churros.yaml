@@ -7,43 +7,49 @@ sections:
       max: 0
       min: 300
     ingredients:
-      - amount: 0
-        grams: 270
+      - amounts:
+          - unit: grams
+            value: 270
         ingredient:
           fdc_id: 496879
           name: water
         kind: ingredient
         optional: false
-      - amount: 0
-        grams: 50
+      - amounts:
+          - unit: grams
+            value: 50
         ingredient:
           fdc_id: 798135
           name: unsalted butter
         kind: ingredient
         optional: false
-      - amount: 0
-        grams: 15
+      - amounts:
+          - unit: grams
+            value: 15
         ingredient:
           fdc_id: 777534
           name: granulated sugar
         kind: ingredient
         optional: false
-      - amount: 0
-        grams: 5
+      - amounts:
+          - unit: grams
+            value: 5
         ingredient:
           fdc_id: 705264
           name: kosher salt
         kind: ingredient
         optional: false
-      - amount: 0
-        grams: 2.5
+      - amounts:
+          - unit: grams
+            value: 2.5
         ingredient:
           fdc_id: 173471
           name: vanilla extract
         kind: ingredient
         optional: false
-      - amount: 0
-        grams: 150
+      - amounts:
+          - unit: grams
+            value: 150
         ingredient:
           fdc_id: 804415
           name: all purpose flour
@@ -54,8 +60,9 @@ sections:
       max: 0
       min: 0
     ingredients:
-      - amount: 0
-        grams: 50
+      - amounts:
+          - unit: grams
+            value: 50
         ingredient:
           fdc_id: 748967
           name: eggs
