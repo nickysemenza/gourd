@@ -12,7 +12,7 @@ export const getIngredient = (
   if (si.recipe) {
     return si.recipe;
   } else if (si.ingredient) {
-    return si.ingredient;
+    return si.ingredient.ingredient;
   }
   return { name: "" };
 };

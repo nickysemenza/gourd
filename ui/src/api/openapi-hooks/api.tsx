@@ -22,7 +22,7 @@ export interface SectionIngredient {
   id: string;
   kind: IngredientKind;
   recipe?: RecipeDetail;
-  ingredient?: Ingredient;
+  ingredient?: IngredientDetail;
   /**
    * the various measures
    */

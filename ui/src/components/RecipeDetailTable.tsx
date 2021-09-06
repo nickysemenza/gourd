@@ -214,7 +214,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 <RecipeLink recipe={ingredient.recipe} />
               ) : (
                 <div className="flex justify-between pr-1">
-                  {ingredient.ingredient?.name}
+                  {ingredient.ingredient?.ingredient.name}
                   {hint && <IngredientPopover detail={hint} />}
                 </div>
               )}

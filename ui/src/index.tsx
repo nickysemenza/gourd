@@ -5,8 +5,7 @@ import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 
 Sentry.init({
-  dsn:
-    "https://6a67b0ba96a744d2877fc1b21984aa18@o83311.ingest.sentry.io/5778936",
+  dsn: "https://6a67b0ba96a744d2877fc1b21984aa18@o83311.ingest.sentry.io/5778936",
   tracesSampleRate: 1.0,
 });
 

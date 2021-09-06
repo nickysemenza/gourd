@@ -77,7 +77,7 @@ func TestAPI(t *testing.T) {
 			Detail: RecipeDetail{Name: rName,
 				Sections: []RecipeSection{{Duration: &TimeRange{Min: 3},
 					Instructions: []SectionInstruction{{Instruction: "mix"}},
-					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &newIngredient, Kind: "ingredient"}},
+					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &IngredientDetail{Ingredient: newIngredient}, Kind: "ingredient"}},
 				}}},
 		}
 		resultRecipe := makeRecipe(newRecipe)
@@ -135,7 +135,7 @@ func TestSearches(t *testing.T) {
 	iName := fmt.Sprintf("ing-%s", common.ID(""))
 	err := api.CreateRecipeDetails(ctx, RecipeDetail{
 		Name:     rName,
-		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &Ingredient{Name: iName}}}}},
+		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &IngredientDetail{Ingredient: Ingredient{Name: iName}}}}}},
 	})
 	require.NoError(err)
 

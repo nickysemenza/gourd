@@ -30,7 +30,7 @@ dev: bin/gourd
 	./bin/gourd server
 
 dev-env:
-	docker-compose up -d db jaeger
+	docker-compose up -d db collector
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
 dev-ui:

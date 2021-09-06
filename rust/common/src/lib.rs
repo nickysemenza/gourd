@@ -1,8 +1,9 @@
 use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
-    unit_conversion_request::Target, Amount, Ingredient, IngredientKind, RecipeDetail,
-    RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest, UnitMapping,
+    unit_conversion_request::Target, Amount, Ingredient, IngredientDetail, IngredientKind,
+    RecipeDetail, RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest,
+    UnitMapping,
 };
 use unit::MeasureKind;
 
@@ -54,7 +55,12 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
     }
     return SectionIngredient {
         adjective: i.modifier,
-        ingredient: Some(Box::new(Ingredient::new("".to_string(), i.name))),
+        ingredient: Some(Box::new(IngredientDetail::new(
+            Ingredient::new("".to_string(), i.name),
+            vec![],
+            vec![],
+            vec![],
+        ))),
         original: Some(original.to_string()),
         ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, amounts)
     };
@@ -102,7 +108,10 @@ pub fn sum_ingredients(
     flat_ingredients.iter().for_each(|i| {
         let (k, m) = match i.kind {
             IngredientKind::Recipe => (i.recipe.as_ref().unwrap().id.clone(), &mut recipes),
-            IngredientKind::Ingredient => (i.ingredient.as_ref().unwrap().id.clone(), &mut ing),
+            IngredientKind::Ingredient => (
+                i.ingredient.as_ref().unwrap().ingredient.id.clone(),
+                &mut ing,
+            ),
         };
         match m.entry(k) {
             Entry::Vacant(e) => {
@@ -164,7 +173,7 @@ pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
 
     let mut name = String::new();
     if s.ingredient.is_some() {
-        name = s.ingredient.unwrap().name;
+        name = s.ingredient.unwrap().ingredient.name;
     }
     if s.recipe.is_some() {
         name = s.recipe.unwrap().name;
@@ -239,23 +248,30 @@ pub fn decode_recipe(r: String) -> RecipeDetail {
 
     RecipeDetail::new("".to_string(), sections, "".to_string(), 0, "".to_string())
 }
-
+fn bare_detail(name: String) -> IngredientDetail {
+    IngredientDetail::new(
+        Ingredient::new("".to_string(), name.to_string()),
+        vec![],
+        vec![],
+        vec![],
+    )
+}
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
     use openapi::models::{
-        Amount, Ingredient, IngredientKind, RecipeDetail, RecipeSection, SectionIngredient,
-        SectionInstruction,
+        Amount, Ingredient, IngredientDetail, IngredientKind, RecipeDetail, RecipeSection,
+        SectionIngredient, SectionInstruction,
     };
     use pretty_assertions::assert_eq;
 
-    use crate::{decode_recipe, encode_recipe, parse_ingredient, sum_ingredients};
+    use crate::{bare_detail, decode_recipe, encode_recipe, parse_ingredient, sum_ingredients};
 
     #[test]
     fn test_encode() {
         let si_1 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new("".to_string(), "foo".to_string()))),
+            ingredient: Some(Box::new(bare_detail("foo".to_string()))),
             original: Some("12 g foo".to_string()),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -264,7 +280,7 @@ mod tests {
             )
         };
         let si_2 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
+            ingredient: Some(Box::new(bare_detail("bar".to_string()))),
             original: Some("14 g / 1.5 cups bar".to_string()),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -276,7 +292,7 @@ mod tests {
             )
         };
         let si_3 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new("".to_string(), "bar".to_string()))),
+            ingredient: Some(Box::new(bare_detail("bar".to_string()))),
             original: Some("2 g bar".to_string()),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -355,16 +371,13 @@ mod tests {
             parse_ingredient("118 grams / 0.5 cups water").unwrap(),
             SectionIngredient {
                 original: Some("118 grams / 0.5 cups water".to_string()),
-                ingredient: Some(Box::new(Ingredient::new(
-                    "".to_string(),
-                    "water".to_string()
-                ))),
+                ingredient: Some(Box::new(bare_detail("water".to_string()))),
                 ..SectionIngredient::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
                         Amount::new("g".to_string(), 118.0),
-                        Amount::new("cups".to_string(), 0.0),
+                        Amount::new("cups".to_string(), 0.5),
                     ]
                 )
             }
@@ -377,15 +390,12 @@ mod tests {
             parse_ingredient("118 ml / 0.5 cups water").unwrap(),
             SectionIngredient {
                 original: Some("118 ml / 0.5 cups water".to_string()),
-                ingredient: Some(Box::new(Ingredient::new(
-                    "".to_string(),
-                    "water".to_string()
-                ))),
+                ingredient: Some(Box::new(bare_detail("water".to_string()))),
                 ..SectionIngredient::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
-                        Amount::new("cups".to_string(), 0.0),
+                        Amount::new("cups".to_string(), 0.5),
                         Amount::new("g".to_string(), 118.0),
                     ]
                 )
@@ -398,15 +408,12 @@ mod tests {
             parse_ingredient("4 oz / 1/2 cup water").unwrap(),
             SectionIngredient {
                 original: Some("4 oz / 1/2 cup water".to_string()),
-                ingredient: Some(Box::new(Ingredient::new(
-                    "".to_string(),
-                    "water".to_string()
-                ))),
+                ingredient: Some(Box::new(bare_detail("water".to_string()))),
                 ..SectionIngredient::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
-                        Amount::new("cup".to_string(), 0.0),
+                        Amount::new("cup".to_string(), 0.5),
                         Amount::new("g".to_string(), 113.0),
                     ]
                 )
@@ -417,9 +424,11 @@ mod tests {
     #[test]
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new(
-                "a".to_string(),
-                "foo".to_string(),
+            ingredient: Some(Box::new(IngredientDetail::new(
+                Ingredient::new("a".to_string(), "foo".to_string()),
+                vec![],
+                vec![],
+                vec![],
             ))),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -428,9 +437,11 @@ mod tests {
             )
         };
         let si_2 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new(
-                "b".to_string(),
-                "bar".to_string(),
+            ingredient: Some(Box::new(IngredientDetail::new(
+                Ingredient::new("b".to_string(), "bar".to_string()),
+                vec![],
+                vec![],
+                vec![],
             ))),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -439,9 +450,11 @@ mod tests {
             )
         };
         let si_3 = SectionIngredient {
-            ingredient: Some(Box::new(Ingredient::new(
-                "b".to_string(),
-                "bar".to_string(),
+            ingredient: Some(Box::new(IngredientDetail::new(
+                Ingredient::new("b".to_string(), "bar".to_string()),
+                vec![],
+                vec![],
+                vec![],
             ))),
             ..SectionIngredient::new(
                 "".to_string(),

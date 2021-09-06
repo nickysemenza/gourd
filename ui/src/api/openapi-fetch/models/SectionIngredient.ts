@@ -18,10 +18,10 @@ import {
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    Ingredient,
-    IngredientFromJSON,
-    IngredientFromJSONTyped,
-    IngredientToJSON,
+    IngredientDetail,
+    IngredientDetailFromJSON,
+    IngredientDetailFromJSONTyped,
+    IngredientDetailToJSON,
     IngredientKind,
     IngredientKindFromJSON,
     IngredientKindFromJSONTyped,
@@ -58,10 +58,10 @@ export interface SectionIngredient {
     recipe?: RecipeDetail;
     /**
      * 
-     * @type {Ingredient}
+     * @type {IngredientDetail}
      * @memberof SectionIngredient
      */
-    ingredient?: Ingredient;
+    ingredient?: IngredientDetail;
     /**
      * the various measures
      * @type {Array<Amount>}
@@ -107,7 +107,7 @@ export function SectionIngredientFromJSONTyped(json: any, ignoreDiscriminator: b
         'id': json['id'],
         'kind': IngredientKindFromJSON(json['kind']),
         'recipe': !exists(json, 'recipe') ? undefined : RecipeDetailFromJSON(json['recipe']),
-        'ingredient': !exists(json, 'ingredient') ? undefined : IngredientFromJSON(json['ingredient']),
+        'ingredient': !exists(json, 'ingredient') ? undefined : IngredientDetailFromJSON(json['ingredient']),
         'amounts': ((json['amounts'] as Array<any>).map(AmountFromJSON)),
         'adjective': !exists(json, 'adjective') ? undefined : json['adjective'],
         'optional': !exists(json, 'optional') ? undefined : json['optional'],
@@ -128,7 +128,7 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'id': value.id,
         'kind': IngredientKindToJSON(value.kind),
         'recipe': RecipeDetailToJSON(value.recipe),
-        'ingredient': IngredientToJSON(value.ingredient),
+        'ingredient': IngredientDetailToJSON(value.ingredient),
         'amounts': ((value.amounts as Array<any>).map(AmountToJSON)),
         'adjective': value.adjective,
         'optional': value.optional,

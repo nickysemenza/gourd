@@ -42,7 +42,7 @@ import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
 const exporter = new CollectorTraceExporter({
   url: "http://localhost:4318/v1/traces",
@@ -75,7 +75,7 @@ provider.register({
 });
 
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (

@@ -13,6 +13,7 @@ import {
   SectionIngredient,
   useGetFoodsByIds,
   useListIngredients,
+  RecipeWrapper as RecipeWrapper2,
   Amount,
 } from "../api/openapi-hooks/api";
 import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
@@ -37,7 +38,7 @@ import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
 import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
-import { RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
+import { Recipe, RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 
 const RecipeDetail: React.FC = () => {
@@ -57,6 +58,10 @@ const RecipeDetail: React.FC = () => {
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
 
+  const setRecipe2 = (r: RecipeWrapper2) => {
+    console.log("setRecipe", r);
+    setRecipe(r);
+  };
   const tweaks: RecipeTweaks = { override, multiplier, edit };
   const { mutate: post } = useCreateRecipes({
     onMutate: (_) => {
@@ -77,7 +82,10 @@ const RecipeDetail: React.FC = () => {
     queryParams: {
       ingredient_id: [
         ...flatIngredients(recipe?.detail.sections || []).map(
-          (i) => i.ingredient?.same_as || i.ingredient?.id || ""
+          (i) =>
+            i.ingredient?.ingredient.same_as ||
+            i.ingredient?.ingredient.id ||
+            ""
         ),
         "",
       ],
@@ -138,7 +146,6 @@ const RecipeDetail: React.FC = () => {
       });
       // const updated = await post(recipe);
       setEdit(false);
-      console.log({ updated });
       history.push(
         `/recipe/${updated.detail.id}?${queryString.stringify(values)}`
       );
@@ -194,14 +201,31 @@ const RecipeDetail: React.FC = () => {
     const foo: Spec<SectionIngredient> = {
       amounts: {
         $apply: (v: Amount[]) => {
-          if (amountIndex && amountIndex > 0) {
-            switch (attr) {
-              case "grams":
-              case "amount":
-                v[amountIndex].value = parseFloat(value);
-                break;
-              case "unit":
-                v[amountIndex].unit = value;
+          console.log("update", { v, value, attr, amountIndex });
+          if (amountIndex !== undefined) {
+            if (amountIndex >= 0) {
+              switch (attr) {
+                case "grams":
+                case "amount":
+                  v[amountIndex].value = parseFloat(value);
+                  break;
+                case "unit":
+                  v[amountIndex].unit = value;
+              }
+            } else {
+              let toAdd: Amount = { unit: "", value: 0 };
+              switch (attr) {
+                case "grams":
+                case "amount":
+                  toAdd.value = parseFloat(value);
+                  if (attr == "grams") {
+                    toAdd.unit = "grams";
+                  }
+                  break;
+                case "unit":
+                  toAdd.unit = value;
+              }
+              v.push(toAdd);
             }
           }
           return v;
@@ -215,7 +239,7 @@ const RecipeDetail: React.FC = () => {
       },
     };
     if (edit) {
-      setRecipe(
+      setRecipe2(
         update(recipe, {
           detail: {
             sections: {

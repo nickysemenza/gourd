@@ -59,7 +59,15 @@ export const updateIngredientInfo = (
                     : undefined,
               },
               ingredient: {
-                $set: kind === "ingredient" ? { id, name, fdc_id } : undefined,
+                $set:
+                  kind === "ingredient"
+                    ? {
+                        ingredient: { id, name, fdc_id },
+                        recipes: [],
+                        children: [],
+                        unit_mappings: [],
+                      }
+                    : undefined,
               },
               kind: { $set: kind },
             },
@@ -153,7 +161,10 @@ export const addIngredient = (recipe: RecipeWrapper, sectionID: number) =>
                 id: "",
                 kind: "ingredient",
                 // info: { name: "", id: "", __typename: "Ingredient" },
-                amounts: [],
+                amounts: [
+                  { unit: "grams", value: 0 },
+                  { unit: "", value: 0 },
+                ],
                 adjective: "",
                 optional: false,
               },
@@ -469,7 +480,7 @@ export const calCalc = (
   Object.keys(uniqIng).forEach((k) => {
     uniqIng[k].forEach((si) => {
       if (!!si.ingredient) {
-        const fdc_id = si.ingredient.fdc_id;
+        const fdc_id = si.ingredient.ingredient.fdc_id;
         if (fdc_id !== undefined) {
           const hint = hints[fdc_id];
           if (hint !== undefined) {
@@ -487,12 +498,12 @@ export const calCalc = (
               ingNutrients.set(label, n.amount * scalingFactor);
             });
             ingredientsWithNutrients.push({
-              ingredient: si.ingredient.name,
+              ingredient: si.ingredient.ingredient.name,
               nutrients: ingNutrients,
             });
             totalCal += cal;
             console.log(
-              `${si.ingredient.name}: ${getGramsFromSI(
+              `${si.ingredient.ingredient.name}: ${getGramsFromSI(
                 si
               )}g = ${scalingFactor}x of ${hint.description}`,
               cal
@@ -524,7 +535,7 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
       section.ingredients
         .map((ingredient) => {
           if (!!ingredient.ingredient) {
-            return [ingredient.ingredient.fdc_id || 0];
+            return [ingredient.ingredient.ingredient.fdc_id || 0];
           } else if (!!ingredient.recipe) {
             return getFDCIds(ingredient.recipe.sections);
           } else {
@@ -540,7 +551,9 @@ export const getHint = (
   ing_hints: IngDetailsById
 ): IngredientDetail | undefined => {
   const ingredientId =
-    ingredient?.ingredient?.same_as || ingredient?.ingredient?.id || "";
+    ingredient?.ingredient?.ingredient.same_as ||
+    ingredient?.ingredient?.ingredient.id ||
+    "";
   const hint = ing_hints[ingredientId];
   return !!hint ? hint : undefined;
 };
@@ -569,7 +582,7 @@ export const inferGrams = (
               hint.unit_mappings,
               [{ unit: unit || "", value: value || 0 }],
               t,
-              ingredient.ingredient?.name
+              ingredient.ingredient?.ingredient.name
             )?.value
         );
         return res.find((x) => x !== undefined && x !== 0);
@@ -609,7 +622,7 @@ const w_convert = (
     hint.unit_mappings,
     [{ unit: "grams", value: grams || 0 }],
     to,
-    ingredient.ingredient?.name
+    ingredient.ingredient?.ingredient.name
   )?.value;
   return val ? val * multiplier : undefined;
 };
@@ -620,7 +633,9 @@ export const totalFlourMass = (sections: RecipeSection[]) =>
     (acc, section) =>
       acc +
       section.ingredients
-        .filter((item) => item.ingredient?.name.toLowerCase().includes("flour"))
+        .filter((item) =>
+          item.ingredient?.ingredient.name.toLowerCase().includes("flour")
+        )
         .reduce((acc, ingredient) => acc + getGramsFromSI(ingredient), 0),
     0
   );

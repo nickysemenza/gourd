@@ -34,8 +34,8 @@ func NewAPI(m *manager.Manager) *API {
 	}
 }
 
-func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
-	sections, err := transformRecipeSections(dbr.Sections)
+func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail) RecipeDetail {
+	sections, err := a.transformRecipeSections(ctx, dbr.Sections)
 	if err != nil {
 		panic(err)
 	}
@@ -56,18 +56,18 @@ func transformRecipe(dbr db.RecipeDetail) RecipeDetail {
 	}
 	return rd
 }
-func transformRecipes(dbr db.RecipeDetails) []RecipeDetail {
+func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails) []RecipeDetail {
 	r := make([]RecipeDetail, len(dbr))
 	for x, d := range dbr {
-		r[x] = transformRecipe(d)
+		r[x] = a.transformRecipe(ctx, d)
 	}
 	return r
 
 }
-func transformRecipeFull(dbr *db.RecipeDetail) *RecipeWrapper {
+func (a *API) transformRecipeFull(ctx context.Context, dbr *db.RecipeDetail) *RecipeWrapper {
 	return &RecipeWrapper{
 		Id:     dbr.RecipeId,
-		Detail: transformRecipe(*dbr),
+		Detail: a.transformRecipe(ctx, *dbr),
 	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
@@ -121,14 +121,14 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 		}
 		si.RecipeId = zero.StringFrom(id)
 	case IngredientKind_ingredient:
-		if i.Ingredient == nil || (i.Ingredient.Name == "" && i.Ingredient.Id == "") {
+		if i.Ingredient == nil || (i.Ingredient.Ingredient.Name == "" && i.Ingredient.Ingredient.Id == "") {
 			return nil, nil
 		}
-		id := i.Ingredient.Id
+		id := i.Ingredient.Ingredient.Id
 
 		// missing id, need to find/create
 		if id == "" {
-			ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Name)
+			ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Ingredient.Name)
 			if err != nil {
 				return nil, err
 			}
@@ -211,7 +211,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 	return &dbr, nil
 
 }
-func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
+func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]RecipeSection, error) {
 	s := []RecipeSection{}
 	for _, d := range dbs {
 		ing := []SectionIngredient{}
@@ -250,12 +250,17 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 			}
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
-				r := transformRecipe(*i.RawRecipe)
+				r := a.transformRecipe(ctx, *i.RawRecipe)
 				item.Recipe = &r
 			} else {
 				item.Kind = "ingredient"
-				i := transformIngredient(*i.RawIngredient)
-				item.Ingredient = &i
+				foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})
+				if err != nil {
+					return nil, err
+				}
+				// i := transformIngredient(*i.RawIngredient)
+				item.Ingredient = &foo[0]
+				//  &IngredientDetail{Ingredient: i, Children: []IngredientDetail{}, UnitMappings: []UnitMapping{}, Recipes: []RecipeDetail{}}
 			}
 			if i.SubsFor.Valid {
 				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], item)
@@ -307,7 +312,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	byId := details.ByRecipeId()
 	items := []Recipe{}
 	for _, r := range recipeIDs {
-		items = append(items, Recipe{Id: r, Versions: transformRecipes(byId[r])})
+		items = append(items, Recipe{Id: r, Versions: a.transformRecipes(ctx, byId[r])})
 	}
 
 	listMeta.setTotalCount(count)
@@ -363,7 +368,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrappe
 		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
 
-	return transformRecipeFull(r2), nil
+	return a.transformRecipeFull(ctx, r2), nil
 }
 
 // Info for a specific recipe
@@ -377,7 +382,7 @@ func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	if r == nil {
 		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 	}
-	apiR := transformRecipeFull(r)
+	apiR := a.transformRecipeFull(ctx, r)
 
 	return c.JSON(http.StatusOK, apiR)
 }
@@ -395,7 +400,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 		if r == nil {
 			return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
 		}
-		apiR := transformRecipeFull(r)
+		apiR := a.transformRecipeFull(ctx, r)
 		list = append(list, *apiR)
 	}
 	result := PaginatedRecipeWrappers{Recipes: &list}
@@ -477,7 +482,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
-		r := transformRecipe(x)
+		r := a.transformRecipe(ctx, x)
 		resRecipes = append(resRecipes, RecipeWrapper{Detail: r, Id: x.RecipeId})
 	}
 	for _, x := range ingredients {

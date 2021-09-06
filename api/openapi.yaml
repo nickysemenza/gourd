@@ -645,7 +645,7 @@ components:
         recipe:
           $ref: "#/components/schemas/RecipeDetail"
         ingredient:
-          $ref: "#/components/schemas/Ingredient"
+          $ref: "#/components/schemas/IngredientDetail"
         amounts:
           description: the various measures
           type: array

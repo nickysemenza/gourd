@@ -71,7 +71,7 @@ export const try_convert = (
   try {
     result = w.dolla(foo);
   } catch (e) {
-    console.error(e, { input, target, unit_mappings });
+    // console.error(e, { input, target, unit_mappings });
     // err = e;
   }
   // console.log("try_convert:" + msg, {

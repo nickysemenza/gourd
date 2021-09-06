@@ -446,8 +446,8 @@ type SectionIngredient struct {
 	Id string `json:"id"`
 
 	// An Ingredient
-	Ingredient *Ingredient    `json:"ingredient,omitempty"`
-	Kind       IngredientKind `json:"kind"`
+	Ingredient *IngredientDetail `json:"ingredient,omitempty"`
+	Kind       IngredientKind    `json:"kind"`
 
 	// optional
 	Optional *bool `json:"optional,omitempty"`
