@@ -31,6 +31,12 @@ export interface Amount {
      * @memberof Amount
      */
     value: number;
+    /**
+     * if it was explicit, inferred, etc
+     * @type {string}
+     * @memberof Amount
+     */
+    source?: string;
 }
 
 export function AmountFromJSON(json: any): Amount {
@@ -45,6 +51,7 @@ export function AmountFromJSONTyped(json: any, ignoreDiscriminator: boolean): Am
         
         'unit': json['unit'],
         'value': json['value'],
+        'source': !exists(json, 'source') ? undefined : json['source'],
     };
 }
 
@@ -59,6 +66,7 @@ export function AmountToJSON(value?: Amount | null): any {
         
         'unit': value.unit,
         'value': value.value,
+        'source': value.source,
     };
 }
 

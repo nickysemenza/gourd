@@ -20,6 +20,9 @@ pub struct Amount {
     /// value
     #[serde(rename = "value")]
     pub value: f64,
+    /// if it was explicit, inferred, etc
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 impl Amount {
@@ -28,6 +31,7 @@ impl Amount {
         Amount {
             unit,
             value,
+            source: None,
         }
     }
 }

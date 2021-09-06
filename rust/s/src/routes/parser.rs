@@ -28,6 +28,7 @@ fn si_to_api(r: SI) -> SectionIngredient {
             .map(|a| Amount {
                 unit: a.unit.clone(),
                 value: a.value,
+                source: Some("todo".to_string()),
             })
             .collect(),
         adjective: r.adjective,

@@ -211,6 +211,10 @@ export interface Amount {
    * value
    */
   value: number;
+  /**
+   * if it was explicit, inferred, etc
+   */
+  source?: string;
 }
 
 /**

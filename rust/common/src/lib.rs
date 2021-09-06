@@ -32,10 +32,10 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
             amount = Some(x.value as f64);
         }
         if amount.is_some() && unit.is_some() {
-            amounts.push(Amount {
-                unit: unit.clone().unwrap_or("unknown".to_string()),
-                value: amount.unwrap_or(0.0),
-            });
+            amounts.push(Amount::new(
+                unit.clone().unwrap_or("unknown".to_string()),
+                amount.unwrap_or(0.0),
+            ));
         }
     }
     if grams == 0.0 {
@@ -49,10 +49,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
             grams = ml
         }
         if grams != 0.0 {
-            amounts.push(Amount {
-                unit: "g".to_string(),
-                value: grams,
-            });
+            amounts.push(Amount::new("g".to_string(), grams));
         }
     }
     return SectionIngredient {
@@ -366,14 +363,8 @@ mod tests {
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
-                        Amount {
-                            unit: "g".to_string(),
-                            value: 118.0
-                        },
-                        Amount {
-                            unit: "cups".to_string(),
-                            value: 0.5
-                        }
+                        Amount::new("g".to_string(), 118.0),
+                        Amount::new("cups".to_string(), 0.0),
                     ]
                 )
             }
@@ -394,14 +385,8 @@ mod tests {
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
-                        Amount {
-                            unit: "cups".to_string(),
-                            value: 0.5
-                        },
-                        Amount {
-                            unit: "g".to_string(),
-                            value: 118.0
-                        }
+                        Amount::new("cups".to_string(), 0.0),
+                        Amount::new("g".to_string(), 118.0),
                     ]
                 )
             }
@@ -421,14 +406,8 @@ mod tests {
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
-                        Amount {
-                            unit: "cup".to_string(),
-                            value: 0.5
-                        },
-                        Amount {
-                            unit: "g".to_string(),
-                            value: 113.0
-                        }
+                        Amount::new("cup".to_string(), 0.0),
+                        Amount::new("g".to_string(), 113.0),
                     ]
                 )
             }
@@ -445,10 +424,7 @@ mod tests {
             ..SectionIngredient::new(
                 "".to_string(),
                 IngredientKind::Ingredient,
-                vec![Amount {
-                    unit: "g".to_string(),
-                    value: 12.0,
-                }],
+                vec![Amount::new("g".to_string(), 12.0)],
             )
         };
         let si_2 = SectionIngredient {
@@ -459,10 +435,7 @@ mod tests {
             ..SectionIngredient::new(
                 "".to_string(),
                 IngredientKind::Ingredient,
-                vec![Amount {
-                    unit: "g".to_string(),
-                    value: 14.0,
-                }],
+                vec![Amount::new("g".to_string(), 14.0)],
             )
         };
         let si_3 = SectionIngredient {
@@ -473,10 +446,7 @@ mod tests {
             ..SectionIngredient::new(
                 "".to_string(),
                 IngredientKind::Ingredient,
-                vec![Amount {
-                    unit: "g".to_string(),
-                    value: 2.0,
-                }],
+                vec![Amount::new("g".to_string(), 2.0)],
             )
         };
         let r = RecipeDetail::new(

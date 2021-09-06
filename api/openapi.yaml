@@ -849,6 +849,9 @@ components:
           description: value
           type: number
           format: double # float64
+        source:
+          description: if it was explicit, inferred, etc
+          type: string
     RecipeSource:
       description: where the recipe came from (i.e. book/website)
       type: object

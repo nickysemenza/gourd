@@ -89,8 +89,9 @@ validate-openapi: api/openapi.yaml
 generate-openapi: validate-openapi api/openapi.yaml
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
-	openapi-generator generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
-	openapi-generator generate -i api/openapi.yaml -o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
+	npx @openapitools/openapi-generator-cli version-manager set 5.2.0
+	npx @openapitools/openapi-generator-cli generate -i api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
+	npx @openapitools/openapi-generator-cli generate -i api/openapi.yaml -o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
 
 
 	mkdir -p ui/src/api/openapi-hooks/

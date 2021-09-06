@@ -10,6 +10,9 @@ import (
 // Amount defines model for Amount.
 type Amount struct {
 
+	// if it was explicit, inferred, etc
+	Source *string `json:"source,omitempty"`
+
 	// unit
 	Unit string `json:"unit"`
 

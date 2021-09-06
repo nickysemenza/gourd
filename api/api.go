@@ -229,8 +229,24 @@ func transformRecipeSections(dbs []db.Section) ([]RecipeSection, error) {
 				Optional:  i.Optional.Ptr(),
 				Amounts:   []Amount{},
 			}
+			hasGrams := false
 			for _, amt := range i.Amounts {
-				item.Amounts = append(item.Amounts, Amount{Unit: amt.Unit, Value: amt.Value})
+				item.Amounts = append(item.Amounts, Amount{
+					Unit:   amt.Unit,
+					Value:  amt.Value,
+					Source: zero.StringFrom("db").Ptr(),
+				})
+
+				if amt.Unit == "grams" || amt.Unit == "g" || amt.Unit == "gram" {
+					hasGrams = true
+				}
+			}
+			if !hasGrams {
+				item.Amounts = append(item.Amounts, Amount{
+					Unit:   "gram",
+					Value:  1.1,
+					Source: zero.StringFrom("calculated-todo").Ptr(),
+				})
 			}
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
