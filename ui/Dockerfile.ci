@@ -1,4 +1,4 @@
-FROM rust:1.54 as builder
+FROM rust:1.55 as builder
 WORKDIR /work/rust
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 COPY rust/ .
