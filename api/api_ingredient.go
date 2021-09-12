@@ -144,7 +144,7 @@ func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error
 		}
 	}
 	for _, n := range food.Nutrients {
-		if n.Nutrient.UnitName == FoodNutrientUnit_KCAL {
+		if n.Nutrient.UnitName == FoodNutrientUnitKCAL {
 			m = append(m, UnitMapping{
 				Amount{Unit: "kcal", Value: n.Amount},
 				Amount{Unit: "grams", Value: 100},

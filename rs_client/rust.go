@@ -18,9 +18,10 @@ import (
 type parseMethod string
 
 const (
-	Ingredient parseMethod = "parse"
-	Scrape     parseMethod = "scrape"
-	Amount     parseMethod = "parse_amount"
+	Ingredient   parseMethod = "parse"
+	Scrape       parseMethod = "scrape"
+	Amount       parseMethod = "parse_amount"
+	RecipeDecode parseMethod = "decode_recipe"
 )
 
 func Call(ctx context.Context, text string, kind parseMethod, target interface{}) error {
@@ -34,7 +35,7 @@ func Call(ctx context.Context, text string, kind parseMethod, target interface{}
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("rs Call to %s failed: %w", url, err)
 	}
 
 	defer res.Body.Close()

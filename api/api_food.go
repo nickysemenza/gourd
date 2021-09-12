@@ -147,7 +147,7 @@ func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
 		return nil, err
 	}
 	if food.FdcID == 0 {
-		return nil, nil //fmt.Errorf("could not find food with fdc id %d", fdcId)
+		return nil, nil // fmt.Errorf("could not find food with fdc id %d", fdcId)
 	}
 
 	f := Food{

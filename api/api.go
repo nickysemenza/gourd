@@ -1,6 +1,6 @@
-//go:generate oapi-codegen --package api --generate server,spec -o api-server.gen.go openapi.yaml
-//go:generate oapi-codegen --package api --generate types,skip-prune -o api-types.gen.go openapi.yaml
-// todo go:generate oapi-codegen --package api --generate client -o api-client.gen.go openapi.yaml
+//go:generate ../bin/oapi-codegen --package api --generate server,spec -o api-server.gen.go openapi.yaml
+//go:generate ../bin/oapi-codegen --package api --generate types,skip-prune -o api-types.gen.go openapi.yaml
+// todo go:generate ../bin/oapi-codegen --package api --generate client -o api-client.gen.go openapi.yaml
 
 package api
 
@@ -94,7 +94,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 		})
 	}
 	switch i.Kind {
-	case IngredientKind_recipe:
+	case IngredientKindRecipe:
 		if i.Recipe == nil {
 			return nil, nil
 		}
@@ -121,15 +121,22 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 			id = r.RecipeId
 		}
 		si.RecipeId = zero.StringFrom(id)
-	case IngredientKind_ingredient:
-		if i.Ingredient == nil || (i.Ingredient.Ingredient.Name == "" && i.Ingredient.Ingredient.Id == "") {
+	case IngredientKindIngredient:
+		if i.Ingredient == nil {
+			return nil, nil
+		}
+		name := i.Ingredient.Ingredient.Name
+		if name == "" {
+			name = i.Ingredient.Name // todo: remove
+		}
+		if name == "" && i.Ingredient.Ingredient.Id == "" {
 			return nil, nil
 		}
 		id := i.Ingredient.Ingredient.Id
 
 		// missing id, need to find/create
 		if id == "" {
-			ing, err := a.DB().IngredientByName(ctx, i.Ingredient.Ingredient.Name)
+			ing, err := a.DB().IngredientByName(ctx, name)
 			if err != nil {
 				return nil, err
 			}
@@ -257,9 +264,10 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				item.Ingredient = &foo[0]
 
 				if !hasGrams {
+					weight := UnitConversionRequestTargetWeight
 					req := UnitConversionRequest{
 						Input:        item.Amounts,
-						Target:       zero.StringFrom("weight").Ptr(),
+						Target:       &weight,
 						UnitMappings: item.Ingredient.UnitMappings,
 					}
 					var res Amount
@@ -275,9 +283,10 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 						item.Amounts = append(item.Amounts, res)
 
 					} else {
+						volume := UnitConversionRequestTargetVolume
 						req := UnitConversionRequest{
 							Input:        item.Amounts,
-							Target:       zero.StringFrom("volume").Ptr(),
+							Target:       &volume,
 							UnitMappings: item.Ingredient.UnitMappings,
 						}
 						err = rs_client.Convert(
@@ -295,9 +304,10 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					}
 
 				}
+				cal := UnitConversionRequestTargetCalories
 				req := UnitConversionRequest{
 					Input:        item.Amounts,
-					Target:       zero.StringFrom("calories").Ptr(),
+					Target:       &cal,
 					UnitMappings: item.Ingredient.UnitMappings,
 				}
 				var res Amount
@@ -314,9 +324,10 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 
 				}
 
+				money := UnitConversionRequestTargetMoney
 				req = UnitConversionRequest{
 					Input:        item.Amounts,
-					Target:       zero.StringFrom("money").Ptr(),
+					Target:       &money,
 					UnitMappings: item.Ingredient.UnitMappings,
 				}
 				err = rs_client.Convert(

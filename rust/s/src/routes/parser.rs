@@ -70,6 +70,22 @@ pub async fn parser(info: web::Query<Info>) -> HttpResponse {
 
     HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
 }
+pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
+    global::tracer("my-component").start("decode_recipe");
+
+    get_active_span(|span| {
+        span.add_event(
+            "decode_recipe".to_string(),
+            vec![KeyValue::new("line", info.text.to_string())],
+        );
+    });
+
+    let detail = gourd_common::decode_recipe(info.text.to_string());
+
+    let foo = web::Json(detail);
+
+    HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
+}
 pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     global::tracer("my-component").start("amount_parser");
 

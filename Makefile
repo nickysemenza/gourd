@@ -51,6 +51,9 @@ bin/migrate:
 bin/go-acc:
 	@mkdir -p $(dir $@)
 	go build -o $@ ./vendor/github.com/ory/go-acc
+bin/oapi-codegen:
+	@mkdir -p $(dir $@)
+	go build -o $@ ./vendor/github.com/deepmap/oapi-codegen/cmd/oapi-codegen
 
 unit-test: 
 	go test -v -race -cover ./...
@@ -86,7 +89,7 @@ migrate-down: bin/migrate
 
 validate-openapi: api/openapi.yaml
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
-generate-openapi: validate-openapi api/openapi.yaml
+generate-openapi: validate-openapi api/openapi.yaml bin/oapi-codegenv
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	npx @openapitools/openapi-generator-cli version-manager set 5.2.0

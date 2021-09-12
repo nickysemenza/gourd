@@ -73,6 +73,7 @@ fn run(
             .wrap(RequestTracing::new())
             .route("/parse", web::get().to(parser))
             .route("/parse_amount", web::get().to(parser::amount_parser))
+            .route("/decode_recipe", web::get().to(parser::decode_recipe))
             .route("/convert", web::post().to(parser::convert))
             .route("/scrape", web::get().to(parser::scrape))
             .service(web::resource("/parse2").route(web::get().to(parser::index)))

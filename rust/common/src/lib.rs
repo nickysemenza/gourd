@@ -201,7 +201,10 @@ pub fn compact_recipe(r: RecipeDetail) -> CompactRecipe {
     for s in r.sections.iter() {
         let mut sec = Vec::new();
         for ing in s.ingredients.clone().into_iter() {
-            sec.push(CompactRecipeLine::Ing(si_to_ingredient(ing)));
+            let mut ing2 = ing.clone();
+            ing2.amounts
+                .retain(|a| a.source.as_ref().unwrap_or(&"".to_string()) != "calculated");
+            sec.push(CompactRecipeLine::Ing(si_to_ingredient(ing2)));
         }
         for ins in s.instructions.iter() {
             sec.push(CompactRecipeLine::Ins(ins.instruction.clone()));
@@ -213,6 +216,11 @@ pub fn compact_recipe(r: RecipeDetail) -> CompactRecipe {
 
 pub fn encode_recipe(r: RecipeDetail) -> String {
     let mut res = String::new();
+    res.push_str(&format!("name: {}\n", r.name));
+    // // // res.push_str("name: ");
+    // // res.push_str(&r.name);
+    // res.push('\n');
+    res.push_str("---\n");
     for s in compact_recipe(r).0.into_iter() {
         for i in s.into_iter() {
             res.push_str(
@@ -229,7 +237,19 @@ pub fn encode_recipe(r: RecipeDetail) -> String {
     return res.trim_end().to_string();
 }
 pub fn decode_recipe(r: String) -> RecipeDetail {
-    let raw_sections: Vec<&str> = r.split("\n\n").collect();
+    let mut name = String::new();
+    let parts: Vec<&str> = r.split("---").collect();
+    if parts.len() == 2 {
+        parts[0]
+            .split("\n")
+            .collect::<Vec<&str>>()
+            .into_iter()
+            .for_each(|s| match s.strip_prefix("name: ") {
+                Some(n) => name = dbg!(n).to_string(),
+                None => {}
+            })
+    }
+    let raw_sections: Vec<&str> = dbg!(parts).last().unwrap().split("\n\n").collect();
 
     let sections = dbg!(raw_sections)
         .into_iter()
@@ -250,17 +270,9 @@ pub fn decode_recipe(r: String) -> RecipeDetail {
         })
         .collect();
 
-    RecipeDetail::new("".to_string(), sections, "".to_string(), 0, "".to_string())
+    RecipeDetail::new("".to_string(), sections, name, 0, "".to_string())
 }
-fn bare_detail(name: String) -> IngredientDetail {
-    IngredientDetail::new(
-        "".to_string(),
-        Ingredient::new("".to_string(), name.to_string()),
-        vec![],
-        vec![],
-        vec![],
-    )
-}
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
@@ -271,7 +283,17 @@ mod tests {
     };
     use pretty_assertions::assert_eq;
 
-    use crate::{bare_detail, decode_recipe, encode_recipe, parse_ingredient, sum_ingredients};
+    use crate::{decode_recipe, encode_recipe, parse_ingredient, sum_ingredients};
+
+    fn bare_detail(name: String) -> IngredientDetail {
+        IngredientDetail::new(
+            "".to_string(),
+            Ingredient::new("".to_string(), name.to_string()),
+            vec![],
+            vec![],
+            vec![],
+        )
+    }
 
     #[test]
     fn test_encode() {
@@ -322,11 +344,13 @@ mod tests {
                     vec![si_3.clone()],
                 ),
             ],
-            "".to_string(),
+            "cake".to_string(),
             0,
             "".to_string(),
         );
-        let raw = "12 g foo
+        let raw = "name: cake
+---
+12 g foo
 14 g / 1.5 cups bar
 2 g bar
 ;inst1
@@ -340,7 +364,9 @@ mod tests {
     }
     #[test]
     fn test_encode_decode() {
-        let r = "113 g / 1 stick butter
+        let r = "name: cookies
+---
+113 g / 1 stick butter
 ;brown, add to mixer
 
 113 g / 1 stick butter, cold

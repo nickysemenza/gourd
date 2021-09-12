@@ -441,7 +441,7 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      {/* <pre>{w.encode_recipe_text(recipe.detail)}</pre> */}
+      <pre>{w.encode_recipe_text(recipe.detail)}</pre>
       <p className="text-lg font-bold">meals</p>
 
       <Nutrition
