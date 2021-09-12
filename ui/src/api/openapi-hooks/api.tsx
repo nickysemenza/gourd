@@ -171,6 +171,10 @@ export interface Ingredient {
  * An Ingredient
  */
 export interface IngredientDetail {
+  /**
+   * Ingredient name
+   */
+  name: string;
   ingredient: Ingredient;
   /**
    * Recipes referencing this ingredient

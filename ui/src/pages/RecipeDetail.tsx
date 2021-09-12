@@ -8,7 +8,6 @@ import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
   useGetRecipeById,
-  useCreateRecipes,
   RecipeSource,
   SectionIngredient,
   useGetFoodsByIds,
@@ -38,7 +37,7 @@ import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
 import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
-import { Recipe, RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
+import { RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 
 const RecipeDetail: React.FC = () => {
@@ -63,11 +62,11 @@ const RecipeDetail: React.FC = () => {
     setRecipe(r);
   };
   const tweaks: RecipeTweaks = { override, multiplier, edit };
-  const { mutate: post } = useCreateRecipes({
-    onMutate: (_) => {
-      // setRecipe(data);
-    },
-  });
+  // const { mutate: post } = useCreateRecipes({
+  //   onMutate: (_) => {
+  //     // setRecipe(data);
+  //   },
+  // });
 
   const { data: foods } = useGetFoodsByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
@@ -218,7 +217,7 @@ const RecipeDetail: React.FC = () => {
                 case "grams":
                 case "amount":
                   toAdd.value = parseFloat(value);
-                  if (attr == "grams") {
+                  if (attr === "grams") {
                     toAdd.unit = "grams";
                   }
                   break;

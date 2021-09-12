@@ -158,7 +158,6 @@ sections:
         kind: recipe
         recipe:
           name: CS Pecan Brittle
-
       - amounts:
           - value: 1
             unit: cup

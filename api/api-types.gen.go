@@ -482,6 +482,17 @@ type TimeRange struct {
 	Min int `json:"min"`
 }
 
+// UnitConversionRequest defines model for UnitConversionRequest.
+type UnitConversionRequest struct {
+
+	// multiple amounts to try
+	Input  []Amount `json:"input"`
+	Target *string  `json:"target,omitempty"`
+
+	// mappings of equivalent units
+	UnitMappings []UnitMapping `json:"unit_mappings"`
+}
+
 // UnitMapping defines model for UnitMapping.
 type UnitMapping struct {
 

@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS "recipe_section_ingredients" (
   --   ingredient can be an `ingredient` or a `recipe`
   "ingredient" TEXT references ingredients(id),
   "recipe" TEXT references recipes(id),
-  "amounts" JSON,
+  "amounts" JSON NOT NULL,
   "adjective" TEXT,
   "original" TEXT,
   "optional" boolean default false,

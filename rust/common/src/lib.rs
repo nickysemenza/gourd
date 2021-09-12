@@ -56,6 +56,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
     return SectionIngredient {
         adjective: i.modifier,
         ingredient: Some(Box::new(IngredientDetail::new(
+            "".to_string(),
             Ingredient::new("".to_string(), i.name),
             vec![],
             vec![],
@@ -153,6 +154,9 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
         Target::Calories => MeasureKind::Calories,
         Target::Other => MeasureKind::Other,
     };
+    if req.input.len() == 0 {
+        return None;
+    }
     return match amount_to_measure(req.input[0].clone()).convert(target, equivalencies) {
         Some(a) => Some(measure_to_amount(a)),
         None => None,
@@ -250,6 +254,7 @@ pub fn decode_recipe(r: String) -> RecipeDetail {
 }
 fn bare_detail(name: String) -> IngredientDetail {
     IngredientDetail::new(
+        "".to_string(),
         Ingredient::new("".to_string(), name.to_string()),
         vec![],
         vec![],
@@ -425,6 +430,7 @@ mod tests {
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
+                "foo".to_string(),
                 Ingredient::new("a".to_string(), "foo".to_string()),
                 vec![],
                 vec![],
@@ -438,6 +444,7 @@ mod tests {
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
+                "bar".to_string(),
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],
@@ -451,6 +458,7 @@ mod tests {
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
+                "bar".to_string(),
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],

@@ -89,6 +89,14 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
 }
 pub async fn convert(r: web::Json<openapi::models::UnitConversionRequest>) -> HttpResponse {
+    global::tracer("my-component").start("convert");
+
+    get_active_span(|span| {
+        span.add_event(
+            "convert".to_string(),
+            vec![KeyValue::new("line", format!("{:#?}", r.0).to_string())],
+        );
+    });
     HttpResponse::Ok().json(convert_to(r.0))
 }
 

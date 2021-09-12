@@ -32,12 +32,12 @@ import {
   updateTimeRange,
   FoodsById,
   IngDetailsById,
-  inferGrams,
   getHint,
   getStats,
   totalFlourMass,
   getGramsFromSI,
   isGram,
+  isVolume,
 } from "./RecipeEditorUtils";
 import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
 import { RecipeLink } from "./Misc";
@@ -133,11 +133,15 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       if (gramIndex === -1 && isGram(a)) {
         gramIndex = i;
       }
-      if (ingIndex === -1 && !isGram(a)) {
+      if (ingIndex === -1 && isVolume(a)) {
         ingIndex = i;
       }
     });
-    const placeholderGrams = w && inferGrams(w, ingredient, ing_hints);
+    const placeholderGrams =
+      (gramIndex >= 0 &&
+        ingredient.amounts[gramIndex].source !== "db" &&
+        ingredient.amounts[gramIndex].value) ||
+      undefined;
     return (
       <div className="flex flex-col">
         <div className={`ing-table-row`} key={y}>

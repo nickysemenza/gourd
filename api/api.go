@@ -1,5 +1,5 @@
 //go:generate oapi-codegen --package api --generate server,spec -o api-server.gen.go openapi.yaml
-//go:generate oapi-codegen --package api --generate types -o api-types.gen.go openapi.yaml
+//go:generate oapi-codegen --package api --generate types,skip-prune -o api-types.gen.go openapi.yaml
 // todo go:generate oapi-codegen --package api --generate client -o api-client.gen.go openapi.yaml
 
 package api
@@ -16,6 +16,7 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -241,13 +242,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					hasGrams = true
 				}
 			}
-			if !hasGrams {
-				item.Amounts = append(item.Amounts, Amount{
-					Unit:   "gram",
-					Value:  1.1,
-					Source: zero.StringFrom("calculated-todo").Ptr(),
-				})
-			}
+
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
 				r := a.transformRecipe(ctx, *i.RawRecipe)
@@ -260,6 +255,82 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				}
 				// i := transformIngredient(*i.RawIngredient)
 				item.Ingredient = &foo[0]
+
+				if !hasGrams {
+					req := UnitConversionRequest{
+						Input:        item.Amounts,
+						Target:       zero.StringFrom("weight").Ptr(),
+						UnitMappings: item.Ingredient.UnitMappings,
+					}
+					var res Amount
+					err = rs_client.Convert(
+						ctx, req, &res,
+					)
+					if err != nil {
+						return nil, err
+					}
+					if res.Value != 0 {
+
+						res.Source = zero.StringFrom("calculated").Ptr()
+						item.Amounts = append(item.Amounts, res)
+
+					} else {
+						req := UnitConversionRequest{
+							Input:        item.Amounts,
+							Target:       zero.StringFrom("volume").Ptr(),
+							UnitMappings: item.Ingredient.UnitMappings,
+						}
+						err = rs_client.Convert(
+							ctx, req, &res,
+						)
+						if err != nil {
+							return nil, err
+						}
+						if res.Value != 0 {
+
+							res.Source = zero.StringFrom("calculated").Ptr()
+							item.Amounts = append(item.Amounts, res)
+
+						}
+					}
+
+				}
+				req := UnitConversionRequest{
+					Input:        item.Amounts,
+					Target:       zero.StringFrom("calories").Ptr(),
+					UnitMappings: item.Ingredient.UnitMappings,
+				}
+				var res Amount
+				err = rs_client.Convert(
+					ctx, req, &res,
+				)
+				if err != nil {
+					return nil, err
+				}
+				if res.Value != 0 {
+
+					res.Source = zero.StringFrom("calculated").Ptr()
+					item.Amounts = append(item.Amounts, res)
+
+				}
+
+				req = UnitConversionRequest{
+					Input:        item.Amounts,
+					Target:       zero.StringFrom("money").Ptr(),
+					UnitMappings: item.Ingredient.UnitMappings,
+				}
+				err = rs_client.Convert(
+					ctx, req, &res,
+				)
+				if err != nil {
+					return nil, err
+				}
+				if res.Value != 0 {
+
+					res.Source = zero.StringFrom("calculated").Ptr()
+					item.Amounts = append(item.Amounts, res)
+
+				}
 				//  &IngredientDetail{Ingredient: i, Children: []IngredientDetail{}, UnitMappings: []UnitMapping{}, Recipes: []RecipeDetail{}}
 			}
 			if i.SubsFor.Valid {

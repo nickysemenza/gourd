@@ -1,15 +1,13 @@
-import React, { useContext } from "react";
+import React from "react";
 import { RecipeDetail } from "../api/openapi-fetch";
 import {
   SectionIngredient,
   useListIngredients,
   useGetRecipesByIds,
 } from "../api/openapi-hooks/api";
-import { WasmContext } from "../wasm";
 import {
   flatIngredients,
   getGramsFromSI,
-  inferGrams,
   IngDetailsById,
   totalFlourMass,
 } from "./RecipeEditorUtils";
@@ -20,9 +18,6 @@ import { useLocation } from "react-router-dom";
 import queryString from "query-string";
 
 const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
-  const w = useContext(WasmContext);
-
-  // const [ids, setIds] = useState(["rd_d041e06b", "rd_3f5f67df", ""]);
   const url = queryString.parse(useLocation().search).recipes;
   const ids = url ? (Array.isArray(url) ? url : [url]) : [];
 
@@ -123,10 +118,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
                 if (!si) {
                   return <td className="border border-gray-400"></td>;
                 }
-                const grams =
-                  getGramsFromSI(si) ||
-                  (w && inferGrams(w, si, ing_hints)) ||
-                  0;
+                const grams = getGramsFromSI(si) || 0;
                 const bp = scaledRound(
                   (grams / totalFlourMass(recipes[x].detail.sections)) * 100
                 );

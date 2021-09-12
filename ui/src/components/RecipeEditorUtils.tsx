@@ -12,8 +12,7 @@ import {
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 import { wasm } from "../wasm";
-import { try_convert } from "./UnitConvertDemo";
-import { Amount, UnitConversionRequestTargetEnum } from "../api/openapi-fetch";
+import { Amount } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -62,6 +61,7 @@ export const updateIngredientInfo = (
                 $set:
                   kind === "ingredient"
                     ? {
+                        name,
                         ingredient: { id, name, fdc_id },
                         recipes: [],
                         children: [],
@@ -388,7 +388,7 @@ export const getStats = (
   ing_hints: IngDetailsById,
   multiplier: number
 ): Stats => {
-  const grams = getGrams(w, si, ing_hints);
+  const grams = getGramsFromSI(si);
   if (si.kind === "recipe") {
     console.log("foo", si);
     const total = countTotals(si.recipe?.sections || [], w, ing_hints);
@@ -397,22 +397,11 @@ export const getStats = (
       total.grams && grams ? (grams / total.grams) * multiplier : 1
     );
   }
+
   return {
     grams,
-    dollars: w_convert(
-      w,
-      si,
-      ing_hints,
-      multiplier,
-      UnitConversionRequestTargetEnum.MONEY
-    ),
-    kcal: w_convert(
-      w,
-      si,
-      ing_hints,
-      multiplier,
-      UnitConversionRequestTargetEnum.CALORIES
-    ),
+    dollars: si.amounts.filter((a) => isMoney(a)).pop()?.value,
+    kcal: si.amounts.filter((a) => isCal(a)).pop()?.value,
   };
 };
 export const countTotals = (
@@ -557,75 +546,14 @@ export const getHint = (
   const hint = ing_hints[ingredientId];
   return !!hint ? hint : undefined;
 };
-// TODO: move this to backend
-export const inferGrams = (
-  w: wasm,
-  ingredient: SectionIngredient,
-  ing_hints: IngDetailsById
-): number | undefined => {
-  const hint = getHint(ingredient, ing_hints);
-  if (!hint) return undefined;
-  return (
-    ingredient.amounts
-      .filter((a) => !isGram(a))
-      .map(({ unit, value }) => {
-        if (!unit || !value || unit === "" || value === 0) return undefined;
 
-        const targets = [
-          UnitConversionRequestTargetEnum.WEIGHT,
-          UnitConversionRequestTargetEnum.VOLUME,
-        ];
-        let res = targets.map(
-          (t) =>
-            try_convert(
-              w,
-              hint.unit_mappings,
-              [{ unit: unit || "", value: value || 0 }],
-              t,
-              ingredient.ingredient?.ingredient.name
-            )?.value
-        );
-        return res.find((x) => x !== undefined && x !== 0);
-      })
-      .filter((x) => x !== undefined)
-      .pop() || 0
-  );
-};
+export const isCal = (a: Amount) => a.unit === "kcal";
+export const isMoney = (a: Amount) => a.unit === "$";
+export const isVolume = (a: Amount) => !isGram(a) && !isMoney(a) && !isCal(a);
 export const isGram = (a: Amount) =>
   a.unit === "grams" || a.unit === "gram" || a.unit === "g";
 export const getGramsFromSI = (si: SectionIngredient) =>
-  (si.amounts.filter((a) => isGram(a)).pop() || { value: 0 }).value;
-const getGrams = (
-  w: wasm,
-  ingredient: SectionIngredient,
-  ing_hints: IngDetailsById
-) => {
-  const grams = getGramsFromSI(ingredient);
-  return grams || inferGrams(w, ingredient, ing_hints);
-};
-const w_convert = (
-  w: wasm,
-  ingredient: SectionIngredient,
-  ing_hints: IngDetailsById,
-  multiplier: number,
-  to:
-    | UnitConversionRequestTargetEnum.CALORIES
-    | UnitConversionRequestTargetEnum.MONEY
-): number | undefined => {
-  // console.info("w_convert", ingredient);
-  const hint = getHint(ingredient, ing_hints);
-  if (!hint) return undefined;
-  const grams = getGrams(w, ingredient, ing_hints);
-  if (grams === 0) return undefined;
-  const val = try_convert(
-    w,
-    hint.unit_mappings,
-    [{ unit: "grams", value: grams || 0 }],
-    to,
-    ingredient.ingredient?.ingredient.name
-  )?.value;
-  return val ? val * multiplier : undefined;
-};
+  si.amounts.filter((a) => isGram(a)).pop()?.value || 0;
 
 // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
 export const totalFlourMass = (sections: RecipeSection[]) =>
