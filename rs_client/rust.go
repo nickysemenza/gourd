@@ -46,7 +46,7 @@ func Call(ctx context.Context, text string, kind parseMethod, target interface{}
 func Convert(ctx context.Context, body, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
 	defer span.End()
-	url := fmt.Sprintf("http://localhost:8080/convert")
+	url := fmt.Sprint("http://localhost:8080/convert")
 
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(body)

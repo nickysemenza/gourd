@@ -17,6 +17,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
     let mut ml = 0.0;
     let mut unit: Option<String> = None;
     let mut amount: Option<f64> = None;
+    let mut kind = IngredientKind::Ingredient;
 
     let mut amounts: Vec<Amount> = Vec::new();
     for x in i.amounts.iter() {
@@ -33,10 +34,12 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
             amount = Some(x.value as f64);
         }
         if amount.is_some() && unit.is_some() {
-            amounts.push(Amount::new(
-                unit.clone().unwrap_or("unknown".to_string()),
-                amount.unwrap_or(0.0),
-            ));
+            let unitstr = unit.clone().unwrap_or("unknown".to_string());
+            if unitstr == "recipe" {
+                // if the ingredient amount has a unit of "recipe", then it's likely a recipe
+                kind = IngredientKind::Recipe;
+            }
+            amounts.push(Amount::new(unitstr, amount.unwrap_or(0.0)));
         }
     }
     if grams == 0.0 {
@@ -53,17 +56,33 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
             amounts.push(Amount::new("g".to_string(), grams));
         }
     }
+
     return SectionIngredient {
         adjective: i.modifier,
-        ingredient: Some(Box::new(IngredientDetail::new(
-            "".to_string(),
-            Ingredient::new("".to_string(), i.name),
-            vec![],
-            vec![],
-            vec![],
-        ))),
+        ingredient: if kind == IngredientKind::Ingredient {
+            Some(Box::new(IngredientDetail::new(
+                "".to_string(),
+                Ingredient::new("".to_string(), i.name.clone()),
+                vec![],
+                vec![],
+                vec![],
+            )))
+        } else {
+            None
+        },
+        recipe: if kind == IngredientKind::Recipe {
+            Some(Box::new(RecipeDetail::new(
+                "".to_string(),
+                vec![],
+                i.name,
+                0,
+                "".to_string(),
+            )))
+        } else {
+            None
+        },
         original: Some(original.to_string()),
-        ..SectionIngredient::new("".to_string(), IngredientKind::Ingredient, amounts)
+        ..SectionIngredient::new("".to_string(), kind, amounts)
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {

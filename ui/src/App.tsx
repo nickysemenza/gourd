@@ -34,10 +34,7 @@ import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 
 import { WebTracerProvider } from "@opentelemetry/web";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
-import {
-  ConsoleSpanExporter,
-  SimpleSpanProcessor,
-} from "@opentelemetry/tracing";
+import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
