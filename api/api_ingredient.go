@@ -57,47 +57,58 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	if err != nil {
 		return nil, err
 	}
-
 	items := make([]IngredientDetail, len(ing))
 	for x, i := range ing {
 		// assemble
-		ctx, span2 := a.tracer.Start(ctx, "addDetailsToIngredients: enhance w/ fdc")
-		defer span2.End()
-		detail := a.makeDetail(ctx, i, sameAs, linkedRecipes)
-
-		for _, x := range append(sameAs.IdsBySameAs(i.Id), i.Id) {
-			if val, ok := unitMappings[x]; ok {
-				for _, m := range val {
-					detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
-						Amount{Unit: m.UnitA, Value: m.AmountA},
-						Amount{Unit: m.UnitB, Value: m.AmountB},
-						fmt.Sprintf("%s (%s)", m.Source, x),
-					})
-				}
-			}
+		item, err := a.enhanceWithFDC(ctx, i, sameAs, linkedRecipes, unitMappings)
+		if err != nil {
+			return nil, fmt.Errorf("enhanceWithFDC: %w", err)
 		}
-
-		if i.FdcID.Valid {
-			food, err := a.getFoodById(ctx, int(i.FdcID.Int64))
-			if err != nil {
-				return nil, err
-			}
-			if food != nil {
-				detail.Food = food
-				span2.SetAttributes(attribute.Int("fdc_id", food.FdcId))
-
-				m, err := UnitMappingsFromFood(ctx, food)
-				if err != nil {
-					return nil, err
-				}
-				detail.UnitMappings = append(detail.UnitMappings, m...)
-			}
-		}
-
-		items[x] = detail
-		span2.End()
+		items[x] = item
 	}
+
 	return items, nil
+}
+func (a *API) enhanceWithFDC(ctx context.Context, i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeDetails, unitMappings map[string][]db.IngredientUnitMapping) (detail IngredientDetail, err error) {
+	ctx, span := a.tracer.Start(ctx, "enhanceWithFDC")
+	defer span.End()
+	detail = a.makeDetail(ctx, i, sameAs, linkedRecipes)
+
+	for _, x := range append(sameAs.IdsBySameAs(i.Id), i.Id) {
+		if val, ok := unitMappings[x]; ok {
+			for _, m := range val {
+				detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
+					Amount{Unit: m.UnitA, Value: m.AmountA},
+					Amount{Unit: m.UnitB, Value: m.AmountB},
+					fmt.Sprintf("%s (%s)", m.Source, x),
+				})
+			}
+		}
+	}
+
+	if !i.FdcID.Valid {
+		return
+	}
+
+	var food *Food
+	food, err = a.getFoodById(ctx, int(i.FdcID.Int64))
+	if err != nil {
+		return
+	}
+	if food == nil {
+		return
+	}
+
+	detail.Food = food
+	span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
+
+	var m []UnitMapping
+	m, err = UnitMappingsFromFood(ctx, food)
+	if err != nil {
+		return
+	}
+	detail.UnitMappings = append(detail.UnitMappings, m...)
+	return
 }
 func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
 	// todo: store these in DB instead of inline parsing ?

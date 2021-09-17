@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/davecgh/go-spew/spew"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -37,6 +38,7 @@ func Call(ctx context.Context, text string, kind parseMethod, target interface{}
 	if err != nil {
 		return fmt.Errorf("rs Call to %s failed: %w", url, err)
 	}
+	log.WithField("kind", kind).Debugf("rs: parsed %s", text)
 
 	defer res.Body.Close()
 	return json.NewDecoder(res.Body).Decode(target)
@@ -65,6 +67,7 @@ func Convert(ctx context.Context, body, target interface{}) error {
 	if err != nil {
 		return err
 	}
+	log.Debugf("rs: converted %v", body)
 
 	defer res.Body.Close()
 	return json.NewDecoder(res.Body).Decode(target)

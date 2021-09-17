@@ -84,6 +84,7 @@ func setupMisc() {
 	// if err := viper.WriteConfig(); err != nil {
 	// 	panic(err)
 	// }
+	log.SetLevel(log.DebugLevel)
 
 	// tracing
 	if err := initTracer(); err != nil {

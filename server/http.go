@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	sentryecho "github.com/getsentry/sentry-go/echo"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	servertiming "github.com/mitchellh/go-server-timing"
+
+	mw2 "github.com/neko-neko/echo-logrus/v2"
+	log2 "github.com/neko-neko/echo-logrus/v2/log"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
@@ -34,14 +36,17 @@ type Server struct {
 	HTTPTimeout time.Duration
 	APIManager  *api.API
 	BypassAuth  bool
+	Logger      *log.Logger
 }
 
 func (s *Server) Run(_ context.Context) error {
 	r := echo.New()
 
+	log2.Logger().Logger = s.Logger
+	r.Logger = log2.Logger()
 	r.Use(otelecho.Middleware("gourd-server"))
 	r.Use(middleware.CORS())
-	r.Use(middleware.Logger())
+	r.Use(mw2.Logger())
 	r.Use(middleware.RequestID())
 	r.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
 	r.Use(middleware.Recover())
@@ -138,11 +143,11 @@ func wrapHandler(h http.Handler) http.Handler {
 				TraceID: trace.TraceID(sc.TraceID),
 			}
 			sc2.TraceFlags |= trace.FlagsSampled
-			spew.Dump("ctx-before", r.Context())
+			// spew.Dump("ctx-before", r.Context())
 
 			ctx := trace.ContextWithRemoteSpanContext(r.Context(), sc2)
 			r = r.Clone(ctx)
-			spew.Dump("extracted span", sc2)
+			// spew.Dump("extracted span", sc2)
 		}
 
 		// h2 := otelhttp.NewHandler(h, "server",

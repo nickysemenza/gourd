@@ -180,7 +180,6 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	}
 	listMeta := &Items{PageCount: 1}
 	listMeta.setTotalCount(count)
-	// spew.Dump(foods, count)
 	items, err := a.buildPaginatedFood(ctx, foods)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)

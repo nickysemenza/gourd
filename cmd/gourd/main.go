@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/scraper"
 	"github.com/spf13/cobra"
@@ -121,7 +120,6 @@ func init() {
 				if err != nil {
 					return err
 				}
-				spew.Dump(recipes)
 
 				for x := range recipes {
 					out, err := s.APIManager.CreateRecipe(ctx, &api.RecipeWrapper{Detail: recipes[x]})

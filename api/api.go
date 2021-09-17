@@ -209,7 +209,6 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 				si2 := *si
 				si2.SubsFor = zero.StringFrom(i.Id)
 				dbs.Ingredients = append(dbs.Ingredients, si2)
-				spew.Dump(si2)
 			}
 		}
 

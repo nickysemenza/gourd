@@ -30,6 +30,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/neko-neko/echo-logrus/v2 v2.0.1
 	github.com/ory/go-acc v0.2.6
 	github.com/prometheus/common v0.18.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect

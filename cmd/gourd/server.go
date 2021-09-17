@@ -40,6 +40,8 @@ func getDBConn() (*sql.DB, error) {
 	return dbConn, err
 }
 func makeServer() (*server.Server, error) {
+	logger := log.New()
+	logger.SetLevel(log.DebugLevel)
 	// setupMisc()
 
 	// postgres database
@@ -85,6 +87,7 @@ func makeServer() (*server.Server, error) {
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 		APIManager:  apiManager,
 		BypassAuth:  viper.GetBool("BYPASS_AUTH"),
+		Logger:      logger,
 	}, nil
 }
 func runServer() {
