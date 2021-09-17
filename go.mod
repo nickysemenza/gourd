@@ -10,11 +10,11 @@ require (
 	github.com/charmbracelet/glamour v0.3.0
 	github.com/cosmtrek/air v1.27.3
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepmap/oapi-codegen v1.6.1
+	github.com/deepmap/oapi-codegen v1.8.2
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/getkin/kin-openapi v0.55.0
+	github.com/getkin/kin-openapi v0.75.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/golang-migrate/migrate/v4 v4.14.1
@@ -79,7 +79,6 @@ require (
 	github.com/bkielbasa/cyclop v1.2.0 // indirect
 	github.com/bombsimon/wsl/v3 v3.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.0.2 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/charithe/durationcheck v0.0.8 // indirect
 	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af // indirect
@@ -158,7 +157,6 @@ require (
 	github.com/jirfag/go-printf-func-name v0.0.0-20200119135958-7558a9eaa5af // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
-	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/julz/importas v0.0.0-20210419104244-841f0c0fe66d // indirect
 	github.com/k0kubun/pp v2.3.0+incompatible // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
@@ -252,7 +250,6 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.18.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
-	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210503060351-7fd8e65b6420 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect

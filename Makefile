@@ -89,7 +89,7 @@ migrate-down: bin/migrate
 
 validate-openapi: api/openapi.yaml
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
-generate-openapi: validate-openapi api/openapi.yaml bin/oapi-codegenv
+generate-openapi: validate-openapi api/openapi.yaml bin/oapi-codegen
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	npx @openapitools/openapi-generator-cli version-manager set 5.2.0
