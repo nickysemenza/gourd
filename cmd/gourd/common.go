@@ -15,7 +15,9 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/trace/jaeger"
 	"go.opentelemetry.io/otel/propagation"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/sdk/resource"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
 func initTracer() error {
@@ -25,30 +27,56 @@ func initTracer() error {
 	if projectID != "" {
 		// google cloud trace
 		// env: GOOGLE_CLOUD_PROJECT=xx GOOGLE_APPLICATION_CREDENTIALS=x.json
-		exporter, err := texporter.NewExporter(texporter.WithProjectID(projectID))
+		// exporter, err := texporter.NewExporter(texporter.WithProjectID(projectID))
+		// if err != nil {
+		// 	return fmt.Errorf("texporter.NewExporter: %w", err)
+		// }
+		exporter, err := texporter.New(texporter.WithProjectID(projectID))
 		if err != nil {
 			return fmt.Errorf("texporter.NewExporter: %w", err)
 		}
+		tp := tracesdk.NewTracerProvider(
+			tracesdk.WithBatcher(exporter),
+		)
 
-		tp := sdktrace.NewTracerProvider(sdktrace.WithSyncer(exporter))
+		// tp := tracesdk.NewTracerProvider(tracesdk.WithSyncer(exporter))
 
 		otel.SetTracerProvider(tp)
 	} else if endpoint != "" {
-		_, err := jaeger.InstallNewPipeline(
-			jaeger.WithCollectorEndpoint(endpoint),
-			jaeger.WithProcess(jaeger.Process{
-				ServiceName: "gourd",
-				Tags: []attribute.KeyValue{
-					attribute.String("exporter", "jaeger"),
-				},
-			}),
-			jaeger.WithSDK(&sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
-		)
-		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}, jaegerp.Jaeger{}))
+		tp, err := tracerProvider(endpoint)
+		if err != nil {
+			return err
+		}
+		otel.SetTracerProvider(tp)
+
+		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{},
+			propagation.Baggage{},
+			jaegerp.Jaeger{},
+		))
 		return err
 	}
 
 	return nil
+}
+func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
+	// Create the Jaeger exporter
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	if err != nil {
+		return nil, err
+	}
+	tp := tracesdk.NewTracerProvider(
+		// Always be sure to batch in production.
+		tracesdk.WithBatcher(exp),
+		tracesdk.WithSampler(tracesdk.AlwaysSample()),
+		// Record information about this application in an Resource.
+		tracesdk.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("gourd"),
+			attribute.String("environment", "dev"),
+		)),
+	)
+	return tp, nil
 }
 
 func setupEnv() {

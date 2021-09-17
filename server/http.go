@@ -17,7 +17,13 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/metric/global"
+	export "go.opentelemetry.io/otel/sdk/export/metric"
+	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
+	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
+	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
+	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/api"
@@ -53,10 +59,21 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
 	r.Use(TraceIDHeader)
 
-	hf, err := prometheus.InstallNewPipeline(prometheus.Config{})
+	pconfig := prometheus.Config{}
+	c := controller.New(
+		processor.New(
+			selector.NewWithHistogramDistribution(
+				histogram.WithExplicitBoundaries(pconfig.DefaultHistogramBoundaries),
+			),
+			export.CumulativeExportKindSelector(),
+			processor.WithMemory(true),
+		),
+	)
+	exporter, err := prometheus.New(pconfig, c)
 	if err != nil {
 		return err
 	}
+	global.SetMeterProvider(exporter.MeterProvider())
 
 	skipper := func(c echo.Context) bool {
 		if s.BypassAuth {
@@ -79,7 +96,7 @@ func (s *Server) Run(_ context.Context) error {
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	// http routes
-	r.GET("/metrics", echo.WrapHandler(hf))
+	r.GET("/metrics", echo.WrapHandler(http.HandlerFunc(exporter.ServeHTTP)))
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
 	// r.Any("/api", echo.WrapHandler(otelhttp.NewHandler(api.Handler(apiManager), "/api")))
@@ -138,11 +155,12 @@ func wrapHandler(h http.Handler) http.Handler {
 		// opts := []trace.SpanOption{}
 		sc, ok := (&propagation.HTTPFormat{}).SpanContextFromRequest(r)
 		if ok && sc.SpanID.String() != "" {
-			sc2 := trace.SpanContext{
-				SpanID:  trace.SpanID(sc.SpanID),
-				TraceID: trace.TraceID(sc.TraceID),
-			}
-			sc2.TraceFlags |= trace.FlagsSampled
+			sc2 := trace.NewSpanContext(trace.SpanContextConfig{
+				SpanID:     trace.SpanID(sc.SpanID),
+				TraceID:    trace.TraceID(sc.TraceID),
+				TraceFlags: trace.FlagsSampled,
+			})
+
 			// spew.Dump("ctx-before", r.Context())
 
 			ctx := trace.ContextWithRemoteSpanContext(r.Context(), sc2)
@@ -190,7 +208,7 @@ func TraceIDHeader(next echo.HandlerFunc) echo.HandlerFunc {
 		sc := trace.SpanContextFromContext(ctx)
 		if sc.IsValid() {
 
-			c.Response().Header().Set(echo.HeaderXRequestID, sc.TraceID.String())
+			c.Response().Header().Set(echo.HeaderXRequestID, sc.TraceID().String())
 		}
 		return next(c)
 	}
