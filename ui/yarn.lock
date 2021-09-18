@@ -2889,7 +2889,7 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@headlessui/react@^1.4.1":
+"@headlessui/react@1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.4.1.tgz#0a8dbb20e1d63dcea55bfc3ab1b87637aaac7777"
   integrity sha512-gL6Ns5xQM57cZBzX6IVv6L7nsam8rDEpRhs5fg28SN64ikfmuuMgunc+Rw5C1cMScnvFM+cz32ueVrlSFEVlSg==
@@ -3152,7 +3152,7 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@^2.4.1":
+"@openapitools/openapi-generator-cli@2.4.4":
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.4.tgz#395cf44fffe61b2d66e535a1b08c3ab47b6d47a3"
   integrity sha512-aKYxbA4pYi9eoG+Z+cmrkb2U0rMz3HXVx1LE5UkTXjC3jEWdTFfRL3EwWTtdkZ5ozJ5VifAqBO//JUroQBhbQw==
@@ -3183,12 +3183,12 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api-metrics/-/api-metrics-0.25.0.tgz#3b996842c8043068da4d11a6e96960e757ad6be9"
   integrity sha512-9T0c9NQAEGRujUC7HzPa2/qZ5px/UvB2sfSU5CAKFRrAlDl2gn25B0oUbDqSRHW/IG1X2rnQ3z2bBQkJyJvE4g==
 
-"@opentelemetry/api@^1.0.3":
+"@opentelemetry/api@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.0.3.tgz#13a12ae9e05c2a782f7b5e84c3cbfda4225eaf80"
   integrity sha512-puWxACExDe9nxbBB3lOymQFrLYml2dVOrd7USiVRnSbgXE+KwBu+HxFvxrzfqsiSda9IWsXJG1ef7C1O2/GmKQ==
 
-"@opentelemetry/auto-instrumentations-web@^0.25.0":
+"@opentelemetry/auto-instrumentations-web@0.25.0":
   version "0.25.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/auto-instrumentations-web/-/auto-instrumentations-web-0.25.0.tgz#264e7baa5ff2721a7247993638cd64ee6177f579"
   integrity sha512-IZoPBEXLTegyZfjAgC2hurfblgLRAUPVGFRPM0hiaSUJ1SsAkN0YqA0nusvxoNW/L0SF1xyfr7+4yNKozVhQXg==
@@ -3204,7 +3204,7 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-zone-peer-dep/-/context-zone-peer-dep-0.24.0.tgz#30dc5deb848cf12c9f27d4742c7955de132455a1"
   integrity sha512-ItXxVSVT9CTkA2SAYJefuZxzaFFwxvCvr2jDpGr2ZtTa+C6QvLAHouq0Szy5TlgqcOitqF/KuppXpPCeItISfw==
 
-"@opentelemetry/context-zone@^0.24.0":
+"@opentelemetry/context-zone@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/context-zone/-/context-zone-0.24.0.tgz#9918ddf5412ebb5faadb22348f72d8c1ea703a6b"
   integrity sha512-yaillqiqCdPhC4UMYBnbEh8X5oIVWLyinqHRrzFem5C/gLBbRHMDFHPzUN7LW5FzDQG2q5Xqo0iOvRZiPaVuyA==
@@ -3228,7 +3228,7 @@
     "@opentelemetry/semantic-conventions" "0.25.0"
     semver "^7.3.5"
 
-"@opentelemetry/exporter-collector@^0.24.0":
+"@opentelemetry/exporter-collector@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/exporter-collector/-/exporter-collector-0.24.0.tgz#6937e9d2536bf40d452853944a8068074de89670"
   integrity sha512-lI/oW7JkGisUofY4g+YmgGSlHuHgjteqRj539IIugmd3/RlY8j2mmAfRK4bwcODTBrxzA8X8Ty/Yh8Ljg18c8Q==
@@ -3250,7 +3250,7 @@
     "@opentelemetry/sdk-trace-web" "^0.25.0"
     "@opentelemetry/semantic-conventions" "^0.25.0"
 
-"@opentelemetry/instrumentation-fetch@^0.24.0":
+"@opentelemetry/instrumentation-fetch@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-fetch/-/instrumentation-fetch-0.24.0.tgz#76bdc0cdd9bfa2709bc914ccc31194850362902b"
   integrity sha512-ZxjEctn5um5R7zBMqo6wdURmP+3gCtmhkg+id4q+1CQIKbZax6/uFCHeXPWyW/svz6QY0985/FJn8f+UStOWaw==
@@ -3319,14 +3319,14 @@
     "@opentelemetry/resources" "0.24.0"
     lodash.merge "^4.6.2"
 
-"@opentelemetry/propagator-b3@^0.24.0":
+"@opentelemetry/propagator-b3@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/propagator-b3/-/propagator-b3-0.24.0.tgz#b5971dee565b76323dd3b3727acee1c452dd0fec"
   integrity sha512-iV7KSN0LkEAkeVCbhaIJAgTEb7HCnVkprmpgkL6q79rP3vTW4dylwfBYgIwod7y0GT4Ofgomm0NrwwWiuGLbQA==
   dependencies:
     "@opentelemetry/core" "0.24.0"
 
-"@opentelemetry/propagator-jaeger@^0.24.0":
+"@opentelemetry/propagator-jaeger@0.24.0":
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/@opentelemetry/propagator-jaeger/-/propagator-jaeger-0.24.0.tgz#b212df61a28af9e0a49bd0f86436537c4942dcc3"
   integrity sha512-QXCxBwuSka+vXbBZdumtF7YKO84gwTyKy3GelZV5BPlgWoge0AbLR3DfsO9Beu13pmD+4PyuwMw3LfYsgG1+3g==
@@ -3521,7 +3521,7 @@
     "@sentry/types" "6.12.0"
     tslib "^1.9.3"
 
-"@sentry/react@^6.5.1":
+"@sentry/react@6.12.0":
   version "6.12.0"
   resolved "https://registry.yarnpkg.com/@sentry/react/-/react-6.12.0.tgz#8ae2680d226fafb0da0f3d8366bb285004ba6c2e"
   integrity sha512-E8Nw9PPzP/EyMy64ksr9xcyYYlBmUA5ROnkPQp7o5wF0xf5/J+nMS1tQdyPnLQe2KUgHlN4kVs2HHft1m7mSYQ==
@@ -3533,7 +3533,7 @@
     hoist-non-react-statics "^3.3.2"
     tslib "^1.9.3"
 
-"@sentry/tracing@^6.5.1":
+"@sentry/tracing@6.12.0":
   version "6.12.0"
   resolved "https://registry.yarnpkg.com/@sentry/tracing/-/tracing-6.12.0.tgz#a05c8985ee7fed7310b029b147d8f9f14f2a2e67"
   integrity sha512-u10QHNknPBzbWSUUNMkvuH53sQd5NaBo6YdNPj4p5b7sE7445Sh0PwBpRbY3ZiUUiwyxV59fx9UQ4yVnPGxZQA==
@@ -4157,7 +4157,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-helmet@^6.1.2":
+"@types/react-helmet@6.1.2":
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/@types/react-helmet/-/react-helmet-6.1.2.tgz#e9d7d16b29e4ec5716711c52c35c3cec45819eac"
   integrity sha512-dcfAZNlWb5JYFbO9CGfrPWLJAyFcT6UeR3u35eBbv8liY2Rg4K7fM1G5+HnwVgot+C+kVwXAZ8pLEn2jsMfTDg==
@@ -9564,7 +9564,7 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-graphviz-react@^1.2.0:
+graphviz-react@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/graphviz-react/-/graphviz-react-1.2.0.tgz#ec2fafc5482569408576e1d6844cf62fbe8dda3d"
   integrity sha512-C3V0LGLSs/gGskGwh5r8QGqGhc3D+H7b+vVGATG6ME5R50FYSl/cQNTTu9p4uOeWlHClVtL/wVZr+/+as9yBKg==
@@ -14558,15 +14558,7 @@ query-string@*:
     split-on-first "^1.0.0"
     strict-uri-encode "^2.0.0"
 
-query-string@^4.1.0:
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/query-string/-/query-string-4.3.4.tgz#bbb693b9ca915c232515b228b1a02b609043dbeb"
-  integrity sha1-u7aTucqRXCMlFbIosaArYJBD2+s=
-  dependencies:
-    object-assign "^4.1.0"
-    strict-uri-encode "^1.0.0"
-
-query-string@^7.0.1:
+query-string@7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-7.0.1.tgz#45bd149cf586aaa582dffc7ec7a8ad97dd02f75d"
   integrity sha512-uIw3iRvHnk9to1blJCG3BTc+Ro56CBowJXKmNNAm3RulvPBzWLRqKSiiDk+IplJhsydwtuNMHi8UGQFcCLVfkA==
@@ -14575,6 +14567,14 @@ query-string@^7.0.1:
     filter-obj "^1.1.0"
     split-on-first "^1.0.0"
     strict-uri-encode "^2.0.0"
+
+query-string@^4.1.0:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/query-string/-/query-string-4.3.4.tgz#bbb693b9ca915c232515b228b1a02b609043dbeb"
+  integrity sha1-u7aTucqRXCMlFbIosaArYJBD2+s=
+  dependencies:
+    object-assign "^4.1.0"
+    strict-uri-encode "^1.0.0"
 
 querystring-es3@^0.2.0, querystring-es3@~0.2.0:
   version "0.2.1"
@@ -14724,7 +14724,7 @@ react-dev-utils@^11.0.3:
     strip-ansi "6.0.0"
     text-table "0.2.0"
 
-react-diff-viewer@^3.1.1:
+react-diff-viewer@3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/react-diff-viewer/-/react-diff-viewer-3.1.1.tgz#21ac9c891193d05a3734bfd6bd54b107ee6d46cc"
   integrity sha512-rmvwNdcClp6ZWdS11m1m01UnBA4OwYaLG/li0dB781e/bQEzsGyj+qewVd6W5ztBwseQ72pO7nwaCcq5jnlzcw==
@@ -14801,7 +14801,7 @@ react-google-login@5.2.2:
     "@types/react" "*"
     prop-types "^15.6.0"
 
-react-helmet@^6.1.0:
+react-helmet@6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/react-helmet/-/react-helmet-6.1.0.tgz#a750d5165cb13cf213e44747502652e794468726"
   integrity sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==
