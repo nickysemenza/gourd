@@ -257,7 +257,7 @@ pub fn encode_recipe(r: RecipeDetail) -> String {
 }
 pub fn decode_recipe(r: String) -> RecipeDetail {
     let mut name = String::new();
-    let parts: Vec<&str> = r.split("---").collect();
+    let parts: Vec<&str> = r.split("---\n").collect();
     if parts.len() == 2 {
         parts[0]
             .split("\n")

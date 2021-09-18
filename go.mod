@@ -52,7 +52,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v0.23.0
 	go.opentelemetry.io/otel/trace v1.0.0-RC3
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	golang.org/x/tools v0.1.5
+	golang.org/x/tools v0.1.6
 	google.golang.org/api v0.57.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.62.0 // indirect
@@ -244,7 +244,7 @@ require (
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.1.0 // indirect
-	github.com/yuin/goldmark v1.3.5 // indirect
+	github.com/yuin/goldmark v1.4.0 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mongodb.org/mongo-driver v1.1.0 // indirect
@@ -253,7 +253,7 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a // indirect
 	golang.org/x/mod v0.4.2 // indirect
-	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect
+	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210908233432-aa78b53d3365 // indirect
 	golang.org/x/text v0.3.6 // indirect

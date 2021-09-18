@@ -242,7 +242,7 @@ mod tests {
 
         assert_eq!(
             response_body,
-            r##"{"id":"","kind":"ingredient","ingredient":{"id":"","name":"flour"},"grams":120.0,"amount":1.0,"unit":"cup","adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
+            r##"{"id":"","kind":"ingredient","ingredient":{"name":"","ingredient":{"id":"","name":"flour"},"recipes":[],"children":[],"unit_mappings":[]},"amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
         );
 
         Ok(())

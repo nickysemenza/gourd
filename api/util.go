@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/nickysemenza/gourd/rs_client"
+	log "github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 )
 
@@ -58,7 +59,9 @@ func JSONBytesFromFile(ctx context.Context, inputPath string) ([][]byte, error) 
 
 // RecipeFromFile reads a recipe from json or yaml file
 func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, error) {
-	switch filepath.Ext(inputPath) {
+	ext := filepath.Ext(inputPath)
+	log.Infof("loading %s (%s)", inputPath, ext)
+	switch ext {
 	case ".txt":
 		data, err := bytesFromFile(ctx, inputPath)
 		if err != nil {
@@ -70,8 +73,7 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, erro
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
 		return []RecipeDetail{output}, nil
-	case ".json":
-	case ".yaml":
+	case ".json", ".yaml":
 		var output []RecipeDetail
 
 		jsonBytes, err := JSONBytesFromFile(ctx, inputPath)
