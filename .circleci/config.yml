@@ -9,7 +9,7 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.17
-      - image: circleci/postgres:9.6-alpine
+      - image: circleci/postgres:12.1-alpine
         environment:
           POSTGRES_USER: gourd
           POSTGRES_DB: food
