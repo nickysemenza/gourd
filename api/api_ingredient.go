@@ -103,19 +103,19 @@ func (a *API) enhanceWithFDC(ctx context.Context, i db.Ingredient, sameAs db.Ing
 	span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
 
 	var m []UnitMapping
-	m, err = UnitMappingsFromFood(ctx, food)
+	m, err = a.UnitMappingsFromFood(ctx, food)
 	if err != nil {
 		return
 	}
 	detail.UnitMappings = append(detail.UnitMappings, m...)
 	return
 }
-func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
+func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
 	// todo: store these in DB instead of inline parsing ?
 	m := []UnitMapping{}
 	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
 		var res []Amount
-		err := rs_client.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
+		err := a.Manager.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
 		if err != nil {
 			return nil, err
 		}
@@ -131,7 +131,7 @@ func UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error
 
 			if p.PortionDescription != "" {
 				var res []Amount
-				err := rs_client.Call(ctx, p.PortionDescription, rs_client.Amount, &res)
+				err := a.Manager.R.Call(ctx, p.PortionDescription, rs_client.Amount, &res)
 				if err != nil {
 					err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
 					log.Error(err)

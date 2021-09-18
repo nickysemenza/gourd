@@ -7,6 +7,7 @@ import (
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/photos"
+	"github.com/nickysemenza/gourd/rs_client"
 )
 
 // Manager manages recipes
@@ -15,13 +16,15 @@ type Manager struct {
 	Google *google.Client
 	Photos *photos.Photos
 	Auth   *auth.Auth
+	R      *rs_client.Client
 }
 
-func New(db *db.Client, g *google.Client, auth *auth.Auth) *Manager {
+func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client) *Manager {
 	return &Manager{db: db,
 		Google: g,
 		Auth:   auth,
 		Photos: photos.New(db, g),
+		R:      r,
 	}
 }
 

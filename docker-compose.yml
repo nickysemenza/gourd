@@ -63,15 +63,37 @@ services:
     depends_on:
       - db
       - jaeger
+      - rs
     restart: always
     environment:
       DB_HOST: db
       DB_PORT: 5432
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      RS_URI: http://rs:8080/
       BYPASS_AUTH: "true"
       JWT_KEY: "foo"
     ports:
       - "4242:4242"
+
+  rs:
+    build:
+      dockerfile: rust/Dockerfile
+      context: .
+    depends_on:
+      - db
+      - jaeger
+    restart: always
+    volumes: 
+      - ./rs-ci.yaml:/work/rust/s/s-configuration/base.yaml
+      - ./rs-ci2.yaml:/work/rust/s/s-configuration/local.yaml
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      # BYPASS_AUTH: "true"
+      # JWT_KEY: "foo"
+    ports:
+      - "8080:8080"
 
   ui:
     build:

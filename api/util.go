@@ -11,6 +11,7 @@ import (
 
 	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel"
 	"sigs.k8s.io/yaml"
 )
 
@@ -58,7 +59,7 @@ func JSONBytesFromFile(ctx context.Context, inputPath string) ([][]byte, error) 
 }
 
 // RecipeFromFile reads a recipe from json or yaml file
-func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, error) {
+func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, error) {
 	ext := filepath.Ext(inputPath)
 	log.Infof("loading %s (%s)", inputPath, ext)
 	switch ext {
@@ -68,7 +69,7 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, erro
 			return nil, fmt.Errorf("failed to read bytes: %w", err)
 		}
 		output := RecipeDetail{}
-		err = rs_client.Call(ctx, string(data), rs_client.RecipeDecode, &output)
+		err = a.Manager.R.Call(ctx, string(data), rs_client.RecipeDecode, &output)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
@@ -97,7 +98,6 @@ func RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, erro
 	default:
 		return nil, fmt.Errorf("unknown extension: %s", inputPath)
 	}
-	return nil, nil
 }
 
 type IngredientMapping struct {
@@ -121,4 +121,17 @@ func IngredientMappingFromFile(ctx context.Context, inputPath string) ([]Ingredi
 	}
 
 	return r, nil
+}
+
+// FetchAndTransform returns a recipe.
+func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string, kind string) (string, error)) (*RecipeWrapper, error) {
+	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
+	defer span.End()
+
+	r := RecipeWrapper{}
+	err := a.Manager.R.Call(ctx, addr, rs_client.Scrape, &r)
+	if err != nil {
+		return nil, err
+	}
+	return &r, nil
 }

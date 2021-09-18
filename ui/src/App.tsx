@@ -21,7 +21,13 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import { getAPIURL, isLoggedIn, onAPIRequest, onAPIError } from "./config";
+import {
+  getAPIURL,
+  isLoggedIn,
+  onAPIRequest,
+  onAPIError,
+  getTracingURL,
+} from "./config";
 import { CookiesProvider } from "react-cookie";
 import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
@@ -39,40 +45,40 @@ import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
-const exporter = new CollectorTraceExporter({
-  url: "http://localhost:4318/v1/traces",
-  // https://github.com/open-telemetry/opentelemetry-js/issues/2321#issuecomment-889861080
-  headers: {
-    "Content-Type": "application/json",
-  },
-  // serviceName: "auto-instrumentations-web",
-});
+const registerTracing = (url: string) => {
+  if (url === "") return;
+  diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
-const provider = new WebTracerProvider();
+  const exporter = new CollectorTraceExporter({
+    url: url,
+    // https://github.com/open-telemetry/opentelemetry-js/issues/2321#issuecomment-889861080
+    headers: {
+      "Content-Type": "application/json",
+    },
+    // serviceName: "auto-instrumentations-web",
+  });
 
-registerInstrumentations({
-  instrumentations: [
-    new FetchInstrumentation({
-      propagateTraceHeaderCorsUrls: /.+/,
-    }),
-    // getWebAutoInstrumentations({
-    //   // load custom configuration for xml-http-request instrumentation
-    //   "@opentelemetry/instrumentation-xml-http-request": {
-    //     clearTimingResources: true,
-    //   },
-    // }),
-  ],
-});
-provider.register({
-  contextManager: new ZoneContextManager(),
-  // propagator: new B3Propagator(),
-  propagator: new JaegerPropagator(),
-});
+  const provider = new WebTracerProvider();
 
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+  registerInstrumentations({
+    instrumentations: [
+      new FetchInstrumentation({
+        propagateTraceHeaderCorsUrls: /.+/,
+      }),
+    ],
+  });
+  provider.register({
+    contextManager: new ZoneContextManager(),
+    // propagator: new B3Propagator(),
+    propagator: new JaegerPropagator(),
+  });
+
+  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+};
+const tracingURL = getTracingURL();
+if (tracingURL) registerTracing(tracingURL);
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (

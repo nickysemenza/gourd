@@ -25,10 +25,17 @@ const (
 	RecipeDecode parseMethod = "decode_recipe"
 )
 
-func Call(ctx context.Context, text string, kind parseMethod, target interface{}) error {
+type Client struct {
+	baseurl string
+}
+
+func New(baseurl string) *Client {
+	return &Client{baseurl}
+}
+func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Parse")
 	defer span.End()
-	url := fmt.Sprintf("http://localhost:8080/%s?text=%s", kind, url.QueryEscape(text))
+	url := fmt.Sprintf("%s%s?text=%s", c.baseurl, kind, url.QueryEscape(text))
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
 
@@ -45,10 +52,10 @@ func Call(ctx context.Context, text string, kind parseMethod, target interface{}
 
 }
 
-func Convert(ctx context.Context, body, target interface{}) error {
+func (c *Client) Convert(ctx context.Context, body, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
 	defer span.End()
-	url := fmt.Sprint("http://localhost:8080/convert")
+	url := fmt.Sprintf("%sconvert", c.baseurl)
 
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(body)

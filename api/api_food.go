@@ -128,7 +128,7 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 	f.Nutrients = fNutrients
 	f.Portions = &apiPortions
 	f.BrandedInfo = brandInfoRes
-	m, err := UnitMappingsFromFood(ctx, f)
+	m, err := a.UnitMappingsFromFood(ctx, f)
 	if err != nil {
 		return err
 	}

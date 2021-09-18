@@ -21,7 +21,7 @@ import (
 func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	t.Helper()
 	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil)
+	m := manager.New(tdb, nil, nil, nil)
 
 	apiManager := NewAPI(m)
 	e := echo.New()
@@ -119,11 +119,11 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	t.Skip("todo: rs in ci")
 	require := require.New(t)
 	ctx := context.Background()
-	r, err := RecipeFromFile(ctx, "../testdata/dep_1.yaml")
-	require.NoError(err)
 	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil)
+	m := manager.New(tdb, nil, nil, nil)
 	apiManager := NewAPI(m)
+	r, err := apiManager.RecipeFromFile(ctx, "../testdata/dep_1.yaml")
+	require.NoError(err)
 	err = apiManager.CreateRecipeDetails(ctx, r...)
 	require.NoError(err)
 }

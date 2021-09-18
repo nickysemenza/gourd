@@ -8,7 +8,6 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/scraper"
 	"github.com/spf13/cobra"
 )
 
@@ -77,7 +76,7 @@ func init() {
 				}
 				ctx := context.Background()
 
-				r, err := scraper.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientIdByName)
+				r, err := s.APIManager.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientIdByName)
 				if err != nil {
 					return err
 				}
@@ -116,7 +115,7 @@ func init() {
 				}
 				ctx := context.Background()
 
-				recipes, err := api.RecipeFromFile(ctx, strings.Join(args, " "))
+				recipes, err := s.APIManager.RecipeFromFile(ctx, strings.Join(args, " "))
 				if err != nil {
 					return err
 				}

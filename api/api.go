@@ -16,7 +16,6 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
-	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -270,7 +269,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 						UnitMappings: item.Ingredient.UnitMappings,
 					}
 					var res Amount
-					err = rs_client.Convert(
+					err = a.Manager.R.Convert(
 						ctx, req, &res,
 					)
 					if err != nil {
@@ -288,7 +287,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 							Target:       &volume,
 							UnitMappings: item.Ingredient.UnitMappings,
 						}
-						err = rs_client.Convert(
+						err = a.Manager.R.Convert(
 							ctx, req, &res,
 						)
 						if err != nil {
@@ -310,7 +309,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					UnitMappings: item.Ingredient.UnitMappings,
 				}
 				var res Amount
-				err = rs_client.Convert(
+				err = a.Manager.R.Convert(
 					ctx, req, &res,
 				)
 				if err != nil {
@@ -329,7 +328,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					Target:       &money,
 					UnitMappings: item.Ingredient.UnitMappings,
 				}
-				err = rs_client.Convert(
+				err = a.Manager.R.Convert(
 					ctx, req, &res,
 				)
 				if err != nil {
