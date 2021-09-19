@@ -15,13 +15,14 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/stretchr/testify/require"
 )
 
 func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	t.Helper()
 	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil, nil)
+	m := manager.New(tdb, nil, nil, rs_client.New("http://localhost:8080/"))
 
 	apiManager := NewAPI(m)
 	e := echo.New()
@@ -30,7 +31,6 @@ func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	return e, apiManager
 }
 func TestAPI(t *testing.T) {
-	t.Skip("todo: rs in ci")
 	require := require.New(t)
 
 	e, _ := makeHandler(t)
@@ -116,12 +116,9 @@ func TestAPI(t *testing.T) {
 }
 
 func TestRecipeReferencingRecipe(t *testing.T) {
-	t.Skip("todo: rs in ci")
 	require := require.New(t)
+	_, apiManager := makeHandler(t)
 	ctx := context.Background()
-	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil, nil)
-	apiManager := NewAPI(m)
 	r, err := apiManager.RecipeFromFile(ctx, "../testdata/dep_1.yaml")
 	require.NoError(err)
 	err = apiManager.CreateRecipeDetails(ctx, r...)
@@ -129,7 +126,6 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 }
 
 func TestSearches(t *testing.T) {
-	t.Skip("todo: rs in ci")
 	require := require.New(t)
 	ctx := context.Background()
 	e, api := makeHandler(t)
@@ -158,7 +154,6 @@ func TestSearches(t *testing.T) {
 }
 
 func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
-	t.Skip("todo: rs in ci")
 	require := require.New(t)
 	result := testutil.NewRequest().Get("/search?name="+name).Go(t, e)
 	require.Equal(http.StatusOK, result.Code())

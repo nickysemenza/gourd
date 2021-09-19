@@ -9,6 +9,18 @@ jobs:
       - uses: actions/checkout@v2
       - name: build e2e docker-compose
         run: docker-compose build --parallel
+      - name: dl deps
+        run: go mod vendor
+      - name: start db
+        run: docker-compose up -d db
+      - name: migrate
+        run: make migrate
+      - name: start rs
+        run: docker-compose up -d rs
+      - name: test rs
+        run: curl -v http://localhost:8080/parse?text=1%20cup
+      - name: go test integration
+        run: make integration-test
       - name: run usda import
         run: docker-compose run usda
       # - name: seed db with testdata

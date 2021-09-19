@@ -42,10 +42,11 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 
 	res, err := client.Do(req)
+	log.WithError(err).WithField("kind", kind).Debugf("rs: parsed %s", text)
+
 	if err != nil {
 		return fmt.Errorf("rs Call to %s failed: %w", url, err)
 	}
-	log.WithField("kind", kind).Debugf("rs: parsed %s", text)
 
 	defer res.Body.Close()
 	return json.NewDecoder(res.Body).Decode(target)
@@ -71,10 +72,10 @@ func (c *Client) Convert(ctx context.Context, body, target interface{}) error {
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 
 	res, err := client.Do(req)
+	log.WithError(err).Debugf("rs: convert %v", body)
 	if err != nil {
 		return err
 	}
-	log.Debugf("rs: converted %v", body)
 
 	defer res.Body.Close()
 	return json.NewDecoder(res.Body).Decode(target)

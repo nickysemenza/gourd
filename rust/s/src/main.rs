@@ -21,6 +21,7 @@ async fn main() -> std::io::Result<()> {
     println!("tracer: {:?}", tracer);
 
     let configuration = get_configuration().expect("Failed to read configuration.");
+    println!("confiig {:?}", configuration);
     let application = Application::build(configuration).await?;
     application.run_until_stopped().await?;
     Ok(())
