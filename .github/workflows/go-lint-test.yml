@@ -17,7 +17,6 @@ jobs:
         with:
           version: latest
   build:
-    # https://github.com/golangci/golangci-lint-action
     name: Go ${{ matrix.go }} test
     runs-on: ubuntu-latest
     strategy:
@@ -39,3 +38,4 @@ jobs:
 
       - name: Test
         run: go test -v -race -cover ./...
+      - uses: codecov/codecov-action@v2

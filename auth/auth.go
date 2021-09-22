@@ -14,9 +14,9 @@ type Claims struct {
 }
 
 func New(key string) (*Auth, error) {
-	if key == "" {
-		return nil, fmt.Errorf("auth: key is empty")
-	}
+	// if key == "" {
+	// 	return nil, fmt.Errorf("auth: key is empty")
+	// }
 	return &Auth{Key: []byte(key)}, nil
 }
 

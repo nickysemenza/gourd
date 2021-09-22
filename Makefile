@@ -59,8 +59,8 @@ unit-test:
 	go test -v -race -cover ./...
 integration-test: 
 	go test -v -race -cover ./... -tags integration	
-test-full-cover: bin/go-acc
-	./bin/go-acc -o coverage-full.txt ./... -- -race -tags integration
+test-unit-cover: bin/go-acc
+	./bin/go-acc -o coverage-full.txt ./... -- -race
 	
 lint: bin/golangci-lint
 	bin/golangci-lint run || (echo "lint failed"; exit 1)	

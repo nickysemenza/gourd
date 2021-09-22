@@ -61,8 +61,8 @@ jobs:
             mkdir -p /tmp/artifacts
       - run:
           command: |
-            make test-full-cover
-            go test ./... -coverprofile=coverage-full.txt -tags integration
+            make test-unit-cover
+            go test ./... -coverprofile=coverage-full.txt
             go tool cover -html=coverage-full.txt -o coverage-full.html
             mv coverage-full.txt /tmp/artifacts
             mv coverage-full.html /tmp/artifacts
@@ -70,33 +70,49 @@ jobs:
           file: /tmp/artifacts/coverage-full.txt
       - store_artifacts:
           path: /tmp/artifacts
-  test_e2e:
-    machine:
-      docker_layer_caching: false
-      image: ubuntu-1604:201903-01
-    steps:
-      - checkout
-      - run:
-          command: docker-compose build
-          no_output_timeout: 10m
-      - run:
-          command: docker-compose run ui
-          no_output_timeout: 3m
-      - run:
-          name: "output container logs to console"
-          command: |
-            docker-compose logs
-      - codecov/upload:
-          file: ui/coverage/coverage-final.json
-      - store_artifacts:
-          path: ui/coverage
-          destination: raw-ui-e2e-test-coverage
-      - store_artifacts:
-          path: ui/cypress
-          destination: raw-ui-e2e-test-cypress
+  # test_e2e:
+  #   machine:
+  #     docker_layer_caching: false
+  #     image: ubuntu-2004:202107-02
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         command: sudo apt-get update && sudo apt-get install golang
+  #     - run:
+  #         command: docker-compose build  --parallel
+  #         no_output_timeout: 10m
+  #     - run:
+  #         command: go mod vendor
+  #     - run:
+  #         command: docker-compose up -d db
+  #     - run:
+  #         command: make migrate
+  #     - run:
+  #         command: docker-compose up -d rs
+  #     - run:
+  #         command: curl -v http://localhost:8080/parse?text=1%20cup
+  #     - run:
+  #         command: make integration-test
+  #     - run:
+  #         command: docker-compose run usda
+  #     - run:
+  #         command: docker-compose run ui
+  #         no_output_timeout: 3m
+  #     - run:
+  #         name: "output container logs to console"
+  #         command: |
+  #           docker-compose logs
+  #     - codecov/upload:
+  #         file: ui/coverage/coverage-final.json
+  #     - store_artifacts:
+  #         path: ui/coverage
+  #         destination: raw-ui-e2e-test-coverage
+  #     - store_artifacts:
+  #         path: ui/cypress
+  #         destination: raw-ui-e2e-test-cypress
 workflows:
   version: 2
   build_fullstack:
     jobs:
       - build_backend
-      - test_e2e
+      # - test_e2e

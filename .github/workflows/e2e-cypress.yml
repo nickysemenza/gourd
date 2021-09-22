@@ -14,7 +14,7 @@ jobs:
       - name: start db
         run: docker-compose up -d db
       - name: migrate
-        run: make migrate
+        run: sleep 5 && make migrate
       - name: start rs
         run: docker-compose up -d rs
       - name: test rs
@@ -23,12 +23,11 @@ jobs:
         run: make integration-test
       - name: run usda import
         run: docker-compose run usda
-      # - name: seed db with testdata
-      #   env:
-      #     DB_HOST: db
-      #     DB_PORT: 5432
-      #   run: make seed-testdata
-
+      - name: seed db with testdata
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5555
+        run: make seed-testdata
       - name: run e2e
         run: docker-compose run ui
       - name: Dump docker logs on failure
