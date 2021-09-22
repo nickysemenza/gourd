@@ -13232,7 +13232,7 @@ react-feather@2.0.9:
   dependencies:
     prop-types "^15.7.2"
 
-react-force-graph-2d@^1.23.0:
+react-force-graph-2d@1.23.8:
   version "1.23.8"
   resolved "https://registry.yarnpkg.com/react-force-graph-2d/-/react-force-graph-2d-1.23.8.tgz#28a6e0d4221f1338f8af896eedd06b73fd23a6f8"
   integrity sha512-ON0vYxZY1PNoEi5RqGtyl5nmUlln6tbTcWdoLbRd9AEC3wCsaDjOQymF77U6DLRuqhqrjaC0SbjH+rAn9np8Lg==
