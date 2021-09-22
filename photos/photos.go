@@ -79,7 +79,7 @@ func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.Me
 	for _, b := range batchResult.MediaItemResults {
 		items = append(items, b.MediaItem)
 	}
-	span.SetAttributes(attribute.Any("result-raw", batchResult))
+	span.SetAttributes(attribute.String("result-raw", fmt.Sprintf("%v", batchResult)))
 
 	return items, nil
 }

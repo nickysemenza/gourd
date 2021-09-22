@@ -17,13 +17,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/exporter/stackdriver/propagation"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
-	"go.opentelemetry.io/otel/exporters/prometheus"
-	"go.opentelemetry.io/otel/metric/global"
-	export "go.opentelemetry.io/otel/sdk/export/metric"
-	"go.opentelemetry.io/otel/sdk/metric/aggregator/histogram"
-	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
-	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
-	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/api"
@@ -58,22 +51,6 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
 	r.Use(TraceIDHeader)
 
-	pconfig := prometheus.Config{}
-	c := controller.New(
-		processor.New(
-			selector.NewWithHistogramDistribution(
-				histogram.WithExplicitBoundaries(pconfig.DefaultHistogramBoundaries),
-			),
-			export.CumulativeExportKindSelector(),
-			processor.WithMemory(true),
-		),
-	)
-	exporter, err := prometheus.New(pconfig, c)
-	if err != nil {
-		return err
-	}
-	global.SetMeterProvider(exporter.MeterProvider())
-
 	skipper := func(c echo.Context) bool {
 		if s.BypassAuth {
 			log.Debugf("bypassing auth for %s", c.Path())
@@ -95,7 +72,6 @@ func (s *Server) Run(_ context.Context) error {
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	// http routes
-	r.GET("/metrics", echo.WrapHandler(http.HandlerFunc(exporter.ServeHTTP)))
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
 	// r.Any("/api", echo.WrapHandler(otelhttp.NewHandler(api.Handler(apiManager), "/api")))
