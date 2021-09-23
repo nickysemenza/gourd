@@ -293,6 +293,8 @@ github.com/gavv/httpexpect v2.0.0+incompatible/go.mod h1:x+9tiU1YnrOvnB725RkpoLv
 github.com/getkin/kin-openapi v0.61.0/go.mod h1:7Yn5whZr5kJi6t+kShccXS8ae1APpYTW6yheSwk8Yi4=
 github.com/getkin/kin-openapi v0.75.0 h1:JEt2etuOJvejeoj7VBslrpGFGKd3FNOyhFAM0uTiOOw=
 github.com/getkin/kin-openapi v0.75.0/go.mod h1:7Yn5whZr5kJi6t+kShccXS8ae1APpYTW6yheSwk8Yi4=
+github.com/getkin/kin-openapi v0.76.0 h1:j77zg3Ec+k+r+GA3d8hBoXpAc6KX9TbBPrwQGBIy2sY=
+github.com/getkin/kin-openapi v0.76.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
 github.com/getsentry/sentry-go v0.11.0 h1:qro8uttJGvNAMr5CLcFI9CHR0aDzXl0Vs3Pmw/oTPg8=
 github.com/getsentry/sentry-go v0.11.0/go.mod h1:KBQIxiZAetw62Cj8Ri964vAEWVdgfaUCn30Q3bCvANo=
 github.com/ghodss/yaml v1.0.0 h1:wQHKEahhL6wmXdzwWG11gIVCkOv05bNOh+Rxn0yngAk=
