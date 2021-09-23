@@ -53,7 +53,7 @@ require (
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.63.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
