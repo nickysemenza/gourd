@@ -27,7 +27,7 @@
     "@types/react-select": "3.1.2",
     "@types/react-table": "7.0.29",
     "blurhash": "1.1.4",
-    "core-js": "3.17.3",
+    "core-js": "3.18.0",
     "dayjs": "1.10.7",
     "gourd_rs": "file:../rust/w/pkg",
     "graphviz-react": "1.2.0",
