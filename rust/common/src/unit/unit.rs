@@ -207,7 +207,7 @@ impl Measure {
         mappings: Vec<(Measure, Measure)>,
     ) -> Option<Measure> {
         let g = make_graph(mappings);
-        println!("{}", petgraph::dot::Dot::new(&g));
+        // println!("{}", petgraph::dot::Dot::new(&g));
 
         let unit_a = self.0.clone();
         let unit_b = unit_from_measurekind(target);
@@ -215,7 +215,7 @@ impl Measure {
         let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
         let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
 
-        println!("calculating {:?} to {:?}", n_a, n_b);
+        // println!("calculating {:?} to {:?}", n_a, n_b);
         if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
             return None;
         };
@@ -231,7 +231,10 @@ impl Measure {
                 .unwrap();
             res *= g.edge_weight(edge).unwrap();
         }
-        return Some(Measure(unit_b, res));
+        let y = (res * 100.0).round() / 100.0;
+        let result = Measure(unit_b, y);
+        println!("unit:convert: {:?} -> {:?}", self, result);
+        return Some(result);
     }
 
     pub fn as_bare(self) -> BareMeasurement {

@@ -75,6 +75,7 @@ fn run(
             .route("/decode_recipe", web::get().to(parser::decode_recipe))
             .route("/convert", web::post().to(parser::convert))
             .route("/scrape", web::get().to(parser::scrape))
+            .route("/pans", web::get().to(parser::pans))
             .service(web::resource("/parse2").route(web::get().to(parser::index)))
             .app_data(db_pool.clone())
         // .app_data(email_client.clone())
