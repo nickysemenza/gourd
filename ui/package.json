@@ -115,6 +115,6 @@
     "prettier": "2.4.1",
     "redoc-cli": "0.12.3",
     "start-server-and-test": "1.14.0",
-    "tailwindcss": "2.2.15"
+    "tailwindcss": "2.2.16"
   }
 }
