@@ -24,7 +24,7 @@ require (
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/labstack/echo/v4 v4.6.0
+	github.com/labstack/echo/v4 v4.6.1
 	github.com/lib/pq v1.10.3
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/mailru/easyjson v0.7.7 // indirect
