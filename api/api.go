@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 
 	sq "github.com/Masterminds/squirrel"
@@ -261,86 +262,17 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				// i := transformIngredient(*i.RawIngredient)
 				item.Ingredient = &foo[0]
 
+				var targets []UnitConversionRequestTarget
 				if !hasGrams {
-					weight := UnitConversionRequestTargetWeight
-					req := UnitConversionRequest{
-						Input:        item.Amounts,
-						Target:       &weight,
-						UnitMappings: item.Ingredient.UnitMappings,
-					}
-					var res Amount
-					err = a.Manager.R.Convert(
-						ctx, req, &res,
-					)
+					targets = append(targets, UnitConversionRequestTargetWeight, UnitConversionRequestTargetVolume)
+				}
+				targets = append(targets, UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney)
+				for _, t := range targets {
+					a.enhance(ctx, t, &item)
 					if err != nil {
 						return nil, err
 					}
-					if res.Value != 0 {
-
-						res.Source = zero.StringFrom("calculated").Ptr()
-						item.Amounts = append(item.Amounts, res)
-
-					} else {
-						volume := UnitConversionRequestTargetVolume
-						req := UnitConversionRequest{
-							Input:        item.Amounts,
-							Target:       &volume,
-							UnitMappings: item.Ingredient.UnitMappings,
-						}
-						err = a.Manager.R.Convert(
-							ctx, req, &res,
-						)
-						if err != nil {
-							return nil, err
-						}
-						if res.Value != 0 {
-
-							res.Source = zero.StringFrom("calculated").Ptr()
-							item.Amounts = append(item.Amounts, res)
-
-						}
-					}
-
 				}
-				cal := UnitConversionRequestTargetCalories
-				req := UnitConversionRequest{
-					Input:        item.Amounts,
-					Target:       &cal,
-					UnitMappings: item.Ingredient.UnitMappings,
-				}
-				var res Amount
-				err = a.Manager.R.Convert(
-					ctx, req, &res,
-				)
-				if err != nil {
-					return nil, err
-				}
-				if res.Value != 0 {
-
-					res.Source = zero.StringFrom("calculated").Ptr()
-					item.Amounts = append(item.Amounts, res)
-
-				}
-
-				money := UnitConversionRequestTargetMoney
-				req = UnitConversionRequest{
-					Input:        item.Amounts,
-					Target:       &money,
-					UnitMappings: item.Ingredient.UnitMappings,
-				}
-				err = a.Manager.R.Convert(
-					ctx, req, &res,
-				)
-				if err != nil {
-					return nil, err
-				}
-				if res.Value != 0 {
-
-					res.Source = zero.StringFrom("calculated").Ptr()
-					item.Amounts = append(item.Amounts, res)
-
-				}
-				//  &IngredientDetail{Ingredient: i, Children: []IngredientDetail{}, UnitMappings: []UnitMapping{}, Recipes: []RecipeDetail{}}
 			}
 			if i.SubsFor.Valid {
 				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], item)
@@ -365,6 +297,26 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 		s = append(s, rs)
 	}
 	return s, nil
+}
+func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, item *SectionIngredient) error {
+	req := UnitConversionRequest{
+		Input:        item.Amounts,
+		Target:       &with,
+		UnitMappings: item.Ingredient.UnitMappings,
+	}
+	var res Amount
+	err := a.Manager.R.Convert(
+		ctx, req, &res,
+	)
+	if err != nil {
+		return fmt.Errorf("enhance: %w", err)
+	}
+	if res.Value != 0 {
+		res.Value = math.Round(res.Value*100) / 100
+		res.Source = zero.StringFrom("calculated").Ptr()
+		item.Amounts = append(item.Amounts, res)
+	}
+	return nil
 }
 
 // Items all recipes

@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use gourd_common::convert_to;
+use gourd_common::{convert_to, pan};
 use openapi::models::{
     Amount, IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
     SectionInstruction,
@@ -145,7 +145,11 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     // let res2 = res.unwrap();
     Ok(dbg!(res))
 }
+pub async fn pans() -> HttpResponse {
+    let p = pan::inventory();
 
+    HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
+}
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
     global::tracer("my-component").start("scraper");
 

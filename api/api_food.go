@@ -288,7 +288,6 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 		if err != nil {
 			return err
 		}
-		log.Printf("loaded %s (%v), fdc: %d=>%s, %d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcID, ing.Id, len(m.UnitMappings))
 
 		sameAsIds := []string{}
 		for _, alias := range m.Aliases {
@@ -303,6 +302,8 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 
+		actualPairs := len(m.UnitMappings)
+		loadedPairs := int64(0)
 		for _, u := range m.UnitMappings {
 			u := db.IngredientUnitMapping{
 				IngredientId: ing.Id,
@@ -312,11 +313,14 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 				AmountB:      u.B.Value,
 				Source:       u.Source,
 			}
-			err = a.Manager.DB().AddIngredientUnit(ctx, u)
+			num, err := a.Manager.DB().AddIngredientUnit(ctx, u)
 			if err != nil {
 				return err
 			}
+			loadedPairs += num
 		}
+		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcID, ing.Id, loadedPairs, actualPairs)
+
 	}
 	return nil
 }

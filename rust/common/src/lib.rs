@@ -10,7 +10,9 @@ use unit::MeasureKind;
 #[macro_use]
 extern crate serde;
 
+pub mod pan;
 pub mod unit;
+
 fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> SectionIngredient {
     let mut grams = 0.0;
     let mut oz = 0.0;
@@ -90,8 +92,9 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
     Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
-    let i = dbg!(ingredient::parse_amount(s))?;
-    Ok(i)
+    let i = ingredient::parse_amount(s);
+    println!("parsed {} into {:?}", s, i.clone().unwrap_or(vec![]));
+    return i;
 }
 fn get_grams_si(si: SectionIngredient) -> f64 {
     for x in si.amounts.iter() {
@@ -185,7 +188,7 @@ pub fn amount_to_measure(a: Amount) -> unit::Measure {
     unit::Measure::parse(unit::BareMeasurement::new(a.unit, a.value as f32))
 }
 pub fn measure_to_amount(m: unit::Measure) -> Amount {
-    let m1 = dbg!(m.as_bare());
+    let m1 = m.as_bare();
     Amount::new(m1.unit, m1.value.into())
 }
 pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
