@@ -360,7 +360,7 @@ mod tests {
     #[test]
     fn test_convert_other() {
         assert_eq!(
-            Measure::from_string("10.000001 cents".to_string()),
+            Measure::from_string("10.0 cents".to_string()),
             Measure::from_string("1 egg".to_string())
                 .convert(
                     MeasureKind::Money,
