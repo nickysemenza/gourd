@@ -5,7 +5,7 @@ use openapi::models::{
     RecipeDetail, RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest,
     UnitMapping,
 };
-use unit::MeasureKind;
+use unit::{Measure, MeasureKind};
 
 #[macro_use]
 extern crate serde;
@@ -179,9 +179,26 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     if req.input.len() == 0 {
         return None;
     }
-    return match amount_to_measure(req.input[0].clone()).convert(target, equivalencies) {
+    return match amount_to_measure(req.input[0].clone())
+        .convert(target.clone(), equivalencies.clone())
+    {
         Some(a) => Some(measure_to_amount(a)),
-        None => None,
+        None => {
+            if target == MeasureKind::Weight {
+                // try again to convert to ml, and then use that as grams
+                return match amount_to_measure(req.input[0].clone())
+                    .convert(MeasureKind::Volume, equivalencies)
+                {
+                    Some(a) => {
+                        let mut a = measure_to_amount(a);
+                        a.unit = "gram".to_string();
+                        return Some(a);
+                    }
+                    None => None,
+                };
+            }
+            return None;
+        }
     };
 }
 pub fn amount_to_measure(a: Amount) -> unit::Measure {

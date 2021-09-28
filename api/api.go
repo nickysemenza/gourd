@@ -218,6 +218,14 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.Reci
 	return &dbr, nil
 
 }
+func hasGrams(amounts []Amount) bool {
+	for _, amt := range amounts {
+		if amt.Unit == "grams" || amt.Unit == "g" || amt.Unit == "gram" {
+			return true
+		}
+	}
+	return false
+}
 func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]RecipeSection, error) {
 	s := []RecipeSection{}
 	for _, d := range dbs {
@@ -236,7 +244,6 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				Optional:  i.Optional.Ptr(),
 				Amounts:   []Amount{},
 			}
-			hasGrams := false
 			for _, amt := range i.Amounts {
 				item.Amounts = append(item.Amounts, Amount{
 					Unit:   amt.Unit,
@@ -244,9 +251,6 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					Source: zero.StringFrom("db").Ptr(),
 				})
 
-				if amt.Unit == "grams" || amt.Unit == "g" || amt.Unit == "gram" {
-					hasGrams = true
-				}
 			}
 
 			if i.RawRecipe != nil {
@@ -262,11 +266,10 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				// i := transformIngredient(*i.RawIngredient)
 				item.Ingredient = &foo[0]
 
-				var targets []UnitConversionRequestTarget
-				if !hasGrams {
-					targets = append(targets, UnitConversionRequestTargetWeight, UnitConversionRequestTargetVolume)
+				targets := []UnitConversionRequestTarget{UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney, UnitConversionRequestTargetVolume}
+				if !hasGrams(item.Amounts) {
+					targets = append(targets, UnitConversionRequestTargetWeight)
 				}
-				targets = append(targets, UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney)
 				for _, t := range targets {
 					a.enhance(ctx, t, &item)
 					if err != nil {
