@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.0.0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
 	golang.org/x/tools v0.1.6
-	google.golang.org/api v0.57.0
+	google.golang.org/api v0.58.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.63.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
@@ -135,7 +135,7 @@ require (
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
-	github.com/googleapis/gax-go/v2 v2.1.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20210225214923-2e10b2664254 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gostaticanalysis/analysisutil v0.4.1 // indirect
@@ -252,12 +252,12 @@ require (
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20210913180222-943fd674d43e // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0 // indirect
+	golang.org/x/sys v0.0.0-20210917161153-d61c044b1678 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20210903162649-d08c68adba83 // indirect
+	google.golang.org/genproto v0.0.0-20210917145530-b395a37504d4 // indirect
 	google.golang.org/grpc v1.40.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
