@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func bytesFromFile(ctx context.Context, inputPath string) ([]byte, error) {
+func bytesFromFile(_ context.Context, inputPath string) ([]byte, error) {
 	inputFile, err := os.Open(inputPath)
 
 	if err != nil {

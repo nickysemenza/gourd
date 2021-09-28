@@ -24,7 +24,7 @@ jobs:
       - name: test rs
         run: curl -v http://localhost:8080/parse?text=1%20cup
       - name: go test integration
-        run: make integration-test
+        run: make integration-test-go
       - name: run usda import
         run: docker-compose run usda
       - name: seed db with testdata

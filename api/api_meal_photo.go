@@ -163,12 +163,14 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	switch r.Action {
-	case "add":
+	case MealRecipeUpdateActionAdd:
 		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, r.Multiplier)
 		if err != nil {
 			return sendErr(c, http.StatusInternalServerError, err)
 		}
 		return a.GetMealById(c, mealId)
+	case MealRecipeUpdateActionRemove:
+		return sendErr(c, http.StatusBadRequest, fmt.Errorf("unsupported %s", r.Action))
 	default:
 		return sendErr(c, http.StatusBadRequest, fmt.Errorf("unknown action %s", r.Action))
 	}

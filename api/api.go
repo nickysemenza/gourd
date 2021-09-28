@@ -271,7 +271,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 					targets = append(targets, UnitConversionRequestTargetWeight)
 				}
 				for _, t := range targets {
-					a.enhance(ctx, t, &item)
+					err = a.enhance(ctx, t, &item)
 					if err != nil {
 						return nil, err
 					}

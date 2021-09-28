@@ -61,7 +61,7 @@ jobs:
             mkdir -p /tmp/artifacts
       - run:
           command: |
-            make test-unit-cover
+            make unit-cover-go
             go test ./... -coverprofile=coverage-full.txt
             go tool cover -html=coverage-full.txt -o coverage-full.html
             mv coverage-full.txt /tmp/artifacts

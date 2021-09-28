@@ -5,7 +5,7 @@ use openapi::models::{
     RecipeDetail, RecipeSection, SectionIngredient, SectionInstruction, UnitConversionRequest,
     UnitMapping,
 };
-use unit::{Measure, MeasureKind};
+use unit::MeasureKind;
 
 #[macro_use]
 extern crate serde;
