@@ -4,11 +4,10 @@ use openapi::models::{
     Amount, IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
     SectionInstruction,
 };
-use opentelemetry::{global, trace::Tracer};
-use opentelemetry::{trace::get_active_span, KeyValue};
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use tracing::{debug, span};
 
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
@@ -47,20 +46,18 @@ pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(data)) // <- send response
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Info {
     text: String,
 }
 
 pub async fn parser(info: web::Query<Info>) -> HttpResponse {
-    global::tracer("my-component").start("parser");
-
-    get_active_span(|span| {
-        span.add_event(
-            "parse".to_string(),
-            vec![KeyValue::new("ingredient", info.text.to_string())],
-        );
-    });
+    let root = span!(
+        tracing::Level::TRACE,
+        "parser",
+        ingredient = info.text.to_string().as_str()
+    );
+    let _enter = root.enter();
 
     let i = gourd_common::parse_ingredient(&info.text);
     if i.is_err() {
@@ -71,14 +68,8 @@ pub async fn parser(info: web::Query<Info>) -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
 }
 pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
-    global::tracer("my-component").start("decode_recipe");
-
-    get_active_span(|span| {
-        span.add_event(
-            "decode_recipe".to_string(),
-            vec![KeyValue::new("line", info.text.to_string())],
-        );
-    });
+    let root = span!(tracing::Level::TRACE, "decode_recipe",);
+    let _enter = root.enter();
 
     let detail = gourd_common::codec::decode_recipe(info.text.to_string());
 
@@ -87,14 +78,12 @@ pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
 }
 pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
-    global::tracer("my-component").start("amount_parser");
-
-    get_active_span(|span| {
-        span.add_event(
-            "amount_parse".to_string(),
-            vec![KeyValue::new("line", info.text.to_string())],
-        );
-    });
+    let root = span!(
+        tracing::Level::TRACE,
+        "amount_parser",
+        amount = info.text.to_string().as_str()
+    );
+    let _enter = root.enter();
 
     let i = gourd_common::parse_amount(&info.text);
     if i.is_err() {
@@ -105,14 +94,12 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
 }
 pub async fn convert(r: web::Json<openapi::models::UnitConversionRequest>) -> HttpResponse {
-    global::tracer("my-component").start("convert");
-
-    get_active_span(|span| {
-        span.add_event(
-            "convert".to_string(),
-            vec![KeyValue::new("line", format!("{:#?}", r.0).to_string())],
-        );
-    });
+    let root = span!(
+        tracing::Level::TRACE,
+        "convert",
+        item = format!("{:#?}", r.0).to_string().as_str()
+    );
+    let _enter = root.enter();
     HttpResponse::Ok().json(convert_to(r.0))
 }
 
@@ -150,16 +137,8 @@ pub async fn pans() -> HttpResponse {
 
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
+#[tracing::instrument(name = "route::scrape")]
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
-    global::tracer("my-component").start("scraper");
-
-    get_active_span(|span| {
-        span.add_event(
-            "parse".to_string(),
-            vec![KeyValue::new("ingredient", info.text.to_string())],
-        );
-    });
-
     let mut sc_result: (Vec<String>, String, String) = (vec![], "".to_string(), "".to_string());
     Python::with_gil(|py| {
         let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
@@ -210,6 +189,7 @@ def sc(x):
     let detail = RecipeDetail::new("".to_string(), sections, sc_result.2, 0, "".to_string());
     let res = RecipeWrapper::new("".to_string(), detail);
 
+    debug!("scraped {}", info.text.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
 }
 

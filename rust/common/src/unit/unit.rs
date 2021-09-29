@@ -2,6 +2,7 @@ use std::fmt;
 
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
+use tracing::debug;
 
 #[derive(Clone, PartialEq, PartialOrd, Debug, Default, Serialize, Deserialize)]
 pub struct BareMeasurement {
@@ -201,6 +202,7 @@ impl Measure {
         };
     }
 
+    #[tracing::instrument(name = "unit::convert")]
     pub fn convert(
         &self,
         target: MeasureKind,
@@ -217,6 +219,7 @@ impl Measure {
 
         // println!("calculating {:?} to {:?}", n_a, n_b);
         if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
+            debug!("convert failed for {:?}", self);
             return None;
         };
 
@@ -233,7 +236,7 @@ impl Measure {
         }
         let y = (res * 100.0).round() / 100.0;
         let result = Measure(unit_b, y);
-        println!("unit:convert: {:?} -> {:?}", self, result);
+        debug!("{:?} -> {:?} ({} hops)", self, result, steps.len());
         return Some(result);
     }
 

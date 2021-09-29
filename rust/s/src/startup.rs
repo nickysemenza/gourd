@@ -8,6 +8,7 @@ use actix_web_opentelemetry::RequestTracing;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::net::TcpListener;
+use tracing::info;
 
 pub struct Application {
     port: u16,
@@ -64,6 +65,8 @@ fn run(
     // email_client: EmailClient,
 ) -> Result<Server, std::io::Error> {
     let db_pool = Data::new(db_pool);
+
+    info!("starting up");
 
     // let email_client = Data::new(email_client);
     let server = HttpServer::new(move || {

@@ -1,4 +1,5 @@
 use openapi::models::{RecipeDetail, RecipeSection, SectionInstruction};
+use tracing::trace;
 
 use crate::{parse_ingredient, si_to_ingredient};
 
@@ -49,6 +50,7 @@ pub fn encode_recipe(r: RecipeDetail) -> String {
     return res.trim_end().to_string();
 }
 pub fn decode_recipe(r: String) -> RecipeDetail {
+    trace!("decoding {}", r);
     let mut name = String::new();
     let parts: Vec<&str> = r.split("---\n").collect();
     if parts.len() == 2 {

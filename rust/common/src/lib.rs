@@ -4,6 +4,7 @@ use openapi::models::{
     unit_conversion_request::Target, Amount, Ingredient, IngredientDetail, IngredientKind,
     RecipeDetail, SectionIngredient, UnitConversionRequest, UnitMapping,
 };
+use tracing::info;
 use unit::MeasureKind;
 
 #[macro_use]
@@ -23,7 +24,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
 
     let mut amounts: Vec<Amount> = Vec::new();
     for x in i.amounts.iter() {
-        if is_gram(x.unit.clone()) {
+        if is_gram(&x.unit) {
             grams = x.value.into();
             amount = Some(grams);
             unit = Some("g".to_string());
@@ -37,7 +38,7 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
         }
         if amount.is_some() && unit.is_some() {
             let unitstr = unit.clone().unwrap_or("unknown".to_string());
-            if unitstr == "recipe" {
+            if unitstr == IngredientKind::Recipe.to_string() {
                 // if the ingredient amount has a unit of "recipe", then it's likely a recipe
                 kind = IngredientKind::Recipe;
             }
@@ -93,12 +94,12 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
 }
 pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
     let i = ingredient::parse_amount(s);
-    println!("parsed {} into {:?}", s, i.clone().unwrap_or(vec![]));
+    info!("parsed {} into {:?}", s, i.clone().unwrap_or(vec![]));
     return i;
 }
 fn get_grams_si(si: SectionIngredient) -> f64 {
     for x in si.amounts.iter() {
-        if is_gram(x.unit.clone()) {
+        if is_gram(&x.unit) {
             return x.value;
         }
     }
@@ -148,7 +149,7 @@ pub fn sum_ingredients(
     (recipes, ing)
 }
 
-fn is_gram(unit: String) -> bool {
+fn is_gram(unit: &String) -> bool {
     unit == "g" || unit == "gram" || unit == "grams"
 }
 fn is_oz(a: &ingredient::Amount) -> bool {
@@ -192,6 +193,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
                     Some(a) => {
                         let mut a = measure_to_amount(a);
                         a.unit = "gram".to_string();
+                        info!("no grams for {:#?} using volume with density 1", req.input);
                         return Some(a);
                     }
                     None => None,
