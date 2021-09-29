@@ -125,20 +125,20 @@ pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
 pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
     utils::set_panic_hook();
     let r: RecipeDetail = recipe_detail.into_serde().unwrap();
-    gourd_common::encode_recipe(r)
+    gourd_common::codec::encode_recipe(r)
 }
 #[wasm_bindgen]
 pub fn encode_recipe_to_compact_json(recipe_detail: &JsValue) -> ICompactR {
     utils::set_panic_hook();
     let r: RecipeDetail = recipe_detail.into_serde().unwrap();
-    let c = gourd_common::compact_recipe(r);
+    let c = gourd_common::codec::compact_recipe(r);
     JsValue::from_serde(&c).unwrap().into()
 }
 
 #[wasm_bindgen]
 pub fn decode_recipe_text(r: String) -> JsValue {
     utils::set_panic_hook();
-    let detail = gourd_common::decode_recipe(r);
+    let detail = gourd_common::codec::decode_recipe(r);
     JsValue::from_serde(&detail).unwrap()
 }
 

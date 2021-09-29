@@ -80,7 +80,7 @@ pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
         );
     });
 
-    let detail = gourd_common::decode_recipe(info.text.to_string());
+    let detail = gourd_common::codec::decode_recipe(info.text.to_string());
 
     let foo = web::Json(detail);
 
