@@ -58,6 +58,12 @@ pub enum Unit {
 }
 
 impl Unit {
+    pub fn normalize(self) -> Unit {
+        match self {
+            Unit::Other(x) => return Unit::Other(singular(&x)),
+            _ => return self,
+        }
+    }
     pub fn from_str(s: &str) -> Self {
         match s {
             "gram" | "g" => Self::Gram,
@@ -98,7 +104,7 @@ impl Unit {
             Unit::Cent => "cent",
             Unit::Dollar => "$",
             Unit::KCal => "kcal",
-            Unit::Other(s) => return s,
+            Unit::Other(s) => return singular(&s),
         }
         .to_string()
     }
@@ -125,11 +131,11 @@ pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> Graph<Unit, f32> {
         let n_a = g
             .node_indices()
             .find(|i| g[*i] == m_a.0)
-            .unwrap_or_else(|| g.add_node(m_a.0.clone()));
+            .unwrap_or_else(|| g.add_node(m_a.0.clone().normalize()));
         let n_b = g
             .node_indices()
             .find(|i| g[*i] == m_b.0)
-            .unwrap_or_else(|| g.add_node(m_b.0.clone()));
+            .unwrap_or_else(|| g.add_node(m_b.0.clone().normalize()));
         let _c1 = g.add_edge(n_a, n_b, m_b.1 / m_a.1);
         let _c2 = g.add_edge(n_b, n_a, m_a.1 / m_b.1);
     }
@@ -152,16 +158,18 @@ const CENTS_TO_DOLLAR: f32 = 100.0;
 impl Measure {
     pub fn from_string(s: String) -> Measure {
         let a = ingredient::parse_amount(s.as_str()).unwrap()[0].clone();
-        Measure::parse(BareMeasurement::new(a.unit, a.value))
+        Measure::parse(BareMeasurement::new(singular(&a.unit), a.value))
     }
     pub fn normalize(&self) -> Measure {
-        let foo = match self.0 {
-            Unit::Teaspoon
-            | Unit::Milliliter
-            | Unit::Gram
-            | Unit::Cent
-            | Unit::KCal
-            | Unit::Other(_) => return self.clone(),
+        let foo = match &self.0 {
+            Unit::Teaspoon | Unit::Milliliter | Unit::Gram | Unit::Cent | Unit::KCal => {
+                return self.clone()
+            }
+            Unit::Other(x) => {
+                let x2 = x.clone();
+                let u2 = singular(&x2);
+                return Measure(Unit::Other(u2), self.1);
+            }
 
             Unit::Kilogram => (Unit::Gram, self.1 * G_TO_K),
 

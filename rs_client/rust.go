@@ -49,6 +49,9 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 	}
 
 	defer res.Body.Close()
+	if res.StatusCode == http.StatusBadRequest {
+		return nil
+	}
 	return json.NewDecoder(res.Body).Decode(target)
 
 }

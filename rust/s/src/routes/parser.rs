@@ -7,7 +7,7 @@ use openapi::models::{
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use tracing::{debug, span};
+use tracing::{debug, error, span};
 
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
@@ -87,7 +87,9 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
 
     let i = gourd_common::parse_amount(&info.text);
     if i.is_err() {
-        return HttpResponse::BadRequest().finish();
+        let msg = format!("{:?}", i.err().unwrap());
+        error!("parse error {}", msg);
+        return HttpResponse::BadRequest().body(msg);
     }
     let foo = web::Json(i.unwrap());
 

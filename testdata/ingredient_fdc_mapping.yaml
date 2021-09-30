@@ -49,6 +49,7 @@
       source: yaml
 
 - name: eggs
+  aliases: ["egg"]
   fdc_id: 748967
   unit_mappings:
     - a:
@@ -214,3 +215,127 @@
   fdc_id: 519412
 - name: blueberries
   fdc_id: 732876
+- name: canned tomatoes
+  fdc_id: 605142
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 28
+      b:
+        unit: dollars
+        value: 3.99
+      source: wf san marzano
+- name: garlic
+  fdc_id: 363696
+  unit_mappings:
+    - a:
+        unit: head
+        value: 1
+      b:
+        unit: dollars
+        value: 0.75
+      source: wf
+    - a:
+        unit: head
+        value: 1
+      b:
+        unit: clove
+        value: 8
+      source: wf
+- name: dried pasta
+  fdc_id: 478340
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 16
+      b:
+        unit: dollars
+        value: 3.50
+      source: wf dececco
+- name: olive oil
+  aliases: ["evoo", "extra virgin olive oil"]
+  fdc_id: 498938
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 101
+      b:
+        unit: dollars
+        value: 20.99
+      source: wf brand
+    - a:
+        unit: ml
+        value: 1
+      b:
+        unit: gram
+        value: 0.947
+      source: todo, bake this in?
+- name: black peppercorns
+  aliases: ["black pepper"]
+  fdc_id: 451342
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 1.8
+      b:
+        unit: dollars
+        value: 4.99
+      source: wf brand
+- name: basil
+  fdc_id: 172232
+  unit_mappings:
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: dollars
+        value: 4
+      source: wf brand
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: oz
+        value: 2.5
+- name: red pepper flakes
+  fdc_id: 547530
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 0.81
+      b:
+        unit: dollars
+        value: 3.79
+      source: wf brand
+- name: broccoli
+  fdc_id: 747447
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 9
+      b:
+        unit: head
+        value: 3.79
+      source: wf brand
+    - a:
+        unit: dollar
+        value: 1.01
+      b:
+        unit: head
+        value: 1
+- name: lemon juice
+  fdc_id: 167747
+  unit_mappings:
+    - a:
+        unit: tbsp
+        value: 3
+      b:
+        unit: lemon
+        value: 1
+      source: wf brand
+    - a:
+        unit: dollar
+        value: 1
+      b:
+        unit: lemon
+        value: 1

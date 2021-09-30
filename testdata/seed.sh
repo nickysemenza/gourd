@@ -9,6 +9,7 @@
 ./bin/gourd import testdata/cookies_2.txt
 ./bin/gourd import testdata/cookies_2b.txt
 ./bin/gourd import testdata/cookies_1.yaml
-./bin/gourd import testdata/dep_1.yaml
+./bin/gourd import testdata/pasta.txt
+
 
 ./bin/gourd load-ingredients testdata/ingredient_fdc_mapping.yaml
