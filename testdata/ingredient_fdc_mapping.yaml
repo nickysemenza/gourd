@@ -339,3 +339,80 @@
       b:
         unit: lemon
         value: 1
+- name: chicken
+  fdc_id: 368434
+  unit_mappings:
+    - a:
+        unit: pound
+        value: 4.75
+      b:
+        unit: whole
+        value: 1
+      source: wf brand
+    - a:
+        unit: dollar
+        value: 15
+      b:
+        unit: whole
+        value: 1
+- name: carrot
+  fdc_id: 170393
+  unit_mappings:
+    - a:
+        unit: pound
+        value: 1
+      b:
+        unit: dollar
+        value: 1.29
+- name: celery
+  fdc_id: 169988
+  unit_mappings:
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: dollar
+        value: 2.7
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: pound
+        value: 1
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: stalk
+        value: 8
+    - a:
+        unit: stalk, medium
+        value: 1
+      b:
+        unit: stalk
+        value: 1
+- name: fingerling potato
+  fdc_id: 1996864
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 1
+      b:
+        unit: dollar
+        value: 0.21
+- name: parsley
+  fdc_id: 170416
+  aliases: ["italian parsley"]
+  unit_mappings:
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: dollars
+        value: 1.39
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: grams
+        value: 55
