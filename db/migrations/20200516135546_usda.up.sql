@@ -1,5 +1,7 @@
 -- schema adepted from https://github.com/hogand/USDA-FoodData-SQLite3/blob/master/import_food_data.py#L89-L404
-
+-- todo: 
+-- ERROR:  insert or update on table "usda_food" violates foreign key constraint "usda_food_food_category_id_fkey"
+-- DETAIL:  Key (food_category_id)=(9602) is not present in table "usda_food_category".
 CREATE TABLE IF NOT EXISTS usda_food_category (
   "id"          INT NOT NULL PRIMARY KEY,
   "code"        TEXT,
@@ -11,7 +13,7 @@ CREATE TABLE IF NOT EXISTS usda_food (
   fdc_id           INT NOT NULL PRIMARY KEY,
   data_type        TEXT,
   description      TEXT,
-  food_category_id INT REFERENCES usda_food_category(id),
+  food_category_id INT, -- REFERENCES usda_food_category(id),
   publication_date TEXT
 );
 
@@ -42,6 +44,9 @@ CREATE TABLE IF NOT EXISTS usda_agricultural_acquisition (
 CREATE TABLE IF NOT EXISTS usda_branded_food (
   "fdc_id"                     INT NOT NULL PRIMARY KEY REFERENCES usda_food(fdc_id),
   "brand_owner"                TEXT,  -- XXX Inconsistent names
+  "brand_name" TEXT,
+  "subbrand_name" TEXT,
+  "not_a_significant_source_of" TEXT,
   "gtin_upc"                   TEXT,
   "ingredients"                TEXT,
   "serving_size"               REAL,
@@ -82,7 +87,7 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient_conversion_factor (
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_conversion_factor_fdc_id ON usda_food_nutrient_conversion_factor (fdc_id);
 
 CREATE TABLE IF NOT EXISTS usda_food_calorie_conversion_factor (
-  "food_nutrient_conversion_factor_id" INT NOT NULL PRIMARY KEY REFERENCES usda_food_nutrient_conversion_factor(id),
+  "food_nutrient_conversion_factor_id" INT NOT NULL, --  PRIMARY KEY REFERENCES usda_food_nutrient_conversion_factor(id),
   "protein_value"      REAL,
   "fat_value"          REAL,
   "carbohydrate_value" REAL
@@ -108,8 +113,8 @@ CREATE TABLE IF NOT EXISTS usda_nutrient (
   "id"           INT NOT NULL PRIMARY KEY,
   "name"         TEXT,
   "unit_name"    TEXT,
-  "nutrient_nbr" REAL UNIQUE,
-  "rank"         INT    -- XXX Not documented
+  "nutrient_nbr" TEXT,
+  "rank"         TEXT    -- XXX Not documented
 );
 
 CREATE TABLE IF NOT EXISTS usda_food_nutrient_source (
@@ -130,8 +135,8 @@ CREATE INDEX IF NOT EXISTS idx_food_nutrient_derivation_source_id ON usda_food_n
 
 CREATE TABLE IF NOT EXISTS usda_food_nutrient (
   "id"                INT NOT NULL PRIMARY KEY,
-  "fdc_id"            INT REFERENCES usda_food(fdc_id),
-  "nutrient_id"       INT REFERENCES usda_nutrient(id),
+  "fdc_id"            INT, -- REFERENCES usda_food(fdc_id),
+  "nutrient_id"       INT, -- REFERENCES usda_nutrient(id),
   "amount"            REAL,
   "data_points"       INT,
   "derivation_id"     INT REFERENCES usda_food_nutrient_derivation(id),
