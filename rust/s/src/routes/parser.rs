@@ -150,8 +150,8 @@ pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
             py,
             r#"
 from recipe_scrapers import scrape_me            
-def sc(x):
-    res = scrape_me(x)
+def sc(x,y):
+    res = scrape_me(x,wild_mode=y)
     return res.ingredients(), res.instructions(), res.title()
             "#,
             "recipe_scrape.py",
@@ -163,7 +163,7 @@ def sc(x):
         sc_result = activators
             .getattr("sc")
             .unwrap()
-            .call1((info.text.clone(),))
+            .call((info.text.clone(), true), None)
             .unwrap()
             .extract()
             .unwrap();
