@@ -3,7 +3,8 @@ ENV SQLX_OFFLINE true
 WORKDIR /work/rust
 RUN apt-get update
 RUN apt-get install -y pip libpython3.9-dev
-RUN pip install recipe_scrapers
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 COPY rust/ .
 WORKDIR /work/rust/s
 RUN pwd && ls

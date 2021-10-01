@@ -8,3 +8,5 @@ usda/FoodData_Central*
 config.toml
 coverage*
 *.zip
+
+ui/target
