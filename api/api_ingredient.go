@@ -53,54 +53,50 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	for _, i := range parent {
 		ingredientIds = append(ingredientIds, i.Id)
 	}
-	span.AddEvent("ingredient-plus-same-as", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
+
+	span.AddEvent("ingredient-plus-parent", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
 
 	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
 	if err != nil {
 		return nil, err
 	}
-	unitMappings, err := a.Manager.DB().GetIngredientUnits(ctx, ingredientIds)
-	if err != nil {
-		return nil, err
-	}
+
 	items := make([]IngredientDetail, len(ing))
 	for x, i := range ing {
 		// assemble
-		item, err := a.enhanceWithFDC(ctx, i, parent, linkedRecipes, unitMappings)
+
+		detail := a.makeDetail(ctx, i, parent, linkedRecipes)
+
+		unitMappings, err := a.Manager.DB().GetIngredientUnits(ctx, []string{i.Id, i.Parent.String})
 		if err != nil {
-			return nil, fmt.Errorf("enhanceWithFDC: %w", err)
+			return nil, err
 		}
-		items[x] = item
+
+		for _, m := range unitMappings {
+			detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
+				Amount{Unit: m.UnitA, Value: m.AmountA},
+				Amount{Unit: m.UnitB, Value: m.AmountB},
+				fmt.Sprintf("%s (%s)", m.Source, i.Id),
+			})
+		}
+		span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
+
+		if i.FdcID.Valid {
+			err := a.enhanceWithFDC(ctx, i.FdcID.Int64, &detail)
+			if err != nil {
+				return nil, fmt.Errorf("enhanceWithFDC: %w", err)
+			}
+		}
+		items[x] = detail
 	}
 
 	return items, nil
 }
-func (a *API) enhanceWithFDC(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails, unitMappings map[string][]db.IngredientUnitMapping) (detail IngredientDetail, err error) {
+func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *IngredientDetail) (err error) {
 	ctx, span := a.tracer.Start(ctx, "enhanceWithFDC")
 	defer span.End()
 
-	span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
-
-	detail = a.makeDetail(ctx, i, parent, linkedRecipes)
-
-	for _, x := range append(parent.IdsByParent(i.Id), i.Id) {
-		if val, ok := unitMappings[x]; ok {
-			for _, m := range val {
-				detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
-					Amount{Unit: m.UnitA, Value: m.AmountA},
-					Amount{Unit: m.UnitB, Value: m.AmountB},
-					fmt.Sprintf("%s (%s)", m.Source, x),
-				})
-			}
-		}
-	}
-
-	if !i.FdcID.Valid {
-		return
-	}
-
-	var food *Food
-	food, err = a.getFoodById(ctx, int(i.FdcID.Int64))
+	food, err := a.getFoodById(ctx, int(fdcId))
 	if err != nil {
 		return
 	}

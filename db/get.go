@@ -469,7 +469,7 @@ func (c *Client) GetIngrientsParent(ctx context.Context, parent ...string) (Ingr
 // 	return res, nil
 // }
 
-func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) (map[string][]IngredientUnitMapping, error) {
+func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) ([]IngredientUnitMapping, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngredientUnits")
 	defer span.End()
 	span.AddEvent("ingredient", trace.WithAttributes(attribute.StringSlice("id", ingredient)))
@@ -477,11 +477,11 @@ func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) (m
 	if err := c.selectContext(ctx, c.psql.Select("*").From("ingredient_units").Where(sq.Eq{"ingredient": ingredient}), &res); err != nil {
 		return nil, err
 	}
-	byId := make(map[string][]IngredientUnitMapping)
-	for _, i := range res {
-		byId[i.IngredientId] = append(byId[i.IngredientId], i)
-	}
-	return byId, nil
+	// byId := make(map[string][]IngredientUnitMapping)
+	// for _, i := range res {
+	// 	byId[i.IngredientId] = append(byId[i.IngredientId], i)
+	// }
+	return res, nil
 
 }
 func (c *Client) AddIngredientUnit(ctx context.Context, m IngredientUnitMapping) (int64, error) {
