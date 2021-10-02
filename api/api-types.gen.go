@@ -215,7 +215,7 @@ type Ingredient struct {
 	Name string `json:"name"`
 
 	// ingredient ID for a similar (likely a different spelling)
-	SameAs *string `json:"same_as,omitempty"`
+	Parent *string `json:"parent,omitempty"`
 }
 
 // An Ingredient

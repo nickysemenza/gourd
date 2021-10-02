@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func (a *API) CreateIngredients(c echo.Context) error {
@@ -42,13 +44,17 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 		ingredientIds = append(ingredientIds, i.Id)
 	}
 
-	sameAs, _, err := a.Manager.DB().GetIngrientsSameAs(ctx, ingredientIds...)
+	span.AddEvent("ingredient-params", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
+
+	parent, _, err := a.Manager.DB().GetIngrientsParent(ctx, ingredientIds...)
 	if err != nil {
 		return nil, err
 	}
-	for _, i := range sameAs {
+	for _, i := range parent {
 		ingredientIds = append(ingredientIds, i.Id)
 	}
+	span.AddEvent("ingredient-plus-same-as", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
+
 	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
 	if err != nil {
 		return nil, err
@@ -60,7 +66,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	items := make([]IngredientDetail, len(ing))
 	for x, i := range ing {
 		// assemble
-		item, err := a.enhanceWithFDC(ctx, i, sameAs, linkedRecipes, unitMappings)
+		item, err := a.enhanceWithFDC(ctx, i, parent, linkedRecipes, unitMappings)
 		if err != nil {
 			return nil, fmt.Errorf("enhanceWithFDC: %w", err)
 		}
@@ -69,12 +75,15 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	return items, nil
 }
-func (a *API) enhanceWithFDC(ctx context.Context, i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeDetails, unitMappings map[string][]db.IngredientUnitMapping) (detail IngredientDetail, err error) {
+func (a *API) enhanceWithFDC(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails, unitMappings map[string][]db.IngredientUnitMapping) (detail IngredientDetail, err error) {
 	ctx, span := a.tracer.Start(ctx, "enhanceWithFDC")
 	defer span.End()
-	detail = a.makeDetail(ctx, i, sameAs, linkedRecipes)
 
-	for _, x := range append(sameAs.IdsBySameAs(i.Id), i.Id) {
+	span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
+
+	detail = a.makeDetail(ctx, i, parent, linkedRecipes)
+
+	for _, x := range append(parent.IdsByParent(i.Id), i.Id) {
 		if val, ok := unitMappings[x]; ok {
 			for _, m := range val {
 				detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
@@ -195,11 +204,14 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) makeDetail(ctx context.Context, i db.Ingredient, sameAs db.Ingredients, linkedRecipes db.RecipeDetails) IngredientDetail {
+func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails) IngredientDetail {
+	ctx, span := a.tracer.Start(ctx, "makeDetail")
+	defer span.End()
+
 	// find linked ingredients
 	same := []IngredientDetail{}
-	for _, x := range sameAs.BySameAs()[i.Id] {
-		same = append(same, a.makeDetail(ctx, x, sameAs, linkedRecipes))
+	for _, x := range parent.ByParent()[i.Id] {
+		same = append(same, a.makeDetail(ctx, x, parent, linkedRecipes))
 	}
 
 	// find linked recipes

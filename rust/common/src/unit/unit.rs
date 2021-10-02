@@ -225,7 +225,7 @@ impl Measure {
         let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
         let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
 
-        // println!("calculating {:?} to {:?}", n_a, n_b);
+        debug!("calculating {:?} to {:?}", n_a, n_b);
         if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
             debug!("convert failed for {:?}", self);
             return None;

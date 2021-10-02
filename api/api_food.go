@@ -289,15 +289,15 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 
-		sameAsIds := []string{}
+		parentIds := []string{}
 		for _, alias := range m.Aliases {
 			ing, err := a.DB().IngredientByName(ctx, alias)
 			if err != nil {
 				return err
 			}
-			sameAsIds = append(sameAsIds, ing.Id)
+			parentIds = append(parentIds, ing.Id)
 		}
-		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, sameAsIds)
+		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, parentIds)
 		if err != nil {
 			return err
 		}

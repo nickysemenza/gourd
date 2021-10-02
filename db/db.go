@@ -125,7 +125,7 @@ type Ingredient struct {
 	Id     string      `json:"id"`
 	Name   string      `json:"name"`
 	FdcID  zero.Int    `db:"fdc_id"`
-	SameAs zero.String `db:"same_as"`
+	Parent zero.String `db:"parent"`
 }
 
 type RecipeIngredientDependency struct {

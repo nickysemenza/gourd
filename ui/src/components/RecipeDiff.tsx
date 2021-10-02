@@ -38,8 +38,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   const allIds = recipesIngredients
     .map((r) =>
       r.map(
-        (si) =>
-          si.ingredient?.ingredient.same_as || si.ingredient?.ingredient.id
+        (si) => si.ingredient?.ingredient.parent || si.ingredient?.ingredient.id
       )
     )
     .flat()
@@ -54,7 +53,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
       let result: SectionIngredient | undefined = undefined;
       r.forEach((si) => {
         const id =
-          si.ingredient?.ingredient.same_as || si.ingredient?.ingredient.id;
+          si.ingredient?.ingredient.parent || si.ingredient?.ingredient.id;
         if (id === eachId) {
           result = si;
         }

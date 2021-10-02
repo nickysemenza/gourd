@@ -10,8 +10,6 @@
 
 /// Ingredient : An Ingredient
 
-
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Ingredient {
     /// id
@@ -21,8 +19,8 @@ pub struct Ingredient {
     #[serde(rename = "name")]
     pub name: String,
     /// ingredient ID for a similar (likely a different spelling)
-    #[serde(rename = "same_as", skip_serializing_if = "Option::is_none")]
-    pub same_as: Option<String>,
+    #[serde(rename = "parent", skip_serializing_if = "Option::is_none")]
+    pub parent: Option<String>,
     /// FDC id equivalent to this ingredient
     #[serde(rename = "fdc_id", skip_serializing_if = "Option::is_none")]
     pub fdc_id: Option<i64>,
@@ -34,10 +32,8 @@ impl Ingredient {
         Ingredient {
             id,
             name,
-            same_as: None,
+            parent: None,
             fdc_id: None,
         }
     }
 }
-
-

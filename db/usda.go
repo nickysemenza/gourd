@@ -102,7 +102,7 @@ func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, c
 	return res, count, nil
 }
 func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
-	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
 	defer span.End()
 	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
 		w := `description ILIKE '%' || $1 || '%'`

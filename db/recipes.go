@@ -246,7 +246,7 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 	return c.GetRecipeDetailByIdFull(ctx, newDetail.Id)
 }
 
-// MergeIngredients sets the provided ingredients `same_as` to the first one.
+// MergeIngredients sets the provided ingredients `parent` to the first one.
 // TODO: prevent cyclic loop?
 func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids []string) error {
 	ctx, span := c.tracer.Start(ctx, "MergeIngredients")
@@ -260,7 +260,7 @@ func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids 
 		tx,
 		c.psql.
 			Update(ingredientsTable).
-			Set("same_as", ingredientID).
+			Set("parent", ingredientID).
 			Where(sq.Eq{"id": ids})); err != nil {
 		return fmt.Errorf("failed to update ingredient: %w", err)
 	}
@@ -291,7 +291,7 @@ FROM
 	LEFT JOIN recipe_section_ingredients ON recipe_section_ingredients.section = recipe_sections.id
 	LEFT JOIN recipe_details r2  ON r2.recipe = recipe_section_ingredients.recipe
 	LEFT JOIN ingredients ON recipe_section_ingredients.ingredient = ingredients.id
-	LEFT JOIN ingredients alts ON ingredients.same_as = alts.id
+	LEFT JOIN ingredients alts ON ingredients.parent = alts.id
 WHERE
 	(recipe_details.is_latest_version = TRUE AND (r2.is_latest_version IS NULL OR r2.is_latest_version = TRUE)
 	)

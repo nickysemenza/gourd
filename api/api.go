@@ -76,7 +76,7 @@ func transformIngredient(dbr db.Ingredient) Ingredient {
 		Id:     dbr.Id,
 		Name:   dbr.Name,
 		FdcId:  dbr.FdcID.Ptr(),
-		SameAs: dbr.SameAs.Ptr(),
+		Parent: dbr.Parent.Ptr(),
 	}
 }
 func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {

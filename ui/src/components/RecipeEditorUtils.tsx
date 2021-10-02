@@ -540,7 +540,7 @@ export const getHint = (
   ing_hints: IngDetailsById
 ): IngredientDetail | undefined => {
   const ingredientId =
-    ingredient?.ingredient?.ingredient.same_as ||
+    ingredient?.ingredient?.ingredient.parent ||
     ingredient?.ingredient?.ingredient.id ||
     "";
   const hint = ing_hints[ingredientId];

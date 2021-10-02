@@ -785,7 +785,7 @@ components:
         name:
           description: Ingredient name
           type: string
-        same_as:
+        parent:
           description: ingredient ID for a similar (likely a different spelling)
           type: string
         fdc_id:

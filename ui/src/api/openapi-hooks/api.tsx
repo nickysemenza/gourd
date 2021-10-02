@@ -160,7 +160,7 @@ export interface Ingredient {
   /**
    * ingredient ID for a similar (likely a different spelling)
    */
-  same_as?: string;
+  parent?: string;
   /**
    * FDC id equivalent to this ingredient
    */

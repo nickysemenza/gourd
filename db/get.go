@@ -9,6 +9,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type RecipeDetails []RecipeDetail
@@ -43,16 +45,16 @@ func (r RecipeDetails) First() *RecipeDetail {
 
 type Ingredients []Ingredient
 
-func (r Ingredients) BySameAs() map[string][]Ingredient {
+func (r Ingredients) ByParent() map[string][]Ingredient {
 	m := make(map[string][]Ingredient)
 	for _, x := range r {
-		m[x.SameAs.ValueOrZero()] = append(m[x.SameAs.ValueOrZero()], x)
+		m[x.Parent.ValueOrZero()] = append(m[x.Parent.ValueOrZero()], x)
 	}
 	return m
 }
-func (r Ingredients) IdsBySameAs(id string) []string {
+func (r Ingredients) IdsByParent(id string) []string {
 	m := []string{}
-	if x, ok := r.BySameAs()[id]; ok {
+	if x, ok := r.ByParent()[id]; ok {
 		for _, y := range x {
 			m = append(m, y.Id)
 		}
@@ -358,9 +360,9 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 	return &r, nil
 }
 func (c *Client) FillFdcIdFromParentIfNcessary(ctx context.Context, i *Ingredient) error {
-	if !i.FdcID.Valid && i.SameAs.Valid {
+	if !i.FdcID.Valid && i.Parent.Valid {
 		// grab fdc_id from parent (todo: optimize this)
-		parent, err := c.GetIngredientById(ctx, i.SameAs.String)
+		parent, err := c.GetIngredientById(ctx, i.Parent.String)
 		if err != nil {
 			return err
 		}
@@ -433,7 +435,7 @@ func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, 
 	ctx, span := c.tracer.Start(ctx, "GetIngredients")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		q = q.Where(sq.Eq{"same_as": nil})
+		q = q.Where(sq.Eq{"parent": nil})
 		q = newSearchQuery(opts...).apply(q)
 		if name != "" {
 			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", name)})
@@ -443,11 +445,11 @@ func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, 
 		return q
 	})
 }
-func (c *Client) GetIngrientsSameAs(ctx context.Context, parent ...string) (Ingredients, uint64, error) {
-	ctx, span := c.tracer.Start(ctx, "GetIngrientsSameAs")
+func (c *Client) GetIngrientsParent(ctx context.Context, parent ...string) (Ingredients, uint64, error) {
+	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.Where(sq.Eq{"same_as": parent})
+		return q.Where(sq.Eq{"parent": parent})
 	})
 }
 
@@ -470,6 +472,7 @@ func (c *Client) GetIngrientsSameAs(ctx context.Context, parent ...string) (Ingr
 func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) (map[string][]IngredientUnitMapping, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngredientUnits")
 	defer span.End()
+	span.AddEvent("ingredient", trace.WithAttributes(attribute.StringSlice("id", ingredient)))
 	var res []IngredientUnitMapping
 	if err := c.selectContext(ctx, c.psql.Select("*").From("ingredient_units").Where(sq.Eq{"ingredient": ingredient}), &res); err != nil {
 		return nil, err
