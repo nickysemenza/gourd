@@ -1925,10 +1925,10 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.9":
-  version "2.4.9"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.9.tgz#25983c4cde17e5789f7e1bcd5fdb3143015326ce"
-  integrity sha512-5Od4F9EeznO/1bDEQpjUSHUNAnnfNRJRkpwO+FqOLfhw1gXgZHbCk8cvLxhUK/MAXEvtt5M/+TLIzp5hsG7M/Q==
+"@openapitools/openapi-generator-cli@2.4.10":
+  version "2.4.10"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.10.tgz#fc982570986cbc84ed4450bd690b65394bbbfa8e"
+  integrity sha512-hxNd2pQPdf/+PuxaIReE+nQZWCDL5ReTeYptbeKJ2+DMLzyT7EQrEENlPPIDBUITGADopAmeh2kNlKLRUllrCg==
   dependencies:
     "@nestjs/common" "8.0.9"
     "@nestjs/core" "8.0.9"
@@ -1936,7 +1936,7 @@
     chalk "4.1.2"
     commander "8.2.0"
     compare-versions "3.6.0"
-    concurrently "6.2.2"
+    concurrently "6.3.0"
     console.table "0.10.0"
     fs-extra "10.0.0"
     glob "7.1.6"
@@ -5274,10 +5274,10 @@ concat-stream@^1.5.0, concat-stream@^1.6.0, concat-stream@^1.6.1, concat-stream@
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
-concurrently@6.2.2:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-6.2.2.tgz#81c11b85d9a7de56ad4388ff6aab4a94ddea51f2"
-  integrity sha512-7a45BjVakAl3pprLOeqaOoZfIWZRmdC68NkjyzPbKu0/pE6CRmqS3l8RG7Q2cX9LnRHkB0oPM6af8PS7NEQvYQ==
+concurrently@6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-6.3.0.tgz#63128cb4a6ed54d3c0ed8528728590a5fe54582a"
+  integrity sha512-k4k1jQGHHKsfbqzkUszVf29qECBrkvBKkcPJEUDTyVR7tZd1G/JOfnst4g1sYbFvJ4UjHZisj1aWQR8yLKpGPw==
   dependencies:
     chalk "^4.1.0"
     date-fns "^2.16.1"
