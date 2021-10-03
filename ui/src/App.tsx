@@ -48,6 +48,7 @@ import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 
 const registerTracing = (url: string) => {
   if (url === "") return;
+  console.info("enabled tracing", url);
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
   const exporter = new CollectorTraceExporter({
@@ -77,8 +78,7 @@ const registerTracing = (url: string) => {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
   // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 };
-const tracingURL = getTracingURL();
-if (tracingURL) registerTracing(tracingURL);
+registerTracing(getTracingURL());
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (

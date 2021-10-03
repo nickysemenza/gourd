@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 export const getAPIURL = () => getBaseURL() + "/api";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;
-export const getTracingURL = () => process.env.REACT_APP_TRACING_URL;
+export const getTracingURL = () => process.env.REACT_APP_TRACING_URL || "";
 
 export const getConfig = () => {
   // TODO: load this all from API + cache it

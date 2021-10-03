@@ -119,6 +119,7 @@ pub struct SI {
     substitutes_for: Option<String>,
 }
 
+#[tracing::instrument]
 pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     let res = sqlx::query_as!(
         SI,
