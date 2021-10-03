@@ -2916,10 +2916,10 @@
     "@types/react-dom" "*"
     "@types/react-transition-group" "*"
 
-"@types/react-table@7.7.5":
-  version "7.7.5"
-  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.7.5.tgz#34603de1f4e745d8eacdb289b90b6853d97f4e6d"
-  integrity sha512-a6KLDyT6ZXxewYTG9sOsB9heoBVTYYwfoyB7+sziNGECOJXqmavdWeRtp548pJl490XHmUSxaWnVeeT9UOW9Gg==
+"@types/react-table@7.7.6":
+  version "7.7.6"
+  resolved "https://registry.yarnpkg.com/@types/react-table/-/react-table-7.7.6.tgz#4899ccc46b4a1de08cc1daf120842e37e112e51e"
+  integrity sha512-ZMFHh1sG5AGDmhVRpz9mgGByGmBFAqnZ7QnyqGa5iAlKtcSC3vb/gul47lM0kJ1uvlawc+qN5k+++pe+GBdJ+g==
   dependencies:
     "@types/react" "*"
 
