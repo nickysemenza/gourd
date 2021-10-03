@@ -200,7 +200,7 @@ export interface UnitMapping {
   /**
    * source of the mapping
    */
-  source: string;
+  source?: string;
 }
 
 /**

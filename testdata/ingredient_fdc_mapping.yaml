@@ -9,9 +9,16 @@
         unit: dollars
         value: 3
       source: wf
+    - &density_liquid
+      a:
+        unit: ml
+        value: 1
+      b:
+        unit: gram
+        value: 0.94
 - name: sugar
   fdc_id: 746784
-  aliases: ["granulated sugar"]
+  aliases: ["granulated sugar", "white sugar"]
   unit_mappings:
     - a:
         unit: lb
@@ -107,6 +114,8 @@
       source: tjs
 - name: water
   fdc_id: 496879
+  unit_mappings:
+    - *density_liquid
 - name: baking soda
   fdc_id: 741258
   unit_mappings:
@@ -216,7 +225,8 @@
 - name: blueberries
   fdc_id: 732876
 - name: canned tomatoes
-  fdc_id: 605142
+  # fdc_id: 605142
+  upc: 725342260133
   unit_mappings:
     - a:
         unit: oz
@@ -263,13 +273,7 @@
         unit: dollars
         value: 20.99
       source: wf brand
-    - a:
-        unit: ml
-        value: 1
-      b:
-        unit: gram
-        value: 0.947
-      source: todo, bake this in?
+    - *density_liquid
 - name: black peppercorns
   aliases: ["black pepper"]
   fdc_id: 451342

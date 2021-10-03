@@ -12,4 +12,5 @@
 ./bin/gourd import testdata/pasta.txt
 
 
-./bin/gourd load-ingredients testdata/ingredient_fdc_mapping.yaml
+# ./bin/gourd load-ingredients testdata/ingredient_fdc_mapping.yaml
+cd rust && RUST_BACKTRACE=1 cargo run load_mappings --mapping ../testdata/ingredient_fdc_mapping.yaml

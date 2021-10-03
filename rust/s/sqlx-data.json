@@ -1,5 +1,244 @@
 {
   "db": "PostgreSQL",
+  "066046463b083b72d884306915b8f67a7ce49dc27290e90efc847673e9c6893a": {
+    "query": "SELECT id, ingredient, unit_a, amount_a, unit_b, amount_b, source FROM ingredient_units LIMIT $1 OFFSET $2",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "ingredient",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "unit_a",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "amount_a",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 4,
+          "name": "unit_b",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "amount_b",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 6,
+          "name": "source",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "11cab95d1e8456586a6b20abd6605e022cfbfc5e14d26f35ff0e80f1361515b4": {
+    "query": "\n        SELECT * FROM ingredients\n        WHERE lower(name) = lower($1) LIMIT 1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "fdc_id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 3,
+          "name": "parent",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        true
+      ]
+    }
+  },
+  "13a952eb570800284cb14e24622ba871840541bf973aef48a5c4786a8e34c07f": {
+    "query": "UPDATE ingredients set fdc_id = $1 where id = $2",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "15850652721cfb778af230df8f6947971f10f6cd3b863b39f62947987abd5d8d": {
+    "query": "select fdc_id from usda_branded_food where gtin_upc = $1 order by fdc_id desc limit 1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "fdc_id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "1859e7c3924f148903be42773802b0ac04ffeab12399127bb03a092a4fb0896a": {
+    "query": "DELETE FROM ingredient_units WHERE id = $1",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "215b79af74cc13fa50bc346718e74dbd7beed299bc8a473d576faa9f1cf2d191": {
+    "query": "SELECT id, ingredient, unit_a, amount_a, unit_b, amount_b, source FROM ingredient_units WHERE id = $1",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "ingredient",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "unit_a",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "amount_a",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 4,
+          "name": "unit_b",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "amount_b",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 6,
+          "name": "source",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "4bea6a0db223f103dd39dcd959785ebe5ccea50c978c5732953092d9e11262ae": {
+    "query": "UPDATE ingredient_units SET ingredient = $1, unit_a = $2, amount_a = $3, unit_b = $4, amount_b = $5, source = $6 WHERE id = $7",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Numeric",
+          "Text",
+          "Numeric",
+          "Text",
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "795495f9ca91aca153227f0edf0a6ed491e5d19712bfb198312031e793b82a4d": {
+    "query": "INSERT INTO ingredient_units (ingredient, unit_a, amount_a, unit_b, amount_b, source) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Numeric",
+          "Text",
+          "Numeric",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "e915ad3c227d50f724b3f8e5a511abe5b84244d6b4e8223b4f31e0282fe80ea8": {
     "query": "\n    select section, id, sort, ingredient, recipe, amounts as \"amounts: sqlx::types::Json<Vec<Amount>>\",\n     adjective, optional, original, substitutes_for from recipe_section_ingredients;\n            ",
     "describe": {
@@ -69,6 +308,73 @@
         true,
         true,
         true
+      ]
+    }
+  },
+  "ed6a26ada774fcc3fb30b61f2d0afdc3d7889aff44566e47db5e5639d3ac1b28": {
+    "query": "INSERT INTO ingredients (id, name) VALUES ($1, $2)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "f0538f208603cba6f56e5e6f9686b88ea2aa56c7f5cf93d48b2fba33ec7f09ac": {
+    "query": "SELECT id, ingredient, unit_a, amount_a, unit_b, amount_b, source FROM ingredient_units",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "ingredient",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "unit_a",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "amount_a",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 4,
+          "name": "unit_b",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "amount_b",
+          "type_info": "Numeric"
+        },
+        {
+          "ordinal": 6,
+          "name": "source",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
       ]
     }
   }

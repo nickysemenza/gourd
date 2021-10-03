@@ -524,7 +524,7 @@ type UnitMapping struct {
 	B Amount `json:"b"`
 
 	// source of the mapping
-	Source string `json:"source"`
+	Source *string `json:"source,omitempty"`
 }
 
 // LimitParam defines model for limitParam.

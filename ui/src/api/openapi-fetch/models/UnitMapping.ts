@@ -43,7 +43,7 @@ export interface UnitMapping {
      * @type {string}
      * @memberof UnitMapping
      */
-    source: string;
+    source?: string;
 }
 
 export function UnitMappingFromJSON(json: any): UnitMapping {
@@ -58,7 +58,7 @@ export function UnitMappingFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'a': AmountFromJSON(json['a']),
         'b': AmountFromJSON(json['b']),
-        'source': json['source'],
+        'source': !exists(json, 'source') ? undefined : json['source'],
     };
 }
 

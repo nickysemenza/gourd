@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
@@ -289,15 +290,15 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 
-		parentIds := []string{}
+		childIds := []string{}
 		for _, alias := range m.Aliases {
 			ing, err := a.DB().IngredientByName(ctx, alias)
 			if err != nil {
 				return err
 			}
-			parentIds = append(parentIds, ing.Id)
+			childIds = append(childIds, ing.Id)
 		}
-		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, parentIds)
+		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, childIds)
 		if err != nil {
 			return err
 		}
@@ -311,7 +312,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 				AmountA:      u.A.Value,
 				UnitB:        u.B.Unit,
 				AmountB:      u.B.Value,
-				Source:       u.Source,
+				Source:       zero.StringFromPtr(u.Source).String,
 			}
 			num, err := a.Manager.DB().AddIngredientUnit(ctx, u)
 			if err != nil {

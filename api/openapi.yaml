@@ -830,7 +830,6 @@ components:
       required:
         - a
         - b
-        - source
       properties:
         a:
           $ref: "#/components/schemas/Amount"

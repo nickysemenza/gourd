@@ -11,4 +11,4 @@ RUN pwd && ls
 RUN cargo build
 RUN ls
 ENV RUST_BACKTRACE 1
-ENTRYPOINT ["/work/rust/target/debug/gourd"]
+ENTRYPOINT ["/work/rust/target/debug/gourd","server"]

@@ -12,69 +12,70 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from "../runtime";
+import { exists, mapValues } from '../runtime';
 /**
  * An Ingredient
  * @export
  * @interface Ingredient
  */
 export interface Ingredient {
-  /**
-   * id
-   * @type {string}
-   * @memberof Ingredient
-   */
-  id: string;
-  /**
-   * Ingredient name
-   * @type {string}
-   * @memberof Ingredient
-   */
-  name: string;
-  /**
-   * ingredient ID for a similar (likely a different spelling)
-   * @type {string}
-   * @memberof Ingredient
-   */
-  parent?: string;
-  /**
-   * FDC id equivalent to this ingredient
-   * @type {number}
-   * @memberof Ingredient
-   */
-  fdc_id?: number;
+    /**
+     * id
+     * @type {string}
+     * @memberof Ingredient
+     */
+    id: string;
+    /**
+     * Ingredient name
+     * @type {string}
+     * @memberof Ingredient
+     */
+    name: string;
+    /**
+     * ingredient ID for a similar (likely a different spelling)
+     * @type {string}
+     * @memberof Ingredient
+     */
+    parent?: string;
+    /**
+     * FDC id equivalent to this ingredient
+     * @type {number}
+     * @memberof Ingredient
+     */
+    fdc_id?: number;
 }
 
 export function IngredientFromJSON(json: any): Ingredient {
-  return IngredientFromJSONTyped(json, false);
+    return IngredientFromJSONTyped(json, false);
 }
 
-export function IngredientFromJSONTyped(
-  json: any,
-  ignoreDiscriminator: boolean
-): Ingredient {
-  if (json === undefined || json === null) {
-    return json;
-  }
-  return {
-    id: json["id"],
-    name: json["name"],
-    parent: !exists(json, "parent") ? undefined : json["parent"],
-    fdc_id: !exists(json, "fdc_id") ? undefined : json["fdc_id"],
-  };
+export function IngredientFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ingredient {
+    if ((json === undefined) || (json === null)) {
+        return json;
+    }
+    return {
+        
+        'id': json['id'],
+        'name': json['name'],
+        'parent': !exists(json, 'parent') ? undefined : json['parent'],
+        'fdc_id': !exists(json, 'fdc_id') ? undefined : json['fdc_id'],
+    };
 }
 
 export function IngredientToJSON(value?: Ingredient | null): any {
-  if (value === undefined) {
-    return undefined;
-  }
-  if (value === null) {
-    return null;
-  }
-  return {
-    id: value.id,
-    name: value.name,
-    parent: value.parent,
-    fdc_id: value.fdc_id,
-  };
+    if (value === undefined) {
+        return undefined;
+    }
+    if (value === null) {
+        return null;
+    }
+    return {
+        
+        'id': value.id,
+        'name': value.name,
+        'parent': value.parent,
+        'fdc_id': value.fdc_id,
+    };
 }
+
+

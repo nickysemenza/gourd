@@ -10,6 +10,8 @@
 
 /// Ingredient : An Ingredient
 
+
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Ingredient {
     /// id
@@ -37,3 +39,5 @@ impl Ingredient {
         }
     }
 }
+
+

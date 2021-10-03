@@ -19,17 +19,17 @@ pub struct UnitMapping {
     #[serde(rename = "b")]
     pub b: Box<crate::models::Amount>,
     /// source of the mapping
-    #[serde(rename = "source")]
-    pub source: String,
+    #[serde(rename = "source", skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 }
 
 impl UnitMapping {
     /// mappings
-    pub fn new(a: crate::models::Amount, b: crate::models::Amount, source: String) -> UnitMapping {
+    pub fn new(a: crate::models::Amount, b: crate::models::Amount) -> UnitMapping {
         UnitMapping {
             a: Box::new(a),
             b: Box::new(b),
-            source,
+            source: None,
         }
     }
 }

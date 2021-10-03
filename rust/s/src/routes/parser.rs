@@ -133,7 +133,7 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
 
     // dbg!(res);
     // let res2 = res.unwrap();
-    Ok(dbg!(res))
+    Ok(res)
 }
 pub async fn pans() -> HttpResponse {
     let p = pan::inventory();

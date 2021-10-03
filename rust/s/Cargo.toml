@@ -18,6 +18,7 @@ env_logger = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_derive = "^1.0"
+serde_yaml = "0.8.21"
 url = "1.7"
 ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
 actix-web-opentelemetry = "0.11.0-beta.5"
@@ -30,10 +31,11 @@ bigdecimal = { version = "0.2.0", features = ["serde"] }
 tracing = "0.1.28"
 tracing-subscriber = "0.2.24"
 tracing-opentelemetry = "0.15.0"
-
-
-
-
+clap = "2.33.3"
+rand = "0.8.4"
+async-recursion = "0.3.2"
+sea-query = {version = "0.16.5", features = ["backend-postgres","sqlx-postgres","with-uuid","with-uuid","with-bigdecimal","with-json","derive"]}
+ormx = {version = "0.10.0", features = ["postgres"]}
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
 

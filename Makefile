@@ -89,7 +89,7 @@ docker-push: docker-build
 validate-openapi: api/openapi.yaml
 	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
 
-generate-openapi-ts: validate-openapi api/openapi.yaml bin/oapi-codegen
+openapi: validate-openapi api/openapi.yaml bin/oapi-codegen
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	npx @openapitools/openapi-generator-cli version-manager set 5.2.0
@@ -114,7 +114,7 @@ cy:
 rs: 
 	cd rust/s && cargo sqlx prepare -- --bin gourd
 dev-rs:
-	cd rust && cargo watch -x run -p s
+	cd rust && cargo watch -x 'run server'
 generate-wasm:
 	cd rust && wasm-pack build w
 wasm-dev: generate-wasm
@@ -123,7 +123,7 @@ wasm-dev: generate-wasm
 test-rs:
 	cd rust && cargo test
 
-generate: wasm-dev generate-openapi-ts
+generate: wasm-dev openapi
 
 
 # misc dev

@@ -12,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (a *API) CreateIngredients(c echo.Context) error {
@@ -76,7 +77,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 			detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
 				Amount{Unit: m.UnitA, Value: m.AmountA},
 				Amount{Unit: m.UnitB, Value: m.AmountB},
-				fmt.Sprintf("%s (%s)", m.Source, i.Id),
+				zero.StringFrom(fmt.Sprintf("%s (%s)", m.Source, i.Id)).Ptr(),
 			})
 		}
 		span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
@@ -128,7 +129,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 			m = append(m, UnitMapping{
 				Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
 				res[0],
-				"fdc hs"})
+				zero.StringFrom("fdc hs").Ptr()})
 		}
 	}
 	if food.Portions != nil {
@@ -149,12 +150,12 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 				m = append(m, UnitMapping{
 					res[0],
 					Amount{Unit: "grams", Value: p.GramWeight},
-					"fdc p1"})
+					zero.StringFrom("fdc p1").Ptr()})
 			} else {
 				m = append(m, UnitMapping{
 					Amount{Unit: p.Modifier, Value: p.Amount},
 					Amount{Unit: "grams", Value: p.GramWeight},
-					"fdc p2"})
+					zero.StringFrom("fdc p2").Ptr()})
 			}
 
 		}
@@ -164,7 +165,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 			m = append(m, UnitMapping{
 				Amount{Unit: "kcal", Value: n.Amount},
 				Amount{Unit: "grams", Value: 100},
-				"fdc n"})
+				zero.StringFrom("fdc n").Ptr()})
 		}
 	}
 	return m, nil
