@@ -1925,10 +1925,10 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.10":
-  version "2.4.10"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.10.tgz#fc982570986cbc84ed4450bd690b65394bbbfa8e"
-  integrity sha512-hxNd2pQPdf/+PuxaIReE+nQZWCDL5ReTeYptbeKJ2+DMLzyT7EQrEENlPPIDBUITGADopAmeh2kNlKLRUllrCg==
+"@openapitools/openapi-generator-cli@2.4.11":
+  version "2.4.11"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.11.tgz#ca45a270ba7112c120a3426465da24045153a15b"
+  integrity sha512-zsO6DdmvwVOR48HbNugS2vwy513Dz9Shj1qyeNNruuxjHHBrm/GuEtkhttaVNWKHnCJ31J0LnbpyAfgzSmN5dQ==
   dependencies:
     "@nestjs/common" "8.0.9"
     "@nestjs/core" "8.0.9"
@@ -1940,7 +1940,7 @@
     console.table "0.10.0"
     fs-extra "10.0.0"
     glob "7.1.6"
-    inquirer "8.1.5"
+    inquirer "8.2.0"
     lodash "4.17.21"
     reflect-metadata "0.1.13"
     rxjs "7.3.1"
@@ -8799,10 +8799,10 @@ inline-source-map@~0.6.0:
   dependencies:
     source-map "~0.5.3"
 
-inquirer@8.1.5:
-  version "8.1.5"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.1.5.tgz#2dc5159203c826d654915b5fe6990fd17f54a150"
-  integrity sha512-G6/9xUqmt/r+UvufSyrPpt84NYwhKZ9jLsgMbQzlx804XErNupor8WQdBnBRrXmBfTPpuwf1sV+ss2ovjgdXIg==
+inquirer@8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-8.2.0.tgz#f44f008dd344bbfc4b30031f45d984e034a3ac3a"
+  integrity sha512-0crLweprevJ02tTuA6ThpoAERAGyVILC4sS74uib58Xf/zSr1/ZWtmm7D5CI+bSQEaA04f0K7idaHpQbSWgiVQ==
   dependencies:
     ansi-escapes "^4.2.1"
     chalk "^4.1.1"
