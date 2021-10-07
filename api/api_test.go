@@ -132,7 +132,7 @@ func TestSearches(t *testing.T) {
 
 	rName := fmt.Sprintf("recipe-%s", common.ID(""))
 	iName := fmt.Sprintf("ing-%s", common.ID(""))
-	err := api.CreateRecipeDetails(ctx, RecipeDetail{
+	err := api.CreateRecipeDetails(ctx, RecipeDetailInput{
 		Name:     rName,
 		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &IngredientDetail{Ingredient: Ingredient{Name: iName}}}}}},
 	})

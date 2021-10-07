@@ -121,7 +121,7 @@ func init() {
 				}
 
 				for x := range recipes {
-					out, err := s.APIManager.CreateRecipe(ctx, &api.RecipeWrapper{Detail: recipes[x]})
+					out, err := s.APIManager.CreateRecipe(ctx, &api.RecipeWrapperInput{Detail: recipes[x]})
 					if err != nil {
 						return err
 					}

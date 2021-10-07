@@ -24,6 +24,9 @@ import {
     RecipeWrapper,
     RecipeWrapperFromJSON,
     RecipeWrapperToJSON,
+    RecipeWrapperInput,
+    RecipeWrapperInputFromJSON,
+    RecipeWrapperInputToJSON,
     SearchResult,
     SearchResultFromJSON,
     SearchResultToJSON,
@@ -34,7 +37,7 @@ export interface RecipesApiConvertIngredientToRecipeRequest {
 }
 
 export interface RecipesApiCreateRecipesRequest {
-    recipeWrapper: RecipeWrapper;
+    recipeWrapperInput: RecipeWrapperInput;
 }
 
 export interface RecipesApiGetRecipeByIdRequest {
@@ -102,8 +105,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * Create a recipe
      */
     async createRecipesRaw(requestParameters: RecipesApiCreateRecipesRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
-        if (requestParameters.recipeWrapper === null || requestParameters.recipeWrapper === undefined) {
-            throw new runtime.RequiredError('recipeWrapper','Required parameter requestParameters.recipeWrapper was null or undefined when calling createRecipes.');
+        if (requestParameters.recipeWrapperInput === null || requestParameters.recipeWrapperInput === undefined) {
+            throw new runtime.RequiredError('recipeWrapperInput','Required parameter requestParameters.recipeWrapperInput was null or undefined when calling createRecipes.');
         }
 
         const queryParameters: any = {};
@@ -125,7 +128,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RecipeWrapperToJSON(requestParameters.recipeWrapper),
+            body: RecipeWrapperInputToJSON(requestParameters.recipeWrapperInput),
         });
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeWrapperFromJSON(jsonValue));

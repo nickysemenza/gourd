@@ -5,6 +5,7 @@ import {
 } from "./api/openapi-hooks/api";
 import { RecipeWrapper, TimeRange } from "./api/openapi-fetch";
 import parse from "parse-duration";
+import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
 
 export const getIngredient = (
   si: Partial<SectionIngredient>
@@ -98,10 +99,10 @@ export const Code: React.FC = ({ children }) => (
   </code>
 );
 
-export const blankRecipeWrapper = (
+export const blankRecipeWrapperInput = (
   name: string = "",
   id: string = ""
-): RecipeWrapper => ({
+): RecipeWrapperInput => ({
   detail: {
     name,
     id: "",

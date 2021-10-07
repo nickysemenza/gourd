@@ -318,7 +318,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecipeWrapper"
+              $ref: "#/components/schemas/RecipeWrapperInput"
       responses:
         "201":
           description: Newly created recipe
@@ -713,6 +713,18 @@ components:
           type: string
         detail:
           $ref: "#/components/schemas/RecipeDetail"
+    RecipeWrapperInput:
+      description: A recipe with subcomponents
+      type: object
+      required:
+        - detail
+        - id
+      properties:
+        id:
+          description: id
+          type: string
+        detail:
+          $ref: "#/components/schemas/RecipeDetailInput"
     Recipe:
       description: A recipe with subcomponents
       type: object
@@ -781,6 +793,43 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RecipeDetail"
+    RecipeDetailInput:
+      description: A revision of a recipe
+      type: object
+      required:
+        - id
+        - name
+        - quantity
+        - unit
+        - sections
+      properties:
+        id:
+          description: id
+          type: string
+        sections:
+          description: sections of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSection"
+        name:
+          description: recipe name
+          type: string
+        sources:
+          description: book or websites
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSource"
+        servings:
+          description: num servings
+          type: integer
+          format: int64
+        quantity:
+          description: serving quantity
+          type: integer
+          format: int64
+        unit:
+          description: serving unit
+          type: string
     Ingredient:
       description: "An Ingredient"
       type: object

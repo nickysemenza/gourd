@@ -411,6 +411,30 @@ type RecipeDetail struct {
 	Version *int64 `json:"version,omitempty"`
 }
 
+// A revision of a recipe
+type RecipeDetailInput struct {
+	// id
+	Id string `json:"id"`
+
+	// recipe name
+	Name string `json:"name"`
+
+	// serving quantity
+	Quantity int64 `json:"quantity"`
+
+	// sections of the recipe
+	Sections []RecipeSection `json:"sections"`
+
+	// num servings
+	Servings *int64 `json:"servings,omitempty"`
+
+	// book or websites
+	Sources *[]RecipeSource `json:"sources,omitempty"`
+
+	// serving unit
+	Unit string `json:"unit"`
+}
+
 // A step in the recipe
 type RecipeSection struct {
 	// A range of time or a specific duration of time (in seconds)
@@ -442,6 +466,15 @@ type RecipeSource struct {
 type RecipeWrapper struct {
 	// A revision of a recipe
 	Detail RecipeDetail `json:"detail"`
+
+	// id
+	Id string `json:"id"`
+}
+
+// A recipe with subcomponents
+type RecipeWrapperInput struct {
+	// A revision of a recipe
+	Detail RecipeDetailInput `json:"detail"`
 
 	// id
 	Id string `json:"id"`
@@ -623,7 +656,7 @@ type ListRecipesParams struct {
 }
 
 // CreateRecipesJSONBody defines parameters for CreateRecipes.
-type CreateRecipesJSONBody RecipeWrapper
+type CreateRecipesJSONBody RecipeWrapperInput
 
 // GetRecipesByIdsParams defines parameters for GetRecipesByIds.
 type GetRecipesByIdsParams struct {

@@ -162,7 +162,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 	}
 	return &si, nil
 }
-func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapper) (*db.RecipeDetail, error) {
+func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
 		Id:   r.Detail.Id,
 		Name: r.Detail.Name,
@@ -373,7 +373,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 // (POST /recipes)
 func (a *API) CreateRecipes(c echo.Context) error {
 	ctx := c.Request().Context()
-	var r RecipeWrapper
+	var r RecipeWrapperInput
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
 		return sendErr(c, http.StatusBadRequest, err)
@@ -385,16 +385,16 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
-func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetail) error {
+func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetailInput) error {
 	for _, r := range recipes {
-		_, err := a.CreateRecipe(ctx, &RecipeWrapper{Detail: r})
+		_, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
 		if err != nil {
 			return err
 		}
 	}
 	return nil
 }
-func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapper) (*RecipeWrapper, error) {
+func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "CreateRecipe")
 	defer span.End()
 

@@ -59,7 +59,7 @@ func JSONBytesFromFile(ctx context.Context, inputPath string) ([][]byte, error) 
 }
 
 // RecipeFromFile reads a recipe from json or yaml file
-func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetail, error) {
+func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetailInput, error) {
 	ext := filepath.Ext(inputPath)
 	log.Infof("loading %s (%s)", inputPath, ext)
 	switch ext {
@@ -68,14 +68,14 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 		if err != nil {
 			return nil, fmt.Errorf("failed to read bytes: %w", err)
 		}
-		output := RecipeDetail{}
+		output := RecipeDetailInput{}
 		err = a.Manager.R.Call(ctx, string(data), rs_client.RecipeDecode, &output)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
-		return []RecipeDetail{output}, nil
+		return []RecipeDetailInput{output}, nil
 	case ".json", ".yaml":
-		var output []RecipeDetail
+		var output []RecipeDetailInput
 
 		jsonBytes, err := JSONBytesFromFile(ctx, inputPath)
 		if err != nil {
@@ -84,7 +84,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 
 		for _, doc := range jsonBytes {
 
-			var r RecipeDetail
+			var r RecipeDetailInput
 			err = json.Unmarshal(doc, &r)
 			if err != nil {
 				return nil, fmt.Errorf("failed to read recipe: %w", err)
@@ -124,11 +124,11 @@ func IngredientMappingFromFile(ctx context.Context, inputPath string) ([]Ingredi
 }
 
 // FetchAndTransform returns a recipe.
-func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string, kind string) (string, error)) (*RecipeWrapper, error) {
+func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string, kind string) (string, error)) (*RecipeWrapperInput, error) {
 	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 
-	r := RecipeWrapper{}
+	r := RecipeWrapperInput{}
 	err := a.Manager.R.Call(ctx, addr, rs_client.Scrape, &r)
 	if err != nil {
 		return nil, err

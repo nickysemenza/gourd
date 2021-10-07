@@ -39,9 +39,11 @@ src/models/paginated_recipes.rs
 src/models/recipe.rs
 src/models/recipe_dependency.rs
 src/models/recipe_detail.rs
+src/models/recipe_detail_input.rs
 src/models/recipe_section.rs
 src/models/recipe_source.rs
 src/models/recipe_wrapper.rs
+src/models/recipe_wrapper_input.rs
 src/models/search_result.rs
 src/models/section_ingredient.rs
 src/models/section_instruction.rs

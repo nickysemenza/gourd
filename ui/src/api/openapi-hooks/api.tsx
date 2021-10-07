@@ -92,6 +92,17 @@ export interface RecipeWrapper {
 /**
  * A recipe with subcomponents
  */
+export interface RecipeWrapperInput {
+  /**
+   * id
+   */
+  id: string;
+  detail: RecipeDetailInput;
+}
+
+/**
+ * A recipe with subcomponents
+ */
 export interface Recipe {
   /**
    * id
@@ -147,6 +158,40 @@ export interface RecipeDetail {
    * Other versions
    */
   other_versions?: RecipeDetail[];
+}
+
+/**
+ * A revision of a recipe
+ */
+export interface RecipeDetailInput {
+  /**
+   * id
+   */
+  id: string;
+  /**
+   * sections of the recipe
+   */
+  sections: RecipeSection[];
+  /**
+   * recipe name
+   */
+  name: string;
+  /**
+   * book or websites
+   */
+  sources?: RecipeSource[];
+  /**
+   * num servings
+   */
+  servings?: number;
+  /**
+   * serving quantity
+   */
+  quantity: number;
+  /**
+   * serving unit
+   */
+  unit: string;
 }
 
 /**
@@ -1051,7 +1096,7 @@ export const useListRecipes = (props: UseListRecipesProps) =>
   );
 
 export type CreateRecipesProps = Omit<
-  MutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
+  MutateProps<RecipeWrapper, Error, void, RecipeWrapperInput, void>,
   "path" | "verb"
 >;
 
@@ -1061,7 +1106,7 @@ export type CreateRecipesProps = Omit<
  * todo
  */
 export const CreateRecipes = (props: CreateRecipesProps) => (
-  <Mutate<RecipeWrapper, Error, void, RecipeWrapper, void>
+  <Mutate<RecipeWrapper, Error, void, RecipeWrapperInput, void>
     verb="POST"
     path={`/recipes`}
     {...props}
@@ -1069,7 +1114,7 @@ export const CreateRecipes = (props: CreateRecipesProps) => (
 );
 
 export type UseCreateRecipesProps = Omit<
-  UseMutateProps<RecipeWrapper, Error, void, RecipeWrapper, void>,
+  UseMutateProps<RecipeWrapper, Error, void, RecipeWrapperInput, void>,
   "path" | "verb"
 >;
 
@@ -1079,7 +1124,7 @@ export type UseCreateRecipesProps = Omit<
  * todo
  */
 export const useCreateRecipes = (props: UseCreateRecipesProps) =>
-  useMutate<RecipeWrapper, Error, void, RecipeWrapper, void>(
+  useMutate<RecipeWrapper, Error, void, RecipeWrapperInput, void>(
     "POST",
     `/recipes`,
     props

@@ -3,7 +3,7 @@ import { ActionMeta, Styles, ValueType } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
-import { blankRecipeWrapper, blankIngredient } from "../util";
+import { blankRecipeWrapperInput, blankIngredient } from "../util";
 import { IngredientKind } from "./RecipeEditorUtils";
 
 type Option = {
@@ -77,7 +77,7 @@ export const EntitySelector: React.FC<{
           createKind === "recipe"
             ? (
                 await rApi.createRecipes({
-                  recipeWrapper: blankRecipeWrapper(name),
+                  recipeWrapperInput: blankRecipeWrapperInput(name),
                 })
               ).detail.id
             : (

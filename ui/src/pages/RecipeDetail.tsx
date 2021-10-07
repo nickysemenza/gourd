@@ -37,7 +37,7 @@ import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
 import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
-import { RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
+import { RecipesApi, RecipeWrapperInput } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import Debug from "../components/Debug";
 import { RecipeLink } from "../components/Misc";
@@ -142,7 +142,7 @@ const RecipeDetail: React.FC = () => {
       console.log({ recipe });
       const bar = new RecipesApi(getOpenapiFetchConfig());
       const updated = await bar.createRecipes({
-        recipeWrapper: recipe as RecipeWrapper,
+        recipeWrapperInput: recipe as RecipeWrapperInput,
       });
       // const updated = await post(recipe);
       setEdit(false);

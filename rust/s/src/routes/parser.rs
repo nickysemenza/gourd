@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan};
 use openapi::models::{
-    Amount, IngredientKind, RecipeDetail, RecipeSection, RecipeWrapper, SectionIngredient,
-    SectionInstruction,
+    Amount, IngredientKind, RecipeDetailInput, RecipeSection, RecipeWrapperInput,
+    SectionIngredient, SectionInstruction,
 };
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
@@ -189,8 +189,8 @@ def sc(x,y):
             })
             .collect(),
     )];
-    let detail = RecipeDetail::new("".to_string(), sections, sc_result.2, 0, "".to_string());
-    let res = RecipeWrapper::new("".to_string(), detail);
+    let detail = RecipeDetailInput::new("".to_string(), sections, sc_result.2, 0, "".to_string());
+    let res = RecipeWrapperInput::new("".to_string(), detail);
 
     debug!("scraped {}", info.text.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
