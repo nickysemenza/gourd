@@ -1925,10 +1925,10 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.11":
-  version "2.4.11"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.11.tgz#ca45a270ba7112c120a3426465da24045153a15b"
-  integrity sha512-zsO6DdmvwVOR48HbNugS2vwy513Dz9Shj1qyeNNruuxjHHBrm/GuEtkhttaVNWKHnCJ31J0LnbpyAfgzSmN5dQ==
+"@openapitools/openapi-generator-cli@2.4.12":
+  version "2.4.12"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.12.tgz#946cc7dccea99dad721dfc48a0cdba8228fbc71d"
+  integrity sha512-SgsI5hyEEpoFZRe3tkc/fFA0cRmXXS0HFwjV/0WChgl1IVQQGjQERwe9T4CmNucDzbZV1/57Gm4VAQBYEE5Alw==
   dependencies:
     "@nestjs/common" "8.0.9"
     "@nestjs/core" "8.0.9"
@@ -1943,7 +1943,7 @@
     inquirer "8.2.0"
     lodash "4.17.21"
     reflect-metadata "0.1.13"
-    rxjs "7.3.1"
+    rxjs "7.4.0"
     tslib "1.13.0"
 
 "@opentelemetry/api-metrics@0.24.0":
@@ -14168,10 +14168,10 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-rxjs@7.3.1:
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.3.1.tgz#cc375521f9e238b474fe552b0b9fd1be33d08099"
-  integrity sha512-vNenx7gqjPyeKpRnM6S5Ksm/oFTRijWWzYlRON04KaehZ3YjDwEmVjGUGo0TKWVjeNXOujVRlh0K1drUbcdPkw==
+rxjs@7.4.0:
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.4.0.tgz#a12a44d7eebf016f5ff2441b87f28c9a51cebc68"
+  integrity sha512-7SQDi7xeTMCJpqViXh8gL/lebcwlp3d831F05+9B44A4B0WfsEwUQHR64gsH1kvJ+Ep/J9K2+n1hVl1CsGN23w==
   dependencies:
     tslib "~2.1.0"
 
