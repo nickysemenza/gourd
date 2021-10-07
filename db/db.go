@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dgraph-io/ristretto"
@@ -80,6 +81,7 @@ type RecipeDetail struct {
 	LatestVersion bool        `db:"is_latest_version"`
 	Sections      []Section
 	Ingredient    zero.String `db:"ingredient"` // sometimes, from FK
+	CreatedAt     time.Time   `db:"created_at"`
 }
 
 // Section represents a Section

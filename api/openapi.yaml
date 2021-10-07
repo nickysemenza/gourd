@@ -772,6 +772,15 @@ components:
         is_latest_version:
           description: whether or not it is the most recent version
           type: boolean
+        # created_at:
+        #   description: when the version was created
+        #   type: string
+        #   format: date-time
+        other_versions:
+          description: Other versions
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeDetail"
     Ingredient:
       description: "An Ingredient"
       type: object

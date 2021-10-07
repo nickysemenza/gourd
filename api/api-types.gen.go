@@ -389,6 +389,9 @@ type RecipeDetail struct {
 	// recipe name
 	Name string `json:"name"`
 
+	// Other versions
+	OtherVersions *[]RecipeDetail `json:"other_versions,omitempty"`
+
 	// serving quantity
 	Quantity int64 `json:"quantity"`
 

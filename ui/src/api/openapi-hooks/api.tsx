@@ -143,6 +143,10 @@ export interface RecipeDetail {
    * whether or not it is the most recent version
    */
   is_latest_version?: boolean;
+  /**
+   * Other versions
+   */
+  other_versions?: RecipeDetail[];
 }
 
 /**

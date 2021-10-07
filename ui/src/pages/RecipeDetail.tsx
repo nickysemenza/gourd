@@ -39,6 +39,9 @@ import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
 import { RecipesApi, RecipeWrapper } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
+import Debug from "../components/Debug";
+import { RecipeLink } from "../components/Misc";
+import { Alert } from "../components/Alert";
 
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
@@ -298,6 +301,11 @@ const RecipeDetail: React.FC = () => {
     dollars: totalDollars,
     kcal: totalKCal,
   } = countTotals(recipe.detail.sections, w, ing_hints);
+
+  const newerVersion = recipe.detail.other_versions
+    ?.filter((r) => r.is_latest_version)
+    .pop();
+
   return (
     <div>
       <Helmet>
@@ -399,6 +407,19 @@ const RecipeDetail: React.FC = () => {
         </div>
       </div>
 
+      {newerVersion && (
+        <Alert
+          title="Newer version available"
+          line={
+            <p>
+              newest version is
+              <RecipeLink recipe={newerVersion} multiplier={multiplier} />, this
+              is version{recipe.detail.version}
+            </p>
+          }
+        />
+      )}
+
       <RecipeDetailTable
         hints={hints}
         ing_hints={ing_hints}
@@ -407,12 +428,12 @@ const RecipeDetail: React.FC = () => {
         recipe={recipe}
         setRecipe={setRecipe}
       />
-      <InstructionsListParser
+      {/* <InstructionsListParser
         setDetail={(s) => {
           setRecipe(setDetail(recipe, s));
           setEdit(true);
         }}
-      />
+      /> */}
       <p className="text-lg font-bold">totals</p>
       <div>
         calories: {totalCal}
@@ -446,6 +467,17 @@ const RecipeDetail: React.FC = () => {
         items={ingredientsWithNutrients}
         h={[...totalNutrients.keys()]}
       />
+      <p>
+        <h3>other versions</h3>
+        <ul>
+          {recipe.detail.other_versions?.map((v) => (
+            <li key={`${v.id}@`}>
+              <RecipeLink recipe={v} />
+            </li>
+          ))}
+        </ul>
+        {/* <Debug data={recipe.detail.other_versions} /> */}
+      </p>
     </div>
   );
 };

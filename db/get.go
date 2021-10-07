@@ -242,7 +242,7 @@ func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient 
 		"equipment",
 		"source", "servings",
 		"quantity",
-		"recipe_details.unit", "is_latest_version").From(recipeDetailsTable).
+		"recipe_details.unit", "is_latest_version", "created_at").From(recipeDetailsTable).
 		Distinct().
 		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.id").
 		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section").

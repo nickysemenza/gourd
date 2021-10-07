@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "unit" TEXT,
   "version" INTEGER NOT NULL,
   "is_latest_version" BOOLEAN DEFAULT FALSE,
+  "created_at" timestamp NOT NULL DEFAULT now(),
   PRIMARY KEY ("id"),
   unique("recipe", "version")
 );

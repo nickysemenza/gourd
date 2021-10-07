@@ -41,6 +41,9 @@ pub struct RecipeDetail {
     /// whether or not it is the most recent version
     #[serde(rename = "is_latest_version", skip_serializing_if = "Option::is_none")]
     pub is_latest_version: Option<bool>,
+    /// Other versions
+    #[serde(rename = "other_versions", skip_serializing_if = "Option::is_none")]
+    pub other_versions: Option<Vec<crate::models::RecipeDetail>>,
 }
 
 impl RecipeDetail {
@@ -56,6 +59,7 @@ impl RecipeDetail {
             unit,
             version: None,
             is_latest_version: None,
+            other_versions: None,
         }
     }
 }

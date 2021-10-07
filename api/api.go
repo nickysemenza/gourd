@@ -35,7 +35,7 @@ func NewAPI(m *manager.Manager) *API {
 	}
 }
 
-func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail) RecipeDetail {
+func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) RecipeDetail {
 	sections, err := a.transformRecipeSections(ctx, dbr.Sections)
 	if err != nil {
 		panic(err)
@@ -49,18 +49,27 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail) RecipeDe
 		Servings:        &dbr.Servings.Int64,
 		Unit:            dbr.Unit.String,
 		Sections:        sections,
+		// CreatedAt:       &dbr.CreatedAt,
 	}
 	if dbr.Source.Valid {
 		if err := json.Unmarshal([]byte(dbr.Source.String), &rd.Sources); err != nil {
 			panic(err)
 		}
 	}
+	if includeOtherVersions {
+		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
+		if err != nil {
+			panic(err)
+		}
+		details := a.transformRecipes(ctx, recipes, false)
+		rd.OtherVersions = &details
+	}
 	return rd
 }
-func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails) []RecipeDetail {
+func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) []RecipeDetail {
 	r := make([]RecipeDetail, len(dbr))
 	for x, d := range dbr {
-		r[x] = a.transformRecipe(ctx, d)
+		r[x] = a.transformRecipe(ctx, d, includeOtherVersions)
 	}
 	return r
 
@@ -68,7 +77,7 @@ func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails) []Reci
 func (a *API) transformRecipeFull(ctx context.Context, dbr *db.RecipeDetail) *RecipeWrapper {
 	return &RecipeWrapper{
 		Id:     dbr.RecipeId,
-		Detail: a.transformRecipe(ctx, *dbr),
+		Detail: a.transformRecipe(ctx, *dbr, true),
 	}
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
@@ -255,7 +264,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
-				r := a.transformRecipe(ctx, *i.RawRecipe)
+				r := a.transformRecipe(ctx, *i.RawRecipe, false)
 				item.Recipe = &r
 			} else {
 				item.Kind = "ingredient"
@@ -347,7 +356,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	byId := details.ByRecipeId()
 	items := []Recipe{}
 	for _, r := range recipeIDs {
-		items = append(items, Recipe{Id: r, Versions: a.transformRecipes(ctx, byId[r])})
+		items = append(items, Recipe{Id: r, Versions: a.transformRecipes(ctx, byId[r], true)})
 	}
 
 	listMeta.setTotalCount(count)
@@ -517,7 +526,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
-		r := a.transformRecipe(ctx, x)
+		r := a.transformRecipe(ctx, x, true)
 		resRecipes = append(resRecipes, RecipeWrapper{Detail: r, Id: x.RecipeId})
 	}
 	for _, x := range ingredients {

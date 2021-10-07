@@ -82,7 +82,7 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		mrs := []MealRecipe{}
 		for _, mr := range mealRecipes.ByMealID()[m.ID] {
 
-			test := a.transformRecipes(ctx, recipeDetailsById[mr.RecipeID])
+			test := a.transformRecipes(ctx, recipeDetailsById[mr.RecipeID], true)
 
 			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: test[0]})
 		}

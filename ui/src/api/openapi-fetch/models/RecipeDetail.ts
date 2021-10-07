@@ -84,6 +84,12 @@ export interface RecipeDetail {
      * @memberof RecipeDetail
      */
     is_latest_version?: boolean;
+    /**
+     * Other versions
+     * @type {Array<RecipeDetail>}
+     * @memberof RecipeDetail
+     */
+    other_versions?: Array<RecipeDetail>;
 }
 
 export function RecipeDetailFromJSON(json: any): RecipeDetail {
@@ -105,6 +111,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'unit': json['unit'],
         'version': !exists(json, 'version') ? undefined : json['version'],
         'is_latest_version': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
+        'other_versions': !exists(json, 'other_versions') ? undefined : ((json['other_versions'] as Array<any>).map(RecipeDetailFromJSON)),
     };
 }
 
@@ -126,6 +133,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'unit': value.unit,
         'version': value.version,
         'is_latest_version': value.is_latest_version,
+        'other_versions': value.other_versions === undefined ? undefined : ((value.other_versions as Array<any>).map(RecipeDetailToJSON)),
     };
 }
 

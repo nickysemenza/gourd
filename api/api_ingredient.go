@@ -214,7 +214,7 @@ func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredi
 	// find linked recipes
 	recipes := []RecipeDetail{}
 	for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
-		recipes = append(recipes, a.transformRecipe(ctx, x))
+		recipes = append(recipes, a.transformRecipe(ctx, x, false))
 	}
 
 	detail := IngredientDetail{
@@ -236,7 +236,7 @@ func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) err
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(http.StatusCreated, a.transformRecipe(ctx, *detail))
+	return c.JSON(http.StatusCreated, a.transformRecipe(ctx, *detail, true))
 }
 
 func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
