@@ -54,7 +54,16 @@ export const updateIngredientInfo = (
               recipe: {
                 $set:
                   kind === "recipe"
-                    ? { id, name, quantity: 0, unit: "", sections: [] }
+                    ? {
+                        id,
+                        name,
+                        quantity: 0,
+                        unit: "",
+                        sections: [],
+                        version: 0,
+                        is_latest_version: false,
+                        created_at: "",
+                      }
                     : undefined,
               },
               ingredient: {

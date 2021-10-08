@@ -1,4 +1,7 @@
-use openapi::models::{RecipeDetail, RecipeSection, SectionInstruction};
+use openapi::models::{
+    RecipeDetail, RecipeDetailInput, RecipeSection, RecipeSectionInput, SectionIngredient,
+    SectionIngredientInput, SectionInstruction, SectionInstructionInput,
+};
 use tracing::trace;
 
 use crate::{parse_ingredient, si_to_ingredient};
@@ -12,7 +15,7 @@ pub enum CompactRecipeLine {
 #[derive(Serialize, Deserialize)]
 pub struct CompactRecipe(Vec<Vec<CompactRecipeLine>>);
 
-pub fn compact_recipe(r: RecipeDetail) -> CompactRecipe {
+pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
     let mut sections = Vec::new();
     for s in r.sections.iter() {
         let mut sec = Vec::new();
@@ -30,7 +33,7 @@ pub fn compact_recipe(r: RecipeDetail) -> CompactRecipe {
     return CompactRecipe(sections);
 }
 
-pub fn encode_recipe(r: RecipeDetail) -> String {
+pub fn encode_recipe(r: RecipeDetailInput) -> String {
     let mut res = String::new();
     res.push_str(&format!("name: {}\n", r.name));
     res.push_str("---\n");
@@ -49,7 +52,7 @@ pub fn encode_recipe(r: RecipeDetail) -> String {
     }
     return res.trim_end().to_string();
 }
-pub fn decode_recipe(r: String) -> RecipeDetail {
+pub fn decode_recipe(r: String) -> RecipeDetailInput {
     trace!("decoding {}", r);
     let mut name = String::new();
     let parts: Vec<&str> = r.split("---\n").collect();
@@ -73,19 +76,70 @@ pub fn decode_recipe(r: String) -> RecipeDetail {
             let lines: Vec<&str> = s.split("\n").collect();
             for line in lines.into_iter() {
                 match dbg!(line).strip_prefix(";") {
-                    Some(i) => {
-                        instructions.push(SectionInstruction::new("".to_string(), i.to_string()))
-                    }
+                    Some(i) => instructions.push(SectionInstructionInput::new(i.to_string())),
 
                     None => ingredients.push(parse_ingredient(line).unwrap()),
                 };
             }
-            RecipeSection::new("".to_string(), instructions, ingredients)
+            RecipeSectionInput::new(instructions, ingredients)
         })
         .collect();
 
-    RecipeDetail::new("".to_string(), sections, name, 0, "".to_string())
+    RecipeDetailInput::new("".to_string(), sections, name, 0, "".to_string())
 }
+pub fn section_to_input(s: &RecipeSection) -> RecipeSectionInput {
+    RecipeSectionInput::new(
+        s.instructions
+            .iter()
+            .map(|i| section_instruction_to_input(i))
+            .collect(),
+        s.ingredients
+            .iter()
+            .map(|i| section_ingredient_to_input(i))
+            .collect(),
+    )
+}
+pub fn section_ingredient_to_input(s: &SectionIngredient) -> SectionIngredientInput {
+    SectionIngredientInput {
+        name: match s.kind {
+            openapi::models::IngredientKind::Ingredient => {
+                Some(s.ingredient.clone().unwrap().ingredient.name.clone())
+            }
+
+            openapi::models::IngredientKind::Recipe => Some(s.recipe.clone().unwrap().name.clone()),
+        },
+        original: s.original.clone(),
+        ..SectionIngredientInput::new(s.id.clone(), s.kind, s.amounts.clone())
+    }
+}
+pub fn section_instruction_to_input(s: &SectionInstruction) -> SectionInstructionInput {
+    SectionInstructionInput::new(s.instruction.clone())
+}
+pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
+    RecipeDetailInput::new(
+        r.id,
+        r.sections
+            .into_iter()
+            .map(|s| section_to_input(&s))
+            .collect(),
+        r.name,
+        r.quantity,
+        r.unit,
+    )
+}
+// pub fn recipe_from_input(r: RecipeDetailInput) -> RecipeDetail {
+//     RecipeDetail::new(
+//         r.id,
+//         // r.sections,
+//         vec![], // TODO!
+//         r.name,
+//         r.quantity,
+//         r.unit,
+//         0,
+//         false,
+//         "".to_string(),
+//     )
+// }
 
 #[cfg(test)]
 mod tests {
@@ -97,7 +151,7 @@ mod tests {
 
     use crate::{
         bare_detail,
-        codec::{decode_recipe, encode_recipe},
+        codec::{decode_recipe, encode_recipe, recipe_to_input},
     };
 
     #[test]
@@ -152,6 +206,9 @@ mod tests {
             "cake".to_string(),
             0,
             "".to_string(),
+            0,
+            false,
+            "".to_string(),
         );
         let raw = "name: cake
 ---
@@ -163,9 +220,9 @@ mod tests {
 2 g bar
 ;inst2
 ;inst3";
-        assert_eq!(encode_recipe(r.clone()), raw);
+        assert_eq!(encode_recipe(recipe_to_input(r.clone())), raw);
         let decoded = decode_recipe(raw.to_string());
-        assert_eq!(dbg!(decoded), dbg!(r));
+        assert_eq!(dbg!(decoded), dbg!(recipe_to_input(r)));
     }
     #[test]
     fn test_encode_decode() {

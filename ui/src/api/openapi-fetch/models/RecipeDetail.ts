@@ -77,13 +77,19 @@ export interface RecipeDetail {
      * @type {number}
      * @memberof RecipeDetail
      */
-    version?: number;
+    version: number;
     /**
      * whether or not it is the most recent version
      * @type {boolean}
      * @memberof RecipeDetail
      */
-    is_latest_version?: boolean;
+    is_latest_version: boolean;
+    /**
+     * when the version was created
+     * @type {Date}
+     * @memberof RecipeDetail
+     */
+    created_at: Date;
     /**
      * Other versions
      * @type {Array<RecipeDetail>}
@@ -109,8 +115,9 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
         'unit': json['unit'],
-        'version': !exists(json, 'version') ? undefined : json['version'],
-        'is_latest_version': !exists(json, 'is_latest_version') ? undefined : json['is_latest_version'],
+        'version': json['version'],
+        'is_latest_version': json['is_latest_version'],
+        'created_at': (new Date(json['created_at'])),
         'other_versions': !exists(json, 'other_versions') ? undefined : ((json['other_versions'] as Array<any>).map(RecipeDetailFromJSON)),
     };
 }
@@ -133,6 +140,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'unit': value.unit,
         'version': value.version,
         'is_latest_version': value.is_latest_version,
+        'created_at': (value.created_at.toISOString()),
         'other_versions': value.other_versions === undefined ? undefined : ((value.other_versions as Array<any>).map(RecipeDetailToJSON)),
     };
 }

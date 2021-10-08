@@ -37,12 +37,48 @@ import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
 import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
-import { RecipesApi, RecipeWrapperInput } from "../api/openapi-fetch";
+import {
+  RecipesApi,
+  RecipeWrapperInput,
+  RecipeWrapper,
+  SectionInstructionInput,
+  SectionIngredientInput,
+} from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import Debug from "../components/Debug";
 import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
 
+const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
+  return {
+    id: r.id,
+    detail: {
+      id: r.id,
+      name: r.detail.name,
+      quantity: r.detail.quantity,
+      unit: r.detail.unit,
+      sections: r.detail.sections.map((s) => {
+        const instructions: Array<SectionInstructionInput> = s.instructions.map(
+          (i) => ({
+            instruction: i.instruction,
+          })
+        );
+        const ingredients: Array<SectionIngredientInput> = s.ingredients.map(
+          (i) => ({
+            name: i.ingredient?.name || i.recipe?.name || undefined,
+            amounts: i.amounts,
+            kind: i.kind,
+            target_id: i.ingredient?.ingredient.id || i.recipe?.id || "",
+          })
+        );
+        return {
+          ingredients,
+          instructions,
+        };
+      }),
+    },
+  };
+};
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
   let history = useHistory();
@@ -142,7 +178,7 @@ const RecipeDetail: React.FC = () => {
       console.log({ recipe });
       const bar = new RecipesApi(getOpenapiFetchConfig());
       const updated = await bar.createRecipes({
-        recipeWrapperInput: recipe as RecipeWrapperInput,
+        recipeWrapperInput: toInput(recipe as unknown as RecipeWrapper),
       });
       // const updated = await post(recipe);
       setEdit(false);

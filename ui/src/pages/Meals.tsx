@@ -78,6 +78,9 @@ const Meals: React.FC = () => {
                       sections: [],
                       quantity: 1,
                       unit: "",
+                      version: 0,
+                      is_latest_version: false,
+                      created_at: "",
                     })
                   );
                 }}

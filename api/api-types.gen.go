@@ -380,11 +380,14 @@ type RecipeDependency struct {
 
 // A revision of a recipe
 type RecipeDetail struct {
+	// when the version was created
+	CreatedAt time.Time `json:"created_at"`
+
 	// id
 	Id string `json:"id"`
 
 	// whether or not it is the most recent version
-	IsLatestVersion *bool `json:"is_latest_version,omitempty"`
+	IsLatestVersion bool `json:"is_latest_version"`
 
 	// recipe name
 	Name string `json:"name"`
@@ -408,7 +411,7 @@ type RecipeDetail struct {
 	Unit string `json:"unit"`
 
 	// version of the recipe
-	Version *int64 `json:"version,omitempty"`
+	Version int64 `json:"version"`
 }
 
 // A revision of a recipe
@@ -423,7 +426,7 @@ type RecipeDetailInput struct {
 	Quantity int64 `json:"quantity"`
 
 	// sections of the recipe
-	Sections []RecipeSection `json:"sections"`
+	Sections []RecipeSectionInput `json:"sections"`
 
 	// num servings
 	Servings *int64 `json:"servings,omitempty"`
@@ -448,6 +451,18 @@ type RecipeSection struct {
 
 	// x
 	Instructions []SectionInstruction `json:"instructions"`
+}
+
+// A step in the recipe
+type RecipeSectionInput struct {
+	// A range of time or a specific duration of time (in seconds)
+	Duration *TimeRange `json:"duration,omitempty"`
+
+	// x
+	Ingredients []SectionIngredientInput `json:"ingredients"`
+
+	// x
+	Instructions []SectionInstructionInput `json:"instructions"`
 }
 
 // where the recipe came from (i.e. book/website)
@@ -520,11 +535,42 @@ type SectionIngredient struct {
 	Substitutes *[]SectionIngredient `json:"substitutes,omitempty"`
 }
 
+// Ingredients in a single section
+type SectionIngredientInput struct {
+	// adjective
+	Adjective *string `json:"adjective,omitempty"`
+
+	// the various measures
+	Amounts []Amount       `json:"amounts"`
+	Kind    IngredientKind `json:"kind"`
+
+	// recipe/ingredient name
+	Name *string `json:"name,omitempty"`
+
+	// optional
+	Optional *bool `json:"optional,omitempty"`
+
+	// raw line item (pre-import/scrape)
+	Original *string `json:"original,omitempty"`
+
+	// x
+	Substitutes *[]SectionIngredientInput `json:"substitutes,omitempty"`
+
+	// recipe/ingredient id
+	TargetId string `json:"target_id"`
+}
+
 // Instructions in a single section
 type SectionInstruction struct {
 	// id
 	Id string `json:"id"`
 
+	// instruction
+	Instruction string `json:"instruction"`
+}
+
+// Instructions in a single section
+type SectionInstructionInput struct {
 	// instruction
 	Instruction string `json:"instruction"`
 }

@@ -665,6 +665,42 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SectionIngredient"
+    SectionIngredientInput:
+      description: Ingredients in a single section
+      type: object
+      required:
+        - target_id
+        - amounts
+        - kind
+      properties:
+        target_id:
+          description: recipe/ingredient id
+          type: string
+        name:
+          description: recipe/ingredient name
+          type: string
+        kind:
+          description: what kind of ingredient, for target_id or name
+          $ref: "#/components/schemas/IngredientKind"
+        amounts:
+          description: the various measures
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        adjective:
+          description: adjective
+          type: string
+        optional:
+          description: optional
+          type: boolean
+        original:
+          description: raw line item (pre-import/scrape)
+          type: string
+        substitutes:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredientInput"
     SectionInstruction:
       description: Instructions in a single section
       type: object
@@ -675,6 +711,15 @@ components:
         id:
           description: id
           type: string
+        instruction:
+          description: instruction
+          type: string
+    SectionInstructionInput:
+      description: Instructions in a single section
+      type: object
+      required:
+        - instruction
+      properties:
         instruction:
           description: instruction
           type: string
@@ -701,6 +746,25 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SectionIngredient"
+    RecipeSectionInput:
+      description: A step in the recipe
+      type: object
+      required:
+        - instructions
+        - ingredients
+      properties:
+        duration:
+          $ref: "#/components/schemas/TimeRange"
+        instructions:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionInstructionInput"
+        ingredients:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredientInput"
     RecipeWrapper:
       description: A recipe with subcomponents
       type: object
@@ -749,6 +813,9 @@ components:
         - quantity
         - unit
         - sections
+        - version
+        - is_latest_version
+        - created_at
       properties:
         id:
           description: id
@@ -784,10 +851,10 @@ components:
         is_latest_version:
           description: whether or not it is the most recent version
           type: boolean
-        # created_at:
-        #   description: when the version was created
-        #   type: string
-        #   format: date-time
+        created_at:
+          description: when the version was created
+          type: string
+          format: date-time
         other_versions:
           description: Other versions
           type: array
@@ -810,7 +877,7 @@ components:
           description: sections of the recipe
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSection"
+            $ref: "#/components/schemas/RecipeSectionInput"
         name:
           description: recipe name
           type: string

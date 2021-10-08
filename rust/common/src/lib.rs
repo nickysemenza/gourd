@@ -2,7 +2,7 @@ use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
     unit_conversion_request::Target, Amount, Ingredient, IngredientDetail, IngredientKind,
-    RecipeDetail, SectionIngredient, UnitConversionRequest, UnitMapping,
+    RecipeDetail, SectionIngredient, SectionIngredientInput, UnitConversionRequest, UnitMapping,
 };
 use tracing::info;
 use unit::MeasureKind;
@@ -14,7 +14,10 @@ pub mod codec;
 pub mod pan;
 pub mod unit;
 
-fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> SectionIngredient {
+fn section_ingredient_from_parsed(
+    i: ingredient::Ingredient,
+    original: &str,
+) -> SectionIngredientInput {
     let mut grams = 0.0;
     let mut oz = 0.0;
     let mut ml = 0.0;
@@ -60,35 +63,14 @@ fn section_ingredient_from_parsed(i: ingredient::Ingredient, original: &str) -> 
         }
     }
 
-    return SectionIngredient {
+    return SectionIngredientInput {
         adjective: i.modifier,
-        ingredient: if kind == IngredientKind::Ingredient {
-            Some(Box::new(IngredientDetail::new(
-                "".to_string(),
-                Ingredient::new("".to_string(), i.name.clone()),
-                vec![],
-                vec![],
-                vec![],
-            )))
-        } else {
-            None
-        },
-        recipe: if kind == IngredientKind::Recipe {
-            Some(Box::new(RecipeDetail::new(
-                "".to_string(),
-                vec![],
-                i.name,
-                0,
-                "".to_string(),
-            )))
-        } else {
-            None
-        },
+        name: Some(i.name),
         original: Some(original.to_string()),
-        ..SectionIngredient::new("".to_string(), kind, amounts)
+        ..SectionIngredientInput::new("".to_string(), kind, amounts)
     };
 }
-pub fn parse_ingredient(s: &str) -> Result<SectionIngredient, String> {
+pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     let i = dbg!(ingredient::from_str(s, true))?;
     Ok(section_ingredient_from_parsed(i, s))
 }
@@ -210,21 +192,14 @@ pub fn measure_to_amount(m: unit::Measure) -> Amount {
     let m1 = m.as_bare();
     Amount::new(m1.unit, m1.value.into())
 }
-pub fn si_to_ingredient(s: SectionIngredient) -> ingredient::Ingredient {
+pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     let mut amounts = vec![];
     for a in s.amounts.iter() {
         amounts.push(ingredient::Amount::new(&a.unit, a.value as f32));
     }
 
-    let mut name = String::new();
-    if s.ingredient.is_some() {
-        name = s.ingredient.unwrap().ingredient.name;
-    }
-    if s.recipe.is_some() {
-        name = s.recipe.unwrap().name;
-    }
     return ingredient::Ingredient {
-        name,
+        name: s.name.unwrap_or_default(),
         modifier: s.adjective,
         amounts,
     };
@@ -246,20 +221,20 @@ mod tests {
 
     use openapi::models::{
         Amount, Ingredient, IngredientDetail, IngredientKind, RecipeDetail, RecipeSection,
-        SectionIngredient,
+        SectionIngredient, SectionIngredientInput,
     };
     use pretty_assertions::assert_eq;
 
-    use crate::{bare_detail, parse_ingredient, sum_ingredients};
+    use crate::{parse_ingredient, sum_ingredients};
 
     #[test]
     fn test_from_parsed() {
         assert_eq!(
             parse_ingredient("118 grams / 0.5 cups water").unwrap(),
-            SectionIngredient {
+            SectionIngredientInput {
                 original: Some("118 grams / 0.5 cups water".to_string()),
-                ingredient: Some(Box::new(bare_detail("water".to_string()))),
-                ..SectionIngredient::new(
+                name: Some("water".to_string()),
+                ..SectionIngredientInput::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
@@ -275,10 +250,10 @@ mod tests {
         // ml is parsed as grams if not present
         assert_eq!(
             parse_ingredient("118 ml / 0.5 cups water").unwrap(),
-            SectionIngredient {
+            SectionIngredientInput {
                 original: Some("118 ml / 0.5 cups water".to_string()),
-                ingredient: Some(Box::new(bare_detail("water".to_string()))),
-                ..SectionIngredient::new(
+                name: Some("water".to_string()),
+                ..SectionIngredientInput::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
@@ -293,10 +268,10 @@ mod tests {
     fn test_from_parsed_grams_from_oz() {
         assert_eq!(
             parse_ingredient("4 oz / 1/2 cup water").unwrap(),
-            SectionIngredient {
+            SectionIngredientInput {
                 original: Some("4 oz / 1/2 cup water".to_string()),
-                ingredient: Some(Box::new(bare_detail("water".to_string()))),
-                ..SectionIngredient::new(
+                name: Some("water".to_string()),
+                ..SectionIngredientInput::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
@@ -361,6 +336,9 @@ mod tests {
             )],
             "".to_string(),
             0,
+            "".to_string(),
+            0,
+            false,
             "".to_string(),
         );
         let expected: HashMap<String, Vec<SectionIngredient>> = [

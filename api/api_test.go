@@ -134,7 +134,7 @@ func TestSearches(t *testing.T) {
 	iName := fmt.Sprintf("ing-%s", common.ID(""))
 	err := api.CreateRecipeDetails(ctx, RecipeDetailInput{
 		Name:     rName,
-		Sections: []RecipeSection{{Ingredients: []SectionIngredient{{Kind: "ingredient", Ingredient: &IngredientDetail{Ingredient: Ingredient{Name: iName}}}}}},
+		Sections: []RecipeSectionInput{{Ingredients: []SectionIngredientInput{{Kind: "ingredient", Name: &iName}}}},
 	})
 	require.NoError(err)
 

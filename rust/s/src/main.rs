@@ -1,3 +1,5 @@
+use std::env;
+
 use gourd::configuration::get_configuration;
 use gourd::startup::Application;
 use opentelemetry::sdk::{
@@ -13,6 +15,7 @@ use clap::{App, Arg, SubCommand};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env::set_var("RUST_BACKTRACE", "1");
     let matches = App::new("gourd CLI")
         .version("1.0")
         .arg(

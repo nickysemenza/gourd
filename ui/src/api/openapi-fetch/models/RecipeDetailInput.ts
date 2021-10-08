@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    RecipeSection,
-    RecipeSectionFromJSON,
-    RecipeSectionFromJSONTyped,
-    RecipeSectionToJSON,
+    RecipeSectionInput,
+    RecipeSectionInputFromJSON,
+    RecipeSectionInputFromJSONTyped,
+    RecipeSectionInputToJSON,
     RecipeSource,
     RecipeSourceFromJSON,
     RecipeSourceFromJSONTyped,
@@ -38,10 +38,10 @@ export interface RecipeDetailInput {
     id: string;
     /**
      * sections of the recipe
-     * @type {Array<RecipeSection>}
+     * @type {Array<RecipeSectionInput>}
      * @memberof RecipeDetailInput
      */
-    sections: Array<RecipeSection>;
+    sections: Array<RecipeSectionInput>;
     /**
      * recipe name
      * @type {string}
@@ -85,7 +85,7 @@ export function RecipeDetailInputFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'id': json['id'],
-        'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
+        'sections': ((json['sections'] as Array<any>).map(RecipeSectionInputFromJSON)),
         'name': json['name'],
         'sources': !exists(json, 'sources') ? undefined : ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
@@ -104,7 +104,7 @@ export function RecipeDetailInputToJSON(value?: RecipeDetailInput | null): any {
     return {
         
         'id': value.id,
-        'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
+        'sections': ((value.sections as Array<any>).map(RecipeSectionInputToJSON)),
         'name': value.name,
         'sources': value.sources === undefined ? undefined : ((value.sources as Array<any>).map(RecipeSourceToJSON)),
         'servings': value.servings,

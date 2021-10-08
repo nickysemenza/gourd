@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan};
 use openapi::models::{
-    Amount, IngredientKind, RecipeDetailInput, RecipeSection, RecipeWrapperInput,
-    SectionIngredient, SectionInstruction,
+    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
+    SectionIngredient, SectionIngredientInput, SectionInstructionInput,
 };
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
@@ -169,19 +169,18 @@ def sc(x,y):
             .extract()
             .unwrap();
     });
-    let sections = vec![RecipeSection::new(
-        "".to_string(),
+    let sections = vec![RecipeSectionInput::new(
         sc_result
             .1
             .split('\n')
-            .map(|x| SectionInstruction::new("".to_string(), x.to_string()))
+            .map(|x| SectionInstructionInput::new(x.to_string()))
             .collect(),
         sc_result
             .0
             .iter()
             .map(|x| {
                 let _x = 1;
-                gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredient::new(
+                gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredientInput::new(
                     "".to_string(),
                     IngredientKind::Ingredient,
                     vec![],
@@ -229,7 +228,7 @@ mod tests {
 
         assert_eq!(
             response_body,
-            r##"{"id":"","kind":"ingredient","ingredient":{"name":"","ingredient":{"id":"","name":"flour"},"recipes":[],"children":[],"unit_mappings":[]},"amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
+            r##"{"target_id":"","name":"flour","kind":"ingredient","amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
         );
 
         Ok(())

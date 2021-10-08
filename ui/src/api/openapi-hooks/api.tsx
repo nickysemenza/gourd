@@ -46,6 +46,41 @@ export interface SectionIngredient {
 }
 
 /**
+ * Ingredients in a single section
+ */
+export interface SectionIngredientInput {
+  /**
+   * recipe/ingredient id
+   */
+  target_id: string;
+  /**
+   * recipe/ingredient name
+   */
+  name?: string;
+  kind: IngredientKind;
+  /**
+   * the various measures
+   */
+  amounts: Amount[];
+  /**
+   * adjective
+   */
+  adjective?: string;
+  /**
+   * optional
+   */
+  optional?: boolean;
+  /**
+   * raw line item (pre-import/scrape)
+   */
+  original?: string;
+  /**
+   * x
+   */
+  substitutes?: SectionIngredientInput[];
+}
+
+/**
  * Instructions in a single section
  */
 export interface SectionInstruction {
@@ -53,6 +88,16 @@ export interface SectionInstruction {
    * id
    */
   id: string;
+  /**
+   * instruction
+   */
+  instruction: string;
+}
+
+/**
+ * Instructions in a single section
+ */
+export interface SectionInstructionInput {
   /**
    * instruction
    */
@@ -76,6 +121,21 @@ export interface RecipeSection {
    * x
    */
   ingredients: SectionIngredient[];
+}
+
+/**
+ * A step in the recipe
+ */
+export interface RecipeSectionInput {
+  duration?: TimeRange;
+  /**
+   * x
+   */
+  instructions: SectionInstructionInput[];
+  /**
+   * x
+   */
+  ingredients: SectionIngredientInput[];
 }
 
 /**
@@ -149,11 +209,15 @@ export interface RecipeDetail {
   /**
    * version of the recipe
    */
-  version?: number;
+  version: number;
   /**
    * whether or not it is the most recent version
    */
-  is_latest_version?: boolean;
+  is_latest_version: boolean;
+  /**
+   * when the version was created
+   */
+  created_at: string;
   /**
    * Other versions
    */
@@ -171,7 +235,7 @@ export interface RecipeDetailInput {
   /**
    * sections of the recipe
    */
-  sections: RecipeSection[];
+  sections: RecipeSectionInput[];
   /**
    * recipe name
    */

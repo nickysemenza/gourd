@@ -19,7 +19,7 @@ pub struct RecipeDetailInput {
     pub id: String,
     /// sections of the recipe
     #[serde(rename = "sections")]
-    pub sections: Vec<crate::models::RecipeSection>,
+    pub sections: Vec<crate::models::RecipeSectionInput>,
     /// recipe name
     #[serde(rename = "name")]
     pub name: String,
@@ -39,7 +39,7 @@ pub struct RecipeDetailInput {
 
 impl RecipeDetailInput {
     /// A revision of a recipe
-    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String) -> RecipeDetailInput {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSectionInput>, name: String, quantity: i64, unit: String) -> RecipeDetailInput {
         RecipeDetailInput {
             id,
             sections,

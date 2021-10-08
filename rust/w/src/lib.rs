@@ -4,7 +4,7 @@ use gourd_common::{
     convert_to, parse_unit_mappings, sum_ingredients,
     unit::{make_graph, print_graph},
 };
-use openapi::models::{RecipeDetail, UnitConversionRequest};
+use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -124,13 +124,13 @@ pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
 #[wasm_bindgen]
 pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
     utils::set_panic_hook();
-    let r: RecipeDetail = recipe_detail.into_serde().unwrap();
+    let r: RecipeDetailInput = recipe_detail.into_serde().unwrap();
     gourd_common::codec::encode_recipe(r)
 }
 #[wasm_bindgen]
 pub fn encode_recipe_to_compact_json(recipe_detail: &JsValue) -> ICompactR {
     utils::set_panic_hook();
-    let r: RecipeDetail = recipe_detail.into_serde().unwrap();
+    let r: RecipeDetailInput = recipe_detail.into_serde().unwrap();
     let c = gourd_common::codec::compact_recipe(r);
     JsValue::from_serde(&c).unwrap().into()
 }

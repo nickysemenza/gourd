@@ -187,13 +187,13 @@ func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
 		r.Sections[x].RecipeDetailId = r.Id
 		for y := range r.Sections[x].Ingredients {
 			if r.Sections[x].Ingredients[y].Id == "" {
-				r.Sections[x].Ingredients[y].Id = common.ID("si")
+				r.Sections[x].Ingredients[y].Id = common.ID("s_2ing")
 			}
 			r.Sections[x].Ingredients[y].SectionId = r.Sections[x].Id
 
 		}
 		for y := range r.Sections[x].Instructions {
-			r.Sections[x].Instructions[y].Id = common.ID("si")
+			r.Sections[x].Instructions[y].Id = common.ID("s_ins")
 			r.Sections[x].Instructions[y].SectionId = r.Sections[x].Id
 		}
 	}

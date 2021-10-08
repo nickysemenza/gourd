@@ -10,8 +10,6 @@
 
 /// RecipeDetail : A revision of a recipe
 
-
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RecipeDetail {
     /// id
@@ -36,11 +34,14 @@ pub struct RecipeDetail {
     #[serde(rename = "unit")]
     pub unit: String,
     /// version of the recipe
-    #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
-    pub version: Option<i64>,
+    #[serde(rename = "version")]
+    pub version: i64,
     /// whether or not it is the most recent version
-    #[serde(rename = "is_latest_version", skip_serializing_if = "Option::is_none")]
-    pub is_latest_version: Option<bool>,
+    #[serde(rename = "is_latest_version")]
+    pub is_latest_version: bool,
+    /// when the version was created
+    #[serde(rename = "created_at")]
+    pub created_at: String,
     /// Other versions
     #[serde(rename = "other_versions", skip_serializing_if = "Option::is_none")]
     pub other_versions: Option<Vec<crate::models::RecipeDetail>>,
@@ -48,7 +49,16 @@ pub struct RecipeDetail {
 
 impl RecipeDetail {
     /// A revision of a recipe
-    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String) -> RecipeDetail {
+    pub fn new(
+        id: String,
+        sections: Vec<crate::models::RecipeSection>,
+        name: String,
+        quantity: i64,
+        unit: String,
+        version: i64,
+        is_latest_version: bool,
+        created_at: String,
+    ) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,
@@ -57,11 +67,10 @@ impl RecipeDetail {
             servings: None,
             quantity,
             unit,
-            version: None,
-            is_latest_version: None,
+            version,
+            is_latest_version,
+            created_at,
             other_versions: None,
         }
     }
 }
-
-

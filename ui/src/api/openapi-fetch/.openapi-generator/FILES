@@ -45,12 +45,15 @@ models/RecipeDependency.ts
 models/RecipeDetail.ts
 models/RecipeDetailInput.ts
 models/RecipeSection.ts
+models/RecipeSectionInput.ts
 models/RecipeSource.ts
 models/RecipeWrapper.ts
 models/RecipeWrapperInput.ts
 models/SearchResult.ts
 models/SectionIngredient.ts
+models/SectionIngredientInput.ts
 models/SectionInstruction.ts
+models/SectionInstructionInput.ts
 models/TimeRange.ts
 models/UnitConversionRequest.ts
 models/UnitMapping.ts

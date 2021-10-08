@@ -43,8 +43,8 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 	rd := RecipeDetail{
 		Id:              dbr.Id,
 		Name:            dbr.Name,
-		Version:         &dbr.Version,
-		IsLatestVersion: &dbr.LatestVersion,
+		Version:         dbr.Version,
+		IsLatestVersion: dbr.LatestVersion,
 		Quantity:        dbr.Quantity.Int64,
 		Servings:        &dbr.Servings.Int64,
 		Unit:            dbr.Unit.String,
@@ -88,9 +88,9 @@ func transformIngredient(dbr db.Ingredient) Ingredient {
 		Parent: dbr.Parent.Ptr(),
 	}
 }
-func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*db.SectionIngredient, error) {
+func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredientInput) (*db.SectionIngredient, error) {
 	si := db.SectionIngredient{
-		Id:        i.Id,
+		Id:        common.ID("si"),
 		Adjective: zero.StringFromPtr(i.Adjective),
 		Original:  zero.StringFromPtr(i.Original),
 		Optional:  zero.BoolFromPtr(i.Optional),
@@ -102,17 +102,17 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 			Value: amt.Value,
 		})
 	}
+	iOrRiD := i.TargetId
+	name := zero.StringFromPtr(i.Name).ValueOrZero()
+	if name == "" && iOrRiD == "" {
+		return nil, nil
+	}
 	switch i.Kind {
 	case IngredientKindRecipe:
-		if i.Recipe == nil {
-			return nil, nil
-		}
-		var eq sq.Eq
-		id := i.Recipe.Id
-		if id == "" {
-			eq = sq.Eq{"name": i.Recipe.Name}
-		} else {
-			eq = sq.Eq{"recipe": i.Recipe.Id}
+
+		eq := sq.Eq{"recipe": iOrRiD}
+		if iOrRiD != "" {
+			eq = sq.Eq{"name": name}
 		}
 		rs, err := a.DB().GetRecipeDetailWhere(ctx, eq)
 		if err != nil {
@@ -121,38 +121,27 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredient) (*
 
 		r := rs.First()
 		if r != nil {
-			id = r.RecipeId
+			iOrRiD = r.RecipeId
 		} else {
-			r, err := a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: i.Recipe.Name})
+			r, err := a.DB().InsertRecipe(ctx, &db.RecipeDetail{Name: name})
 			if err != nil {
 				return nil, err
 			}
-			id = r.RecipeId
+			iOrRiD = r.RecipeId
 		}
-		si.RecipeId = zero.StringFrom(id)
+		si.RecipeId = zero.StringFrom(iOrRiD)
 	case IngredientKindIngredient:
-		if i.Ingredient == nil {
-			return nil, nil
-		}
-		name := i.Ingredient.Ingredient.Name
-		if name == "" {
-			name = i.Ingredient.Name // todo: remove
-		}
-		if name == "" && i.Ingredient.Ingredient.Id == "" {
-			return nil, nil
-		}
-		id := i.Ingredient.Ingredient.Id
 
 		// missing id, need to find/create
-		if id == "" {
+		if iOrRiD == "" {
 			ing, err := a.DB().IngredientByName(ctx, name)
 			if err != nil {
 				return nil, err
 			}
-			id = ing.Id
+			iOrRiD = ing.Id
 		}
 
-		si.IngredientId = zero.StringFrom(id)
+		si.IngredientId = zero.StringFrom(iOrRiD)
 	case "":
 		// empty table row, drop it
 		return nil, nil
@@ -195,7 +184,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 			})
 		}
 		for _, i := range s.Ingredients {
-			i.Id = common.ID("ing")
+			// i. = common.ID("s_ing")
 			si, err := a.sectionIngredientTODB(ctx, i)
 			if err != nil {
 				return nil, err
@@ -216,7 +205,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 					continue
 				}
 				si2 := *si
-				si2.SubsFor = zero.StringFrom(i.Id)
+				si2.SubsFor = zero.StringFrom(i.TargetId)
 				dbs.Ingredients = append(dbs.Ingredients, si2)
 			}
 		}
