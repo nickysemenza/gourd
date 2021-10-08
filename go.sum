@@ -98,6 +98,8 @@ github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24 h1:sHglBQTwgx+rW
 github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24/go.mod h1:4UJr5HIiMZrwgkSPdsjy2uOQExX/WEILpIrO9UPGuXs=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2 h1:zQoLPDL4o59qnguhsQ655DD/B0MBnPILQLVU1oirN9E=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2/go.mod h1:wUQuqLc5wdTVnX/mgszL0WJagBhN+cbqZf1Ax/SNGSk=
+github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0 h1:38fNtfhHY6bs22b/D6+hDzO6JR0rDzpGPD36dY2uPL4=
+github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0/go.mod h1:jE23wM1jvwSKgdGcoOkj5j9n1VWtncW36pL2bK1JU+0=
 github.com/Joker/hpp v1.0.0/go.mod h1:8x5n+M1Hp5hC0g8okX3sR3vFQwynaX/UgSOM9MeBKzY=
 github.com/Masterminds/goutils v1.1.0/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
@@ -1360,6 +1362,8 @@ go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.21.0/go.mod h1:JQAtechjxLEL81EjmbRwxBq/XEzGaHcsPuDHAx54hg4=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.23.0 h1:hNSH6f4WUMDnRAvUCLItD0WKzQqAPoECvORj+ZChbnA=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.23.0/go.mod h1:wLrbAf2Qb+kFsEjowrxOcuy2SE0dcY0VwFiiYCmUeFQ=
+go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0 h1:qW6j1kJU24yo2xIu16Py4m4AXn1dd+s2uKllGnTFAm0=
+go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0/go.mod h1:7W3JSDYTtH3qKKHrS1fMiwLtK7iZFLPq1+7htfspX/E=
 go.opentelemetry.io/contrib/propagators/b3 v0.23.0 h1:sxitmDBHZS3Z2lw81kDntCRFt4dQglu9EOhBPNHN9CY=
 go.opentelemetry.io/contrib/propagators/b3 v0.23.0/go.mod h1:tAJUf0uW1xrgQ1QgOZqLXFbn3DNFO4tTmh0Nqe3kSzw=
 go.opentelemetry.io/contrib/propagators/jaeger v0.23.0 h1:sVMsCeDMgJiz8NW0NilH2NhydiU+r+pYUMHkWf0zi/k=

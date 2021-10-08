@@ -3,7 +3,7 @@ module github.com/nickysemenza/gourd
 go 1.17
 
 require (
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0-RC2
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/alecthomas/repr v0.0.0-20181024024818-d37bc2a10ba1 // indirect
 	github.com/buckket/go-blurhash v1.1.0
@@ -41,7 +41,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.23.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0
 	go.opentelemetry.io/contrib/propagators/jaeger v0.23.0
 	go.opentelemetry.io/otel v1.0.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0
