@@ -7,12 +7,10 @@ sections:
         recipe:
           name: dep 1
       - grams: 200
-        ingredient:
-          name: all purpose flour
+        name: all purpose flour
         kind: ingredient
       - grams: 200
-        ingredient:
-          name: sugar
+        name: sugar
         kind: ingredient
     instructions:
       - instruction: mix
@@ -21,8 +19,7 @@ name: dep 1
 sections:
   - ingredients:
       - grams: 2000
-        ingredient:
-          name: eggs
+        name: eggs
         kind: ingredient
     instructions:
       - instruction: mix

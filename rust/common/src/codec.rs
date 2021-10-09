@@ -85,7 +85,7 @@ pub fn decode_recipe(r: String) -> RecipeDetailInput {
         })
         .collect();
 
-    RecipeDetailInput::new("".to_string(), sections, name, 0, "".to_string())
+    RecipeDetailInput::new(sections, name, 0, "".to_string())
 }
 pub fn section_to_input(s: &RecipeSection) -> RecipeSectionInput {
     RecipeSectionInput::new(
@@ -117,7 +117,6 @@ pub fn section_instruction_to_input(s: &SectionInstruction) -> SectionInstructio
 }
 pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
     RecipeDetailInput::new(
-        r.id,
         r.sections
             .into_iter()
             .map(|s| section_to_input(&s))

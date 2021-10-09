@@ -53,7 +53,6 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
     id: r.id,
     detail: {
-      id: r.id,
       name: r.detail.name,
       quantity: r.detail.quantity,
       unit: r.detail.unit,
@@ -65,10 +64,16 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
         );
         const ingredients: Array<SectionIngredientInput> = s.ingredients.map(
           (i) => ({
-            name: i.ingredient?.name || i.recipe?.name || undefined,
+            name:
+              i.ingredient?.name ||
+              i.ingredient?.ingredient.name ||
+              i.recipe?.name ||
+              undefined,
             amounts: i.amounts,
             kind: i.kind,
             target_id: i.ingredient?.ingredient.id || i.recipe?.id || "",
+            original: i.original,
+            optional: i.optional,
           })
         );
         return {
@@ -96,6 +101,8 @@ const RecipeDetail: React.FC = () => {
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
 
+  if (recipe)
+    console.log({ recipe, a: toInput(recipe as unknown as RecipeWrapper) });
   const setRecipe2 = (r: RecipeWrapper2) => {
     console.log("setRecipe", r);
     setRecipe(r);
@@ -496,7 +503,11 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      <pre>{w.encode_recipe_text(recipe.detail)}</pre>
+      <pre>
+        {w.encode_recipe_text(
+          toInput(recipe as unknown as RecipeWrapper).detail
+        )}
+      </pre>
       <p className="text-lg font-bold">meals</p>
 
       <Nutrition

@@ -31,7 +31,7 @@ export interface RecipeWrapperInput {
      * @type {string}
      * @memberof RecipeWrapperInput
      */
-    id: string;
+    id?: string;
     /**
      * 
      * @type {RecipeDetailInput}
@@ -50,7 +50,7 @@ export function RecipeWrapperInputFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'id': json['id'],
+        'id': !exists(json, 'id') ? undefined : json['id'],
         'detail': RecipeDetailInputFromJSON(json['detail']),
     };
 }

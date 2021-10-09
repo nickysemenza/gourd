@@ -7,16 +7,14 @@ sections:
       - adjective: room temp
         amount: 0
         grams: 120
-        ingredient:
-          name: egg whites
+        name: egg whites
         kind: ingredient
         optional: false
         unit:
       - adjective:
         amount: 0
         grams: 1
-        ingredient:
-          name: cream of tartar
+        name: cream of tartar
         kind: ingredient
         optional: false
         substitutes:
@@ -36,24 +34,21 @@ sections:
       - adjective:
         amount: 0
         grams: 200
-        ingredient:
-          name: water
+        name: water
         kind: ingredient
         optional: false
         unit:
       - adjective:
         amount: 0
         grams: 600
-        ingredient:
-          name: sugar
+        name: sugar
         kind: ingredient
         optional: false
         unit:
       - adjective:
         amount: 0
         grams: 170
-        ingredient:
-          name: glucose
+        name: glucose
         kind: ingredient
         optional: false
         unit:
@@ -66,8 +61,7 @@ sections:
       - adjective:
         amount: 0
         grams: 400
-        ingredient:
-          name: honey
+        name: honey
         kind: ingredient
         optional: false
         unit:
@@ -82,32 +76,27 @@ sections:
       - adjective: toasted
         amount: 0
         grams: 150
-        ingredient:
-          name: pistachio
+        name: pistachio
         kind: ingredient
         optional: false
         unit:
       - adjective: toasted
         amount: 0
         grams: 240
-        ingredient:
-          name: almonds
+        name: almonds
         kind: ingredient
         optional: false
         unit:
       - grams: 220
-        ingredient:
-          name: candied orange peels
+        name: candied orange peels
         adjective: diced
         kind: ingredient
       - grams: 100
-        ingredient:
-          name: dried apricot peels
+        name: dried apricot peels
         adjective: diced
         kind: ingredient
       - grams: 40
-        ingredient:
-          name: dried ginger
+        name: dried ginger
         adjective: diced
         kind: ingredient
     instructions:
@@ -119,16 +108,14 @@ sections:
       - adjective:
         amount: 0
         grams: 30
-        ingredient:
-          name: corn starch
+        name: corn starch
         kind: ingredient
         optional: false
         unit:
       - adjective:
         amount: 0
         grams: 20
-        ingredient:
-          name: powdered sugar
+        name: powdered sugar
         kind: ingredient
         optional: false
         unit:

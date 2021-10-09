@@ -105,7 +105,6 @@ export const blankRecipeWrapperInput = (
 ): RecipeWrapperInput => ({
   detail: {
     name,
-    id: "",
     quantity: 0,
     unit: "",
     sections: [],

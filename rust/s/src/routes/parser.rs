@@ -188,8 +188,8 @@ def sc(x,y):
             })
             .collect(),
     )];
-    let detail = RecipeDetailInput::new("".to_string(), sections, sc_result.2, 0, "".to_string());
-    let res = RecipeWrapperInput::new("".to_string(), detail);
+    let detail = RecipeDetailInput::new(sections, sc_result.2, 0, "".to_string());
+    let res = RecipeWrapperInput::new(detail);
 
     debug!("scraped {}", info.text.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response

@@ -156,7 +156,7 @@ export interface RecipeWrapperInput {
   /**
    * id
    */
-  id: string;
+  id?: string;
   detail: RecipeDetailInput;
 }
 
@@ -228,10 +228,6 @@ export interface RecipeDetail {
  * A revision of a recipe
  */
 export interface RecipeDetailInput {
-  /**
-   * id
-   */
-  id: string;
   /**
    * sections of the recipe
    */

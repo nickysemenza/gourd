@@ -31,12 +31,6 @@ import {
  */
 export interface RecipeDetailInput {
     /**
-     * id
-     * @type {string}
-     * @memberof RecipeDetailInput
-     */
-    id: string;
-    /**
      * sections of the recipe
      * @type {Array<RecipeSectionInput>}
      * @memberof RecipeDetailInput
@@ -84,7 +78,6 @@ export function RecipeDetailInputFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionInputFromJSON)),
         'name': json['name'],
         'sources': !exists(json, 'sources') ? undefined : ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
@@ -103,7 +96,6 @@ export function RecipeDetailInputToJSON(value?: RecipeDetailInput | null): any {
     }
     return {
         
-        'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionInputToJSON)),
         'name': value.name,
         'sources': value.sources === undefined ? undefined : ((value.sources as Array<any>).map(RecipeSourceToJSON)),

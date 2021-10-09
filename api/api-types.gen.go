@@ -416,9 +416,6 @@ type RecipeDetail struct {
 
 // A revision of a recipe
 type RecipeDetailInput struct {
-	// id
-	Id string `json:"id"`
-
 	// recipe name
 	Name string `json:"name"`
 
@@ -492,7 +489,7 @@ type RecipeWrapperInput struct {
 	Detail RecipeDetailInput `json:"detail"`
 
 	// id
-	Id string `json:"id"`
+	Id *string `json:"id,omitempty"`
 }
 
 // A search result wrapper, which contains ingredients and recipes

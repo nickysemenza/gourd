@@ -10,6 +10,8 @@
 
 /// RecipeDetail : A revision of a recipe
 
+
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RecipeDetail {
     /// id
@@ -49,16 +51,7 @@ pub struct RecipeDetail {
 
 impl RecipeDetail {
     /// A revision of a recipe
-    pub fn new(
-        id: String,
-        sections: Vec<crate::models::RecipeSection>,
-        name: String,
-        quantity: i64,
-        unit: String,
-        version: i64,
-        is_latest_version: bool,
-        created_at: String,
-    ) -> RecipeDetail {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,
@@ -74,3 +67,5 @@ impl RecipeDetail {
         }
     }
 }
+
+

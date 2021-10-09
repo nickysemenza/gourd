@@ -782,7 +782,6 @@ components:
       type: object
       required:
         - detail
-        - id
       properties:
         id:
           description: id
@@ -864,15 +863,11 @@ components:
       description: A revision of a recipe
       type: object
       required:
-        - id
         - name
         - quantity
         - unit
         - sections
       properties:
-        id:
-          description: id
-          type: string
         sections:
           description: sections of the recipe
           type: array

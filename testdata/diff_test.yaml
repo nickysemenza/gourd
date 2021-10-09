@@ -5,22 +5,19 @@ sections:
   - ingredients:
       - adjective: eggs
         grams: 50
-        ingredient:
-          name: eggs
+        name: eggs
         kind: ingredient
         unit: "2"
       - adjective:
         grams: 100
-        ingredient:
-          name: sugar
+        name: sugar
         kind: ingredient
         unit: "cup"
         amount: 0.5
   - ingredients:
       - adjective: ""
         grams: 200
-        ingredient:
-          name: flour
+        name: flour
         kind: ingredient
         unit: ""
 ---
@@ -31,28 +28,24 @@ sections:
   - ingredients:
       - adjective: eggs
         grams: 100
-        ingredient:
-          name: eggs
+        name: eggs
         kind: ingredient
         unit: "4"
       - adjective:
         grams: 100
-        ingredient:
-          name: granulated sugar
+        name: granulated sugar
         kind: ingredient
         unit: "cup"
         amount: 0.5
   - ingredients:
       - adjective: ""
         grams: 200
-        ingredient:
-          name: flour
+        name: flour
         kind: ingredient
         unit: ""
   - ingredients:
       - adjective: ""
         grams: 20
-        ingredient:
-          name: salt
+        name: salt
         kind: ingredient
         unit: ""

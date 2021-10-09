@@ -153,7 +153,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredientInpu
 }
 func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
-		Id:   r.Detail.Id,
+		// Id:   r.Detail.Id,
 		Name: r.Detail.Name,
 	}
 	source, err := json.Marshal(r.Detail.Sources)
@@ -387,7 +387,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 	ctx, span := a.tracer.Start(ctx, "CreateRecipe")
 	defer span.End()
 
-	span.AddEvent("got wrapper", trace.WithAttributes(attribute.String("id", r.Id), attribute.String("recipe", spew.Sdump(r))))
+	span.AddEvent("got wrapper", trace.WithAttributes(attribute.String("recipe", spew.Sdump(r))))
 	dbVersion, err := a.recipeWrappertoDB(ctx, r)
 	if err != nil {
 		return nil, err

@@ -16,8 +16,7 @@ sections:
         optional: false
       - amount: 0
         grams: 50
-        ingredient:
-          name: diastatic malt powder
+        name: diastatic malt powder
         kind: ingredient
         optional: false
       - amount: 0

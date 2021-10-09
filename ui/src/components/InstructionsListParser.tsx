@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { RecipeDetail } from "../api/openapi-fetch";
+import { RecipeDetail, RecipeDetailInput } from "../api/openapi-fetch";
 import { WasmContext } from "../wasm";
 import { ButtonGroup } from "./Button";
 
@@ -12,7 +12,7 @@ const InstructionsListParser: React.FC<{
 
   if (!w) return null;
 
-  const si = w.decode_recipe_text(area) as RecipeDetail;
+  const si = w.decode_recipe_text(area) as RecipeDetailInput;
   const si2 = w.encode_recipe_to_compact_json(si);
   return (
     <div>
@@ -67,7 +67,8 @@ const InstructionsListParser: React.FC<{
             buttons={[
               {
                 onClick: () => {
-                  setDetail(si);
+                  // setDetail(si);
+                  // todo
                 },
                 text: "inject ingredients",
                 IconLeft: PlusCircle,

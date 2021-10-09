@@ -15,17 +15,17 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RecipeWrapperInput {
     /// id
-    #[serde(rename = "id")]
-    pub id: String,
+    #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
     #[serde(rename = "detail")]
     pub detail: Box<crate::models::RecipeDetailInput>,
 }
 
 impl RecipeWrapperInput {
     /// A recipe with subcomponents
-    pub fn new(id: String, detail: crate::models::RecipeDetailInput) -> RecipeWrapperInput {
+    pub fn new(detail: crate::models::RecipeDetailInput) -> RecipeWrapperInput {
         RecipeWrapperInput {
-            id,
+            id: None,
             detail: Box::new(detail),
         }
     }
