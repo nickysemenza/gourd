@@ -13,9 +13,7 @@
               "value": 42
             }
           ],
-          "ingredient": {
-            "name": "eggs"
-          },
+          "name": "eggs",
           "kind": "ingredient",
           "unit": "2"
         },
@@ -27,9 +25,7 @@
               "value": 52
             }
           ],
-          "ingredient": {
-            "name": "brown sugar"
-          },
+          "name": "brown sugar",
           "kind": "ingredient",
           "unit": "1"
         }
@@ -56,9 +52,7 @@
               "value": 52
             }
           ],
-          "ingredient": {
-            "name": "flour"
-          },
+          "name": "flour",
           "kind": "ingredient",
           "unit": ""
         }

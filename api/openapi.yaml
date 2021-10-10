@@ -669,7 +669,6 @@ components:
       description: Ingredients in a single section
       type: object
       required:
-        - target_id
         - amounts
         - kind
       properties:

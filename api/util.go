@@ -73,6 +73,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
+		output.Sources = &[]RecipeSource{{Title: &inputPath}}
 		return []RecipeDetailInput{output}, nil
 	case ".json", ".yaml":
 		var output []RecipeDetailInput
@@ -92,12 +93,14 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 			if r.Name == "" {
 				return nil, fmt.Errorf("failed to read recipe name from file %s [%v]", inputPath, r)
 			}
+			r.Sources = &[]RecipeSource{{Title: &inputPath}}
 			output = append(output, r)
 		}
 		return output, nil
 	default:
 		return nil, fmt.Errorf("unknown extension: %s", inputPath)
 	}
+
 }
 
 type IngredientMapping struct {
@@ -133,5 +136,6 @@ func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId
 	if err != nil {
 		return nil, err
 	}
+	r.Detail.Sources = &[]RecipeSource{{Url: &addr}}
 	return &r, nil
 }

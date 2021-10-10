@@ -102,11 +102,14 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredientInpu
 			Value: amt.Value,
 		})
 	}
-	iOrRiD := i.TargetId
-	name := zero.StringFromPtr(i.Name).ValueOrZero()
-	if name == "" && iOrRiD == "" {
+
+	if i.Name == nil && i.TargetId == nil {
 		return nil, nil
 	}
+
+	iOrRiD := zero.StringFromPtr(i.TargetId).ValueOrZero()
+	name := zero.StringFromPtr(i.Name).ValueOrZero()
+
 	switch i.Kind {
 	case IngredientKindRecipe:
 
@@ -205,7 +208,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 					continue
 				}
 				si2 := *si
-				si2.SubsFor = zero.StringFrom(i.TargetId)
+				si2.SubsFor = zero.StringFromPtr(i.TargetId)
 				dbs.Ingredients = append(dbs.Ingredients, si2)
 			}
 		}

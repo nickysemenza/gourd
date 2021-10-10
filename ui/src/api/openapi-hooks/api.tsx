@@ -52,7 +52,7 @@ export interface SectionIngredientInput {
   /**
    * recipe/ingredient id
    */
-  target_id: string;
+  target_id?: string;
   /**
    * recipe/ingredient name
    */

@@ -554,7 +554,7 @@ type SectionIngredientInput struct {
 	Substitutes *[]SectionIngredientInput `json:"substitutes,omitempty"`
 
 	// recipe/ingredient id
-	TargetId string `json:"target_id"`
+	TargetId *string `json:"target_id,omitempty"`
 }
 
 // Instructions in a single section

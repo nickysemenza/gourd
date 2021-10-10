@@ -35,7 +35,7 @@ export interface SectionIngredientInput {
      * @type {string}
      * @memberof SectionIngredientInput
      */
-    target_id: string;
+    target_id?: string;
     /**
      * recipe/ingredient name
      * @type {string}
@@ -90,7 +90,7 @@ export function SectionIngredientInputFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'target_id': json['target_id'],
+        'target_id': !exists(json, 'target_id') ? undefined : json['target_id'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'kind': IngredientKindFromJSON(json['kind']),
         'amounts': ((json['amounts'] as Array<any>).map(AmountFromJSON)),

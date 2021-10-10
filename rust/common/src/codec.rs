@@ -109,7 +109,12 @@ pub fn section_ingredient_to_input(s: &SectionIngredient) -> SectionIngredientIn
             openapi::models::IngredientKind::Recipe => Some(s.recipe.clone().unwrap().name.clone()),
         },
         original: s.original.clone(),
-        ..SectionIngredientInput::new(s.id.clone(), s.kind, s.amounts.clone())
+        target_id: if let "" = s.id.as_str() {
+            None
+        } else {
+            Some(s.id.clone())
+        },
+        ..SectionIngredientInput::new(s.kind, s.amounts.clone())
     }
 }
 pub fn section_instruction_to_input(s: &SectionInstruction) -> SectionInstructionInput {

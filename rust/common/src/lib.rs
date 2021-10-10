@@ -67,7 +67,7 @@ fn section_ingredient_from_parsed(
         adjective: i.modifier,
         name: Some(i.name),
         original: Some(original.to_string()),
-        ..SectionIngredientInput::new("".to_string(), kind, amounts)
+        ..SectionIngredientInput::new(kind, amounts)
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
@@ -235,7 +235,6 @@ mod tests {
                 original: Some("118 grams / 0.5 cups water".to_string()),
                 name: Some("water".to_string()),
                 ..SectionIngredientInput::new(
-                    "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
                         Amount::new("g".to_string(), 118.0),
@@ -254,7 +253,6 @@ mod tests {
                 original: Some("118 ml / 0.5 cups water".to_string()),
                 name: Some("water".to_string()),
                 ..SectionIngredientInput::new(
-                    "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
                         Amount::new("cups".to_string(), 0.5),
@@ -272,7 +270,6 @@ mod tests {
                 original: Some("4 oz / 1/2 cup water".to_string()),
                 name: Some("water".to_string()),
                 ..SectionIngredientInput::new(
-                    "".to_string(),
                     IngredientKind::Ingredient,
                     vec![
                         Amount::new("cup".to_string(), 0.5),

@@ -181,7 +181,6 @@ def sc(x,y):
             .map(|x| {
                 let _x = 1;
                 gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredientInput::new(
-                    "".to_string(),
                     IngredientKind::Ingredient,
                     vec![],
                 ))
@@ -228,7 +227,7 @@ mod tests {
 
         assert_eq!(
             response_body,
-            r##"{"target_id":"","name":"flour","kind":"ingredient","amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
+            r##"{"name":"flour","kind":"ingredient","amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
         );
 
         Ok(())

@@ -15,8 +15,8 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SectionIngredientInput {
     /// recipe/ingredient id
-    #[serde(rename = "target_id")]
-    pub target_id: String,
+    #[serde(rename = "target_id", skip_serializing_if = "Option::is_none")]
+    pub target_id: Option<String>,
     /// recipe/ingredient name
     #[serde(rename = "name", skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -41,9 +41,9 @@ pub struct SectionIngredientInput {
 
 impl SectionIngredientInput {
     /// Ingredients in a single section
-    pub fn new(target_id: String, kind: crate::models::IngredientKind, amounts: Vec<crate::models::Amount>) -> SectionIngredientInput {
+    pub fn new(kind: crate::models::IngredientKind, amounts: Vec<crate::models::Amount>) -> SectionIngredientInput {
         SectionIngredientInput {
-            target_id,
+            target_id: None,
             name: None,
             kind,
             amounts,
