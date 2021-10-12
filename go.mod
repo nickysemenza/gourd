@@ -14,7 +14,7 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.4.0 // indirect
-	github.com/getkin/kin-openapi v0.78.0
+	github.com/getkin/kin-openapi v0.79.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-openapi/swag v0.19.14 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.0
