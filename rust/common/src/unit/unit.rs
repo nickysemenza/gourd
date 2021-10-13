@@ -251,32 +251,16 @@ impl Measure {
     pub fn as_bare(self) -> BareMeasurement {
         let m = self.1;
         let (val, u, f) = match self.0 {
-            Unit::Gram => {
-                if m < 1000.0 {
-                    (m, Unit::Gram, 1.0)
-                } else {
-                    (m, Unit::Kilogram, G_TO_K)
-                }
-            }
-            Unit::Milliliter => {
-                if m < 1000.0 {
-                    (m, Unit::Milliliter, 1.0)
-                } else {
-                    (m, Unit::Liter, G_TO_K)
-                }
-            }
+            Unit::Gram => (m, Unit::Gram, 1.0),
+            Unit::Milliliter => (m, Unit::Milliliter, 1.0),
             Unit::Teaspoon => match m {
+                // only for these measurements to we convert to the best fit, others stay bare due to the nature of the values
                 m if { m < 3.0 } => (m, Unit::Teaspoon, 1.0),
                 m if { m < 12.0 } => (m, Unit::Tablespoon, TSP_TO_TBSP),
                 m if { m < CUP_TO_QUART * TSP_TO_CUP } => (m, Unit::Cup, TSP_TO_CUP),
                 _ => (m, Unit::Teaspoon, 1.0),
             },
-
-            Unit::Cent => match m {
-                // m if { m < CENTS_TO_DOLLAR } => (m, Unit::Cent, 1.0),
-                // _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
-                _ => (m, Unit::Dollar, CENTS_TO_DOLLAR),
-            },
+            Unit::Cent => (m, Unit::Dollar, CENTS_TO_DOLLAR),
             Unit::KCal => (m, Unit::KCal, 1.0),
 
             Unit::Other(o) => (m, Unit::Other(o), 1.0),

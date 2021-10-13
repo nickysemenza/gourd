@@ -62,3 +62,8 @@ export const Pill: React.FC = ({ children }) => (
     {children}
   </span>
 );
+
+export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({
+  x,
+  kind,
+}) => <Pill>{kind === "letter" ? String.fromCharCode(65 + x) : x}</Pill>;
