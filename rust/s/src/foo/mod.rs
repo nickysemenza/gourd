@@ -28,9 +28,8 @@ pub struct Root2 {
 // impl Bar {
 
 #[tracing::instrument]
-pub async fn foo(filename: &str, pool: &PgPool) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn foo(filename: &str, pool: &PgPool) -> anyhow::Result<()> {
     let f = std::fs::File::open(filename)?;
-    // info!("Read file: {}", f);
     let d: Vec<Root2> = serde_yaml::from_reader(f)?;
     info!("Read mappings: {}", d.len());
 
@@ -90,10 +89,11 @@ pub async fn foo(filename: &str, pool: &PgPool) -> Result<(), Box<dyn std::error
                             }
                         }
                         if !ok {
-                            panic!("{:?}", e);
+                            anyhow::bail!("{:?}", e);
                         }
                     }
                 };
+                Ok(())
             }))
             .await;
         })

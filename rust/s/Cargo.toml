@@ -38,6 +38,7 @@ sea-query = {version = "0.16.5", features = ["backend-postgres","sqlx-postgres",
 ormx = {version = "0.10.0", features = ["postgres"]}
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
+anyhow = "1.0"
 
 [dependencies.pyo3]
 version = "0.13.2"

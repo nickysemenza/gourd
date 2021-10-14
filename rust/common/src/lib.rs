@@ -165,7 +165,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     return match amount_to_measure(req.input[0].clone())
         .convert(target.clone(), equivalencies.clone())
     {
-        Some(a) => Some(measure_to_amount(a)),
+        Some(a) => Some(measure_to_amount(a).unwrap()),
         None => {
             if target == MeasureKind::Weight {
                 // try again to convert to ml, and then use that as grams
@@ -173,7 +173,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
                     .convert(MeasureKind::Volume, equivalencies)
                 {
                     Some(a) => {
-                        let mut a = measure_to_amount(a);
+                        let mut a = measure_to_amount(a).unwrap();
                         a.unit = "gram".to_string();
                         info!("no grams for {:#?} using volume with density 1", req.input);
                         return Some(a);
@@ -188,9 +188,9 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
 pub fn amount_to_measure(a: Amount) -> unit::Measure {
     unit::Measure::parse(unit::BareMeasurement::new(a.unit, a.value as f32))
 }
-pub fn measure_to_amount(m: unit::Measure) -> Amount {
-    let m1 = m.as_bare();
-    Amount::new(m1.unit, m1.value.into())
+pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
+    let m1 = m.as_bare()?;
+    Ok(Amount::new(m1.unit, m1.value.into()))
 }
 pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     let mut amounts = vec![];

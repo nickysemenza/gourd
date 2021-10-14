@@ -1,5 +1,6 @@
 use std::fmt;
 
+use anyhow::bail;
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
@@ -190,14 +191,13 @@ impl Measure {
     pub fn parse(m: BareMeasurement) -> Measure {
         Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
     }
-    pub fn kind(&self) -> MeasureKind {
-        return match self.0 {
-            Unit::Gram => MeasureKind::Weight,
-            Unit::Cent => MeasureKind::Money,
-            Unit::Teaspoon | Unit::Milliliter => MeasureKind::Volume,
-
-            Unit::KCal => MeasureKind::Calories,
-            Unit::Other(_) => MeasureKind::Other,
+    pub fn kind(&self) -> Result<MeasureKind, anyhow::Error> {
+        match self.0 {
+            Unit::Gram => Ok(MeasureKind::Weight),
+            Unit::Cent => Ok(MeasureKind::Money),
+            Unit::Teaspoon | Unit::Milliliter => Ok(MeasureKind::Volume),
+            Unit::KCal => Ok(MeasureKind::Calories),
+            Unit::Other(_) => Ok(MeasureKind::Other),
             Unit::Kilogram
             | Unit::Liter
             | Unit::Tablespoon
@@ -206,8 +206,8 @@ impl Measure {
             | Unit::FluidOunce
             | Unit::Ounce
             | Unit::Pound
-            | Unit::Dollar => panic!("unit not normalized: {:?}", self),
-        };
+            | Unit::Dollar => bail!("unit not normalized: {:?}", self),
+        }
     }
 
     #[tracing::instrument(name = "unit::convert")]
@@ -217,7 +217,6 @@ impl Measure {
         mappings: Vec<(Measure, Measure)>,
     ) -> Option<Measure> {
         let g = make_graph(mappings);
-        // println!("{}", petgraph::dot::Dot::new(&g));
 
         let unit_a = self.0.clone();
         let unit_b = unit_from_measurekind(target);
@@ -248,7 +247,7 @@ impl Measure {
         return Some(result);
     }
 
-    pub fn as_bare(self) -> BareMeasurement {
+    pub fn as_bare(self) -> anyhow::Result<BareMeasurement> {
         let m = self.1;
         let (val, u, f) = match self.0 {
             Unit::Gram => (m, Unit::Gram, 1.0),
@@ -272,9 +271,9 @@ impl Measure {
             | Unit::FluidOunce
             | Unit::Ounce
             | Unit::Pound
-            | Unit::Dollar => panic!("unit not normalized: {:?}", self),
+            | Unit::Dollar => bail!("unit not normalized: {:?}", self),
         };
-        return BareMeasurement::new(u.to_str(), val / f);
+        return Ok(BareMeasurement::new(u.to_str(), val / f));
     }
 }
 pub fn singular(s: &str) -> String {
@@ -289,17 +288,26 @@ mod tests {
     fn test_measure() {
         let m1 = Measure::from_string("16 tbsp".to_string());
         assert_eq!(m1, Measure(Unit::Teaspoon, 48.0));
-        assert_eq!(m1.as_bare(), BareMeasurement::new("cup".to_string(), 1.0));
         assert_eq!(
-            Measure::from_string("25.2 grams".to_string()).as_bare(),
+            m1.as_bare().unwrap(),
+            BareMeasurement::new("cup".to_string(), 1.0)
+        );
+        assert_eq!(
+            Measure::from_string("25.2 grams".to_string())
+                .as_bare()
+                .unwrap(),
             BareMeasurement::new("g".to_string(), 25.2)
         );
         assert_eq!(
-            Measure::from_string("2500.2 grams".to_string()).as_bare(),
-            BareMeasurement::new("kg".to_string(), 2.5002)
+            Measure::from_string("2500.2 grams".to_string())
+                .as_bare()
+                .unwrap(),
+            BareMeasurement::new("g".to_string(), 2500.2)
         );
         assert_eq!(
-            Measure::from_string("12 foo".to_string()).as_bare(),
+            Measure::from_string("12 foo".to_string())
+                .as_bare()
+                .unwrap(),
             BareMeasurement::new("foo".to_string(), 12.0)
         );
     }
