@@ -13,7 +13,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { ButtonGroup, Pill, PillLabel } from "./Button";
+import { ButtonGroup, PillLabel } from "./Button";
 import { DragWrapper } from "./DragDrop";
 import {
   addIngredient,

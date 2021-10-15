@@ -11,5 +11,4 @@ export const navItems: {
   { title: "photos", path: "photos" },
   { title: "meals", path: "meals" },
   { title: "albums", path: "albums" },
-  { title: "docs", path: "docs" },
 ];

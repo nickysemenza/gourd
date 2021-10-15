@@ -26,7 +26,6 @@ import {
   isGram,
   Override,
   RecipeTweaks,
-  setDetail,
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
@@ -35,7 +34,6 @@ import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
 import { WasmContext } from "../wasm";
-import InstructionsListParser from "../components/InstructionsListParser";
 import { Helmet } from "react-helmet";
 import {
   RecipesApi,
@@ -45,7 +43,6 @@ import {
   SectionIngredientInput,
 } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
-import Debug from "../components/Debug";
 import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
 

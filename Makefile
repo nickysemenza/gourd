@@ -101,6 +101,9 @@ openapi: validate-openapi api/openapi.yaml bin/oapi-codegen
 
 	go generate ./api
 
+openapi-docs:
+	npx @redocly/openapi-cli preview-docs api/openapi.yaml -p 8081
+
 # frontend
 dev-ui:
 	cd ui && yarn run start

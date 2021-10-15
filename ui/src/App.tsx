@@ -29,7 +29,6 @@ import {
   getTracingURL,
 } from "./config";
 import { CookiesProvider } from "react-cookie";
-import { Docs } from "./pages/Misc";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
@@ -134,9 +133,6 @@ function App() {
                 </Route>
                 <Route path="/food">
                   <Food />
-                </Route>
-                <Route path="/docs">
-                  <Docs />
                 </Route>
                 <Route path="/playground">
                   <Playground />
