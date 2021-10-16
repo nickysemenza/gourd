@@ -11,6 +11,8 @@ import { Helmet } from "react-helmet";
 import update from "immutability-helper";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
+import { ButtonGroup } from "../components/Button";
+import { PlusCircle } from "react-feather";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -25,6 +27,7 @@ const RecipeList: React.FC = () => {
   };
 
   const [params, setParams] = useState(initialParams);
+  const [showOlder, setShowOlder] = useState(false);
 
   const fetchData = React.useCallback((params: PaginationParameters) => {
     setParams(params);
@@ -53,28 +56,30 @@ const RecipeList: React.FC = () => {
           return (
             <div>
               <ul>
-                {(versions || []).map((i) => (
-                  <li>
-                    <div className="flex">
-                      <RecipeLink recipe={i} />
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={checked.has(i.id)}
-                        onClick={() =>
-                          setChecked(
-                            update(
-                              checked,
-                              checked.has(i.id)
-                                ? { $remove: [i.id] }
-                                : { $add: [i.id] }
+                {(versions || [])
+                  .filter((v) => showOlder || v.is_latest_version !== showOlder)
+                  .map((i) => (
+                    <li>
+                      <div className="flex">
+                        <RecipeLink recipe={i} />
+                        <input
+                          type="checkbox"
+                          className="form-checkbox"
+                          checked={checked.has(i.id)}
+                          onClick={() =>
+                            setChecked(
+                              update(
+                                checked,
+                                checked.has(i.id)
+                                  ? { $remove: [i.id] }
+                                  : { $add: [i.id] }
+                              )
                             )
-                          )
-                        }
-                      />
-                    </div>
-                  </li>
-                ))}
+                          }
+                        />
+                      </div>
+                    </li>
+                  ))}
               </ul>
             </div>
           );
@@ -90,7 +95,7 @@ const RecipeList: React.FC = () => {
       //   ),
       // },
     ],
-    [checked]
+    [checked, showOlder]
   );
 
   return (
@@ -106,17 +111,31 @@ const RecipeList: React.FC = () => {
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />
-      {checked.size > 0 && (
-        <>
-          <Link
-            to={`/playground?${queryString.stringify({
-              recipes: [...checked.keys()],
-            })}`}
-          >
-            Compare {checked.size} recipes
-          </Link>
-        </>
-      )}
+      <div>
+        <ButtonGroup
+          compact
+          buttons={[
+            {
+              onClick: () => {
+                setShowOlder(!showOlder);
+              },
+              text: "toggle older",
+              IconLeft: PlusCircle,
+            },
+          ]}
+        />
+        {checked.size > 0 && (
+          <>
+            <Link
+              to={`/playground?${queryString.stringify({
+                recipes: [...checked.keys()],
+              })}`}
+            >
+              Compare {checked.size} recipes
+            </Link>
+          </>
+        )}
+      </div>
       <Debug data={{ error }} />
     </div>
   );
