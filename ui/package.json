@@ -25,7 +25,7 @@
     "@types/react-helmet": "6.1.4",
     "@types/react-router-dom": "5.3.1",
     "@types/react-select": "3.1.2",
-    "@types/react-table": "7.7.6",
+    "@types/react-table": "7.7.7",
     "blurhash": "1.1.4",
     "dayjs": "1.10.7",
     "gourd_rs": "file:../rust/w/pkg",
