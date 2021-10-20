@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.0.1
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/tools v0.1.7
-	google.golang.org/api v0.58.0
+	google.golang.org/api v0.59.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.63.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
@@ -58,7 +58,7 @@ require (
 
 require (
 	4d63.com/gochecknoglobals v0.0.0-20201008074935-acfc0b28355a // indirect
-	cloud.google.com/go v0.94.1 // indirect
+	cloud.google.com/go v0.97.0 // indirect
 	cloud.google.com/go/spanner v1.24.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
 	cloud.google.com/go/trace v0.1.0 // indirect
