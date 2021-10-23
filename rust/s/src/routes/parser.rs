@@ -200,7 +200,7 @@ mod tests {
     use actix_web::Error;
     use actix_web::{test, web, App};
 
-    #[actix_rt::test]
+    #[actix_web::test]
     async fn test_parse() -> Result<(), Error> {
         let mut app = test::init_service(
             App::new().service(web::resource("/parse").route(web::get().to(parser))),
