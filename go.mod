@@ -56,6 +56,8 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
+require github.com/jomei/notionapi v1.5.2
+
 require (
 	4d63.com/gochecknoglobals v0.0.0-20201008074935-acfc0b28355a // indirect
 	cloud.google.com/go v0.97.0 // indirect
@@ -116,6 +118,7 @@ require (
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/fzipp/gocyclo v0.3.1 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-critic/go-critic v0.5.6 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect

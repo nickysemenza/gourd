@@ -8,7 +8,10 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/nickysemenza/gourd/api"
+	"github.com/nickysemenza/gourd/notion"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -41,6 +44,15 @@ func init() {
 			Short: "Run the server",
 			Run: func(cmd *cobra.Command, args []string) {
 				runServer()
+			},
+		},
+		&cobra.Command{
+			Use:   "tmp",
+			Short: "misc",
+			Run: func(cmd *cobra.Command, args []string) {
+				n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
+				err := n.Dump(context.Background())
+				log.Error(err)
 			},
 		},
 		&cobra.Command{
