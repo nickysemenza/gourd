@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@craco/craco": "6.3.0",
+    "@craco/craco": "6.4.0",
     "@headlessui/react": "1.4.1",
     "@opentelemetry/api": "1.0.3",
     "@opentelemetry/auto-instrumentations-web": "0.25.0",
