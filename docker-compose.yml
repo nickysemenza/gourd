@@ -3,6 +3,7 @@ version: "3.1"
 
 services:
   db:
+    platform: linux/amd64
     image: postgres:9.6
     restart: always
     ports:
@@ -23,6 +24,7 @@ services:
       ]
   jaeger:
     container_name: food-jaeger
+    platform: linux/amd64
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411
     ports:
@@ -37,6 +39,7 @@ services:
   # Collector
   collector:
     image: otel/opentelemetry-collector:0.38.0
+    platform: linux/amd64
     command: ["--config=/conf/collector-config.yaml", "--log-level=DEBUG"]
     volumes:
       - ./collector-config.yaml:/conf/collector-config.yaml
@@ -51,6 +54,7 @@ services:
 
   # Prometheus
   prometheus:
+    platform: linux/amd64
     container_name: prometheus
     image: prom/prometheus:latest
     volumes:
@@ -83,7 +87,7 @@ services:
       - db
       - jaeger
     restart: always
-    volumes: 
+    volumes:
       - ./rust/s-configuration/base.yaml:/work/rust/s/s-configuration/base.yaml
       - ./rs-ci2.yaml:/work/rust/s/s-configuration/local.yaml
     environment:

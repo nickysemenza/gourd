@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/notion"
 	log "github.com/sirupsen/logrus"
@@ -51,8 +52,9 @@ func init() {
 			Short: "misc",
 			Run: func(cmd *cobra.Command, args []string) {
 				n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
-				err := n.Dump(context.Background())
+				res, err := n.Dump(context.Background())
 				log.Error(err)
+				spew.Dump(res)
 			},
 		},
 		&cobra.Command{

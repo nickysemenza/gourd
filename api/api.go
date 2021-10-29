@@ -553,3 +553,14 @@ func (a *API) RecipeDependencies(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, Test2{res})
 }
+
+func (a *API) Notion(c echo.Context) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
+	defer span.End()
+
+	res, err := a.Manager.Notion.Dump(ctx)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, res)
+}

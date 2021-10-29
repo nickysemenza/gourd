@@ -6,6 +6,7 @@ import (
 	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
+	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/photos"
 	"github.com/nickysemenza/gourd/rs_client"
 )
@@ -17,14 +18,16 @@ type Manager struct {
 	Photos *photos.Photos
 	Auth   *auth.Auth
 	R      *rs_client.Client
+	Notion *notion.Client
 }
 
-func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client) *Manager {
+func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, notion *notion.Client) *Manager {
 	return &Manager{db: db,
 		Google: g,
 		Auth:   auth,
 		Photos: photos.New(db, g),
 		R:      r,
+		Notion: notion,
 	}
 }
 

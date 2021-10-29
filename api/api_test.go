@@ -22,7 +22,7 @@ import (
 func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	t.Helper()
 	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil, rs_client.New("http://localhost:8080/"))
+	m := manager.New(tdb, nil, nil, rs_client.New("http://localhost:8080/"), nil)
 
 	apiManager := NewAPI(m)
 	e := echo.New()

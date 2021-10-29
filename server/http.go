@@ -94,6 +94,8 @@ func (s *Server) Run(_ context.Context) error {
 		return c.JSON(http.StatusOK, spec)
 	})
 
+	r.GET("/notion", s.APIManager.Notion)
+
 	// r.GET("/auth/redirect", func(c echo.Context) error {
 	// 	return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())
 	// })

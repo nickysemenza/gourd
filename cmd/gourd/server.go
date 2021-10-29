@@ -20,6 +20,7 @@ import (
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/nickysemenza/gourd/server"
 )
@@ -77,7 +78,8 @@ func makeServer() (*server.Server, error) {
 	}
 
 	r := rs_client.New(viper.GetString("RS_URI"))
-	m := manager.New(dbClient, gClient, auth, r)
+	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
+	m := manager.New(dbClient, gClient, auth, r, n)
 	apiManager := api.NewAPI(m)
 
 	// server
