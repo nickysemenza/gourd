@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.1.0
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
 	golang.org/x/tools v0.1.7
-	google.golang.org/api v0.59.0
+	google.golang.org/api v0.60.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.63.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
@@ -96,10 +96,13 @@ require (
 	github.com/bkielbasa/cyclop v1.2.0 // indirect
 	github.com/bombsimon/wsl/v3 v3.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.0.2 // indirect
+	github.com/census-instrumentation/opencensus-proto v0.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/charithe/durationcheck v0.0.8 // indirect
 	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af // indirect
 	github.com/cloudflare/golz4 v0.0.0-20150217214814-ef862a3cdc58 // indirect
+	github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403 // indirect
+	github.com/cncf/xds/go v0.0.0-20210805033703-aa0b78936158 // indirect
 	github.com/cockroachdb/cockroach-go v0.0.0-20190925194419-606b3d062051 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.1.1 // indirect
 	github.com/creack/pty v1.1.15 // indirect
@@ -110,6 +113,8 @@ require (
 	github.com/denisenkom/go-mssqldb v0.10.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
+	github.com/envoyproxy/go-control-plane v0.9.10-0.20210907150352-cf90f659a021 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/esimonov/ifshort v1.0.2 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.12.0 // indirect
@@ -285,12 +290,12 @@ require (
 	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20211013171255-e13a2654a71e // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211013075003-97ac67df715c // indirect
+	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20211013025323-ce878158c4d4 // indirect
+	google.golang.org/genproto v0.0.0-20211021150943-2b146023228c // indirect
 	google.golang.org/grpc v1.41.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
