@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -80,7 +81,24 @@ func (c *Client) GetAllPhotos(ctx context.Context) (map[string]Photo, error) {
 	}
 	return byId, nil
 }
+func (c *Client) MealIDInRange(ctx context.Context, t time.Time, name string, notion *string) (mealID string, err error) {
+	ctx, span := c.tracer.Start(ctx, "db.MealIDInRange")
+	defer span.End()
 
+	err = c.db.GetContext(ctx, &mealID, `select id from meals
+WHERE  (notion_link IS NOT NULL and notion_link = $2) OR (ate_at > $1::timestamp - INTERVAL '1 hour'
+AND ate_at < $1::timestamp + INTERVAL '1 hour') order by notion_link ASC limit 1`, pq.FormatTimestamp(t), notion)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return
+		}
+		// err no rows, need to insert
+		mealID = common.ID("m")
+		iq := c.psql.Insert("meals").Columns("id", "ate_at", "name", "notion_link").Values(mealID, t, name, notion)
+		_, err = c.execContext(ctx, iq)
+	}
+	return
+}
 func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 	q := c.psql.Select("id", "album_id", "creation_time").From("gphotos_photos").
 		LeftJoin("meal_photo on gphotos_photos.id = meal_photo.gphotos_id").Where(sq.Eq{"meal": nil})
@@ -91,27 +109,10 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 	}
 
 	for _, m := range missingMeals {
-		target := pq.FormatTimestamp(m.Created)
-		// select mealID from meals WHERE ate_at > now() - INTERVAL '1 hour' AND ate_at < now() + INTERVAL '1 hour' limit 1
-		// q = c.psql.Select("mealID").From("meals").
-		// 	Where(sq.GtOrEq{"ate_at": fmt.Sprintf("timestamp '%s' - INTERVAL '1 hour'", target)}).
-		// 	Limit(1)
-		var mealID string
-		// err := c.getContext(ctx, q, id)
-		err := c.db.GetContext(ctx, &mealID, `select id from meals
-WHERE ate_at > $1::timestamp - INTERVAL '1 hour'
-AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, target)
+
+		mealID, err := c.MealIDInRange(ctx, m.Created, fmt.Sprintf("meal on %s", m.Created), nil)
 		if err != nil {
-			if !errors.Is(err, sql.ErrNoRows) {
-				return err
-			}
-			// insert
-			mealID = common.ID("m")
-			iq := c.psql.Insert("meals").Columns("id", "ate_at", "name").Values(mealID, m.Created, mealID)
-			_, err := c.execContext(ctx, iq)
-			if err != nil {
-				return err
-			}
+			return err
 		}
 
 		q := c.psql.Insert("meal_photo").Columns("meal", "gphotos_id").Values(mealID, m.PhotoID)

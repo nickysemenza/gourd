@@ -49,3 +49,22 @@ func (m *Manager) ProcessGoogleAuth(ctx context.Context, code string) (jwt strin
 	jwt, err = m.Auth.GetJWT(user)
 	return
 }
+
+func (m *Manager) SyncNotionToMeals(ctx context.Context) error {
+	nMeals, err := m.Notion.Dump(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, nMeal := range nMeals {
+		if nMeal.Time == nil {
+			continue
+		}
+		_, err := m.db.MealIDInRange(ctx, *nMeal.Time, nMeal.Title, &nMeal.PageID)
+		if err != nil {
+			return err
+		}
+		// nm
+	}
+	return nil
+}

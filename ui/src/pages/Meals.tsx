@@ -49,6 +49,16 @@ const Meals: React.FC = () => {
         },
       },
       {
+        Header: "name",
+        accessor: "name",
+        // Cell: (cell: CellProps<i>) => {
+        //   const { ate_at } = cell.row.original;
+        //   const ago = dayjs(ate_at);
+
+        //   return <div>{ago.format("dddd, MMMM D, YYYY h:mm A")}</div>;
+        // },
+      },
+      {
         Header: "recipes",
         accessor: "recipes",
         Cell: (cell: CellProps<i>) => {
