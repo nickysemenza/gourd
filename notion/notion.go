@@ -73,7 +73,7 @@ func (c *Client) Dump(ctx context.Context) ([]NotionMeal, error) {
 			}
 
 			// on each page, get all the blocks that are images
-			meal.Photos, err = c.imagesFromPage(ctx, page.ID)
+			meal.Photos, err = c.ImagesFromPage(ctx, page.ID)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
 			}
@@ -90,7 +90,7 @@ func (c *Client) Dump(ctx context.Context) ([]NotionMeal, error) {
 
 }
 
-func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) ([]string, error) {
+func (c *Client) ImagesFromPage(ctx context.Context, pageID notionapi.ObjectID) ([]string, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "imagesFromPage")
 	defer span.End()
 

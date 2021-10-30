@@ -127,9 +127,10 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 }
 
 type Meal struct {
-	ID    string    `db:"id"`
-	Name  string    `db:"name"`
-	AteAt time.Time `db:"ate_at"`
+	ID     string    `db:"id"`
+	Name   string    `db:"name"`
+	AteAt  time.Time `db:"ate_at"`
+	Notion *string   `db:"notion_link"`
 }
 type Meals []Meal
 
@@ -144,7 +145,7 @@ func (r Meals) MealIDs() []string {
 func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
-	q := c.psql.Select("id", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
+	q := c.psql.Select("id", "name", "ate_at", "notion_link").From("meals").OrderBy("ate_at DESC")
 	var results Meals
 	err := c.selectContext(ctx, q, &results)
 	return results, err

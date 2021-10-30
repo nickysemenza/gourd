@@ -26,7 +26,9 @@ const ProgressiveImage: React.FC<{ photo: GooglePhoto; maxWidth?: number }> = ({
         onLoad={() => setLoaded(true)}
         key={id}
         // https://developers.google.com/photos/library/guides/access-media-items#image-base-urls
-        src={`${base_url}=w${maxWidth}`}
+        src={
+          base_url.includes("notion") ? base_url : `${base_url}=w${maxWidth}`
+        }
         width={maxWidth}
         height={scaledHeight}
         alt="todo"

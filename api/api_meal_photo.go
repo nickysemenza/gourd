@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/jomei/notionapi"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
 )
@@ -107,6 +108,15 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		return nil, err
 	}
 	for x, item := range items {
+		if meals[x].Notion != nil {
+			urls, err := a.Manager.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
+			if err != nil {
+				return nil, err
+			}
+			if len(urls) > 0 {
+				items[x].Photos = []GooglePhoto{{BaseUrl: urls[0]}}
+			}
+		}
 		for y, photo := range item.Photos {
 			val, ok := urls[photo.Id]
 			if !ok {
