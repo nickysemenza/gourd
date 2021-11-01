@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -11,6 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -27,59 +30,65 @@ func New(token, database string) *Client {
 	}
 }
 
-type NotionMeal struct {
+type NotionRecipe struct {
 	Title  string     `json:"title,omitempty"`
 	Time   *time.Time `json:"time,omitempty"`
 	Tags   []string   `json:"tags,omitempty"`
 	Photos []string   `json:"photos,omitempty"`
 	PageID string     `json:"page_id,omitempty"`
 	URL    string     `json:"url,omitempty"`
+	Raw    string     `json:"raw,omitempty"`
 }
 
-func (c *Client) Dump(ctx context.Context) ([]NotionMeal, error) {
+func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "Dump")
 	defer span.End()
 
 	var cursor notionapi.Cursor
-	meals := []NotionMeal{}
+	meals := []NotionRecipe{}
+
+	var filter *notionapi.PropertyFilter
+	if true {
+		filter = &notionapi.PropertyFilter{
+			Property:    "Tags",
+			MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
+		}
+	}
 	for {
-		resp, err := c.client.Database.Query(ctx, c.database,
-			&notionapi.DatabaseQueryRequest{
-				// PropertyFilter: &notionapi.PropertyFilter{
-				// 	Property:    "Tags",
-				// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "done"},
-				// },
-				PageSize:    100,
-				StartCursor: cursor,
-			})
+		resp, err := c.client.Database.Query(ctx, c.database, &notionapi.DatabaseQueryRequest{
+			PropertyFilter: filter,
+			PageSize:       100,
+			StartCursor:    cursor,
+		})
+
 		if err != nil {
 			return nil, err
 		}
 		for _, page := range resp.Results {
-			if page.Object != notionapi.ObjectTypePage {
-				continue
-			}
-			meal := NotionMeal{
-				Title:  page.Properties["Name"].(*notionapi.TitleProperty).Title[0].Text.Content,
-				PageID: page.ID.String(),
-				URL:    page.URL,
-			}
-			date := page.Properties["Date"].(*notionapi.DateProperty).Date.Start
-			if date != nil {
-				meal.Time = zero.TimeFrom(time.Time(*date).Add(time.Hour * 9)).Ptr()
-			}
-			for _, ms := range page.Properties["Tags"].(*notionapi.MultiSelectProperty).MultiSelect {
-				meal.Tags = append(meal.Tags, ms.Name)
-			}
+			span.AddEvent("page", trace.WithAttributes(attribute.String("page", spew.Sdump(page))))
+			switch page.Object {
+			case "column_list", notionapi.ObjectTypePage:
+				meal := NotionRecipe{
+					Title:  page.Properties["Name"].(*notionapi.TitleProperty).Title[0].Text.Content,
+					PageID: page.ID.String(),
+					URL:    page.URL,
+				}
+				date := page.Properties["Date"].(*notionapi.DateProperty).Date.Start
+				if date != nil {
+					meal.Time = zero.TimeFrom(time.Time(*date).Add(time.Hour * 9)).Ptr()
+				}
+				for _, ms := range page.Properties["Tags"].(*notionapi.MultiSelectProperty).MultiSelect {
+					meal.Tags = append(meal.Tags, ms.Name)
+				}
 
-			// on each page, get all the blocks that are images
-			meal.Photos, err = c.ImagesFromPage(ctx, page.ID)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
+				// on each page, get all the blocks that are images
+				meal.Photos, meal.Raw, err = c.ImagesFromPage(ctx, page.ID)
+				if err != nil {
+					return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
+				}
+				meals = append(meals, meal)
+
 			}
-
-			meals = append(meals, meal)
-
 		}
 		spew.Dump(resp.HasMore, resp.NextCursor, resp.Object)
 		cursor = resp.NextCursor
@@ -90,25 +99,39 @@ func (c *Client) Dump(ctx context.Context) ([]NotionMeal, error) {
 
 }
 
-func (c *Client) ImagesFromPage(ctx context.Context, pageID notionapi.ObjectID) ([]string, error) {
+func (c *Client) ImagesFromPage(ctx context.Context, pageID notionapi.ObjectID) (images []string, raw string, err error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "imagesFromPage")
 	defer span.End()
 
-	var images []string
+	// var images []string
 	var childCursor notionapi.Cursor
 	for {
 		children, err := c.client.Block.GetChildren(ctx, notionapi.BlockID(pageID), &notionapi.Pagination{PageSize: 100, StartCursor: childCursor})
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 
 		for _, block := range children.Results {
+			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
 			log.Info(block.GetType())
-			if block.GetType() != notionapi.BlockTypeImage {
-				continue
+			switch block.GetType() {
+			case notionapi.BlockTypeImage:
+				i := block.(*notionapi.ImageBlock)
+				images = append(images, i.Image.File.URL)
+			case "column", "column_list":
+				i := block.(*notionapi.UnsupportedBlock)
+				images2, _, err := c.ImagesFromPage(ctx, notionapi.ObjectID(i.ID))
+				if err != nil {
+					return nil, "", err
+				}
+				images = append(images, images2...)
+			case notionapi.BlockTypeCode:
+				i := block.(*notionapi.CodeBlock)
+				if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
+					raw = text
+				}
+
 			}
-			i := block.(*notionapi.ImageBlock)
-			images = append(images, i.Image.File.URL)
 		}
 
 		childCursor = notionapi.Cursor(children.NextCursor)
@@ -116,6 +139,6 @@ func (c *Client) ImagesFromPage(ctx context.Context, pageID notionapi.ObjectID) 
 			break
 		}
 	}
-	return images, nil
+	return
 
 }
