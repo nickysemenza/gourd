@@ -1843,6 +1843,8 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0 h1:qW6j1kJ
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.24.0/go.mod h1:7W3JSDYTtH3qKKHrS1fMiwLtK7iZFLPq1+7htfspX/E=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.0 h1:sdwza9BScvbOFaZLhvKDQc54vQ8CWM8jD9BO2t+rP4E=
 go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.0/go.mod h1:4vatbW3QwS11DK0H0SB7FR31/VbthXcYorswdkVXdyg=
+go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.1 h1:/PDcqsmxpbI/3ERJ6s6cwF13ZSH5m9NNCOPsoeazEhA=
+go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.1/go.mod h1:4vatbW3QwS11DK0H0SB7FR31/VbthXcYorswdkVXdyg=
 go.opentelemetry.io/contrib/propagators/b3 v0.23.0 h1:sxitmDBHZS3Z2lw81kDntCRFt4dQglu9EOhBPNHN9CY=
 go.opentelemetry.io/contrib/propagators/b3 v0.23.0/go.mod h1:tAJUf0uW1xrgQ1QgOZqLXFbn3DNFO4tTmh0Nqe3kSzw=
 go.opentelemetry.io/contrib/propagators/b3 v1.1.0/go.mod h1:FmkfYfWE0QCQHVpiio3tgDUijxfz32JO0duXldug9Ow=
