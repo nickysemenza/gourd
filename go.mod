@@ -40,7 +40,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.26.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.26.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.0
 	go.opentelemetry.io/contrib/propagators/jaeger v0.24.0
 	go.opentelemetry.io/otel v1.1.0
