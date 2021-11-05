@@ -7,7 +7,7 @@ const ProgressiveImage: React.FC<{ photo: GooglePhoto; maxWidth?: number }> = ({
   maxWidth = 120,
 }) => {
   const [loaded, setLoaded] = useState(false);
-  const { blur_hash, width, height, base_url, id } = photo;
+  const { blur_hash, width, height, base_url, id, source } = photo;
   const scalingRatio = maxWidth / width;
   const scaledHeight = scalingRatio * height;
   return (
@@ -28,11 +28,12 @@ const ProgressiveImage: React.FC<{ photo: GooglePhoto; maxWidth?: number }> = ({
           key={id}
           // https://developers.google.com/photos/library/guides/access-media-items#image-base-urls
           src={
-            base_url.includes("notion") ? base_url : `${base_url}=w${maxWidth}`
+            base_url
+            // base_url.includes("notion") ? base_url : `${base_url}=w${maxWidth}`
           }
           width={maxWidth}
           height={scaledHeight}
-          alt="todo"
+          alt={`todo - ${source} ${id}`}
         />
       )}
     </div>

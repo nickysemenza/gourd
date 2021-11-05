@@ -97,6 +97,29 @@ func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) 
 	q = addons(q)
 	var results []GPhoto
 	err := c.selectContext(ctx, q, &results)
+	// return results, err
+
+	if err != nil {
+		return nil, err
+	}
+	var ids []string
+	for _, r := range results {
+		ids = append(ids, r.ImageID)
+	}
+
+	images := []Image{}
+	q = c.psql.Select("id", "blur_hash", "source").From("images").Where(sq.Eq{"id": ids})
+	err = c.selectContext(ctx, q, &images)
+	if err != nil {
+		return nil, err
+	}
+	for i, r := range results {
+		for _, img := range images {
+			if img.ID == r.ImageID {
+				results[i].Image = img
+			}
+		}
+	}
 	return results, err
 }
 
@@ -105,12 +128,13 @@ func (c *Client) getNotionPhotos(ctx context.Context, addons func(q sq.SelectBui
 	defer span.End()
 	q := c.psql.Select("block_id", "notion_image.page_id", "notion_image.last_seen", "image").From("notion_image").OrderBy("last_seen DESC")
 	q = addons(q)
-	var ids []string
 	var results []NotionImage
 	err := c.selectContext(ctx, q, &results)
 	if err != nil {
 		return nil, err
 	}
+
+	var ids []string
 	for _, r := range results {
 		ids = append(ids, r.ImageID)
 	}

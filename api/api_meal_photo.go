@@ -37,34 +37,56 @@ func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionIma
 func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, getURLs bool) ([]GooglePhoto, []string, error) {
 	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
-	items := []GooglePhoto{}
+	// items := []GooglePhoto{}
 	var ids []string
-	for _, p := range photos {
-		gp := GooglePhoto{Id: p.PhotoID, Created: p.Created, Source: GooglePhotoSourceGoogle}
-		// if p.BlurHash.Valid {
-		// 	s := p.BlurHash.String
-		// 	gp.BlurHash = &s
-		// }
-		gp.BlurHash = &p.Image.BlurHash
-		items = append(items, gp)
-		ids = append(ids, p.PhotoID)
-	}
+	// for _, p := range photos {
+	// 	gp := GooglePhoto{Id: p.PhotoID, Created: p.Created, Source: GooglePhotoSourceGoogle}
+	// 	// if p.BlurHash.Valid {
+	// 	// 	s := p.BlurHash.String
+	// 	// 	gp.BlurHash = &s
+	// 	// }
+	// 	gp.BlurHash = &p.Image.BlurHash
+	// 	items = append(items, gp)
+	// 	ids = append(ids, p.PhotoID)
+	// }
 
-	if getURLs {
-		results, err := a.Manager.Photos.GetMediaItems(ctx, ids)
-		if err != nil {
-			return nil, nil, err
-		}
-		for x, item := range items {
-			val, ok := results[item.Id]
-			if !ok {
-				continue
-			}
-			items[x].BaseUrl = val.BaseUrl
-			items[x].Width = val.MediaMetadata.Width
-			items[x].Height = val.MediaMetadata.Height
-		}
+	// if getURLs {
+	// 	results, err := a.Manager.Photos.GetMediaItems(ctx, ids)
+	// 	if err != nil {
+	// 		return nil, nil, err
+	// 	}
+	// 	for x, item := range items {
+	// 		val, ok := results[item.Id]
+	// 		if !ok {
+	// 			continue
+	// 		}
+	// 		items[x].BaseUrl = val.BaseUrl
+	// 		items[x].Width = val.MediaMetadata.Width
+	// 		items[x].Height = val.MediaMetadata.Height
+	// 	}
+	// }
+	items := []GooglePhoto{}
+	for _, aa := range photos {
+		ids = append(ids, aa.PhotoID)
+		bh := aa.Image.BlurHash
+		// url := aa.Image.ID
+		url := a.Manager.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		// bh := aa.Image.BlurHash
+		// url, err := a.Manager.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
+		// if err != nil {
+		// 	return nil, err
+		// }
+		items = append(items, GooglePhoto{
+			Id:       aa.PhotoID,
+			Created:  aa.Seen,
+			BlurHash: &bh,
+			Width:    300,
+			Height:   400,
+			BaseUrl:  url,
+			Source:   GooglePhotoSourceGoogle,
+		})
 	}
+	// return items, nil
 	return items, ids, nil
 }
 func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
@@ -136,30 +158,30 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		gphotoIDs = append(gphotoIDs, gIDs...)
 		items = append(items, meal)
 	}
-	urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
-	if err != nil {
-		return nil, err
-	}
-	for x, item := range items {
-		// if meals[x].Notion != nil {
-		// 	images, _, err := a.Manager.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
-		// 	if err != nil {
-		// 		return nil, err
-		// 	}
-		// 	for _, url := range images {
-		// 		items[x].Photos = append(items[x].Photos, GooglePhoto{BaseUrl: url.URL})
-		// 	}
-		// }
-		for y, photo := range item.Photos {
-			val, ok := urls[photo.Id]
-			if !ok {
-				continue
-			}
-			items[x].Photos[y].BaseUrl = val.BaseUrl
-			items[x].Photos[y].Width = val.MediaMetadata.Width
-			items[x].Photos[y].Height = val.MediaMetadata.Height
-		}
-	}
+	// urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// for x, item := range items {
+	// 	// if meals[x].Notion != nil {
+	// 	// 	images, _, err := a.Manager.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
+	// 	// 	if err != nil {
+	// 	// 		return nil, err
+	// 	// 	}
+	// 	// 	for _, url := range images {
+	// 	// 		items[x].Photos = append(items[x].Photos, GooglePhoto{BaseUrl: url.URL})
+	// 	// 	}
+	// 	// }
+	// 	for y, photo := range item.Photos {
+	// 		val, ok := urls[photo.Id]
+	// 		if !ok {
+	// 			continue
+	// 		}
+	// 		items[x].Photos[y].BaseUrl = val.BaseUrl
+	// 		items[x].Photos[y].Width = val.MediaMetadata.Width
+	// 		items[x].Photos[y].Height = val.MediaMetadata.Height
+	// 	}
+	// }
 	return items, nil
 }
 func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
