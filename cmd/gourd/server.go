@@ -19,6 +19,7 @@ import (
 	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
+	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
@@ -77,22 +78,27 @@ func makeServer() (*server.Server, error) {
 		return nil, err
 	}
 
-	r := rs_client.New(viper.GetString("RS_URI"))
-	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
-	m := manager.New(dbClient, gClient, auth, r, n)
-	apiManager := api.NewAPI(m)
-
-	// server
-	return &server.Server{
-		Manager:     m,
+	s := &server.Server{
 		HTTPPort:    viper.GetUint("PORT"),
 		DB:          dbClient,
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
-		APIManager:  apiManager,
 		BypassAuth:  viper.GetBool("BYPASS_AUTH"),
 		Logger:      logger,
-	}, nil
+	}
+
+	r := rs_client.New(viper.GetString("RS_URI"))
+	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
+	i, err := image.NewLocalImageStore(s.GetBaseURL())
+	if err != nil {
+		return nil, err
+	}
+	m := manager.New(dbClient, gClient, auth, r, n, i)
+	s.APIManager = api.NewAPI(m)
+	s.Manager = m
+
+	// server
+	return s, nil
 }
 func runServer() {
 	ctx := context.Background()

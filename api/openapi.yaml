@@ -1017,6 +1017,7 @@ components:
         - created
         - width
         - height
+        - source
       properties:
         id:
           description: id
@@ -1039,6 +1040,10 @@ components:
           description: height px
           type: integer
           format: int64
+        source:
+          description: where the photo came from
+          type: string
+          enum: [google, notion]
     Meal:
       description: A meal, which bridges recipes to photos
       type: object

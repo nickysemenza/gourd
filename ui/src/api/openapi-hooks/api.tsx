@@ -398,6 +398,10 @@ export interface GooglePhoto {
    * height px
    */
   height: number;
+  /**
+   * where the photo came from
+   */
+  source: "google" | "notion";
 }
 
 /**

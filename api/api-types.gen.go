@@ -49,6 +49,13 @@ const (
 	FoodNutrientUnitUG FoodNutrientUnit = "UG"
 )
 
+// Defines values for GooglePhotoSource.
+const (
+	GooglePhotoSourceGoogle GooglePhotoSource = "google"
+
+	GooglePhotoSourceNotion GooglePhotoSource = "notion"
+)
+
 // Defines values for IngredientKind.
 const (
 	IngredientKindIngredient IngredientKind = "ingredient"
@@ -184,9 +191,15 @@ type GooglePhoto struct {
 	// id
 	Id string `json:"id"`
 
+	// where the photo came from
+	Source GooglePhotoSource `json:"source"`
+
 	// width px
 	Width int64 `json:"width"`
 }
+
+// where the photo came from
+type GooglePhotoSource string
 
 // an album containing `GooglePhoto`
 type GooglePhotosAlbum struct {

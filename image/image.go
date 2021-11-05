@@ -15,19 +15,23 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 )
 
-const aspectWidth = 4
-const aspectHeight = 3
+const aspectWidth = 4 * 2
+const aspectHeight = 3 * 2
 
-func GetBlurHash(ctx context.Context, url string) (string, error) {
+func GetBlurHash(ctx context.Context, url string) (hash string, image image.Image, err error) {
 	ctx, span := otel.Tracer("image").Start(ctx, "image.GetBlurHash")
 	defer span.End()
 
-	image, err := GetFromURL(ctx, url)
+	image, err = GetFromURL(ctx, url)
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return blurhash.Encode(aspectWidth, aspectHeight, image)
+	hash, err = blurhash.Encode(aspectWidth, aspectHeight, image)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func GetFromURL(ctx context.Context, url string) (image.Image, error) {

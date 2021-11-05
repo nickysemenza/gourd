@@ -32,11 +32,14 @@ pub struct GooglePhoto {
     /// height px
     #[serde(rename = "height")]
     pub height: i64,
+    /// where the photo came from
+    #[serde(rename = "source")]
+    pub source: Source,
 }
 
 impl GooglePhoto {
     /// A google photo
-    pub fn new(id: String, base_url: String, created: String, width: i64, height: i64) -> GooglePhoto {
+    pub fn new(id: String, base_url: String, created: String, width: i64, height: i64, source: Source) -> GooglePhoto {
         GooglePhoto {
             id,
             base_url,
@@ -44,8 +47,17 @@ impl GooglePhoto {
             created,
             width,
             height,
+            source,
         }
     }
 }
 
+/// where the photo came from
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+pub enum Source {
+    #[serde(rename = "google")]
+    Google,
+    #[serde(rename = "notion")]
+    Notion,
+}
 

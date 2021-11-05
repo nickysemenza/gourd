@@ -37,72 +37,166 @@ func (c *Client) GetAlbums(ctx context.Context) ([]GAlbum, error) {
 	return albums, err
 }
 
-type Photo struct {
-	AlbumID  string      `db:"album_id"`
-	PhotoID  string      `db:"id"`
-	Created  time.Time   `db:"creation_time"`
-	Seen     time.Time   `db:"last_seen"`
-	BlurHash zero.String `db:"blur_hash"`
+type GPhoto struct {
+	AlbumID string    `db:"album_id"`
+	PhotoID string    `db:"id"`
+	Created time.Time `db:"creation_time"`
+	Seen    time.Time `db:"last_seen"`
+	ImageID string    `db:"image"`
 	// MetadataJSON types.JSONText `db:"media_metadata"`
+	Image Image
 }
 
-func (c *Client) UpsertPhotos(ctx context.Context, photos []Photo) error {
-	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "blur_hash")
+type Image struct {
+	ID       string `db:"id"`
+	BlurHash string `db:"blur_hash"`
+	Source   string `db:"source"`
+}
+
+type NotionRecipe struct {
+	PageID    string `db:"page_id"`
+	PageTitle string `db:"page_title"`
+	// Meta      string      `db:"meta"`
+	LastSeen time.Time   `db:"last_seen"`
+	Recipe   zero.String `db:"recipe"`
+	AteAt    zero.Time   `db:"ate_at"`
+}
+
+func (c *Client) UpsertPhotos(ctx context.Context, photos []GPhoto) error {
+	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "image")
 	for _, photo := range photos {
-		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created, photo.BlurHash)
+		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created, photo.ImageID)
 	}
-	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?, blur_hash = excluded.blur_hash", time.Now())
+	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
 	_, err := c.execContext(ctx, q)
 	return err
 }
 
-func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]Photo, error) {
+type NotionImage struct {
+	BlockID  string    `db:"block_id"`
+	PageID   string    `db:"page_id"`
+	ImageID  string    `db:"image"`
+	LastSeen time.Time `db:"last_seen"`
+	Image    Image
+}
+
+func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) error {
+	q := c.psql.Insert("notion_image").Columns("block_id", "page_id", "image")
+	for _, photo := range photos {
+		q = q.Values(photo.BlockID, photo.PageID, photo.ImageID)
+	}
+	q = q.Suffix("ON CONFLICT (block_id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
+	_, err := c.execContext(ctx, q)
+	return err
+}
+
+func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]GPhoto, error) {
 	ctx, span := c.tracer.Start(ctx, "db.getPhotos")
 	defer span.End()
-	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "blur_hash").From("gphotos_photos").OrderBy("creation_time DESC")
+	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "image").From("gphotos_photos").OrderBy("creation_time DESC")
 	q = addons(q)
-	var results []Photo
+	var results []GPhoto
 	err := c.selectContext(ctx, q, &results)
 	return results, err
 }
-func (c *Client) GetPhotos(ctx context.Context) ([]Photo, error) {
+
+func (c *Client) getNotionPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]NotionImage, error) {
+	ctx, span := c.tracer.Start(ctx, "db.getPhotos")
+	defer span.End()
+	q := c.psql.Select("block_id", "notion_image.page_id", "notion_image.last_seen", "image").From("notion_image").OrderBy("last_seen DESC")
+	q = addons(q)
+	var ids []string
+	var results []NotionImage
+	err := c.selectContext(ctx, q, &results)
+	if err != nil {
+		return nil, err
+	}
+	for _, r := range results {
+		ids = append(ids, r.ImageID)
+	}
+
+	images := []Image{}
+	q = c.psql.Select("id", "blur_hash", "source").From("images").Where(sq.Eq{"id": ids})
+	err = c.selectContext(ctx, q, &images)
+	if err != nil {
+		return nil, err
+	}
+	for i, r := range results {
+		for _, img := range images {
+			if img.ID == r.ImageID {
+				results[i].Image = img
+			}
+		}
+	}
+	return results, err
+}
+func (c *Client) GetPhotos(ctx context.Context) ([]GPhoto, error) {
 	return c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder { return q })
 }
-func (c *Client) GetAllPhotos(ctx context.Context) (map[string]Photo, error) {
+func (c *Client) GetAllPhotos(ctx context.Context) (map[string]GPhoto, error) {
 	ctx, span := c.tracer.Start(ctx, "db.GetAllPhotos")
 	defer span.End()
 	photos, err := c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder { return q })
 	if err != nil {
 		return nil, err
 	}
-	byId := make(map[string]Photo)
+	byId := make(map[string]GPhoto)
 	for _, p := range photos {
 		byId[p.PhotoID] = p
 	}
 	return byId, nil
 }
-func (c *Client) MealIDInRange(ctx context.Context, t time.Time, name string, notion *string) (mealID string, err error) {
+func (c *Client) MealIDInRange(ctx context.Context, t time.Time, name string) (mealID string, err error) {
 	ctx, span := c.tracer.Start(ctx, "db.MealIDInRange")
 	defer span.End()
 
 	err = c.db.GetContext(ctx, &mealID, `select id from meals
-WHERE  (notion_link IS NOT NULL and notion_link = $2) OR (ate_at > $1::timestamp - INTERVAL '1 hour'
-AND ate_at < $1::timestamp + INTERVAL '1 hour') order by notion_link ASC limit 1`, pq.FormatTimestamp(t), notion)
+WHERE ate_at > $1::timestamp - INTERVAL '1 hour'
+AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, pq.FormatTimestamp(t))
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			return
 		}
 		// err no rows, need to insert
 		mealID = common.ID("m")
-		iq := c.psql.Insert("meals").Columns("id", "ate_at", "name", "notion_link").Values(mealID, t, name, notion)
+		iq := c.psql.Insert("meals").Columns("id", "ate_at", "name").Values(mealID, t, name)
 		_, err = c.execContext(ctx, iq)
 	}
 	return
 }
+
+func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
+	ctx, span := c.tracer.Start(ctx, "db.SaveImage")
+	defer span.End()
+
+	q := c.psql.Insert("images").Columns("id", "blur_hash", "source")
+	for _, r := range items {
+		q = q.Values(r.ID, r.BlurHash, r.Source)
+	}
+	// q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title", time.Now())
+	_, err = c.execContext(ctx, q)
+
+	return
+}
+
+func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (err error) {
+	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
+	defer span.End()
+
+	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at")
+	for _, r := range items {
+		q = q.Values(r.PageID, r.PageTitle, r.AteAt)
+	}
+	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title", time.Now())
+	_, err = c.execContext(ctx, q)
+
+	return
+}
+
 func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 	q := c.psql.Select("id", "album_id", "creation_time").From("gphotos_photos").
-		LeftJoin("meal_photo on gphotos_photos.id = meal_photo.gphotos_id").Where(sq.Eq{"meal": nil})
-	var missingMeals []Photo
+		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").Where(sq.Eq{"meal": nil})
+	var missingMeals []GPhoto
 	err := c.selectContext(ctx, q, &missingMeals)
 	if err != nil {
 		return err
@@ -110,12 +204,42 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 
 	for _, m := range missingMeals {
 
-		mealID, err := c.MealIDInRange(ctx, m.Created, fmt.Sprintf("meal on %s", m.Created), nil)
+		mealID, err := c.MealIDInRange(ctx, m.Created, fmt.Sprintf("meal on %s", m.Created))
 		if err != nil {
 			return err
 		}
 
-		q := c.psql.Insert("meal_photo").Columns("meal", "gphotos_id").Values(mealID, m.PhotoID)
+		q := c.psql.Insert("meal_gphoto").Columns("meal", "gphotos_id").Values(mealID, m.PhotoID)
+		_, err = c.execContext(ctx, q)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+
+}
+
+func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
+	q := c.psql.Select("page_id", "ate_at").From("notion_recipe").
+		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal": nil})
+	var missingMeals []NotionRecipe
+	err := c.selectContext(ctx, q, &missingMeals)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range missingMeals {
+		if !m.AteAt.Valid {
+			continue
+		}
+
+		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time, fmt.Sprintf("meal on %s", m.AteAt.Time))
+		if err != nil {
+			return err
+		}
+
+		q := c.psql.Insert("notion_meal").Columns("meal", "notion_recipe").Values(mealID, m.PageID)
 		_, err = c.execContext(ctx, q)
 		if err != nil {
 			return err
@@ -127,10 +251,9 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 }
 
 type Meal struct {
-	ID     string    `db:"id"`
-	Name   string    `db:"name"`
-	AteAt  time.Time `db:"ate_at"`
-	Notion *string   `db:"notion_link"`
+	ID    string    `db:"id"`
+	Name  string    `db:"name"`
+	AteAt time.Time `db:"ate_at"`
 }
 type Meals []Meal
 
@@ -145,7 +268,7 @@ func (r Meals) MealIDs() []string {
 func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
-	q := c.psql.Select("id", "name", "ate_at", "notion_link").From("meals").OrderBy("ate_at DESC")
+	q := c.psql.Select("id", "name", "ate_at").From("meals").OrderBy("ate_at DESC")
 	var results Meals
 	err := c.selectContext(ctx, q, &results)
 	return results, err
@@ -203,11 +326,21 @@ func (c *Client) GetMealRecipes(ctx context.Context, mealID ...string) (MealReci
 	return results, err
 }
 
-func (c *Client) GetPhotosForMeal(ctx context.Context, meal string) ([]Photo, error) {
+func (c *Client) GetPhotosForMeal(ctx context.Context, meal string) ([]GPhoto, error) {
 	ctx, span := c.tracer.Start(ctx, "GetPhotosForMeal")
 	defer span.End()
 	return c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.LeftJoin("meal_photo on meal_photo.gphotos_id = gphotos_photos.id").
+		return q.LeftJoin("meal_gphoto on meal_gphoto.gphotos_id = gphotos_photos.id").
+			Where(sq.Eq{"meal": meal})
+	})
+}
+
+func (c *Client) GetNotionPhotosForMeal(ctx context.Context, meal string) ([]NotionImage, error) {
+	ctx, span := c.tracer.Start(ctx, "GetNotionPhotosForMeal")
+	defer span.End()
+	return c.getNotionPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
+		return q.LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
+			LeftJoin("notion_meal on notion_meal.notion_recipe = notion_recipe.page_id").
 			Where(sq.Eq{"meal": meal})
 	})
 }

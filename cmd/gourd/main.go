@@ -71,6 +71,10 @@ func init() {
 				if err != nil {
 					return err
 				}
+				err = s.DB.SyncNotionMealFromNotionRecipe(ctx)
+				if err != nil {
+					return err
+				}
 				err = s.Manager.Photos.SyncAlbums(ctx)
 				if err != nil {
 					return err

@@ -453,22 +453,6 @@ func (c *Client) GetIngrientsParent(ctx context.Context, parent ...string) (Ingr
 	})
 }
 
-//TODO: non-gql version
-// func (c *Client) GetMeals(ctx context.Context, recipe string) ([]*model.Meal, error) {
-// 	query, args, err := c.psql.Select("meal_id AS id", "name", "notion_link AS notionURL").From("meals").
-// 		LeftJoin("meal_recipe on meals.id = meal_recipe.meal_id").
-// 		Where(sq.Eq{"recipe_id": recipe}).ToSql()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var res []*model.Meal
-// 	err = c.db.SelectContext(ctx, &res, query, args...)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return res, nil
-// }
-
 func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) ([]IngredientUnitMapping, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngredientUnits")
 	defer span.End()

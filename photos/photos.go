@@ -12,25 +12,26 @@ import (
 
 	gphotos "github.com/gphotosuploader/google-photos-api-client-go/lib-gphotos"
 	"github.com/gphotosuploader/googlemirror/api/photoslibrary/v1"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"gopkg.in/guregu/null.v4/zero"
 )
 
 // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchGet#query-parameters
 const maxPhotoBatchGet = 50
 
 type Photos struct {
-	g  *google.Client
-	db *db.Client
+	g          *google.Client
+	db         *db.Client
+	ImageStore image.Store
 }
 
-func New(db *db.Client, g *google.Client) *Photos {
-	return &Photos{g: g, db: db}
+func New(db *db.Client, g *google.Client, imageStore image.Store) *Photos {
+	return &Photos{g: g, db: db, ImageStore: imageStore}
 
 }
 func (p *Photos) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
@@ -142,10 +143,10 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		return fmt.Errorf("bad client: %w", err)
 	}
 
-	dbPhotos, err := p.db.GetAllPhotos(ctx)
-	if err != nil {
-		return err
-	}
+	// dbPhotos, err := p.db.GetAllPhotos(ctx)
+	// if err != nil {
+	// 	return err
+	// }
 	albums, err := p.db.GetAlbums(ctx)
 	if err != nil {
 		return err
@@ -153,7 +154,8 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 	log.Infof("syncing %d album(s)", len(albums))
 	numBlurHashCalculated := 0
 	for _, album := range albums {
-		var photos []db.Photo
+		var photos []db.GPhoto
+		var img []db.Image
 		err = client.MediaItems.Search(&photoslibrary.SearchMediaItemsRequest{
 			AlbumId:  album.ID,
 			PageSize: maxPhotoBatchGet,
@@ -163,27 +165,43 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
-				var bh string
-				if dbPhoto, ok := dbPhotos[m.Id]; ok && dbPhoto.BlurHash.Valid && dbPhoto.BlurHash.String != "" {
-					bh = dbPhoto.BlurHash.String
-				} else {
-					bh, err = image.GetBlurHash(ctx, m.BaseUrl)
-					if err != nil {
-						return err
-					}
-					numBlurHashCalculated++
+				// var bh string
+				// if dbPhoto, ok := dbPhotos[m.Id]; ok && dbPhoto.BlurHash.Valid && dbPhoto.BlurHash.String != "" {
+				// 	bh = dbPhoto.BlurHash.String
+				// } else {
+				bh, rimage, err := image.GetBlurHash(ctx, m.BaseUrl)
+				if err != nil {
+					return err
 				}
+				numBlurHashCalculated++
+				// }
+				id := common.ID("google_image")
+				err = p.ImageStore.SaveImage(ctx, id, rimage)
+				if err != nil {
+					return err
+				}
+				i := db.Image{
+					ID:       id,
+					BlurHash: bh,
+					Source:   "google",
+				}
+				img = append(img, i)
 
 				//nolint:scopelint
-				photos = append(photos, db.Photo{
-					AlbumID:  album.ID,
-					PhotoID:  m.Id,
-					Created:  t,
-					BlurHash: zero.StringFrom(bh),
+				photos = append(photos, db.GPhoto{
+					AlbumID: album.ID,
+					PhotoID: m.Id,
+					Created: t,
+					ImageID: id,
+					// BlurHash: zero.StringFrom(bh),
 				})
 			}
 			return nil
 		})
+		if err != nil {
+			return err
+		}
+		err = p.db.SaveImage(ctx, img)
 		if err != nil {
 			return err
 		}

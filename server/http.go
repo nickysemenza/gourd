@@ -71,6 +71,8 @@ func (s *Server) Run(_ context.Context) error {
 	}
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
+	// r.Add("/images", echo.WrapHandler(s.APIManager.ImageStore.Handler))
+	r.Static("/images", s.Manager.ImageStore.Dir())
 	// http routes
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
@@ -117,14 +119,19 @@ func (s *Server) Run(_ context.Context) error {
 	// 	return c.JSON(http.StatusOK, pics)
 	// })
 
-	addr := fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
-	log.Printf("running on: http://%s/", addr)
-	return http.ListenAndServe(addr,
+	log.Printf("running on: %s", s.GetBaseURL())
+	return http.ListenAndServe(s.getAddress(),
 		wrapHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout")),
 		// otelhttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
 		// 	otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
 		// ),
 	)
+}
+func (s *Server) getAddress() string {
+	return fmt.Sprintf("%s:%d", s.HTTPHost, s.HTTPPort)
+}
+func (s *Server) GetBaseURL() string {
+	return fmt.Sprintf("http://%s", s.getAddress())
 }
 func wrapHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

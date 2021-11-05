@@ -55,6 +55,21 @@ export interface GooglePhoto {
      * @memberof GooglePhoto
      */
     height: number;
+    /**
+     * where the photo came from
+     * @type {string}
+     * @memberof GooglePhoto
+     */
+    source: GooglePhotoSourceEnum;
+}
+
+/**
+* @export
+* @enum {string}
+*/
+export enum GooglePhotoSourceEnum {
+    GOOGLE = 'google',
+    NOTION = 'notion'
 }
 
 export function GooglePhotoFromJSON(json: any): GooglePhoto {
@@ -73,6 +88,7 @@ export function GooglePhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'created': (new Date(json['created'])),
         'width': json['width'],
         'height': json['height'],
+        'source': json['source'],
     };
 }
 
@@ -91,6 +107,7 @@ export function GooglePhotoToJSON(value?: GooglePhoto | null): any {
         'created': (value.created.toISOString()),
         'width': value.width,
         'height': value.height,
+        'source': value.source,
     };
 }
 

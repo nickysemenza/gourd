@@ -10,7 +10,7 @@ CREATE TABLE "gphotos_photos" (
     "last_seen" timestamp NOT NULL DEFAULT now(),
     PRIMARY KEY ("id")
 );
-CREATE TABLE IF NOT EXISTS "meal_photo" (
+CREATE TABLE IF NOT EXISTS "meal_gphoto" (
     "meal" TEXT references meals(id) NOT NULL,
     "gphotos_id" TEXT references gphotos_photos(id) NOT NULL,
     "highlight_recipe" TEXT references recipes(id),
