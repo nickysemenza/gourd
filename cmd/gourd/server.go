@@ -42,9 +42,6 @@ func getDBConn() (*sql.DB, error) {
 	return dbConn, err
 }
 func makeServer() (*server.Server, error) {
-	logger := log.New()
-	logger.SetLevel(log.DebugLevel)
-	// setupMisc()
 
 	// postgres database
 	dbConn, err := getDBConn()
@@ -83,7 +80,7 @@ func makeServer() (*server.Server, error) {
 		HTTPTimeout: viper.GetDuration("HTTP_TIMEOUT"),
 		HTTPHost:    viper.GetString("HTTP_HOST"),
 		BypassAuth:  viper.GetBool("BYPASS_AUTH"),
-		Logger:      logger,
+		Logger:      log.New(),
 	}
 
 	r := rs_client.New(viper.GetString("RS_URI"))

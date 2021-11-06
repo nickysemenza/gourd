@@ -35,13 +35,14 @@ type NotionPhoto struct {
 	URL     string `json:"url,omitempty"`
 }
 type NotionRecipe struct {
-	Title  string        `json:"title,omitempty"`
-	Time   *time.Time    `json:"time,omitempty"`
-	Tags   []string      `json:"tags,omitempty"`
-	Photos []NotionPhoto `json:"photos,omitempty"`
-	PageID string        `json:"page_id,omitempty"`
-	URL    string        `json:"url,omitempty"`
-	Raw    string        `json:"raw,omitempty"`
+	Title     string        `json:"title,omitempty"`
+	Time      *time.Time    `json:"time,omitempty"`
+	Tags      []string      `json:"tags,omitempty"`
+	Photos    []NotionPhoto `json:"photos,omitempty"`
+	PageID    string        `json:"page_id,omitempty"`
+	NotionURL string        `json:"notion_url,omitempty"`
+	SourceURL string        `json:"source_url,omitempty"`
+	Raw       string        `json:"raw,omitempty"`
 }
 
 func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
@@ -73,9 +74,9 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 			switch page.Object {
 			case "column_list", notionapi.ObjectTypePage:
 				meal := NotionRecipe{
-					Title:  page.Properties["Name"].(*notionapi.TitleProperty).Title[0].Text.Content,
-					PageID: page.ID.String(),
-					URL:    page.URL,
+					Title:     page.Properties["Name"].(*notionapi.TitleProperty).Title[0].Text.Content,
+					PageID:    page.ID.String(),
+					NotionURL: page.URL,
 				}
 				date := page.Properties["Date"].(*notionapi.DateProperty).Date.Start
 				if date != nil {
@@ -84,6 +85,7 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 				for _, ms := range page.Properties["Tags"].(*notionapi.MultiSelectProperty).MultiSelect {
 					meal.Tags = append(meal.Tags, ms.Name)
 				}
+				meal.SourceURL = page.Properties["source"].(*notionapi.URLProperty).URL
 
 				// on each page, get all the blocks that are images
 				meal.Photos, meal.Raw, err = c.ImagesFromPage(ctx, page.ID)

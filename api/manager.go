@@ -48,6 +48,12 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 				return fmt.Errorf("failed to decode recipe: %w", err)
 			}
 			// output.Sources = &[]api.RecipeSource{{Title: }}
+		} else if nRecipe.SourceURL != "" {
+			r, err := m.FetchAndTransform(ctx, nRecipe.SourceURL, m.IngredientIdByName)
+			if err != nil {
+				return err
+			}
+			output = r.Detail
 		}
 		output.Name = nRecipe.Title
 
