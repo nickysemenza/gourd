@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/rs_client"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -43,19 +45,17 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 	var img []db.Image
 	for _, nRecipe := range nRecipes {
 
-		dbr := &db.RecipeDetail{Name: nRecipe.Title}
-		// output := api.RecipeDetailInput{}
-		// if nRecipe.Raw != "" {
-		// 	err = m.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
-		// 	if err != nil {
-		// 		return fmt.Errorf("failed to decode recipe: %w", err)
-		// 	}
-		// 	// output.Sources = &[]api.RecipeSource{{Title: }}
-		// }
+		output := RecipeDetailInput{}
+		if nRecipe.Raw != "" {
+			err = m.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
+			if err != nil {
+				return fmt.Errorf("failed to decode recipe: %w", err)
+			}
+			// output.Sources = &[]api.RecipeSource{{Title: }}
+		}
+		output.Name = nRecipe.Title
 
-		// .CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
-
-		r, err := m.DB().InsertRecipe(ctx, dbr)
+		r, err := m.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
 		if err != nil {
 			return err
 		}
@@ -63,7 +63,7 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 			PageID:    nRecipe.PageID,
 			PageTitle: nRecipe.Title,
 			AteAt:     zero.TimeFromPtr(nRecipe.Time),
-			Recipe:    zero.StringFrom(r.RecipeId),
+			Recipe:    zero.StringFrom(r.Id),
 		})
 		for _, nPhoto := range nRecipe.Photos {
 			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
