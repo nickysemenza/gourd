@@ -207,11 +207,11 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (e
 	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
 	defer span.End()
 
-	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at")
+	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at", "recipe")
 	for _, r := range items {
-		q = q.Values(r.PageID, r.PageTitle, r.AteAt)
+		q = q.Values(r.PageID, r.PageTitle, r.AteAt, r.Recipe)
 	}
-	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title", time.Now())
+	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title, recipe = excluded.recipe", time.Now())
 	_, err = c.execContext(ctx, q)
 
 	return
@@ -245,7 +245,7 @@ func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	q := c.psql.Select("page_id", "ate_at").From("notion_recipe").
+	q := c.psql.Select("page_id", "ate_at", "recipe").From("notion_recipe").
 		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal": nil})
 	var missingMeals []NotionRecipe
 	err := c.selectContext(ctx, q, &missingMeals)
@@ -261,6 +261,13 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time, fmt.Sprintf("meal on %s", m.AteAt.Time))
 		if err != nil {
 			return err
+		}
+
+		if m.Recipe.Valid {
+			err = c.AddRecipeToMeal(ctx, mealID, m.Recipe.ValueOrZero(), 1)
+			if err != nil {
+				return err
+			}
 		}
 
 		q := c.psql.Insert("notion_meal").Columns("meal", "notion_recipe").Values(mealID, m.PageID)

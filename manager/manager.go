@@ -56,7 +56,7 @@ func (m *Manager) ProcessGoogleAuth(ctx context.Context, code string) (jwt strin
 }
 
 func (m *Manager) SyncNotionToMeals(ctx context.Context) error {
-	nMeals, err := m.Notion.Dump(ctx)
+	nRecipes, err := m.Notion.Dump(ctx)
 	if err != nil {
 		return err
 	}
@@ -64,13 +64,31 @@ func (m *Manager) SyncNotionToMeals(ctx context.Context) error {
 	var foo []db.NotionRecipe
 	var bar []db.NotionImage
 	var img []db.Image
-	for _, nMeal := range nMeals {
+	for _, nRecipe := range nRecipes {
+
+		dbr := &db.RecipeDetail{Name: nRecipe.Title}
+		// output := api.RecipeDetailInput{}
+		// if nRecipe.Raw != "" {
+		// 	err = m.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
+		// 	if err != nil {
+		// 		return fmt.Errorf("failed to decode recipe: %w", err)
+		// 	}
+		// 	// output.Sources = &[]api.RecipeSource{{Title: }}
+		// }
+
+		// .CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
+
+		r, err := m.DB().InsertRecipe(ctx, dbr)
+		if err != nil {
+			return err
+		}
 		foo = append(foo, db.NotionRecipe{
-			PageID:    nMeal.PageID,
-			PageTitle: nMeal.Title,
-			AteAt:     zero.TimeFromPtr(nMeal.Time),
+			PageID:    nRecipe.PageID,
+			PageTitle: nRecipe.Title,
+			AteAt:     zero.TimeFromPtr(nRecipe.Time),
+			Recipe:    zero.StringFrom(r.RecipeId),
 		})
-		for _, nPhoto := range nMeal.Photos {
+		for _, nPhoto := range nRecipe.Photos {
 			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
 			if err != nil {
 				return err
@@ -88,7 +106,7 @@ func (m *Manager) SyncNotionToMeals(ctx context.Context) error {
 			}
 			img = append(img, i)
 			bar = append(bar, db.NotionImage{
-				PageID:  nMeal.PageID,
+				PageID:  nRecipe.PageID,
 				BlockID: nPhoto.BlockID,
 				ImageID: id,
 			})
