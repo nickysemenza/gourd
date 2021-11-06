@@ -11,10 +11,6 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-// Manager manages recipes
-type Manager struct {
-}
-
 func (m *API) DB() *db.Client {
 	return m.db
 }

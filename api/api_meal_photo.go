@@ -10,17 +10,11 @@ import (
 	"github.com/nickysemenza/gourd/db"
 )
 
-func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) ([]GooglePhoto, error) {
+func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) []GooglePhoto {
 	items := []GooglePhoto{}
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
-		// url := aa.Image.ID
 		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
-		// bh := aa.Image.BlurHash
-		// url, err := a.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
-		// if err != nil {
-		// 	return nil, err
-		// }
 		items = append(items, GooglePhoto{
 			Id:       aa.BlockID,
 			Created:  aa.LastSeen,
@@ -31,51 +25,17 @@ func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionIma
 			Source:   GooglePhotoSourceNotion,
 		})
 	}
-	return items, nil
+	return items
 }
 
-func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, getURLs bool) ([]GooglePhoto, []string, error) {
+func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) []GooglePhoto {
 	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
-	// items := []GooglePhoto{}
-	var ids []string
-	// for _, p := range photos {
-	// 	gp := GooglePhoto{Id: p.PhotoID, Created: p.Created, Source: GooglePhotoSourceGoogle}
-	// 	// if p.BlurHash.Valid {
-	// 	// 	s := p.BlurHash.String
-	// 	// 	gp.BlurHash = &s
-	// 	// }
-	// 	gp.BlurHash = &p.Image.BlurHash
-	// 	items = append(items, gp)
-	// 	ids = append(ids, p.PhotoID)
-	// }
 
-	// if getURLs {
-	// 	results, err := a.Photos.GetMediaItems(ctx, ids)
-	// 	if err != nil {
-	// 		return nil, nil, err
-	// 	}
-	// 	for x, item := range items {
-	// 		val, ok := results[item.Id]
-	// 		if !ok {
-	// 			continue
-	// 		}
-	// 		items[x].BaseUrl = val.BaseUrl
-	// 		items[x].Width = val.MediaMetadata.Width
-	// 		items[x].Height = val.MediaMetadata.Height
-	// 	}
-	// }
 	items := []GooglePhoto{}
 	for _, aa := range photos {
-		ids = append(ids, aa.PhotoID)
 		bh := aa.Image.BlurHash
-		// url := aa.Image.ID
 		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
-		// bh := aa.Image.BlurHash
-		// url, err := a.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
-		// if err != nil {
-		// 	return nil, err
-		// }
 		items = append(items, GooglePhoto{
 			Id:       aa.PhotoID,
 			Created:  aa.Seen,
@@ -86,8 +46,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, g
 			Source:   GooglePhotoSourceGoogle,
 		})
 	}
-	// return items, nil
-	return items, ids, nil
+	return items
 }
 func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	ctx := c.Request().Context()
@@ -95,10 +54,7 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
-	items, _, err := a.googlePhotosFromDBPhoto(ctx, photos, true)
-	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
-	}
+	items := a.googlePhotosFromDBPhoto(ctx, photos)
 
 	resp := PaginatedPhotos{
 		Photos: &items,
@@ -120,7 +76,6 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 	}
 	recipeDetailsById := recipesDetails.ByRecipeId()
 
-	var gphotoIDs []string
 	for _, m := range meals {
 		meal := Meal{Id: m.ID,
 			Name:  m.Name,
@@ -140,48 +95,17 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 			return nil, err
 		}
 
-		googlePhotos, gIDs, err := a.googlePhotosFromDBPhoto(ctx, googlePhotosDB, false)
-		if err != nil {
-			return nil, err
-		}
+		googlePhotos := a.googlePhotosFromDBPhoto(ctx, googlePhotosDB)
 
 		notionPhotosDB, err := a.DB().GetNotionPhotosForMeal(ctx, m.ID)
 		if err != nil {
 			return nil, err
 		}
-		notionPhotos, err := a.notionPhotosFromDBPhoto(ctx, notionPhotosDB)
-		if err != nil {
-			return nil, err
-		}
+		notionPhotos := a.notionPhotosFromDBPhoto(ctx, notionPhotosDB)
 		googlePhotos = append(googlePhotos, notionPhotos...)
 		meal.Photos = googlePhotos
-		gphotoIDs = append(gphotoIDs, gIDs...)
 		items = append(items, meal)
 	}
-	// urls, err := a.Photos.GetMediaItems(ctx, gphotoIDs)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// for x, item := range items {
-	// 	// if meals[x].Notion != nil {
-	// 	// 	images, _, err := a.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
-	// 	// 	if err != nil {
-	// 	// 		return nil, err
-	// 	// 	}
-	// 	// 	for _, url := range images {
-	// 	// 		items[x].Photos = append(items[x].Photos, GooglePhoto{BaseUrl: url.URL})
-	// 	// 	}
-	// 	// }
-	// 	for y, photo := range item.Photos {
-	// 		val, ok := urls[photo.Id]
-	// 		if !ok {
-	// 			continue
-	// 		}
-	// 		items[x].Photos[y].BaseUrl = val.BaseUrl
-	// 		items[x].Photos[y].Width = val.MediaMetadata.Width
-	// 		items[x].Photos[y].Height = val.MediaMetadata.Height
-	// 	}
-	// }
 	return items, nil
 }
 func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {

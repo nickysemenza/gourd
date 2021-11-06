@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "notion_recipe" (
 CREATE TABLE IF NOT EXISTS "notion_image" (
 	"block_id" text NOT NULL,
 	"page_id" text references notion_recipe(page_id) NOT NULL,
-	-- "blur_hash" text,
+	"blur_hash" text,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
 	PRIMARY KEY ("block_id"),
 	unique (block_id, page_id)
