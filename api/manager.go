@@ -1,46 +1,23 @@
-package manager
+package api
 
 import (
 	"context"
 
-	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/image"
-	"github.com/nickysemenza/gourd/notion"
-	"github.com/nickysemenza/gourd/photos"
-	"github.com/nickysemenza/gourd/rs_client"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
 // Manager manages recipes
 type Manager struct {
-	db         *db.Client
-	Google     *google.Client
-	Photos     *photos.Photos
-	Auth       *auth.Auth
-	R          *rs_client.Client
-	Notion     *notion.Client
-	ImageStore image.Store
 }
 
-func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, notion *notion.Client, imageStore image.Store) *Manager {
-	return &Manager{db: db,
-		Google:     g,
-		Auth:       auth,
-		Photos:     photos.New(db, g, imageStore),
-		R:          r,
-		Notion:     notion,
-		ImageStore: imageStore,
-	}
-}
-
-func (m *Manager) DB() *db.Client {
+func (m *API) DB() *db.Client {
 	return m.db
 }
 
-func (m *Manager) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, rawUser map[string]interface{}, err error) {
+func (m *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, rawUser map[string]interface{}, err error) {
 	err = m.Google.Finish(ctx, code)
 	if err != nil {
 		return
@@ -55,7 +32,7 @@ func (m *Manager) ProcessGoogleAuth(ctx context.Context, code string) (jwt strin
 	return
 }
 
-func (m *Manager) SyncNotionToMeals(ctx context.Context) error {
+func (m *API) SyncNotionToMeals(ctx context.Context) error {
 	nRecipes, err := m.Notion.Dump(ctx)
 	if err != nil {
 		return err

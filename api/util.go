@@ -69,7 +69,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 			return nil, fmt.Errorf("failed to read bytes: %w", err)
 		}
 		output := RecipeDetailInput{}
-		err = a.Manager.R.Call(ctx, string(data), rs_client.RecipeDecode, &output)
+		err = a.R.Call(ctx, string(data), rs_client.RecipeDecode, &output)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
@@ -132,7 +132,7 @@ func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId
 	defer span.End()
 
 	r := RecipeWrapperInput{}
-	err := a.Manager.R.Call(ctx, addr, rs_client.Scrape, &r)
+	err := a.R.Call(ctx, addr, rs_client.Scrape, &r)
 	if err != nil {
 		return nil, err
 	}

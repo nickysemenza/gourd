@@ -47,7 +47,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	span.AddEvent("ingredient-params", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
 
-	parent, _, err := a.Manager.DB().GetIngrientsParent(ctx, ingredientIds...)
+	parent, _, err := a.DB().GetIngrientsParent(ctx, ingredientIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	span.AddEvent("ingredient-plus-parent", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
 
-	linkedRecipes, err := a.Manager.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
+	linkedRecipes, err := a.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 		detail := a.makeDetail(ctx, i, parent, linkedRecipes)
 
-		unitMappings, err := a.Manager.DB().GetIngredientUnits(ctx, []string{i.Id, i.Parent.String})
+		unitMappings, err := a.DB().GetIngredientUnits(ctx, []string{i.Id, i.Parent.String})
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 	m := []UnitMapping{}
 	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
 		var res []Amount
-		err := a.Manager.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
+		err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +137,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 
 			if p.PortionDescription != "" {
 				var res []Amount
-				err := a.Manager.R.Call(ctx, p.PortionDescription, rs_client.Amount, &res)
+				err := a.R.Call(ctx, p.PortionDescription, rs_client.Amount, &res)
 				if err != nil {
 					err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
 					log.Error(err)
@@ -182,7 +182,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	if params.IngredientId != nil {
 		ids = *params.IngredientId
 	}
-	ing, count, err := a.Manager.DB().GetIngredients(ctx, "", ids, paginationParams...)
+	ing, count, err := a.DB().GetIngredients(ctx, "", ids, paginationParams...)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}

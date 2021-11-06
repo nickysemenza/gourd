@@ -22,12 +22,10 @@ import (
 	"github.com/nickysemenza/gourd/api"
 	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/manager"
 )
 
 // Server represents a server
 type Server struct {
-	Manager     *manager.Manager
 	DB          *db.Client
 	HTTPHost    string
 	HTTPPort    uint
@@ -67,12 +65,12 @@ func (s *Server) Run(_ context.Context) error {
 	config := middleware.JWTConfig{
 		Skipper:    skipper,
 		Claims:     &auth.Claims{},
-		SigningKey: s.Manager.Auth.Key,
+		SigningKey: s.APIManager.Auth.Key,
 	}
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	// r.Add("/images", echo.WrapHandler(s.APIManager.ImageStore.Handler))
-	r.Static("/images", s.Manager.ImageStore.Dir())
+	r.Static("/images", s.APIManager.ImageStore.Dir())
 	// http routes
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
@@ -96,7 +94,7 @@ func (s *Server) Run(_ context.Context) error {
 		return c.JSON(http.StatusOK, spec)
 	})
 
-	r.GET("/notion", s.APIManager.Notion)
+	r.GET("/notion", s.APIManager.NotionTest)
 
 	// r.GET("/auth/redirect", func(c echo.Context) error {
 	// 	return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())

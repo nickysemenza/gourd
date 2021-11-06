@@ -175,7 +175,7 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodsByIds")
 	defer span.End()
 
-	foods, count, err := a.Manager.DB().FoodsByIds(ctx, params.FdcId)
+	foods, count, err := a.DB().FoodsByIds(ctx, params.FdcId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
@@ -205,7 +205,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 			}
 		}
 	}
-	foods, count, err := a.Manager.DB().SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
+	foods, count, err := a.DB().SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
@@ -270,7 +270,7 @@ func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, 
 func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, params AssociateFoodWithIngredientParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "AssociateFoodWithIngredient")
 	defer span.End()
-	err := a.Manager.DB().AssociateFoodWithIngredient(ctx, ingredientId, params.FdcId)
+	err := a.DB().AssociateFoodWithIngredient(ctx, ingredientId, params.FdcId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
@@ -285,7 +285,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 
-		err = a.Manager.DB().AssociateFoodWithIngredient(ctx, ing.Id, m.FdcID)
+		err = a.DB().AssociateFoodWithIngredient(ctx, ing.Id, m.FdcID)
 		if err != nil {
 			return err
 		}
@@ -298,7 +298,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			}
 			childIds = append(childIds, ing.Id)
 		}
-		err = a.Manager.DB().MergeIngredients(ctx, ing.Id, childIds)
+		err = a.DB().MergeIngredients(ctx, ing.Id, childIds)
 		if err != nil {
 			return err
 		}
@@ -314,7 +314,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 				AmountB:      u.B.Value,
 				Source:       zero.StringFromPtr(u.Source).String,
 			}
-			num, err := a.Manager.DB().AddIngredientUnit(ctx, u)
+			num, err := a.DB().AddIngredientUnit(ctx, u)
 			if err != nil {
 				return err
 			}

@@ -15,9 +15,9 @@ func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionIma
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
 		// url := aa.Image.ID
-		url := a.Manager.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
 		// bh := aa.Image.BlurHash
-		// url, err := a.Manager.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
+		// url, err := a.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
 		// if err != nil {
 		// 	return nil, err
 		// }
@@ -51,7 +51,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, g
 	// }
 
 	// if getURLs {
-	// 	results, err := a.Manager.Photos.GetMediaItems(ctx, ids)
+	// 	results, err := a.Photos.GetMediaItems(ctx, ids)
 	// 	if err != nil {
 	// 		return nil, nil, err
 	// 	}
@@ -70,9 +70,9 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, g
 		ids = append(ids, aa.PhotoID)
 		bh := aa.Image.BlurHash
 		// url := aa.Image.ID
-		url := a.Manager.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
 		// bh := aa.Image.BlurHash
-		// url, err := a.Manager.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
+		// url, err := a.Notion.ImageFromBlock(ctx, notionapi.BlockID(aa.BlockID))
 		// if err != nil {
 		// 	return nil, err
 		// }
@@ -91,7 +91,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto, g
 }
 func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	ctx := c.Request().Context()
-	photos, err := a.Manager.DB().GetPhotos(ctx)
+	photos, err := a.DB().GetPhotos(ctx)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -158,13 +158,13 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		gphotoIDs = append(gphotoIDs, gIDs...)
 		items = append(items, meal)
 	}
-	// urls, err := a.Manager.Photos.GetMediaItems(ctx, gphotoIDs)
+	// urls, err := a.Photos.GetMediaItems(ctx, gphotoIDs)
 	// if err != nil {
 	// 	return nil, err
 	// }
 	// for x, item := range items {
 	// 	// if meals[x].Notion != nil {
-	// 	// 	images, _, err := a.Manager.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
+	// 	// 	images, _, err := a.Notion.ImagesFromPage(ctx, notionapi.ObjectID(*meals[x].Notion))
 	// 	// 	if err != nil {
 	// 	// 		return nil, err
 	// 	// 	}

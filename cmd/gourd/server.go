@@ -20,7 +20,6 @@ import (
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/image"
-	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/nickysemenza/gourd/server"
@@ -93,9 +92,8 @@ func makeServer() (*server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	m := manager.New(dbClient, gClient, auth, r, n, i)
-	s.APIManager = api.NewAPI(m)
-	s.Manager = m
+	m := api.New(dbClient, gClient, auth, r, n, i)
+	s.APIManager = m
 
 	// server
 	return s, nil

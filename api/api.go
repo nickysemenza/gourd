@@ -14,9 +14,14 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
+	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/manager"
+	"github.com/nickysemenza/gourd/google"
+	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/notion"
+	"github.com/nickysemenza/gourd/photos"
+	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -24,14 +29,26 @@ import (
 )
 
 type API struct {
-	*manager.Manager
-	tracer trace.Tracer
+	db         *db.Client
+	Google     *google.Client
+	Photos     *photos.Photos
+	Auth       *auth.Auth
+	R          *rs_client.Client
+	Notion     *notion.Client
+	ImageStore image.Store
+	tracer     trace.Tracer
 }
 
-func NewAPI(m *manager.Manager) *API {
+func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, notion *notion.Client, imageStore image.Store) *API {
 	return &API{
-		Manager: m,
-		tracer:  otel.Tracer("api"),
+		db:         db,
+		Google:     g,
+		Auth:       auth,
+		Photos:     photos.New(db, g, imageStore),
+		R:          r,
+		Notion:     notion,
+		ImageStore: imageStore,
+		tracer:     otel.Tracer("api"),
 	}
 }
 
@@ -309,7 +326,7 @@ func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, ite
 		UnitMappings: item.Ingredient.UnitMappings,
 	}
 	var res Amount
-	err := a.Manager.R.Convert(
+	err := a.R.Convert(
 		ctx, req, &res,
 	)
 	if err != nil {
@@ -331,7 +348,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	defer span.End()
 
 	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	recipes, count, err := a.Manager.DB().GetRecipes(ctx, "", paginationParams...)
+	recipes, count, err := a.DB().GetRecipes(ctx, "", paginationParams...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
@@ -341,7 +358,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		recipeIDs = append(recipeIDs, r.Id)
 	}
 
-	details, err := a.Manager.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": recipeIDs})
+	details, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": recipeIDs})
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
@@ -411,7 +428,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 // (GET /recipes/{recipeId})
 func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	ctx := c.Request().Context()
-	r, err := a.Manager.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+	r, err := a.DB().GetRecipeDetailByIdFull(ctx, recipeId)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
@@ -429,7 +446,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 	list := []RecipeWrapper{}
 
 	for _, recipeId := range params.RecipeId {
-		r, err := a.Manager.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+		r, err := a.DB().GetRecipeDetailByIdFull(ctx, recipeId)
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
@@ -445,7 +462,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 
 func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
 	ctx := c.Request().Context()
-	jwt, rawUser, err := a.Manager.ProcessGoogleAuth(ctx, params.Code)
+	jwt, rawUser, err := a.ProcessGoogleAuth(ctx, params.Code)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -466,12 +483,12 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 
 	var resp Test
 
-	dbAlbums, err := a.Manager.DB().GetAlbums(ctx)
+	dbAlbums, err := a.DB().GetAlbums(ctx)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
-	albums, err := a.Manager.Photos.GetAvailableAlbums(ctx)
+	albums, err := a.Photos.GetAvailableAlbums(ctx)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -503,11 +520,11 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	_, listMeta := parsePagination(params.Offset, params.Limit)
 
-	recipes, recipesCount, err := a.Manager.DB().GetRecipesDetails(ctx, string(params.Name))
+	recipes, recipesCount, err := a.DB().GetRecipesDetails(ctx, string(params.Name))
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
-	ingredients, ingredientsCount, err := a.Manager.DB().GetIngredients(ctx, string(params.Name), nil)
+	ingredients, ingredientsCount, err := a.DB().GetIngredients(ctx, string(params.Name), nil)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -554,11 +571,11 @@ func (a *API) RecipeDependencies(c echo.Context) error {
 	return c.JSON(http.StatusOK, Test2{res})
 }
 
-func (a *API) Notion(c echo.Context) error {
+func (a *API) NotionTest(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
 	defer span.End()
 
-	res, err := a.Manager.Notion.Dump(ctx)
+	res, err := a.Notion.Dump(ctx)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}

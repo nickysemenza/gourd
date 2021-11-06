@@ -14,7 +14,6 @@ import (
 	echo_middleware "github.com/labstack/echo/v4/middleware"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/manager"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/stretchr/testify/require"
 )
@@ -22,9 +21,8 @@ import (
 func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	t.Helper()
 	tdb := db.NewDB(t)
-	m := manager.New(tdb, nil, nil, rs_client.New("http://localhost:8080/"), nil, nil)
+	apiManager := New(tdb, nil, nil, rs_client.New("http://localhost:8080/"), nil, nil)
 
-	apiManager := NewAPI(m)
 	e := echo.New()
 	e.Use(echo_middleware.Logger())
 	RegisterHandlers(e, apiManager)
