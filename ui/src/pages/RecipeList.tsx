@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import queryString from "query-string";
 import { ButtonGroup } from "../components/Button";
 import { PlusCircle } from "react-feather";
+import ProgressiveImage from "../components/ProgressiveImage";
 
 const RecipeList: React.FC = () => {
   // const { data, error } = useGetRecipesQuery({});
@@ -85,15 +86,27 @@ const RecipeList: React.FC = () => {
           );
         },
       },
-      // {
-      //   Header: "test",
-      //   accessor: "test",
-      //   Cell: (cell: CellProps<any>) => (
-      //     <Link to={`recipe/${cell.row.original.id}`} className="link">
-      //       details
-      //     </Link>
-      //   ),
-      // },
+      {
+        Header: "meals",
+        Cell: ({ row: { original } }: CellProps<i>) => (
+          // return (original.linked_meals || []).map((m) => (
+          //   <div className="w-9/12">
+          //     {m.name}
+          //     <div className="flex flex-wrap">
+          //       {m.photos.map((photo) => (
+          //         <ProgressiveImage photo={photo} />
+          //       ))}
+          //     </div>
+          //   </div>
+          // ));
+          <div className="w-9/12 flex flex-wrap">
+            {(original.linked_photos || []).map((p) => (
+              <ProgressiveImage photo={p} />
+            ))}
+          </div>
+        ),
+        // return <Debug data={original.linked_meals} />;
+      },
     ],
     [checked, showOlder]
   );

@@ -172,6 +172,8 @@ export interface Recipe {
    * all the versions of the recipe
    */
   versions: RecipeDetail[];
+  linked_meals?: Meal[];
+  linked_photos?: Photo[];
 }
 
 /**
@@ -349,7 +351,7 @@ export interface RecipeSource {
 }
 
 /**
- * an album containing `GooglePhoto`
+ * an album containing `Photo`
  */
 export interface GooglePhotosAlbum {
   /**
@@ -371,9 +373,9 @@ export interface GooglePhotosAlbum {
 }
 
 /**
- * A google photo
+ * A photo
  */
-export interface GooglePhoto {
+export interface Photo {
   /**
    * id
    */
@@ -420,7 +422,7 @@ export interface Meal {
    * when it was taken
    */
   ate_at: string;
-  photos: GooglePhoto[];
+  photos: Photo[];
   recipes?: MealRecipe[];
 }
 
@@ -530,10 +532,10 @@ export interface PaginatedIngredients {
 }
 
 /**
- * pages of GooglePhoto
+ * pages of Photos
  */
 export interface PaginatedPhotos {
-  photos?: GooglePhoto[];
+  photos?: Photo[];
   meta?: Items;
 }
 

@@ -52,13 +52,13 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 	var cursor notionapi.Cursor
 	meals := []NotionRecipe{}
 
-	var filter *notionapi.PropertyFilter
-	if false {
-		filter = &notionapi.PropertyFilter{
-			Property:    "Tags",
-			MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
-		}
+	// var filter *notionapi.PropertyFilter
+	// if false {
+	filter := &notionapi.PropertyFilter{
+		Property:    "Tags",
+		MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
 	}
+	// }
 	for {
 		resp, err := c.client.Database.Query(ctx, c.database, &notionapi.DatabaseQueryRequest{
 			PropertyFilter: filter,
@@ -96,7 +96,6 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 
 			}
 		}
-		spew.Dump(resp.HasMore, resp.NextCursor, resp.Object)
 		cursor = resp.NextCursor
 		if !resp.HasMore {
 			return meals, nil

@@ -24,14 +24,14 @@ pub struct Meal {
     #[serde(rename = "ate_at")]
     pub ate_at: String,
     #[serde(rename = "photos")]
-    pub photos: Vec<crate::models::GooglePhoto>,
+    pub photos: Vec<crate::models::Photo>,
     #[serde(rename = "recipes", skip_serializing_if = "Option::is_none")]
     pub recipes: Option<Vec<crate::models::MealRecipe>>,
 }
 
 impl Meal {
     /// A meal, which bridges recipes to photos
-    pub fn new(id: String, name: String, ate_at: String, photos: Vec<crate::models::GooglePhoto>) -> Meal {
+    pub fn new(id: String, name: String, ate_at: String, photos: Vec<crate::models::Photo>) -> Meal {
         Meal {
             id,
             name,

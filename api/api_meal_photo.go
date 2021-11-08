@@ -10,40 +10,40 @@ import (
 	"github.com/nickysemenza/gourd/db"
 )
 
-func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) []GooglePhoto {
-	items := []GooglePhoto{}
+func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) []Photo {
+	items := []Photo{}
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
 		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
-		items = append(items, GooglePhoto{
+		items = append(items, Photo{
 			Id:       aa.BlockID,
 			Created:  aa.LastSeen,
 			BlurHash: &bh,
 			Width:    300,
 			Height:   400,
 			BaseUrl:  url,
-			Source:   GooglePhotoSourceNotion,
+			Source:   PhotoSourceNotion,
 		})
 	}
 	return items
 }
 
-func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) []GooglePhoto {
+func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) []Photo {
 	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
 
-	items := []GooglePhoto{}
+	items := []Photo{}
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
 		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
-		items = append(items, GooglePhoto{
+		items = append(items, Photo{
 			Id:       aa.PhotoID,
 			Created:  aa.Seen,
 			BlurHash: &bh,
 			Width:    300,
 			Height:   400,
 			BaseUrl:  url,
-			Source:   GooglePhotoSourceGoogle,
+			Source:   PhotoSourceGoogle,
 		})
 	}
 	return items
@@ -125,6 +125,18 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 		Meals: &items,
 	}
 	return c.JSON(http.StatusOK, resp)
+}
+
+func (a *API) getLinkedMeals(ctx context.Context, recipeID string) (items []Meal, err error) {
+	meals, err := a.DB().GetMealsWithRecipe(ctx, recipeID)
+	if err != nil {
+		return
+	}
+	items, err = a.GetMealInfo(ctx, meals)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func (a *API) GetMealById(c echo.Context, mealId string) error {

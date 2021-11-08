@@ -79,7 +79,6 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 			if err != nil {
 				return fmt.Errorf("failed to insert sections: %w", err)
 			}
-			spew.Dump(i)
 			ingredientsInsert = ingredientsInsert.Values(i.Id, i.SectionId, i.IngredientId, i.RecipeId,
 				string(amounts), i.Adjective, i.Optional, i.Original, i.SubsFor)
 		}

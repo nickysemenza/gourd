@@ -296,6 +296,34 @@ func (r Meals) MealIDs() []string {
 	return m
 }
 
+func (c *Client) GetMealsWithRecipe(ctx context.Context, recipeID string) (Meals, error) {
+	ctx, span := c.tracer.Start(ctx, "GetMealsWithRecipe")
+	defer span.End()
+	q := c.psql.Select("id", "name", "ate_at").
+		From("meals").
+		LeftJoin("meal_recipe on meals.id = meal_recipe.meal_id").
+		// LeftJoin("recipe_details on recipe_details.recipe = meal_recipe.recipe_id").
+		Where(sq.Eq{"meal_recipe.recipe_id": recipeID}).
+		OrderBy("ate_at DESC")
+	var results Meals
+	err := c.selectContext(ctx, q, &results)
+	return results, err
+}
+
+// Returns photos related to notion; google photos are tied to meals not recipes
+func (c *Client) GetPhotosWithRecipe(ctx context.Context, recipeID string) (images []Image, err error) {
+	ctx, span := c.tracer.Start(ctx, "GetPhotosWithRecipe")
+	defer span.End()
+
+	q := c.psql.Select("id", "blur_hash", "source").From("images").
+		LeftJoin("notion_image on notion_image.image = images.id").
+		LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
+		Where(sq.Eq{"notion_recipe.recipe": recipeID})
+
+	err = c.selectContext(ctx, q, &images)
+	return
+}
+
 func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
 	defer span.End()
@@ -306,7 +334,7 @@ func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
 }
 
 func (c *Client) GetMealById(ctx context.Context, id string) (*Meal, error) {
-	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	ctx, span := c.tracer.Start(ctx, "GetMealById")
 	defer span.End()
 	q := c.psql.Select("id", "name", "ate_at").From("meals")
 	var result Meal
@@ -315,7 +343,7 @@ func (c *Client) GetMealById(ctx context.Context, id string) (*Meal, error) {
 }
 
 func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, multiplier float64) error {
-	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	ctx, span := c.tracer.Start(ctx, "AddRecipeToMeal")
 	defer span.End()
 
 	c.psql.Insert("meals")
@@ -349,7 +377,7 @@ func (r MealRecipes) RecipeIDs() []string {
 }
 
 func (c *Client) GetMealRecipes(ctx context.Context, mealID ...string) (MealRecipes, error) {
-	ctx, span := c.tracer.Start(ctx, "GetAllMeals")
+	ctx, span := c.tracer.Start(ctx, "GetMealRecipes")
 	defer span.End()
 	q := c.psql.Select("*").From("meal_recipe").Where(sq.Eq{"meal_id": mealID})
 	var results MealRecipes

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Blurhash } from "react-blurhash";
-import { GooglePhoto } from "../api/openapi-hooks/api";
+import { Photo } from "../api/openapi-hooks/api";
 
-const ProgressiveImage: React.FC<{ photo: GooglePhoto; maxWidth?: number }> = ({
+const ProgressiveImage: React.FC<{ photo: Photo; maxWidth?: number }> = ({
   photo,
   maxWidth = 120,
 }) => {

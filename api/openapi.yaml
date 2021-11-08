@@ -802,6 +802,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RecipeDetail"
+        linked_meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+        linked_photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
     RecipeDetail:
       description: A revision of a recipe
       type: object
@@ -988,7 +996,7 @@ components:
           description: page number/section (if book)
           type: string
     GooglePhotosAlbum:
-      description: an album containing `GooglePhoto`
+      description: an album containing `Photo`
       type: object
       required:
         - id
@@ -1008,8 +1016,8 @@ components:
         usecase:
           description: usecase
           type: string
-    GooglePhoto:
-      description: A google photo
+    Photo:
+      description: A photo
       type: object
       required:
         - id
@@ -1066,7 +1074,7 @@ components:
         photos:
           type: array
           items:
-            $ref: "#/components/schemas/GooglePhoto"
+            $ref: "#/components/schemas/Photo"
         recipes:
           type: array
           items:
@@ -1190,12 +1198,12 @@ components:
           $ref: "#/components/schemas/Items"
     PaginatedPhotos:
       type: object
-      description: pages of GooglePhoto
+      description: pages of Photos
       properties:
         photos:
           type: array
           items:
-            $ref: "#/components/schemas/GooglePhoto"
+            $ref: "#/components/schemas/Photo"
         meta:
           $ref: "#/components/schemas/Items"
     PaginatedMeals:

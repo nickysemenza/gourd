@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * an album containing `GooglePhoto`
+ * an album containing `Photo`
  * @export
  * @interface GooglePhotosAlbum
  */

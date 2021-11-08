@@ -14,69 +14,69 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * A google photo
+ * A photo
  * @export
- * @interface GooglePhoto
+ * @interface Photo
  */
-export interface GooglePhoto {
+export interface Photo {
     /**
      * id
      * @type {string}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     id: string;
     /**
      * public image
      * @type {string}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     base_url: string;
     /**
      * blur hash
      * @type {string}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     blur_hash?: string;
     /**
      * when it was taken
      * @type {Date}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     created: Date;
     /**
      * width px
      * @type {number}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     width: number;
     /**
      * height px
      * @type {number}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
     height: number;
     /**
      * where the photo came from
      * @type {string}
-     * @memberof GooglePhoto
+     * @memberof Photo
      */
-    source: GooglePhotoSourceEnum;
+    source: PhotoSourceEnum;
 }
 
 /**
 * @export
 * @enum {string}
 */
-export enum GooglePhotoSourceEnum {
+export enum PhotoSourceEnum {
     GOOGLE = 'google',
     NOTION = 'notion'
 }
 
-export function GooglePhotoFromJSON(json: any): GooglePhoto {
-    return GooglePhotoFromJSONTyped(json, false);
+export function PhotoFromJSON(json: any): Photo {
+    return PhotoFromJSONTyped(json, false);
 }
 
-export function GooglePhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean): GooglePhoto {
+export function PhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Photo {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -92,7 +92,7 @@ export function GooglePhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function GooglePhotoToJSON(value?: GooglePhoto | null): any {
+export function PhotoToJSON(value?: Photo | null): any {
     if (value === undefined) {
         return undefined;
     }

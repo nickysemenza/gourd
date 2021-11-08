@@ -49,13 +49,6 @@ const (
 	FoodNutrientUnitUG FoodNutrientUnit = "UG"
 )
 
-// Defines values for GooglePhotoSource.
-const (
-	GooglePhotoSourceGoogle GooglePhotoSource = "google"
-
-	GooglePhotoSourceNotion GooglePhotoSource = "notion"
-)
-
 // Defines values for IngredientKind.
 const (
 	IngredientKindIngredient IngredientKind = "ingredient"
@@ -68,6 +61,13 @@ const (
 	MealRecipeUpdateActionAdd MealRecipeUpdateAction = "add"
 
 	MealRecipeUpdateActionRemove MealRecipeUpdateAction = "remove"
+)
+
+// Defines values for PhotoSource.
+const (
+	PhotoSourceGoogle PhotoSource = "google"
+
+	PhotoSourceNotion PhotoSource = "notion"
 )
 
 // Defines values for UnitConversionRequestTarget.
@@ -174,34 +174,7 @@ type FoodPortion struct {
 	PortionDescription string  `json:"portion_description"`
 }
 
-// A google photo
-type GooglePhoto struct {
-	// public image
-	BaseUrl string `json:"base_url"`
-
-	// blur hash
-	BlurHash *string `json:"blur_hash,omitempty"`
-
-	// when it was taken
-	Created time.Time `json:"created"`
-
-	// height px
-	Height int64 `json:"height"`
-
-	// id
-	Id string `json:"id"`
-
-	// where the photo came from
-	Source GooglePhotoSource `json:"source"`
-
-	// width px
-	Width int64 `json:"width"`
-}
-
-// where the photo came from
-type GooglePhotoSource string
-
-// an album containing `GooglePhoto`
+// an album containing `Photo`
 type GooglePhotosAlbum struct {
 	// id
 	Id string `json:"id"`
@@ -283,7 +256,7 @@ type Meal struct {
 
 	// public image
 	Name    string        `json:"name"`
-	Photos  []GooglePhoto `json:"photos"`
+	Photos  []Photo       `json:"photos"`
 	Recipes *[]MealRecipe `json:"recipes,omitempty"`
 }
 
@@ -345,11 +318,11 @@ type PaginatedMeals struct {
 	Meta *Items `json:"meta,omitempty"`
 }
 
-// pages of GooglePhoto
+// pages of Photos
 type PaginatedPhotos struct {
 	// A generic list (for pagination use)
-	Meta   *Items         `json:"meta,omitempty"`
-	Photos *[]GooglePhoto `json:"photos,omitempty"`
+	Meta   *Items   `json:"meta,omitempty"`
+	Photos *[]Photo `json:"photos,omitempty"`
 }
 
 // pages of Recipe
@@ -366,10 +339,39 @@ type PaginatedRecipes struct {
 	Recipes *[]Recipe `json:"recipes,omitempty"`
 }
 
+// A photo
+type Photo struct {
+	// public image
+	BaseUrl string `json:"base_url"`
+
+	// blur hash
+	BlurHash *string `json:"blur_hash,omitempty"`
+
+	// when it was taken
+	Created time.Time `json:"created"`
+
+	// height px
+	Height int64 `json:"height"`
+
+	// id
+	Id string `json:"id"`
+
+	// where the photo came from
+	Source PhotoSource `json:"source"`
+
+	// width px
+	Width int64 `json:"width"`
+}
+
+// where the photo came from
+type PhotoSource string
+
 // A recipe with subcomponents
 type Recipe struct {
 	// id
-	Id string `json:"id"`
+	Id           string   `json:"id"`
+	LinkedMeals  *[]Meal  `json:"linked_meals,omitempty"`
+	LinkedPhotos *[]Photo `json:"linked_photos,omitempty"`
 
 	// all the versions of the recipe
 	Versions []RecipeDetail `json:"versions"`

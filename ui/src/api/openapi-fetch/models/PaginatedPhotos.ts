@@ -14,28 +14,28 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    GooglePhoto,
-    GooglePhotoFromJSON,
-    GooglePhotoFromJSONTyped,
-    GooglePhotoToJSON,
     Items,
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
+    Photo,
+    PhotoFromJSON,
+    PhotoFromJSONTyped,
+    PhotoToJSON,
 } from './';
 
 /**
- * pages of GooglePhoto
+ * pages of Photos
  * @export
  * @interface PaginatedPhotos
  */
 export interface PaginatedPhotos {
     /**
      * 
-     * @type {Array<GooglePhoto>}
+     * @type {Array<Photo>}
      * @memberof PaginatedPhotos
      */
-    photos?: Array<GooglePhoto>;
+    photos?: Array<Photo>;
     /**
      * 
      * @type {Items}
@@ -54,7 +54,7 @@ export function PaginatedPhotosFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'photos': !exists(json, 'photos') ? undefined : ((json['photos'] as Array<any>).map(GooglePhotoFromJSON)),
+        'photos': !exists(json, 'photos') ? undefined : ((json['photos'] as Array<any>).map(PhotoFromJSON)),
         'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
     };
 }
@@ -68,7 +68,7 @@ export function PaginatedPhotosToJSON(value?: PaginatedPhotos | null): any {
     }
     return {
         
-        'photos': value.photos === undefined ? undefined : ((value.photos as Array<any>).map(GooglePhotoToJSON)),
+        'photos': value.photos === undefined ? undefined : ((value.photos as Array<any>).map(PhotoToJSON)),
         'meta': ItemsToJSON(value.meta),
     };
 }

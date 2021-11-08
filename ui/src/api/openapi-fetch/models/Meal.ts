@@ -14,14 +14,14 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    GooglePhoto,
-    GooglePhotoFromJSON,
-    GooglePhotoFromJSONTyped,
-    GooglePhotoToJSON,
     MealRecipe,
     MealRecipeFromJSON,
     MealRecipeFromJSONTyped,
     MealRecipeToJSON,
+    Photo,
+    PhotoFromJSON,
+    PhotoFromJSONTyped,
+    PhotoToJSON,
 } from './';
 
 /**
@@ -50,10 +50,10 @@ export interface Meal {
     ate_at: Date;
     /**
      * 
-     * @type {Array<GooglePhoto>}
+     * @type {Array<Photo>}
      * @memberof Meal
      */
-    photos: Array<GooglePhoto>;
+    photos: Array<Photo>;
     /**
      * 
      * @type {Array<MealRecipe>}
@@ -75,7 +75,7 @@ export function MealFromJSONTyped(json: any, ignoreDiscriminator: boolean): Meal
         'id': json['id'],
         'name': json['name'],
         'ate_at': (new Date(json['ate_at'])),
-        'photos': ((json['photos'] as Array<any>).map(GooglePhotoFromJSON)),
+        'photos': ((json['photos'] as Array<any>).map(PhotoFromJSON)),
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(MealRecipeFromJSON)),
     };
 }
@@ -92,7 +92,7 @@ export function MealToJSON(value?: Meal | null): any {
         'id': value.id,
         'name': value.name,
         'ate_at': (value.ate_at.toISOString()),
-        'photos': ((value.photos as Array<any>).map(GooglePhotoToJSON)),
+        'photos': ((value.photos as Array<any>).map(PhotoToJSON)),
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(MealRecipeToJSON)),
     };
 }

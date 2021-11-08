@@ -96,33 +96,9 @@ func (s *Server) Run(_ context.Context) error {
 
 	r.GET("/notion", s.APIManager.NotionTest)
 
-	// r.GET("/auth/redirect", func(c echo.Context) error {
-	// 	return c.Redirect(http.StatusTemporaryRedirect, s.APIManager.Google.GetURL())
-	// })
-	// r.GET("/auth/callback", func(c echo.Context) error {
-	// 	code := c.Request().FormValue("code")
-	// 	err := s.APIManager.Google.Finish(c.Request().Context(), code)
-	// 	if err != nil {
-	// 		return c.JSON(http.StatusInternalServerError, err.Error())
-	// 	}
-	// 	return c.JSON(http.StatusOK, "ok")
-	// })
-
-	// r.GET("/photos", func(c echo.Context) error {
-	// 	pics, err := s.APIManager.Google.GetTest(c.Request().Context())
-	// 	if err != nil {
-	// 		spew.Dump(err)
-	// 		return c.JSON(http.StatusInternalServerError, err.Error())
-	// 	}
-	// 	return c.JSON(http.StatusOK, pics)
-	// })
-
 	log.Printf("running on: %s", s.GetBaseURL())
 	return http.ListenAndServe(s.getAddress(),
 		wrapHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout")),
-		// otelhttp.NewHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout"), "server",
-		// 	otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-		// ),
 	)
 }
 func (s *Server) getAddress() string {
@@ -143,17 +119,10 @@ func wrapHandler(h http.Handler) http.Handler {
 				TraceFlags: trace.FlagsSampled,
 			})
 
-			// spew.Dump("ctx-before", r.Context())
-
 			ctx := trace.ContextWithRemoteSpanContext(r.Context(), sc2)
 			r = r.Clone(ctx)
-			// spew.Dump("extracted span", sc2)
 		}
 
-		// h2 := otelhttp.NewHandler(h, "server",
-		// 	otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
-		// 	// otelhttp.WithSpanOptions(opts...),
-		// )
 		h.ServeHTTP(w, r) // call original
 	})
 }

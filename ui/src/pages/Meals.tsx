@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { CellProps, Column } from "react-table";
 import dayjs from "dayjs";
 import Debug from "../components/Debug";
-import { GooglePhoto, useListMeals } from "../api/openapi-hooks/api";
+import { Photo, useListMeals } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
@@ -113,16 +113,8 @@ const Meals: React.FC = () => {
           // https://developers.google.com/meals/library/guides/access-media-items#image-base-urls
           return (
             <div className="flex flex-wrap">
-              {photos.map((photo: GooglePhoto) => (
+              {photos.map((photo: Photo) => (
                 <ProgressiveImage photo={photo} />
-                // <img
-                //   onLoad={(x) => {
-                //     console.log(x);
-                //   }}
-                //   key={photo.id}
-                //   src={`${photo.base_url}=w120`}
-                //   alt="todo"
-                // />
               ))}
             </div>
           );

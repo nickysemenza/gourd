@@ -16,7 +16,6 @@ src/models/food_data_type.rs
 src/models/food_nutrient.rs
 src/models/food_nutrient_unit.rs
 src/models/food_portion.rs
-src/models/google_photo.rs
 src/models/google_photos_album.rs
 src/models/ingredient.rs
 src/models/ingredient_detail.rs
@@ -36,6 +35,7 @@ src/models/paginated_meals.rs
 src/models/paginated_photos.rs
 src/models/paginated_recipe_wrappers.rs
 src/models/paginated_recipes.rs
+src/models/photo.rs
 src/models/recipe.rs
 src/models/recipe_dependency.rs
 src/models/recipe_detail.rs

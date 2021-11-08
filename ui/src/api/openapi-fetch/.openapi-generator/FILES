@@ -20,7 +20,6 @@ models/FoodDataType.ts
 models/FoodNutrient.ts
 models/FoodNutrientUnit.ts
 models/FoodPortion.ts
-models/GooglePhoto.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
@@ -40,6 +39,7 @@ models/PaginatedMeals.ts
 models/PaginatedPhotos.ts
 models/PaginatedRecipeWrappers.ts
 models/PaginatedRecipes.ts
+models/Photo.ts
 models/Recipe.ts
 models/RecipeDependency.ts
 models/RecipeDetail.ts

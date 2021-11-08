@@ -364,8 +364,32 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	}
 	byId := details.ByRecipeId()
 	items := []Recipe{}
+
 	for _, r := range recipeIDs {
-		items = append(items, Recipe{Id: r, Versions: a.transformRecipes(ctx, byId[r], true)})
+		meals, err := a.getLinkedMeals(ctx, r)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
+		photosDB, err := a.DB().GetPhotosWithRecipe(ctx, r)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
+		photos := []Photo{}
+		for _, p := range photosDB {
+			url := a.ImageStore.GetImageURL(ctx, p.ID)
+			photos = append(photos, Photo{
+				Id:      p.ID,
+				Source:  PhotoSource(p.Source),
+				BaseUrl: url,
+			})
+		}
+
+		items = append(items, Recipe{
+			Id:           r,
+			LinkedMeals:  &meals,
+			LinkedPhotos: &photos,
+			Versions:     a.transformRecipes(ctx, byId[r], true),
+		})
 	}
 
 	listMeta.setTotalCount(count)

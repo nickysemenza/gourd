@@ -20,6 +20,10 @@ pub struct Recipe {
     /// all the versions of the recipe
     #[serde(rename = "versions")]
     pub versions: Vec<crate::models::RecipeDetail>,
+    #[serde(rename = "linked_meals", skip_serializing_if = "Option::is_none")]
+    pub linked_meals: Option<Vec<crate::models::Meal>>,
+    #[serde(rename = "linked_photos", skip_serializing_if = "Option::is_none")]
+    pub linked_photos: Option<Vec<crate::models::Photo>>,
 }
 
 impl Recipe {
@@ -28,6 +32,8 @@ impl Recipe {
         Recipe {
             id,
             versions,
+            linked_meals: None,
+            linked_photos: None,
         }
     }
 }
