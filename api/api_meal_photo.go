@@ -63,6 +63,9 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 }
 
 func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
+	ctx, span := a.tracer.Start(ctx, "GetMealInfo")
+	defer span.End()
+
 	items := []Meal{}
 	mealIds := meals.MealIDs()
 	mealRecipes, err := a.DB().GetMealRecipes(ctx, mealIds...)
@@ -128,6 +131,9 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 }
 
 func (a *API) getLinkedMeals(ctx context.Context, recipeID string) (items []Meal, err error) {
+	ctx, span := a.tracer.Start(ctx, "getLinkedMeals")
+	defer span.End()
+
 	meals, err := a.DB().GetMealsWithRecipe(ctx, recipeID)
 	if err != nil {
 		return

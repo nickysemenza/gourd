@@ -11,27 +11,29 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (m *API) DB() *db.Client {
-	return m.db
+func (a *API) DB() *db.Client {
+	return a.db
 }
 
-func (m *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, rawUser map[string]interface{}, err error) {
-	err = m.Google.Finish(ctx, code)
+func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, rawUser map[string]interface{}, err error) {
+	err = a.Google.Finish(ctx, code)
 	if err != nil {
 		return
 	}
-	user, err := m.Google.GetUserInfo(ctx)
+	user, err := a.Google.GetUserInfo(ctx)
 	if err != nil {
 		return
 	}
 	rawUser = map[string]interface{}{"raw": user}
 
-	jwt, err = m.Auth.GetJWT(user)
+	jwt, err = a.Auth.GetJWT(user)
 	return
 }
 
-func (m *API) SyncNotionToMeals(ctx context.Context) error {
-	nRecipes, err := m.Notion.Dump(ctx)
+func (a *API) syncRecipeFromNotion(ctx context.Context) error {
+	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
+	defer span.End()
+	nRecipes, err := a.Notion.Dump(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,13 +45,13 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 
 		output := RecipeDetailInput{}
 		if nRecipe.Raw != "" {
-			err = m.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
+			err = a.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
 			if err != nil {
 				return fmt.Errorf("failed to decode recipe: %w", err)
 			}
 			// output.Sources = &[]api.RecipeSource{{Title: }}
 		} else if nRecipe.SourceURL != "" {
-			r, err := m.FetchAndTransform(ctx, nRecipe.SourceURL, m.IngredientIdByName)
+			r, err := a.FetchAndTransform(ctx, nRecipe.SourceURL, a.IngredientIdByName)
 			if err != nil {
 				return err
 			}
@@ -57,7 +59,7 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 		}
 		output.Name = nRecipe.Title
 
-		r, err := m.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
+		r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
 		if err != nil {
 			return err
 		}
@@ -73,7 +75,7 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 				return err
 			}
 			id := common.ID("notion_image")
-			err = m.ImageStore.SaveImage(ctx, id, image)
+			err = a.ImageStore.SaveImage(ctx, id, image)
 			if err != nil {
 				return err
 			}
@@ -92,16 +94,39 @@ func (m *API) SyncNotionToMeals(ctx context.Context) error {
 		}
 	}
 
-	err = m.db.SaveImage(ctx, img)
+	err = a.db.SaveImage(ctx, img)
 	if err != nil {
 		return err
 	}
 
-	err = m.db.SaveNotionRecipes(ctx, foo)
+	err = a.db.SaveNotionRecipes(ctx, foo)
 	if err != nil {
 		return err
 	}
-	err = m.db.UpsertNotionImages(ctx, bar)
+	err = a.db.UpsertNotionImages(ctx, bar)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *API) DoSync(ctx context.Context) error {
+	ctx, span := a.tracer.Start(ctx, "DoSync")
+	defer span.End()
+
+	err := a.syncRecipeFromNotion(ctx)
+	if err != nil {
+		return err
+	}
+	err = a.DB().SyncNotionMealFromNotionRecipe(ctx)
+	if err != nil {
+		return err
+	}
+	err = a.GPhotos.SyncAlbums(ctx)
+	if err != nil {
+		return err
+	}
+	err = a.DB().SyncMealsFromPhotos(ctx)
 	if err != nil {
 		return err
 	}

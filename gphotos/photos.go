@@ -1,4 +1,4 @@
-package photos
+package gphotos
 
 import (
 	"context"
@@ -143,10 +143,6 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		return fmt.Errorf("bad client: %w", err)
 	}
 
-	// dbPhotos, err := p.db.GetAllPhotos(ctx)
-	// if err != nil {
-	// 	return err
-	// }
 	albums, err := p.db.GetAlbums(ctx)
 	if err != nil {
 		return err
@@ -165,10 +161,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 				if err != nil {
 					return err
 				}
-				// var bh string
-				// if dbPhoto, ok := dbPhotos[m.Id]; ok && dbPhoto.BlurHash.Valid && dbPhoto.BlurHash.String != "" {
-				// 	bh = dbPhoto.BlurHash.String
-				// } else {
+
 				bh, rimage, err := image.GetBlurHash(ctx, m.BaseUrl)
 				if err != nil {
 					return err

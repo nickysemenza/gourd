@@ -75,6 +75,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   const { sections } = recipe.detail;
   const flourMass = totalFlourMass(sections || []);
   const showBP = flourMass > 0;
+  const showOriginalLine = false;
 
   const w = useContext(WasmContext);
 
@@ -314,7 +315,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
         </div>
-        {!!ingredient.original && (
+        {showOriginalLine && !!ingredient.original && (
           <div className="italic text-xs pb-2">
             original: {ingredient.original} ({w && w.parse(ingredient.original)}
             )

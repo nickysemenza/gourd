@@ -67,19 +67,7 @@ func init() {
 				}
 				ctx := context.Background()
 
-				err = s.APIManager.SyncNotionToMeals(ctx)
-				if err != nil {
-					return err
-				}
-				err = s.DB.SyncNotionMealFromNotionRecipe(ctx)
-				if err != nil {
-					return err
-				}
-				err = s.APIManager.Photos.SyncAlbums(ctx)
-				if err != nil {
-					return err
-				}
-				err = s.DB.SyncMealsFromPhotos(ctx)
+				err = s.APIManager.DoSync(ctx)
 				if err != nil {
 					return err
 				}

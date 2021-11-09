@@ -18,9 +18,9 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/google"
+	"github.com/nickysemenza/gourd/gphotos"
 	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/notion"
-	"github.com/nickysemenza/gourd/photos"
 	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -31,7 +31,7 @@ import (
 type API struct {
 	db         *db.Client
 	Google     *google.Client
-	Photos     *photos.Photos
+	GPhotos    *gphotos.Photos
 	Auth       *auth.Auth
 	R          *rs_client.Client
 	Notion     *notion.Client
@@ -44,7 +44,7 @@ func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, 
 		db:         db,
 		Google:     g,
 		Auth:       auth,
-		Photos:     photos.New(db, g, imageStore),
+		GPhotos:    gphotos.New(db, g, imageStore),
 		R:          r,
 		Notion:     notion,
 		ImageStore: imageStore,
@@ -53,6 +53,8 @@ func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, 
 }
 
 func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) RecipeDetail {
+	ctx, span := a.tracer.Start(ctx, "transformRecipe")
+	defer span.End()
 	sections, err := a.transformRecipeSections(ctx, dbr.Sections)
 	if err != nil {
 		panic(err)
@@ -512,7 +514,7 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
 
-	albums, err := a.Photos.GetAvailableAlbums(ctx)
+	albums, err := a.GPhotos.GetAvailableAlbums(ctx)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
