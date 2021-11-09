@@ -17,7 +17,7 @@
     "@sentry/tracing": "6.14.1",
     "@types/jest": "27.0.2",
     "@types/jwt-decode": "3.1.0",
-    "@types/node": "16.11.6",
+    "@types/node": "16.11.7",
     "@types/pluralize": "0.0.29",
     "@types/query-string": "6.3.0",
     "@types/react": "17.0.34",
