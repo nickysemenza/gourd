@@ -83,9 +83,25 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		details := a.transformRecipes(ctx, recipes, false)
 		rd.OtherVersions = &details
 	}
+	photosDB, err := a.DB().GetPhotosWithRecipe(ctx, dbr.RecipeId)
+	if err != nil {
+		panic(err)
+	}
+	photos := []Photo{}
+	for _, p := range photosDB[dbr.RecipeId] {
+		photos = append(photos, Photo{
+			Id:      p.ID,
+			Source:  PhotoSource(p.Source),
+			BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
+		})
+	}
+	spew.Dump(photos)
+
 	return rd
 }
 func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) []RecipeDetail {
+	ctx, span := a.tracer.Start(ctx, "transformRecipes")
+	defer span.End()
 	r := make([]RecipeDetail, len(dbr))
 	for x, d := range dbr {
 		r[x] = a.transformRecipe(ctx, d, includeOtherVersions)
@@ -367,28 +383,30 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	byId := details.ByRecipeId()
 	items := []Recipe{}
 
+	ctx, span2 := a.tracer.Start(ctx, "ListRecipes2")
+	defer span2.End()
+	photosDB, err := a.DB().GetPhotosWithRecipe(ctx, recipeIDs...)
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
 	for _, r := range recipeIDs {
-		meals, err := a.getLinkedMeals(ctx, r)
-		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
-		}
-		photosDB, err := a.DB().GetPhotosWithRecipe(ctx, r)
-		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
-		}
+		// meals, err := a.getLinkedMeals(ctx, r)
+		// if err != nil {
+		// 	return sendErr(c, http.StatusBadRequest, err)
+		// }
+
 		photos := []Photo{}
-		for _, p := range photosDB {
-			url := a.ImageStore.GetImageURL(ctx, p.ID)
+		for _, p := range photosDB[r] {
 			photos = append(photos, Photo{
 				Id:      p.ID,
 				Source:  PhotoSource(p.Source),
-				BaseUrl: url,
+				BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
 			})
 		}
 
 		items = append(items, Recipe{
-			Id:           r,
-			LinkedMeals:  &meals,
+			Id: r,
+			// LinkedMeals:  &meals,
 			LinkedPhotos: &photos,
 			Versions:     a.transformRecipes(ctx, byId[r], true),
 		})

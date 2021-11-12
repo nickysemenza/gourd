@@ -52,13 +52,10 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 	var cursor notionapi.Cursor
 	meals := []NotionRecipe{}
 
-	// var filter *notionapi.PropertyFilter
-	// if false {
 	filter := &notionapi.PropertyFilter{
 		Property:    "Tags",
 		MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
 	}
-	// }
 	for {
 		resp, err := c.client.Database.Query(ctx, c.database, &notionapi.DatabaseQueryRequest{
 			PropertyFilter: filter,
@@ -78,9 +75,11 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 					PageID:    page.ID.String(),
 					NotionURL: page.URL,
 				}
+				log.WithField("page_id", meal.PageID).Info(meal.Title)
 				date := page.Properties["Date"].(*notionapi.DateProperty).Date.Start
 				if date != nil {
-					meal.Time = zero.TimeFrom(time.Time(*date).Add(time.Hour * 9)).Ptr()
+					utcTime := time.Time(*date) //todo: this is slightly wrong
+					meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 9)).Ptr()
 				}
 				for _, ms := range page.Properties["Tags"].(*notionapi.MultiSelectProperty).MultiSelect {
 					meal.Tags = append(meal.Tags, ms.Name)
@@ -136,7 +135,7 @@ func (c *Client) ImagesFromPage(ctx context.Context, pageID notionapi.ObjectID) 
 
 		for _, block := range children.Results {
 			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
-			log.Info(block.GetType())
+			log.WithField("page_id", pageID).Infof("found notion %s", block.GetType())
 			switch block.GetType() {
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)

@@ -1,7 +1,7 @@
 ---
 - name: vegetable oil
-  aliases: ["neutral oil", "oil"]
-  fdc_id: 454974
+  aliases: ["neutral oil", "oil", "canola oil"]
+  fdc_id: 748278
   unit_mappings:
     - a:
         unit: oz

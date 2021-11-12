@@ -38,7 +38,10 @@ context("Basic Create, List, Edit test", () => {
     cy.contains("add section").click();
     cy.contains("add ingredient").click();
     cy.get("input[data-cy=grams-input]").first().type("{selectall}4");
-    cy.get("div[data-cy=name-input]").find("input").type(`${newIngredient}`);
+    cy.get("div[data-cy=name-input]")
+      .find("input")
+      .first()
+      .type(`${newIngredient}`);
     cy.wait(500);
     cy.contains(`create ingredient: ${newIngredient}`);
 

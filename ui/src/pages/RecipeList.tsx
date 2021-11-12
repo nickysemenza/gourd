@@ -16,11 +16,7 @@ import { PlusCircle } from "react-feather";
 import ProgressiveImage from "../components/ProgressiveImage";
 
 const RecipeList: React.FC = () => {
-  // const { data, error } = useGetRecipesQuery({});
-  // const queryParams = React.useMemo(
-  //   () => queryString.stringify(params as any),
-  //   [params]
-  // );
+  const showIds = false;
   const [checked, setChecked] = useState(new Set<string>());
   let initialParams: PaginationParameters = {
     offset: 0,
@@ -43,12 +39,6 @@ const RecipeList: React.FC = () => {
 
   const columns: Array<Column<i>> = React.useMemo(
     () => [
-      {
-        Header: "id",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          return <Code>{original.id} </Code>;
-        },
-      },
       {
         Header: "Name",
         // accessor: "name",
@@ -107,14 +97,18 @@ const RecipeList: React.FC = () => {
         ),
         // return <Debug data={original.linked_meals} />;
       },
-      {
-        Header: "edit",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          return <Code>{original.id} </Code>;
-        },
-      },
+      ...(showIds
+        ? [
+            {
+              Header: "edit",
+              Cell: ({ row: { original } }: CellProps<i>) => {
+                return <Code>{original.id} </Code>;
+              },
+            },
+          ]
+        : []),
     ],
-    [checked, showOlder]
+    [checked, showOlder, showIds]
   );
 
   return (

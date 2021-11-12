@@ -311,16 +311,25 @@ func (c *Client) GetMealsWithRecipe(ctx context.Context, recipeID string) (Meals
 }
 
 // Returns photos related to notion; google photos are tied to meals not recipes
-func (c *Client) GetPhotosWithRecipe(ctx context.Context, recipeID string) (images []Image, err error) {
+func (c *Client) GetPhotosWithRecipe(ctx context.Context, recipeID ...string) (images map[string][]Image, err error) {
 	ctx, span := c.tracer.Start(ctx, "GetPhotosWithRecipe")
 	defer span.End()
 
-	q := c.psql.Select("id", "blur_hash", "source").From("images").
+	type res struct {
+		Recipe string `db:"recipe"`
+		Image
+	}
+	res2 := []res{}
+	q := c.psql.Select("notion_recipe.recipe as recipe", "id", "blur_hash", "source").From("images").
 		LeftJoin("notion_image on notion_image.image = images.id").
 		LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
 		Where(sq.Eq{"notion_recipe.recipe": recipeID})
 
-	err = c.selectContext(ctx, q, &images)
+	err = c.selectContext(ctx, q, &res2)
+	images = make(map[string][]Image)
+	for _, rec := range res2 {
+		images[rec.Recipe] = append(images[rec.Recipe], rec.Image)
+	}
 	return
 }
 

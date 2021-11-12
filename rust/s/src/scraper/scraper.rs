@@ -9,6 +9,7 @@ pub struct ScrapeResult {
     pub url: String,
 }
 
+#[tracing::instrument(name = "route::scrape_recipe")]
 pub fn scrape_recipe(url: &str) -> ScrapeResult {
     let mut sc_result: (Vec<String>, String, String) = (vec![], "".to_string(), "".to_string());
     Python::with_gil(|py| {

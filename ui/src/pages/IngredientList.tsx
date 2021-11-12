@@ -61,7 +61,7 @@ const IngredientList: React.FC = () => {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { ingredient, children, food, unit_mappings } = original;
+          const { ingredient, children } = original;
           return (
             <div className="flex flex-col w-4">
               {showIDs && <Code>{original.ingredient.id}</Code>}
@@ -118,7 +118,7 @@ const IngredientList: React.FC = () => {
         Header: "Units",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { ingredient, children, food, unit_mappings } = original;
+          const { unit_mappings } = original;
           return (
             <div className="flex flex-col w-8">
               <UnitMappingList unit_mappings={unit_mappings} includeDot />
@@ -130,7 +130,7 @@ const IngredientList: React.FC = () => {
         Header: "Actions",
         id: "actions",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { ingredient, children, food, unit_mappings } = original;
+          const { ingredient } = original;
           return (
             <div className="flex flex-col w-8">
               <ButtonGroup
@@ -174,7 +174,7 @@ const IngredientList: React.FC = () => {
         },
       },
     ];
-  }, [onlyMissingFDC]);
+  }, [onlyMissingFDC, showIDs]);
 
   return (
     <>
