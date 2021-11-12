@@ -1,4 +1,15 @@
 ---
+- name: vegetable oil
+  aliases: ["neutral oil", "oil"]
+  fdc_id: 454974
+  unit_mappings:
+    - a:
+        unit: oz
+        value: 48
+      b:
+        unit: dollars
+        value: 3
+      source: wf
 - name: buttermilk
   fdc_id: 454974
   unit_mappings:
@@ -358,6 +369,23 @@
         value: 15
       b:
         unit: whole
+        value: 1
+- name: chicken thighs
+  aliases: ["boneless skinless chicken thighs", "chicken thigh"]
+  fdc_id: 1688557
+  unit_mappings:
+    - a:
+        unit: pound
+        value: 0.375
+      b:
+        unit: whole
+        value: 1
+      source: wf brand
+    - a:
+        unit: dollar
+        value: 5.99
+      b:
+        unit: pound
         value: 1
 - name: carrot
   fdc_id: 170393

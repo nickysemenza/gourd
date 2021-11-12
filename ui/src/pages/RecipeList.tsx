@@ -107,6 +107,12 @@ const RecipeList: React.FC = () => {
         ),
         // return <Debug data={original.linked_meals} />;
       },
+      {
+        Header: "edit",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          return <Code>{original.id} </Code>;
+        },
+      },
     ],
     [checked, showOlder]
   );

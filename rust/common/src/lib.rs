@@ -71,7 +71,13 @@ fn section_ingredient_from_parsed(
     };
 }
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
-    let i = dbg!(ingredient::from_str(s, true))?;
+    let mut s2 = s.to_string();
+    if s2.contains("((") {
+        // for woksoflife.com
+        s2 = s2.replace("((", "(");
+        s2 = s2.replace("))", ")");
+    }
+    let i = dbg!(ingredient::from_str(s2.as_str(), true))?;
     Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {

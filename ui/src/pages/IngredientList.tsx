@@ -16,6 +16,8 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 
 const IngredientList: React.FC = () => {
+  const showIDs = false;
+
   let initialParams: PaginationParameters = {
     offset: 0,
     limit: 2,
@@ -61,39 +63,24 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { ingredient, children, food, unit_mappings } = original;
           return (
-            <div className="flex flex-col w-64">
-              {ingredient.name}
-              <Code>{original.ingredient.id}</Code>
-              <ButtonGroup
-                compact
-                buttons={[
-                  {
-                    disabled: ingredient.fdc_id != null,
-                    onClick: () => {
-                      convertToRecipe(ingredient.id);
-                    },
-                    text: "convert to recipe",
-                    IconLeft: PlusCircle,
-                  },
-                ]}
-              />
-              <ul>
-                {(children || []).map((i) => (
-                  <li className="pl-6 flex" key={i.ingredient.id}>
-                    aka. <div className="italic pl-1">{i.ingredient.name}</div>
-                  </li>
-                ))}
-              </ul>
-              <div>fdc: {!!food ? food.description : "n/a"}</div>
-              <Link to={`/ingredients/${ingredient.id}`} className="link">
-                <div className="text-blue-800">view</div>
-              </Link>
-              <UnitMappingList unit_mappings={unit_mappings} includeDot />
+            <div className="flex flex-col w-4">
+              {showIDs && <Code>{original.ingredient.id}</Code>}
+
+              <div className="text-md font-medium text-gray-900">
+                {ingredient.name}
+              </div>
+
+              {(children || []).map((i) => (
+                <React.Fragment key={i.ingredient.id}>
+                  <div className="text-sm text-gray-500 pl-1">
+                    {i.ingredient.name}
+                  </div>
+                </React.Fragment>
+              ))}
             </div>
           );
         },
       },
-
       {
         Header: "Recipes",
         id: "recipes",
@@ -101,7 +88,7 @@ const IngredientList: React.FC = () => {
           const recipes = original.recipes || [];
           const children = original.children || [];
           return (
-            <div className="w-64">
+            <div className="w-16">
               <ul className="list-disc list-outside pl-4">
                 {recipes.map((r) => (
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
@@ -128,19 +115,61 @@ const IngredientList: React.FC = () => {
         },
       },
       {
+        Header: "Units",
+        // accessor: "name",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const { ingredient, children, food, unit_mappings } = original;
+          return (
+            <div className="flex flex-col w-8">
+              <UnitMappingList unit_mappings={unit_mappings} includeDot />
+            </div>
+          );
+        },
+      },
+      {
+        Header: "Actions",
+        id: "actions",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          const { ingredient, children, food, unit_mappings } = original;
+          return (
+            <div className="flex flex-col w-8">
+              <ButtonGroup
+                compact
+                buttons={[
+                  {
+                    disabled: ingredient.fdc_id != null,
+                    onClick: () => {
+                      convertToRecipe(ingredient.id);
+                    },
+                    text: "convert to recipe",
+                    IconLeft: PlusCircle,
+                  },
+                ]}
+              />
+              <Link to={`/ingredients/${ingredient.id}`} className="link">
+                <div className="text-blue-800">view detail</div>
+              </Link>
+            </div>
+          );
+        },
+      },
+
+      {
         Header: "USDA Food",
         id: "food",
         Cell: ({ row: { original } }: CellProps<i>) => {
           return (
-            <FoodSearch
-              enableSearch={onlyMissingFDC}
-              name={original.ingredient.name}
-              highlightId={original.food?.fdc_id}
-              onLink={(fdcId: number) => {
-                linkFoodToIngredient(original.ingredient.id, fdcId);
-              }}
-              addon={original.food}
-            />
+            <div className="flex flex-col w-32">
+              <FoodSearch
+                enableSearch={onlyMissingFDC}
+                name={original.ingredient.name}
+                highlightId={original.food?.fdc_id}
+                onLink={(fdcId: number) => {
+                  linkFoodToIngredient(original.ingredient.id, fdcId);
+                }}
+                addon={original.food}
+              />
+            </div>
           );
         },
       },
