@@ -4,10 +4,11 @@ use openapi::models::{
     Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
     SectionIngredient, SectionIngredientInput, SectionInstructionInput,
 };
-use pyo3::{types::PyModule, PyAny, Python};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use tracing::{debug, error, span};
+
+use crate::scraper;
 
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
@@ -27,6 +28,7 @@ fn si_to_api(r: SI) -> SectionIngredient {
             .map(|a| Amount {
                 unit: a.unit.clone(),
                 value: a.value,
+                upper_value: None,
                 source: Some("todo".to_string()),
             })
             .collect(),
@@ -49,6 +51,11 @@ pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
 #[derive(Deserialize, Debug)]
 pub struct Info {
     text: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct URLInput {
+    url: String,
 }
 
 pub async fn parser(info: web::Query<Info>) -> HttpResponse {
@@ -140,43 +147,24 @@ pub async fn pans() -> HttpResponse {
 
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
-#[tracing::instrument(name = "route::scrape")]
-pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
-    let mut sc_result: (Vec<String>, String, String) = (vec![], "".to_string(), "".to_string());
-    Python::with_gil(|py| {
-        let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
 
-        dbg!(syspath);
-        let activators = PyModule::from_code(
-            py,
-            r#"
-from recipe_scrapers import scrape_me            
-def sc(x,y):
-    res = scrape_me(x,wild_mode=y)
-    return res.ingredients(), res.instructions(), res.title()
-            "#,
-            "recipe_scrape.py",
-            "recipe_scrape",
-        )
-        .unwrap();
+#[tracing::instrument(name = "route::debug_scrape")]
+pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
+    let url = info.url.as_str();
 
-        dbg!(activators);
-        sc_result = activators
-            .getattr("sc")
-            .unwrap()
-            .call((info.text.clone(), true), None)
-            .unwrap()
-            .extract()
-            .unwrap();
-    });
+    let sc_result = scraper::scrape_recipe(url);
+    let res = scrape_result_to_recipe(sc_result.clone());
+    HttpResponse::Ok().json((sc_result, res))
+}
+pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
     let sections = vec![RecipeSectionInput::new(
         sc_result
-            .1
+            .instructions
             .split('\n')
             .map(|x| SectionInstructionInput::new(x.to_string()))
             .collect(),
         sc_result
-            .0
+            .ingredients
             .iter()
             .map(|x| {
                 let _x = 1;
@@ -187,10 +175,17 @@ def sc(x,y):
             })
             .collect(),
     )];
-    let detail = RecipeDetailInput::new(sections, sc_result.2, 0, "".to_string());
-    let res = RecipeWrapperInput::new(detail);
 
-    debug!("scraped {}", info.text.clone());
+    let detail = RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string());
+    return RecipeWrapperInput::new(detail);
+}
+#[tracing::instrument(name = "route::scrape")]
+pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
+    let url = info.text.as_str();
+    let sc_result = scraper::scrape_recipe(url);
+    let res = scrape_result_to_recipe(sc_result);
+
+    debug!("scraped {}", url.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
 }
 

@@ -32,6 +32,12 @@ export interface Amount {
      */
     value: number;
     /**
+     * value
+     * @type {number}
+     * @memberof Amount
+     */
+    upper_value?: number;
+    /**
      * if it was explicit, inferred, etc
      * @type {string}
      * @memberof Amount
@@ -51,6 +57,7 @@ export function AmountFromJSONTyped(json: any, ignoreDiscriminator: boolean): Am
         
         'unit': json['unit'],
         'value': json['value'],
+        'upper_value': !exists(json, 'upper_value') ? undefined : json['upper_value'],
         'source': !exists(json, 'source') ? undefined : json['source'],
     };
 }
@@ -66,6 +73,7 @@ export function AmountToJSON(value?: Amount | null): any {
         
         'unit': value.unit,
         'value': value.value,
+        'upper_value': value.upper_value,
         'source': value.source,
     };
 }

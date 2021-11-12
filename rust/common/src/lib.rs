@@ -45,7 +45,11 @@ fn section_ingredient_from_parsed(
                 // if the ingredient amount has a unit of "recipe", then it's likely a recipe
                 kind = IngredientKind::Recipe;
             }
-            amounts.push(Amount::new(unitstr, amount.unwrap_or(0.0)));
+            let mut a = Amount::new(unitstr, amount.unwrap_or(0.0));
+            if x.upper_value.is_some() {
+                a.upper_value = Some(x.upper_value.unwrap().into());
+            }
+            amounts.push(a);
         }
     }
     if grams == 0.0 {

@@ -92,6 +92,9 @@ type Amount struct {
 	Unit string `json:"unit"`
 
 	// value
+	UpperValue *float64 `json:"upper_value,omitempty"`
+
+	// value
 	Value float64 `json:"value"`
 }
 

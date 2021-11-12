@@ -979,6 +979,10 @@ components:
           description: value
           type: number
           format: double # float64
+        upper_value:
+          description: value
+          type: number
+          format: double # float64
         source:
           description: if it was explicit, inferred, etc
           type: string

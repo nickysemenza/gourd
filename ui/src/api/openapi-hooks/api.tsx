@@ -327,6 +327,10 @@ export interface Amount {
    */
   value: number;
   /**
+   * value
+   */
+  upper_value?: number;
+  /**
    * if it was explicit, inferred, etc
    */
   source?: string;
