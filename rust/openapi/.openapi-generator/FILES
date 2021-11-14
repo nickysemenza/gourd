@@ -34,9 +34,7 @@ src/models/paginated_ingredients.rs
 src/models/paginated_meals.rs
 src/models/paginated_photos.rs
 src/models/paginated_recipe_wrappers.rs
-src/models/paginated_recipes.rs
 src/models/photo.rs
-src/models/recipe.rs
 src/models/recipe_dependency.rs
 src/models/recipe_detail.rs
 src/models/recipe_detail_input.rs

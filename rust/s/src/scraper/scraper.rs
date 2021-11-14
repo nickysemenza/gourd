@@ -1,5 +1,5 @@
 use pyo3::{types::PyModule, PyAny, Python};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ScrapeResult {

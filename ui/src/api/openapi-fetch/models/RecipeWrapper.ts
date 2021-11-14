@@ -14,6 +14,14 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    Meal,
+    MealFromJSON,
+    MealFromJSONTyped,
+    MealToJSON,
+    Photo,
+    PhotoFromJSON,
+    PhotoFromJSONTyped,
+    PhotoToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
@@ -38,6 +46,18 @@ export interface RecipeWrapper {
      * @memberof RecipeWrapper
      */
     detail: RecipeDetail;
+    /**
+     * 
+     * @type {Array<Meal>}
+     * @memberof RecipeWrapper
+     */
+    linked_meals?: Array<Meal>;
+    /**
+     * 
+     * @type {Array<Photo>}
+     * @memberof RecipeWrapper
+     */
+    linked_photos?: Array<Photo>;
 }
 
 export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
@@ -52,6 +72,8 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'id': json['id'],
         'detail': RecipeDetailFromJSON(json['detail']),
+        'linked_meals': !exists(json, 'linked_meals') ? undefined : ((json['linked_meals'] as Array<any>).map(MealFromJSON)),
+        'linked_photos': !exists(json, 'linked_photos') ? undefined : ((json['linked_photos'] as Array<any>).map(PhotoFromJSON)),
     };
 }
 
@@ -66,6 +88,8 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         
         'id': value.id,
         'detail': RecipeDetailToJSON(value.detail),
+        'linked_meals': value.linked_meals === undefined ? undefined : ((value.linked_meals as Array<any>).map(MealToJSON)),
+        'linked_photos': value.linked_photos === undefined ? undefined : ((value.linked_photos as Array<any>).map(PhotoToJSON)),
     };
 }
 

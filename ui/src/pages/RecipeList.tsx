@@ -43,34 +43,36 @@ const RecipeList: React.FC = () => {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const { versions } = original;
+          const olderVersions = original.detail.other_versions || [];
+          const versions = [
+            original.detail,
+            ...(showOlder ? olderVersions : []),
+          ];
           return (
             <div>
               <ul>
-                {(versions || [])
-                  .filter((v) => showOlder || v.is_latest_version !== showOlder)
-                  .map((i) => (
-                    <li>
-                      <div className="flex">
-                        <RecipeLink recipe={i} />
-                        <input
-                          type="checkbox"
-                          className="form-checkbox"
-                          checked={checked.has(i.id)}
-                          onClick={() =>
-                            setChecked(
-                              update(
-                                checked,
-                                checked.has(i.id)
-                                  ? { $remove: [i.id] }
-                                  : { $add: [i.id] }
-                              )
+                {versions.map((i) => (
+                  <li>
+                    <div className="flex">
+                      <RecipeLink recipe={i} />
+                      <input
+                        type="checkbox"
+                        className="form-checkbox"
+                        checked={checked.has(i.id)}
+                        onClick={() =>
+                          setChecked(
+                            update(
+                              checked,
+                              checked.has(i.id)
+                                ? { $remove: [i.id] }
+                                : { $add: [i.id] }
                             )
-                          }
-                        />
-                      </div>
-                    </li>
-                  ))}
+                          )
+                        }
+                      />
+                    </div>
+                  </li>
+                ))}
               </ul>
             </div>
           );

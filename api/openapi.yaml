@@ -299,7 +299,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedRecipes"
+                $ref: "#/components/schemas/PaginatedRecipeWrappers"
         default:
           description: unexpected error
           content:
@@ -776,6 +776,14 @@ components:
           type: string
         detail:
           $ref: "#/components/schemas/RecipeDetail"
+        linked_meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+        linked_photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
     RecipeWrapperInput:
       description: A recipe with subcomponents
       type: object
@@ -787,29 +795,6 @@ components:
           type: string
         detail:
           $ref: "#/components/schemas/RecipeDetailInput"
-    Recipe:
-      description: A recipe with subcomponents
-      type: object
-      required:
-        - versions
-        - id
-      properties:
-        id:
-          description: id
-          type: string
-        versions:
-          description: all the versions of the recipe
-          type: array
-          items:
-            $ref: "#/components/schemas/RecipeDetail"
-        linked_meals:
-          type: array
-          items:
-            $ref: "#/components/schemas/Meal"
-        linked_photos:
-          type: array
-          items:
-            $ref: "#/components/schemas/Photo"
     RecipeDetail:
       description: A revision of a recipe
       type: object
@@ -1170,16 +1155,6 @@ components:
         max:
           description: The maximum amount of seconds (if a range)
           type: integer
-    PaginatedRecipes:
-      type: object
-      description: pages of Recipe
-      properties:
-        recipes:
-          type: array
-          items:
-            $ref: "#/components/schemas/Recipe"
-        meta:
-          $ref: "#/components/schemas/Items"
     PaginatedRecipeWrappers:
       type: object
       description: pages of Recipe

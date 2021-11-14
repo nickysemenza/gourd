@@ -335,13 +335,6 @@ type PaginatedRecipeWrappers struct {
 	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
 }
 
-// pages of Recipe
-type PaginatedRecipes struct {
-	// A generic list (for pagination use)
-	Meta    *Items    `json:"meta,omitempty"`
-	Recipes *[]Recipe `json:"recipes,omitempty"`
-}
-
 // A photo
 type Photo struct {
 	// public image
@@ -368,17 +361,6 @@ type Photo struct {
 
 // where the photo came from
 type PhotoSource string
-
-// A recipe with subcomponents
-type Recipe struct {
-	// id
-	Id           string   `json:"id"`
-	LinkedMeals  *[]Meal  `json:"linked_meals,omitempty"`
-	LinkedPhotos *[]Photo `json:"linked_photos,omitempty"`
-
-	// all the versions of the recipe
-	Versions []RecipeDetail `json:"versions"`
-}
 
 // node?
 type RecipeDependency struct {
@@ -498,7 +480,9 @@ type RecipeWrapper struct {
 	Detail RecipeDetail `json:"detail"`
 
 	// id
-	Id string `json:"id"`
+	Id           string   `json:"id"`
+	LinkedMeals  *[]Meal  `json:"linked_meals,omitempty"`
+	LinkedPhotos *[]Photo `json:"linked_photos,omitempty"`
 }
 
 // A recipe with subcomponents

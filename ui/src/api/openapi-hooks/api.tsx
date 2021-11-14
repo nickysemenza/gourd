@@ -147,6 +147,8 @@ export interface RecipeWrapper {
    */
   id: string;
   detail: RecipeDetail;
+  linked_meals?: Meal[];
+  linked_photos?: Photo[];
 }
 
 /**
@@ -158,22 +160,6 @@ export interface RecipeWrapperInput {
    */
   id?: string;
   detail: RecipeDetailInput;
-}
-
-/**
- * A recipe with subcomponents
- */
-export interface Recipe {
-  /**
-   * id
-   */
-  id: string;
-  /**
-   * all the versions of the recipe
-   */
-  versions: RecipeDetail[];
-  linked_meals?: Meal[];
-  linked_photos?: Photo[];
 }
 
 /**
@@ -509,14 +495,6 @@ export interface TimeRange {
    * The maximum amount of seconds (if a range)
    */
   max: number;
-}
-
-/**
- * pages of Recipe
- */
-export interface PaginatedRecipes {
-  recipes?: Recipe[];
-  meta?: Items;
 }
 
 /**
@@ -1133,7 +1111,7 @@ export interface ListRecipesQueryParams {
 }
 
 export type ListRecipesProps = Omit<
-  GetProps<PaginatedRecipes, Error, ListRecipesQueryParams, void>,
+  GetProps<PaginatedRecipeWrappers, Error, ListRecipesQueryParams, void>,
   "path"
 >;
 
@@ -1143,14 +1121,14 @@ export type ListRecipesProps = Omit<
  * todo
  */
 export const ListRecipes = (props: ListRecipesProps) => (
-  <Get<PaginatedRecipes, Error, ListRecipesQueryParams, void>
+  <Get<PaginatedRecipeWrappers, Error, ListRecipesQueryParams, void>
     path={`/recipes`}
     {...props}
   />
 );
 
 export type UseListRecipesProps = Omit<
-  UseGetProps<PaginatedRecipes, Error, ListRecipesQueryParams, void>,
+  UseGetProps<PaginatedRecipeWrappers, Error, ListRecipesQueryParams, void>,
   "path"
 >;
 
@@ -1160,7 +1138,7 @@ export type UseListRecipesProps = Omit<
  * todo
  */
 export const useListRecipes = (props: UseListRecipesProps) =>
-  useGet<PaginatedRecipes, Error, ListRecipesQueryParams, void>(
+  useGet<PaginatedRecipeWrappers, Error, ListRecipesQueryParams, void>(
     `/recipes`,
     props
   );

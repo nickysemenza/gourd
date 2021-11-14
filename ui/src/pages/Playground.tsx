@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { PaginatedRecipes, RecipesApi } from "../api/openapi-fetch";
+import { PaginatedRecipeWrappers, RecipesApi } from "../api/openapi-fetch";
 import {
   UnitConversionRequest,
   UnitConversionRequestTargetEnum,
@@ -11,7 +11,7 @@ import { WasmContext } from "../wasm";
 
 const Playground: React.FC = () => {
   const url = getAPIURL();
-  const [r2, setR2] = useState<PaginatedRecipes>();
+  const [r2, setR2] = useState<PaginatedRecipeWrappers>();
 
   const w = useContext(WasmContext);
 
@@ -84,7 +84,7 @@ const Playground: React.FC = () => {
       <Helmet>
         <title>playground | gourd</title>
       </Helmet>
-      <RecipeDiff details={r2.recipes[0].versions} />
+      <RecipeDiff details={r2.recipes[0].detail.other_versions || []} />
     </div>
   );
 };

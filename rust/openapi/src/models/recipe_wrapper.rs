@@ -19,6 +19,10 @@ pub struct RecipeWrapper {
     pub id: String,
     #[serde(rename = "detail")]
     pub detail: Box<crate::models::RecipeDetail>,
+    #[serde(rename = "linked_meals", skip_serializing_if = "Option::is_none")]
+    pub linked_meals: Option<Vec<crate::models::Meal>>,
+    #[serde(rename = "linked_photos", skip_serializing_if = "Option::is_none")]
+    pub linked_photos: Option<Vec<crate::models::Photo>>,
 }
 
 impl RecipeWrapper {
@@ -27,6 +31,8 @@ impl RecipeWrapper {
         RecipeWrapper {
             id,
             detail: Box::new(detail),
+            linked_meals: None,
+            linked_photos: None,
         }
     }
 }

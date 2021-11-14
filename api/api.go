@@ -83,19 +83,19 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		details := a.transformRecipes(ctx, recipes, false)
 		rd.OtherVersions = &details
 	}
-	photosDB, err := a.DB().GetPhotosWithRecipe(ctx, dbr.RecipeId)
-	if err != nil {
-		panic(err)
-	}
-	photos := []Photo{}
-	for _, p := range photosDB[dbr.RecipeId] {
-		photos = append(photos, Photo{
-			Id:      p.ID,
-			Source:  PhotoSource(p.Source),
-			BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
-		})
-	}
-	spew.Dump(photos)
+	// photosDB, err := a.DB().GetPhotosWithRecipe(ctx, dbr.RecipeId)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// photos := []Photo{}
+	// for _, p := range photosDB[dbr.RecipeId] {
+	// 	photos = append(photos, Photo{
+	// 		Id:      p.ID,
+	// 		Source:  PhotoSource(p.Source),
+	// 		BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
+	// 	})
+	// }
+	// spew.Dump(photos)
 
 	return rd
 }
@@ -381,7 +381,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	byId := details.ByRecipeId()
-	items := []Recipe{}
+	items := []RecipeWrapper{}
 
 	ctx, span2 := a.tracer.Start(ctx, "ListRecipes2")
 	defer span2.End()
@@ -390,10 +390,10 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	for _, r := range recipeIDs {
-		// meals, err := a.getLinkedMeals(ctx, r)
-		// if err != nil {
-		// 	return sendErr(c, http.StatusBadRequest, err)
-		// }
+		meals, err := a.getLinkedMeals(ctx, r)
+		if err != nil {
+			return sendErr(c, http.StatusBadRequest, err)
+		}
 
 		photos := []Photo{}
 		for _, p := range photosDB[r] {
@@ -404,17 +404,36 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 			})
 		}
 
-		items = append(items, Recipe{
-			Id: r,
-			// LinkedMeals:  &meals,
+		rw := RecipeWrapper{
+			Id:           r,
+			LinkedMeals:  &meals,
 			LinkedPhotos: &photos,
-			Versions:     a.transformRecipes(ctx, byId[r], true),
-		})
+		}
+
+		recipes := a.transformRecipes(ctx, byId[r], true)
+		for x := range recipes {
+			eachRecipe := recipes[x]
+			others := []RecipeDetail{}
+			if eachRecipe.IsLatestVersion {
+				rw.Detail = eachRecipe
+			}
+			if rw.Detail.OtherVersions != nil {
+				others = *rw.Detail.OtherVersions
+				if !eachRecipe.IsLatestVersion {
+					others = append(others, eachRecipe)
+				}
+			}
+			rw.Detail.OtherVersions = &others
+
+			if eachRecipe.IsLatestVersion {
+				items = append(items, rw)
+			}
+		}
 	}
 
 	listMeta.setTotalCount(count)
 
-	resp := PaginatedRecipes{
+	resp := PaginatedRecipeWrappers{
 		Recipes: &items,
 		Meta:    listMeta,
 	}

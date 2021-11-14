@@ -38,9 +38,7 @@ models/PaginatedIngredients.ts
 models/PaginatedMeals.ts
 models/PaginatedPhotos.ts
 models/PaginatedRecipeWrappers.ts
-models/PaginatedRecipes.ts
 models/Photo.ts
-models/Recipe.ts
 models/RecipeDependency.ts
 models/RecipeDetail.ts
 models/RecipeDetailInput.ts

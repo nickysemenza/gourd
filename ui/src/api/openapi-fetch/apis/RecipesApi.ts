@@ -15,9 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
-    PaginatedRecipes,
-    PaginatedRecipesFromJSON,
-    PaginatedRecipesToJSON,
+    PaginatedRecipeWrappers,
+    PaginatedRecipeWrappersFromJSON,
+    PaginatedRecipeWrappersToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
@@ -187,7 +187,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * List all recipes
      */
-    async listRecipesRaw(requestParameters: RecipesApiListRecipesRequest): Promise<runtime.ApiResponse<PaginatedRecipes>> {
+    async listRecipesRaw(requestParameters: RecipesApiListRecipesRequest): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -215,14 +215,14 @@ export class RecipesApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipesFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipeWrappersFromJSON(jsonValue));
     }
 
     /**
      * todo
      * List all recipes
      */
-    async listRecipes(requestParameters: RecipesApiListRecipesRequest): Promise<PaginatedRecipes> {
+    async listRecipes(requestParameters: RecipesApiListRecipesRequest): Promise<PaginatedRecipeWrappers> {
         const response = await this.listRecipesRaw(requestParameters);
         return await response.value();
     }

@@ -97,7 +97,7 @@ func TestAPI(t *testing.T) {
 	{
 		result := testutil.NewRequest().Get("/recipes?offset=0&limit=10").Go(t, e)
 		require.Equal(http.StatusOK, result.Code())
-		var results PaginatedRecipes
+		var results PaginatedRecipeWrappers
 		require.NoError(result.UnmarshalBodyToObject(&results))
 		// require.Contains(results, name)
 		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
