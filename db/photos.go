@@ -217,7 +217,7 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (e
 	return
 }
 
-func (c *Client) SyncMealsFromPhotos(ctx context.Context) error {
+func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 	q := c.psql.Select("id", "album_id", "creation_time").From("gphotos_photos").
 		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").Where(sq.Eq{"meal": nil})
 	var missingMeals []GPhoto

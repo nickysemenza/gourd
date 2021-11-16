@@ -71,6 +71,7 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
             target_id: i.ingredient?.ingredient.id || i.recipe?.id || "",
             original: i.original,
             optional: i.optional,
+            adjective: i.adjective,
           })
         );
         return {

@@ -1,5 +1,4 @@
 ---
-is_latest_version: true
 name: nougat
 quantity: 0
 sections:
@@ -123,5 +122,3 @@ sections:
       - instruction: for dusting tray
     duration:
       min: 0
-unit:
-version: 2

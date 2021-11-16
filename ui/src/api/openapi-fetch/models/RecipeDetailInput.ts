@@ -66,6 +66,12 @@ export interface RecipeDetailInput {
      * @memberof RecipeDetailInput
      */
     unit: string;
+    /**
+     * when it created / updated
+     * @type {Date}
+     * @memberof RecipeDetailInput
+     */
+    date?: Date;
 }
 
 export function RecipeDetailInputFromJSON(json: any): RecipeDetailInput {
@@ -84,6 +90,7 @@ export function RecipeDetailInputFromJSONTyped(json: any, ignoreDiscriminator: b
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
         'unit': json['unit'],
+        'date': !exists(json, 'date') ? undefined : (new Date(json['date'])),
     };
 }
 
@@ -102,6 +109,7 @@ export function RecipeDetailInputToJSON(value?: RecipeDetailInput | null): any {
         'servings': value.servings,
         'quantity': value.quantity,
         'unit': value.unit,
+        'date': value.date === undefined ? undefined : (value.date.toISOString()),
     };
 }
 

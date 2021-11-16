@@ -884,6 +884,10 @@ components:
         unit:
           description: serving unit
           type: string
+        date:
+          description: when it created / updated
+          type: string
+          format: date-time
     Ingredient:
       description: "An Ingredient"
       type: object

@@ -10,3 +10,4 @@ coverage*
 *.zip
 
 ui/target
+tmp_images/

@@ -416,6 +416,9 @@ type RecipeDetail struct {
 
 // A revision of a recipe
 type RecipeDetailInput struct {
+	// when it created / updated
+	Date *time.Time `json:"date,omitempty"`
+
 	// recipe name
 	Name string `json:"name"`
 

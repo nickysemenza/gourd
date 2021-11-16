@@ -68,7 +68,7 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		Servings:        &dbr.Servings.Int64,
 		Unit:            dbr.Unit.String,
 		Sections:        sections,
-		// CreatedAt:       &dbr.CreatedAt,
+		CreatedAt:       dbr.CreatedAt,
 	}
 	if dbr.Source.Valid {
 		if err := json.Unmarshal([]byte(dbr.Source.String), &rd.Sources); err != nil {
@@ -191,8 +191,8 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredientInpu
 }
 func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db.RecipeDetail, error) {
 	dbr := db.RecipeDetail{
-		// Id:   r.Detail.Id,
-		Name: r.Detail.Name,
+		Name:      r.Detail.Name,
+		CreatedAt: zero.TimeFromPtr(r.Detail.Date).Time,
 	}
 	source, err := json.Marshal(r.Detail.Sources)
 	if err != nil {

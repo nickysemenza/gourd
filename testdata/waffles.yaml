@@ -1,5 +1,4 @@
 ---
-is_latest_version: true
 name: Chefsteps Waffles
 quantity: 14
 sections:
@@ -83,4 +82,3 @@ servings: 0
 sources:
   - url: https://www.chefsteps.com/activities/crispy-yeasted-waffles
 unit: waffles
-version: 2

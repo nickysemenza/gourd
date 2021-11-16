@@ -80,6 +80,7 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 }
 
 func setupEnv() {
+	viper.SetDefault("LOG_LEVEL", "info")
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
 	viper.SetDefault("DB_USER", "gourd")
@@ -112,7 +113,11 @@ func setupMisc() {
 	// if err := viper.WriteConfig(); err != nil {
 	// 	panic(err)
 	// }
-	log.SetLevel(log.DebugLevel)
+	level, err := log.ParseLevel(viper.GetString("LOG_LEVEL"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetLevel(level)
 
 	// tracing
 	if err := initTracer(); err != nil {

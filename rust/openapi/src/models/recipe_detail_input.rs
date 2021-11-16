@@ -32,6 +32,9 @@ pub struct RecipeDetailInput {
     /// serving unit
     #[serde(rename = "unit")]
     pub unit: String,
+    /// when it created / updated
+    #[serde(rename = "date", skip_serializing_if = "Option::is_none")]
+    pub date: Option<String>,
 }
 
 impl RecipeDetailInput {
@@ -44,6 +47,7 @@ impl RecipeDetailInput {
             servings: None,
             quantity,
             unit,
+            date: None,
         }
     }
 }

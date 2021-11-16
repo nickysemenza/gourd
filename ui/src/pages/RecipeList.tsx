@@ -99,6 +99,12 @@ const RecipeList: React.FC = () => {
         ),
         // return <Debug data={original.linked_meals} />;
       },
+      {
+        Header: "created at",
+        Cell: ({ row: { original } }: CellProps<i>) => {
+          return original.detail.created_at;
+        },
+      },
       ...(showIds
         ? [
             {

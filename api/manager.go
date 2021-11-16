@@ -3,11 +3,15 @@ package api
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/rs_client"
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -58,6 +62,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 			output = r.Detail
 		}
 		output.Name = nRecipe.Title
+		output.Date = nRecipe.Time
 
 		r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
 		if err != nil {
@@ -70,6 +75,10 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 			Recipe:    zero.StringFrom(r.Id),
 		})
 		for _, nPhoto := range nRecipe.Photos {
+			if strings.Contains(nPhoto.URL, ".heic") {
+				logrus.Infof("skipping heic: %s", nPhoto.URL)
+				continue
+			}
 			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
 			if err != nil {
 				return err
@@ -111,24 +120,23 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 }
 
 func (a *API) DoSync(ctx context.Context) error {
+	now := time.Now()
 	ctx, span := a.tracer.Start(ctx, "DoSync")
 	defer span.End()
 
-	err := a.syncRecipeFromNotion(ctx)
-	if err != nil {
+	if err := a.syncRecipeFromNotion(ctx); err != nil {
 		return err
 	}
-	err = a.DB().SyncNotionMealFromNotionRecipe(ctx)
-	if err != nil {
+	log.Infof("synced recipes from notion")
+	if err := a.DB().SyncNotionMealFromNotionRecipe(ctx); err != nil {
 		return err
 	}
-	err = a.GPhotos.SyncAlbums(ctx)
-	if err != nil {
+	if err := a.GPhotos.SyncAlbums(ctx); err != nil {
 		return err
 	}
-	err = a.DB().SyncMealsFromPhotos(ctx)
-	if err != nil {
+	if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
 		return err
 	}
+	log.Infof("sync complete in %s", time.Since(now))
 	return nil
 }

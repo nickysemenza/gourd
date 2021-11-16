@@ -1,5 +1,4 @@
 ---
-is_latest_version: true
 name: Churros
 quantity: 20
 sections:
@@ -71,4 +70,3 @@ sections:
     instructions: []
 servings: 0
 unit: churros
-version: 3

@@ -207,8 +207,9 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 	ctx, span := c.tracer.Start(ctx, "GetRecipes")
 	defer span.End()
 
-	q := c.psql.Select("*").From(recipesTable)
+	q := c.psql.Select("recipes.id").From(recipesTable)
 	cq := c.psql.Select("count(*)").From(recipesTable)
+	q = q.LeftJoin(recipeDetailsTable + " ON recipes.id = recipe_details.recipe")
 	q = newSearchQuery(opts...).apply(q)
 	cq = newSearchQuery(opts...).apply(cq)
 	if searchQuery != "" {
@@ -216,7 +217,7 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 		cq = cq.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", searchQuery)})
 	}
 	cq = cq.RemoveLimit().RemoveOffset()
-
+	q = q.Where(sq.Eq{"is_latest_version": true}).OrderBy("created_at DESC")
 	r := []Recipe{}
 	err := c.selectContext(ctx, q, &r)
 	if errors.Is(err, sql.ErrNoRows) {

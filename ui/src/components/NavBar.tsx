@@ -1,7 +1,7 @@
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { Menu as MenuIcon, X } from "react-feather";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { isLoggedIn, parseJWT } from "../config";
 import { Logo } from "./Logo";
 import { navItems } from "./navItems";
@@ -43,14 +43,16 @@ const NavBar: React.FC = () => {
                           </a>
                         </Fragment>
                       ) : (
-                        <a
+                        <Link
+                          // <a
                           key={item.path}
                           href={`/${item.title}`}
-                          onClick={() => history.push("/" + item.path)}
+                          to={`/${item.path}`}
+                          // onClick={() => history.push("/" + item.path)}
                           className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                         >
                           {item.title}
-                        </a>
+                        </Link>
                       )
                     )}
                   </div>

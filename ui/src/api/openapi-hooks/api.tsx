@@ -240,6 +240,10 @@ export interface RecipeDetailInput {
    * serving unit
    */
   unit: string;
+  /**
+   * when it created / updated
+   */
+  date?: string;
 }
 
 /**

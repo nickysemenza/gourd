@@ -32,7 +32,7 @@ func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
 	// if err != nil {
 	// 	return nil, err
 	// }
-	dir := "tmp"
+	dir := "tmp_images"
 	return &LocalImageStore{
 		httpBaseURL: httpBaseURL,
 		dir:         dir,
