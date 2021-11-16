@@ -56,7 +56,7 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require github.com/jomei/notionapi v1.5.3
+require github.com/jomei/notionapi v1.6.0
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
