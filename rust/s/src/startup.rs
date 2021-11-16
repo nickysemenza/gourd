@@ -1,6 +1,6 @@
 use crate::configuration::{DatabaseSettings, Settings};
 // use crate::email_clhealth_checkient::EmailClient;
-use crate::routes::parser;
+use crate::routes::{api, parser};
 use actix_web::{dev::Server, web};
 use actix_web::{middleware::Logger, web::Data};
 use actix_web::{App, HttpServer};
@@ -80,7 +80,8 @@ fn run(
             .route("/scrape", web::get().to(parser::scrape))
             .route("/pans", web::get().to(parser::pans))
             .route("/debug/scrape", web::get().to(parser::debug_scrape))
-            .service(web::resource("/parse2").route(web::get().to(parser::index)))
+            .route("/debug/recipes", web::get().to(api::index))
+            // .service(web::resource("/parse2").route(web::get().to(api::index)))
             .app_data(db_pool.clone())
         // .app_data(email_client.clone())
     })

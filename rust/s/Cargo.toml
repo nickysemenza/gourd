@@ -34,7 +34,8 @@ tracing-opentelemetry = "0.15.0"
 clap = "2.33.3"
 rand = "0.8.4"
 async-recursion = "0.3.2"
-sea-query = {version = "0.16.5", features = ["backend-postgres","sqlx-postgres","with-uuid","with-uuid","with-bigdecimal","with-json","derive"]}
+sea-query = {version = "0.16.5", features = ["backend-postgres","sqlx-postgres","with-uuid","with-bigdecimal","with-json","derive"]}
+sea-orm = {version= "0.3.2",features = ["with-json","with-uuid","sqlx-dep","sqlx-postgres","debug-print","with-chrono"]}
 ormx = {version = "0.10.0", features = ["postgres"]}
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}

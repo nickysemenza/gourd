@@ -1,52 +1,13 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan};
 use openapi::models::{
-    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
-    SectionIngredient, SectionIngredientInput, SectionInstructionInput,
+    IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
+    SectionIngredientInput, SectionInstructionInput,
 };
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use serde::Deserialize;
 use tracing::{debug, error, span};
 
 use crate::scraper;
-
-fn si_to_api(r: SI) -> SectionIngredient {
-    SectionIngredient {
-        kind: if r.ingredient.is_some() {
-            IngredientKind::Ingredient
-        } else {
-            IngredientKind::Recipe
-        },
-        // section: r.section,
-        id: r.id,
-        // sort: r.sort,
-        ingredient: None,
-        recipe: None,
-        amounts: r
-            .amounts
-            .iter()
-            .map(|a| Amount {
-                unit: a.unit.clone(),
-                value: a.value,
-                upper_value: None,
-                source: Some("todo".to_string()),
-            })
-            .collect(),
-        adjective: r.adjective,
-        optional: r.optional,
-        original: r.original,
-        substitutes: None,
-        // substitutes_for: r.substitutes_for,
-    }
-}
-/// This handler uses json extractor
-pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = get_test(&pool).await.unwrap();
-    let data: Vec<SectionIngredient> = rows.into_iter().map(|r| si_to_api(r)).collect();
-    // dbg!(a);
-
-    HttpResponse::Ok().json(actix_web::web::Json(data)) // <- send response
-}
 
 #[derive(Deserialize, Debug)]
 pub struct Info {
@@ -112,36 +73,6 @@ pub async fn convert(r: web::Json<openapi::models::UnitConversionRequest>) -> Ht
     HttpResponse::Ok().json(convert_to(r.0))
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct SI {
-    section: String,
-    id: String,
-    sort: Option<i32>,
-    ingredient: Option<String>,
-    recipe: Option<String>,
-    amounts: sqlx::types::Json<Vec<Amount>>,
-    adjective: Option<String>,
-    optional: Option<bool>,
-    original: Option<String>,
-    substitutes_for: Option<String>,
-}
-
-#[tracing::instrument]
-pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
-    let res = sqlx::query_as!(
-        SI,
-        r#"
-    select section, id, sort, ingredient, recipe, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
-     adjective, optional, original, substitutes_for from recipe_section_ingredients;
-            "#,
-    )
-    .fetch_all(pool)
-    .await?;
-
-    // dbg!(res);
-    // let res2 = res.unwrap();
-    Ok(res)
-}
 pub async fn pans() -> HttpResponse {
     let p = pan::inventory();
 
