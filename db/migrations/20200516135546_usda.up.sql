@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient_conversion_factor (
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_conversion_factor_fdc_id ON usda_food_nutrient_conversion_factor (fdc_id);
 
 CREATE TABLE IF NOT EXISTS usda_food_calorie_conversion_factor (
-  "food_nutrient_conversion_factor_id" INT NOT NULL, --  PRIMARY KEY REFERENCES usda_food_nutrient_conversion_factor(id),
+  "food_nutrient_conversion_factor_id" INT NOT NULL PRIMARY KEY, -- REFERENCES -0 usda_food_nutrient_conversion_factor(id),
   "protein_value"      REAL,
   "fat_value"          REAL,
   "carbohydrate_value" REAL

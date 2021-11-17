@@ -95,6 +95,7 @@ func (s *Server) Run(_ context.Context) error {
 	})
 
 	r.GET("/notion", s.APIManager.NotionTest)
+	r.GET("/misc", s.APIManager.Misc)
 
 	log.Printf("running on: %s", s.GetBaseURL())
 	return http.ListenAndServe(s.getAddress(),

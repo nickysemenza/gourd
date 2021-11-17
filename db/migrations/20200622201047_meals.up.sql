@@ -8,5 +8,5 @@ CREATE TABLE IF NOT EXISTS "meal_recipe" (
   "meal_id" TEXT references meals(id) NOT NULL,
   "recipe_id" TEXT references recipes(id) NOT NULL,
   "multiplier" numeric(10, 2) DEFAULT 1.0,
-  unique (meal_id, recipe_id)
+  primary key (meal_id, recipe_id)
 );

@@ -14,20 +14,20 @@ CREATE TABLE IF NOT EXISTS "notion_image" (
 	"page_id" text references notion_recipe(page_id) NOT NULL,
 	"blur_hash" text,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
-	PRIMARY KEY ("block_id"),
+	primary key (block_id, page_id),
 	unique (block_id, page_id)
 );
 CREATE TABLE IF NOT EXISTS "notion_meal" (
 	"meal" TEXT references meals(id) NOT NULL,
 	"notion_recipe" TEXT references notion_recipe(page_id) NOT NULL,
-	unique (meal, notion_recipe)
+	primary key (meal, notion_recipe)
 );
 -- 
 CREATE TABLE IF NOT EXISTS "images" (
 	"id" text NOT NULL,
 	"blur_hash" text NOT NULL,
 	"source" text NOT NULL,
-	unique (id)
+	PRIMARY KEY ("id")
 );
 ALTER TABLE "notion_image"
 ADD COLUMN "image" text references images(id) NOT NULL;

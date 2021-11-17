@@ -37,6 +37,10 @@ type Client struct {
 	tracer trace.Tracer
 }
 
+func (c *Client) DB() *sqlx.DB {
+	return c.db
+}
+
 // RecipeDetail represents a recipe
 type Recipe struct {
 	Id     string `db:"id"`

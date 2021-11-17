@@ -58,6 +58,15 @@ require (
 require github.com/jomei/notionapi v1.6.0
 
 require (
+	github.com/friendsofgo/errors v0.9.2
+	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
+	github.com/volatiletech/null/v8 v8.1.2
+	github.com/volatiletech/randomize v0.0.1
+	github.com/volatiletech/sqlboiler/v4 v4.8.1
+	github.com/volatiletech/strmangle v0.0.1
+)
+
+require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
 	cloud.google.com/go v0.97.0 // indirect
 	cloud.google.com/go/spanner v1.27.0 // indirect
@@ -118,6 +127,7 @@ require (
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
+	github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5 // indirect
 	github.com/esimonov/ifshort v1.0.3 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
@@ -143,6 +153,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocql/gocql v0.0.0-20211015133455-b225f9b53fa1 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
@@ -276,6 +287,7 @@ require (
 	github.com/uudashr/gocognit v1.0.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
+	github.com/volatiletech/inflect v0.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.51.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect

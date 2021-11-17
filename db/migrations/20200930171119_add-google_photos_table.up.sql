@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "meal_gphoto" (
     "meal" TEXT references meals(id) NOT NULL,
     "gphotos_id" TEXT references gphotos_photos(id) NOT NULL,
     "highlight_recipe" TEXT references recipes(id),
-    unique (meal, gphotos_id)
+    primary key (meal, gphotos_id)
 );
 ALTER TABLE "meals"
 ADD COLUMN "ate_at" timestamp NOT NULL;

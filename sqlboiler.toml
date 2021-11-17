@@ -1,0 +1,8 @@
+[psql]
+  dbname = "food"
+  host   = "localhost"
+  port   = 5555
+  user   = "gourd"
+  pass   = "gourd"
+  sslmode = "disable"
+  blacklist = ["migrations"]
