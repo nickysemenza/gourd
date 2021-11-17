@@ -209,7 +209,7 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 
 	q := c.psql.Select("recipes.id").From(recipesTable)
 	cq := c.psql.Select("count(*)").From(recipesTable)
-	q = q.LeftJoin(recipeDetailsTable + " ON recipes.id = recipe_details.recipe")
+	q = q.LeftJoin(recipeDetailsTable + " ON recipes.id = recipe_details.recipe_id")
 	q = newSearchQuery(opts...).apply(q)
 	cq = newSearchQuery(opts...).apply(cq)
 	if searchQuery != "" {
@@ -324,7 +324,7 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 	if len(recipeIds) == 0 {
 		eq = topLevelDetail
 	} else {
-		eq = sq.Or{topLevelDetail, sq.Eq{"recipe": recipeIds}}
+		eq = sq.Or{topLevelDetail, sq.Eq{"recipe_id": recipeIds}}
 	}
 	recipes, err := c.GetRecipeDetailWhere(ctx, eq)
 	if err != nil {

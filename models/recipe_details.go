@@ -25,7 +25,7 @@ import (
 // RecipeDetail is an object representing the database table.
 type RecipeDetail struct {
 	ID              string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Recipe          string      `boil:"recipe" json:"recipe" toml:"recipe" yaml:"recipe"`
+	RecipeID        string      `boil:"recipe_id" json:"recipe_id" toml:"recipe_id" yaml:"recipe_id"`
 	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
 	Equipment       null.String `boil:"equipment" json:"equipment,omitempty" toml:"equipment" yaml:"equipment,omitempty"`
 	Source          null.JSON   `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
@@ -42,7 +42,7 @@ type RecipeDetail struct {
 
 var RecipeDetailColumns = struct {
 	ID              string
-	Recipe          string
+	RecipeID        string
 	Name            string
 	Equipment       string
 	Source          string
@@ -54,7 +54,7 @@ var RecipeDetailColumns = struct {
 	CreatedAt       string
 }{
 	ID:              "id",
-	Recipe:          "recipe",
+	RecipeID:        "recipe_id",
 	Name:            "name",
 	Equipment:       "equipment",
 	Source:          "source",
@@ -68,7 +68,7 @@ var RecipeDetailColumns = struct {
 
 var RecipeDetailTableColumns = struct {
 	ID              string
-	Recipe          string
+	RecipeID        string
 	Name            string
 	Equipment       string
 	Source          string
@@ -80,7 +80,7 @@ var RecipeDetailTableColumns = struct {
 	CreatedAt       string
 }{
 	ID:              "recipe_details.id",
-	Recipe:          "recipe_details.recipe",
+	RecipeID:        "recipe_details.recipe_id",
 	Name:            "recipe_details.name",
 	Equipment:       "recipe_details.equipment",
 	Source:          "recipe_details.source",
@@ -120,7 +120,7 @@ func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsN
 
 var RecipeDetailWhere = struct {
 	ID              whereHelperstring
-	Recipe          whereHelperstring
+	RecipeID        whereHelperstring
 	Name            whereHelperstring
 	Equipment       whereHelpernull_String
 	Source          whereHelpernull_JSON
@@ -132,7 +132,7 @@ var RecipeDetailWhere = struct {
 	CreatedAt       whereHelpertime_Time
 }{
 	ID:              whereHelperstring{field: "\"recipe_details\".\"id\""},
-	Recipe:          whereHelperstring{field: "\"recipe_details\".\"recipe\""},
+	RecipeID:        whereHelperstring{field: "\"recipe_details\".\"recipe_id\""},
 	Name:            whereHelperstring{field: "\"recipe_details\".\"name\""},
 	Equipment:       whereHelpernull_String{field: "\"recipe_details\".\"equipment\""},
 	Source:          whereHelpernull_JSON{field: "\"recipe_details\".\"source\""},
@@ -146,17 +146,17 @@ var RecipeDetailWhere = struct {
 
 // RecipeDetailRels is where relationship names are stored.
 var RecipeDetailRels = struct {
-	RecipeDetailRecipe string
-	RecipeSections     string
+	Recipe         string
+	RecipeSections string
 }{
-	RecipeDetailRecipe: "RecipeDetailRecipe",
-	RecipeSections:     "RecipeSections",
+	Recipe:         "Recipe",
+	RecipeSections: "RecipeSections",
 }
 
 // recipeDetailR is where relationships are stored.
 type recipeDetailR struct {
-	RecipeDetailRecipe *Recipe            `boil:"RecipeDetailRecipe" json:"RecipeDetailRecipe" toml:"RecipeDetailRecipe" yaml:"RecipeDetailRecipe"`
-	RecipeSections     RecipeSectionSlice `boil:"RecipeSections" json:"RecipeSections" toml:"RecipeSections" yaml:"RecipeSections"`
+	Recipe         *Recipe            `boil:"Recipe" json:"Recipe" toml:"Recipe" yaml:"Recipe"`
+	RecipeSections RecipeSectionSlice `boil:"RecipeSections" json:"RecipeSections" toml:"RecipeSections" yaml:"RecipeSections"`
 }
 
 // NewStruct creates a new relationship struct
@@ -168,8 +168,8 @@ func (*recipeDetailR) NewStruct() *recipeDetailR {
 type recipeDetailL struct{}
 
 var (
-	recipeDetailAllColumns            = []string{"id", "recipe", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at"}
-	recipeDetailColumnsWithoutDefault = []string{"id", "recipe", "name", "equipment", "source", "servings", "quantity", "unit", "version"}
+	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at"}
+	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version"}
 	recipeDetailColumnsWithDefault    = []string{"is_latest_version", "created_at"}
 	recipeDetailPrimaryKeyColumns     = []string{"id"}
 )
@@ -449,10 +449,10 @@ func (q recipeDetailQuery) Exists(ctx context.Context, exec boil.ContextExecutor
 	return count > 0, nil
 }
 
-// RecipeDetailRecipe pointed to by the foreign key.
-func (o *RecipeDetail) RecipeDetailRecipe(mods ...qm.QueryMod) recipeQuery {
+// Recipe pointed to by the foreign key.
+func (o *RecipeDetail) Recipe(mods ...qm.QueryMod) recipeQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Recipe),
+		qm.Where("\"id\" = ?", o.RecipeID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -484,9 +484,9 @@ func (o *RecipeDetail) RecipeSections(mods ...qm.QueryMod) recipeSectionQuery {
 	return query
 }
 
-// LoadRecipeDetailRecipe allows an eager lookup of values, cached into the
+// LoadRecipe allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeDetailL) LoadRecipeDetailRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeDetail interface{}, mods queries.Applicator) error {
+func (recipeDetailL) LoadRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeDetail interface{}, mods queries.Applicator) error {
 	var slice []*RecipeDetail
 	var object *RecipeDetail
 
@@ -501,7 +501,7 @@ func (recipeDetailL) LoadRecipeDetailRecipe(ctx context.Context, e boil.ContextE
 		if object.R == nil {
 			object.R = &recipeDetailR{}
 		}
-		args = append(args, object.Recipe)
+		args = append(args, object.RecipeID)
 
 	} else {
 	Outer:
@@ -511,12 +511,12 @@ func (recipeDetailL) LoadRecipeDetailRecipe(ctx context.Context, e boil.ContextE
 			}
 
 			for _, a := range args {
-				if a == obj.Recipe {
+				if a == obj.RecipeID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Recipe)
+			args = append(args, obj.RecipeID)
 
 		}
 	}
@@ -564,7 +564,7 @@ func (recipeDetailL) LoadRecipeDetailRecipe(ctx context.Context, e boil.ContextE
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.RecipeDetailRecipe = foreign
+		object.R.Recipe = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeR{}
 		}
@@ -574,8 +574,8 @@ func (recipeDetailL) LoadRecipeDetailRecipe(ctx context.Context, e boil.ContextE
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Recipe == foreign.ID {
-				local.R.RecipeDetailRecipe = foreign
+			if local.RecipeID == foreign.ID {
+				local.R.Recipe = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeR{}
 				}
@@ -686,10 +686,10 @@ func (recipeDetailL) LoadRecipeSections(ctx context.Context, e boil.ContextExecu
 	return nil
 }
 
-// SetRecipeDetailRecipe of the recipeDetail to the related item.
-// Sets o.R.RecipeDetailRecipe to related.
+// SetRecipe of the recipeDetail to the related item.
+// Sets o.R.Recipe to related.
 // Adds o to related.R.RecipeDetail.
-func (o *RecipeDetail) SetRecipeDetailRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
+func (o *RecipeDetail) SetRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -699,7 +699,7 @@ func (o *RecipeDetail) SetRecipeDetailRecipe(ctx context.Context, exec boil.Cont
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_details\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeDetailPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -713,13 +713,13 @@ func (o *RecipeDetail) SetRecipeDetailRecipe(ctx context.Context, exec boil.Cont
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Recipe = related.ID
+	o.RecipeID = related.ID
 	if o.R == nil {
 		o.R = &recipeDetailR{
-			RecipeDetailRecipe: related,
+			Recipe: related,
 		}
 	} else {
-		o.R.RecipeDetailRecipe = related
+		o.R.Recipe = related
 	}
 
 	if related.R == nil {

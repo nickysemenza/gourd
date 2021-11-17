@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS "recipes" (
 );
 CREATE TABLE IF NOT EXISTS "recipe_details" (
   "id" TEXT NOT NULL UNIQUE,
-  "recipe" TEXT references recipes(id) NOT NULL,
+  "recipe_id" TEXT references recipes(id) NOT NULL,
   "name" TEXT NOT NULL,
   "equipment" TEXT,
   "source" JSONB,
@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "is_latest_version" BOOLEAN DEFAULT FALSE,
   "created_at" timestamp NOT NULL DEFAULT now(),
   PRIMARY KEY ("id"),
-  unique("recipe", "version")
+  unique("recipe_id", "version")
 );
 -- https://stackoverflow.com/a/11014977
-create unique index one_latest_revision_of_recipe on recipe_details (recipe)
+create unique index one_latest_revision_of_recipe on recipe_details (recipe_id)
 where is_latest_version;
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "id" TEXT NOT NULL UNIQUE,

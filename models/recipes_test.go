@@ -514,7 +514,7 @@ func testRecipeOneToOneRecipeDetailUsingRecipeDetail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	foreign.Recipe = local.ID
+	foreign.RecipeID = local.ID
 	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
@@ -524,8 +524,8 @@ func testRecipeOneToOneRecipeDetailUsingRecipeDetail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if check.Recipe != foreign.Recipe {
-		t.Errorf("want: %v, got %v", foreign.Recipe, check.Recipe)
+	if check.RecipeID != foreign.RecipeID {
+		t.Errorf("want: %v, got %v", foreign.RecipeID, check.RecipeID)
 	}
 
 	slice := RecipeSlice{&local}
@@ -582,23 +582,23 @@ func testRecipeOneToOneSetOpRecipeDetailUsingRecipeDetail(t *testing.T) {
 		if a.R.RecipeDetail != x {
 			t.Error("relationship struct not set to correct value")
 		}
-		if x.R.RecipeDetailRecipe != &a {
+		if x.R.Recipe != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 
-		if a.ID != x.Recipe {
+		if a.ID != x.RecipeID {
 			t.Error("foreign key was wrong value", a.ID)
 		}
 
-		zero := reflect.Zero(reflect.TypeOf(x.Recipe))
-		reflect.Indirect(reflect.ValueOf(&x.Recipe)).Set(zero)
+		zero := reflect.Zero(reflect.TypeOf(x.RecipeID))
+		reflect.Indirect(reflect.ValueOf(&x.RecipeID)).Set(zero)
 
 		if err = x.Reload(ctx, tx); err != nil {
 			t.Fatal("failed to reload", err)
 		}
 
-		if a.ID != x.Recipe {
-			t.Error("foreign key was wrong value", a.ID, x.Recipe)
+		if a.ID != x.RecipeID {
+			t.Error("foreign key was wrong value", a.ID, x.RecipeID)
 		}
 
 		if _, err = x.Delete(ctx, tx); err != nil {

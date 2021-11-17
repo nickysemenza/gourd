@@ -119,7 +119,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	}
 
 	if modifying != nil {
-		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe": modifying.RecipeId})
+		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": modifying.RecipeId})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
@@ -140,7 +140,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		_, err = c.execTx(ctx, tx, c.psql.
 			Update(recipeDetailsTable).
 			Set("is_latest_version", false).
-			Where(sq.Eq{"recipe": parentID}),
+			Where(sq.Eq{"recipe_id": parentID}),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to update other verions to not be latest: %w", err)
@@ -295,7 +295,7 @@ FROM
 	recipe_details
 	LEFT JOIN recipe_sections ON recipe_details.id = recipe_sections.recipe_detail
 	LEFT JOIN recipe_section_ingredients ON recipe_section_ingredients.section = recipe_sections.id
-	LEFT JOIN recipe_details r2  ON r2.recipe = recipe_section_ingredients.recipe
+	LEFT JOIN recipe_details r2  ON r2.recipe_id = recipe_section_ingredients.recipe
 	LEFT JOIN ingredients ON recipe_section_ingredients.ingredient = ingredients.id
 	LEFT JOIN ingredients alts ON ingredients.parent = alts.id
 WHERE

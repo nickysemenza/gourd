@@ -647,7 +647,7 @@ func testRecipeDetailToManyAddOpRecipeSections(t *testing.T) {
 		}
 	}
 }
-func testRecipeDetailToOneRecipeUsingRecipeDetailRecipe(t *testing.T) {
+func testRecipeDetailToOneRecipeUsingRecipe(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
@@ -667,12 +667,12 @@ func testRecipeDetailToOneRecipeUsingRecipeDetailRecipe(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	local.Recipe = foreign.ID
+	local.RecipeID = foreign.ID
 	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
 	}
 
-	check, err := local.RecipeDetailRecipe().One(ctx, tx)
+	check, err := local.Recipe().One(ctx, tx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -682,23 +682,23 @@ func testRecipeDetailToOneRecipeUsingRecipeDetailRecipe(t *testing.T) {
 	}
 
 	slice := RecipeDetailSlice{&local}
-	if err = local.L.LoadRecipeDetailRecipe(ctx, tx, false, (*[]*RecipeDetail)(&slice), nil); err != nil {
+	if err = local.L.LoadRecipe(ctx, tx, false, (*[]*RecipeDetail)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
-	if local.R.RecipeDetailRecipe == nil {
+	if local.R.Recipe == nil {
 		t.Error("struct should have been eager loaded")
 	}
 
-	local.R.RecipeDetailRecipe = nil
-	if err = local.L.LoadRecipeDetailRecipe(ctx, tx, true, &local, nil); err != nil {
+	local.R.Recipe = nil
+	if err = local.L.LoadRecipe(ctx, tx, true, &local, nil); err != nil {
 		t.Fatal(err)
 	}
-	if local.R.RecipeDetailRecipe == nil {
+	if local.R.Recipe == nil {
 		t.Error("struct should have been eager loaded")
 	}
 }
 
-func testRecipeDetailToOneSetOpRecipeUsingRecipeDetailRecipe(t *testing.T) {
+func testRecipeDetailToOneSetOpRecipeUsingRecipe(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
@@ -727,31 +727,31 @@ func testRecipeDetailToOneSetOpRecipeUsingRecipeDetailRecipe(t *testing.T) {
 	}
 
 	for i, x := range []*Recipe{&b, &c} {
-		err = a.SetRecipeDetailRecipe(ctx, tx, i != 0, x)
+		err = a.SetRecipe(ctx, tx, i != 0, x)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if a.R.RecipeDetailRecipe != x {
+		if a.R.Recipe != x {
 			t.Error("relationship struct not set to correct value")
 		}
 
 		if x.R.RecipeDetail != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
-		if a.Recipe != x.ID {
-			t.Error("foreign key was wrong value", a.Recipe)
+		if a.RecipeID != x.ID {
+			t.Error("foreign key was wrong value", a.RecipeID)
 		}
 
-		zero := reflect.Zero(reflect.TypeOf(a.Recipe))
-		reflect.Indirect(reflect.ValueOf(&a.Recipe)).Set(zero)
+		zero := reflect.Zero(reflect.TypeOf(a.RecipeID))
+		reflect.Indirect(reflect.ValueOf(&a.RecipeID)).Set(zero)
 
 		if err = a.Reload(ctx, tx); err != nil {
 			t.Fatal("failed to reload", err)
 		}
 
-		if a.Recipe != x.ID {
-			t.Error("foreign key was wrong value", a.Recipe, x.ID)
+		if a.RecipeID != x.ID {
+			t.Error("foreign key was wrong value", a.RecipeID, x.ID)
 		}
 	}
 }
@@ -830,7 +830,7 @@ func testRecipeDetailsSelect(t *testing.T) {
 }
 
 var (
-	recipeDetailDBTypes = map[string]string{`ID`: `text`, `Recipe`: `text`, `Name`: `text`, `Equipment`: `text`, `Source`: `jsonb`, `Servings`: `integer`, `Quantity`: `integer`, `Unit`: `text`, `Version`: `integer`, `IsLatestVersion`: `boolean`, `CreatedAt`: `timestamp without time zone`}
+	recipeDetailDBTypes = map[string]string{`ID`: `text`, `RecipeID`: `text`, `Name`: `text`, `Equipment`: `text`, `Source`: `jsonb`, `Servings`: `integer`, `Quantity`: `integer`, `Unit`: `text`, `Version`: `integer`, `IsLatestVersion`: `boolean`, `CreatedAt`: `timestamp without time zone`}
 	_                   = bytes.MinRead
 )
 

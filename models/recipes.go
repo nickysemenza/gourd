@@ -366,7 +366,7 @@ func (q recipeQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (boo
 // RecipeDetail pointed to by the foreign key.
 func (o *Recipe) RecipeDetail(mods ...qm.QueryMod) recipeDetailQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"recipe\" = ?", o.ID),
+		qm.Where("\"recipe_id\" = ?", o.ID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -502,7 +502,7 @@ func (recipeL) LoadRecipeDetail(ctx context.Context, e boil.ContextExecutor, sin
 
 	query := NewQuery(
 		qm.From(`recipe_details`),
-		qm.WhereIn(`recipe_details.recipe in ?`, args...),
+		qm.WhereIn(`recipe_details.recipe_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -543,17 +543,17 @@ func (recipeL) LoadRecipeDetail(ctx context.Context, e boil.ContextExecutor, sin
 		if foreign.R == nil {
 			foreign.R = &recipeDetailR{}
 		}
-		foreign.R.RecipeDetailRecipe = object
+		foreign.R.Recipe = object
 	}
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.ID == foreign.Recipe {
+			if local.ID == foreign.RecipeID {
 				local.R.RecipeDetail = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeDetailR{}
 				}
-				foreign.R.RecipeDetailRecipe = local
+				foreign.R.Recipe = local
 				break
 			}
 		}
@@ -956,12 +956,12 @@ func (recipeL) LoadRecipeSectionIngredients(ctx context.Context, e boil.ContextE
 
 // SetRecipeDetail of the recipe to the related item.
 // Sets o.R.RecipeDetail to related.
-// Adds o to related.R.RecipeDetailRecipe.
+// Adds o to related.R.Recipe.
 func (o *Recipe) SetRecipeDetail(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeDetail) error {
 	var err error
 
 	if insert {
-		related.Recipe = o.ID
+		related.RecipeID = o.ID
 
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
 			return errors.Wrap(err, "failed to insert into foreign table")
@@ -969,7 +969,7 @@ func (o *Recipe) SetRecipeDetail(ctx context.Context, exec boil.ContextExecutor,
 	} else {
 		updateQuery := fmt.Sprintf(
 			"UPDATE \"recipe_details\" SET %s WHERE %s",
-			strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+			strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 			strmangle.WhereClause("\"", "\"", 2, recipeDetailPrimaryKeyColumns),
 		)
 		values := []interface{}{o.ID, related.ID}
@@ -983,7 +983,7 @@ func (o *Recipe) SetRecipeDetail(ctx context.Context, exec boil.ContextExecutor,
 			return errors.Wrap(err, "failed to update foreign table")
 		}
 
-		related.Recipe = o.ID
+		related.RecipeID = o.ID
 
 	}
 
@@ -997,10 +997,10 @@ func (o *Recipe) SetRecipeDetail(ctx context.Context, exec boil.ContextExecutor,
 
 	if related.R == nil {
 		related.R = &recipeDetailR{
-			RecipeDetailRecipe: o,
+			Recipe: o,
 		}
 	} else {
-		related.R.RecipeDetailRecipe = o
+		related.R.Recipe = o
 	}
 	return nil
 }

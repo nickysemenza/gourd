@@ -148,7 +148,7 @@ func (a *API) sectionIngredientTODB(ctx context.Context, i SectionIngredientInpu
 	switch i.Kind {
 	case IngredientKindRecipe:
 
-		eq := sq.Eq{"recipe": iOrRiD}
+		eq := sq.Eq{"recipe_id": iOrRiD}
 		if iOrRiD != "" {
 			eq = sq.Eq{"name": name}
 		}

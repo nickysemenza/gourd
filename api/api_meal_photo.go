@@ -73,7 +73,7 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		return nil, err
 	}
 
-	recipesDetails, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": mealRecipes.RecipeIDs()})
+	recipesDetails, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": mealRecipes.RecipeIDs()})
 	if err != nil {
 		return nil, err
 	}

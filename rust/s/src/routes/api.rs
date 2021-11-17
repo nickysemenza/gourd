@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse};
 use openapi::models::{Amount, IngredientKind, SectionIngredient};
-use sea_orm::{entity::*, query::*};
+use sea_orm::entity::*;
 use serde::Serialize;
 use sqlx::PgPool;
 
