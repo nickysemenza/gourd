@@ -74,7 +74,7 @@ type Amount struct {
 // RecipeDetail represents a recipe
 type RecipeDetail struct {
 	Id            string      `db:"id"`
-	RecipeId      string      `db:"recipe"`
+	RecipeId      string      `db:"recipe_id"`
 	Name          string      `db:"name"`
 	Equipment     zero.String `db:"equipment"`
 	Source        zero.String `db:"source"`

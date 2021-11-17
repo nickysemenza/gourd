@@ -24,81 +24,89 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	}
 	sections := []RecipeSection{}
 
-	d := recipe.R.RecipeDetails[0]
-
-	for _, section := range d.R.RecipeSections {
-		s := RecipeSection{
-			Id: section.ID,
-			// Duration: ,
-		}
-		for _, instruction := range section.R.SectionRecipeSectionInstructions {
-			s.Instructions = append(s.Instructions, SectionInstruction{
-				Id:          instruction.ID,
-				Instruction: instruction.Instruction.String,
-			})
-		}
-		for _, ingredient := range section.R.SectionRecipeSectionIngredients {
-			si := SectionIngredient{
-				Id:        ingredient.ID,
-				Adjective: ingredient.Adjective.Ptr(),
-				// Instruction: ingredient.Instruction.String,
-			}
-			if ingredient.Ingredient.Valid {
-				si.Kind = IngredientKindIngredient
-				var err error
-				si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.RecipeSectionIngredientIngredient)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				si.Kind = IngredientKindRecipe
-				// si.Recipe = &recipeFromDB(ingredient.R.RecipeSectionIngredientRecipe).Detail
-			}
-			s.Ingredients = append(s.Ingredients, si)
-		}
-		sections = append(sections, s)
-
-	}
-
-	other := []RecipeDetail{}
-	if d.IsLatestVersion.Bool {
-
-		others, err := models.Recipes(
-			Where("recipes.id = ?", recipe.ID),
-			Load(models.RecipeRels.RecipeDetails,
-				Where("recipe_details.is_latest_version = ?", false)),
-		).
-			All(ctx, a.db.DB())
-		if err != nil {
-			panic(err)
-		}
-		for _, o := range others {
-			r, err := a.recipeFromModel(ctx, o)
-			if err != nil {
-				return nil, err
-			}
-			other = append(other, r.Detail)
-		}
-	}
-
-	rd := RecipeDetail{
-		Id:        d.ID,
-		CreatedAt: d.CreatedAt,
-		Name:      d.Name,
-		Quantity:  int64(d.Quantity.Int),
-		// Servings:  int64(d.Servings.Int),
-		// Sources:   d.Source,
-		Unit:            d.Unit.String,
-		Version:         int64(d.Version),
-		Sections:        sections,
-		IsLatestVersion: d.IsLatestVersion.Bool,
-		OtherVersions:   &other,
-	}
-
+	// d := recipe.R.RecipeDetails[0]
 	rw := RecipeWrapper{
-		Id:     recipe.ID,
-		Detail: rd,
+		Id: recipe.ID,
+		// Detail: rd,
 	}
+	other := []RecipeDetail{}
+
+	for _, d := range recipe.R.RecipeDetails {
+
+		for _, section := range d.R.RecipeSections {
+			s := RecipeSection{
+				Id: section.ID,
+				// Duration: ,
+			}
+			for _, instruction := range section.R.SectionRecipeSectionInstructions {
+				s.Instructions = append(s.Instructions, SectionInstruction{
+					Id:          instruction.ID,
+					Instruction: instruction.Instruction.String,
+				})
+			}
+			for _, ingredient := range section.R.SectionRecipeSectionIngredients {
+				si := SectionIngredient{
+					Id:        ingredient.ID,
+					Adjective: ingredient.Adjective.Ptr(),
+					// Instruction: ingredient.Instruction.String,
+				}
+				if ingredient.Ingredient.Valid {
+					si.Kind = IngredientKindIngredient
+					var err error
+					si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.RecipeSectionIngredientIngredient)
+					if err != nil {
+						return nil, err
+					}
+				} else {
+					si.Kind = IngredientKindRecipe
+					// si.Recipe = &recipeFromDB(ingredient.R.RecipeSectionIngredientRecipe).Detail
+				}
+				s.Ingredients = append(s.Ingredients, si)
+			}
+			sections = append(sections, s)
+
+		}
+
+		// if detail.IsLatestVersion.Bool {
+
+		// 	others, err := models.Recipes(
+		// 		Where("recipes.id = ?", recipe.ID),
+		// 		Load(models.RecipeRels.RecipeDetails,
+		// 			Where("recipe_details.is_latest_version = ?", false)),
+		// 	).
+		// 		All(ctx, a.db.DB())
+		// 	if err != nil {
+		// 		panic(err)
+		// 	}
+		// 	for _, o := range others {
+		// 		r, err := a.recipeFromModel(ctx, o)
+		// 		if err != nil {
+		// 			return nil, err
+		// 		}
+		// 		other = append(other, r.Detail)
+		// 	}
+		// }
+
+		rd := RecipeDetail{
+			Id:        d.ID,
+			CreatedAt: d.CreatedAt,
+			Name:      d.Name,
+			Quantity:  int64(d.Quantity.Int),
+			// Servings:  int64(d.Servings.Int),
+			// Sources:   d.Source,
+			Unit:            d.Unit.String,
+			Version:         int64(d.Version),
+			Sections:        sections,
+			IsLatestVersion: d.IsLatestVersion.Bool,
+			// OtherVersions:   &other,
+		}
+		if rd.IsLatestVersion {
+			rw.Detail = rd
+		} else {
+			other = append(other, rd)
+		}
+	}
+	rw.Detail.OtherVersions = &other
 
 	items := []Photo{}
 	for _, notionRecipe := range recipe.R.NotionRecipes {
@@ -121,7 +129,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 }
 func (a *API) RecipeListV2(ctx context.Context) ([]RecipeWrapper, error) {
 	recipes, err := models.Recipes(
-		Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
+		// Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,

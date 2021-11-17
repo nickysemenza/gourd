@@ -76,7 +76,7 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		}
 	}
 	if includeOtherVersions {
-		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
+		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe_id": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
 		if err != nil {
 			panic(err)
 		}
@@ -365,77 +365,82 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx, span := a.tracer.Start(ctx, "ListRecipes")
 	defer span.End()
 
-	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	recipes, count, err := a.DB().GetRecipes(ctx, "", paginationParams...)
+	// paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	// recipes, count, err := a.DB().GetRecipes(ctx, "", paginationParams...)
+	// if err != nil {
+	// 	return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	// }
+
+	// var recipeIDs []string
+	// for _, r := range recipes {
+	// 	recipeIDs = append(recipeIDs, r.Id)
+	// }
+
+	// details, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": recipeIDs})
+	// if err != nil {
+	// 	return sendErr(c, http.StatusBadRequest, err)
+	// }
+	// byId := details.ByRecipeId()
+	// items := []RecipeWrapper{}
+
+	// ctx, span2 := a.tracer.Start(ctx, "ListRecipes2")
+	// defer span2.End()
+	// photosDB, err := a.DB().GetPhotosWithRecipe(ctx, recipeIDs...)
+	// if err != nil {
+	// 	return sendErr(c, http.StatusBadRequest, err)
+	// }
+	// for _, r := range recipeIDs {
+	// 	meals, err := a.getLinkedMeals(ctx, r)
+	// 	if err != nil {
+	// 		return sendErr(c, http.StatusBadRequest, err)
+	// 	}
+
+	// 	photos := []Photo{}
+	// 	for _, p := range photosDB[r] {
+	// 		photos = append(photos, Photo{
+	// 			Id:      p.ID,
+	// 			Source:  PhotoSource(p.Source),
+	// 			BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
+	// 		})
+	// 	}
+
+	// 	rw := RecipeWrapper{
+	// 		Id:           r,
+	// 		LinkedMeals:  &meals,
+	// 		LinkedPhotos: &photos,
+	// 	}
+
+	// 	recipes := a.transformRecipes(ctx, byId[r], true)
+	// 	for x := range recipes {
+	// 		eachRecipe := recipes[x]
+	// 		others := []RecipeDetail{}
+	// 		if eachRecipe.IsLatestVersion {
+	// 			rw.Detail = eachRecipe
+	// 		}
+	// 		if rw.Detail.OtherVersions != nil {
+	// 			others = *rw.Detail.OtherVersions
+	// 			if !eachRecipe.IsLatestVersion {
+	// 				others = append(others, eachRecipe)
+	// 			}
+	// 		}
+	// 		rw.Detail.OtherVersions = &others
+
+	// 		if eachRecipe.IsLatestVersion {
+	// 			items = append(items, rw)
+	// 		}
+	// 	}
+	// }
+
+	// listMeta.setTotalCount(count)
+
+	items, err := a.RecipeListV2(ctx)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
 
-	var recipeIDs []string
-	for _, r := range recipes {
-		recipeIDs = append(recipeIDs, r.Id)
-	}
-
-	details, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe": recipeIDs})
-	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
-	}
-	byId := details.ByRecipeId()
-	items := []RecipeWrapper{}
-
-	ctx, span2 := a.tracer.Start(ctx, "ListRecipes2")
-	defer span2.End()
-	photosDB, err := a.DB().GetPhotosWithRecipe(ctx, recipeIDs...)
-	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
-	}
-	for _, r := range recipeIDs {
-		meals, err := a.getLinkedMeals(ctx, r)
-		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
-		}
-
-		photos := []Photo{}
-		for _, p := range photosDB[r] {
-			photos = append(photos, Photo{
-				Id:      p.ID,
-				Source:  PhotoSource(p.Source),
-				BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
-			})
-		}
-
-		rw := RecipeWrapper{
-			Id:           r,
-			LinkedMeals:  &meals,
-			LinkedPhotos: &photos,
-		}
-
-		recipes := a.transformRecipes(ctx, byId[r], true)
-		for x := range recipes {
-			eachRecipe := recipes[x]
-			others := []RecipeDetail{}
-			if eachRecipe.IsLatestVersion {
-				rw.Detail = eachRecipe
-			}
-			if rw.Detail.OtherVersions != nil {
-				others = *rw.Detail.OtherVersions
-				if !eachRecipe.IsLatestVersion {
-					others = append(others, eachRecipe)
-				}
-			}
-			rw.Detail.OtherVersions = &others
-
-			if eachRecipe.IsLatestVersion {
-				items = append(items, rw)
-			}
-		}
-	}
-
-	listMeta.setTotalCount(count)
-
 	resp := PaginatedRecipeWrappers{
 		Recipes: &items,
-		Meta:    listMeta,
+		// Meta:    listMeta,
 	}
 
 	return c.JSON(http.StatusOK, resp)

@@ -24,6 +24,7 @@ const ProgressiveImage: React.FC<{ photo: Photo; maxWidth?: number }> = ({
       )}
       {base_url !== "" && (
         <img
+          loading="lazy"
           onLoad={() => setLoaded(true)}
           key={id}
           // https://developers.google.com/photos/library/guides/access-media-items#image-base-urls

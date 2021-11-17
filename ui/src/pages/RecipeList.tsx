@@ -81,17 +81,7 @@ const RecipeList: React.FC = () => {
       {
         Header: "meals",
         Cell: ({ row: { original } }: CellProps<i>) => (
-          // return (original.linked_meals || []).map((m) => (
-          //   <div className="w-9/12">
-          //     {m.name}
-          //     <div className="flex flex-wrap">
-          //       {m.photos.map((photo) => (
-          //         <ProgressiveImage photo={photo} />
-          //       ))}
-          //     </div>
-          //   </div>
-          // ));
-          <div className="w-9/12 flex flex-wrap">
+          <div className="w-9/12 flex ">
             {(original.linked_photos || []).map((p) => (
               <ProgressiveImage photo={p} />
             ))}
