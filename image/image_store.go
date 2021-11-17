@@ -41,8 +41,6 @@ func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
 }
 
 func (l *LocalImageStore) GetImageURL(ctx context.Context, id string) string {
-	_, span := l.tracer.Start(ctx, "GetImageURL")
-	defer span.End()
 	fileName := l.getFileName(id)
 	return l.httpBaseURL + "/images/" + fileName
 }

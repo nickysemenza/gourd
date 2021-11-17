@@ -736,7 +736,7 @@ func testRecipeDetailToOneSetOpRecipeUsingRecipe(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.RecipeDetail != &a {
+		if x.R.RecipeDetails[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.RecipeID != x.ID {

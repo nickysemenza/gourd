@@ -711,7 +711,6 @@ func TestToOne(t *testing.T) {
 // TestOneToOne tests cannot be run in parallel
 // or deadlocks can occur.
 func TestOneToOne(t *testing.T) {
-	t.Run("RecipeToRecipeDetailUsingRecipeDetail", testRecipeOneToOneRecipeDetailUsingRecipeDetail)
 	t.Run("UsdaFoodToUsdaBrandedFoodUsingFDCUsdaBrandedFood", testUsdaFoodOneToOneUsdaBrandedFoodUsingFDCUsdaBrandedFood)
 	t.Run("UsdaFoodToUsdaFoundationFoodUsingFDCUsdaFoundationFood", testUsdaFoodOneToOneUsdaFoundationFoodUsingFDCUsdaFoundationFood)
 	t.Run("UsdaFoodToUsdaMarketAcquisitionUsingFDCUsdaMarketAcquisition", testUsdaFoodOneToOneUsdaMarketAcquisitionUsingFDCUsdaMarketAcquisition)
@@ -745,6 +744,7 @@ func TestToMany(t *testing.T) {
 	t.Run("RecipeToHighlightRecipeMealGphotos", testRecipeToManyHighlightRecipeMealGphotos)
 	t.Run("RecipeToMealRecipes", testRecipeToManyMealRecipes)
 	t.Run("RecipeToNotionRecipes", testRecipeToManyNotionRecipes)
+	t.Run("RecipeToRecipeDetails", testRecipeToManyRecipeDetails)
 	t.Run("RecipeToRecipeSectionIngredients", testRecipeToManyRecipeSectionIngredients)
 	t.Run("UsdaFoodToFDCIDOfSampleFoodUsdaFoods", testUsdaFoodToManyFDCIDOfSampleFoodUsdaFoods)
 	t.Run("UsdaFoodToFDCIDOfAcquisitionFoodUsdaFoods", testUsdaFoodToManyFDCIDOfAcquisitionFoodUsdaFoods)
@@ -782,7 +782,7 @@ func TestToOneSet(t *testing.T) {
 	t.Run("NotionImageToImageUsingNotionImages", testNotionImageToOneSetOpImageUsingNotionImageImage)
 	t.Run("NotionImageToNotionRecipeUsingPageNotionImages", testNotionImageToOneSetOpNotionRecipeUsingPage)
 	t.Run("NotionRecipeToRecipeUsingNotionRecipes", testNotionRecipeToOneSetOpRecipeUsingNotionRecipeRecipe)
-	t.Run("RecipeDetailToRecipeUsingRecipeDetail", testRecipeDetailToOneSetOpRecipeUsingRecipe)
+	t.Run("RecipeDetailToRecipeUsingRecipeDetails", testRecipeDetailToOneSetOpRecipeUsingRecipe)
 	t.Run("RecipeSectionIngredientToIngredientUsingRecipeSectionIngredients", testRecipeSectionIngredientToOneSetOpIngredientUsingRecipeSectionIngredientIngredient)
 	t.Run("RecipeSectionIngredientToRecipeUsingRecipeSectionIngredients", testRecipeSectionIngredientToOneSetOpRecipeUsingRecipeSectionIngredientRecipe)
 	t.Run("RecipeSectionIngredientToRecipeSectionUsingSectionRecipeSectionIngredients", testRecipeSectionIngredientToOneSetOpRecipeSectionUsingSectionRecipeSection)
@@ -848,7 +848,6 @@ func TestToOneRemove(t *testing.T) {
 // TestOneToOneSet tests cannot be run in parallel
 // or deadlocks can occur.
 func TestOneToOneSet(t *testing.T) {
-	t.Run("RecipeToRecipeDetailUsingRecipeDetail", testRecipeOneToOneSetOpRecipeDetailUsingRecipeDetail)
 	t.Run("UsdaFoodToUsdaBrandedFoodUsingFDCUsdaBrandedFood", testUsdaFoodOneToOneSetOpUsdaBrandedFoodUsingFDCUsdaBrandedFood)
 	t.Run("UsdaFoodToUsdaFoundationFoodUsingFDCUsdaFoundationFood", testUsdaFoodOneToOneSetOpUsdaFoundationFoodUsingFDCUsdaFoundationFood)
 	t.Run("UsdaFoodToUsdaMarketAcquisitionUsingFDCUsdaMarketAcquisition", testUsdaFoodOneToOneSetOpUsdaMarketAcquisitionUsingFDCUsdaMarketAcquisition)
@@ -886,6 +885,7 @@ func TestToManyAdd(t *testing.T) {
 	t.Run("RecipeToHighlightRecipeMealGphotos", testRecipeToManyAddOpHighlightRecipeMealGphotos)
 	t.Run("RecipeToMealRecipes", testRecipeToManyAddOpMealRecipes)
 	t.Run("RecipeToNotionRecipes", testRecipeToManyAddOpNotionRecipes)
+	t.Run("RecipeToRecipeDetails", testRecipeToManyAddOpRecipeDetails)
 	t.Run("RecipeToRecipeSectionIngredients", testRecipeToManyAddOpRecipeSectionIngredients)
 	t.Run("UsdaFoodToFDCIDOfSampleFoodUsdaFoods", testUsdaFoodToManyAddOpFDCIDOfSampleFoodUsdaFoods)
 	t.Run("UsdaFoodToFDCIDOfAcquisitionFoodUsdaFoods", testUsdaFoodToManyAddOpFDCIDOfAcquisitionFoodUsdaFoods)

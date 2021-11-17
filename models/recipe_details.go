@@ -568,7 +568,7 @@ func (recipeDetailL) LoadRecipe(ctx context.Context, e boil.ContextExecutor, sin
 		if foreign.R == nil {
 			foreign.R = &recipeR{}
 		}
-		foreign.R.RecipeDetail = object
+		foreign.R.RecipeDetails = append(foreign.R.RecipeDetails, object)
 		return nil
 	}
 
@@ -579,7 +579,7 @@ func (recipeDetailL) LoadRecipe(ctx context.Context, e boil.ContextExecutor, sin
 				if foreign.R == nil {
 					foreign.R = &recipeR{}
 				}
-				foreign.R.RecipeDetail = local
+				foreign.R.RecipeDetails = append(foreign.R.RecipeDetails, local)
 				break
 			}
 		}
@@ -688,7 +688,7 @@ func (recipeDetailL) LoadRecipeSections(ctx context.Context, e boil.ContextExecu
 
 // SetRecipe of the recipeDetail to the related item.
 // Sets o.R.Recipe to related.
-// Adds o to related.R.RecipeDetail.
+// Adds o to related.R.RecipeDetails.
 func (o *RecipeDetail) SetRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
 	var err error
 	if insert {
@@ -724,10 +724,10 @@ func (o *RecipeDetail) SetRecipe(ctx context.Context, exec boil.ContextExecutor,
 
 	if related.R == nil {
 		related.R = &recipeR{
-			RecipeDetail: o,
+			RecipeDetails: RecipeDetailSlice{o},
 		}
 	} else {
-		related.R.RecipeDetail = o
+		related.R.RecipeDetails = append(related.R.RecipeDetails, o)
 	}
 
 	return nil

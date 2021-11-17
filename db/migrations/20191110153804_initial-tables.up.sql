@@ -23,8 +23,9 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   unique("recipe_id", "version")
 );
 -- https://stackoverflow.com/a/11014977
-create unique index one_latest_revision_of_recipe on recipe_details (recipe_id)
-where is_latest_version;
+-- create unique index one_latest_revision_of_recipe on recipe_details (recipe_id)
+-- where is_latest_version;
+-- breaks https://github.com/volatiletech/sqlboiler/issues/698
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "id" TEXT NOT NULL UNIQUE,
   "recipe_detail" TEXT references recipe_details(id) NOT NULL,

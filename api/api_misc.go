@@ -6,26 +6,27 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/models"
-	"github.com/sirupsen/logrus"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func ingredientFromModel(ingredient *models.Ingredient) *IngredientDetail {
+func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredient) (*IngredientDetail, error) {
 	if ingredient == nil {
-		return nil
+		return nil, nil
 	}
 	i := IngredientDetail{
 		Name: ingredient.Name,
 	}
-	return &i
+	return &i, nil
 }
-func (a *API) recipeFromModel(recipe *models.Recipe) *RecipeWrapper {
+func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
 	if recipe == nil {
-		return nil
+		return nil, nil
 	}
 	sections := []RecipeSection{}
 
-	for _, section := range recipe.R.RecipeDetail.R.RecipeSections {
+	d := recipe.R.RecipeDetails[0]
+
+	for _, section := range d.R.RecipeSections {
 		s := RecipeSection{
 			Id: section.ID,
 			// Duration: ,
@@ -44,7 +45,11 @@ func (a *API) recipeFromModel(recipe *models.Recipe) *RecipeWrapper {
 			}
 			if ingredient.Ingredient.Valid {
 				si.Kind = IngredientKindIngredient
-				si.Ingredient = ingredientFromModel(ingredient.R.RecipeSectionIngredientIngredient)
+				var err error
+				si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.RecipeSectionIngredientIngredient)
+				if err != nil {
+					return nil, err
+				}
 			} else {
 				si.Kind = IngredientKindRecipe
 				// si.Recipe = &recipeFromDB(ingredient.R.RecipeSectionIngredientRecipe).Detail
@@ -55,17 +60,39 @@ func (a *API) recipeFromModel(recipe *models.Recipe) *RecipeWrapper {
 
 	}
 
+	other := []RecipeDetail{}
+	if d.IsLatestVersion.Bool {
+
+		others, err := models.Recipes(
+			Where("recipes.id = ?", recipe.ID),
+			Load(models.RecipeRels.RecipeDetails,
+				Where("recipe_details.is_latest_version = ?", false)),
+		).
+			All(ctx, a.db.DB())
+		if err != nil {
+			panic(err)
+		}
+		for _, o := range others {
+			r, err := a.recipeFromModel(ctx, o)
+			if err != nil {
+				return nil, err
+			}
+			other = append(other, r.Detail)
+		}
+	}
+
 	rd := RecipeDetail{
-		Id:        recipe.R.RecipeDetail.ID,
-		CreatedAt: recipe.R.RecipeDetail.CreatedAt,
-		Name:      recipe.R.RecipeDetail.Name,
-		Quantity:  int64(recipe.R.RecipeDetail.Quantity.Int),
-		// Servings:  int64(recipe.R.RecipeDetail.Servings.Int),
-		// Sources:   recipe.R.RecipeDetail.Source,
-		Unit:            recipe.R.RecipeDetail.Unit.String,
-		Version:         int64(recipe.R.RecipeDetail.Version),
+		Id:        d.ID,
+		CreatedAt: d.CreatedAt,
+		Name:      d.Name,
+		Quantity:  int64(d.Quantity.Int),
+		// Servings:  int64(d.Servings.Int),
+		// Sources:   d.Source,
+		Unit:            d.Unit.String,
+		Version:         int64(d.Version),
 		Sections:        sections,
-		IsLatestVersion: recipe.R.RecipeDetail.IsLatestVersion.Bool,
+		IsLatestVersion: d.IsLatestVersion.Bool,
+		OtherVersions:   &other,
 	}
 
 	rw := RecipeWrapper{
@@ -76,7 +103,7 @@ func (a *API) recipeFromModel(recipe *models.Recipe) *RecipeWrapper {
 	items := []Photo{}
 	for _, notionRecipe := range recipe.R.NotionRecipes {
 		for _, notionImage := range notionRecipe.R.PageNotionImages {
-			url := a.ImageStore.GetImageURL(context.Background(), notionImage.Image)
+			url := a.ImageStore.GetImageURL(ctx, notionImage.Image)
 			items = append(items, Photo{
 				Id:       notionImage.BlockID,
 				Created:  notionImage.LastSeen,
@@ -90,36 +117,47 @@ func (a *API) recipeFromModel(recipe *models.Recipe) *RecipeWrapper {
 	}
 	rw.LinkedPhotos = &items
 
-	return &rw
+	return &rw, nil
 }
-func (a *API) Misc(c echo.Context) error {
-	ctx, span := a.tracer.Start(c.Request().Context(), "Misc")
-	defer span.End()
-
+func (a *API) RecipeListV2(ctx context.Context) ([]RecipeWrapper, error) {
 	recipes, err := models.Recipes(
-		Load(Rels(models.RecipeRels.RecipeDetail,
+		Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
+		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,
 			models.RecipeSectionIngredientRels.RecipeSectionIngredientIngredient,
 			// models.RecipeSectionIngredientRels.RecipeSectionIngredientRecipe,
 		)),
-		Load(Rels(models.RecipeRels.RecipeDetail,
+		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionInstructions)),
 		Load(Rels(models.RecipeRels.NotionRecipes,
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.NotionImageImage,
 		)),
-	).All(ctx, a.db.DB())
+	).
+		All(ctx, a.db.DB())
 	if err != nil {
-		logrus.Error(err)
-		return c.JSON(http.StatusInternalServerError, err)
+		return nil, err
 	}
 	// spew.Dump(recipes)
 	items := []RecipeWrapper{}
 	for _, recipe := range recipes {
-		rw := a.recipeFromModel(recipe)
+		rw, err := a.recipeFromModel(ctx, recipe)
+		if err != nil {
+			return nil, err
+		}
 		items = append(items, *rw)
+	}
+	return items, nil
+}
+func (a *API) Misc(c echo.Context) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "Misc")
+	defer span.End()
+
+	items, err := a.RecipeListV2(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 	}
 	// s := spew.Sdump(recipes)
 	// // s = strings.ReplaceAll(s, "\n", "<br/>")
