@@ -1861,20 +1861,20 @@
     "@types/yargs" "^16.0.0"
     chalk "^4.0.0"
 
-"@nestjs/common@8.2.1":
-  version "8.2.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-8.2.1.tgz#2067d7dda6d1741f0dbffbef7a771851704fd2eb"
-  integrity sha512-xtcvRm46hyLVacMEfGJq4byFVkkP/xo255Em1T6BISyqJe2Cf2eCHSVOwxElDCIlonpGwrJhWosGgyOUgWk1iw==
+"@nestjs/common@8.2.2":
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-8.2.2.tgz#44bbdd85ce7918083b04b00e2e88204cb655587a"
+  integrity sha512-Qy8GUFwV34YCw34fbFkyBi9bhDPPBacVhZMUxVUmnoqBL8GEdSpPDzW6epbl+IF1Q6TACK5L8WvTkd5V3/Eifw==
   dependencies:
     axios "0.24.0"
     iterare "1.2.1"
     tslib "2.3.1"
     uuid "8.3.2"
 
-"@nestjs/core@8.2.1":
-  version "8.2.1"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.2.1.tgz#dd9540ade8cc13e274e0dbf4d54ece288fde5cae"
-  integrity sha512-5JyCBd+gDkl32Xa7ZRp2cvLR/elPSE/T4egtMFvSwQJDhek+djp9jaVq5PYvsBgaCr/HSHHrLIQ72nnDRLTisQ==
+"@nestjs/core@8.2.2":
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.2.2.tgz#4ad1608be81090a6e2b734f718c7e70de3826328"
+  integrity sha512-89ChFrPfePOlcEqpCYU+tExsGZTXxyieVIrRZXqxxbxhS6sf2VqF84zXK9NhVqISZdDwGmDTy+yKu0k2h/FHVA==
   dependencies:
     "@nuxtjs/opencollective" "0.3.2"
     fast-safe-stringify "2.1.1"
@@ -1930,13 +1930,13 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.16":
-  version "2.4.16"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.16.tgz#1091697ec8f6ecc9e20896b153b757346d8a100a"
-  integrity sha512-XsB+aDNBDJKyKm77TZQIlavXfN1beAkRrf9aIojuP/4kWG+wtzw1l1WZWahkkJdJN1MlhEWUsXxRycC8g7nY1g==
+"@openapitools/openapi-generator-cli@2.4.17":
+  version "2.4.17"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.17.tgz#b67d23659f0c2ec4741e2a57c1600028f15c7024"
+  integrity sha512-qK+eou0Q0V2AyXfeVhyiLy3fIk2YMYuti/x81elQPXbOj9VzI1kwA4ANjNjo7jEuRguPix98WF00bAqVJlcbyw==
   dependencies:
-    "@nestjs/common" "8.2.1"
-    "@nestjs/core" "8.2.1"
+    "@nestjs/common" "8.2.2"
+    "@nestjs/core" "8.2.2"
     "@nuxtjs/opencollective" "0.3.2"
     chalk "4.1.2"
     commander "8.3.0"
