@@ -161,7 +161,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	_, err = c.execTx(ctx, tx, c.psql.
 		Insert(recipeDetailsTable).
-		Columns("id", "recipe", "name", "version", "is_latest_version", "source", "created_at").
+		Columns("id", "recipe_id", "name", "version", "is_latest_version", "source", "created_at").
 		Values(r.Id, r.RecipeId, r.Name, r.Version, true, r.Source, date))
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert new recipe details row: %w", err)

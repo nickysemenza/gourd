@@ -219,7 +219,7 @@ func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredi
 
 	detail := IngredientDetail{
 		Ingredient:   transformIngredient(i),
-		Children:     same,
+		Children:     &same,
 		Recipes:      recipes,
 		UnitMappings: []UnitMapping{},
 	}

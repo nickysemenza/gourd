@@ -23,8 +23,8 @@ pub struct IngredientDetail {
     #[serde(rename = "recipes")]
     pub recipes: Vec<crate::models::RecipeDetail>,
     /// Ingredients that are equivalent
-    #[serde(rename = "children")]
-    pub children: Vec<crate::models::IngredientDetail>,
+    #[serde(rename = "children", skip_serializing_if = "Option::is_none")]
+    pub children: Option<Vec<crate::models::IngredientDetail>>,
     #[serde(rename = "food", skip_serializing_if = "Option::is_none")]
     pub food: Option<Box<crate::models::Food>>,
     /// mappings of equivalent units
@@ -34,12 +34,12 @@ pub struct IngredientDetail {
 
 impl IngredientDetail {
     /// An Ingredient
-    pub fn new(name: String, ingredient: crate::models::Ingredient, recipes: Vec<crate::models::RecipeDetail>, children: Vec<crate::models::IngredientDetail>, unit_mappings: Vec<crate::models::UnitMapping>) -> IngredientDetail {
+    pub fn new(name: String, ingredient: crate::models::Ingredient, recipes: Vec<crate::models::RecipeDetail>, unit_mappings: Vec<crate::models::UnitMapping>) -> IngredientDetail {
         IngredientDetail {
             name,
             ingredient: Box::new(ingredient),
             recipes,
-            children,
+            children: None,
             food: None,
             unit_mappings,
         }

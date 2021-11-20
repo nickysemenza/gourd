@@ -210,7 +210,7 @@ type Ingredient struct {
 // An Ingredient
 type IngredientDetail struct {
 	// Ingredients that are equivalent
-	Children []IngredientDetail `json:"children"`
+	Children *[]IngredientDetail `json:"children,omitempty"`
 
 	// A top level food
 	Food *Food `json:"food,omitempty"`

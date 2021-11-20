@@ -221,7 +221,6 @@ fn bare_detail(name: String) -> IngredientDetail {
         Ingredient::new("".to_string(), name.to_string()),
         vec![],
         vec![],
-        vec![],
     )
 }
 
@@ -298,7 +297,6 @@ mod tests {
                 Ingredient::new("a".to_string(), "foo".to_string()),
                 vec![],
                 vec![],
-                vec![],
             ))),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -312,7 +310,6 @@ mod tests {
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],
-                vec![],
             ))),
             ..SectionIngredient::new(
                 "".to_string(),
@@ -324,7 +321,6 @@ mod tests {
             ingredient: Some(Box::new(IngredientDetail::new(
                 "bar".to_string(),
                 Ingredient::new("b".to_string(), "bar".to_string()),
-                vec![],
                 vec![],
                 vec![],
             ))),

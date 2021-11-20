@@ -59,9 +59,7 @@ require github.com/jomei/notionapi v1.6.0
 
 require (
 	github.com/friendsofgo/errors v0.9.2
-	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/volatiletech/null/v8 v8.1.2
-	github.com/volatiletech/randomize v0.0.1
 	github.com/volatiletech/sqlboiler/v4 v4.8.1
 	github.com/volatiletech/strmangle v0.0.1
 )
@@ -288,6 +286,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
+	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.51.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect

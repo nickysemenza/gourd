@@ -84,6 +84,7 @@ const FoodSearch: React.FC<{
               isHighlighted={isHighlighted}
               onLink={onLink}
               x={x}
+              key={x}
             />
           );
         })}

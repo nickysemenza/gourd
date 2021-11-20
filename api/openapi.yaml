@@ -915,7 +915,7 @@ components:
         - name
         - ingredient
         - recipes
-        - children
+        # - children
         - unit_mappings
       properties:
         name:

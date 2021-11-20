@@ -11,6 +11,9 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.17
+      - run: docker-compose pull
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
       - name: build e2e docker-compose
         run: docker-compose build --parallel
       - name: dl deps
@@ -25,8 +28,8 @@ jobs:
         run: curl -v http://localhost:8080/parse?text=1%20cup
       - name: go test integration
         run: make integration-test-go
-      - name: run usda import
-        run: docker-compose run usda
+      # - name: run usda import
+      # run: docker-compose run usda
       - name: seed db with testdata
         env:
           DB_HOST: localhost
@@ -41,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-results
-          path: ui/cypress
+          path: /work/ui/cypress

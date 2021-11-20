@@ -284,7 +284,7 @@ export interface IngredientDetail {
   /**
    * Ingredients that are equivalent
    */
-  children: IngredientDetail[];
+  children?: IngredientDetail[];
   food?: Food;
   /**
    * mappings of equivalent units

@@ -46,8 +46,8 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
       <table>
         {nutrients
           .filter((n) => n.amount > 0.1)
-          .map((n) => (
-            <tr>
+          .map((n, x) => (
+            <tr key={x}>
               <td>{scaledRound(n.amount)} </td>
               <td>{n.nutrient.unit_name} </td>
               <td>{n.nutrient.name} </td>

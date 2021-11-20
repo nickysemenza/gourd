@@ -1,3 +1,4 @@
+no-tests = true
 [psql]
   dbname = "food"
   host   = "localhost"

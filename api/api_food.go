@@ -168,6 +168,9 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	if f == nil {
+		return c.JSON(http.StatusNotFound, nil)
+	}
 
 	return c.JSON(http.StatusOK, *f)
 }

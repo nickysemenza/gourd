@@ -51,10 +51,9 @@ fn si_to_api(r: SI) -> SectionIngredient {
 }
 /// This handler uses json extractor
 pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
-    // let conn = &pool.co
-    // let rows = get_test(&pool).await.unwrap();
-    // let data: Vec<SectionIngredient> = rows.into_iter().map(|r| si_to_api(r)).collect();
-    // dbg!(a);
+    let rows = get_test(&pool).await.unwrap();
+    let data: Vec<SectionIngredient> = rows.into_iter().map(|r| si_to_api(r)).collect();
+    dbg!(data);
 
     let conn = sea_orm::Database::connect("postgresql://gourd:gourd@localhost:5555/food")
         .await
