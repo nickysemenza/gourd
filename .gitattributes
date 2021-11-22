@@ -1,2 +1,4 @@
 *.sql linguist-language=SQL
 ui/src/api/* linguist-generated
+rust/openapi/* linguist-generated
+models/* linguist-generated

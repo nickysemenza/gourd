@@ -105,6 +105,9 @@ openapi: validate-openapi api/openapi.yaml bin/oapi-codegen
 openapi-docs:
 	npx @redocly/openapi-cli preview-docs api/openapi.yaml -p 8081
 
+gen-db:
+	sqlboiler psql --relation-tag rel
+
 # frontend
 dev-ui:
 	cd ui && yarn run start
@@ -127,7 +130,7 @@ wasm-dev: generate-wasm
 test-rs:
 	cd rust && cargo test
 
-generate: wasm-dev openapi
+generate: wasm-dev openapi gen-db
 
 
 # misc dev
