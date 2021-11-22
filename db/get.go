@@ -430,6 +430,10 @@ func newSearchQuery(opts ...SearchOption) *SearchQuery {
 	}
 	return q
 }
+func GetPagination(opts ...SearchOption) (uint64, uint64) {
+	s := newSearchQuery(opts...)
+	return s.limit, s.offset
+}
 
 // GetIngredients returns all ingredients.
 func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, opts ...SearchOption) ([]Ingredient, uint64, error) {

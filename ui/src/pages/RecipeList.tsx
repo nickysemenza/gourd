@@ -11,9 +11,10 @@ import { Helmet } from "react-helmet";
 import update from "immutability-helper";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
-import { ButtonGroup } from "../components/Button";
+import { ButtonGroup, Pill2 } from "../components/Button";
 import { PlusCircle } from "react-feather";
 import ProgressiveImage from "../components/ProgressiveImage";
+import { sumIngredients } from "../components/RecipeEditorUtils";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -74,6 +75,22 @@ const RecipeList: React.FC = () => {
                   </li>
                 ))}
               </ul>
+              <Pill2
+                color={
+                  Object.keys(
+                    sumIngredients(original.detail.sections).ingredients
+                  ).length > 0
+                    ? "green"
+                    : "red"
+                }
+              >
+                {
+                  Object.keys(
+                    sumIngredients(original.detail.sections).ingredients
+                  ).length
+                }{" "}
+                ingredients
+              </Pill2>
             </div>
           );
         },

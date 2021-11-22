@@ -62,6 +62,16 @@ export const Pill: React.FC = ({ children }) => (
     {children}
   </span>
 );
+export const Pill2: React.FC<{ color: "red" | "green" }> = ({
+  children,
+  color,
+}) => (
+  <span
+    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${color}-100 text-${color}-800`}
+  >
+    {children}
+  </span>
+);
 
 export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({
   x,

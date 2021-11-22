@@ -429,17 +429,17 @@ export const countTotals = (
     )
     .reduce((a, b) => sumStats(a, b), { grams: 0, dollars: 0 });
 
-export const sumIngredients = (sections: RecipeSection[]) => {
+export const sumIngredients = (sections?: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
   let ingredients: Record<string, SectionIngredient[]> = {};
 
-  flatIngredients(sections).forEach((i) => {
+  flatIngredients(sections || []).forEach((i) => {
     switch (i.kind) {
       case "recipe":
         const r = i;
         if (!!r) {
           //todo: don't group by recipe/ingredient
-          ingredients[r.id] = [...(ingredients[r.id] || []), r];
+          recipes[r.id] = [...(recipes[r.id] || []), r];
         }
         break;
       case "ingredient":

@@ -4,7 +4,7 @@ import { Photo } from "../api/openapi-hooks/api";
 
 const ProgressiveImage: React.FC<{ photo: Photo; maxWidth?: number }> = ({
   photo,
-  maxWidth = 120,
+  maxWidth = 40,
 }) => {
   const [loaded, setLoaded] = useState(false);
   const { blur_hash, width, height, base_url, id, source } = photo;

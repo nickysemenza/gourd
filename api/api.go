@@ -20,6 +20,7 @@ import (
 	"github.com/nickysemenza/gourd/google"
 	"github.com/nickysemenza/gourd/gphotos"
 	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/models"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"go.opentelemetry.io/otel"
@@ -365,82 +366,24 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 	ctx, span := a.tracer.Start(ctx, "ListRecipes")
 	defer span.End()
 
-	// paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	// recipes, count, err := a.DB().GetRecipes(ctx, "", paginationParams...)
-	// if err != nil {
-	// 	return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
-	// }
+	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	limit, offset := db.GetPagination(paginationParams...)
 
-	// var recipeIDs []string
-	// for _, r := range recipes {
-	// 	recipeIDs = append(recipeIDs, r.Id)
-	// }
+	count, err := models.Recipes().Count(ctx, a.db.DB())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+	}
 
-	// details, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": recipeIDs})
-	// if err != nil {
-	// 	return sendErr(c, http.StatusBadRequest, err)
-	// }
-	// byId := details.ByRecipeId()
-	// items := []RecipeWrapper{}
+	listMeta.setTotalCount(uint64(count))
 
-	// ctx, span2 := a.tracer.Start(ctx, "ListRecipes2")
-	// defer span2.End()
-	// photosDB, err := a.DB().GetPhotosWithRecipe(ctx, recipeIDs...)
-	// if err != nil {
-	// 	return sendErr(c, http.StatusBadRequest, err)
-	// }
-	// for _, r := range recipeIDs {
-	// 	meals, err := a.getLinkedMeals(ctx, r)
-	// 	if err != nil {
-	// 		return sendErr(c, http.StatusBadRequest, err)
-	// 	}
-
-	// 	photos := []Photo{}
-	// 	for _, p := range photosDB[r] {
-	// 		photos = append(photos, Photo{
-	// 			Id:      p.ID,
-	// 			Source:  PhotoSource(p.Source),
-	// 			BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
-	// 		})
-	// 	}
-
-	// 	rw := RecipeWrapper{
-	// 		Id:           r,
-	// 		LinkedMeals:  &meals,
-	// 		LinkedPhotos: &photos,
-	// 	}
-
-	// 	recipes := a.transformRecipes(ctx, byId[r], true)
-	// 	for x := range recipes {
-	// 		eachRecipe := recipes[x]
-	// 		others := []RecipeDetail{}
-	// 		if eachRecipe.IsLatestVersion {
-	// 			rw.Detail = eachRecipe
-	// 		}
-	// 		if rw.Detail.OtherVersions != nil {
-	// 			others = *rw.Detail.OtherVersions
-	// 			if !eachRecipe.IsLatestVersion {
-	// 				others = append(others, eachRecipe)
-	// 			}
-	// 		}
-	// 		rw.Detail.OtherVersions = &others
-
-	// 		if eachRecipe.IsLatestVersion {
-	// 			items = append(items, rw)
-	// 		}
-	// 	}
-	// }
-
-	// listMeta.setTotalCount(count)
-
-	items, err := a.RecipeListV2(ctx)
+	items, err := a.RecipeListV2(ctx, limit, offset)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
 
 	resp := PaginatedRecipeWrappers{
 		Recipes: &items,
-		// Meta:    listMeta,
+		Meta:    listMeta,
 	}
 
 	return c.JSON(http.StatusOK, resp)

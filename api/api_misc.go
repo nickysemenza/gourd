@@ -127,22 +127,28 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 
 	return &rw, nil
 }
-func (a *API) RecipeListV2(ctx context.Context) ([]RecipeWrapper, error) {
+func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeWrapper, error) {
 	recipes, err := models.Recipes(
 		// Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
+		// has many sections, has many ingredients, which can be ingredients or recipes
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,
 			models.RecipeSectionIngredientRels.RecipeSectionIngredientIngredient,
+			// TODO
 			// models.RecipeSectionIngredientRels.RecipeSectionIngredientRecipe,
 		)),
+		// has many sections, has many instructions
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionInstructions)),
+		// has images via notion recipe
 		Load(Rels(models.RecipeRels.NotionRecipes,
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.NotionImageImage,
 		)),
+		Limit(int(limit)),
+		Offset(int(offset)),
 	).
 		All(ctx, a.db.DB())
 	if err != nil {
@@ -163,7 +169,7 @@ func (a *API) Misc(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Misc")
 	defer span.End()
 
-	items, err := a.RecipeListV2(ctx)
+	items, err := a.RecipeListV2(ctx, 10, 0)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}
