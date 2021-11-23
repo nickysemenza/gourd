@@ -302,7 +302,7 @@ type PaginatedFoods struct {
 	Foods *[]Food `json:"foods,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *Items `json:"meta,omitempty"`
+	Meta Items `json:"meta"`
 }
 
 // pages of IngredientDetail
@@ -310,7 +310,7 @@ type PaginatedIngredients struct {
 	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *Items `json:"meta,omitempty"`
+	Meta Items `json:"meta"`
 }
 
 // pages of Meal
@@ -318,20 +318,20 @@ type PaginatedMeals struct {
 	Meals *[]Meal `json:"meals,omitempty"`
 
 	// A generic list (for pagination use)
-	Meta *Items `json:"meta,omitempty"`
+	Meta Items `json:"meta"`
 }
 
 // pages of Photos
 type PaginatedPhotos struct {
 	// A generic list (for pagination use)
-	Meta   *Items   `json:"meta,omitempty"`
+	Meta   Items    `json:"meta"`
 	Photos *[]Photo `json:"photos,omitempty"`
 }
 
 // pages of Recipe
 type PaginatedRecipeWrappers struct {
 	// A generic list (for pagination use)
-	Meta    *Items           `json:"meta,omitempty"`
+	Meta    Items            `json:"meta"`
 	Recipes *[]RecipeWrapper `json:"recipes,omitempty"`
 }
 

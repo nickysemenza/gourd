@@ -1,13 +1,10 @@
 .openapi-generator-ignore
 apis/AlbumsApi.ts
 apis/AuthenticationApi.ts
-apis/FoodApi.ts
 apis/FoodsApi.ts
-apis/IngredientApi.ts
 apis/IngredientsApi.ts
 apis/MealsApi.ts
 apis/PhotosApi.ts
-apis/RecipeApi.ts
 apis/RecipesApi.ts
 apis/index.ts
 index.ts

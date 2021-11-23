@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    InlineResponse2001,
+    InlineResponse2001FromJSON,
+    InlineResponse2001ToJSON,
     PaginatedRecipeWrappers,
     PaginatedRecipeWrappersFromJSON,
     PaginatedRecipeWrappersToJSON,
@@ -44,6 +47,10 @@ export interface RecipesApiGetRecipeByIdRequest {
     recipeId: string;
 }
 
+export interface RecipesApiGetRecipesByIdsRequest {
+    recipeId: Array<string>;
+}
+
 export interface RecipesApiListRecipesRequest {
     offset?: number;
     limit?: number;
@@ -62,7 +69,7 @@ export class RecipesApi extends runtime.BaseAPI {
 
     /**
      * todo
-     * Converts an ingredient to a recipe, updating all recipes depending on it.
+     * Converts an ingredient to a recipe, updating all recipes depending on it
      */
     async convertIngredientToRecipeRaw(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
@@ -93,7 +100,7 @@ export class RecipesApi extends runtime.BaseAPI {
 
     /**
      * todo
-     * Converts an ingredient to a recipe, updating all recipes depending on it.
+     * Converts an ingredient to a recipe, updating all recipes depending on it
      */
     async convertIngredientToRecipe(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
         const response = await this.convertIngredientToRecipeRaw(requestParameters);
@@ -184,6 +191,50 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
+     * get recipes by ids
+     * Get recipes
+     */
+    async getRecipesByIdsRaw(requestParameters: RecipesApiGetRecipesByIdsRequest): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
+        if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
+            throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getRecipesByIds.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.recipeId) {
+            queryParameters['recipe_id'] = requestParameters.recipeId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/recipes/bulk`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipeWrappersFromJSON(jsonValue));
+    }
+
+    /**
+     * get recipes by ids
+     * Get recipes
+     */
+    async getRecipesByIds(requestParameters: RecipesApiGetRecipesByIdsRequest): Promise<PaginatedRecipeWrappers> {
+        const response = await this.getRecipesByIdsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
      * todo
      * List all recipes
      */
@@ -224,6 +275,42 @@ export class RecipesApi extends runtime.BaseAPI {
      */
     async listRecipes(requestParameters: RecipesApiListRecipesRequest): Promise<PaginatedRecipeWrappers> {
         const response = await this.listRecipesRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * recipe dependencies
+     * Get foods
+     */
+    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2001>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/data/recipe_dependencies`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+    }
+
+    /**
+     * recipe dependencies
+     * Get foods
+     */
+    async recipeDependencies(): Promise<InlineResponse2001> {
+        const response = await this.recipeDependenciesRaw();
         return await response.value();
     }
 

@@ -15,6 +15,15 @@
 
 import * as runtime from '../runtime';
 import {
+    Food,
+    FoodFromJSON,
+    FoodToJSON,
+    FoodDataType,
+    FoodDataTypeFromJSON,
+    FoodDataTypeToJSON,
+    PaginatedFoods,
+    PaginatedFoodsFromJSON,
+    PaginatedFoodsToJSON,
     RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
@@ -23,6 +32,21 @@ import {
 export interface FoodsApiAssociateFoodWithIngredientRequest {
     ingredientId: string;
     fdcId: number;
+}
+
+export interface FoodsApiGetFoodByIdRequest {
+    fdcId: number;
+}
+
+export interface FoodsApiGetFoodsByIdsRequest {
+    fdcId: Array<number>;
+}
+
+export interface FoodsApiSearchFoodsRequest {
+    name: string;
+    offset?: number;
+    limit?: number;
+    dataTypes?: Array<FoodDataType>;
 }
 
 /**
@@ -75,6 +99,146 @@ export class FoodsApi extends runtime.BaseAPI {
      */
     async associateFoodWithIngredient(requestParameters: FoodsApiAssociateFoodWithIngredientRequest): Promise<RecipeDetail> {
         const response = await this.associateFoodWithIngredientRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * get a FDC entry by id
+     */
+    async getFoodByIdRaw(requestParameters: FoodsApiGetFoodByIdRequest): Promise<runtime.ApiResponse<Food>> {
+        if (requestParameters.fdcId === null || requestParameters.fdcId === undefined) {
+            throw new runtime.RequiredError('fdcId','Required parameter requestParameters.fdcId was null or undefined when calling getFoodById.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/foods/{fdc_id}`.replace(`{${"fdc_id"}}`, encodeURIComponent(String(requestParameters.fdcId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FoodFromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * get a FDC entry by id
+     */
+    async getFoodById(requestParameters: FoodsApiGetFoodByIdRequest): Promise<Food> {
+        const response = await this.getFoodByIdRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * get foods by ids
+     * Get foods
+     */
+    async getFoodsByIdsRaw(requestParameters: FoodsApiGetFoodsByIdsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
+        if (requestParameters.fdcId === null || requestParameters.fdcId === undefined) {
+            throw new runtime.RequiredError('fdcId','Required parameter requestParameters.fdcId was null or undefined when calling getFoodsByIds.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.fdcId) {
+            queryParameters['fdc_id'] = requestParameters.fdcId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/foods/bulk`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedFoodsFromJSON(jsonValue));
+    }
+
+    /**
+     * get foods by ids
+     * Get foods
+     */
+    async getFoodsByIds(requestParameters: FoodsApiGetFoodsByIdsRequest): Promise<PaginatedFoods> {
+        const response = await this.getFoodsByIdsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * Search foods
+     */
+    async searchFoodsRaw(requestParameters: FoodsApiSearchFoodsRequest): Promise<runtime.ApiResponse<PaginatedFoods>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling searchFoods.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.name !== undefined) {
+            queryParameters['name'] = requestParameters.name;
+        }
+
+        if (requestParameters.dataTypes) {
+            queryParameters['data_types'] = requestParameters.dataTypes;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/foods/search`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedFoodsFromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * Search foods
+     */
+    async searchFoods(requestParameters: FoodsApiSearchFoodsRequest): Promise<PaginatedFoods> {
+        const response = await this.searchFoodsRaw(requestParameters);
         return await response.value();
     }
 

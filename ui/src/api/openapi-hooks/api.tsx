@@ -506,7 +506,7 @@ export interface TimeRange {
  */
 export interface PaginatedRecipeWrappers {
   recipes?: RecipeWrapper[];
-  meta?: Items;
+  meta: Items;
 }
 
 /**
@@ -514,7 +514,7 @@ export interface PaginatedRecipeWrappers {
  */
 export interface PaginatedIngredients {
   ingredients?: IngredientDetail[];
-  meta?: Items;
+  meta: Items;
 }
 
 /**
@@ -522,7 +522,7 @@ export interface PaginatedIngredients {
  */
 export interface PaginatedPhotos {
   photos?: Photo[];
-  meta?: Items;
+  meta: Items;
 }
 
 /**
@@ -530,7 +530,7 @@ export interface PaginatedPhotos {
  */
 export interface PaginatedMeals {
   meals?: Meal[];
-  meta?: Items;
+  meta: Items;
 }
 
 /**
@@ -538,7 +538,7 @@ export interface PaginatedMeals {
  */
 export interface PaginatedFoods {
   foods?: Food[];
-  meta?: Items;
+  meta: Items;
 }
 
 /**
@@ -1293,7 +1293,7 @@ export type ConvertIngredientToRecipeProps = Omit<
   ConvertIngredientToRecipePathParams;
 
 /**
- * Converts an ingredient to a recipe, updating all recipes depending on it.
+ * Converts an ingredient to a recipe, updating all recipes depending on it
  *
  * todo
  */
@@ -1321,7 +1321,7 @@ export type UseConvertIngredientToRecipeProps = Omit<
   ConvertIngredientToRecipePathParams;
 
 /**
- * Converts an ingredient to a recipe, updating all recipes depending on it.
+ * Converts an ingredient to a recipe, updating all recipes depending on it
  *
  * todo
  */

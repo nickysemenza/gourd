@@ -21,7 +21,7 @@ tags:
     description: meals operations
   - name: ingredients
     description: ingredients operations
-  - name: food
+  - name: foods
     description: food operations
 
 servers:
@@ -365,7 +365,7 @@ paths:
       description: get recipes by ids
       operationId: get_recipes_by_ids
       tags:
-        - recipe
+        - recipes
       parameters:
         - name: recipe_id
           in: query
@@ -384,7 +384,7 @@ paths:
                 $ref: "#/components/schemas/PaginatedRecipeWrappers"
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
-      summary: Converts an ingredient to a recipe, updating all recipes depending on it.
+      summary: Converts an ingredient to a recipe, updating all recipes depending on it
       description: todo
       operationId: convert_ingredient_to_recipe
       tags:
@@ -494,7 +494,7 @@ paths:
       description: todo
       operationId: get_food_by_id
       tags:
-        - food
+        - foods
       parameters:
         - name: fdc_id
           in: path
@@ -548,7 +548,7 @@ paths:
       description: todo
       operationId: search_foods
       tags:
-        - food
+        - foods
       parameters:
         - $ref: "#/components/parameters/offsetParam"
         - $ref: "#/components/parameters/limitParam"
@@ -580,7 +580,7 @@ paths:
       description: get foods by ids
       operationId: get_foods_by_ids
       tags:
-        - food
+        - foods
       parameters:
         - name: fdc_id
           in: query
@@ -603,8 +603,8 @@ paths:
       description: recipe dependencies
       operationId: recipe_dependencies
       tags:
-        - recipe
-        - ingredient
+        - recipes
+        - ingredients
       responses:
         "200":
           description: All dependencies
@@ -1162,6 +1162,8 @@ components:
     PaginatedRecipeWrappers:
       type: object
       description: pages of Recipe
+      required:
+        - meta
       properties:
         recipes:
           type: array
@@ -1172,6 +1174,8 @@ components:
     PaginatedIngredients:
       type: object
       description: pages of IngredientDetail
+      required:
+        - meta
       properties:
         ingredients:
           type: array
@@ -1182,6 +1186,8 @@ components:
     PaginatedPhotos:
       type: object
       description: pages of Photos
+      required:
+        - meta
       properties:
         photos:
           type: array
@@ -1192,6 +1198,8 @@ components:
     PaginatedMeals:
       type: object
       description: pages of Meal
+      required:
+        - meta
       properties:
         meals:
           type: array
@@ -1202,6 +1210,8 @@ components:
     PaginatedFoods:
       type: object
       description: pages of Food
+      required:
+        - meta
       properties:
         foods:
           type: array

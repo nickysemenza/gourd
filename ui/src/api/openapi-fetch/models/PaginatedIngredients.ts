@@ -41,7 +41,7 @@ export interface PaginatedIngredients {
      * @type {Items}
      * @memberof PaginatedIngredients
      */
-    meta?: Items;
+    meta: Items;
 }
 
 export function PaginatedIngredientsFromJSON(json: any): PaginatedIngredients {
@@ -55,7 +55,7 @@ export function PaginatedIngredientsFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'ingredients': !exists(json, 'ingredients') ? undefined : ((json['ingredients'] as Array<any>).map(IngredientDetailFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
+        'meta': ItemsFromJSON(json['meta']),
     };
 }
 

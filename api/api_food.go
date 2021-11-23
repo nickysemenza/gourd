@@ -182,7 +182,7 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}
-	listMeta := &Items{PageCount: 1}
+	listMeta := Items{PageCount: 1}
 	listMeta.setTotalCount(count)
 	items, err := a.buildPaginatedFood(ctx, foods)
 	if err != nil {

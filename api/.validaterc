@@ -8,13 +8,13 @@
       ],
       "no_summary": "warning",
       "no_array_responses": "error",
-      "parameter_order": "warning",
+      "parameter_order": "off",
       "undefined_tag": "warning",
       "unused_tag": "warning",
       "operation_id_naming_convention": "warning"
     },
     "pagination": {
-      "pagination_style": "off"
+      "pagination_style": "warning"
     },
     "parameters": {
       "no_parameter_description": "error",
@@ -54,7 +54,15 @@
       "no_property_description": "off",
       "description_mentions_json": "warning",
       "array_of_arrays": "warning",
-      "inconsistent_property_type": "warning",
+      "inconsistent_property_type": [
+        "warning",
+        [
+          "code",
+          "default",
+          "type",
+          "value"
+        ]
+      ],
       "property_case_convention": [
         "error",
         "lower_snake_case"
@@ -63,8 +71,7 @@
       "enum_case_convention": [
         "warning",
         "lower_snake_case"
-      ],
-      "undefined_required_properties": "warning"
+      ]
     },
     "walker": {
       "no_empty_descriptions": "error",
@@ -87,11 +94,18 @@
     },
     "responses": {
       "no_success_response_codes": "warning",
+      "protocol_switching_and_success_code": "error",
       "no_response_body": "warning",
       "ibm_status_code_guidelines": "warning"
     },
     "schemas": {
       "json_or_param_binary_string": "warning"
+    }
+  },
+  "spectral": {
+    "rules": {
+      "string-boundary": "off",
+      "response-example-provided": "off"
     }
   }
 }

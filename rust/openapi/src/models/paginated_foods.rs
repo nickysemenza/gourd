@@ -16,16 +16,16 @@
 pub struct PaginatedFoods {
     #[serde(rename = "foods", skip_serializing_if = "Option::is_none")]
     pub foods: Option<Vec<crate::models::Food>>,
-    #[serde(rename = "meta", skip_serializing_if = "Option::is_none")]
-    pub meta: Option<Box<crate::models::Items>>,
+    #[serde(rename = "meta")]
+    pub meta: Box<crate::models::Items>,
 }
 
 impl PaginatedFoods {
     /// pages of Food
-    pub fn new() -> PaginatedFoods {
+    pub fn new(meta: crate::models::Items) -> PaginatedFoods {
         PaginatedFoods {
             foods: None,
-            meta: None,
+            meta: Box::new(meta),
         }
     }
 }

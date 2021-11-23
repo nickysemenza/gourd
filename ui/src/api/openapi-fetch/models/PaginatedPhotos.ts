@@ -41,7 +41,7 @@ export interface PaginatedPhotos {
      * @type {Items}
      * @memberof PaginatedPhotos
      */
-    meta?: Items;
+    meta: Items;
 }
 
 export function PaginatedPhotosFromJSON(json: any): PaginatedPhotos {
@@ -55,7 +55,7 @@ export function PaginatedPhotosFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'photos': !exists(json, 'photos') ? undefined : ((json['photos'] as Array<any>).map(PhotoFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
+        'meta': ItemsFromJSON(json['meta']),
     };
 }
 

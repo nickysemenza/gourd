@@ -9,7 +9,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *Items) {
+func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, Items) {
 	offset := 0
 	limit := 20
 	if o != nil {
@@ -18,7 +18,7 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, *Items) 
 	if l != nil {
 		limit = int(*l)
 	}
-	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, &Items{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
+	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, Items{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
 }
 
 func (l *Items) setTotalCount(count uint64) {

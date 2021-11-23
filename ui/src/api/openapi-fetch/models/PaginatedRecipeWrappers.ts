@@ -41,7 +41,7 @@ export interface PaginatedRecipeWrappers {
      * @type {Items}
      * @memberof PaginatedRecipeWrappers
      */
-    meta?: Items;
+    meta: Items;
 }
 
 export function PaginatedRecipeWrappersFromJSON(json: any): PaginatedRecipeWrappers {
@@ -55,7 +55,7 @@ export function PaginatedRecipeWrappersFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'recipes': !exists(json, 'recipes') ? undefined : ((json['recipes'] as Array<any>).map(RecipeWrapperFromJSON)),
-        'meta': !exists(json, 'meta') ? undefined : ItemsFromJSON(json['meta']),
+        'meta': ItemsFromJSON(json['meta']),
     };
 }
 
