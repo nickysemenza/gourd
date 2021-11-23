@@ -14,14 +14,26 @@ import (
 	echo_middleware "github.com/labstack/echo/v4/middleware"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/stretchr/testify/require"
 )
 
+func makeAPI(t *testing.T) *API {
+	t.Helper()
+	tdb := db.NewTestDB(t)
+	i, err := image.NewLocalImageStore("aa")
+	require.NoError(t, err)
+	apiManager := New(tdb,
+		nil, nil,
+		rs_client.New("http://localhost:8080/"),
+		nil, i)
+
+	return apiManager
+}
 func makeHandler(t *testing.T) (*echo.Echo, *API) {
 	t.Helper()
-	tdb := db.NewDB(t)
-	apiManager := New(tdb, nil, nil, rs_client.New("http://localhost:8080/"), nil, nil)
+	apiManager := makeAPI(t)
 
 	e := echo.New()
 	e.Use(echo_middleware.Logger())
@@ -46,7 +58,7 @@ func TestAPI(t *testing.T) {
 
 	{
 		var results PaginatedIngredients
-		result := testutil.NewRequest().Get("/ingredients?limit=100").Go(t, e)
+		result := testutil.NewRequest().Get("/ingredients?limit=1000").Go(t, e)
 		require.Equal(http.StatusOK, result.Code(), result.Recorder.Body)
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)

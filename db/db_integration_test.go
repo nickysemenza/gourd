@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package db
@@ -16,7 +17,7 @@ import (
 func TestInsertGet(t *testing.T) {
 	ctx := context.Background()
 	require := require.New(t)
-	db := NewDB(t)
+	db := NewTestDB(t)
 
 	all1, _, err := db.GetRecipesDetails(ctx, "")
 	require.NoError(err)

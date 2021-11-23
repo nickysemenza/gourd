@@ -18,15 +18,20 @@ import (
 )
 
 type Client struct {
-	client   *notionapi.Client
-	database notionapi.DatabaseID
+	// client   *notionapi.Client
+	dbId  notionapi.DatabaseID
+	block notionapi.BlockService
+	db    notionapi.DatabaseService
 }
 
 func New(token, database string) *Client {
 	hClient := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
+	client := notionapi.NewClient(notionapi.Token(token), notionapi.WithHTTPClient(&hClient))
 	return &Client{
-		client:   notionapi.NewClient(notionapi.Token(token), notionapi.WithHTTPClient(&hClient)),
-		database: notionapi.DatabaseID(database),
+		// client:   client,
+		dbId:  notionapi.DatabaseID(database),
+		db:    client.Database,
+		block: client.Block,
 	}
 }
 
@@ -57,7 +62,7 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 		MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
 	}
 	for {
-		resp, err := c.client.Database.Query(ctx, c.database, &notionapi.DatabaseQueryRequest{
+		resp, err := c.db.Query(ctx, c.dbId, &notionapi.DatabaseQueryRequest{
 			PropertyFilter: filter,
 			PageSize:       100,
 			StartCursor:    cursor,
@@ -84,10 +89,14 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 					utcTime := time.Time(*date) //todo: this is slightly wrong
 					meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 9)).Ptr()
 				}
-				for _, ms := range page.Properties["Tags"].(*notionapi.MultiSelectProperty).MultiSelect {
-					meal.Tags = append(meal.Tags, ms.Name)
+				if tags, ok := page.Properties["Tags"]; ok {
+					for _, ms := range tags.(*notionapi.MultiSelectProperty).MultiSelect {
+						meal.Tags = append(meal.Tags, ms.Name)
+					}
 				}
-				meal.SourceURL = page.Properties["source"].(*notionapi.URLProperty).URL
+				if url, ok := page.Properties["source"]; ok {
+					meal.SourceURL = url.(*notionapi.URLProperty).URL
+				}
 
 				// on each page, get all the blocks that are images
 				meal.Photos, meal.Raw, err = c.imagesFromPage(ctx, page.ID)
@@ -106,32 +115,13 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 
 }
 
-// func (c *Client) ImageFromBlock(ctx context.Context, blockID notionapi.BlockID) (NotionPhoto, error) {
-// 	ctx, span := otel.Tracer("notion").Start(ctx, "ImageFromBlock")
-// 	defer span.End()
-
-// 	block, err := c.client.Block.Get(ctx, blockID)
-// 	if err != nil {
-// 		return NotionPhoto{}, err
-// 	}
-// 	if block.GetType() != notionapi.BlockTypeImage {
-// 		return NotionPhoto{}, fmt.Errorf("block %s is not an image", blockID)
-// 	}
-// 	span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
-// 	i := block.(*notionapi.ImageBlock)
-// 	return NotionPhoto{
-// 		BlockID: blockID.String(),
-// 		URL:     i.Image.File.URL,
-// 	}, nil
-// }
-
 func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) (images []NotionPhoto, raw string, err error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "imagesFromPage")
 	defer span.End()
 
 	var childCursor notionapi.Cursor
 	for {
-		children, err := c.client.Block.GetChildren(ctx, notionapi.BlockID(pageID), &notionapi.Pagination{PageSize: 100, StartCursor: childCursor})
+		children, err := c.block.GetChildren(ctx, notionapi.BlockID(pageID), &notionapi.Pagination{PageSize: 100, StartCursor: childCursor})
 		if err != nil {
 			return nil, "", err
 		}
