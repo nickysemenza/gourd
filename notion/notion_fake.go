@@ -56,6 +56,11 @@ type fakeBlock struct{}
 var _ notionapi.BlockService = &fakeBlock{}
 
 func (f *fakeBlock) GetChildren(context.Context, notionapi.BlockID, *notionapi.Pagination) (*notionapi.GetChildrenResponse, error) {
+	exampleRecipe := `name: toast
+---
+1 slice  bread
+; toast
+`
 	return &notionapi.GetChildrenResponse{
 		Results: []notionapi.Block{
 			&notionapi.ImageBlock{
@@ -72,7 +77,7 @@ func (f *fakeBlock) GetChildren(context.Context, notionapi.BlockID, *notionapi.P
 				ID:   "block2",
 				Code: notionapi.Code{
 					Text: []notionapi.RichText{
-						{Text: notionapi.Text{Content: "name: toast"}},
+						{Text: notionapi.Text{Content: exampleRecipe}},
 					},
 				},
 			},

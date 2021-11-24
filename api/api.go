@@ -438,18 +438,26 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 	return a.transformRecipeFull(ctx, r2), nil
 }
 
+func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, error) {
+	r, err := a.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+	if err != nil {
+		return nil, err
+	}
+	if r == nil {
+		return nil, fmt.Errorf("could not find recipe with detail %s", recipeId)
+	}
+	return a.transformRecipeFull(ctx, r), nil
+}
+
 // Info for a specific recipe
 // (GET /recipes/{recipeId})
 func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 	ctx := c.Request().Context()
-	r, err := a.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+
+	apiR, err := a.recipeById(ctx, recipeId)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	if r == nil {
-		return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
-	}
-	apiR := a.transformRecipeFull(ctx, r)
 
 	return c.JSON(http.StatusOK, apiR)
 }
@@ -460,14 +468,10 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 	list := []RecipeWrapper{}
 
 	for _, recipeId := range params.RecipeId {
-		r, err := a.DB().GetRecipeDetailByIdFull(ctx, recipeId)
+		apiR, err := a.recipeById(ctx, recipeId)
 		if err != nil {
 			return sendErr(c, http.StatusBadRequest, err)
 		}
-		if r == nil {
-			return sendErr(c, http.StatusNotFound, fmt.Errorf("could not find recipe with detail %s", recipeId))
-		}
-		apiR := a.transformRecipeFull(ctx, r)
 		list = append(list, *apiR)
 	}
 	result := PaginatedRecipeWrappers{Recipes: &list}

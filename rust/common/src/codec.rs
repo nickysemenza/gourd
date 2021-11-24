@@ -76,7 +76,11 @@ pub fn decode_recipe(r: String) -> RecipeDetailInput {
             let lines: Vec<&str> = s.split("\n").collect();
             for line in lines.into_iter() {
                 match dbg!(line).strip_prefix(";") {
-                    Some(i) => instructions.push(SectionInstructionInput::new(i.to_string())),
+                    Some(i) => instructions.push(SectionInstructionInput::new(
+                        i.strip_prefix(" ")
+                            .unwrap_or(i) // trim leading space if exsists to support `;` or `; `
+                            .to_string(),
+                    )),
 
                     None => ingredients.push(parse_ingredient(line).unwrap()),
                 };

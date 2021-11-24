@@ -28,11 +28,10 @@ func (l *LocalImageStore) Dir() string {
 }
 
 func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
-	// dir, err := ioutil.TempDir("", "gourdphotos")
-	// if err != nil {
-	// 	return nil, err
-	// }
-	dir := "tmp_images"
+	dir := "/tmp/gourd_images"
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return nil, err
+	}
 	return &LocalImageStore{
 		httpBaseURL: httpBaseURL,
 		dir:         dir,
