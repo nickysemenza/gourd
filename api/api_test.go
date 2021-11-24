@@ -15,6 +15,7 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/stretchr/testify/require"
 )
@@ -27,7 +28,7 @@ func makeAPI(t *testing.T) *API {
 	apiManager := New(tdb,
 		nil, nil,
 		rs_client.New("http://localhost:8080/"),
-		nil, i)
+		notion.NewFakeNotion(t), i)
 
 	return apiManager
 }
@@ -188,4 +189,11 @@ func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
 	}
 
 	return id
+}
+
+func TestSync(t *testing.T) {
+	require := require.New(t)
+	apiManager := makeAPI(t)
+	err := apiManager.DoSync(context.Background())
+	require.NoError(err)
 }

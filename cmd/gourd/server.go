@@ -59,7 +59,7 @@ func makeServer() (*server.Server, error) {
 	}
 
 	// postgres db/migrations
-	if err := autoMigrate(dbConn); err != nil {
+	if err := autoMigrate(dbConn, true); err != nil {
 		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
 	}
@@ -105,7 +105,7 @@ func runServer() {
 	log.Fatal(s.Run(ctx))
 }
 
-func autoMigrate(dbConn *sql.DB) error {
+func autoMigrate(dbConn *sql.DB, up bool) error {
 	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
 	if err != nil {
 		return err
@@ -117,7 +117,11 @@ func autoMigrate(dbConn *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize migrator: %w", err)
 	}
-	if err := m.Up(); err != nil {
+	action := m.Down
+	if up {
+		action = m.Up
+	}
+	if err := action(); err != nil {
 		if !errors.Is(err, migrate.ErrNoChange) {
 			return fmt.Errorf("failed to migrate: %w", err)
 		}

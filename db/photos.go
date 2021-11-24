@@ -85,7 +85,7 @@ func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) e
 	for _, photo := range photos {
 		q = q.Values(photo.BlockID, photo.PageID, photo.ImageID)
 	}
-	q = q.Suffix("ON CONFLICT (block_id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
+	q = q.Suffix("ON CONFLICT (block_id,page_id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
 	_, err := c.execContext(ctx, q)
 	return err
 }
@@ -197,7 +197,6 @@ func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
 	for _, r := range items {
 		q = q.Values(r.ID, r.BlurHash, r.Source)
 	}
-	// q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title", time.Now())
 	_, err = c.execContext(ctx, q)
 
 	return

@@ -131,8 +131,10 @@ func (a *API) DoSync(ctx context.Context) error {
 	if err := a.DB().SyncNotionMealFromNotionRecipe(ctx); err != nil {
 		return err
 	}
-	if err := a.GPhotos.SyncAlbums(ctx); err != nil {
-		return err
+	if a.GPhotos != nil {
+		if err := a.GPhotos.SyncAlbums(ctx); err != nil {
+			return err
+		}
 	}
 	if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
 		return err

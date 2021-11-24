@@ -41,16 +41,19 @@ type API struct {
 }
 
 func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, notion *notion.Client, imageStore image.Store) *API {
-	return &API{
+	a := API{
 		db:         db,
 		Google:     g,
 		Auth:       auth,
-		GPhotos:    gphotos.New(db, g, imageStore),
 		R:          r,
 		Notion:     notion,
 		ImageStore: imageStore,
 		tracer:     otel.Tracer("api"),
 	}
+	if a.Google != nil {
+		a.GPhotos = gphotos.New(db, g, imageStore)
+	}
+	return &a
 }
 
 func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) RecipeDetail {
