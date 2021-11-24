@@ -27,6 +27,9 @@ jobs:
         run: curl -v http://localhost:8080/parse?text=1%20cup
       - name: go integration tests
         run: make integration-test-go
+        env:
+          MIGRATIONS_DIR: file://../db/migrations
+      - uses: codecov/codecov-action@v2
       # - name: run usda import
       # run: docker-compose run usda
       - name: seed db with testdata

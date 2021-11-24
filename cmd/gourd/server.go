@@ -3,12 +3,8 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/luna-duclos/instrumentedsql"
@@ -59,7 +55,7 @@ func makeServer() (*server.Server, error) {
 	}
 
 	// postgres db/migrations
-	if err := autoMigrate(dbConn, true); err != nil {
+	if err := db.AutoMigrate(dbConn, true); err != nil {
 		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
 	}
@@ -103,29 +99,4 @@ func runServer() {
 		log.Fatal(err)
 	}
 	log.Fatal(s.Run(ctx))
-}
-
-func autoMigrate(dbConn *sql.DB, up bool) error {
-	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
-	if err != nil {
-		return err
-	}
-
-	m, err := migrate.NewWithDatabaseInstance(
-		"file://./db/migrations",
-		"postgres", driver)
-	if err != nil {
-		return fmt.Errorf("failed to initialize migrator: %w", err)
-	}
-	action := m.Down
-	if up {
-		action = m.Up
-	}
-	if err := action(); err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			return fmt.Errorf("failed to migrate: %w", err)
-		}
-	}
-	log.Info("db: migrated")
-	return nil
 }

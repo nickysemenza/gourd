@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS "images" (
+	"id" text NOT NULL,
+	"blur_hash" text NOT NULL,
+	"source" text NOT NULL,
+	PRIMARY KEY ("id")
+);
+ALTER TABLE "gphotos_photos"
+ADD COLUMN "image" text references images(id) NOT NULL;
 CREATE TABLE IF NOT EXISTS "notion_recipe" (
 	"page_id" text NOT NULL,
 	"page_title" text NOT NULL,
@@ -12,8 +20,8 @@ CREATE TABLE IF NOT EXISTS "notion_recipe" (
 CREATE TABLE IF NOT EXISTS "notion_image" (
 	"block_id" text NOT NULL,
 	"page_id" text references notion_recipe(page_id) NOT NULL,
-	"blur_hash" text,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
+	"image" text references images(id) NOT NULL,
 	primary key (block_id, page_id),
 	unique (block_id, page_id)
 );
@@ -22,15 +30,4 @@ CREATE TABLE IF NOT EXISTS "notion_meal" (
 	"notion_recipe" TEXT references notion_recipe(page_id) NOT NULL,
 	primary key (meal, notion_recipe)
 );
--- 
-CREATE TABLE IF NOT EXISTS "images" (
-	"id" text NOT NULL,
-	"blur_hash" text NOT NULL,
-	"source" text NOT NULL,
-	PRIMARY KEY ("id")
-);
-ALTER TABLE "notion_image"
-ADD COLUMN "image" text references images(id) NOT NULL;
-ALTER TABLE "notion_image" DROP COLUMN "blur_hash";
-ALTER TABLE "gphotos_photos"
-ADD COLUMN "image" text references images(id) NOT NULL;
+--

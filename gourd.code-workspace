@@ -34,9 +34,11 @@
     "go.lintTool": "golangci-lint",
     "go.lintFlags": ["--fast"],
     "editor.formatOnSave": true,
-    "go.buildFlags": [
-      "-tags", "integration"
-  ],
+    "go.buildFlags": ["-tags", "integration"],
+    "go.testEnvVars": {
+      "MIGRATIONS_DIR": "file://${workspaceFolder}/db/migrations"
+      // "MIGRATIONS_DIR": "file://..//db/migrations"
+    },
     "typescript.tsdk": "ui/node_modules/typescript/lib",
     "sqltools.connections": [
       {
@@ -50,6 +52,5 @@
         "password": "gourd"
       }
     ]
-    
   }
 }

@@ -28,6 +28,12 @@ func NewTestDB(t *testing.T) *Client {
 		viper.GetString("DB_DBNAME"),
 		viper.GetInt64("DB_PORT")))
 	require.NoError(t, err)
+
+	err = AutoMigrate(dbConn, false)
+	require.NoError(t, err)
+	err = AutoMigrate(dbConn, true)
+	require.NoError(t, err)
+
 	d, err := New(dbConn)
 	require.NoError(t, err)
 	return d
