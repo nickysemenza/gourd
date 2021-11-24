@@ -35,7 +35,9 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 
 		for _, section := range d.R.RecipeSections {
 			s := RecipeSection{
-				Id: section.ID,
+				Id:           section.ID,
+				Ingredients:  []SectionIngredient{},
+				Instructions: []SectionInstruction{},
 				// Duration: ,
 			}
 			for _, instruction := range section.R.SectionRecipeSectionInstructions {

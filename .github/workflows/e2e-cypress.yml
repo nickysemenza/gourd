@@ -14,19 +14,18 @@ jobs:
       - run: docker-compose pull
       - uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
-      - name: build e2e docker-compose
+      - name: docker-compose build
         run: docker-compose build --parallel
-      - name: dl deps
-        run: go mod vendor
-      - name: start db
+      - run: go mod vendor
+      - name: start postgres db
         run: docker-compose up -d db
-      - name: migrate
+      - name: migrate db
         run: sleep 5 && make migrate
-      - name: start rs
+      - name: start rust server
         run: docker-compose up -d rs
-      - name: test rs
+      - name: smoke test rust server
         run: curl -v http://localhost:8080/parse?text=1%20cup
-      - name: go test integration
+      - name: go integration tests
         run: make integration-test-go
       # - name: run usda import
       # run: docker-compose run usda
@@ -35,7 +34,7 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5555
         run: make seed-testdata
-      - name: run e2e
+      - name: run cypress
         run: docker-compose run ui
       - name: Dump docker logs on failure
         if: failure()

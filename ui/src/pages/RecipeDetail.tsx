@@ -512,7 +512,7 @@ const RecipeDetail: React.FC = () => {
         items={ingredientsWithNutrients}
         h={[...totalNutrients.keys()]}
       />
-      <p>
+      <div>
         <h3>other versions</h3>
         <ul>
           {recipe.detail.other_versions?.map((v) => (
@@ -522,7 +522,7 @@ const RecipeDetail: React.FC = () => {
           ))}
         </ul>
         {/* <Debug data={recipe.detail.other_versions} /> */}
-      </p>
+      </div>
     </div>
   );
 };

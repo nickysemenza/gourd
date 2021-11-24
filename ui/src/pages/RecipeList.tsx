@@ -53,13 +53,14 @@ const RecipeList: React.FC = () => {
             <div>
               <ul>
                 {versions.map((i) => (
-                  <li>
+                  <li key={i.id}>
                     <div className="flex">
                       <RecipeLink recipe={i} />
                       <input
                         type="checkbox"
                         className="form-checkbox"
                         checked={checked.has(i.id)}
+                        onChange={(e) => {}}
                         onClick={() =>
                           setChecked(
                             update(
