@@ -179,7 +179,9 @@ func (a *API) Misc(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Misc")
 	defer span.End()
 
-	items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
+	// items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
+	items, err := a.Notion.PageById(ctx, "57946cb8ce6c40fdb685a25d14bf9feb")
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}

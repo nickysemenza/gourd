@@ -9,6 +9,7 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -34,10 +35,46 @@ func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, r
 	return
 }
 
+func (a *API) tmp(ctx context.Context, nRecipe notion.NotionRecipe) (*db.NotionRecipe, error) {
+	output := RecipeDetailInput{}
+	if nRecipe.Raw != "" {
+		err := a.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode recipe: %w", err)
+		}
+		// output.Sources = &[]api.RecipeSource{{Title: }}
+	} else if nRecipe.SourceURL != "" {
+		r, err := a.FetchAndTransform(ctx, nRecipe.SourceURL, a.IngredientIdByName)
+		if err != nil {
+			return nil, err
+		}
+		output = r.Detail
+	}
+	output.Name = nRecipe.Title
+	output.Date = nRecipe.Time
+
+	r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, child := range nRecipe.Children {
+		_, err := a.tmp(ctx, child)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &db.NotionRecipe{
+		PageID:    nRecipe.PageID,
+		PageTitle: nRecipe.Title,
+		AteAt:     zero.TimeFromPtr(nRecipe.Time),
+		Recipe:    zero.StringFrom(r.Id),
+	}, nil
+}
 func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
 	defer span.End()
-	nRecipes, err := a.Notion.Dump(ctx)
+	nRecipes, err := a.Notion.GetAll(ctx)
 	if err != nil {
 		return err
 	}
@@ -47,33 +84,11 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	var img []db.Image
 	for _, nRecipe := range nRecipes {
 
-		output := RecipeDetailInput{}
-		if nRecipe.Raw != "" {
-			err = a.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
-			if err != nil {
-				return fmt.Errorf("failed to decode recipe: %w", err)
-			}
-			// output.Sources = &[]api.RecipeSource{{Title: }}
-		} else if nRecipe.SourceURL != "" {
-			r, err := a.FetchAndTransform(ctx, nRecipe.SourceURL, a.IngredientIdByName)
-			if err != nil {
-				return err
-			}
-			output = r.Detail
-		}
-		output.Name = nRecipe.Title
-		output.Date = nRecipe.Time
-
-		r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
+		dbnr, err := a.tmp(ctx, nRecipe)
 		if err != nil {
 			return err
 		}
-		foo = append(foo, db.NotionRecipe{
-			PageID:    nRecipe.PageID,
-			PageTitle: nRecipe.Title,
-			AteAt:     zero.TimeFromPtr(nRecipe.Time),
-			Recipe:    zero.StringFrom(r.Id),
-		})
+		foo = append(foo, *dbnr)
 		for _, nPhoto := range nRecipe.Photos {
 			if strings.Contains(nPhoto.URL, ".heic") {
 				logrus.Infof("skipping heic: %s", nPhoto.URL)

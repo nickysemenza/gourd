@@ -22,6 +22,7 @@ type Client struct {
 	dbId  notionapi.DatabaseID
 	block notionapi.BlockService
 	db    notionapi.DatabaseService
+	page  notionapi.PageService
 }
 
 func New(token, database string) *Client {
@@ -32,6 +33,7 @@ func New(token, database string) *Client {
 		dbId:  notionapi.DatabaseID(database),
 		db:    client.Database,
 		block: client.Block,
+		page:  client.Page,
 	}
 }
 
@@ -40,17 +42,83 @@ type NotionPhoto struct {
 	URL     string `json:"url,omitempty"`
 }
 type NotionRecipe struct {
-	Title     string        `json:"title,omitempty"`
-	Time      *time.Time    `json:"time,omitempty"`
-	Tags      []string      `json:"tags,omitempty"`
-	Photos    []NotionPhoto `json:"photos,omitempty"`
-	PageID    string        `json:"page_id,omitempty"`
-	NotionURL string        `json:"notion_url,omitempty"`
-	SourceURL string        `json:"source_url,omitempty"`
-	Raw       string        `json:"raw,omitempty"`
+	Title     string         `json:"title,omitempty"`
+	Time      *time.Time     `json:"time,omitempty"`
+	Tags      []string       `json:"tags,omitempty"`
+	Photos    []NotionPhoto  `json:"photos,omitempty"`
+	PageID    string         `json:"page_id,omitempty"`
+	NotionURL string         `json:"notion_url,omitempty"`
+	SourceURL string         `json:"source_url,omitempty"`
+	Raw       string         `json:"raw,omitempty"`
+	Children  []NotionRecipe `json:"children,omitempty"`
 }
 
-func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
+func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *NotionRecipe, err error) {
+	switch page.Object {
+	case "column_list", notionapi.ObjectTypePage:
+
+		var name string
+		var titlePropName string
+		switch page.Parent.Type {
+		case "database_id":
+			titlePropName = "Name"
+		case "page_id":
+			// sub page
+			titlePropName = "title"
+		}
+
+		nameProp, nameOk := page.Properties[titlePropName]
+		if nameOk && len(nameProp.(*notionapi.TitleProperty).Title) != 1 {
+			err = fmt.Errorf("page %s has no title", page.ID)
+			log.Error(err)
+			return
+		}
+		name = nameProp.(*notionapi.TitleProperty).Title[0].Text.Content
+		meal := NotionRecipe{
+			Title:     name,
+			PageID:    page.ID.String(),
+			NotionURL: page.URL,
+		}
+		log.WithField("page_id", meal.PageID).Info(meal.Title)
+
+		if dateProp, ok := page.Properties["Date"]; ok {
+			date := dateProp.(*notionapi.DateProperty).Date.Start
+			if date != nil {
+				utcTime := time.Time(*date) //todo: this is slightly wrong
+				meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 9)).Ptr()
+			}
+		}
+		if tags, ok := page.Properties["Tags"]; ok {
+			for _, ms := range tags.(*notionapi.MultiSelectProperty).MultiSelect {
+				meal.Tags = append(meal.Tags, ms.Name)
+			}
+		}
+		if url, ok := page.Properties["source"]; ok {
+			meal.SourceURL = url.(*notionapi.URLProperty).URL
+		}
+
+		// on each page, get all the blocks that are images
+		return c.detailsFromPage(ctx, page.ID, meal)
+		// if err != nil {
+		// 	return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
+		// }
+		// return &meal, err
+
+	}
+	return nil, nil
+}
+func (c *Client) PageById(ctx context.Context, id notionapi.PageID) (*NotionRecipe, error) {
+	ctx, span := otel.Tracer("notion").Start(ctx, "PageById")
+	defer span.End()
+
+	page, err := c.page.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return c.processPage(ctx, *page)
+	// return page, nil
+}
+func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "Dump")
 	defer span.End()
 
@@ -67,44 +135,18 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 			PageSize:       100,
 			StartCursor:    cursor,
 		})
-
 		if err != nil {
 			return nil, err
 		}
+
 		for _, page := range resp.Results {
 			span.AddEvent("page", trace.WithAttributes(attribute.String("page", spew.Sdump(page))))
-			switch page.Object {
-			case "column_list", notionapi.ObjectTypePage:
-				if len(page.Properties["Name"].(*notionapi.TitleProperty).Title) != 1 {
-					return nil, fmt.Errorf("page %s has no title", page.ID)
-				}
-				meal := NotionRecipe{
-					Title:     page.Properties["Name"].(*notionapi.TitleProperty).Title[0].Text.Content,
-					PageID:    page.ID.String(),
-					NotionURL: page.URL,
-				}
-				log.WithField("page_id", meal.PageID).Info(meal.Title)
-				date := page.Properties["Date"].(*notionapi.DateProperty).Date.Start
-				if date != nil {
-					utcTime := time.Time(*date) //todo: this is slightly wrong
-					meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 9)).Ptr()
-				}
-				if tags, ok := page.Properties["Tags"]; ok {
-					for _, ms := range tags.(*notionapi.MultiSelectProperty).MultiSelect {
-						meal.Tags = append(meal.Tags, ms.Name)
-					}
-				}
-				if url, ok := page.Properties["source"]; ok {
-					meal.SourceURL = url.(*notionapi.URLProperty).URL
-				}
-
-				// on each page, get all the blocks that are images
-				meal.Photos, meal.Raw, err = c.imagesFromPage(ctx, page.ID)
-				if err != nil {
-					return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
-				}
-				meals = append(meals, meal)
-
+			meal, err := c.processPage(ctx, page)
+			if err != nil {
+				return nil, err
+			}
+			if meal != nil {
+				meals = append(meals, *meal)
 			}
 		}
 		cursor = resp.NextCursor
@@ -115,7 +157,7 @@ func (c *Client) Dump(ctx context.Context) ([]NotionRecipe, error) {
 
 }
 
-func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) (images []NotionPhoto, raw string, err error) {
+func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, meal NotionRecipe) (*NotionRecipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "imagesFromPage")
 	defer span.End()
 
@@ -123,7 +165,7 @@ func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) 
 	for {
 		children, err := c.block.GetChildren(ctx, notionapi.BlockID(pageID), &notionapi.Pagination{PageSize: 100, StartCursor: childCursor})
 		if err != nil {
-			return nil, "", err
+			return nil, err
 		}
 
 		for _, block := range children.Results {
@@ -132,20 +174,28 @@ func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) 
 			switch block.GetType() {
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)
-				images = append(images, NotionPhoto{URL: i.Image.File.URL, BlockID: i.ID.String()})
+				meal.Photos = append(meal.Photos, NotionPhoto{URL: i.Image.File.URL, BlockID: i.ID.String()})
 			case "column", "column_list":
 				i := block.(*notionapi.UnsupportedBlock)
-				images2, _, err := c.imagesFromPage(ctx, notionapi.ObjectID(i.ID))
+				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(i.ID), meal)
 				if err != nil {
-					return nil, "", err
+					return nil, err
 				}
-				images = append(images, images2...)
+				meal.Photos = append(meal.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
 				if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
-					raw = text
+					meal.Raw = text
 				}
-
+			case notionapi.BlockTypeChildPage:
+				i := block.(*notionapi.ChildPageBlock)
+				foo, err := c.PageById(ctx, notionapi.PageID(i.ID))
+				if err != nil {
+					return nil, err
+				}
+				meal.Children = append(meal.Children, *foo)
+				spew.Dump(foo)
+				// treat as top level page?
 			}
 		}
 
@@ -154,6 +204,6 @@ func (c *Client) imagesFromPage(ctx context.Context, pageID notionapi.ObjectID) 
 			break
 		}
 	}
-	return
+	return &meal, nil
 
 }

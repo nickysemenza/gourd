@@ -11,7 +11,7 @@ import (
 func TestSmoke(t *testing.T) {
 
 	c := NewFakeNotion(t)
-	res, err := c.Dump(context.Background())
+	res, err := c.GetAll(context.Background())
 	require.NoError(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, res[0].Title, "test1")

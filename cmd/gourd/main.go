@@ -52,7 +52,7 @@ func init() {
 			Short: "misc",
 			Run: func(cmd *cobra.Command, args []string) {
 				n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
-				res, err := n.Dump(context.Background())
+				res, err := n.GetAll(context.Background())
 				log.Error(err)
 				spew.Dump(res)
 			},

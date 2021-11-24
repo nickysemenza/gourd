@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/deepmap/oapi-codegen/pkg/testutil"
 	"github.com/labstack/echo/v4"
 	echo_middleware "github.com/labstack/echo/v4/middleware"
@@ -201,14 +200,13 @@ func TestSync(t *testing.T) {
 
 	items, err := apiManager.RecipeListV2(ctx, 10, 0)
 	require.NoError(err)
-	require.Len(items, 1)
+	require.Len(items, 3)
 	rd := items[0].Detail.Id
 	res, err := apiManager.recipeById(ctx, rd)
 	require.NoError(err)
-	spew.Dump(res)
 
 	require.Len(res.Detail.Sections, 1)
 	require.Equal("bread", res.Detail.Sections[0].Ingredients[0].Ingredient.Ingredient.Name)
-	require.Equal("toast", res.Detail.Sections[0].Instructions[0].Instruction)
+	require.Equal("eat", res.Detail.Sections[0].Instructions[0].Instruction)
 
 }
