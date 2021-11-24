@@ -110,7 +110,7 @@
     "@testing-library/user-event": "13.5.0",
     "autoprefixer": "10.4.0",
     "chokidar-cli": "3.0.0",
-    "cypress": "9.1.0",
+    "cypress": "9.0.0",
     "cypress-terminal-report": "3.4.0",
     "esbuild": "0.13.15",
     "ibm-openapi-validator": "0.51.3",
