@@ -19,9 +19,9 @@ import (
 type parseMethod string
 
 const (
-	Ingredient   parseMethod = "parse"
+	// ParseIngredient parseMethod = "parse"
 	Scrape       parseMethod = "scrape"
-	Amount       parseMethod = "parse_amount"
+	ParseAmount  parseMethod = "parse_amount"
 	RecipeDecode parseMethod = "decode_recipe"
 )
 
@@ -56,7 +56,7 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 
 }
 
-func (c *Client) Convert(ctx context.Context, body, target interface{}) error {
+func (c *Client) ConvertUnit(ctx context.Context, body, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
 	defer span.End()
 	url := fmt.Sprintf("%sconvert", c.baseurl)

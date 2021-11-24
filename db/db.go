@@ -86,6 +86,7 @@ type RecipeDetail struct {
 	Sections      []Section
 	Ingredient    zero.String `db:"ingredient"` // sometimes, from FK
 	CreatedAt     time.Time   `db:"created_at"`
+	UpdatedAt     time.Time   `db:"updated_at"`
 }
 
 // Section represents a Section

@@ -121,7 +121,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 	m := []UnitMapping{}
 	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
 		var res []Amount
-		err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.Amount, &res)
+		err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.ParseAmount, &res)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +137,7 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 
 			if p.PortionDescription != "" {
 				var res []Amount
-				err := a.R.Call(ctx, p.PortionDescription, rs_client.Amount, &res)
+				err := a.R.Call(ctx, p.PortionDescription, rs_client.ParseAmount, &res)
 				if err != nil {
 					err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
 					log.Error(err)

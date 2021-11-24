@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS "ingredients" (
 );
 CREATE TABLE IF NOT EXISTS "recipes" (
   "id" TEXT NOT NULL UNIQUE,
+  "created_at" timestamp NOT NULL DEFAULT now(),
   PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "recipe_details" (
@@ -19,6 +20,7 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "version" INTEGER NOT NULL,
   "is_latest_version" BOOLEAN DEFAULT FALSE,
   "created_at" timestamp NOT NULL DEFAULT now(),
+  "updated_at" timestamp NOT NULL DEFAULT now(),
   PRIMARY KEY ("id"),
   unique("recipe_id", "version")
 );

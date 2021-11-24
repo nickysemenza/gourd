@@ -46,6 +46,7 @@ import { getOpenapiFetchConfig } from "../config";
 import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
 import ProgressiveImage from "../components/ProgressiveImage";
+import Debug from "../components/Debug";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
@@ -222,6 +223,9 @@ const RecipeDetail: React.FC = () => {
         </div>
         <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
           <p>{e.message}</p>
+          <p>
+            <Debug data={e.data} />
+          </p>
         </div>
       </div>
     );

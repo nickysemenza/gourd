@@ -133,6 +133,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.NotionImageImage,
 		)),
+		OrderBy("recipes.created_at DESC"),
 		Limit(int(limit)),
 		Offset(int(offset)),
 	).

@@ -16,3 +16,5 @@ func ID(prefix string) string {
 	return fmt.Sprintf("%s_%s", prefix, s)
 
 }
+
+var ErrNotFound = fmt.Errorf("not found")

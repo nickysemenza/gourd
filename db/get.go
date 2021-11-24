@@ -8,6 +8,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/nickysemenza/gourd/common"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -332,7 +333,7 @@ func (c *Client) GetRecipeDetailByIdFull(ctx context.Context, detailId string) (
 	}
 	r, ok := recipes.ByDetailId()[detailId]
 	if !ok {
-		return nil, fmt.Errorf("failed to find recipe with detail id %s", detailId)
+		return nil, fmt.Errorf("failed to find recipe with detail id %s: %w", detailId, common.ErrNotFound)
 	}
 
 	recipesUsed := recipes.ByRecipeId()

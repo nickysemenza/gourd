@@ -23,30 +23,37 @@ import (
 
 // Recipe is an object representing the database table.
 type Recipe struct {
-	ID string `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID        string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	CreatedAt time.Time `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 
 	R *recipeR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L recipeL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RecipeColumns = struct {
-	ID string
+	ID        string
+	CreatedAt string
 }{
-	ID: "id",
+	ID:        "id",
+	CreatedAt: "created_at",
 }
 
 var RecipeTableColumns = struct {
-	ID string
+	ID        string
+	CreatedAt string
 }{
-	ID: "recipes.id",
+	ID:        "recipes.id",
+	CreatedAt: "recipes.created_at",
 }
 
 // Generated where
 
 var RecipeWhere = struct {
-	ID whereHelperstring
+	ID        whereHelperstring
+	CreatedAt whereHelpertime_Time
 }{
-	ID: whereHelperstring{field: "\"recipes\".\"id\""},
+	ID:        whereHelperstring{field: "\"recipes\".\"id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"recipes\".\"created_at\""},
 }
 
 // RecipeRels is where relationship names are stored.
@@ -82,9 +89,9 @@ func (*recipeR) NewStruct() *recipeR {
 type recipeL struct{}
 
 var (
-	recipeAllColumns            = []string{"id"}
+	recipeAllColumns            = []string{"id", "created_at"}
 	recipeColumnsWithoutDefault = []string{"id"}
-	recipeColumnsWithDefault    = []string{}
+	recipeColumnsWithDefault    = []string{"created_at"}
 	recipePrimaryKeyColumns     = []string{"id"}
 )
 
@@ -1489,6 +1496,13 @@ func (o *Recipe) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -1693,6 +1707,13 @@ func (o RecipeSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, c
 func (o *Recipe) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("models: no recipes provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

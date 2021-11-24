@@ -35,6 +35,7 @@ type RecipeDetail struct {
 	Version         int         `boil:"version" json:"version" toml:"version" yaml:"version"`
 	IsLatestVersion null.Bool   `boil:"is_latest_version" json:"is_latest_version,omitempty" toml:"is_latest_version" yaml:"is_latest_version,omitempty"`
 	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *recipeDetailR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L recipeDetailL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -52,6 +53,7 @@ var RecipeDetailColumns = struct {
 	Version         string
 	IsLatestVersion string
 	CreatedAt       string
+	UpdatedAt       string
 }{
 	ID:              "id",
 	RecipeID:        "recipe_id",
@@ -64,6 +66,7 @@ var RecipeDetailColumns = struct {
 	Version:         "version",
 	IsLatestVersion: "is_latest_version",
 	CreatedAt:       "created_at",
+	UpdatedAt:       "updated_at",
 }
 
 var RecipeDetailTableColumns = struct {
@@ -78,6 +81,7 @@ var RecipeDetailTableColumns = struct {
 	Version         string
 	IsLatestVersion string
 	CreatedAt       string
+	UpdatedAt       string
 }{
 	ID:              "recipe_details.id",
 	RecipeID:        "recipe_details.recipe_id",
@@ -90,6 +94,7 @@ var RecipeDetailTableColumns = struct {
 	Version:         "recipe_details.version",
 	IsLatestVersion: "recipe_details.is_latest_version",
 	CreatedAt:       "recipe_details.created_at",
+	UpdatedAt:       "recipe_details.updated_at",
 }
 
 // Generated where
@@ -130,6 +135,7 @@ var RecipeDetailWhere = struct {
 	Version         whereHelperint
 	IsLatestVersion whereHelpernull_Bool
 	CreatedAt       whereHelpertime_Time
+	UpdatedAt       whereHelpertime_Time
 }{
 	ID:              whereHelperstring{field: "\"recipe_details\".\"id\""},
 	RecipeID:        whereHelperstring{field: "\"recipe_details\".\"recipe_id\""},
@@ -142,6 +148,7 @@ var RecipeDetailWhere = struct {
 	Version:         whereHelperint{field: "\"recipe_details\".\"version\""},
 	IsLatestVersion: whereHelpernull_Bool{field: "\"recipe_details\".\"is_latest_version\""},
 	CreatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"created_at\""},
+	UpdatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"updated_at\""},
 }
 
 // RecipeDetailRels is where relationship names are stored.
@@ -168,9 +175,9 @@ func (*recipeDetailR) NewStruct() *recipeDetailR {
 type recipeDetailL struct{}
 
 var (
-	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at"}
+	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at", "updated_at"}
 	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version"}
-	recipeDetailColumnsWithDefault    = []string{"is_latest_version", "created_at"}
+	recipeDetailColumnsWithDefault    = []string{"is_latest_version", "created_at", "updated_at"}
 	recipeDetailPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -836,6 +843,9 @@ func (o *RecipeDetail) Insert(ctx context.Context, exec boil.ContextExecutor, co
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
 		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
 	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
@@ -912,6 +922,12 @@ func (o *RecipeDetail) Insert(ctx context.Context, exec boil.ContextExecutor, co
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *RecipeDetail) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1048,6 +1064,7 @@ func (o *RecipeDetail) Upsert(ctx context.Context, exec boil.ContextExecutor, up
 		if o.CreatedAt.IsZero() {
 			o.CreatedAt = currTime
 		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

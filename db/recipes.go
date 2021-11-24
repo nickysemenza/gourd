@@ -99,6 +99,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 }
 
 func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) (recipeDetail *RecipeDetail, err error) {
+	if r.CreatedAt.IsZero() {
+		r.CreatedAt = time.Now()
+	}
 	// if we have an existing recipe with the same Id or name, this one is a n+1 version of that one
 	version := int64(1)
 	var modifying *RecipeDetail
@@ -131,7 +134,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	if parentID == "" {
 		parentID = common.ID("r")
-		_, err = c.execTx(ctx, tx, c.psql.Insert(recipesTable).Columns("id").Values(parentID))
+		_, err = c.execTx(ctx, tx, c.psql.Insert(recipesTable).Columns("id", "created_at").Values(parentID, r.CreatedAt))
 		if err != nil {
 			return nil, fmt.Errorf("failed to insert parent recipe: %w", err)
 		}

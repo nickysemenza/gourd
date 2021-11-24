@@ -1,10 +1,13 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -27,9 +30,17 @@ func (l *Items) setTotalCount(count uint64) {
 	l.PageCount = int(math.Ceil(float64(c) / float64(l.Limit)))
 }
 
-func sendErr(ctx echo.Context, code int, err error) error {
-	trace.SpanFromContext(ctx.Request().Context()).AddEvent(fmt.Sprintf("error: %s", err))
-	return ctx.JSON(code, Error{
+func sendErr(c echo.Context, code int, err error) error {
+	trace.SpanFromContext(c.Request().Context()).AddEvent(fmt.Sprintf("error: %v", err))
+	return c.JSON(code, Error{
 		Message: err.Error(),
 	})
+}
+
+func handleErr(c echo.Context, err error) error {
+	if errors.Is(err, common.ErrNotFound) {
+		return sendErr(c, http.StatusNotFound, err)
+	}
+	return sendErr(c, http.StatusInternalServerError, err)
+
 }

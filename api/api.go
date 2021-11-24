@@ -348,7 +348,7 @@ func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, ite
 		UnitMappings: item.Ingredient.UnitMappings,
 	}
 	var res Amount
-	err := a.R.Convert(
+	err := a.R.ConvertUnit(
 		ctx, req, &res,
 	)
 	if err != nil {
@@ -399,11 +399,11 @@ func (a *API) CreateRecipes(c echo.Context) error {
 	var r RecipeWrapperInput
 	if err := c.Bind(&r); err != nil {
 		err = fmt.Errorf("invalid format for input: %w", err)
-		return sendErr(c, http.StatusBadRequest, err)
+		return handleErr(c, err)
 	}
 	recipe, err := a.CreateRecipe(ctx, &r)
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return handleErr(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, recipe)
@@ -462,7 +462,7 @@ func (a *API) GetRecipeById(c echo.Context, recipeId string) error {
 
 	apiR, err := a.recipeById(ctx, recipeId)
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return handleErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, apiR)
@@ -476,7 +476,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 	for _, recipeId := range params.RecipeId {
 		apiR, err := a.recipeById(ctx, recipeId)
 		if err != nil {
-			return sendErr(c, http.StatusBadRequest, err)
+			return handleErr(c, err)
 		}
 		list = append(list, *apiR)
 	}
@@ -488,7 +488,7 @@ func (a *API) AuthLogin(c echo.Context, params AuthLoginParams) error {
 	ctx := c.Request().Context()
 	jwt, rawUser, err := a.ProcessGoogleAuth(ctx, params.Code)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	resp := AuthResp{
@@ -509,12 +509,12 @@ func (a *API) ListAllAlbums(c echo.Context) error {
 
 	dbAlbums, err := a.DB().GetAlbums(ctx)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	albums, err := a.GPhotos.GetAvailableAlbums(ctx)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	for _, a := range albums {
@@ -546,11 +546,11 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 
 	recipes, recipesCount, err := a.DB().GetRecipesDetails(ctx, string(params.Name))
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	ingredients, ingredientsCount, err := a.DB().GetIngredients(ctx, string(params.Name), nil)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	listMeta.setTotalCount(recipesCount + ingredientsCount)
@@ -590,7 +590,7 @@ func (a *API) RecipeDependencies(c echo.Context) error {
 		})
 	}
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusOK, Test2{res})
 }
@@ -599,9 +599,9 @@ func (a *API) NotionTest(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
 	defer span.End()
 
-	res, err := a.Notion.Dump(ctx)
+	res, err := a.Notion.GetAll(ctx)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusOK, res)
 }
