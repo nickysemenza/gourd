@@ -36,11 +36,11 @@ jobs:
         run: make seed-testdata
       - name: run cypress
         run: docker-compose run ui
-      - name: Dump docker logs on failure
-        if: failure()
-        uses: jwalton/gh-docker-logs@v2
       - name: Archive cypress results
         uses: actions/upload-artifact@v2
         with:
           name: cypress-results
           path: /work/ui/cypress/
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2

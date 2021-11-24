@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:stable
 
 RUN apt-get update && apt-get install -y unzip postgresql
 

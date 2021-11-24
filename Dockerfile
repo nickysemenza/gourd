@@ -11,7 +11,6 @@ RUN go mod download
 COPY . .
 RUN make bin/gourd
 
-# FROM debian:buster
 FROM alpine:20210804
 RUN apk add --no-cache ca-certificates
 # https://stackoverflow.com/a/35613430/1374045
