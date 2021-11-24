@@ -44,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cypress-results
-          path: /work/ui/cypress
+          path: /work/ui/cypress/
