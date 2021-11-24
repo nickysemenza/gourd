@@ -18,6 +18,24 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 	}
 	return &i, nil
 }
+func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) []Photo {
+	items := []Photo{}
+	for _, notionRecipe := range nr {
+		for _, notionImage := range notionRecipe.R.PageNotionImages {
+			url := a.ImageStore.GetImageURL(ctx, notionImage.Image)
+			items = append(items, Photo{
+				Id:       notionImage.BlockID,
+				Created:  notionImage.LastSeen,
+				BlurHash: &notionImage.R.NotionImageImage.BlurHash,
+				Width:    300,
+				Height:   400,
+				BaseUrl:  url,
+				Source:   PhotoSourceNotion,
+			})
+		}
+	}
+	return items
+}
 func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
 	if recipe == nil {
 		return nil, nil
@@ -69,26 +87,6 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 
 		}
 
-		// if detail.IsLatestVersion.Bool {
-
-		// 	others, err := models.Recipes(
-		// 		Where("recipes.id = ?", recipe.ID),
-		// 		Load(models.RecipeRels.RecipeDetails,
-		// 			Where("recipe_details.is_latest_version = ?", false)),
-		// 	).
-		// 		All(ctx, a.db.DB())
-		// 	if err != nil {
-		// 		panic(err)
-		// 	}
-		// 	for _, o := range others {
-		// 		r, err := a.recipeFromModel(ctx, o)
-		// 		if err != nil {
-		// 			return nil, err
-		// 		}
-		// 		other = append(other, r.Detail)
-		// 	}
-		// }
-
 		rd := RecipeDetail{
 			Id:        d.ID,
 			CreatedAt: d.CreatedAt,
@@ -110,21 +108,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	}
 	rw.Detail.OtherVersions = &other
 
-	items := []Photo{}
-	for _, notionRecipe := range recipe.R.NotionRecipes {
-		for _, notionImage := range notionRecipe.R.PageNotionImages {
-			url := a.ImageStore.GetImageURL(ctx, notionImage.Image)
-			items = append(items, Photo{
-				Id:       notionImage.BlockID,
-				Created:  notionImage.LastSeen,
-				BlurHash: &notionImage.R.NotionImageImage.BlurHash,
-				Width:    300,
-				Height:   400,
-				BaseUrl:  url,
-				Source:   PhotoSourceNotion,
-			})
-		}
-	}
+	items := a.imagesFromModel(ctx, recipe.R.NotionRecipes)
 	rw.LinkedPhotos = &items
 
 	return &rw, nil
@@ -167,11 +151,34 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 	}
 	return items, nil
 }
+
+func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo, error) {
+	rd, err := models.RecipeDetails(
+		Where("recipe_details.id = ?", id),
+		Load(Rels(
+			models.RecipeDetailRels.Recipe,
+			models.RecipeRels.NotionRecipes,
+			models.NotionRecipeRels.PageNotionImages,
+			models.NotionImageRels.NotionImageImage,
+		)),
+	).
+		One(ctx, a.db.DB())
+	if err != nil {
+		return nil, err
+	}
+	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes), nil
+	// rw, err := a.recipeFromModel(ctx, recipe.R.Recipe)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return rw, nil
+}
+
 func (a *API) Misc(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Misc")
 	defer span.End()
 
-	items, err := a.RecipeListV2(ctx, 10, 0)
+	items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 	}

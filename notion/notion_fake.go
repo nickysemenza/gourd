@@ -59,8 +59,7 @@ func (f *fakeBlock) GetChildren(context.Context, notionapi.BlockID, *notionapi.P
 	exampleRecipe := `name: toast
 ---
 1 slice  bread
-; toast
-`
+; toast`
 	return &notionapi.GetChildrenResponse{
 		Results: []notionapi.Block{
 			&notionapi.ImageBlock{

@@ -45,6 +45,7 @@ import {
 import { getOpenapiFetchConfig } from "../config";
 import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
+import ProgressiveImage from "../components/ProgressiveImage";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
@@ -512,6 +513,11 @@ const RecipeDetail: React.FC = () => {
         items={ingredientsWithNutrients}
         h={[...totalNutrients.keys()]}
       />
+      <div className="w-9/12 flex ">
+        {(recipe.linked_photos || []).map((p) => (
+          <ProgressiveImage photo={p} maxWidth={200} />
+        ))}
+      </div>
       <div>
         <h3>other versions</h3>
         <ul>

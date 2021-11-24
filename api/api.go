@@ -446,7 +446,13 @@ func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, 
 	if r == nil {
 		return nil, fmt.Errorf("could not find recipe with detail %s", recipeId)
 	}
-	return a.transformRecipeFull(ctx, r), nil
+	full := a.transformRecipeFull(ctx, r)
+	p, err := a.imagesFromRecipeDetailId(ctx, recipeId)
+	if err != nil {
+		return nil, err
+	}
+	full.LinkedPhotos = &p
+	return full, nil
 }
 
 // Info for a specific recipe
