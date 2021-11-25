@@ -19,21 +19,23 @@ import (
 
 type Client struct {
 	// client   *notionapi.Client
-	dbId  notionapi.DatabaseID
-	block notionapi.BlockService
-	db    notionapi.DatabaseService
-	page  notionapi.PageService
+	dbId     notionapi.DatabaseID
+	block    notionapi.BlockService
+	db       notionapi.DatabaseService
+	page     notionapi.PageService
+	testOnly bool
 }
 
-func New(token, database string) *Client {
+func New(token, database string, testOnly bool) *Client {
 	hClient := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	client := notionapi.NewClient(notionapi.Token(token), notionapi.WithHTTPClient(&hClient))
 	return &Client{
 		// client:   client,
-		dbId:  notionapi.DatabaseID(database),
-		db:    client.Database,
-		block: client.Block,
-		page:  client.Page,
+		dbId:     notionapi.DatabaseID(database),
+		db:       client.Database,
+		block:    client.Block,
+		page:     client.Page,
+		testOnly: testOnly,
 	}
 }
 
@@ -125,13 +127,23 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 	var cursor notionapi.Cursor
 	meals := []NotionRecipe{}
 
-	filter := &notionapi.PropertyFilter{
-		Property:    "Tags",
-		MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
+	filter := notionapi.CompoundFilter{
+		"and": {
+			notionapi.PropertyFilter{
+				Property:    "Tags",
+				MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
+			},
+		},
+	}
+	if c.testOnly {
+		filter["and"] = append(filter["and"], notionapi.PropertyFilter{
+			Property:    "Tags",
+			MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
+		})
 	}
 	for {
 		resp, err := c.db.Query(ctx, c.dbId, &notionapi.DatabaseQueryRequest{
-			PropertyFilter: filter,
+			CompoundFilter: &filter,
 			PageSize:       100,
 			StartCursor:    cursor,
 		})

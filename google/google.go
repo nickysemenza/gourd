@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"go.opentelemetry.io/otel"
 	"golang.org/x/oauth2"
@@ -75,6 +76,9 @@ func (c *Client) GetToken(ctx context.Context) (*oauth2.Token, error) {
 	res, err := c.db.GetKV(ctx, "gphotos-oauth2-token")
 	if err != nil {
 		return nil, err
+	}
+	if res == "" {
+		return nil, fmt.Errorf("no google token in kv: %w", common.ErrNotFound)
 	}
 
 	err = json.Unmarshal([]byte(res), &token)

@@ -35,7 +35,7 @@ func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
 	return &LocalImageStore{
 		httpBaseURL: httpBaseURL,
 		dir:         dir,
-		tracer:      otel.Tracer("db"),
+		tracer:      otel.Tracer("imagestore"),
 	}, nil
 }
 

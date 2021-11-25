@@ -1,0 +1,11 @@
+name: plurals combo
+---
+2 tsp black pepper
+2 tsp black peppercorns
+; similars
+
+1 egg
+2 eggs
+3 large eggs
+1 large egg
+; eggs

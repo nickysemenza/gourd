@@ -3,21 +3,27 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/charmbracelet/glamour"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/notion"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"go.opentelemetry.io/otel"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 )
 
 func main() {
-	setupMisc()
-	Execute()
+	if err := setupMisc(); err != nil {
+		log.Fatal(err)
+	}
+	err := rootCmd.Execute()
+	log.Info("cleaning up tracer")
+	otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // nolint:gochecknoglobals
@@ -50,11 +56,17 @@ func init() {
 		&cobra.Command{
 			Use:   "tmp",
 			Short: "misc",
-			Run: func(cmd *cobra.Command, args []string) {
-				n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
-				res, err := n.GetAll(context.Background())
-				log.Error(err)
+			RunE: func(cmd *cobra.Command, args []string) error {
+				s, err := makeServer()
+				if err != nil {
+					return err
+				}
+				res, err := s.APIManager.Notion.GetAll(context.Background())
+				if err != nil {
+					return err
+				}
 				spew.Dump(res)
+				return nil
 			},
 		},
 		&cobra.Command{
@@ -148,11 +160,4 @@ Imported `+" **%s** as `%s`", out.Detail.Name, out.Detail.Id), "dark")
 			},
 		},
 	)
-}
-
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 }

@@ -105,7 +105,7 @@ func NewFakeNotion(t *testing.T) *Client {
 	db := &fakeDB{}
 	block := &fakeBlock{
 		children: map[notionapi.BlockID][]notionapi.Block{
-			"foo": []notionapi.Block{
+			"foo": {
 				&notionapi.ImageBlock{
 					Type: notionapi.BlockTypeImage,
 					ID:   "block1",
@@ -147,7 +147,7 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 				},
 			},
-			"foo2": []notionapi.Block{
+			"foo2": {
 				&notionapi.CodeBlock{
 					Type: notionapi.BlockTypeCode,
 					ID:   "block2",
@@ -165,7 +165,7 @@ func NewFakeNotion(t *testing.T) *Client {
 	}
 	page := &fakePage{
 		details: map[notionapi.PageID]*notionapi.Page{
-			"block4child": &notionapi.Page{
+			"block4child": {
 				Object: notionapi.ObjectTypePage,
 				ID:     "foo2",
 				Parent: notionapi.Parent{

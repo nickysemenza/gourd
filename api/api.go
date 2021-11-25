@@ -87,19 +87,6 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		details := a.transformRecipes(ctx, recipes, false)
 		rd.OtherVersions = &details
 	}
-	// photosDB, err := a.DB().GetPhotosWithRecipe(ctx, dbr.RecipeId)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// photos := []Photo{}
-	// for _, p := range photosDB[dbr.RecipeId] {
-	// 	photos = append(photos, Photo{
-	// 		Id:      p.ID,
-	// 		Source:  PhotoSource(p.Source),
-	// 		BaseUrl: a.ImageStore.GetImageURL(ctx, p.ID),
-	// 	})
-	// }
-	// spew.Dump(photos)
 
 	return rd
 }

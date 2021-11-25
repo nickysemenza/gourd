@@ -79,7 +79,7 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 	return tp, nil
 }
 
-func setupEnv() {
+func setupEnv() error {
 	viper.SetDefault("LOG_LEVEL", "info")
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
@@ -100,36 +100,41 @@ func setupEnv() {
 	if err != nil {
 		var configErr *viper.ConfigFileNotFoundError
 		if errors.As(err, &configErr) {
-			panic(fmt.Errorf("Fatal error config file: %s \n", configErr))
+			return fmt.Errorf("Fatal error config file: %s \n", configErr)
 		}
+		return err
 	}
+	return nil
 
 }
 
-func setupMisc() {
+func setupMisc() error {
 	// env vars
-	setupEnv()
+	err := setupEnv()
+	if err != nil {
+		return err
+	}
+
 	viper.AutomaticEnv()
-	// if err := viper.WriteConfig(); err != nil {
-	// 	panic(err)
-	// }
+
 	level, err := log.ParseLevel(viper.GetString("LOG_LEVEL"))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	log.SetLevel(level)
 
 	// tracing
 	if err := initTracer(); err != nil {
 		err := fmt.Errorf("failed to init tracer: %w", err)
-		log.Fatal(err)
+		return err
 	}
 	log.Infof("tracer initialized")
 
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn: viper.GetString("SENTRY_DSN"),
 	}); err != nil {
-		log.Fatalf("sentry.Init: %s", err)
+		return fmt.Errorf("sentry.Init: %w", err)
 	}
 	log.Infof("sentry initialized")
+	return nil
 }

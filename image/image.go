@@ -11,6 +11,7 @@ import (
 	_ "image/png"
 
 	"github.com/buckket/go-blurhash"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -41,7 +42,9 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}
-	resp, err := http.DefaultClient.Do(req)
+	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}

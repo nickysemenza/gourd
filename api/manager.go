@@ -35,7 +35,10 @@ func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, r
 	return
 }
 
-func (a *API) tmp(ctx context.Context, nRecipe notion.NotionRecipe) (*db.NotionRecipe, error) {
+func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe) (*db.NotionRecipe, error) {
+	ctx, span := a.tracer.Start(ctx, "notionRecipeToDB")
+	defer span.End()
+
 	output := RecipeDetailInput{}
 	if nRecipe.Raw != "" {
 		err := a.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
@@ -59,7 +62,7 @@ func (a *API) tmp(ctx context.Context, nRecipe notion.NotionRecipe) (*db.NotionR
 	}
 
 	for _, child := range nRecipe.Children {
-		_, err := a.tmp(ctx, child)
+		_, err := a.notionRecipeToDB(ctx, child)
 		if err != nil {
 			return nil, err
 		}
@@ -79,17 +82,28 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 		return err
 	}
 
-	var foo []db.NotionRecipe
-	var bar []db.NotionImage
-	var img []db.Image
+	var notionRecipes []db.NotionRecipe
+	var notionImages []db.NotionImage
+	var images []db.Image
 	for _, nRecipe := range nRecipes {
 
-		dbnr, err := a.tmp(ctx, nRecipe)
+		dbnr, err := a.notionRecipeToDB(ctx, nRecipe)
 		if err != nil {
 			return err
 		}
-		foo = append(foo, *dbnr)
+		notionRecipes = append(notionRecipes, *dbnr)
 		for _, nPhoto := range nRecipe.Photos {
+
+			// nPhoto.BlockID
+			exists, err := a.db.DoesNotionImageExist(ctx, nPhoto.BlockID)
+			if err != nil {
+				return err
+			}
+			if exists {
+				log.Println("already exists")
+				continue
+			}
+
 			if strings.Contains(nPhoto.URL, ".heic") {
 				logrus.Infof("skipping heic: %s", nPhoto.URL)
 				continue
@@ -104,13 +118,12 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 				return err
 			}
 
-			i := db.Image{
+			images = append(images, db.Image{
 				ID:       id,
 				BlurHash: bh,
 				Source:   "notion",
-			}
-			img = append(img, i)
-			bar = append(bar, db.NotionImage{
+			})
+			notionImages = append(notionImages, db.NotionImage{
 				PageID:  nRecipe.PageID,
 				BlockID: nPhoto.BlockID,
 				ImageID: id,
@@ -118,18 +131,24 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 		}
 	}
 
-	err = a.db.SaveImage(ctx, img)
-	if err != nil {
-		return err
+	if len(images) > 0 {
+		err = a.db.SaveImage(ctx, images)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = a.db.SaveNotionRecipes(ctx, foo)
-	if err != nil {
-		return err
+	if len(notionRecipes) > 0 {
+		err = a.db.SaveNotionRecipes(ctx, notionRecipes)
+		if err != nil {
+			return err
+		}
 	}
-	err = a.db.UpsertNotionImages(ctx, bar)
-	if err != nil {
-		return err
+	if len(notionImages) > 0 {
+		err = a.db.UpsertNotionImages(ctx, notionImages)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

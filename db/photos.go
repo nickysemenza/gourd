@@ -10,6 +10,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/common"
+	"github.com/nickysemenza/gourd/models"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -202,6 +204,11 @@ func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
 	return
 }
 
+func (c *Client) DoesNotionImageExist(ctx context.Context, blockID string) (exists bool, err error) {
+	res, err := models.NotionImages(qm.Where("block_id = ?", blockID)).One(ctx, c.db)
+	return res != nil, err
+}
+
 func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (err error) {
 	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
 	defer span.End()
@@ -218,7 +225,7 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (e
 
 func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 	q := c.psql.Select("id", "album_id", "creation_time").From("gphotos_photos").
-		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").Where(sq.Eq{"meal": nil})
+		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").Where(sq.Eq{"meal_id": nil})
 	var missingMeals []GPhoto
 	err := c.selectContext(ctx, q, &missingMeals)
 	if err != nil {
@@ -232,7 +239,7 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 			return err
 		}
 
-		q := c.psql.Insert("meal_gphoto").Columns("meal", "gphotos_id").Values(mealID, m.PhotoID)
+		q := c.psql.Insert("meal_gphoto").Columns("meal_id", "gphotos_id").Values(mealID, m.PhotoID)
 		_, err = c.execContext(ctx, q)
 		if err != nil {
 			return err
@@ -245,7 +252,7 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 	q := c.psql.Select("page_id", "ate_at", "recipe_id").From("notion_recipe").
-		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal": nil})
+		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal_id": nil})
 	var missingMeals []NotionRecipe
 	err := c.selectContext(ctx, q, &missingMeals)
 	if err != nil {
@@ -269,7 +276,7 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 			}
 		}
 
-		q := c.psql.Insert("notion_meal").Columns("meal", "notion_recipe").Values(mealID, m.PageID)
+		q := c.psql.Insert("notion_meal").Columns("meal_id", "notion_recipe").Values(mealID, m.PageID)
 		_, err = c.execContext(ctx, q)
 		if err != nil {
 			return err
@@ -398,7 +405,7 @@ func (c *Client) GetPhotosForMeal(ctx context.Context, meal string) ([]GPhoto, e
 	defer span.End()
 	return c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		return q.LeftJoin("meal_gphoto on meal_gphoto.gphotos_id = gphotos_photos.id").
-			Where(sq.Eq{"meal": meal})
+			Where(sq.Eq{"meal_id": meal})
 	})
 }
 
@@ -408,6 +415,6 @@ func (c *Client) GetNotionPhotosForMeal(ctx context.Context, meal string) ([]Not
 	return c.getNotionPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		return q.LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
 			LeftJoin("notion_meal on notion_meal.notion_recipe = notion_recipe.page_id").
-			Where(sq.Eq{"meal": meal})
+			Where(sq.Eq{"meal_id": meal})
 	})
 }
