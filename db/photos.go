@@ -206,6 +206,9 @@ func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
 
 func (c *Client) DoesNotionImageExist(ctx context.Context, blockID string) (exists bool, err error) {
 	res, err := models.NotionImages(qm.Where("block_id = ?", blockID)).One(ctx, c.db)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, nil
+	}
 	return res != nil, err
 }
 

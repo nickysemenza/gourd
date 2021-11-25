@@ -11,7 +11,6 @@ import (
 	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -62,6 +61,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 	}
 
 	for _, child := range nRecipe.Children {
+		//todo: child images aren't saved
 		_, err := a.notionRecipeToDB(ctx, child)
 		if err != nil {
 			return nil, err
@@ -94,18 +94,19 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 		notionRecipes = append(notionRecipes, *dbnr)
 		for _, nPhoto := range nRecipe.Photos {
 
+			l := log.WithField("block_id", nPhoto.BlockID)
 			// nPhoto.BlockID
 			exists, err := a.db.DoesNotionImageExist(ctx, nPhoto.BlockID)
 			if err != nil {
 				return err
 			}
 			if exists {
-				log.Println("already exists")
+				l.Println("already exists")
 				continue
 			}
 
 			if strings.Contains(nPhoto.URL, ".heic") {
-				logrus.Infof("skipping heic: %s", nPhoto.URL)
+				l.Infof("skipping heic: %s", nPhoto.URL)
 				continue
 			}
 			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)

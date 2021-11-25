@@ -8,7 +8,6 @@ import (
 )
 
 func TestSmoke(t *testing.T) {
-
 	c := NewFakeNotion(t)
 	res, err := c.GetAll(context.Background())
 	require.NoError(t, err)

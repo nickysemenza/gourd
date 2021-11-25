@@ -170,7 +170,7 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 }
 
 func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, meal NotionRecipe) (*NotionRecipe, error) {
-	ctx, span := otel.Tracer("notion").Start(ctx, "imagesFromPage")
+	ctx, span := otel.Tracer("notion").Start(ctx, "detailsFromPage")
 	defer span.End()
 
 	var childCursor notionapi.Cursor
