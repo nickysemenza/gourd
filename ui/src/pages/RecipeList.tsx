@@ -49,6 +49,12 @@ const RecipeList: React.FC = () => {
             original.detail,
             ...(showOlder ? olderVersions : []),
           ];
+          const ing = Object.keys(
+            sumIngredients(original.detail.sections).ingredients
+          );
+          const rec = Object.keys(
+            sumIngredients(original.detail.sections).recipes
+          );
           return (
             <div>
               <ul>
@@ -76,21 +82,8 @@ const RecipeList: React.FC = () => {
                   </li>
                 ))}
               </ul>
-              <Pill2
-                color={
-                  Object.keys(
-                    sumIngredients(original.detail.sections).ingredients
-                  ).length > 0
-                    ? "green"
-                    : "red"
-                }
-              >
-                {
-                  Object.keys(
-                    sumIngredients(original.detail.sections).ingredients
-                  ).length
-                }{" "}
-                ingredients
+              <Pill2 color={ing.length + rec.length > 0 ? "green" : "red"}>
+                {ing.length} ing / {rec.length} rec
               </Pill2>
             </div>
           );

@@ -24,52 +24,52 @@ import (
 
 // IngredientUnit is an object representing the database table.
 type IngredientUnit struct {
-	ID         int           `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Ingredient string        `boil:"ingredient" json:"ingredient" toml:"ingredient" yaml:"ingredient"`
-	UnitA      string        `boil:"unit_a" json:"unit_a" toml:"unit_a" yaml:"unit_a"`
-	AmountA    types.Decimal `boil:"amount_a" json:"amount_a" toml:"amount_a" yaml:"amount_a"`
-	UnitB      string        `boil:"unit_b" json:"unit_b" toml:"unit_b" yaml:"unit_b"`
-	AmountB    types.Decimal `boil:"amount_b" json:"amount_b" toml:"amount_b" yaml:"amount_b"`
-	Source     string        `boil:"source" json:"source" toml:"source" yaml:"source"`
+	ID           int           `boil:"id" json:"id" toml:"id" yaml:"id"`
+	IngredientID string        `boil:"ingredient_id" json:"ingredient_id" toml:"ingredient_id" yaml:"ingredient_id"`
+	UnitA        string        `boil:"unit_a" json:"unit_a" toml:"unit_a" yaml:"unit_a"`
+	AmountA      types.Decimal `boil:"amount_a" json:"amount_a" toml:"amount_a" yaml:"amount_a"`
+	UnitB        string        `boil:"unit_b" json:"unit_b" toml:"unit_b" yaml:"unit_b"`
+	AmountB      types.Decimal `boil:"amount_b" json:"amount_b" toml:"amount_b" yaml:"amount_b"`
+	Source       string        `boil:"source" json:"source" toml:"source" yaml:"source"`
 
 	R *ingredientUnitR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L ingredientUnitL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var IngredientUnitColumns = struct {
-	ID         string
-	Ingredient string
-	UnitA      string
-	AmountA    string
-	UnitB      string
-	AmountB    string
-	Source     string
+	ID           string
+	IngredientID string
+	UnitA        string
+	AmountA      string
+	UnitB        string
+	AmountB      string
+	Source       string
 }{
-	ID:         "id",
-	Ingredient: "ingredient",
-	UnitA:      "unit_a",
-	AmountA:    "amount_a",
-	UnitB:      "unit_b",
-	AmountB:    "amount_b",
-	Source:     "source",
+	ID:           "id",
+	IngredientID: "ingredient_id",
+	UnitA:        "unit_a",
+	AmountA:      "amount_a",
+	UnitB:        "unit_b",
+	AmountB:      "amount_b",
+	Source:       "source",
 }
 
 var IngredientUnitTableColumns = struct {
-	ID         string
-	Ingredient string
-	UnitA      string
-	AmountA    string
-	UnitB      string
-	AmountB    string
-	Source     string
+	ID           string
+	IngredientID string
+	UnitA        string
+	AmountA      string
+	UnitB        string
+	AmountB      string
+	Source       string
 }{
-	ID:         "ingredient_units.id",
-	Ingredient: "ingredient_units.ingredient",
-	UnitA:      "ingredient_units.unit_a",
-	AmountA:    "ingredient_units.amount_a",
-	UnitB:      "ingredient_units.unit_b",
-	AmountB:    "ingredient_units.amount_b",
-	Source:     "ingredient_units.source",
+	ID:           "ingredient_units.id",
+	IngredientID: "ingredient_units.ingredient_id",
+	UnitA:        "ingredient_units.unit_a",
+	AmountA:      "ingredient_units.amount_a",
+	UnitB:        "ingredient_units.unit_b",
+	AmountB:      "ingredient_units.amount_b",
+	Source:       "ingredient_units.source",
 }
 
 // Generated where
@@ -119,33 +119,33 @@ func (w whereHelpertypes_Decimal) GTE(x types.Decimal) qm.QueryMod {
 }
 
 var IngredientUnitWhere = struct {
-	ID         whereHelperint
-	Ingredient whereHelperstring
-	UnitA      whereHelperstring
-	AmountA    whereHelpertypes_Decimal
-	UnitB      whereHelperstring
-	AmountB    whereHelpertypes_Decimal
-	Source     whereHelperstring
+	ID           whereHelperint
+	IngredientID whereHelperstring
+	UnitA        whereHelperstring
+	AmountA      whereHelpertypes_Decimal
+	UnitB        whereHelperstring
+	AmountB      whereHelpertypes_Decimal
+	Source       whereHelperstring
 }{
-	ID:         whereHelperint{field: "\"ingredient_units\".\"id\""},
-	Ingredient: whereHelperstring{field: "\"ingredient_units\".\"ingredient\""},
-	UnitA:      whereHelperstring{field: "\"ingredient_units\".\"unit_a\""},
-	AmountA:    whereHelpertypes_Decimal{field: "\"ingredient_units\".\"amount_a\""},
-	UnitB:      whereHelperstring{field: "\"ingredient_units\".\"unit_b\""},
-	AmountB:    whereHelpertypes_Decimal{field: "\"ingredient_units\".\"amount_b\""},
-	Source:     whereHelperstring{field: "\"ingredient_units\".\"source\""},
+	ID:           whereHelperint{field: "\"ingredient_units\".\"id\""},
+	IngredientID: whereHelperstring{field: "\"ingredient_units\".\"ingredient_id\""},
+	UnitA:        whereHelperstring{field: "\"ingredient_units\".\"unit_a\""},
+	AmountA:      whereHelpertypes_Decimal{field: "\"ingredient_units\".\"amount_a\""},
+	UnitB:        whereHelperstring{field: "\"ingredient_units\".\"unit_b\""},
+	AmountB:      whereHelpertypes_Decimal{field: "\"ingredient_units\".\"amount_b\""},
+	Source:       whereHelperstring{field: "\"ingredient_units\".\"source\""},
 }
 
 // IngredientUnitRels is where relationship names are stored.
 var IngredientUnitRels = struct {
-	IngredientUnitIngredient string
+	Ingredient string
 }{
-	IngredientUnitIngredient: "IngredientUnitIngredient",
+	Ingredient: "Ingredient",
 }
 
 // ingredientUnitR is where relationships are stored.
 type ingredientUnitR struct {
-	IngredientUnitIngredient *Ingredient `boil:"IngredientUnitIngredient" json:"IngredientUnitIngredient" toml:"IngredientUnitIngredient" yaml:"IngredientUnitIngredient"`
+	Ingredient *Ingredient `boil:"Ingredient" json:"Ingredient" toml:"Ingredient" yaml:"Ingredient"`
 }
 
 // NewStruct creates a new relationship struct
@@ -157,8 +157,8 @@ func (*ingredientUnitR) NewStruct() *ingredientUnitR {
 type ingredientUnitL struct{}
 
 var (
-	ingredientUnitAllColumns            = []string{"id", "ingredient", "unit_a", "amount_a", "unit_b", "amount_b", "source"}
-	ingredientUnitColumnsWithoutDefault = []string{"ingredient", "unit_a", "amount_a", "unit_b", "amount_b", "source"}
+	ingredientUnitAllColumns            = []string{"id", "ingredient_id", "unit_a", "amount_a", "unit_b", "amount_b", "source"}
+	ingredientUnitColumnsWithoutDefault = []string{"ingredient_id", "unit_a", "amount_a", "unit_b", "amount_b", "source"}
 	ingredientUnitColumnsWithDefault    = []string{"id"}
 	ingredientUnitPrimaryKeyColumns     = []string{"id"}
 )
@@ -438,10 +438,10 @@ func (q ingredientUnitQuery) Exists(ctx context.Context, exec boil.ContextExecut
 	return count > 0, nil
 }
 
-// IngredientUnitIngredient pointed to by the foreign key.
-func (o *IngredientUnit) IngredientUnitIngredient(mods ...qm.QueryMod) ingredientQuery {
+// Ingredient pointed to by the foreign key.
+func (o *IngredientUnit) Ingredient(mods ...qm.QueryMod) ingredientQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Ingredient),
+		qm.Where("\"id\" = ?", o.IngredientID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -452,9 +452,9 @@ func (o *IngredientUnit) IngredientUnitIngredient(mods ...qm.QueryMod) ingredien
 	return query
 }
 
-// LoadIngredientUnitIngredient allows an eager lookup of values, cached into the
+// LoadIngredient allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeIngredientUnit interface{}, mods queries.Applicator) error {
+func (ingredientUnitL) LoadIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeIngredientUnit interface{}, mods queries.Applicator) error {
 	var slice []*IngredientUnit
 	var object *IngredientUnit
 
@@ -469,7 +469,7 @@ func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.
 		if object.R == nil {
 			object.R = &ingredientUnitR{}
 		}
-		args = append(args, object.Ingredient)
+		args = append(args, object.IngredientID)
 
 	} else {
 	Outer:
@@ -479,12 +479,12 @@ func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.
 			}
 
 			for _, a := range args {
-				if a == obj.Ingredient {
+				if a == obj.IngredientID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Ingredient)
+			args = append(args, obj.IngredientID)
 
 		}
 	}
@@ -532,7 +532,7 @@ func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.IngredientUnitIngredient = foreign
+		object.R.Ingredient = foreign
 		if foreign.R == nil {
 			foreign.R = &ingredientR{}
 		}
@@ -542,8 +542,8 @@ func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Ingredient == foreign.ID {
-				local.R.IngredientUnitIngredient = foreign
+			if local.IngredientID == foreign.ID {
+				local.R.Ingredient = foreign
 				if foreign.R == nil {
 					foreign.R = &ingredientR{}
 				}
@@ -556,10 +556,10 @@ func (ingredientUnitL) LoadIngredientUnitIngredient(ctx context.Context, e boil.
 	return nil
 }
 
-// SetIngredientUnitIngredient of the ingredientUnit to the related item.
-// Sets o.R.IngredientUnitIngredient to related.
+// SetIngredient of the ingredientUnit to the related item.
+// Sets o.R.Ingredient to related.
 // Adds o to related.R.IngredientUnits.
-func (o *IngredientUnit) SetIngredientUnitIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Ingredient) error {
+func (o *IngredientUnit) SetIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Ingredient) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -569,7 +569,7 @@ func (o *IngredientUnit) SetIngredientUnitIngredient(ctx context.Context, exec b
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"ingredient_units\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient_id"}),
 		strmangle.WhereClause("\"", "\"", 2, ingredientUnitPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -583,13 +583,13 @@ func (o *IngredientUnit) SetIngredientUnitIngredient(ctx context.Context, exec b
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Ingredient = related.ID
+	o.IngredientID = related.ID
 	if o.R == nil {
 		o.R = &ingredientUnitR{
-			IngredientUnitIngredient: related,
+			Ingredient: related,
 		}
 	} else {
-		o.R.IngredientUnitIngredient = related
+		o.R.Ingredient = related
 	}
 
 	if related.R == nil {

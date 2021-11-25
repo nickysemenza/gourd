@@ -29,7 +29,7 @@ type GphotosPhoto struct {
 	CreationTime time.Time   `boil:"creation_time" json:"creation_time" toml:"creation_time" yaml:"creation_time"`
 	LastSeen     time.Time   `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
 	BlurHash     null.String `boil:"blur_hash" json:"blur_hash,omitempty" toml:"blur_hash" yaml:"blur_hash,omitempty"`
-	Image        string      `boil:"image" json:"image" toml:"image" yaml:"image"`
+	ImageID      string      `boil:"image_id" json:"image_id" toml:"image_id" yaml:"image_id"`
 
 	R *gphotosPhotoR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L gphotosPhotoL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -41,14 +41,14 @@ var GphotosPhotoColumns = struct {
 	CreationTime string
 	LastSeen     string
 	BlurHash     string
-	Image        string
+	ImageID      string
 }{
 	ID:           "id",
 	AlbumID:      "album_id",
 	CreationTime: "creation_time",
 	LastSeen:     "last_seen",
 	BlurHash:     "blur_hash",
-	Image:        "image",
+	ImageID:      "image_id",
 }
 
 var GphotosPhotoTableColumns = struct {
@@ -57,14 +57,14 @@ var GphotosPhotoTableColumns = struct {
 	CreationTime string
 	LastSeen     string
 	BlurHash     string
-	Image        string
+	ImageID      string
 }{
 	ID:           "gphotos_photos.id",
 	AlbumID:      "gphotos_photos.album_id",
 	CreationTime: "gphotos_photos.creation_time",
 	LastSeen:     "gphotos_photos.last_seen",
 	BlurHash:     "gphotos_photos.blur_hash",
-	Image:        "gphotos_photos.image",
+	ImageID:      "gphotos_photos.image_id",
 }
 
 // Generated where
@@ -120,31 +120,31 @@ var GphotosPhotoWhere = struct {
 	CreationTime whereHelpertime_Time
 	LastSeen     whereHelpertime_Time
 	BlurHash     whereHelpernull_String
-	Image        whereHelperstring
+	ImageID      whereHelperstring
 }{
 	ID:           whereHelperstring{field: "\"gphotos_photos\".\"id\""},
 	AlbumID:      whereHelperstring{field: "\"gphotos_photos\".\"album_id\""},
 	CreationTime: whereHelpertime_Time{field: "\"gphotos_photos\".\"creation_time\""},
 	LastSeen:     whereHelpertime_Time{field: "\"gphotos_photos\".\"last_seen\""},
 	BlurHash:     whereHelpernull_String{field: "\"gphotos_photos\".\"blur_hash\""},
-	Image:        whereHelperstring{field: "\"gphotos_photos\".\"image\""},
+	ImageID:      whereHelperstring{field: "\"gphotos_photos\".\"image_id\""},
 }
 
 // GphotosPhotoRels is where relationship names are stored.
 var GphotosPhotoRels = struct {
 	Album             string
-	GphotosPhotoImage string
+	Image             string
 	GphotoMealGphotos string
 }{
 	Album:             "Album",
-	GphotosPhotoImage: "GphotosPhotoImage",
+	Image:             "Image",
 	GphotoMealGphotos: "GphotoMealGphotos",
 }
 
 // gphotosPhotoR is where relationships are stored.
 type gphotosPhotoR struct {
 	Album             *GphotosAlbum   `boil:"Album" json:"Album" toml:"Album" yaml:"Album"`
-	GphotosPhotoImage *Image          `boil:"GphotosPhotoImage" json:"GphotosPhotoImage" toml:"GphotosPhotoImage" yaml:"GphotosPhotoImage"`
+	Image             *Image          `boil:"Image" json:"Image" toml:"Image" yaml:"Image"`
 	GphotoMealGphotos MealGphotoSlice `boil:"GphotoMealGphotos" json:"GphotoMealGphotos" toml:"GphotoMealGphotos" yaml:"GphotoMealGphotos"`
 }
 
@@ -157,8 +157,8 @@ func (*gphotosPhotoR) NewStruct() *gphotosPhotoR {
 type gphotosPhotoL struct{}
 
 var (
-	gphotosPhotoAllColumns            = []string{"id", "album_id", "creation_time", "last_seen", "blur_hash", "image"}
-	gphotosPhotoColumnsWithoutDefault = []string{"id", "album_id", "creation_time", "blur_hash", "image"}
+	gphotosPhotoAllColumns            = []string{"id", "album_id", "creation_time", "last_seen", "blur_hash", "image_id"}
+	gphotosPhotoColumnsWithoutDefault = []string{"id", "album_id", "creation_time", "blur_hash", "image_id"}
 	gphotosPhotoColumnsWithDefault    = []string{"last_seen"}
 	gphotosPhotoPrimaryKeyColumns     = []string{"id"}
 )
@@ -452,10 +452,10 @@ func (o *GphotosPhoto) Album(mods ...qm.QueryMod) gphotosAlbumQuery {
 	return query
 }
 
-// GphotosPhotoImage pointed to by the foreign key.
-func (o *GphotosPhoto) GphotosPhotoImage(mods ...qm.QueryMod) imageQuery {
+// Image pointed to by the foreign key.
+func (o *GphotosPhoto) Image(mods ...qm.QueryMod) imageQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Image),
+		qm.Where("\"id\" = ?", o.ImageID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -591,9 +591,9 @@ func (gphotosPhotoL) LoadAlbum(ctx context.Context, e boil.ContextExecutor, sing
 	return nil
 }
 
-// LoadGphotosPhotoImage allows an eager lookup of values, cached into the
+// LoadImage allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (gphotosPhotoL) LoadGphotosPhotoImage(ctx context.Context, e boil.ContextExecutor, singular bool, maybeGphotosPhoto interface{}, mods queries.Applicator) error {
+func (gphotosPhotoL) LoadImage(ctx context.Context, e boil.ContextExecutor, singular bool, maybeGphotosPhoto interface{}, mods queries.Applicator) error {
 	var slice []*GphotosPhoto
 	var object *GphotosPhoto
 
@@ -608,7 +608,7 @@ func (gphotosPhotoL) LoadGphotosPhotoImage(ctx context.Context, e boil.ContextEx
 		if object.R == nil {
 			object.R = &gphotosPhotoR{}
 		}
-		args = append(args, object.Image)
+		args = append(args, object.ImageID)
 
 	} else {
 	Outer:
@@ -618,12 +618,12 @@ func (gphotosPhotoL) LoadGphotosPhotoImage(ctx context.Context, e boil.ContextEx
 			}
 
 			for _, a := range args {
-				if a == obj.Image {
+				if a == obj.ImageID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Image)
+			args = append(args, obj.ImageID)
 
 		}
 	}
@@ -671,7 +671,7 @@ func (gphotosPhotoL) LoadGphotosPhotoImage(ctx context.Context, e boil.ContextEx
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.GphotosPhotoImage = foreign
+		object.R.Image = foreign
 		if foreign.R == nil {
 			foreign.R = &imageR{}
 		}
@@ -681,8 +681,8 @@ func (gphotosPhotoL) LoadGphotosPhotoImage(ctx context.Context, e boil.ContextEx
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Image == foreign.ID {
-				local.R.GphotosPhotoImage = foreign
+			if local.ImageID == foreign.ID {
+				local.R.Image = foreign
 				if foreign.R == nil {
 					foreign.R = &imageR{}
 				}
@@ -840,10 +840,10 @@ func (o *GphotosPhoto) SetAlbum(ctx context.Context, exec boil.ContextExecutor, 
 	return nil
 }
 
-// SetGphotosPhotoImage of the gphotosPhoto to the related item.
-// Sets o.R.GphotosPhotoImage to related.
+// SetImage of the gphotosPhoto to the related item.
+// Sets o.R.Image to related.
 // Adds o to related.R.GphotosPhotos.
-func (o *GphotosPhoto) SetGphotosPhotoImage(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Image) error {
+func (o *GphotosPhoto) SetImage(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Image) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -853,7 +853,7 @@ func (o *GphotosPhoto) SetGphotosPhotoImage(ctx context.Context, exec boil.Conte
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"gphotos_photos\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"image"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"image_id"}),
 		strmangle.WhereClause("\"", "\"", 2, gphotosPhotoPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -867,13 +867,13 @@ func (o *GphotosPhoto) SetGphotosPhotoImage(ctx context.Context, exec boil.Conte
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Image = related.ID
+	o.ImageID = related.ID
 	if o.R == nil {
 		o.R = &gphotosPhotoR{
-			GphotosPhotoImage: related,
+			Image: related,
 		}
 	} else {
-		o.R.GphotosPhotoImage = related
+		o.R.Image = related
 	}
 
 	if related.R == nil {
@@ -905,7 +905,7 @@ func (o *GphotosPhoto) AddGphotoMealGphotos(ctx context.Context, exec boil.Conte
 				strmangle.SetParamNames("\"", "\"", 1, []string{"gphotos_id"}),
 				strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.Meal, rel.GphotosID}
+			values := []interface{}{o.ID, rel.MealID, rel.GphotosID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)

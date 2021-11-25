@@ -376,7 +376,7 @@ func (o *Image) GphotosPhotos(mods ...qm.QueryMod) gphotosPhotoQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"gphotos_photos\".\"image\"=?", o.ID),
+		qm.Where("\"gphotos_photos\".\"image_id\"=?", o.ID),
 	)
 
 	query := GphotosPhotos(queryMods...)
@@ -397,7 +397,7 @@ func (o *Image) NotionImages(mods ...qm.QueryMod) notionImageQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"notion_image\".\"image\"=?", o.ID),
+		qm.Where("\"notion_image\".\"image_id\"=?", o.ID),
 	)
 
 	query := NotionImages(queryMods...)
@@ -451,7 +451,7 @@ func (imageL) LoadGphotosPhotos(ctx context.Context, e boil.ContextExecutor, sin
 
 	query := NewQuery(
 		qm.From(`gphotos_photos`),
-		qm.WhereIn(`gphotos_photos.image in ?`, args...),
+		qm.WhereIn(`gphotos_photos.image_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -487,19 +487,19 @@ func (imageL) LoadGphotosPhotos(ctx context.Context, e boil.ContextExecutor, sin
 			if foreign.R == nil {
 				foreign.R = &gphotosPhotoR{}
 			}
-			foreign.R.GphotosPhotoImage = object
+			foreign.R.Image = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.Image {
+			if local.ID == foreign.ImageID {
 				local.R.GphotosPhotos = append(local.R.GphotosPhotos, foreign)
 				if foreign.R == nil {
 					foreign.R = &gphotosPhotoR{}
 				}
-				foreign.R.GphotosPhotoImage = local
+				foreign.R.Image = local
 				break
 			}
 		}
@@ -549,7 +549,7 @@ func (imageL) LoadNotionImages(ctx context.Context, e boil.ContextExecutor, sing
 
 	query := NewQuery(
 		qm.From(`notion_image`),
-		qm.WhereIn(`notion_image.image in ?`, args...),
+		qm.WhereIn(`notion_image.image_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -585,19 +585,19 @@ func (imageL) LoadNotionImages(ctx context.Context, e boil.ContextExecutor, sing
 			if foreign.R == nil {
 				foreign.R = &notionImageR{}
 			}
-			foreign.R.NotionImageImage = object
+			foreign.R.Image = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.Image {
+			if local.ID == foreign.ImageID {
 				local.R.NotionImages = append(local.R.NotionImages, foreign)
 				if foreign.R == nil {
 					foreign.R = &notionImageR{}
 				}
-				foreign.R.NotionImageImage = local
+				foreign.R.Image = local
 				break
 			}
 		}
@@ -609,19 +609,19 @@ func (imageL) LoadNotionImages(ctx context.Context, e boil.ContextExecutor, sing
 // AddGphotosPhotos adds the given related objects to the existing relationships
 // of the image, optionally inserting them as new records.
 // Appends related to o.R.GphotosPhotos.
-// Sets related.R.GphotosPhotoImage appropriately.
+// Sets related.R.Image appropriately.
 func (o *Image) AddGphotosPhotos(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*GphotosPhoto) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.Image = o.ID
+			rel.ImageID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"gphotos_photos\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"image"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"image_id"}),
 				strmangle.WhereClause("\"", "\"", 2, gphotosPhotoPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -635,7 +635,7 @@ func (o *Image) AddGphotosPhotos(ctx context.Context, exec boil.ContextExecutor,
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.Image = o.ID
+			rel.ImageID = o.ID
 		}
 	}
 
@@ -650,10 +650,10 @@ func (o *Image) AddGphotosPhotos(ctx context.Context, exec boil.ContextExecutor,
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &gphotosPhotoR{
-				GphotosPhotoImage: o,
+				Image: o,
 			}
 		} else {
-			rel.R.GphotosPhotoImage = o
+			rel.R.Image = o
 		}
 	}
 	return nil
@@ -662,19 +662,19 @@ func (o *Image) AddGphotosPhotos(ctx context.Context, exec boil.ContextExecutor,
 // AddNotionImages adds the given related objects to the existing relationships
 // of the image, optionally inserting them as new records.
 // Appends related to o.R.NotionImages.
-// Sets related.R.NotionImageImage appropriately.
+// Sets related.R.Image appropriately.
 func (o *Image) AddNotionImages(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*NotionImage) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.Image = o.ID
+			rel.ImageID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"notion_image\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"image"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"image_id"}),
 				strmangle.WhereClause("\"", "\"", 2, notionImagePrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.BlockID, rel.PageID}
@@ -688,7 +688,7 @@ func (o *Image) AddNotionImages(ctx context.Context, exec boil.ContextExecutor, 
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.Image = o.ID
+			rel.ImageID = o.ID
 		}
 	}
 
@@ -703,10 +703,10 @@ func (o *Image) AddNotionImages(ctx context.Context, exec boil.ContextExecutor, 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &notionImageR{
-				NotionImageImage: o,
+				Image: o,
 			}
 		} else {
-			rel.R.NotionImageImage = o
+			rel.R.Image = o
 		}
 	}
 	return nil

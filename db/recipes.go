@@ -52,7 +52,7 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	}
 
 	// sections
-	sectionInsert := c.psql.Insert(sectionsTable).Columns("id", "recipe_detail", "duration_timerange")
+	sectionInsert := c.psql.Insert(sectionsTable).Columns("id", "recipe_detail_id", "duration_timerange")
 	for _, s := range r.Sections {
 		sectionInsert = sectionInsert.Values(s.Id, s.RecipeDetailId, s.TimeRange)
 	}
@@ -62,9 +62,9 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		return fmt.Errorf("failed to insert sections: %w", err)
 	}
 
-	instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section", "instruction")
-	ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section", "ingredient", "recipe",
-		"amounts", "adjective", "optional", "original", "substitutes_for")
+	instructionsInsert := c.psql.Insert(sInstructionsTable).Columns("id", "section_id", "instruction")
+	ingredientsInsert := c.psql.Insert(sIngredientsTable).Columns("id", "section_id", "ingredient_id", "recipe_id",
+		"amounts", "adjective", "optional", "original", "sub_for_ingredient_id")
 
 	var hasInstructions, hasIngredients bool
 	for _, s := range r.Sections {
@@ -233,9 +233,9 @@ func (c *Client) IngredientToRecipe(ctx context.Context, ingredientID string) (*
 		tx,
 		c.psql.
 			Update(sIngredientsTable).
-			Set("ingredient", nil).
-			Set("recipe", newDetail.RecipeId).
-			Where(sq.Eq{"ingredient": ingredientID})); err != nil {
+			Set("ingredient_id", nil).
+			Set("recipe_id", newDetail.RecipeId).
+			Where(sq.Eq{"ingredient_id": ingredientID})); err != nil {
 		return nil, fmt.Errorf("failed to update references to transformed ingredient: %w", err)
 	}
 
@@ -269,7 +269,7 @@ func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids 
 		tx,
 		c.psql.
 			Update(ingredientsTable).
-			Set("parent", ingredientID).
+			Set("parent_ingredient_id", ingredientID).
 			Where(sq.Eq{"id": ids})); err != nil {
 		return fmt.Errorf("failed to update ingredient: %w", err)
 	}
@@ -296,11 +296,11 @@ func (c *Client) RecipeIngredientDependencies(ctx context.Context) ([]RecipeIngr
 
 FROM
 	recipe_details
-	LEFT JOIN recipe_sections ON recipe_details.id = recipe_sections.recipe_detail
-	LEFT JOIN recipe_section_ingredients ON recipe_section_ingredients.section = recipe_sections.id
-	LEFT JOIN recipe_details r2  ON r2.recipe_id = recipe_section_ingredients.recipe
-	LEFT JOIN ingredients ON recipe_section_ingredients.ingredient = ingredients.id
-	LEFT JOIN ingredients alts ON ingredients.parent = alts.id
+	LEFT JOIN recipe_sections ON recipe_details.id = recipe_sections.recipe_detail_id
+	LEFT JOIN recipe_section_ingredients ON recipe_section_ingredients.section_id = recipe_sections.id
+	LEFT JOIN recipe_details r2  ON r2.recipe_id = recipe_section_ingredients.recipe_id
+	LEFT JOIN ingredients ON recipe_section_ingredients.ingredient_id = ingredients.id
+	LEFT JOIN ingredients alts ON ingredients.parent_ingredient_id = alts.id
 WHERE
 	(recipe_details.is_latest_version = TRUE AND (r2.is_latest_version IS NULL OR r2.is_latest_version = TRUE)
 	)

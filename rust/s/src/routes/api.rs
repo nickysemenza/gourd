@@ -8,21 +8,21 @@ use crate::db;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SI {
-    section: String,
+    section_id: String,
     id: String,
     sort: Option<i32>,
-    ingredient: Option<String>,
-    recipe: Option<String>,
+    ingredient_id: Option<String>,
+    recipe_id: Option<String>,
     amounts: sqlx::types::Json<Vec<Amount>>,
     adjective: Option<String>,
     optional: Option<bool>,
     original: Option<String>,
-    substitutes_for: Option<String>,
+    sub_for_ingredient_id: Option<String>,
 }
 
 fn si_to_api(r: SI) -> SectionIngredient {
     SectionIngredient {
-        kind: if r.ingredient.is_some() {
+        kind: if r.ingredient_id.is_some() {
             IngredientKind::Ingredient
         } else {
             IngredientKind::Recipe
@@ -74,8 +74,8 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     let res = sqlx::query_as!(
         SI,
         r#"
-    select section, id, sort, ingredient, recipe, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
-     adjective, optional, original, substitutes_for from recipe_section_ingredients;
+    select section_id, id, sort, ingredient_id, recipe_id, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
+     adjective, optional, original, sub_for_ingredient_id from recipe_section_ingredients;
             "#,
     )
     .fetch_all(pool)

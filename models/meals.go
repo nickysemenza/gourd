@@ -387,7 +387,7 @@ func (o *Meal) MealGphotos(mods ...qm.QueryMod) mealGphotoQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"meal_gphoto\".\"meal\"=?", o.ID),
+		qm.Where("\"meal_gphoto\".\"meal_id\"=?", o.ID),
 	)
 
 	query := MealGphotos(queryMods...)
@@ -430,7 +430,7 @@ func (o *Meal) NotionRecipes(mods ...qm.QueryMod) notionRecipeQuery {
 
 	queryMods = append(queryMods,
 		qm.InnerJoin("\"notion_meal\" on \"notion_recipe\".\"page_id\" = \"notion_meal\".\"notion_recipe\""),
-		qm.Where("\"notion_meal\".\"meal\"=?", o.ID),
+		qm.Where("\"notion_meal\".\"meal_id\"=?", o.ID),
 	)
 
 	query := NotionRecipes(queryMods...)
@@ -484,7 +484,7 @@ func (mealL) LoadMealGphotos(ctx context.Context, e boil.ContextExecutor, singul
 
 	query := NewQuery(
 		qm.From(`meal_gphoto`),
-		qm.WhereIn(`meal_gphoto.meal in ?`, args...),
+		qm.WhereIn(`meal_gphoto.meal_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -520,19 +520,19 @@ func (mealL) LoadMealGphotos(ctx context.Context, e boil.ContextExecutor, singul
 			if foreign.R == nil {
 				foreign.R = &mealGphotoR{}
 			}
-			foreign.R.MealGphotoMeal = object
+			foreign.R.Meal = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.Meal {
+			if local.ID == foreign.MealID {
 				local.R.MealGphotos = append(local.R.MealGphotos, foreign)
 				if foreign.R == nil {
 					foreign.R = &mealGphotoR{}
 				}
-				foreign.R.MealGphotoMeal = local
+				foreign.R.Meal = local
 				break
 			}
 		}
@@ -679,10 +679,10 @@ func (mealL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, sing
 	}
 
 	query := NewQuery(
-		qm.Select("\"notion_recipe\".page_id, \"notion_recipe\".page_title, \"notion_recipe\".meta, \"notion_recipe\".last_seen, \"notion_recipe\".recipe, \"notion_recipe\".ate_at, \"a\".\"meal\""),
+		qm.Select("\"notion_recipe\".page_id, \"notion_recipe\".page_title, \"notion_recipe\".meta, \"notion_recipe\".last_seen, \"notion_recipe\".recipe_id, \"notion_recipe\".ate_at, \"a\".\"meal_id\""),
 		qm.From("\"notion_recipe\""),
 		qm.InnerJoin("\"notion_meal\" as \"a\" on \"notion_recipe\".\"page_id\" = \"a\".\"notion_recipe\""),
-		qm.WhereIn("\"a\".\"meal\" in ?", args...),
+		qm.WhereIn("\"a\".\"meal_id\" in ?", args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -700,7 +700,7 @@ func (mealL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, sing
 		one := new(NotionRecipe)
 		var localJoinCol string
 
-		err = results.Scan(&one.PageID, &one.PageTitle, &one.Meta, &one.LastSeen, &one.Recipe, &one.AteAt, &localJoinCol)
+		err = results.Scan(&one.PageID, &one.PageTitle, &one.Meta, &one.LastSeen, &one.RecipeID, &one.AteAt, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for notion_recipe")
 		}
@@ -757,22 +757,22 @@ func (mealL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, sing
 // AddMealGphotos adds the given related objects to the existing relationships
 // of the meal, optionally inserting them as new records.
 // Appends related to o.R.MealGphotos.
-// Sets related.R.MealGphotoMeal appropriately.
+// Sets related.R.Meal appropriately.
 func (o *Meal) AddMealGphotos(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*MealGphoto) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.Meal = o.ID
+			rel.MealID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"meal_gphoto\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"meal"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"meal_id"}),
 				strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.Meal, rel.GphotosID}
+			values := []interface{}{o.ID, rel.MealID, rel.GphotosID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -783,7 +783,7 @@ func (o *Meal) AddMealGphotos(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.Meal = o.ID
+			rel.MealID = o.ID
 		}
 	}
 
@@ -798,10 +798,10 @@ func (o *Meal) AddMealGphotos(ctx context.Context, exec boil.ContextExecutor, in
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &mealGphotoR{
-				MealGphotoMeal: o,
+				Meal: o,
 			}
 		} else {
-			rel.R.MealGphotoMeal = o
+			rel.R.Meal = o
 		}
 	}
 	return nil
@@ -875,7 +875,7 @@ func (o *Meal) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	for _, rel := range related {
-		query := "insert into \"notion_meal\" (\"meal\", \"notion_recipe\") values ($1, $2)"
+		query := "insert into \"notion_meal\" (\"meal_id\", \"notion_recipe\") values ($1, $2)"
 		values := []interface{}{o.ID, rel.PageID}
 
 		if boil.IsDebug(ctx) {
@@ -915,7 +915,7 @@ func (o *Meal) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor, 
 // Replaces o.R.NotionRecipes with related.
 // Sets related.R.Meals's NotionRecipes accordingly.
 func (o *Meal) SetNotionRecipes(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*NotionRecipe) error {
-	query := "delete from \"notion_meal\" where \"meal\" = $1"
+	query := "delete from \"notion_meal\" where \"meal_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -944,7 +944,7 @@ func (o *Meal) RemoveNotionRecipes(ctx context.Context, exec boil.ContextExecuto
 
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"notion_meal\" where \"meal\" = $1 and \"notion_recipe\" in (%s)",
+		"delete from \"notion_meal\" where \"meal_id\" = $1 and \"notion_recipe\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
 	values := []interface{}{o.ID}

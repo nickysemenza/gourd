@@ -30,33 +30,33 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
 -- breaks https://github.com/volatiletech/sqlboiler/issues/698
 CREATE TABLE IF NOT EXISTS "recipe_sections" (
   "id" TEXT NOT NULL UNIQUE,
-  "recipe_detail" TEXT references recipe_details(id) NOT NULL,
+  "recipe_detail_id" TEXT references recipe_details(id) NOT NULL,
   "sort" INTEGER,
   "duration_timerange" JSONB,
   PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "recipe_section_instructions" (
   "id" TEXT NOT NULL UNIQUE,
-  "section" TEXT references recipe_sections(id) NOT NULL,
+  "section_id" TEXT references recipe_sections(id) NOT NULL,
   "sort" INTEGER,
   "instruction" TEXT,
   PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "recipe_section_ingredients" (
   "id" TEXT NOT NULL UNIQUE,
-  "section" TEXT references recipe_sections(id) NOT NULL,
+  "section_id" TEXT references recipe_sections(id) NOT NULL,
   "sort" INTEGER,
   --   ingredient can be an `ingredient` or a `recipe`
-  "ingredient" TEXT references ingredients(id),
-  "recipe" TEXT references recipes(id),
+  "ingredient_id" TEXT references ingredients(id),
+  "recipe_id" TEXT references recipes(id),
   "amounts" JSON NOT NULL,
   "adjective" TEXT,
   "original" TEXT,
   "optional" boolean default false,
-  "substitutes_for" TEXT references recipe_section_ingredients(id),
+  "sub_for_ingredient_id" TEXT references recipe_section_ingredients(id),
   PRIMARY KEY ("id"),
   constraint check_ingredient check (
-    ingredient is not null
-    or recipe is not null
+    ingredient_id is not null
+    or recipe_id is not null
   )
 );

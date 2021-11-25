@@ -68,7 +68,7 @@ func (c *Client) GetRecipeDetailSections(ctx context.Context, detailID string) (
 	ctx, span := c.tracer.Start(ctx, "GetRecipeDetailSections")
 	defer span.End()
 	var res []Section
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe_detail": detailID}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sectionsTable).Where(sq.Eq{"recipe_detail_id": detailID}), &res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -79,7 +79,7 @@ func (c *Client) GetSectionInstructions(ctx context.Context, sectionId []string)
 	ctx, span := c.tracer.Start(ctx, "GetSectionInstructions")
 	defer span.End()
 	var res []SectionInstruction
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sInstructionsTable).Where(sq.Eq{"section_id": sectionId}), &res); err != nil {
 		return nil, err
 	}
 	byId := make(map[string][]SectionInstruction)
@@ -96,7 +96,7 @@ func (c *Client) GetSectionIngredients(ctx context.Context, sectionId []string) 
 	defer span.End()
 
 	var res []SectionIngredient
-	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section": sectionId}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From(sIngredientsTable).Where(sq.Eq{"section_id": sectionId}), &res); err != nil {
 		return nil, err
 	}
 	byId := make(map[string][]SectionIngredient)
@@ -239,16 +239,16 @@ func (c *Client) GetRecipes(ctx context.Context, searchQuery string, opts ...Sea
 func (c *Client) GetRecipeDetailsWithIngredient(ctx context.Context, ingredient ...string) (RecipeDetails, error) {
 	ctx, span := c.tracer.Start(ctx, "GetRecipesWithIngredient")
 	defer span.End()
-	query, args, err := c.psql.Select("recipe_details.id", "ingredient",
+	query, args, err := c.psql.Select("recipe_details.id", "ingredient_id",
 		"name", "version",
 		"equipment",
 		"source", "servings",
 		"quantity",
 		"recipe_details.unit", "is_latest_version", "created_at").From(recipeDetailsTable).
 		Distinct().
-		Join("recipe_sections on recipe_sections.recipe_detail = recipe_details.id").
-		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section").
-		Where(sq.Eq{"ingredient": ingredient}).
+		Join("recipe_sections on recipe_sections.recipe_detail_id = recipe_details.id").
+		Join("recipe_section_ingredients on recipe_sections.id = recipe_section_ingredients.section_id").
+		Where(sq.Eq{"ingredient_id": ingredient}).
 		OrderBy("name desc").
 		OrderBy("version desc").
 		ToSql()
@@ -441,7 +441,7 @@ func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, 
 	ctx, span := c.tracer.Start(ctx, "GetIngredients")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		q = q.Where(sq.Eq{"parent": nil})
+		q = q.Where(sq.Eq{"parent_ingredient_id": nil})
 		q = newSearchQuery(opts...).apply(q)
 		if name != "" {
 			return q.Where(sq.ILike{"name": fmt.Sprintf("%%%s%%", name)})
@@ -455,16 +455,16 @@ func (c *Client) GetIngrientsParent(ctx context.Context, parent ...string) (Ingr
 	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
 	defer span.End()
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.Where(sq.Eq{"parent": parent})
+		return q.Where(sq.Eq{"parent_ingredient_id": parent})
 	})
 }
 
 func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) ([]IngredientUnitMapping, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngredientUnits")
 	defer span.End()
-	span.AddEvent("ingredient", trace.WithAttributes(attribute.StringSlice("id", ingredient)))
+	span.AddEvent("ingredient_id", trace.WithAttributes(attribute.StringSlice("id", ingredient)))
 	var res []IngredientUnitMapping
-	if err := c.selectContext(ctx, c.psql.Select("*").From("ingredient_units").Where(sq.Eq{"ingredient": ingredient}), &res); err != nil {
+	if err := c.selectContext(ctx, c.psql.Select("*").From("ingredient_units").Where(sq.Eq{"ingredient_id": ingredient}), &res); err != nil {
 		return nil, err
 	}
 	// byId := make(map[string][]IngredientUnitMapping)
@@ -476,7 +476,7 @@ func (c *Client) GetIngredientUnits(ctx context.Context, ingredient []string) ([
 }
 func (c *Client) AddIngredientUnit(ctx context.Context, m IngredientUnitMapping) (int64, error) {
 	q := c.psql.Insert("ingredient_units").
-		Columns("ingredient", "unit_a", "amount_a", "unit_b", "amount_b", "source").
+		Columns("ingredient_id", "unit_a", "amount_a", "unit_b", "amount_b", "source").
 		Values(m.IngredientId, m.UnitA, m.AmountA, m.UnitB, m.AmountB, m.Source).Suffix("ON CONFLICT (ingredient, unit_a, amount_a, unit_b, amount_b) DO NOTHING")
 	r, err := c.execContext(ctx, q)
 	if err != nil {

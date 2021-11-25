@@ -26,7 +26,7 @@ type NotionImage struct {
 	BlockID  string    `boil:"block_id" json:"block_id" toml:"block_id" yaml:"block_id"`
 	PageID   string    `boil:"page_id" json:"page_id" toml:"page_id" yaml:"page_id"`
 	LastSeen time.Time `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
-	Image    string    `boil:"image" json:"image" toml:"image" yaml:"image"`
+	ImageID  string    `boil:"image_id" json:"image_id" toml:"image_id" yaml:"image_id"`
 
 	R *notionImageR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L notionImageL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -36,24 +36,24 @@ var NotionImageColumns = struct {
 	BlockID  string
 	PageID   string
 	LastSeen string
-	Image    string
+	ImageID  string
 }{
 	BlockID:  "block_id",
 	PageID:   "page_id",
 	LastSeen: "last_seen",
-	Image:    "image",
+	ImageID:  "image_id",
 }
 
 var NotionImageTableColumns = struct {
 	BlockID  string
 	PageID   string
 	LastSeen string
-	Image    string
+	ImageID  string
 }{
 	BlockID:  "notion_image.block_id",
 	PageID:   "notion_image.page_id",
 	LastSeen: "notion_image.last_seen",
-	Image:    "notion_image.image",
+	ImageID:  "notion_image.image_id",
 }
 
 // Generated where
@@ -62,27 +62,27 @@ var NotionImageWhere = struct {
 	BlockID  whereHelperstring
 	PageID   whereHelperstring
 	LastSeen whereHelpertime_Time
-	Image    whereHelperstring
+	ImageID  whereHelperstring
 }{
 	BlockID:  whereHelperstring{field: "\"notion_image\".\"block_id\""},
 	PageID:   whereHelperstring{field: "\"notion_image\".\"page_id\""},
 	LastSeen: whereHelpertime_Time{field: "\"notion_image\".\"last_seen\""},
-	Image:    whereHelperstring{field: "\"notion_image\".\"image\""},
+	ImageID:  whereHelperstring{field: "\"notion_image\".\"image_id\""},
 }
 
 // NotionImageRels is where relationship names are stored.
 var NotionImageRels = struct {
-	NotionImageImage string
-	Page             string
+	Image string
+	Page  string
 }{
-	NotionImageImage: "NotionImageImage",
-	Page:             "Page",
+	Image: "Image",
+	Page:  "Page",
 }
 
 // notionImageR is where relationships are stored.
 type notionImageR struct {
-	NotionImageImage *Image        `boil:"NotionImageImage" json:"NotionImageImage" toml:"NotionImageImage" yaml:"NotionImageImage"`
-	Page             *NotionRecipe `boil:"Page" json:"Page" toml:"Page" yaml:"Page"`
+	Image *Image        `boil:"Image" json:"Image" toml:"Image" yaml:"Image"`
+	Page  *NotionRecipe `boil:"Page" json:"Page" toml:"Page" yaml:"Page"`
 }
 
 // NewStruct creates a new relationship struct
@@ -94,8 +94,8 @@ func (*notionImageR) NewStruct() *notionImageR {
 type notionImageL struct{}
 
 var (
-	notionImageAllColumns            = []string{"block_id", "page_id", "last_seen", "image"}
-	notionImageColumnsWithoutDefault = []string{"block_id", "page_id", "image"}
+	notionImageAllColumns            = []string{"block_id", "page_id", "last_seen", "image_id"}
+	notionImageColumnsWithoutDefault = []string{"block_id", "page_id", "image_id"}
 	notionImageColumnsWithDefault    = []string{"last_seen"}
 	notionImagePrimaryKeyColumns     = []string{"block_id", "page_id"}
 )
@@ -375,10 +375,10 @@ func (q notionImageQuery) Exists(ctx context.Context, exec boil.ContextExecutor)
 	return count > 0, nil
 }
 
-// NotionImageImage pointed to by the foreign key.
-func (o *NotionImage) NotionImageImage(mods ...qm.QueryMod) imageQuery {
+// Image pointed to by the foreign key.
+func (o *NotionImage) Image(mods ...qm.QueryMod) imageQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Image),
+		qm.Where("\"id\" = ?", o.ImageID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -403,9 +403,9 @@ func (o *NotionImage) Page(mods ...qm.QueryMod) notionRecipeQuery {
 	return query
 }
 
-// LoadNotionImageImage allows an eager lookup of values, cached into the
+// LoadImage allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (notionImageL) LoadNotionImageImage(ctx context.Context, e boil.ContextExecutor, singular bool, maybeNotionImage interface{}, mods queries.Applicator) error {
+func (notionImageL) LoadImage(ctx context.Context, e boil.ContextExecutor, singular bool, maybeNotionImage interface{}, mods queries.Applicator) error {
 	var slice []*NotionImage
 	var object *NotionImage
 
@@ -420,7 +420,7 @@ func (notionImageL) LoadNotionImageImage(ctx context.Context, e boil.ContextExec
 		if object.R == nil {
 			object.R = &notionImageR{}
 		}
-		args = append(args, object.Image)
+		args = append(args, object.ImageID)
 
 	} else {
 	Outer:
@@ -430,12 +430,12 @@ func (notionImageL) LoadNotionImageImage(ctx context.Context, e boil.ContextExec
 			}
 
 			for _, a := range args {
-				if a == obj.Image {
+				if a == obj.ImageID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Image)
+			args = append(args, obj.ImageID)
 
 		}
 	}
@@ -483,7 +483,7 @@ func (notionImageL) LoadNotionImageImage(ctx context.Context, e boil.ContextExec
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.NotionImageImage = foreign
+		object.R.Image = foreign
 		if foreign.R == nil {
 			foreign.R = &imageR{}
 		}
@@ -493,8 +493,8 @@ func (notionImageL) LoadNotionImageImage(ctx context.Context, e boil.ContextExec
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Image == foreign.ID {
-				local.R.NotionImageImage = foreign
+			if local.ImageID == foreign.ID {
+				local.R.Image = foreign
 				if foreign.R == nil {
 					foreign.R = &imageR{}
 				}
@@ -611,10 +611,10 @@ func (notionImageL) LoadPage(ctx context.Context, e boil.ContextExecutor, singul
 	return nil
 }
 
-// SetNotionImageImage of the notionImage to the related item.
-// Sets o.R.NotionImageImage to related.
+// SetImage of the notionImage to the related item.
+// Sets o.R.Image to related.
 // Adds o to related.R.NotionImages.
-func (o *NotionImage) SetNotionImageImage(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Image) error {
+func (o *NotionImage) SetImage(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Image) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -624,7 +624,7 @@ func (o *NotionImage) SetNotionImageImage(ctx context.Context, exec boil.Context
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"notion_image\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"image"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"image_id"}),
 		strmangle.WhereClause("\"", "\"", 2, notionImagePrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.BlockID, o.PageID}
@@ -638,13 +638,13 @@ func (o *NotionImage) SetNotionImageImage(ctx context.Context, exec boil.Context
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Image = related.ID
+	o.ImageID = related.ID
 	if o.R == nil {
 		o.R = &notionImageR{
-			NotionImageImage: related,
+			Image: related,
 		}
 	} else {
-		o.R.NotionImageImage = related
+		o.R.Image = related
 	}
 
 	if related.R == nil {

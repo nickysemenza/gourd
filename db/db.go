@@ -84,7 +84,7 @@ type RecipeDetail struct {
 	Version       int64       `db:"version"`
 	LatestVersion bool        `db:"is_latest_version"`
 	Sections      []Section
-	Ingredient    zero.String `db:"ingredient"` // sometimes, from FK
+	Ingredient    zero.String `db:"ingredient_id"` // sometimes, from FK
 	CreatedAt     time.Time   `db:"created_at"`
 	UpdatedAt     time.Time   `db:"updated_at"`
 }
@@ -92,7 +92,7 @@ type RecipeDetail struct {
 // Section represents a Section
 type Section struct {
 	Id             string   `db:"id"`
-	RecipeDetailId string   `db:"recipe_detail"`
+	RecipeDetailId string   `db:"recipe_detail_id"`
 	TimeRange      string   `db:"duration_timerange"`
 	Sort           zero.Int `db:"sort"`
 	Ingredients    []SectionIngredient
@@ -102,17 +102,17 @@ type Section struct {
 // SectionIngredient is a foo
 type SectionIngredient struct {
 	Id        string      `db:"id"`
-	SectionId string      `db:"section"`
+	SectionId string      `db:"section_id"`
 	Sort      zero.Int    `db:"sort"`
 	Amounts   Amounts     `db:"amounts"`
 	Adjective zero.String `db:"adjective"`
 	Optional  zero.Bool   `db:"optional"`
 	Original  zero.String `db:"original"`
-	SubsFor   zero.String `db:"substitutes_for"`
+	SubsFor   zero.String `db:"sub_for_ingredient_id"`
 
 	// one of the following is required for get and update:
-	RecipeId     zero.String `db:"recipe"`
-	IngredientId zero.String `db:"ingredient"`
+	RecipeId     zero.String `db:"recipe_id"`
+	IngredientId zero.String `db:"ingredient_id"`
 
 	// one of these is populated via gets
 	RawRecipe     *RecipeDetail
@@ -124,7 +124,7 @@ type SectionInstruction struct {
 	Id          string   `db:"id"`
 	Sort        zero.Int `db:"sort"`
 	Instruction string   `db:"instruction"`
-	SectionId   string   `db:"section"`
+	SectionId   string   `db:"section_id"`
 }
 
 // Ingredient is a globally-scoped ingredient
@@ -132,7 +132,7 @@ type Ingredient struct {
 	Id     string      `json:"id"`
 	Name   string      `json:"name"`
 	FdcID  zero.Int    `db:"fdc_id"`
-	Parent zero.String `db:"parent"`
+	Parent zero.String `db:"parent_ingredient_id"`
 }
 
 type RecipeIngredientDependency struct {
@@ -145,7 +145,7 @@ type RecipeIngredientDependency struct {
 
 type IngredientUnitMapping struct {
 	Id           int64   `db:"id"`
-	IngredientId string  `db:"ingredient"`
+	IngredientId string  `db:"ingredient_id"`
 	UnitA        string  `db:"unit_a"`
 	AmountA      float64 `db:"amount_a"`
 	UnitB        string  `db:"unit_b"`

@@ -25,117 +25,117 @@ import (
 
 // RecipeSectionIngredient is an object representing the database table.
 type RecipeSectionIngredient struct {
-	ID             string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Section        string      `boil:"section" json:"section" toml:"section" yaml:"section"`
-	Sort           null.Int    `boil:"sort" json:"sort,omitempty" toml:"sort" yaml:"sort,omitempty"`
-	Ingredient     null.String `boil:"ingredient" json:"ingredient,omitempty" toml:"ingredient" yaml:"ingredient,omitempty"`
-	Recipe         null.String `boil:"recipe" json:"recipe,omitempty" toml:"recipe" yaml:"recipe,omitempty"`
-	Amounts        types.JSON  `boil:"amounts" json:"amounts" toml:"amounts" yaml:"amounts"`
-	Adjective      null.String `boil:"adjective" json:"adjective,omitempty" toml:"adjective" yaml:"adjective,omitempty"`
-	Original       null.String `boil:"original" json:"original,omitempty" toml:"original" yaml:"original,omitempty"`
-	Optional       null.Bool   `boil:"optional" json:"optional,omitempty" toml:"optional" yaml:"optional,omitempty"`
-	SubstitutesFor null.String `boil:"substitutes_for" json:"substitutes_for,omitempty" toml:"substitutes_for" yaml:"substitutes_for,omitempty"`
+	ID                 string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	SectionID          string      `boil:"section_id" json:"section_id" toml:"section_id" yaml:"section_id"`
+	Sort               null.Int    `boil:"sort" json:"sort,omitempty" toml:"sort" yaml:"sort,omitempty"`
+	IngredientID       null.String `boil:"ingredient_id" json:"ingredient_id,omitempty" toml:"ingredient_id" yaml:"ingredient_id,omitempty"`
+	RecipeID           null.String `boil:"recipe_id" json:"recipe_id,omitempty" toml:"recipe_id" yaml:"recipe_id,omitempty"`
+	Amounts            types.JSON  `boil:"amounts" json:"amounts" toml:"amounts" yaml:"amounts"`
+	Adjective          null.String `boil:"adjective" json:"adjective,omitempty" toml:"adjective" yaml:"adjective,omitempty"`
+	Original           null.String `boil:"original" json:"original,omitempty" toml:"original" yaml:"original,omitempty"`
+	Optional           null.Bool   `boil:"optional" json:"optional,omitempty" toml:"optional" yaml:"optional,omitempty"`
+	SubForIngredientID null.String `boil:"sub_for_ingredient_id" json:"sub_for_ingredient_id,omitempty" toml:"sub_for_ingredient_id" yaml:"sub_for_ingredient_id,omitempty"`
 
 	R *recipeSectionIngredientR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L recipeSectionIngredientL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var RecipeSectionIngredientColumns = struct {
-	ID             string
-	Section        string
-	Sort           string
-	Ingredient     string
-	Recipe         string
-	Amounts        string
-	Adjective      string
-	Original       string
-	Optional       string
-	SubstitutesFor string
+	ID                 string
+	SectionID          string
+	Sort               string
+	IngredientID       string
+	RecipeID           string
+	Amounts            string
+	Adjective          string
+	Original           string
+	Optional           string
+	SubForIngredientID string
 }{
-	ID:             "id",
-	Section:        "section",
-	Sort:           "sort",
-	Ingredient:     "ingredient",
-	Recipe:         "recipe",
-	Amounts:        "amounts",
-	Adjective:      "adjective",
-	Original:       "original",
-	Optional:       "optional",
-	SubstitutesFor: "substitutes_for",
+	ID:                 "id",
+	SectionID:          "section_id",
+	Sort:               "sort",
+	IngredientID:       "ingredient_id",
+	RecipeID:           "recipe_id",
+	Amounts:            "amounts",
+	Adjective:          "adjective",
+	Original:           "original",
+	Optional:           "optional",
+	SubForIngredientID: "sub_for_ingredient_id",
 }
 
 var RecipeSectionIngredientTableColumns = struct {
-	ID             string
-	Section        string
-	Sort           string
-	Ingredient     string
-	Recipe         string
-	Amounts        string
-	Adjective      string
-	Original       string
-	Optional       string
-	SubstitutesFor string
+	ID                 string
+	SectionID          string
+	Sort               string
+	IngredientID       string
+	RecipeID           string
+	Amounts            string
+	Adjective          string
+	Original           string
+	Optional           string
+	SubForIngredientID string
 }{
-	ID:             "recipe_section_ingredients.id",
-	Section:        "recipe_section_ingredients.section",
-	Sort:           "recipe_section_ingredients.sort",
-	Ingredient:     "recipe_section_ingredients.ingredient",
-	Recipe:         "recipe_section_ingredients.recipe",
-	Amounts:        "recipe_section_ingredients.amounts",
-	Adjective:      "recipe_section_ingredients.adjective",
-	Original:       "recipe_section_ingredients.original",
-	Optional:       "recipe_section_ingredients.optional",
-	SubstitutesFor: "recipe_section_ingredients.substitutes_for",
+	ID:                 "recipe_section_ingredients.id",
+	SectionID:          "recipe_section_ingredients.section_id",
+	Sort:               "recipe_section_ingredients.sort",
+	IngredientID:       "recipe_section_ingredients.ingredient_id",
+	RecipeID:           "recipe_section_ingredients.recipe_id",
+	Amounts:            "recipe_section_ingredients.amounts",
+	Adjective:          "recipe_section_ingredients.adjective",
+	Original:           "recipe_section_ingredients.original",
+	Optional:           "recipe_section_ingredients.optional",
+	SubForIngredientID: "recipe_section_ingredients.sub_for_ingredient_id",
 }
 
 // Generated where
 
 var RecipeSectionIngredientWhere = struct {
-	ID             whereHelperstring
-	Section        whereHelperstring
-	Sort           whereHelpernull_Int
-	Ingredient     whereHelpernull_String
-	Recipe         whereHelpernull_String
-	Amounts        whereHelpertypes_JSON
-	Adjective      whereHelpernull_String
-	Original       whereHelpernull_String
-	Optional       whereHelpernull_Bool
-	SubstitutesFor whereHelpernull_String
+	ID                 whereHelperstring
+	SectionID          whereHelperstring
+	Sort               whereHelpernull_Int
+	IngredientID       whereHelpernull_String
+	RecipeID           whereHelpernull_String
+	Amounts            whereHelpertypes_JSON
+	Adjective          whereHelpernull_String
+	Original           whereHelpernull_String
+	Optional           whereHelpernull_Bool
+	SubForIngredientID whereHelpernull_String
 }{
-	ID:             whereHelperstring{field: "\"recipe_section_ingredients\".\"id\""},
-	Section:        whereHelperstring{field: "\"recipe_section_ingredients\".\"section\""},
-	Sort:           whereHelpernull_Int{field: "\"recipe_section_ingredients\".\"sort\""},
-	Ingredient:     whereHelpernull_String{field: "\"recipe_section_ingredients\".\"ingredient\""},
-	Recipe:         whereHelpernull_String{field: "\"recipe_section_ingredients\".\"recipe\""},
-	Amounts:        whereHelpertypes_JSON{field: "\"recipe_section_ingredients\".\"amounts\""},
-	Adjective:      whereHelpernull_String{field: "\"recipe_section_ingredients\".\"adjective\""},
-	Original:       whereHelpernull_String{field: "\"recipe_section_ingredients\".\"original\""},
-	Optional:       whereHelpernull_Bool{field: "\"recipe_section_ingredients\".\"optional\""},
-	SubstitutesFor: whereHelpernull_String{field: "\"recipe_section_ingredients\".\"substitutes_for\""},
+	ID:                 whereHelperstring{field: "\"recipe_section_ingredients\".\"id\""},
+	SectionID:          whereHelperstring{field: "\"recipe_section_ingredients\".\"section_id\""},
+	Sort:               whereHelpernull_Int{field: "\"recipe_section_ingredients\".\"sort\""},
+	IngredientID:       whereHelpernull_String{field: "\"recipe_section_ingredients\".\"ingredient_id\""},
+	RecipeID:           whereHelpernull_String{field: "\"recipe_section_ingredients\".\"recipe_id\""},
+	Amounts:            whereHelpertypes_JSON{field: "\"recipe_section_ingredients\".\"amounts\""},
+	Adjective:          whereHelpernull_String{field: "\"recipe_section_ingredients\".\"adjective\""},
+	Original:           whereHelpernull_String{field: "\"recipe_section_ingredients\".\"original\""},
+	Optional:           whereHelpernull_Bool{field: "\"recipe_section_ingredients\".\"optional\""},
+	SubForIngredientID: whereHelpernull_String{field: "\"recipe_section_ingredients\".\"sub_for_ingredient_id\""},
 }
 
 // RecipeSectionIngredientRels is where relationship names are stored.
 var RecipeSectionIngredientRels = struct {
-	RecipeSectionIngredientIngredient      string
-	RecipeSectionIngredientRecipe          string
-	SectionRecipeSection                   string
-	SubstitutesForRecipeSectionIngredient  string
-	SubstitutesForRecipeSectionIngredients string
+	Ingredient                               string
+	Recipe                                   string
+	Section                                  string
+	SubForIngredient                         string
+	SubForIngredientRecipeSectionIngredients string
 }{
-	RecipeSectionIngredientIngredient:      "RecipeSectionIngredientIngredient",
-	RecipeSectionIngredientRecipe:          "RecipeSectionIngredientRecipe",
-	SectionRecipeSection:                   "SectionRecipeSection",
-	SubstitutesForRecipeSectionIngredient:  "SubstitutesForRecipeSectionIngredient",
-	SubstitutesForRecipeSectionIngredients: "SubstitutesForRecipeSectionIngredients",
+	Ingredient:                               "Ingredient",
+	Recipe:                                   "Recipe",
+	Section:                                  "Section",
+	SubForIngredient:                         "SubForIngredient",
+	SubForIngredientRecipeSectionIngredients: "SubForIngredientRecipeSectionIngredients",
 }
 
 // recipeSectionIngredientR is where relationships are stored.
 type recipeSectionIngredientR struct {
-	RecipeSectionIngredientIngredient      *Ingredient                  `boil:"RecipeSectionIngredientIngredient" json:"RecipeSectionIngredientIngredient" toml:"RecipeSectionIngredientIngredient" yaml:"RecipeSectionIngredientIngredient"`
-	RecipeSectionIngredientRecipe          *Recipe                      `boil:"RecipeSectionIngredientRecipe" json:"RecipeSectionIngredientRecipe" toml:"RecipeSectionIngredientRecipe" yaml:"RecipeSectionIngredientRecipe"`
-	SectionRecipeSection                   *RecipeSection               `boil:"SectionRecipeSection" json:"SectionRecipeSection" toml:"SectionRecipeSection" yaml:"SectionRecipeSection"`
-	SubstitutesForRecipeSectionIngredient  *RecipeSectionIngredient     `boil:"SubstitutesForRecipeSectionIngredient" json:"SubstitutesForRecipeSectionIngredient" toml:"SubstitutesForRecipeSectionIngredient" yaml:"SubstitutesForRecipeSectionIngredient"`
-	SubstitutesForRecipeSectionIngredients RecipeSectionIngredientSlice `boil:"SubstitutesForRecipeSectionIngredients" json:"SubstitutesForRecipeSectionIngredients" toml:"SubstitutesForRecipeSectionIngredients" yaml:"SubstitutesForRecipeSectionIngredients"`
+	Ingredient                               *Ingredient                  `boil:"Ingredient" json:"Ingredient" toml:"Ingredient" yaml:"Ingredient"`
+	Recipe                                   *Recipe                      `boil:"Recipe" json:"Recipe" toml:"Recipe" yaml:"Recipe"`
+	Section                                  *RecipeSection               `boil:"Section" json:"Section" toml:"Section" yaml:"Section"`
+	SubForIngredient                         *RecipeSectionIngredient     `boil:"SubForIngredient" json:"SubForIngredient" toml:"SubForIngredient" yaml:"SubForIngredient"`
+	SubForIngredientRecipeSectionIngredients RecipeSectionIngredientSlice `boil:"SubForIngredientRecipeSectionIngredients" json:"SubForIngredientRecipeSectionIngredients" toml:"SubForIngredientRecipeSectionIngredients" yaml:"SubForIngredientRecipeSectionIngredients"`
 }
 
 // NewStruct creates a new relationship struct
@@ -147,8 +147,8 @@ func (*recipeSectionIngredientR) NewStruct() *recipeSectionIngredientR {
 type recipeSectionIngredientL struct{}
 
 var (
-	recipeSectionIngredientAllColumns            = []string{"id", "section", "sort", "ingredient", "recipe", "amounts", "adjective", "original", "optional", "substitutes_for"}
-	recipeSectionIngredientColumnsWithoutDefault = []string{"id", "section", "sort", "ingredient", "recipe", "amounts", "adjective", "original", "substitutes_for"}
+	recipeSectionIngredientAllColumns            = []string{"id", "section_id", "sort", "ingredient_id", "recipe_id", "amounts", "adjective", "original", "optional", "sub_for_ingredient_id"}
+	recipeSectionIngredientColumnsWithoutDefault = []string{"id", "section_id", "sort", "ingredient_id", "recipe_id", "amounts", "adjective", "original", "sub_for_ingredient_id"}
 	recipeSectionIngredientColumnsWithDefault    = []string{"optional"}
 	recipeSectionIngredientPrimaryKeyColumns     = []string{"id"}
 )
@@ -428,10 +428,10 @@ func (q recipeSectionIngredientQuery) Exists(ctx context.Context, exec boil.Cont
 	return count > 0, nil
 }
 
-// RecipeSectionIngredientIngredient pointed to by the foreign key.
-func (o *RecipeSectionIngredient) RecipeSectionIngredientIngredient(mods ...qm.QueryMod) ingredientQuery {
+// Ingredient pointed to by the foreign key.
+func (o *RecipeSectionIngredient) Ingredient(mods ...qm.QueryMod) ingredientQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Ingredient),
+		qm.Where("\"id\" = ?", o.IngredientID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -442,10 +442,10 @@ func (o *RecipeSectionIngredient) RecipeSectionIngredientIngredient(mods ...qm.Q
 	return query
 }
 
-// RecipeSectionIngredientRecipe pointed to by the foreign key.
-func (o *RecipeSectionIngredient) RecipeSectionIngredientRecipe(mods ...qm.QueryMod) recipeQuery {
+// Recipe pointed to by the foreign key.
+func (o *RecipeSectionIngredient) Recipe(mods ...qm.QueryMod) recipeQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Recipe),
+		qm.Where("\"id\" = ?", o.RecipeID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -456,10 +456,10 @@ func (o *RecipeSectionIngredient) RecipeSectionIngredientRecipe(mods ...qm.Query
 	return query
 }
 
-// SectionRecipeSection pointed to by the foreign key.
-func (o *RecipeSectionIngredient) SectionRecipeSection(mods ...qm.QueryMod) recipeSectionQuery {
+// Section pointed to by the foreign key.
+func (o *RecipeSectionIngredient) Section(mods ...qm.QueryMod) recipeSectionQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Section),
+		qm.Where("\"id\" = ?", o.SectionID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -470,10 +470,10 @@ func (o *RecipeSectionIngredient) SectionRecipeSection(mods ...qm.QueryMod) reci
 	return query
 }
 
-// SubstitutesForRecipeSectionIngredient pointed to by the foreign key.
-func (o *RecipeSectionIngredient) SubstitutesForRecipeSectionIngredient(mods ...qm.QueryMod) recipeSectionIngredientQuery {
+// SubForIngredient pointed to by the foreign key.
+func (o *RecipeSectionIngredient) SubForIngredient(mods ...qm.QueryMod) recipeSectionIngredientQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.SubstitutesFor),
+		qm.Where("\"id\" = ?", o.SubForIngredientID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -484,15 +484,15 @@ func (o *RecipeSectionIngredient) SubstitutesForRecipeSectionIngredient(mods ...
 	return query
 }
 
-// SubstitutesForRecipeSectionIngredients retrieves all the recipe_section_ingredient's RecipeSectionIngredients with an executor via substitutes_for column.
-func (o *RecipeSectionIngredient) SubstitutesForRecipeSectionIngredients(mods ...qm.QueryMod) recipeSectionIngredientQuery {
+// SubForIngredientRecipeSectionIngredients retrieves all the recipe_section_ingredient's RecipeSectionIngredients with an executor via sub_for_ingredient_id column.
+func (o *RecipeSectionIngredient) SubForIngredientRecipeSectionIngredients(mods ...qm.QueryMod) recipeSectionIngredientQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"recipe_section_ingredients\".\"substitutes_for\"=?", o.ID),
+		qm.Where("\"recipe_section_ingredients\".\"sub_for_ingredient_id\"=?", o.ID),
 	)
 
 	query := RecipeSectionIngredients(queryMods...)
@@ -505,9 +505,9 @@ func (o *RecipeSectionIngredient) SubstitutesForRecipeSectionIngredients(mods ..
 	return query
 }
 
-// LoadRecipeSectionIngredientIngredient allows an eager lookup of values, cached into the
+// LoadIngredient allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
+func (recipeSectionIngredientL) LoadIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionIngredient
 	var object *RecipeSectionIngredient
 
@@ -522,8 +522,8 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx contex
 		if object.R == nil {
 			object.R = &recipeSectionIngredientR{}
 		}
-		if !queries.IsNil(object.Ingredient) {
-			args = append(args, object.Ingredient)
+		if !queries.IsNil(object.IngredientID) {
+			args = append(args, object.IngredientID)
 		}
 
 	} else {
@@ -534,13 +534,13 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx contex
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.Ingredient) {
+				if queries.Equal(a, obj.IngredientID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.Ingredient) {
-				args = append(args, obj.Ingredient)
+			if !queries.IsNil(obj.IngredientID) {
+				args = append(args, obj.IngredientID)
 			}
 
 		}
@@ -589,7 +589,7 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx contex
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.RecipeSectionIngredientIngredient = foreign
+		object.R.Ingredient = foreign
 		if foreign.R == nil {
 			foreign.R = &ingredientR{}
 		}
@@ -599,8 +599,8 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx contex
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.Ingredient, foreign.ID) {
-				local.R.RecipeSectionIngredientIngredient = foreign
+			if queries.Equal(local.IngredientID, foreign.ID) {
+				local.R.Ingredient = foreign
 				if foreign.R == nil {
 					foreign.R = &ingredientR{}
 				}
@@ -613,9 +613,9 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientIngredient(ctx contex
 	return nil
 }
 
-// LoadRecipeSectionIngredientRecipe allows an eager lookup of values, cached into the
+// LoadRecipe allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
+func (recipeSectionIngredientL) LoadRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionIngredient
 	var object *RecipeSectionIngredient
 
@@ -630,8 +630,8 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Co
 		if object.R == nil {
 			object.R = &recipeSectionIngredientR{}
 		}
-		if !queries.IsNil(object.Recipe) {
-			args = append(args, object.Recipe)
+		if !queries.IsNil(object.RecipeID) {
+			args = append(args, object.RecipeID)
 		}
 
 	} else {
@@ -642,13 +642,13 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Co
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.Recipe) {
+				if queries.Equal(a, obj.RecipeID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.Recipe) {
-				args = append(args, obj.Recipe)
+			if !queries.IsNil(obj.RecipeID) {
+				args = append(args, obj.RecipeID)
 			}
 
 		}
@@ -697,7 +697,7 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Co
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.RecipeSectionIngredientRecipe = foreign
+		object.R.Recipe = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeR{}
 		}
@@ -707,8 +707,8 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Co
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.Recipe, foreign.ID) {
-				local.R.RecipeSectionIngredientRecipe = foreign
+			if queries.Equal(local.RecipeID, foreign.ID) {
+				local.R.Recipe = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeR{}
 				}
@@ -721,9 +721,9 @@ func (recipeSectionIngredientL) LoadRecipeSectionIngredientRecipe(ctx context.Co
 	return nil
 }
 
-// LoadSectionRecipeSection allows an eager lookup of values, cached into the
+// LoadSection allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
+func (recipeSectionIngredientL) LoadSection(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionIngredient
 	var object *RecipeSectionIngredient
 
@@ -738,7 +738,7 @@ func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e 
 		if object.R == nil {
 			object.R = &recipeSectionIngredientR{}
 		}
-		args = append(args, object.Section)
+		args = append(args, object.SectionID)
 
 	} else {
 	Outer:
@@ -748,12 +748,12 @@ func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e 
 			}
 
 			for _, a := range args {
-				if a == obj.Section {
+				if a == obj.SectionID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Section)
+			args = append(args, obj.SectionID)
 
 		}
 	}
@@ -801,7 +801,7 @@ func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e 
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.SectionRecipeSection = foreign
+		object.R.Section = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeSectionR{}
 		}
@@ -811,8 +811,8 @@ func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e 
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Section == foreign.ID {
-				local.R.SectionRecipeSection = foreign
+			if local.SectionID == foreign.ID {
+				local.R.Section = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeSectionR{}
 				}
@@ -825,9 +825,9 @@ func (recipeSectionIngredientL) LoadSectionRecipeSection(ctx context.Context, e 
 	return nil
 }
 
-// LoadSubstitutesForRecipeSectionIngredient allows an eager lookup of values, cached into the
+// LoadSubForIngredient allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
+func (recipeSectionIngredientL) LoadSubForIngredient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionIngredient
 	var object *RecipeSectionIngredient
 
@@ -842,8 +842,8 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredient(ctx co
 		if object.R == nil {
 			object.R = &recipeSectionIngredientR{}
 		}
-		if !queries.IsNil(object.SubstitutesFor) {
-			args = append(args, object.SubstitutesFor)
+		if !queries.IsNil(object.SubForIngredientID) {
+			args = append(args, object.SubForIngredientID)
 		}
 
 	} else {
@@ -854,13 +854,13 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredient(ctx co
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.SubstitutesFor) {
+				if queries.Equal(a, obj.SubForIngredientID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.SubstitutesFor) {
-				args = append(args, obj.SubstitutesFor)
+			if !queries.IsNil(obj.SubForIngredientID) {
+				args = append(args, obj.SubForIngredientID)
 			}
 
 		}
@@ -909,22 +909,22 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredient(ctx co
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.SubstitutesForRecipeSectionIngredient = foreign
+		object.R.SubForIngredient = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeSectionIngredientR{}
 		}
-		foreign.R.SubstitutesForRecipeSectionIngredients = append(foreign.R.SubstitutesForRecipeSectionIngredients, object)
+		foreign.R.SubForIngredientRecipeSectionIngredients = append(foreign.R.SubForIngredientRecipeSectionIngredients, object)
 		return nil
 	}
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.SubstitutesFor, foreign.ID) {
-				local.R.SubstitutesForRecipeSectionIngredient = foreign
+			if queries.Equal(local.SubForIngredientID, foreign.ID) {
+				local.R.SubForIngredient = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeSectionIngredientR{}
 				}
-				foreign.R.SubstitutesForRecipeSectionIngredients = append(foreign.R.SubstitutesForRecipeSectionIngredients, local)
+				foreign.R.SubForIngredientRecipeSectionIngredients = append(foreign.R.SubForIngredientRecipeSectionIngredients, local)
 				break
 			}
 		}
@@ -933,9 +933,9 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredient(ctx co
 	return nil
 }
 
-// LoadSubstitutesForRecipeSectionIngredients allows an eager lookup of values, cached into the
+// LoadSubForIngredientRecipeSectionIngredients allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredients(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
+func (recipeSectionIngredientL) LoadSubForIngredientRecipeSectionIngredients(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionIngredient interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionIngredient
 	var object *RecipeSectionIngredient
 
@@ -974,7 +974,7 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredients(ctx c
 
 	query := NewQuery(
 		qm.From(`recipe_section_ingredients`),
-		qm.WhereIn(`recipe_section_ingredients.substitutes_for in ?`, args...),
+		qm.WhereIn(`recipe_section_ingredients.sub_for_ingredient_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -1005,24 +1005,24 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredients(ctx c
 		}
 	}
 	if singular {
-		object.R.SubstitutesForRecipeSectionIngredients = resultSlice
+		object.R.SubForIngredientRecipeSectionIngredients = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
 				foreign.R = &recipeSectionIngredientR{}
 			}
-			foreign.R.SubstitutesForRecipeSectionIngredient = object
+			foreign.R.SubForIngredient = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.SubstitutesFor) {
-				local.R.SubstitutesForRecipeSectionIngredients = append(local.R.SubstitutesForRecipeSectionIngredients, foreign)
+			if queries.Equal(local.ID, foreign.SubForIngredientID) {
+				local.R.SubForIngredientRecipeSectionIngredients = append(local.R.SubForIngredientRecipeSectionIngredients, foreign)
 				if foreign.R == nil {
 					foreign.R = &recipeSectionIngredientR{}
 				}
-				foreign.R.SubstitutesForRecipeSectionIngredient = local
+				foreign.R.SubForIngredient = local
 				break
 			}
 		}
@@ -1031,10 +1031,10 @@ func (recipeSectionIngredientL) LoadSubstitutesForRecipeSectionIngredients(ctx c
 	return nil
 }
 
-// SetRecipeSectionIngredientIngredient of the recipeSectionIngredient to the related item.
-// Sets o.R.RecipeSectionIngredientIngredient to related.
+// SetIngredient of the recipeSectionIngredient to the related item.
+// Sets o.R.Ingredient to related.
 // Adds o to related.R.RecipeSectionIngredients.
-func (o *RecipeSectionIngredient) SetRecipeSectionIngredientIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Ingredient) error {
+func (o *RecipeSectionIngredient) SetIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Ingredient) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1044,7 +1044,7 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientIngredient(ctx conte
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -1058,13 +1058,13 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientIngredient(ctx conte
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.Ingredient, related.ID)
+	queries.Assign(&o.IngredientID, related.ID)
 	if o.R == nil {
 		o.R = &recipeSectionIngredientR{
-			RecipeSectionIngredientIngredient: related,
+			Ingredient: related,
 		}
 	} else {
-		o.R.RecipeSectionIngredientIngredient = related
+		o.R.Ingredient = related
 	}
 
 	if related.R == nil {
@@ -1078,26 +1078,26 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientIngredient(ctx conte
 	return nil
 }
 
-// RemoveRecipeSectionIngredientIngredient relationship.
-// Sets o.R.RecipeSectionIngredientIngredient to nil.
+// RemoveIngredient relationship.
+// Sets o.R.Ingredient to nil.
 // Removes o from all passed in related items' relationships struct (Optional).
-func (o *RecipeSectionIngredient) RemoveRecipeSectionIngredientIngredient(ctx context.Context, exec boil.ContextExecutor, related *Ingredient) error {
+func (o *RecipeSectionIngredient) RemoveIngredient(ctx context.Context, exec boil.ContextExecutor, related *Ingredient) error {
 	var err error
 
-	queries.SetScanner(&o.Ingredient, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("ingredient")); err != nil {
+	queries.SetScanner(&o.IngredientID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("ingredient_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
 	if o.R != nil {
-		o.R.RecipeSectionIngredientIngredient = nil
+		o.R.Ingredient = nil
 	}
 	if related == nil || related.R == nil {
 		return nil
 	}
 
 	for i, ri := range related.R.RecipeSectionIngredients {
-		if queries.Equal(o.Ingredient, ri.Ingredient) {
+		if queries.Equal(o.IngredientID, ri.IngredientID) {
 			continue
 		}
 
@@ -1111,10 +1111,10 @@ func (o *RecipeSectionIngredient) RemoveRecipeSectionIngredientIngredient(ctx co
 	return nil
 }
 
-// SetRecipeSectionIngredientRecipe of the recipeSectionIngredient to the related item.
-// Sets o.R.RecipeSectionIngredientRecipe to related.
+// SetRecipe of the recipeSectionIngredient to the related item.
+// Sets o.R.Recipe to related.
 // Adds o to related.R.RecipeSectionIngredients.
-func (o *RecipeSectionIngredient) SetRecipeSectionIngredientRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
+func (o *RecipeSectionIngredient) SetRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1124,7 +1124,7 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientRecipe(ctx context.C
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -1138,13 +1138,13 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientRecipe(ctx context.C
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.Recipe, related.ID)
+	queries.Assign(&o.RecipeID, related.ID)
 	if o.R == nil {
 		o.R = &recipeSectionIngredientR{
-			RecipeSectionIngredientRecipe: related,
+			Recipe: related,
 		}
 	} else {
-		o.R.RecipeSectionIngredientRecipe = related
+		o.R.Recipe = related
 	}
 
 	if related.R == nil {
@@ -1158,26 +1158,26 @@ func (o *RecipeSectionIngredient) SetRecipeSectionIngredientRecipe(ctx context.C
 	return nil
 }
 
-// RemoveRecipeSectionIngredientRecipe relationship.
-// Sets o.R.RecipeSectionIngredientRecipe to nil.
+// RemoveRecipe relationship.
+// Sets o.R.Recipe to nil.
 // Removes o from all passed in related items' relationships struct (Optional).
-func (o *RecipeSectionIngredient) RemoveRecipeSectionIngredientRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
+func (o *RecipeSectionIngredient) RemoveRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
 	var err error
 
-	queries.SetScanner(&o.Recipe, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("recipe")); err != nil {
+	queries.SetScanner(&o.RecipeID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("recipe_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
 	if o.R != nil {
-		o.R.RecipeSectionIngredientRecipe = nil
+		o.R.Recipe = nil
 	}
 	if related == nil || related.R == nil {
 		return nil
 	}
 
 	for i, ri := range related.R.RecipeSectionIngredients {
-		if queries.Equal(o.Recipe, ri.Recipe) {
+		if queries.Equal(o.RecipeID, ri.RecipeID) {
 			continue
 		}
 
@@ -1191,10 +1191,10 @@ func (o *RecipeSectionIngredient) RemoveRecipeSectionIngredientRecipe(ctx contex
 	return nil
 }
 
-// SetSectionRecipeSection of the recipeSectionIngredient to the related item.
-// Sets o.R.SectionRecipeSection to related.
+// SetSection of the recipeSectionIngredient to the related item.
+// Sets o.R.Section to related.
 // Adds o to related.R.SectionRecipeSectionIngredients.
-func (o *RecipeSectionIngredient) SetSectionRecipeSection(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSection) error {
+func (o *RecipeSectionIngredient) SetSection(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSection) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1204,7 +1204,7 @@ func (o *RecipeSectionIngredient) SetSectionRecipeSection(ctx context.Context, e
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"section"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"section_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -1218,13 +1218,13 @@ func (o *RecipeSectionIngredient) SetSectionRecipeSection(ctx context.Context, e
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Section = related.ID
+	o.SectionID = related.ID
 	if o.R == nil {
 		o.R = &recipeSectionIngredientR{
-			SectionRecipeSection: related,
+			Section: related,
 		}
 	} else {
-		o.R.SectionRecipeSection = related
+		o.R.Section = related
 	}
 
 	if related.R == nil {
@@ -1238,10 +1238,10 @@ func (o *RecipeSectionIngredient) SetSectionRecipeSection(ctx context.Context, e
 	return nil
 }
 
-// SetSubstitutesForRecipeSectionIngredient of the recipeSectionIngredient to the related item.
-// Sets o.R.SubstitutesForRecipeSectionIngredient to related.
-// Adds o to related.R.SubstitutesForRecipeSectionIngredients.
-func (o *RecipeSectionIngredient) SetSubstitutesForRecipeSectionIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSectionIngredient) error {
+// SetSubForIngredient of the recipeSectionIngredient to the related item.
+// Sets o.R.SubForIngredient to related.
+// Adds o to related.R.SubForIngredientRecipeSectionIngredients.
+func (o *RecipeSectionIngredient) SetSubForIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSectionIngredient) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -1251,7 +1251,7 @@ func (o *RecipeSectionIngredient) SetSubstitutesForRecipeSectionIngredient(ctx c
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"substitutes_for"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"sub_for_ingredient_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -1265,75 +1265,75 @@ func (o *RecipeSectionIngredient) SetSubstitutesForRecipeSectionIngredient(ctx c
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.SubstitutesFor, related.ID)
+	queries.Assign(&o.SubForIngredientID, related.ID)
 	if o.R == nil {
 		o.R = &recipeSectionIngredientR{
-			SubstitutesForRecipeSectionIngredient: related,
+			SubForIngredient: related,
 		}
 	} else {
-		o.R.SubstitutesForRecipeSectionIngredient = related
+		o.R.SubForIngredient = related
 	}
 
 	if related.R == nil {
 		related.R = &recipeSectionIngredientR{
-			SubstitutesForRecipeSectionIngredients: RecipeSectionIngredientSlice{o},
+			SubForIngredientRecipeSectionIngredients: RecipeSectionIngredientSlice{o},
 		}
 	} else {
-		related.R.SubstitutesForRecipeSectionIngredients = append(related.R.SubstitutesForRecipeSectionIngredients, o)
+		related.R.SubForIngredientRecipeSectionIngredients = append(related.R.SubForIngredientRecipeSectionIngredients, o)
 	}
 
 	return nil
 }
 
-// RemoveSubstitutesForRecipeSectionIngredient relationship.
-// Sets o.R.SubstitutesForRecipeSectionIngredient to nil.
+// RemoveSubForIngredient relationship.
+// Sets o.R.SubForIngredient to nil.
 // Removes o from all passed in related items' relationships struct (Optional).
-func (o *RecipeSectionIngredient) RemoveSubstitutesForRecipeSectionIngredient(ctx context.Context, exec boil.ContextExecutor, related *RecipeSectionIngredient) error {
+func (o *RecipeSectionIngredient) RemoveSubForIngredient(ctx context.Context, exec boil.ContextExecutor, related *RecipeSectionIngredient) error {
 	var err error
 
-	queries.SetScanner(&o.SubstitutesFor, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("substitutes_for")); err != nil {
+	queries.SetScanner(&o.SubForIngredientID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("sub_for_ingredient_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
 	if o.R != nil {
-		o.R.SubstitutesForRecipeSectionIngredient = nil
+		o.R.SubForIngredient = nil
 	}
 	if related == nil || related.R == nil {
 		return nil
 	}
 
-	for i, ri := range related.R.SubstitutesForRecipeSectionIngredients {
-		if queries.Equal(o.SubstitutesFor, ri.SubstitutesFor) {
+	for i, ri := range related.R.SubForIngredientRecipeSectionIngredients {
+		if queries.Equal(o.SubForIngredientID, ri.SubForIngredientID) {
 			continue
 		}
 
-		ln := len(related.R.SubstitutesForRecipeSectionIngredients)
+		ln := len(related.R.SubForIngredientRecipeSectionIngredients)
 		if ln > 1 && i < ln-1 {
-			related.R.SubstitutesForRecipeSectionIngredients[i] = related.R.SubstitutesForRecipeSectionIngredients[ln-1]
+			related.R.SubForIngredientRecipeSectionIngredients[i] = related.R.SubForIngredientRecipeSectionIngredients[ln-1]
 		}
-		related.R.SubstitutesForRecipeSectionIngredients = related.R.SubstitutesForRecipeSectionIngredients[:ln-1]
+		related.R.SubForIngredientRecipeSectionIngredients = related.R.SubForIngredientRecipeSectionIngredients[:ln-1]
 		break
 	}
 	return nil
 }
 
-// AddSubstitutesForRecipeSectionIngredients adds the given related objects to the existing relationships
+// AddSubForIngredientRecipeSectionIngredients adds the given related objects to the existing relationships
 // of the recipe_section_ingredient, optionally inserting them as new records.
-// Appends related to o.R.SubstitutesForRecipeSectionIngredients.
-// Sets related.R.SubstitutesForRecipeSectionIngredient appropriately.
-func (o *RecipeSectionIngredient) AddSubstitutesForRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
+// Appends related to o.R.SubForIngredientRecipeSectionIngredients.
+// Sets related.R.SubForIngredient appropriately.
+func (o *RecipeSectionIngredient) AddSubForIngredientRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.SubstitutesFor, o.ID)
+			queries.Assign(&rel.SubForIngredientID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"substitutes_for"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"sub_for_ingredient_id"}),
 				strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -1347,38 +1347,38 @@ func (o *RecipeSectionIngredient) AddSubstitutesForRecipeSectionIngredients(ctx 
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.SubstitutesFor, o.ID)
+			queries.Assign(&rel.SubForIngredientID, o.ID)
 		}
 	}
 
 	if o.R == nil {
 		o.R = &recipeSectionIngredientR{
-			SubstitutesForRecipeSectionIngredients: related,
+			SubForIngredientRecipeSectionIngredients: related,
 		}
 	} else {
-		o.R.SubstitutesForRecipeSectionIngredients = append(o.R.SubstitutesForRecipeSectionIngredients, related...)
+		o.R.SubForIngredientRecipeSectionIngredients = append(o.R.SubForIngredientRecipeSectionIngredients, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &recipeSectionIngredientR{
-				SubstitutesForRecipeSectionIngredient: o,
+				SubForIngredient: o,
 			}
 		} else {
-			rel.R.SubstitutesForRecipeSectionIngredient = o
+			rel.R.SubForIngredient = o
 		}
 	}
 	return nil
 }
 
-// SetSubstitutesForRecipeSectionIngredients removes all previously related items of the
+// SetSubForIngredientRecipeSectionIngredients removes all previously related items of the
 // recipe_section_ingredient replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.SubstitutesForRecipeSectionIngredient's SubstitutesForRecipeSectionIngredients accordingly.
-// Replaces o.R.SubstitutesForRecipeSectionIngredients with related.
-// Sets related.R.SubstitutesForRecipeSectionIngredient's SubstitutesForRecipeSectionIngredients accordingly.
-func (o *RecipeSectionIngredient) SetSubstitutesForRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
-	query := "update \"recipe_section_ingredients\" set \"substitutes_for\" = null where \"substitutes_for\" = $1"
+// Sets o.R.SubForIngredient's SubForIngredientRecipeSectionIngredients accordingly.
+// Replaces o.R.SubForIngredientRecipeSectionIngredients with related.
+// Sets related.R.SubForIngredient's SubForIngredientRecipeSectionIngredients accordingly.
+func (o *RecipeSectionIngredient) SetSubForIngredientRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
+	query := "update \"recipe_section_ingredients\" set \"sub_for_ingredient_id\" = null where \"sub_for_ingredient_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1391,35 +1391,35 @@ func (o *RecipeSectionIngredient) SetSubstitutesForRecipeSectionIngredients(ctx 
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.SubstitutesForRecipeSectionIngredients {
-			queries.SetScanner(&rel.SubstitutesFor, nil)
+		for _, rel := range o.R.SubForIngredientRecipeSectionIngredients {
+			queries.SetScanner(&rel.SubForIngredientID, nil)
 			if rel.R == nil {
 				continue
 			}
 
-			rel.R.SubstitutesForRecipeSectionIngredient = nil
+			rel.R.SubForIngredient = nil
 		}
 
-		o.R.SubstitutesForRecipeSectionIngredients = nil
+		o.R.SubForIngredientRecipeSectionIngredients = nil
 	}
-	return o.AddSubstitutesForRecipeSectionIngredients(ctx, exec, insert, related...)
+	return o.AddSubForIngredientRecipeSectionIngredients(ctx, exec, insert, related...)
 }
 
-// RemoveSubstitutesForRecipeSectionIngredients relationships from objects passed in.
-// Removes related items from R.SubstitutesForRecipeSectionIngredients (uses pointer comparison, removal does not keep order)
-// Sets related.R.SubstitutesForRecipeSectionIngredient.
-func (o *RecipeSectionIngredient) RemoveSubstitutesForRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*RecipeSectionIngredient) error {
+// RemoveSubForIngredientRecipeSectionIngredients relationships from objects passed in.
+// Removes related items from R.SubForIngredientRecipeSectionIngredients (uses pointer comparison, removal does not keep order)
+// Sets related.R.SubForIngredient.
+func (o *RecipeSectionIngredient) RemoveSubForIngredientRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*RecipeSectionIngredient) error {
 	if len(related) == 0 {
 		return nil
 	}
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.SubstitutesFor, nil)
+		queries.SetScanner(&rel.SubForIngredientID, nil)
 		if rel.R != nil {
-			rel.R.SubstitutesForRecipeSectionIngredient = nil
+			rel.R.SubForIngredient = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("substitutes_for")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("sub_for_ingredient_id")); err != nil {
 			return err
 		}
 	}
@@ -1428,16 +1428,16 @@ func (o *RecipeSectionIngredient) RemoveSubstitutesForRecipeSectionIngredients(c
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.SubstitutesForRecipeSectionIngredients {
+		for i, ri := range o.R.SubForIngredientRecipeSectionIngredients {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.SubstitutesForRecipeSectionIngredients)
+			ln := len(o.R.SubForIngredientRecipeSectionIngredients)
 			if ln > 1 && i < ln-1 {
-				o.R.SubstitutesForRecipeSectionIngredients[i] = o.R.SubstitutesForRecipeSectionIngredients[ln-1]
+				o.R.SubForIngredientRecipeSectionIngredients[i] = o.R.SubForIngredientRecipeSectionIngredients[ln-1]
 			}
-			o.R.SubstitutesForRecipeSectionIngredients = o.R.SubstitutesForRecipeSectionIngredients[:ln-1]
+			o.R.SubForIngredientRecipeSectionIngredients = o.R.SubForIngredientRecipeSectionIngredients[:ln-1]
 			break
 		}
 	}

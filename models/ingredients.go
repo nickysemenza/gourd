@@ -24,37 +24,37 @@ import (
 
 // Ingredient is an object representing the database table.
 type Ingredient struct {
-	ID     string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name   string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	FDCID  null.Int    `boil:"fdc_id" json:"fdc_id,omitempty" toml:"fdc_id" yaml:"fdc_id,omitempty"`
-	Parent null.String `boil:"parent" json:"parent,omitempty" toml:"parent" yaml:"parent,omitempty"`
+	ID                 string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name               string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	FDCID              null.Int    `boil:"fdc_id" json:"fdc_id,omitempty" toml:"fdc_id" yaml:"fdc_id,omitempty"`
+	ParentIngredientID null.String `boil:"parent_ingredient_id" json:"parent_ingredient_id,omitempty" toml:"parent_ingredient_id" yaml:"parent_ingredient_id,omitempty"`
 
 	R *ingredientR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L ingredientL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var IngredientColumns = struct {
-	ID     string
-	Name   string
-	FDCID  string
-	Parent string
+	ID                 string
+	Name               string
+	FDCID              string
+	ParentIngredientID string
 }{
-	ID:     "id",
-	Name:   "name",
-	FDCID:  "fdc_id",
-	Parent: "parent",
+	ID:                 "id",
+	Name:               "name",
+	FDCID:              "fdc_id",
+	ParentIngredientID: "parent_ingredient_id",
 }
 
 var IngredientTableColumns = struct {
-	ID     string
-	Name   string
-	FDCID  string
-	Parent string
+	ID                 string
+	Name               string
+	FDCID              string
+	ParentIngredientID string
 }{
-	ID:     "ingredients.id",
-	Name:   "ingredients.name",
-	FDCID:  "ingredients.fdc_id",
-	Parent: "ingredients.parent",
+	ID:                 "ingredients.id",
+	Name:               "ingredients.name",
+	FDCID:              "ingredients.fdc_id",
+	ParentIngredientID: "ingredients.parent_ingredient_id",
 }
 
 // Generated where
@@ -84,36 +84,36 @@ func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNu
 func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var IngredientWhere = struct {
-	ID     whereHelperstring
-	Name   whereHelperstring
-	FDCID  whereHelpernull_Int
-	Parent whereHelpernull_String
+	ID                 whereHelperstring
+	Name               whereHelperstring
+	FDCID              whereHelpernull_Int
+	ParentIngredientID whereHelpernull_String
 }{
-	ID:     whereHelperstring{field: "\"ingredients\".\"id\""},
-	Name:   whereHelperstring{field: "\"ingredients\".\"name\""},
-	FDCID:  whereHelpernull_Int{field: "\"ingredients\".\"fdc_id\""},
-	Parent: whereHelpernull_String{field: "\"ingredients\".\"parent\""},
+	ID:                 whereHelperstring{field: "\"ingredients\".\"id\""},
+	Name:               whereHelperstring{field: "\"ingredients\".\"name\""},
+	FDCID:              whereHelpernull_Int{field: "\"ingredients\".\"fdc_id\""},
+	ParentIngredientID: whereHelpernull_String{field: "\"ingredients\".\"parent_ingredient_id\""},
 }
 
 // IngredientRels is where relationship names are stored.
 var IngredientRels = struct {
-	ParentIngredient         string
-	IngredientUnits          string
-	ParentIngredients        string
-	RecipeSectionIngredients string
+	ParentIngredient            string
+	IngredientUnits             string
+	ParentIngredientIngredients string
+	RecipeSectionIngredients    string
 }{
-	ParentIngredient:         "ParentIngredient",
-	IngredientUnits:          "IngredientUnits",
-	ParentIngredients:        "ParentIngredients",
-	RecipeSectionIngredients: "RecipeSectionIngredients",
+	ParentIngredient:            "ParentIngredient",
+	IngredientUnits:             "IngredientUnits",
+	ParentIngredientIngredients: "ParentIngredientIngredients",
+	RecipeSectionIngredients:    "RecipeSectionIngredients",
 }
 
 // ingredientR is where relationships are stored.
 type ingredientR struct {
-	ParentIngredient         *Ingredient                  `boil:"ParentIngredient" json:"ParentIngredient" toml:"ParentIngredient" yaml:"ParentIngredient"`
-	IngredientUnits          IngredientUnitSlice          `boil:"IngredientUnits" json:"IngredientUnits" toml:"IngredientUnits" yaml:"IngredientUnits"`
-	ParentIngredients        IngredientSlice              `boil:"ParentIngredients" json:"ParentIngredients" toml:"ParentIngredients" yaml:"ParentIngredients"`
-	RecipeSectionIngredients RecipeSectionIngredientSlice `boil:"RecipeSectionIngredients" json:"RecipeSectionIngredients" toml:"RecipeSectionIngredients" yaml:"RecipeSectionIngredients"`
+	ParentIngredient            *Ingredient                  `boil:"ParentIngredient" json:"ParentIngredient" toml:"ParentIngredient" yaml:"ParentIngredient"`
+	IngredientUnits             IngredientUnitSlice          `boil:"IngredientUnits" json:"IngredientUnits" toml:"IngredientUnits" yaml:"IngredientUnits"`
+	ParentIngredientIngredients IngredientSlice              `boil:"ParentIngredientIngredients" json:"ParentIngredientIngredients" toml:"ParentIngredientIngredients" yaml:"ParentIngredientIngredients"`
+	RecipeSectionIngredients    RecipeSectionIngredientSlice `boil:"RecipeSectionIngredients" json:"RecipeSectionIngredients" toml:"RecipeSectionIngredients" yaml:"RecipeSectionIngredients"`
 }
 
 // NewStruct creates a new relationship struct
@@ -125,8 +125,8 @@ func (*ingredientR) NewStruct() *ingredientR {
 type ingredientL struct{}
 
 var (
-	ingredientAllColumns            = []string{"id", "name", "fdc_id", "parent"}
-	ingredientColumnsWithoutDefault = []string{"id", "name", "fdc_id", "parent"}
+	ingredientAllColumns            = []string{"id", "name", "fdc_id", "parent_ingredient_id"}
+	ingredientColumnsWithoutDefault = []string{"id", "name", "fdc_id", "parent_ingredient_id"}
 	ingredientColumnsWithDefault    = []string{}
 	ingredientPrimaryKeyColumns     = []string{"id"}
 )
@@ -409,7 +409,7 @@ func (q ingredientQuery) Exists(ctx context.Context, exec boil.ContextExecutor) 
 // ParentIngredient pointed to by the foreign key.
 func (o *Ingredient) ParentIngredient(mods ...qm.QueryMod) ingredientQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Parent),
+		qm.Where("\"id\" = ?", o.ParentIngredientID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -428,7 +428,7 @@ func (o *Ingredient) IngredientUnits(mods ...qm.QueryMod) ingredientUnitQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"ingredient_units\".\"ingredient\"=?", o.ID),
+		qm.Where("\"ingredient_units\".\"ingredient_id\"=?", o.ID),
 	)
 
 	query := IngredientUnits(queryMods...)
@@ -441,15 +441,15 @@ func (o *Ingredient) IngredientUnits(mods ...qm.QueryMod) ingredientUnitQuery {
 	return query
 }
 
-// ParentIngredients retrieves all the ingredient's Ingredients with an executor via parent column.
-func (o *Ingredient) ParentIngredients(mods ...qm.QueryMod) ingredientQuery {
+// ParentIngredientIngredients retrieves all the ingredient's Ingredients with an executor via parent_ingredient_id column.
+func (o *Ingredient) ParentIngredientIngredients(mods ...qm.QueryMod) ingredientQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"ingredients\".\"parent\"=?", o.ID),
+		qm.Where("\"ingredients\".\"parent_ingredient_id\"=?", o.ID),
 	)
 
 	query := Ingredients(queryMods...)
@@ -470,7 +470,7 @@ func (o *Ingredient) RecipeSectionIngredients(mods ...qm.QueryMod) recipeSection
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"recipe_section_ingredients\".\"ingredient\"=?", o.ID),
+		qm.Where("\"recipe_section_ingredients\".\"ingredient_id\"=?", o.ID),
 	)
 
 	query := RecipeSectionIngredients(queryMods...)
@@ -500,8 +500,8 @@ func (ingredientL) LoadParentIngredient(ctx context.Context, e boil.ContextExecu
 		if object.R == nil {
 			object.R = &ingredientR{}
 		}
-		if !queries.IsNil(object.Parent) {
-			args = append(args, object.Parent)
+		if !queries.IsNil(object.ParentIngredientID) {
+			args = append(args, object.ParentIngredientID)
 		}
 
 	} else {
@@ -512,13 +512,13 @@ func (ingredientL) LoadParentIngredient(ctx context.Context, e boil.ContextExecu
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.Parent) {
+				if queries.Equal(a, obj.ParentIngredientID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.Parent) {
-				args = append(args, obj.Parent)
+			if !queries.IsNil(obj.ParentIngredientID) {
+				args = append(args, obj.ParentIngredientID)
 			}
 
 		}
@@ -571,18 +571,18 @@ func (ingredientL) LoadParentIngredient(ctx context.Context, e boil.ContextExecu
 		if foreign.R == nil {
 			foreign.R = &ingredientR{}
 		}
-		foreign.R.ParentIngredients = append(foreign.R.ParentIngredients, object)
+		foreign.R.ParentIngredientIngredients = append(foreign.R.ParentIngredientIngredients, object)
 		return nil
 	}
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.Parent, foreign.ID) {
+			if queries.Equal(local.ParentIngredientID, foreign.ID) {
 				local.R.ParentIngredient = foreign
 				if foreign.R == nil {
 					foreign.R = &ingredientR{}
 				}
-				foreign.R.ParentIngredients = append(foreign.R.ParentIngredients, local)
+				foreign.R.ParentIngredientIngredients = append(foreign.R.ParentIngredientIngredients, local)
 				break
 			}
 		}
@@ -632,7 +632,7 @@ func (ingredientL) LoadIngredientUnits(ctx context.Context, e boil.ContextExecut
 
 	query := NewQuery(
 		qm.From(`ingredient_units`),
-		qm.WhereIn(`ingredient_units.ingredient in ?`, args...),
+		qm.WhereIn(`ingredient_units.ingredient_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -668,19 +668,19 @@ func (ingredientL) LoadIngredientUnits(ctx context.Context, e boil.ContextExecut
 			if foreign.R == nil {
 				foreign.R = &ingredientUnitR{}
 			}
-			foreign.R.IngredientUnitIngredient = object
+			foreign.R.Ingredient = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if local.ID == foreign.Ingredient {
+			if local.ID == foreign.IngredientID {
 				local.R.IngredientUnits = append(local.R.IngredientUnits, foreign)
 				if foreign.R == nil {
 					foreign.R = &ingredientUnitR{}
 				}
-				foreign.R.IngredientUnitIngredient = local
+				foreign.R.Ingredient = local
 				break
 			}
 		}
@@ -689,9 +689,9 @@ func (ingredientL) LoadIngredientUnits(ctx context.Context, e boil.ContextExecut
 	return nil
 }
 
-// LoadParentIngredients allows an eager lookup of values, cached into the
+// LoadParentIngredientIngredients allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (ingredientL) LoadParentIngredients(ctx context.Context, e boil.ContextExecutor, singular bool, maybeIngredient interface{}, mods queries.Applicator) error {
+func (ingredientL) LoadParentIngredientIngredients(ctx context.Context, e boil.ContextExecutor, singular bool, maybeIngredient interface{}, mods queries.Applicator) error {
 	var slice []*Ingredient
 	var object *Ingredient
 
@@ -730,7 +730,7 @@ func (ingredientL) LoadParentIngredients(ctx context.Context, e boil.ContextExec
 
 	query := NewQuery(
 		qm.From(`ingredients`),
-		qm.WhereIn(`ingredients.parent in ?`, args...),
+		qm.WhereIn(`ingredients.parent_ingredient_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -761,7 +761,7 @@ func (ingredientL) LoadParentIngredients(ctx context.Context, e boil.ContextExec
 		}
 	}
 	if singular {
-		object.R.ParentIngredients = resultSlice
+		object.R.ParentIngredientIngredients = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
 				foreign.R = &ingredientR{}
@@ -773,8 +773,8 @@ func (ingredientL) LoadParentIngredients(ctx context.Context, e boil.ContextExec
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.Parent) {
-				local.R.ParentIngredients = append(local.R.ParentIngredients, foreign)
+			if queries.Equal(local.ID, foreign.ParentIngredientID) {
+				local.R.ParentIngredientIngredients = append(local.R.ParentIngredientIngredients, foreign)
 				if foreign.R == nil {
 					foreign.R = &ingredientR{}
 				}
@@ -828,7 +828,7 @@ func (ingredientL) LoadRecipeSectionIngredients(ctx context.Context, e boil.Cont
 
 	query := NewQuery(
 		qm.From(`recipe_section_ingredients`),
-		qm.WhereIn(`recipe_section_ingredients.ingredient in ?`, args...),
+		qm.WhereIn(`recipe_section_ingredients.ingredient_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -864,19 +864,19 @@ func (ingredientL) LoadRecipeSectionIngredients(ctx context.Context, e boil.Cont
 			if foreign.R == nil {
 				foreign.R = &recipeSectionIngredientR{}
 			}
-			foreign.R.RecipeSectionIngredientIngredient = object
+			foreign.R.Ingredient = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.Ingredient) {
+			if queries.Equal(local.ID, foreign.IngredientID) {
 				local.R.RecipeSectionIngredients = append(local.R.RecipeSectionIngredients, foreign)
 				if foreign.R == nil {
 					foreign.R = &recipeSectionIngredientR{}
 				}
-				foreign.R.RecipeSectionIngredientIngredient = local
+				foreign.R.Ingredient = local
 				break
 			}
 		}
@@ -887,7 +887,7 @@ func (ingredientL) LoadRecipeSectionIngredients(ctx context.Context, e boil.Cont
 
 // SetParentIngredient of the ingredient to the related item.
 // Sets o.R.ParentIngredient to related.
-// Adds o to related.R.ParentIngredients.
+// Adds o to related.R.ParentIngredientIngredients.
 func (o *Ingredient) SetParentIngredient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Ingredient) error {
 	var err error
 	if insert {
@@ -898,7 +898,7 @@ func (o *Ingredient) SetParentIngredient(ctx context.Context, exec boil.ContextE
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"ingredients\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"parent"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"parent_ingredient_id"}),
 		strmangle.WhereClause("\"", "\"", 2, ingredientPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -912,7 +912,7 @@ func (o *Ingredient) SetParentIngredient(ctx context.Context, exec boil.ContextE
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.Parent, related.ID)
+	queries.Assign(&o.ParentIngredientID, related.ID)
 	if o.R == nil {
 		o.R = &ingredientR{
 			ParentIngredient: related,
@@ -923,10 +923,10 @@ func (o *Ingredient) SetParentIngredient(ctx context.Context, exec boil.ContextE
 
 	if related.R == nil {
 		related.R = &ingredientR{
-			ParentIngredients: IngredientSlice{o},
+			ParentIngredientIngredients: IngredientSlice{o},
 		}
 	} else {
-		related.R.ParentIngredients = append(related.R.ParentIngredients, o)
+		related.R.ParentIngredientIngredients = append(related.R.ParentIngredientIngredients, o)
 	}
 
 	return nil
@@ -938,8 +938,8 @@ func (o *Ingredient) SetParentIngredient(ctx context.Context, exec boil.ContextE
 func (o *Ingredient) RemoveParentIngredient(ctx context.Context, exec boil.ContextExecutor, related *Ingredient) error {
 	var err error
 
-	queries.SetScanner(&o.Parent, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("parent")); err != nil {
+	queries.SetScanner(&o.ParentIngredientID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("parent_ingredient_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
@@ -950,16 +950,16 @@ func (o *Ingredient) RemoveParentIngredient(ctx context.Context, exec boil.Conte
 		return nil
 	}
 
-	for i, ri := range related.R.ParentIngredients {
-		if queries.Equal(o.Parent, ri.Parent) {
+	for i, ri := range related.R.ParentIngredientIngredients {
+		if queries.Equal(o.ParentIngredientID, ri.ParentIngredientID) {
 			continue
 		}
 
-		ln := len(related.R.ParentIngredients)
+		ln := len(related.R.ParentIngredientIngredients)
 		if ln > 1 && i < ln-1 {
-			related.R.ParentIngredients[i] = related.R.ParentIngredients[ln-1]
+			related.R.ParentIngredientIngredients[i] = related.R.ParentIngredientIngredients[ln-1]
 		}
-		related.R.ParentIngredients = related.R.ParentIngredients[:ln-1]
+		related.R.ParentIngredientIngredients = related.R.ParentIngredientIngredients[:ln-1]
 		break
 	}
 	return nil
@@ -968,19 +968,19 @@ func (o *Ingredient) RemoveParentIngredient(ctx context.Context, exec boil.Conte
 // AddIngredientUnits adds the given related objects to the existing relationships
 // of the ingredient, optionally inserting them as new records.
 // Appends related to o.R.IngredientUnits.
-// Sets related.R.IngredientUnitIngredient appropriately.
+// Sets related.R.Ingredient appropriately.
 func (o *Ingredient) AddIngredientUnits(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*IngredientUnit) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			rel.Ingredient = o.ID
+			rel.IngredientID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"ingredient_units\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient_id"}),
 				strmangle.WhereClause("\"", "\"", 2, ingredientUnitPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -994,7 +994,7 @@ func (o *Ingredient) AddIngredientUnits(ctx context.Context, exec boil.ContextEx
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			rel.Ingredient = o.ID
+			rel.IngredientID = o.ID
 		}
 	}
 
@@ -1009,31 +1009,31 @@ func (o *Ingredient) AddIngredientUnits(ctx context.Context, exec boil.ContextEx
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &ingredientUnitR{
-				IngredientUnitIngredient: o,
+				Ingredient: o,
 			}
 		} else {
-			rel.R.IngredientUnitIngredient = o
+			rel.R.Ingredient = o
 		}
 	}
 	return nil
 }
 
-// AddParentIngredients adds the given related objects to the existing relationships
+// AddParentIngredientIngredients adds the given related objects to the existing relationships
 // of the ingredient, optionally inserting them as new records.
-// Appends related to o.R.ParentIngredients.
+// Appends related to o.R.ParentIngredientIngredients.
 // Sets related.R.ParentIngredient appropriately.
-func (o *Ingredient) AddParentIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Ingredient) error {
+func (o *Ingredient) AddParentIngredientIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Ingredient) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.Parent, o.ID)
+			queries.Assign(&rel.ParentIngredientID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"ingredients\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"parent"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"parent_ingredient_id"}),
 				strmangle.WhereClause("\"", "\"", 2, ingredientPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -1047,16 +1047,16 @@ func (o *Ingredient) AddParentIngredients(ctx context.Context, exec boil.Context
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.Parent, o.ID)
+			queries.Assign(&rel.ParentIngredientID, o.ID)
 		}
 	}
 
 	if o.R == nil {
 		o.R = &ingredientR{
-			ParentIngredients: related,
+			ParentIngredientIngredients: related,
 		}
 	} else {
-		o.R.ParentIngredients = append(o.R.ParentIngredients, related...)
+		o.R.ParentIngredientIngredients = append(o.R.ParentIngredientIngredients, related...)
 	}
 
 	for _, rel := range related {
@@ -1071,14 +1071,14 @@ func (o *Ingredient) AddParentIngredients(ctx context.Context, exec boil.Context
 	return nil
 }
 
-// SetParentIngredients removes all previously related items of the
+// SetParentIngredientIngredients removes all previously related items of the
 // ingredient replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.ParentIngredient's ParentIngredients accordingly.
-// Replaces o.R.ParentIngredients with related.
-// Sets related.R.ParentIngredient's ParentIngredients accordingly.
-func (o *Ingredient) SetParentIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Ingredient) error {
-	query := "update \"ingredients\" set \"parent\" = null where \"parent\" = $1"
+// Sets o.R.ParentIngredient's ParentIngredientIngredients accordingly.
+// Replaces o.R.ParentIngredientIngredients with related.
+// Sets related.R.ParentIngredient's ParentIngredientIngredients accordingly.
+func (o *Ingredient) SetParentIngredientIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Ingredient) error {
+	query := "update \"ingredients\" set \"parent_ingredient_id\" = null where \"parent_ingredient_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1091,8 +1091,8 @@ func (o *Ingredient) SetParentIngredients(ctx context.Context, exec boil.Context
 	}
 
 	if o.R != nil {
-		for _, rel := range o.R.ParentIngredients {
-			queries.SetScanner(&rel.Parent, nil)
+		for _, rel := range o.R.ParentIngredientIngredients {
+			queries.SetScanner(&rel.ParentIngredientID, nil)
 			if rel.R == nil {
 				continue
 			}
@@ -1100,26 +1100,26 @@ func (o *Ingredient) SetParentIngredients(ctx context.Context, exec boil.Context
 			rel.R.ParentIngredient = nil
 		}
 
-		o.R.ParentIngredients = nil
+		o.R.ParentIngredientIngredients = nil
 	}
-	return o.AddParentIngredients(ctx, exec, insert, related...)
+	return o.AddParentIngredientIngredients(ctx, exec, insert, related...)
 }
 
-// RemoveParentIngredients relationships from objects passed in.
-// Removes related items from R.ParentIngredients (uses pointer comparison, removal does not keep order)
+// RemoveParentIngredientIngredients relationships from objects passed in.
+// Removes related items from R.ParentIngredientIngredients (uses pointer comparison, removal does not keep order)
 // Sets related.R.ParentIngredient.
-func (o *Ingredient) RemoveParentIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*Ingredient) error {
+func (o *Ingredient) RemoveParentIngredientIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*Ingredient) error {
 	if len(related) == 0 {
 		return nil
 	}
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.Parent, nil)
+		queries.SetScanner(&rel.ParentIngredientID, nil)
 		if rel.R != nil {
 			rel.R.ParentIngredient = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("parent")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("parent_ingredient_id")); err != nil {
 			return err
 		}
 	}
@@ -1128,16 +1128,16 @@ func (o *Ingredient) RemoveParentIngredients(ctx context.Context, exec boil.Cont
 	}
 
 	for _, rel := range related {
-		for i, ri := range o.R.ParentIngredients {
+		for i, ri := range o.R.ParentIngredientIngredients {
 			if rel != ri {
 				continue
 			}
 
-			ln := len(o.R.ParentIngredients)
+			ln := len(o.R.ParentIngredientIngredients)
 			if ln > 1 && i < ln-1 {
-				o.R.ParentIngredients[i] = o.R.ParentIngredients[ln-1]
+				o.R.ParentIngredientIngredients[i] = o.R.ParentIngredientIngredients[ln-1]
 			}
-			o.R.ParentIngredients = o.R.ParentIngredients[:ln-1]
+			o.R.ParentIngredientIngredients = o.R.ParentIngredientIngredients[:ln-1]
 			break
 		}
 	}
@@ -1148,19 +1148,19 @@ func (o *Ingredient) RemoveParentIngredients(ctx context.Context, exec boil.Cont
 // AddRecipeSectionIngredients adds the given related objects to the existing relationships
 // of the ingredient, optionally inserting them as new records.
 // Appends related to o.R.RecipeSectionIngredients.
-// Sets related.R.RecipeSectionIngredientIngredient appropriately.
+// Sets related.R.Ingredient appropriately.
 func (o *Ingredient) AddRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.Ingredient, o.ID)
+			queries.Assign(&rel.IngredientID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"ingredient_id"}),
 				strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -1174,7 +1174,7 @@ func (o *Ingredient) AddRecipeSectionIngredients(ctx context.Context, exec boil.
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.Ingredient, o.ID)
+			queries.Assign(&rel.IngredientID, o.ID)
 		}
 	}
 
@@ -1189,10 +1189,10 @@ func (o *Ingredient) AddRecipeSectionIngredients(ctx context.Context, exec boil.
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &recipeSectionIngredientR{
-				RecipeSectionIngredientIngredient: o,
+				Ingredient: o,
 			}
 		} else {
-			rel.R.RecipeSectionIngredientIngredient = o
+			rel.R.Ingredient = o
 		}
 	}
 	return nil
@@ -1201,11 +1201,11 @@ func (o *Ingredient) AddRecipeSectionIngredients(ctx context.Context, exec boil.
 // SetRecipeSectionIngredients removes all previously related items of the
 // ingredient replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.RecipeSectionIngredientIngredient's RecipeSectionIngredients accordingly.
+// Sets o.R.Ingredient's RecipeSectionIngredients accordingly.
 // Replaces o.R.RecipeSectionIngredients with related.
-// Sets related.R.RecipeSectionIngredientIngredient's RecipeSectionIngredients accordingly.
+// Sets related.R.Ingredient's RecipeSectionIngredients accordingly.
 func (o *Ingredient) SetRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
-	query := "update \"recipe_section_ingredients\" set \"ingredient\" = null where \"ingredient\" = $1"
+	query := "update \"recipe_section_ingredients\" set \"ingredient_id\" = null where \"ingredient_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1219,12 +1219,12 @@ func (o *Ingredient) SetRecipeSectionIngredients(ctx context.Context, exec boil.
 
 	if o.R != nil {
 		for _, rel := range o.R.RecipeSectionIngredients {
-			queries.SetScanner(&rel.Ingredient, nil)
+			queries.SetScanner(&rel.IngredientID, nil)
 			if rel.R == nil {
 				continue
 			}
 
-			rel.R.RecipeSectionIngredientIngredient = nil
+			rel.R.Ingredient = nil
 		}
 
 		o.R.RecipeSectionIngredients = nil
@@ -1234,7 +1234,7 @@ func (o *Ingredient) SetRecipeSectionIngredients(ctx context.Context, exec boil.
 
 // RemoveRecipeSectionIngredients relationships from objects passed in.
 // Removes related items from R.RecipeSectionIngredients (uses pointer comparison, removal does not keep order)
-// Sets related.R.RecipeSectionIngredientIngredient.
+// Sets related.R.Ingredient.
 func (o *Ingredient) RemoveRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*RecipeSectionIngredient) error {
 	if len(related) == 0 {
 		return nil
@@ -1242,11 +1242,11 @@ func (o *Ingredient) RemoveRecipeSectionIngredients(ctx context.Context, exec bo
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.Ingredient, nil)
+		queries.SetScanner(&rel.IngredientID, nil)
 		if rel.R != nil {
-			rel.R.RecipeSectionIngredientIngredient = nil
+			rel.R.Ingredient = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("ingredient")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("ingredient_id")); err != nil {
 			return err
 		}
 	}

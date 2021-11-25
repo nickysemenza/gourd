@@ -42,7 +42,7 @@ type GPhoto struct {
 	PhotoID string    `db:"id"`
 	Created time.Time `db:"creation_time"`
 	Seen    time.Time `db:"last_seen"`
-	ImageID string    `db:"image"`
+	ImageID string    `db:"image_id"`
 	// MetadataJSON types.JSONText `db:"media_metadata"`
 	Image Image
 }
@@ -58,16 +58,16 @@ type NotionRecipe struct {
 	PageTitle string `db:"page_title"`
 	// Meta      string      `db:"meta"`
 	LastSeen time.Time   `db:"last_seen"`
-	Recipe   zero.String `db:"recipe"`
+	Recipe   zero.String `db:"recipe_id"`
 	AteAt    zero.Time   `db:"ate_at"`
 }
 
 func (c *Client) UpsertPhotos(ctx context.Context, photos []GPhoto) error {
-	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "image")
+	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "image_id")
 	for _, photo := range photos {
 		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created, photo.ImageID)
 	}
-	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
+	q = q.Suffix("ON CONFLICT (id) DO UPDATE SET last_seen = ?, image_id = excluded.image_id", time.Now())
 	_, err := c.execContext(ctx, q)
 	return err
 }
@@ -75,17 +75,17 @@ func (c *Client) UpsertPhotos(ctx context.Context, photos []GPhoto) error {
 type NotionImage struct {
 	BlockID  string    `db:"block_id"`
 	PageID   string    `db:"page_id"`
-	ImageID  string    `db:"image"`
+	ImageID  string    `db:"image_id"`
 	LastSeen time.Time `db:"last_seen"`
 	Image    Image
 }
 
 func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) error {
-	q := c.psql.Insert("notion_image").Columns("block_id", "page_id", "image")
+	q := c.psql.Insert("notion_image").Columns("block_id", "page_id", "image_id")
 	for _, photo := range photos {
 		q = q.Values(photo.BlockID, photo.PageID, photo.ImageID)
 	}
-	q = q.Suffix("ON CONFLICT (block_id,page_id) DO UPDATE SET last_seen = ?, image = excluded.image", time.Now())
+	q = q.Suffix("ON CONFLICT (block_id,page_id) DO UPDATE SET last_seen = ?, image_id = excluded.image_id", time.Now())
 	_, err := c.execContext(ctx, q)
 	return err
 }
@@ -93,7 +93,7 @@ func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) e
 func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]GPhoto, error) {
 	ctx, span := c.tracer.Start(ctx, "db.getPhotos")
 	defer span.End()
-	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "image").From("gphotos_photos").OrderBy("creation_time DESC")
+	q := c.psql.Select("id", "album_id", "creation_time", "last_seen", "image_id").From("gphotos_photos").OrderBy("creation_time DESC")
 	q = addons(q)
 	var results []GPhoto
 	err := c.selectContext(ctx, q, &results)
@@ -126,7 +126,7 @@ func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) 
 func (c *Client) getNotionPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]NotionImage, error) {
 	ctx, span := c.tracer.Start(ctx, "db.getPhotos")
 	defer span.End()
-	q := c.psql.Select("block_id", "notion_image.page_id", "notion_image.last_seen", "image").From("notion_image").OrderBy("last_seen DESC")
+	q := c.psql.Select("block_id", "notion_image.page_id", "notion_image.last_seen", "image_id").From("notion_image").OrderBy("last_seen DESC")
 	q = addons(q)
 	var results []NotionImage
 	err := c.selectContext(ctx, q, &results)
@@ -206,11 +206,11 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (e
 	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
 	defer span.End()
 
-	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at", "recipe")
+	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at", "recipe_id")
 	for _, r := range items {
 		q = q.Values(r.PageID, r.PageTitle, r.AteAt, r.Recipe)
 	}
-	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title, recipe = excluded.recipe", time.Now())
+	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title, recipe_id = excluded.recipe_id", time.Now())
 	_, err = c.execContext(ctx, q)
 
 	return
@@ -244,7 +244,7 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	q := c.psql.Select("page_id", "ate_at", "recipe").From("notion_recipe").
+	q := c.psql.Select("page_id", "ate_at", "recipe_id").From("notion_recipe").
 		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal": nil})
 	var missingMeals []NotionRecipe
 	err := c.selectContext(ctx, q, &missingMeals)
@@ -315,14 +315,14 @@ func (c *Client) GetPhotosWithRecipe(ctx context.Context, recipeID ...string) (i
 	defer span.End()
 
 	type res struct {
-		Recipe string `db:"recipe"`
+		Recipe string `db:"recipe_id"`
 		Image
 	}
 	res2 := []res{}
-	q := c.psql.Select("notion_recipe.recipe as recipe", "id", "blur_hash", "source").From("images").
+	q := c.psql.Select("notion_recipe.recipe_id as recipe_id", "id", "blur_hash", "source").From("images").
 		LeftJoin("notion_image on notion_image.image = images.id").
 		LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
-		Where(sq.Eq{"notion_recipe.recipe": recipeID})
+		Where(sq.Eq{"notion_recipe.recipe_id": recipeID})
 
 	err = c.selectContext(ctx, q, &res2)
 	images = make(map[string][]Image)

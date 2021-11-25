@@ -68,7 +68,7 @@ pub async fn foo(filename: &str, pool: &PgPool) -> anyhow::Result<()> {
 
             futures::future::join_all(x.unit_mappings.into_iter().map(|u| async {
                 let ins = InsertIngredientUnitMapping {
-                    ingredient: ing.clone().id,
+                    ingredient_id: ing.clone().id,
                     unit_a: u.a.unit,
                     amount_a: BigDecimal::from_f64(u.a.value).unwrap(),
                     unit_b: u.b.unit,
@@ -116,7 +116,7 @@ pub async fn foo(filename: &str, pool: &PgPool) -> anyhow::Result<()> {
 pub struct IngredientUnitMapping {
     #[ormx(default)]
     id: i32,
-    ingredient: String,
+    ingredient_id: String,
     unit_a: String,
     amount_a: sqlx::types::BigDecimal,
     unit_b: String,
@@ -132,7 +132,7 @@ pub struct Ingredient {
     name: String,
     // #[ormx(set)]
     fdc_id: Option<i32>,
-    parent: Option<String>,
+    parent_ingredient_id: Option<String>,
 }
 
 fn id(prefix: &str) -> String {
@@ -198,21 +198,21 @@ pub async fn get_fdc_id_from_upc(pool: &PgPool, upc: String) -> Result<Option<i3
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SI {
-    section: String,
+    section_id: String,
     id: String,
     sort: Option<i32>,
-    ingredient: Option<String>,
-    recipe: Option<String>,
+    ingredient_id: Option<String>,
+    recipe_id: Option<String>,
     amounts: sqlx::types::Json<Vec<Amount>>,
     adjective: Option<String>,
     optional: Option<bool>,
     original: Option<String>,
-    substitutes_for: Option<String>,
+    sub_for_ingredient_id: Option<String>,
 }
 #[derive(Iden)]
 enum Ingredients {
     Table,
-    Parent,
+    ParentIngredientId,
     Id,
 }
 
@@ -237,7 +237,7 @@ pub async fn merge_ingredients(
 
     let (sql, values) = Query::update()
         .table(Ingredients::Table)
-        .values(vec![(Ingredients::Parent, parent_id.into())])
+        .values(vec![(Ingredients::ParentIngredientId, parent_id.into())])
         .and_where(Expr::col(Ingredients::Id).is_in(children))
         .build(PostgresQueryBuilder);
     bind_query(sqlx::query(&sql), &values)
@@ -253,8 +253,8 @@ pub async fn get_test(pool: &PgPool) -> Result<Vec<SI>, sqlx::Error> {
     let res = sqlx::query_as!(
         SI,
         r#"
-    select section, id, sort, ingredient, recipe, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
-     adjective, optional, original, substitutes_for from recipe_section_ingredients;
+    select section_id, id, sort, ingredient_id, recipe_id, amounts as "amounts: sqlx::types::Json<Vec<Amount>>",
+     adjective, optional, original, sub_for_ingredient_id from recipe_section_ingredients;
             "#,
     )
     .fetch_all(pool)

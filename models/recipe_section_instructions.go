@@ -25,7 +25,7 @@ import (
 // RecipeSectionInstruction is an object representing the database table.
 type RecipeSectionInstruction struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Section     string      `boil:"section" json:"section" toml:"section" yaml:"section"`
+	SectionID   string      `boil:"section_id" json:"section_id" toml:"section_id" yaml:"section_id"`
 	Sort        null.Int    `boil:"sort" json:"sort,omitempty" toml:"sort" yaml:"sort,omitempty"`
 	Instruction null.String `boil:"instruction" json:"instruction,omitempty" toml:"instruction" yaml:"instruction,omitempty"`
 
@@ -35,24 +35,24 @@ type RecipeSectionInstruction struct {
 
 var RecipeSectionInstructionColumns = struct {
 	ID          string
-	Section     string
+	SectionID   string
 	Sort        string
 	Instruction string
 }{
 	ID:          "id",
-	Section:     "section",
+	SectionID:   "section_id",
 	Sort:        "sort",
 	Instruction: "instruction",
 }
 
 var RecipeSectionInstructionTableColumns = struct {
 	ID          string
-	Section     string
+	SectionID   string
 	Sort        string
 	Instruction string
 }{
 	ID:          "recipe_section_instructions.id",
-	Section:     "recipe_section_instructions.section",
+	SectionID:   "recipe_section_instructions.section_id",
 	Sort:        "recipe_section_instructions.sort",
 	Instruction: "recipe_section_instructions.instruction",
 }
@@ -61,26 +61,26 @@ var RecipeSectionInstructionTableColumns = struct {
 
 var RecipeSectionInstructionWhere = struct {
 	ID          whereHelperstring
-	Section     whereHelperstring
+	SectionID   whereHelperstring
 	Sort        whereHelpernull_Int
 	Instruction whereHelpernull_String
 }{
 	ID:          whereHelperstring{field: "\"recipe_section_instructions\".\"id\""},
-	Section:     whereHelperstring{field: "\"recipe_section_instructions\".\"section\""},
+	SectionID:   whereHelperstring{field: "\"recipe_section_instructions\".\"section_id\""},
 	Sort:        whereHelpernull_Int{field: "\"recipe_section_instructions\".\"sort\""},
 	Instruction: whereHelpernull_String{field: "\"recipe_section_instructions\".\"instruction\""},
 }
 
 // RecipeSectionInstructionRels is where relationship names are stored.
 var RecipeSectionInstructionRels = struct {
-	SectionRecipeSection string
+	Section string
 }{
-	SectionRecipeSection: "SectionRecipeSection",
+	Section: "Section",
 }
 
 // recipeSectionInstructionR is where relationships are stored.
 type recipeSectionInstructionR struct {
-	SectionRecipeSection *RecipeSection `boil:"SectionRecipeSection" json:"SectionRecipeSection" toml:"SectionRecipeSection" yaml:"SectionRecipeSection"`
+	Section *RecipeSection `boil:"Section" json:"Section" toml:"Section" yaml:"Section"`
 }
 
 // NewStruct creates a new relationship struct
@@ -92,8 +92,8 @@ func (*recipeSectionInstructionR) NewStruct() *recipeSectionInstructionR {
 type recipeSectionInstructionL struct{}
 
 var (
-	recipeSectionInstructionAllColumns            = []string{"id", "section", "sort", "instruction"}
-	recipeSectionInstructionColumnsWithoutDefault = []string{"id", "section", "sort", "instruction"}
+	recipeSectionInstructionAllColumns            = []string{"id", "section_id", "sort", "instruction"}
+	recipeSectionInstructionColumnsWithoutDefault = []string{"id", "section_id", "sort", "instruction"}
 	recipeSectionInstructionColumnsWithDefault    = []string{}
 	recipeSectionInstructionPrimaryKeyColumns     = []string{"id"}
 )
@@ -373,10 +373,10 @@ func (q recipeSectionInstructionQuery) Exists(ctx context.Context, exec boil.Con
 	return count > 0, nil
 }
 
-// SectionRecipeSection pointed to by the foreign key.
-func (o *RecipeSectionInstruction) SectionRecipeSection(mods ...qm.QueryMod) recipeSectionQuery {
+// Section pointed to by the foreign key.
+func (o *RecipeSectionInstruction) Section(mods ...qm.QueryMod) recipeSectionQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Section),
+		qm.Where("\"id\" = ?", o.SectionID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -387,9 +387,9 @@ func (o *RecipeSectionInstruction) SectionRecipeSection(mods ...qm.QueryMod) rec
 	return query
 }
 
-// LoadSectionRecipeSection allows an eager lookup of values, cached into the
+// LoadSection allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionInstruction interface{}, mods queries.Applicator) error {
+func (recipeSectionInstructionL) LoadSection(ctx context.Context, e boil.ContextExecutor, singular bool, maybeRecipeSectionInstruction interface{}, mods queries.Applicator) error {
 	var slice []*RecipeSectionInstruction
 	var object *RecipeSectionInstruction
 
@@ -404,7 +404,7 @@ func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e
 		if object.R == nil {
 			object.R = &recipeSectionInstructionR{}
 		}
-		args = append(args, object.Section)
+		args = append(args, object.SectionID)
 
 	} else {
 	Outer:
@@ -414,12 +414,12 @@ func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e
 			}
 
 			for _, a := range args {
-				if a == obj.Section {
+				if a == obj.SectionID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Section)
+			args = append(args, obj.SectionID)
 
 		}
 	}
@@ -467,7 +467,7 @@ func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.SectionRecipeSection = foreign
+		object.R.Section = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeSectionR{}
 		}
@@ -477,8 +477,8 @@ func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Section == foreign.ID {
-				local.R.SectionRecipeSection = foreign
+			if local.SectionID == foreign.ID {
+				local.R.Section = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeSectionR{}
 				}
@@ -491,10 +491,10 @@ func (recipeSectionInstructionL) LoadSectionRecipeSection(ctx context.Context, e
 	return nil
 }
 
-// SetSectionRecipeSection of the recipeSectionInstruction to the related item.
-// Sets o.R.SectionRecipeSection to related.
+// SetSection of the recipeSectionInstruction to the related item.
+// Sets o.R.Section to related.
 // Adds o to related.R.SectionRecipeSectionInstructions.
-func (o *RecipeSectionInstruction) SetSectionRecipeSection(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSection) error {
+func (o *RecipeSectionInstruction) SetSection(ctx context.Context, exec boil.ContextExecutor, insert bool, related *RecipeSection) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -504,7 +504,7 @@ func (o *RecipeSectionInstruction) SetSectionRecipeSection(ctx context.Context, 
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"recipe_section_instructions\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"section"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"section_id"}),
 		strmangle.WhereClause("\"", "\"", 2, recipeSectionInstructionPrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.ID}
@@ -518,13 +518,13 @@ func (o *RecipeSectionInstruction) SetSectionRecipeSection(ctx context.Context, 
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Section = related.ID
+	o.SectionID = related.ID
 	if o.R == nil {
 		o.R = &recipeSectionInstructionR{
-			SectionRecipeSection: related,
+			Section: related,
 		}
 	} else {
-		o.R.SectionRecipeSection = related
+		o.R.Section = related
 	}
 
 	if related.R == nil {

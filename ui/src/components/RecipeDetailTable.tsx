@@ -76,6 +76,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   const flourMass = totalFlourMass(sections || []);
   const showBP = flourMass > 0;
   const showOriginalLine = false;
+  const showKcalDollars = false;
 
   const w = useContext(WasmContext);
 
@@ -287,11 +288,12 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
           <div>
-            {/* <div>{getCal(ingredient, hints, tweaks.multiplier)} kcal</div> */}
-            <div>
-              {kcal ? scaledRound(kcal) : "n/a"}
-              kcal ${dollars ? scaledRound(dollars) : "n/a"}
-            </div>
+            {showKcalDollars && (
+              <div>
+                {kcal ? scaledRound(kcal) : "n/a"}
+                kcal ${dollars ? scaledRound(dollars) : "n/a"}
+              </div>
+            )}
 
             {!isSub && iActions(x, y, "ingredients")}
             {!isSub && edit && (

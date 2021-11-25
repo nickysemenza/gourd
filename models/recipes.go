@@ -370,7 +370,7 @@ func (q recipeQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (boo
 	return count > 0, nil
 }
 
-// HighlightRecipeMealGphotos retrieves all the meal_gphoto's MealGphotos with an executor via highlight_recipe column.
+// HighlightRecipeMealGphotos retrieves all the meal_gphoto's MealGphotos with an executor via highlight_recipe_id column.
 func (o *Recipe) HighlightRecipeMealGphotos(mods ...qm.QueryMod) mealGphotoQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
@@ -378,7 +378,7 @@ func (o *Recipe) HighlightRecipeMealGphotos(mods ...qm.QueryMod) mealGphotoQuery
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"meal_gphoto\".\"highlight_recipe\"=?", o.ID),
+		qm.Where("\"meal_gphoto\".\"highlight_recipe_id\"=?", o.ID),
 	)
 
 	query := MealGphotos(queryMods...)
@@ -420,7 +420,7 @@ func (o *Recipe) NotionRecipes(mods ...qm.QueryMod) notionRecipeQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"notion_recipe\".\"recipe\"=?", o.ID),
+		qm.Where("\"notion_recipe\".\"recipe_id\"=?", o.ID),
 	)
 
 	query := NotionRecipes(queryMods...)
@@ -462,7 +462,7 @@ func (o *Recipe) RecipeSectionIngredients(mods ...qm.QueryMod) recipeSectionIngr
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"recipe_section_ingredients\".\"recipe\"=?", o.ID),
+		qm.Where("\"recipe_section_ingredients\".\"recipe_id\"=?", o.ID),
 	)
 
 	query := RecipeSectionIngredients(queryMods...)
@@ -516,7 +516,7 @@ func (recipeL) LoadHighlightRecipeMealGphotos(ctx context.Context, e boil.Contex
 
 	query := NewQuery(
 		qm.From(`meal_gphoto`),
-		qm.WhereIn(`meal_gphoto.highlight_recipe in ?`, args...),
+		qm.WhereIn(`meal_gphoto.highlight_recipe_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -552,19 +552,19 @@ func (recipeL) LoadHighlightRecipeMealGphotos(ctx context.Context, e boil.Contex
 			if foreign.R == nil {
 				foreign.R = &mealGphotoR{}
 			}
-			foreign.R.HighlightRecipeRecipe = object
+			foreign.R.HighlightRecipe = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.HighlightRecipe) {
+			if queries.Equal(local.ID, foreign.HighlightRecipeID) {
 				local.R.HighlightRecipeMealGphotos = append(local.R.HighlightRecipeMealGphotos, foreign)
 				if foreign.R == nil {
 					foreign.R = &mealGphotoR{}
 				}
-				foreign.R.HighlightRecipeRecipe = local
+				foreign.R.HighlightRecipe = local
 				break
 			}
 		}
@@ -712,7 +712,7 @@ func (recipeL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, si
 
 	query := NewQuery(
 		qm.From(`notion_recipe`),
-		qm.WhereIn(`notion_recipe.recipe in ?`, args...),
+		qm.WhereIn(`notion_recipe.recipe_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -748,19 +748,19 @@ func (recipeL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, si
 			if foreign.R == nil {
 				foreign.R = &notionRecipeR{}
 			}
-			foreign.R.NotionRecipeRecipe = object
+			foreign.R.Recipe = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.Recipe) {
+			if queries.Equal(local.ID, foreign.RecipeID) {
 				local.R.NotionRecipes = append(local.R.NotionRecipes, foreign)
 				if foreign.R == nil {
 					foreign.R = &notionRecipeR{}
 				}
-				foreign.R.NotionRecipeRecipe = local
+				foreign.R.Recipe = local
 				break
 			}
 		}
@@ -908,7 +908,7 @@ func (recipeL) LoadRecipeSectionIngredients(ctx context.Context, e boil.ContextE
 
 	query := NewQuery(
 		qm.From(`recipe_section_ingredients`),
-		qm.WhereIn(`recipe_section_ingredients.recipe in ?`, args...),
+		qm.WhereIn(`recipe_section_ingredients.recipe_id in ?`, args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -944,19 +944,19 @@ func (recipeL) LoadRecipeSectionIngredients(ctx context.Context, e boil.ContextE
 			if foreign.R == nil {
 				foreign.R = &recipeSectionIngredientR{}
 			}
-			foreign.R.RecipeSectionIngredientRecipe = object
+			foreign.R.Recipe = object
 		}
 		return nil
 	}
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.Recipe) {
+			if queries.Equal(local.ID, foreign.RecipeID) {
 				local.R.RecipeSectionIngredients = append(local.R.RecipeSectionIngredients, foreign)
 				if foreign.R == nil {
 					foreign.R = &recipeSectionIngredientR{}
 				}
-				foreign.R.RecipeSectionIngredientRecipe = local
+				foreign.R.Recipe = local
 				break
 			}
 		}
@@ -968,22 +968,22 @@ func (recipeL) LoadRecipeSectionIngredients(ctx context.Context, e boil.ContextE
 // AddHighlightRecipeMealGphotos adds the given related objects to the existing relationships
 // of the recipe, optionally inserting them as new records.
 // Appends related to o.R.HighlightRecipeMealGphotos.
-// Sets related.R.HighlightRecipeRecipe appropriately.
+// Sets related.R.HighlightRecipe appropriately.
 func (o *Recipe) AddHighlightRecipeMealGphotos(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*MealGphoto) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.HighlightRecipe, o.ID)
+			queries.Assign(&rel.HighlightRecipeID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"meal_gphoto\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"highlight_recipe"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"highlight_recipe_id"}),
 				strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.Meal, rel.GphotosID}
+			values := []interface{}{o.ID, rel.MealID, rel.GphotosID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)
@@ -994,7 +994,7 @@ func (o *Recipe) AddHighlightRecipeMealGphotos(ctx context.Context, exec boil.Co
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.HighlightRecipe, o.ID)
+			queries.Assign(&rel.HighlightRecipeID, o.ID)
 		}
 	}
 
@@ -1009,10 +1009,10 @@ func (o *Recipe) AddHighlightRecipeMealGphotos(ctx context.Context, exec boil.Co
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &mealGphotoR{
-				HighlightRecipeRecipe: o,
+				HighlightRecipe: o,
 			}
 		} else {
-			rel.R.HighlightRecipeRecipe = o
+			rel.R.HighlightRecipe = o
 		}
 	}
 	return nil
@@ -1021,11 +1021,11 @@ func (o *Recipe) AddHighlightRecipeMealGphotos(ctx context.Context, exec boil.Co
 // SetHighlightRecipeMealGphotos removes all previously related items of the
 // recipe replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.HighlightRecipeRecipe's HighlightRecipeMealGphotos accordingly.
+// Sets o.R.HighlightRecipe's HighlightRecipeMealGphotos accordingly.
 // Replaces o.R.HighlightRecipeMealGphotos with related.
-// Sets related.R.HighlightRecipeRecipe's HighlightRecipeMealGphotos accordingly.
+// Sets related.R.HighlightRecipe's HighlightRecipeMealGphotos accordingly.
 func (o *Recipe) SetHighlightRecipeMealGphotos(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*MealGphoto) error {
-	query := "update \"meal_gphoto\" set \"highlight_recipe\" = null where \"highlight_recipe\" = $1"
+	query := "update \"meal_gphoto\" set \"highlight_recipe_id\" = null where \"highlight_recipe_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1039,12 +1039,12 @@ func (o *Recipe) SetHighlightRecipeMealGphotos(ctx context.Context, exec boil.Co
 
 	if o.R != nil {
 		for _, rel := range o.R.HighlightRecipeMealGphotos {
-			queries.SetScanner(&rel.HighlightRecipe, nil)
+			queries.SetScanner(&rel.HighlightRecipeID, nil)
 			if rel.R == nil {
 				continue
 			}
 
-			rel.R.HighlightRecipeRecipe = nil
+			rel.R.HighlightRecipe = nil
 		}
 
 		o.R.HighlightRecipeMealGphotos = nil
@@ -1054,7 +1054,7 @@ func (o *Recipe) SetHighlightRecipeMealGphotos(ctx context.Context, exec boil.Co
 
 // RemoveHighlightRecipeMealGphotos relationships from objects passed in.
 // Removes related items from R.HighlightRecipeMealGphotos (uses pointer comparison, removal does not keep order)
-// Sets related.R.HighlightRecipeRecipe.
+// Sets related.R.HighlightRecipe.
 func (o *Recipe) RemoveHighlightRecipeMealGphotos(ctx context.Context, exec boil.ContextExecutor, related ...*MealGphoto) error {
 	if len(related) == 0 {
 		return nil
@@ -1062,11 +1062,11 @@ func (o *Recipe) RemoveHighlightRecipeMealGphotos(ctx context.Context, exec boil
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.HighlightRecipe, nil)
+		queries.SetScanner(&rel.HighlightRecipeID, nil)
 		if rel.R != nil {
-			rel.R.HighlightRecipeRecipe = nil
+			rel.R.HighlightRecipe = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("highlight_recipe")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("highlight_recipe_id")); err != nil {
 			return err
 		}
 	}
@@ -1148,19 +1148,19 @@ func (o *Recipe) AddMealRecipes(ctx context.Context, exec boil.ContextExecutor, 
 // AddNotionRecipes adds the given related objects to the existing relationships
 // of the recipe, optionally inserting them as new records.
 // Appends related to o.R.NotionRecipes.
-// Sets related.R.NotionRecipeRecipe appropriately.
+// Sets related.R.Recipe appropriately.
 func (o *Recipe) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*NotionRecipe) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.Recipe, o.ID)
+			queries.Assign(&rel.RecipeID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"notion_recipe\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 				strmangle.WhereClause("\"", "\"", 2, notionRecipePrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.PageID}
@@ -1174,7 +1174,7 @@ func (o *Recipe) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.Recipe, o.ID)
+			queries.Assign(&rel.RecipeID, o.ID)
 		}
 	}
 
@@ -1189,10 +1189,10 @@ func (o *Recipe) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &notionRecipeR{
-				NotionRecipeRecipe: o,
+				Recipe: o,
 			}
 		} else {
-			rel.R.NotionRecipeRecipe = o
+			rel.R.Recipe = o
 		}
 	}
 	return nil
@@ -1201,11 +1201,11 @@ func (o *Recipe) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 // SetNotionRecipes removes all previously related items of the
 // recipe replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.NotionRecipeRecipe's NotionRecipes accordingly.
+// Sets o.R.Recipe's NotionRecipes accordingly.
 // Replaces o.R.NotionRecipes with related.
-// Sets related.R.NotionRecipeRecipe's NotionRecipes accordingly.
+// Sets related.R.Recipe's NotionRecipes accordingly.
 func (o *Recipe) SetNotionRecipes(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*NotionRecipe) error {
-	query := "update \"notion_recipe\" set \"recipe\" = null where \"recipe\" = $1"
+	query := "update \"notion_recipe\" set \"recipe_id\" = null where \"recipe_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1219,12 +1219,12 @@ func (o *Recipe) SetNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 
 	if o.R != nil {
 		for _, rel := range o.R.NotionRecipes {
-			queries.SetScanner(&rel.Recipe, nil)
+			queries.SetScanner(&rel.RecipeID, nil)
 			if rel.R == nil {
 				continue
 			}
 
-			rel.R.NotionRecipeRecipe = nil
+			rel.R.Recipe = nil
 		}
 
 		o.R.NotionRecipes = nil
@@ -1234,7 +1234,7 @@ func (o *Recipe) SetNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 
 // RemoveNotionRecipes relationships from objects passed in.
 // Removes related items from R.NotionRecipes (uses pointer comparison, removal does not keep order)
-// Sets related.R.NotionRecipeRecipe.
+// Sets related.R.Recipe.
 func (o *Recipe) RemoveNotionRecipes(ctx context.Context, exec boil.ContextExecutor, related ...*NotionRecipe) error {
 	if len(related) == 0 {
 		return nil
@@ -1242,11 +1242,11 @@ func (o *Recipe) RemoveNotionRecipes(ctx context.Context, exec boil.ContextExecu
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.Recipe, nil)
+		queries.SetScanner(&rel.RecipeID, nil)
 		if rel.R != nil {
-			rel.R.NotionRecipeRecipe = nil
+			rel.R.Recipe = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("recipe")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("recipe_id")); err != nil {
 			return err
 		}
 	}
@@ -1328,19 +1328,19 @@ func (o *Recipe) AddRecipeDetails(ctx context.Context, exec boil.ContextExecutor
 // AddRecipeSectionIngredients adds the given related objects to the existing relationships
 // of the recipe, optionally inserting them as new records.
 // Appends related to o.R.RecipeSectionIngredients.
-// Sets related.R.RecipeSectionIngredientRecipe appropriately.
+// Sets related.R.Recipe appropriately.
 func (o *Recipe) AddRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.Recipe, o.ID)
+			queries.Assign(&rel.RecipeID, o.ID)
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
 				"UPDATE \"recipe_section_ingredients\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+				strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 				strmangle.WhereClause("\"", "\"", 2, recipeSectionIngredientPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
@@ -1354,7 +1354,7 @@ func (o *Recipe) AddRecipeSectionIngredients(ctx context.Context, exec boil.Cont
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.Recipe, o.ID)
+			queries.Assign(&rel.RecipeID, o.ID)
 		}
 	}
 
@@ -1369,10 +1369,10 @@ func (o *Recipe) AddRecipeSectionIngredients(ctx context.Context, exec boil.Cont
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &recipeSectionIngredientR{
-				RecipeSectionIngredientRecipe: o,
+				Recipe: o,
 			}
 		} else {
-			rel.R.RecipeSectionIngredientRecipe = o
+			rel.R.Recipe = o
 		}
 	}
 	return nil
@@ -1381,11 +1381,11 @@ func (o *Recipe) AddRecipeSectionIngredients(ctx context.Context, exec boil.Cont
 // SetRecipeSectionIngredients removes all previously related items of the
 // recipe replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.RecipeSectionIngredientRecipe's RecipeSectionIngredients accordingly.
+// Sets o.R.Recipe's RecipeSectionIngredients accordingly.
 // Replaces o.R.RecipeSectionIngredients with related.
-// Sets related.R.RecipeSectionIngredientRecipe's RecipeSectionIngredients accordingly.
+// Sets related.R.Recipe's RecipeSectionIngredients accordingly.
 func (o *Recipe) SetRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*RecipeSectionIngredient) error {
-	query := "update \"recipe_section_ingredients\" set \"recipe\" = null where \"recipe\" = $1"
+	query := "update \"recipe_section_ingredients\" set \"recipe_id\" = null where \"recipe_id\" = $1"
 	values := []interface{}{o.ID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1399,12 +1399,12 @@ func (o *Recipe) SetRecipeSectionIngredients(ctx context.Context, exec boil.Cont
 
 	if o.R != nil {
 		for _, rel := range o.R.RecipeSectionIngredients {
-			queries.SetScanner(&rel.Recipe, nil)
+			queries.SetScanner(&rel.RecipeID, nil)
 			if rel.R == nil {
 				continue
 			}
 
-			rel.R.RecipeSectionIngredientRecipe = nil
+			rel.R.Recipe = nil
 		}
 
 		o.R.RecipeSectionIngredients = nil
@@ -1414,7 +1414,7 @@ func (o *Recipe) SetRecipeSectionIngredients(ctx context.Context, exec boil.Cont
 
 // RemoveRecipeSectionIngredients relationships from objects passed in.
 // Removes related items from R.RecipeSectionIngredients (uses pointer comparison, removal does not keep order)
-// Sets related.R.RecipeSectionIngredientRecipe.
+// Sets related.R.Recipe.
 func (o *Recipe) RemoveRecipeSectionIngredients(ctx context.Context, exec boil.ContextExecutor, related ...*RecipeSectionIngredient) error {
 	if len(related) == 0 {
 		return nil
@@ -1422,11 +1422,11 @@ func (o *Recipe) RemoveRecipeSectionIngredients(ctx context.Context, exec boil.C
 
 	var err error
 	for _, rel := range related {
-		queries.SetScanner(&rel.Recipe, nil)
+		queries.SetScanner(&rel.RecipeID, nil)
 		if rel.R != nil {
-			rel.R.RecipeSectionIngredientRecipe = nil
+			rel.R.Recipe = nil
 		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("recipe")); err != nil {
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("recipe_id")); err != nil {
 			return err
 		}
 	}

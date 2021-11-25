@@ -71,7 +71,7 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		if nameOk && len(nameProp.(*notionapi.TitleProperty).Title) != 1 {
 			err = fmt.Errorf("page %s has no title", page.ID)
 			log.Error(err)
-			return
+			return nil, nil
 		}
 		name = nameProp.(*notionapi.TitleProperty).Title[0].Text.Content
 		meal := NotionRecipe{
@@ -188,14 +188,16 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 					meal.Raw = text
 				}
 			case notionapi.BlockTypeChildPage:
+				// treat as top level page?
+
 				i := block.(*notionapi.ChildPageBlock)
 				foo, err := c.PageById(ctx, notionapi.PageID(i.ID))
 				if err != nil {
 					return nil, err
 				}
-				meal.Children = append(meal.Children, *foo)
-				spew.Dump(foo)
-				// treat as top level page?
+				if foo != nil {
+					meal.Children = append(meal.Children, *foo)
+				}
 			}
 		}
 

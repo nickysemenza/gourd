@@ -5,13 +5,13 @@ CREATE TABLE IF NOT EXISTS "images" (
 	PRIMARY KEY ("id")
 );
 ALTER TABLE "gphotos_photos"
-ADD COLUMN "image" text references images(id) NOT NULL;
+ADD COLUMN "image_id" text references images(id) NOT NULL;
 CREATE TABLE IF NOT EXISTS "notion_recipe" (
 	"page_id" text NOT NULL,
 	"page_title" text NOT NULL,
 	"meta" json,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
-	"recipe" TEXT references recipes(id),
+	"recipe_id" TEXT references recipes(id),
 	-- NOT NULL,
 	"ate_at" timestamp,
 	-- NOT NULL,
@@ -21,13 +21,13 @@ CREATE TABLE IF NOT EXISTS "notion_image" (
 	"block_id" text NOT NULL,
 	"page_id" text references notion_recipe(page_id) NOT NULL,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
-	"image" text references images(id) NOT NULL,
+	"image_id" text references images(id) NOT NULL,
 	primary key (block_id, page_id),
 	unique (block_id, page_id)
 );
 CREATE TABLE IF NOT EXISTS "notion_meal" (
-	"meal" TEXT references meals(id) NOT NULL,
+	"meal_id" TEXT references meals(id) NOT NULL,
 	"notion_recipe" TEXT references notion_recipe(page_id) NOT NULL,
-	primary key (meal, notion_recipe)
+	primary key (meal_id, notion_recipe)
 );
 --

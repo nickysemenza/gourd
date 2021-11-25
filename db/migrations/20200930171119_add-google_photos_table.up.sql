@@ -11,10 +11,10 @@ CREATE TABLE "gphotos_photos" (
     PRIMARY KEY ("id")
 );
 CREATE TABLE IF NOT EXISTS "meal_gphoto" (
-    "meal" TEXT references meals(id) NOT NULL,
+    "meal_id" TEXT references meals(id) NOT NULL,
     "gphotos_id" TEXT references gphotos_photos(id) NOT NULL,
-    "highlight_recipe" TEXT references recipes(id),
-    primary key (meal, gphotos_id)
+    "highlight_recipe_id" TEXT references recipes(id),
+    primary key (meal_id, gphotos_id)
 );
 ALTER TABLE "meals"
 ADD COLUMN "ate_at" timestamp NOT NULL;

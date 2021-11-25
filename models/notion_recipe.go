@@ -28,7 +28,7 @@ type NotionRecipe struct {
 	PageTitle string      `boil:"page_title" json:"page_title" toml:"page_title" yaml:"page_title"`
 	Meta      null.JSON   `boil:"meta" json:"meta,omitempty" toml:"meta" yaml:"meta,omitempty"`
 	LastSeen  time.Time   `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
-	Recipe    null.String `boil:"recipe" json:"recipe,omitempty" toml:"recipe" yaml:"recipe,omitempty"`
+	RecipeID  null.String `boil:"recipe_id" json:"recipe_id,omitempty" toml:"recipe_id" yaml:"recipe_id,omitempty"`
 	AteAt     null.Time   `boil:"ate_at" json:"ate_at,omitempty" toml:"ate_at" yaml:"ate_at,omitempty"`
 
 	R *notionRecipeR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
@@ -40,14 +40,14 @@ var NotionRecipeColumns = struct {
 	PageTitle string
 	Meta      string
 	LastSeen  string
-	Recipe    string
+	RecipeID  string
 	AteAt     string
 }{
 	PageID:    "page_id",
 	PageTitle: "page_title",
 	Meta:      "meta",
 	LastSeen:  "last_seen",
-	Recipe:    "recipe",
+	RecipeID:  "recipe_id",
 	AteAt:     "ate_at",
 }
 
@@ -56,14 +56,14 @@ var NotionRecipeTableColumns = struct {
 	PageTitle string
 	Meta      string
 	LastSeen  string
-	Recipe    string
+	RecipeID  string
 	AteAt     string
 }{
 	PageID:    "notion_recipe.page_id",
 	PageTitle: "notion_recipe.page_title",
 	Meta:      "notion_recipe.meta",
 	LastSeen:  "notion_recipe.last_seen",
-	Recipe:    "notion_recipe.recipe",
+	RecipeID:  "notion_recipe.recipe_id",
 	AteAt:     "notion_recipe.ate_at",
 }
 
@@ -122,33 +122,33 @@ var NotionRecipeWhere = struct {
 	PageTitle whereHelperstring
 	Meta      whereHelpernull_JSON
 	LastSeen  whereHelpertime_Time
-	Recipe    whereHelpernull_String
+	RecipeID  whereHelpernull_String
 	AteAt     whereHelpernull_Time
 }{
 	PageID:    whereHelperstring{field: "\"notion_recipe\".\"page_id\""},
 	PageTitle: whereHelperstring{field: "\"notion_recipe\".\"page_title\""},
 	Meta:      whereHelpernull_JSON{field: "\"notion_recipe\".\"meta\""},
 	LastSeen:  whereHelpertime_Time{field: "\"notion_recipe\".\"last_seen\""},
-	Recipe:    whereHelpernull_String{field: "\"notion_recipe\".\"recipe\""},
+	RecipeID:  whereHelpernull_String{field: "\"notion_recipe\".\"recipe_id\""},
 	AteAt:     whereHelpernull_Time{field: "\"notion_recipe\".\"ate_at\""},
 }
 
 // NotionRecipeRels is where relationship names are stored.
 var NotionRecipeRels = struct {
-	NotionRecipeRecipe string
-	PageNotionImages   string
-	Meals              string
+	Recipe           string
+	PageNotionImages string
+	Meals            string
 }{
-	NotionRecipeRecipe: "NotionRecipeRecipe",
-	PageNotionImages:   "PageNotionImages",
-	Meals:              "Meals",
+	Recipe:           "Recipe",
+	PageNotionImages: "PageNotionImages",
+	Meals:            "Meals",
 }
 
 // notionRecipeR is where relationships are stored.
 type notionRecipeR struct {
-	NotionRecipeRecipe *Recipe          `boil:"NotionRecipeRecipe" json:"NotionRecipeRecipe" toml:"NotionRecipeRecipe" yaml:"NotionRecipeRecipe"`
-	PageNotionImages   NotionImageSlice `boil:"PageNotionImages" json:"PageNotionImages" toml:"PageNotionImages" yaml:"PageNotionImages"`
-	Meals              MealSlice        `boil:"Meals" json:"Meals" toml:"Meals" yaml:"Meals"`
+	Recipe           *Recipe          `boil:"Recipe" json:"Recipe" toml:"Recipe" yaml:"Recipe"`
+	PageNotionImages NotionImageSlice `boil:"PageNotionImages" json:"PageNotionImages" toml:"PageNotionImages" yaml:"PageNotionImages"`
+	Meals            MealSlice        `boil:"Meals" json:"Meals" toml:"Meals" yaml:"Meals"`
 }
 
 // NewStruct creates a new relationship struct
@@ -160,8 +160,8 @@ func (*notionRecipeR) NewStruct() *notionRecipeR {
 type notionRecipeL struct{}
 
 var (
-	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe", "ate_at"}
-	notionRecipeColumnsWithoutDefault = []string{"page_id", "page_title", "meta", "recipe", "ate_at"}
+	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at"}
+	notionRecipeColumnsWithoutDefault = []string{"page_id", "page_title", "meta", "recipe_id", "ate_at"}
 	notionRecipeColumnsWithDefault    = []string{"last_seen"}
 	notionRecipePrimaryKeyColumns     = []string{"page_id"}
 )
@@ -441,10 +441,10 @@ func (q notionRecipeQuery) Exists(ctx context.Context, exec boil.ContextExecutor
 	return count > 0, nil
 }
 
-// NotionRecipeRecipe pointed to by the foreign key.
-func (o *NotionRecipe) NotionRecipeRecipe(mods ...qm.QueryMod) recipeQuery {
+// Recipe pointed to by the foreign key.
+func (o *NotionRecipe) Recipe(mods ...qm.QueryMod) recipeQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Recipe),
+		qm.Where("\"id\" = ?", o.RecipeID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -484,7 +484,7 @@ func (o *NotionRecipe) Meals(mods ...qm.QueryMod) mealQuery {
 	}
 
 	queryMods = append(queryMods,
-		qm.InnerJoin("\"notion_meal\" on \"meals\".\"id\" = \"notion_meal\".\"meal\""),
+		qm.InnerJoin("\"notion_meal\" on \"meals\".\"id\" = \"notion_meal\".\"meal_id\""),
 		qm.Where("\"notion_meal\".\"notion_recipe\"=?", o.PageID),
 	)
 
@@ -498,9 +498,9 @@ func (o *NotionRecipe) Meals(mods ...qm.QueryMod) mealQuery {
 	return query
 }
 
-// LoadNotionRecipeRecipe allows an eager lookup of values, cached into the
+// LoadRecipe allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (notionRecipeL) LoadNotionRecipeRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeNotionRecipe interface{}, mods queries.Applicator) error {
+func (notionRecipeL) LoadRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeNotionRecipe interface{}, mods queries.Applicator) error {
 	var slice []*NotionRecipe
 	var object *NotionRecipe
 
@@ -515,8 +515,8 @@ func (notionRecipeL) LoadNotionRecipeRecipe(ctx context.Context, e boil.ContextE
 		if object.R == nil {
 			object.R = &notionRecipeR{}
 		}
-		if !queries.IsNil(object.Recipe) {
-			args = append(args, object.Recipe)
+		if !queries.IsNil(object.RecipeID) {
+			args = append(args, object.RecipeID)
 		}
 
 	} else {
@@ -527,13 +527,13 @@ func (notionRecipeL) LoadNotionRecipeRecipe(ctx context.Context, e boil.ContextE
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.Recipe) {
+				if queries.Equal(a, obj.RecipeID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.Recipe) {
-				args = append(args, obj.Recipe)
+			if !queries.IsNil(obj.RecipeID) {
+				args = append(args, obj.RecipeID)
 			}
 
 		}
@@ -582,7 +582,7 @@ func (notionRecipeL) LoadNotionRecipeRecipe(ctx context.Context, e boil.ContextE
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.NotionRecipeRecipe = foreign
+		object.R.Recipe = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeR{}
 		}
@@ -592,8 +592,8 @@ func (notionRecipeL) LoadNotionRecipeRecipe(ctx context.Context, e boil.ContextE
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.Recipe, foreign.ID) {
-				local.R.NotionRecipeRecipe = foreign
+			if queries.Equal(local.RecipeID, foreign.ID) {
+				local.R.Recipe = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeR{}
 				}
@@ -746,7 +746,7 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 	query := NewQuery(
 		qm.Select("\"meals\".id, \"meals\".name, \"meals\".notion_link, \"meals\".ate_at, \"a\".\"notion_recipe\""),
 		qm.From("\"meals\""),
-		qm.InnerJoin("\"notion_meal\" as \"a\" on \"meals\".\"id\" = \"a\".\"meal\""),
+		qm.InnerJoin("\"notion_meal\" as \"a\" on \"meals\".\"id\" = \"a\".\"meal_id\""),
 		qm.WhereIn("\"a\".\"notion_recipe\" in ?", args...),
 	)
 	if mods != nil {
@@ -819,10 +819,10 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 	return nil
 }
 
-// SetNotionRecipeRecipe of the notionRecipe to the related item.
-// Sets o.R.NotionRecipeRecipe to related.
+// SetRecipe of the notionRecipe to the related item.
+// Sets o.R.Recipe to related.
 // Adds o to related.R.NotionRecipes.
-func (o *NotionRecipe) SetNotionRecipeRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
+func (o *NotionRecipe) SetRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -832,7 +832,7 @@ func (o *NotionRecipe) SetNotionRecipeRecipe(ctx context.Context, exec boil.Cont
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"notion_recipe\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 		strmangle.WhereClause("\"", "\"", 2, notionRecipePrimaryKeyColumns),
 	)
 	values := []interface{}{related.ID, o.PageID}
@@ -846,13 +846,13 @@ func (o *NotionRecipe) SetNotionRecipeRecipe(ctx context.Context, exec boil.Cont
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.Recipe, related.ID)
+	queries.Assign(&o.RecipeID, related.ID)
 	if o.R == nil {
 		o.R = &notionRecipeR{
-			NotionRecipeRecipe: related,
+			Recipe: related,
 		}
 	} else {
-		o.R.NotionRecipeRecipe = related
+		o.R.Recipe = related
 	}
 
 	if related.R == nil {
@@ -866,26 +866,26 @@ func (o *NotionRecipe) SetNotionRecipeRecipe(ctx context.Context, exec boil.Cont
 	return nil
 }
 
-// RemoveNotionRecipeRecipe relationship.
-// Sets o.R.NotionRecipeRecipe to nil.
+// RemoveRecipe relationship.
+// Sets o.R.Recipe to nil.
 // Removes o from all passed in related items' relationships struct (Optional).
-func (o *NotionRecipe) RemoveNotionRecipeRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
+func (o *NotionRecipe) RemoveRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
 	var err error
 
-	queries.SetScanner(&o.Recipe, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("recipe")); err != nil {
+	queries.SetScanner(&o.RecipeID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("recipe_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
 	if o.R != nil {
-		o.R.NotionRecipeRecipe = nil
+		o.R.Recipe = nil
 	}
 	if related == nil || related.R == nil {
 		return nil
 	}
 
 	for i, ri := range related.R.NotionRecipes {
-		if queries.Equal(o.Recipe, ri.Recipe) {
+		if queries.Equal(o.RecipeID, ri.RecipeID) {
 			continue
 		}
 
@@ -967,7 +967,7 @@ func (o *NotionRecipe) AddMeals(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	for _, rel := range related {
-		query := "insert into \"notion_meal\" (\"notion_recipe\", \"meal\") values ($1, $2)"
+		query := "insert into \"notion_meal\" (\"notion_recipe\", \"meal_id\") values ($1, $2)"
 		values := []interface{}{o.PageID, rel.ID}
 
 		if boil.IsDebug(ctx) {
@@ -1036,7 +1036,7 @@ func (o *NotionRecipe) RemoveMeals(ctx context.Context, exec boil.ContextExecuto
 
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"notion_meal\" where \"notion_recipe\" = $1 and \"meal\" in (%s)",
+		"delete from \"notion_meal\" where \"notion_recipe\" = $1 and \"meal_id\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
 	values := []interface{}{o.PageID}

@@ -1,5 +1,5 @@
-import React from "react";
-import { Icon } from "react-feather";
+import React, { useState } from "react";
+import { Icon, MinusCircle, PlusCircle } from "react-feather";
 
 interface ButtonProps {
   // icons from https://feathericons.com/
@@ -72,6 +72,27 @@ export const Pill2: React.FC<{ color: "red" | "green" }> = ({
     {children}
   </span>
 );
+
+export const HideShow: React.FC = ({ children }) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div>
+      <ButtonGroup
+        // compact
+        buttons={[
+          {
+            onClick: () => {
+              setShow(!show);
+            },
+            text: `${show ? "hide" : "show"}`,
+            IconLeft: show ? MinusCircle : PlusCircle,
+          },
+        ]}
+      />
+      {show && children}
+    </div>
+  );
+};
 
 export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({
   x,

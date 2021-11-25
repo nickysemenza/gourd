@@ -22,11 +22,11 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) 
 	items := []Photo{}
 	for _, notionRecipe := range nr {
 		for _, notionImage := range notionRecipe.R.PageNotionImages {
-			url := a.ImageStore.GetImageURL(ctx, notionImage.Image)
+			url := a.ImageStore.GetImageURL(ctx, notionImage.ImageID)
 			items = append(items, Photo{
 				Id:       notionImage.BlockID,
 				Created:  notionImage.LastSeen,
-				BlurHash: &notionImage.R.NotionImageImage.BlurHash,
+				BlurHash: &notionImage.R.Image.BlurHash,
 				Width:    300,
 				Height:   400,
 				BaseUrl:  url,
@@ -70,16 +70,20 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 					Adjective: ingredient.Adjective.Ptr(),
 					// Instruction: ingredient.Instruction.String,
 				}
-				if ingredient.Ingredient.Valid {
+				if ingredient.IngredientID.Valid {
 					si.Kind = IngredientKindIngredient
 					var err error
-					si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.RecipeSectionIngredientIngredient)
+					si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient)
 					if err != nil {
 						return nil, err
 					}
 				} else {
 					si.Kind = IngredientKindRecipe
-					// si.Recipe = &recipeFromDB(ingredient.R.RecipeSectionIngredientRecipe).Detail
+					foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe)
+					if err != nil {
+						return nil, err
+					}
+					si.Recipe = &foo.Detail
 				}
 				s.Ingredients = append(s.Ingredients, si)
 			}
@@ -120,9 +124,13 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,
-			models.RecipeSectionIngredientRels.RecipeSectionIngredientIngredient,
-			// TODO
-			// models.RecipeSectionIngredientRels.RecipeSectionIngredientRecipe,
+			models.RecipeSectionIngredientRels.Ingredient,
+		)),
+		Load(Rels(models.RecipeRels.RecipeDetails,
+			models.RecipeDetailRels.RecipeSections,
+			models.RecipeSectionRels.SectionRecipeSectionIngredients,
+			models.RecipeSectionIngredientRels.Recipe,
+			models.RecipeRels.RecipeDetails,
 		)),
 		// has many sections, has many instructions
 		Load(Rels(models.RecipeRels.RecipeDetails,
@@ -131,7 +139,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 		// has images via notion recipe
 		Load(Rels(models.RecipeRels.NotionRecipes,
 			models.NotionRecipeRels.PageNotionImages,
-			models.NotionImageRels.NotionImageImage,
+			models.NotionImageRels.Image,
 		)),
 		OrderBy("recipes.created_at DESC"),
 		Limit(int(limit)),
@@ -160,7 +168,7 @@ func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo,
 			models.RecipeDetailRels.Recipe,
 			models.RecipeRels.NotionRecipes,
 			models.NotionRecipeRels.PageNotionImages,
-			models.NotionImageRels.NotionImageImage,
+			models.NotionImageRels.Image,
 		)),
 	).
 		One(ctx, a.db.DB())

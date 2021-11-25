@@ -24,62 +24,62 @@ import (
 
 // MealGphoto is an object representing the database table.
 type MealGphoto struct {
-	Meal            string      `boil:"meal" json:"meal" toml:"meal" yaml:"meal"`
-	GphotosID       string      `boil:"gphotos_id" json:"gphotos_id" toml:"gphotos_id" yaml:"gphotos_id"`
-	HighlightRecipe null.String `boil:"highlight_recipe" json:"highlight_recipe,omitempty" toml:"highlight_recipe" yaml:"highlight_recipe,omitempty"`
+	MealID            string      `boil:"meal_id" json:"meal_id" toml:"meal_id" yaml:"meal_id"`
+	GphotosID         string      `boil:"gphotos_id" json:"gphotos_id" toml:"gphotos_id" yaml:"gphotos_id"`
+	HighlightRecipeID null.String `boil:"highlight_recipe_id" json:"highlight_recipe_id,omitempty" toml:"highlight_recipe_id" yaml:"highlight_recipe_id,omitempty"`
 
 	R *mealGphotoR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L mealGphotoL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var MealGphotoColumns = struct {
-	Meal            string
-	GphotosID       string
-	HighlightRecipe string
+	MealID            string
+	GphotosID         string
+	HighlightRecipeID string
 }{
-	Meal:            "meal",
-	GphotosID:       "gphotos_id",
-	HighlightRecipe: "highlight_recipe",
+	MealID:            "meal_id",
+	GphotosID:         "gphotos_id",
+	HighlightRecipeID: "highlight_recipe_id",
 }
 
 var MealGphotoTableColumns = struct {
-	Meal            string
-	GphotosID       string
-	HighlightRecipe string
+	MealID            string
+	GphotosID         string
+	HighlightRecipeID string
 }{
-	Meal:            "meal_gphoto.meal",
-	GphotosID:       "meal_gphoto.gphotos_id",
-	HighlightRecipe: "meal_gphoto.highlight_recipe",
+	MealID:            "meal_gphoto.meal_id",
+	GphotosID:         "meal_gphoto.gphotos_id",
+	HighlightRecipeID: "meal_gphoto.highlight_recipe_id",
 }
 
 // Generated where
 
 var MealGphotoWhere = struct {
-	Meal            whereHelperstring
-	GphotosID       whereHelperstring
-	HighlightRecipe whereHelpernull_String
+	MealID            whereHelperstring
+	GphotosID         whereHelperstring
+	HighlightRecipeID whereHelpernull_String
 }{
-	Meal:            whereHelperstring{field: "\"meal_gphoto\".\"meal\""},
-	GphotosID:       whereHelperstring{field: "\"meal_gphoto\".\"gphotos_id\""},
-	HighlightRecipe: whereHelpernull_String{field: "\"meal_gphoto\".\"highlight_recipe\""},
+	MealID:            whereHelperstring{field: "\"meal_gphoto\".\"meal_id\""},
+	GphotosID:         whereHelperstring{field: "\"meal_gphoto\".\"gphotos_id\""},
+	HighlightRecipeID: whereHelpernull_String{field: "\"meal_gphoto\".\"highlight_recipe_id\""},
 }
 
 // MealGphotoRels is where relationship names are stored.
 var MealGphotoRels = struct {
-	Gphoto                string
-	HighlightRecipeRecipe string
-	MealGphotoMeal        string
+	Gphoto          string
+	HighlightRecipe string
+	Meal            string
 }{
-	Gphoto:                "Gphoto",
-	HighlightRecipeRecipe: "HighlightRecipeRecipe",
-	MealGphotoMeal:        "MealGphotoMeal",
+	Gphoto:          "Gphoto",
+	HighlightRecipe: "HighlightRecipe",
+	Meal:            "Meal",
 }
 
 // mealGphotoR is where relationships are stored.
 type mealGphotoR struct {
-	Gphoto                *GphotosPhoto `boil:"Gphoto" json:"Gphoto" toml:"Gphoto" yaml:"Gphoto"`
-	HighlightRecipeRecipe *Recipe       `boil:"HighlightRecipeRecipe" json:"HighlightRecipeRecipe" toml:"HighlightRecipeRecipe" yaml:"HighlightRecipeRecipe"`
-	MealGphotoMeal        *Meal         `boil:"MealGphotoMeal" json:"MealGphotoMeal" toml:"MealGphotoMeal" yaml:"MealGphotoMeal"`
+	Gphoto          *GphotosPhoto `boil:"Gphoto" json:"Gphoto" toml:"Gphoto" yaml:"Gphoto"`
+	HighlightRecipe *Recipe       `boil:"HighlightRecipe" json:"HighlightRecipe" toml:"HighlightRecipe" yaml:"HighlightRecipe"`
+	Meal            *Meal         `boil:"Meal" json:"Meal" toml:"Meal" yaml:"Meal"`
 }
 
 // NewStruct creates a new relationship struct
@@ -91,10 +91,10 @@ func (*mealGphotoR) NewStruct() *mealGphotoR {
 type mealGphotoL struct{}
 
 var (
-	mealGphotoAllColumns            = []string{"meal", "gphotos_id", "highlight_recipe"}
-	mealGphotoColumnsWithoutDefault = []string{"meal", "gphotos_id", "highlight_recipe"}
+	mealGphotoAllColumns            = []string{"meal_id", "gphotos_id", "highlight_recipe_id"}
+	mealGphotoColumnsWithoutDefault = []string{"meal_id", "gphotos_id", "highlight_recipe_id"}
 	mealGphotoColumnsWithDefault    = []string{}
-	mealGphotoPrimaryKeyColumns     = []string{"meal", "gphotos_id"}
+	mealGphotoPrimaryKeyColumns     = []string{"meal_id", "gphotos_id"}
 )
 
 type (
@@ -386,10 +386,10 @@ func (o *MealGphoto) Gphoto(mods ...qm.QueryMod) gphotosPhotoQuery {
 	return query
 }
 
-// HighlightRecipeRecipe pointed to by the foreign key.
-func (o *MealGphoto) HighlightRecipeRecipe(mods ...qm.QueryMod) recipeQuery {
+// HighlightRecipe pointed to by the foreign key.
+func (o *MealGphoto) HighlightRecipe(mods ...qm.QueryMod) recipeQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.HighlightRecipe),
+		qm.Where("\"id\" = ?", o.HighlightRecipeID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -400,10 +400,10 @@ func (o *MealGphoto) HighlightRecipeRecipe(mods ...qm.QueryMod) recipeQuery {
 	return query
 }
 
-// MealGphotoMeal pointed to by the foreign key.
-func (o *MealGphoto) MealGphotoMeal(mods ...qm.QueryMod) mealQuery {
+// Meal pointed to by the foreign key.
+func (o *MealGphoto) Meal(mods ...qm.QueryMod) mealQuery {
 	queryMods := []qm.QueryMod{
-		qm.Where("\"id\" = ?", o.Meal),
+		qm.Where("\"id\" = ?", o.MealID),
 	}
 
 	queryMods = append(queryMods, mods...)
@@ -518,9 +518,9 @@ func (mealGphotoL) LoadGphoto(ctx context.Context, e boil.ContextExecutor, singu
 	return nil
 }
 
-// LoadHighlightRecipeRecipe allows an eager lookup of values, cached into the
+// LoadHighlightRecipe allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMealGphoto interface{}, mods queries.Applicator) error {
+func (mealGphotoL) LoadHighlightRecipe(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMealGphoto interface{}, mods queries.Applicator) error {
 	var slice []*MealGphoto
 	var object *MealGphoto
 
@@ -535,8 +535,8 @@ func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.Context
 		if object.R == nil {
 			object.R = &mealGphotoR{}
 		}
-		if !queries.IsNil(object.HighlightRecipe) {
-			args = append(args, object.HighlightRecipe)
+		if !queries.IsNil(object.HighlightRecipeID) {
+			args = append(args, object.HighlightRecipeID)
 		}
 
 	} else {
@@ -547,13 +547,13 @@ func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.Context
 			}
 
 			for _, a := range args {
-				if queries.Equal(a, obj.HighlightRecipe) {
+				if queries.Equal(a, obj.HighlightRecipeID) {
 					continue Outer
 				}
 			}
 
-			if !queries.IsNil(obj.HighlightRecipe) {
-				args = append(args, obj.HighlightRecipe)
+			if !queries.IsNil(obj.HighlightRecipeID) {
+				args = append(args, obj.HighlightRecipeID)
 			}
 
 		}
@@ -602,7 +602,7 @@ func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.Context
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.HighlightRecipeRecipe = foreign
+		object.R.HighlightRecipe = foreign
 		if foreign.R == nil {
 			foreign.R = &recipeR{}
 		}
@@ -612,8 +612,8 @@ func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.Context
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.HighlightRecipe, foreign.ID) {
-				local.R.HighlightRecipeRecipe = foreign
+			if queries.Equal(local.HighlightRecipeID, foreign.ID) {
+				local.R.HighlightRecipe = foreign
 				if foreign.R == nil {
 					foreign.R = &recipeR{}
 				}
@@ -626,9 +626,9 @@ func (mealGphotoL) LoadHighlightRecipeRecipe(ctx context.Context, e boil.Context
 	return nil
 }
 
-// LoadMealGphotoMeal allows an eager lookup of values, cached into the
+// LoadMeal allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for an N-1 relationship.
-func (mealGphotoL) LoadMealGphotoMeal(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMealGphoto interface{}, mods queries.Applicator) error {
+func (mealGphotoL) LoadMeal(ctx context.Context, e boil.ContextExecutor, singular bool, maybeMealGphoto interface{}, mods queries.Applicator) error {
 	var slice []*MealGphoto
 	var object *MealGphoto
 
@@ -643,7 +643,7 @@ func (mealGphotoL) LoadMealGphotoMeal(ctx context.Context, e boil.ContextExecuto
 		if object.R == nil {
 			object.R = &mealGphotoR{}
 		}
-		args = append(args, object.Meal)
+		args = append(args, object.MealID)
 
 	} else {
 	Outer:
@@ -653,12 +653,12 @@ func (mealGphotoL) LoadMealGphotoMeal(ctx context.Context, e boil.ContextExecuto
 			}
 
 			for _, a := range args {
-				if a == obj.Meal {
+				if a == obj.MealID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.Meal)
+			args = append(args, obj.MealID)
 
 		}
 	}
@@ -706,7 +706,7 @@ func (mealGphotoL) LoadMealGphotoMeal(ctx context.Context, e boil.ContextExecuto
 
 	if singular {
 		foreign := resultSlice[0]
-		object.R.MealGphotoMeal = foreign
+		object.R.Meal = foreign
 		if foreign.R == nil {
 			foreign.R = &mealR{}
 		}
@@ -716,8 +716,8 @@ func (mealGphotoL) LoadMealGphotoMeal(ctx context.Context, e boil.ContextExecuto
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if local.Meal == foreign.ID {
-				local.R.MealGphotoMeal = foreign
+			if local.MealID == foreign.ID {
+				local.R.Meal = foreign
 				if foreign.R == nil {
 					foreign.R = &mealR{}
 				}
@@ -746,7 +746,7 @@ func (o *MealGphoto) SetGphoto(ctx context.Context, exec boil.ContextExecutor, i
 		strmangle.SetParamNames("\"", "\"", 1, []string{"gphotos_id"}),
 		strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.Meal, o.GphotosID}
+	values := []interface{}{related.ID, o.MealID, o.GphotosID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -777,10 +777,10 @@ func (o *MealGphoto) SetGphoto(ctx context.Context, exec boil.ContextExecutor, i
 	return nil
 }
 
-// SetHighlightRecipeRecipe of the mealGphoto to the related item.
-// Sets o.R.HighlightRecipeRecipe to related.
+// SetHighlightRecipe of the mealGphoto to the related item.
+// Sets o.R.HighlightRecipe to related.
 // Adds o to related.R.HighlightRecipeMealGphotos.
-func (o *MealGphoto) SetHighlightRecipeRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
+func (o *MealGphoto) SetHighlightRecipe(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Recipe) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -790,10 +790,10 @@ func (o *MealGphoto) SetHighlightRecipeRecipe(ctx context.Context, exec boil.Con
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"meal_gphoto\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"highlight_recipe"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"highlight_recipe_id"}),
 		strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.Meal, o.GphotosID}
+	values := []interface{}{related.ID, o.MealID, o.GphotosID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -804,13 +804,13 @@ func (o *MealGphoto) SetHighlightRecipeRecipe(ctx context.Context, exec boil.Con
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.HighlightRecipe, related.ID)
+	queries.Assign(&o.HighlightRecipeID, related.ID)
 	if o.R == nil {
 		o.R = &mealGphotoR{
-			HighlightRecipeRecipe: related,
+			HighlightRecipe: related,
 		}
 	} else {
-		o.R.HighlightRecipeRecipe = related
+		o.R.HighlightRecipe = related
 	}
 
 	if related.R == nil {
@@ -824,26 +824,26 @@ func (o *MealGphoto) SetHighlightRecipeRecipe(ctx context.Context, exec boil.Con
 	return nil
 }
 
-// RemoveHighlightRecipeRecipe relationship.
-// Sets o.R.HighlightRecipeRecipe to nil.
+// RemoveHighlightRecipe relationship.
+// Sets o.R.HighlightRecipe to nil.
 // Removes o from all passed in related items' relationships struct (Optional).
-func (o *MealGphoto) RemoveHighlightRecipeRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
+func (o *MealGphoto) RemoveHighlightRecipe(ctx context.Context, exec boil.ContextExecutor, related *Recipe) error {
 	var err error
 
-	queries.SetScanner(&o.HighlightRecipe, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("highlight_recipe")); err != nil {
+	queries.SetScanner(&o.HighlightRecipeID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("highlight_recipe_id")); err != nil {
 		return errors.Wrap(err, "failed to update local table")
 	}
 
 	if o.R != nil {
-		o.R.HighlightRecipeRecipe = nil
+		o.R.HighlightRecipe = nil
 	}
 	if related == nil || related.R == nil {
 		return nil
 	}
 
 	for i, ri := range related.R.HighlightRecipeMealGphotos {
-		if queries.Equal(o.HighlightRecipe, ri.HighlightRecipe) {
+		if queries.Equal(o.HighlightRecipeID, ri.HighlightRecipeID) {
 			continue
 		}
 
@@ -857,10 +857,10 @@ func (o *MealGphoto) RemoveHighlightRecipeRecipe(ctx context.Context, exec boil.
 	return nil
 }
 
-// SetMealGphotoMeal of the mealGphoto to the related item.
-// Sets o.R.MealGphotoMeal to related.
+// SetMeal of the mealGphoto to the related item.
+// Sets o.R.Meal to related.
 // Adds o to related.R.MealGphotos.
-func (o *MealGphoto) SetMealGphotoMeal(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Meal) error {
+func (o *MealGphoto) SetMeal(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Meal) error {
 	var err error
 	if insert {
 		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
@@ -870,10 +870,10 @@ func (o *MealGphoto) SetMealGphotoMeal(ctx context.Context, exec boil.ContextExe
 
 	updateQuery := fmt.Sprintf(
 		"UPDATE \"meal_gphoto\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"meal"}),
+		strmangle.SetParamNames("\"", "\"", 1, []string{"meal_id"}),
 		strmangle.WhereClause("\"", "\"", 2, mealGphotoPrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.Meal, o.GphotosID}
+	values := []interface{}{related.ID, o.MealID, o.GphotosID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -884,13 +884,13 @@ func (o *MealGphoto) SetMealGphotoMeal(ctx context.Context, exec boil.ContextExe
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	o.Meal = related.ID
+	o.MealID = related.ID
 	if o.R == nil {
 		o.R = &mealGphotoR{
-			MealGphotoMeal: related,
+			Meal: related,
 		}
 	} else {
-		o.R.MealGphotoMeal = related
+		o.R.Meal = related
 	}
 
 	if related.R == nil {
@@ -912,7 +912,7 @@ func MealGphotos(mods ...qm.QueryMod) mealGphotoQuery {
 
 // FindMealGphoto retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindMealGphoto(ctx context.Context, exec boil.ContextExecutor, meal string, gphotosID string, selectCols ...string) (*MealGphoto, error) {
+func FindMealGphoto(ctx context.Context, exec boil.ContextExecutor, mealID string, gphotosID string, selectCols ...string) (*MealGphoto, error) {
 	mealGphotoObj := &MealGphoto{}
 
 	sel := "*"
@@ -920,10 +920,10 @@ func FindMealGphoto(ctx context.Context, exec boil.ContextExecutor, meal string,
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"meal_gphoto\" where \"meal\"=$1 AND \"gphotos_id\"=$2", sel,
+		"select %s from \"meal_gphoto\" where \"meal_id\"=$1 AND \"gphotos_id\"=$2", sel,
 	)
 
-	q := queries.Raw(query, meal, gphotosID)
+	q := queries.Raw(query, mealID, gphotosID)
 
 	err := q.Bind(ctx, exec, mealGphotoObj)
 	if err != nil {
@@ -1274,7 +1274,7 @@ func (o *MealGphoto) Delete(ctx context.Context, exec boil.ContextExecutor) (int
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), mealGphotoPrimaryKeyMapping)
-	sql := "DELETE FROM \"meal_gphoto\" WHERE \"meal\"=$1 AND \"gphotos_id\"=$2"
+	sql := "DELETE FROM \"meal_gphoto\" WHERE \"meal_id\"=$1 AND \"gphotos_id\"=$2"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1371,7 +1371,7 @@ func (o MealGphotoSlice) DeleteAll(ctx context.Context, exec boil.ContextExecuto
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *MealGphoto) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindMealGphoto(ctx, exec, o.Meal, o.GphotosID)
+	ret, err := FindMealGphoto(ctx, exec, o.MealID, o.GphotosID)
 	if err != nil {
 		return err
 	}
@@ -1410,16 +1410,16 @@ func (o *MealGphotoSlice) ReloadAll(ctx context.Context, exec boil.ContextExecut
 }
 
 // MealGphotoExists checks if the MealGphoto row exists.
-func MealGphotoExists(ctx context.Context, exec boil.ContextExecutor, meal string, gphotosID string) (bool, error) {
+func MealGphotoExists(ctx context.Context, exec boil.ContextExecutor, mealID string, gphotosID string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"meal_gphoto\" where \"meal\"=$1 AND \"gphotos_id\"=$2 limit 1)"
+	sql := "select exists(select 1 from \"meal_gphoto\" where \"meal_id\"=$1 AND \"gphotos_id\"=$2 limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, meal, gphotosID)
+		fmt.Fprintln(writer, mealID, gphotosID)
 	}
-	row := exec.QueryRowContext(ctx, sql, meal, gphotosID)
+	row := exec.QueryRowContext(ctx, sql, mealID, gphotosID)
 
 	err := row.Scan(&exists)
 	if err != nil {
