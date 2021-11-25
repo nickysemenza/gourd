@@ -133,21 +133,6 @@ func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) getLinkedMeals(ctx context.Context, recipeID string) (items []Meal, err error) {
-	ctx, span := a.tracer.Start(ctx, "getLinkedMeals")
-	defer span.End()
-
-	meals, err := a.DB().GetMealsWithRecipe(ctx, recipeID)
-	if err != nil {
-		return
-	}
-	items, err = a.GetMealInfo(ctx, meals)
-	if err != nil {
-		return
-	}
-	return
-}
-
 func (a *API) GetMealById(c echo.Context, mealId string) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetMealById")
 	defer span.End()

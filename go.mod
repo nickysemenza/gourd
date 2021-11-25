@@ -117,7 +117,6 @@ require (
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
 	github.com/cockroachdb/cockroach-go/v2 v2.2.1 // indirect
-	github.com/creack/pty v1.1.17 // indirect
 	github.com/daixiang0/gci v0.2.9 // indirect
 	github.com/denis-tingajkin/go-header v0.4.2 // indirect
 	github.com/denisenkom/go-mssqldb v0.11.0 // indirect

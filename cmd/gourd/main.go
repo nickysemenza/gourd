@@ -18,12 +18,18 @@ func main() {
 	if err := setupMisc(); err != nil {
 		log.Fatal(err)
 	}
+	defer func() {
+		log.Info("cleaning up tracer")
+		err := otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
+		if err != nil {
+			log.Error(err)
+		}
+	}()
 	err := rootCmd.Execute()
-	log.Info("cleaning up tracer")
-	otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
+
 }
 
 // nolint:gochecknoglobals

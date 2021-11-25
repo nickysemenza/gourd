@@ -9,14 +9,14 @@ import (
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredient) (*IngredientDetail, error) {
+func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredient) *IngredientDetail {
 	if ingredient == nil {
-		return nil, nil
+		return nil
 	}
 	i := IngredientDetail{
 		Name: ingredient.Name,
 	}
-	return &i, nil
+	return &i
 }
 func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) []Photo {
 	items := []Photo{}
@@ -72,11 +72,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 				}
 				if ingredient.IngredientID.Valid {
 					si.Kind = IngredientKindIngredient
-					var err error
-					si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient)
-					if err != nil {
-						return nil, err
-					}
+					si.Ingredient = a.ingredientFromModel(ctx, ingredient.R.Ingredient)
 				} else {
 					si.Kind = IngredientKindRecipe
 					foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe)
@@ -191,7 +187,7 @@ func (a *API) Misc(c echo.Context) error {
 	items, err := a.Notion.PageById(ctx, "f6a5d0759d4a4becb95adf696b1cccb0")
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	// s := spew.Sdump(recipes)
 	// // s = strings.ReplaceAll(s, "\n", "<br/>")

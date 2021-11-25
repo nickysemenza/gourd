@@ -55,10 +55,10 @@ type NotionRecipe struct {
 	Children  []NotionRecipe `json:"children,omitempty"`
 }
 
+// nolint: exhaustive
 func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *NotionRecipe, err error) {
 	switch page.Object {
 	case "column_list", notionapi.ObjectTypePage:
-
 		var name string
 		var titlePropName string
 		switch page.Parent.Type {
@@ -67,6 +67,8 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		case "page_id":
 			// sub page
 			titlePropName = "title"
+		default:
+			return nil, fmt.Errorf("unknown parent type %s", page.Parent.Type)
 		}
 
 		nameProp, nameOk := page.Properties[titlePropName]
@@ -101,13 +103,10 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 
 		// on each page, get all the blocks that are images
 		return c.detailsFromPage(ctx, page.ID, meal)
-		// if err != nil {
-		// 	return nil, fmt.Errorf("failed to get images for page %s: %w", page.ID, err)
-		// }
-		// return &meal, err
 
+	default:
+		return nil, fmt.Errorf("unknown page type %s", page.Object)
 	}
-	return nil, nil
 }
 func (c *Client) PageById(ctx context.Context, id notionapi.PageID) (*NotionRecipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "PageById")
@@ -183,6 +182,7 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 		for _, block := range children.Results {
 			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
 			log.WithField("page_id", pageID).Infof("\tfound notion %s", block.GetType())
+			// nolint: exhaustive
 			switch block.GetType() {
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)
