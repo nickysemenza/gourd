@@ -66,8 +66,10 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 	for x, i := range ing {
 		// assemble
 
-		detail := a.makeDetail(ctx, i, parent, linkedRecipes)
-
+		detail, err := a.makeDetail(ctx, i, parent, linkedRecipes)
+		if err != nil {
+			return nil, err
+		}
 		unitMappings, err := a.DB().GetIngredientUnits(ctx, []string{i.Id, i.Parent.String})
 		if err != nil {
 			return nil, err
@@ -83,12 +85,12 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 		span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
 
 		if i.FdcID.Valid {
-			err := a.enhanceWithFDC(ctx, i.FdcID.Int64, &detail)
+			err := a.enhanceWithFDC(ctx, i.FdcID.Int64, detail)
 			if err != nil {
 				return nil, fmt.Errorf("enhanceWithFDC: %w", err)
 			}
 		}
-		items[x] = detail
+		items[x] = *detail
 	}
 
 	return items, nil
@@ -201,20 +203,28 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails) IngredientDetail {
+func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails) (*IngredientDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "makeDetail")
 	defer span.End()
 
 	// find linked ingredients
 	same := []IngredientDetail{}
 	for _, x := range parent.ByParent()[i.Id] {
-		same = append(same, a.makeDetail(ctx, x, parent, linkedRecipes))
+		d, err := a.makeDetail(ctx, x, parent, linkedRecipes)
+		if err != nil {
+			return nil, err
+		}
+		same = append(same, *d)
 	}
 
 	// find linked recipes
 	recipes := []RecipeDetail{}
 	for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
-		recipes = append(recipes, a.transformRecipe(ctx, x, false))
+		tr, err := a.transformRecipe(ctx, x, false)
+		if err != nil {
+			return nil, err
+		}
+		recipes = append(recipes, *tr)
 	}
 
 	detail := IngredientDetail{
@@ -224,7 +234,7 @@ func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredi
 		UnitMappings: []UnitMapping{},
 	}
 
-	return detail
+	return &detail, nil
 }
 
 func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) error {
@@ -235,8 +245,12 @@ func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) err
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
+	tr, err := a.transformRecipe(ctx, *detail, true)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
 
-	return c.JSON(http.StatusCreated, a.transformRecipe(ctx, *detail, true))
+	return c.JSON(http.StatusCreated, tr)
 }
 
 func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {

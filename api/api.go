@@ -56,12 +56,12 @@ func New(db *db.Client, g *google.Client, auth *auth.Auth, r *rs_client.Client, 
 	return &a
 }
 
-func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) RecipeDetail {
+func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) (*RecipeDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "transformRecipe")
 	defer span.End()
 	sections, err := a.transformRecipeSections(ctx, dbr.Sections)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	rd := RecipeDetail{
 		Id:              dbr.Id,
@@ -76,35 +76,47 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 	}
 	if dbr.Source.Valid {
 		if err := json.Unmarshal([]byte(dbr.Source.String), &rd.Sources); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 	if includeOtherVersions {
 		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe_id": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
-		details := a.transformRecipes(ctx, recipes, false)
+		details, err := a.transformRecipes(ctx, recipes, false)
+		if err != nil {
+			return nil, err
+		}
 		rd.OtherVersions = &details
 	}
 
-	return rd
+	return &rd, nil
 }
-func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) []RecipeDetail {
+func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) ([]RecipeDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "transformRecipes")
 	defer span.End()
 	r := make([]RecipeDetail, len(dbr))
 	for x, d := range dbr {
-		r[x] = a.transformRecipe(ctx, d, includeOtherVersions)
+		each, err := a.transformRecipe(ctx, d, includeOtherVersions)
+		if err != nil {
+			return nil, err
+		}
+		r[x] = *each
 	}
-	return r
+	return r, nil
 
 }
-func (a *API) transformRecipeFull(ctx context.Context, dbr *db.RecipeDetail) *RecipeWrapper {
+func (a *API) transformRecipeFull(ctx context.Context, dbr *db.RecipeDetail) (*RecipeWrapper, error) {
+	d, err := a.transformRecipe(ctx, *dbr, true)
+	if err != nil {
+		return nil, err
+	}
+
 	return &RecipeWrapper{
 		Id:     dbr.RecipeId,
-		Detail: a.transformRecipe(ctx, *dbr, true),
-	}
+		Detail: *d,
+	}, nil
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{
@@ -282,8 +294,11 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 
 			if i.RawRecipe != nil {
 				item.Kind = "recipe"
-				r := a.transformRecipe(ctx, *i.RawRecipe, false)
-				item.Recipe = &r
+				r, err := a.transformRecipe(ctx, *i.RawRecipe, false)
+				if err != nil {
+					return nil, err
+				}
+				item.Recipe = r
 			} else {
 				item.Kind = "ingredient"
 				foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})
@@ -422,7 +437,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
 
-	return a.transformRecipeFull(ctx, r2), nil
+	return a.transformRecipeFull(ctx, r2)
 }
 
 func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, error) {
@@ -433,7 +448,10 @@ func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, 
 	if r == nil {
 		return nil, fmt.Errorf("could not find recipe with detail %s", recipeId)
 	}
-	full := a.transformRecipeFull(ctx, r)
+	full, err := a.transformRecipeFull(ctx, r)
+	if err != nil {
+		return nil, err
+	}
 	p, err := a.imagesFromRecipeDetailId(ctx, recipeId)
 	if err != nil {
 		return nil, err
@@ -546,8 +564,11 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	var resIngredients []Ingredient
 
 	for _, x := range recipes {
-		r := a.transformRecipe(ctx, x, true)
-		resRecipes = append(resRecipes, RecipeWrapper{Detail: r, Id: x.RecipeId})
+		r, err := a.transformRecipe(ctx, x, true)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		resRecipes = append(resRecipes, RecipeWrapper{Detail: *r, Id: x.RecipeId})
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)
