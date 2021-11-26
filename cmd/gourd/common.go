@@ -97,14 +97,12 @@ func setupEnv() error {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
-	if err != nil {
-		var configErr *viper.ConfigFileNotFoundError
-		if errors.As(err, &configErr) {
-			return fmt.Errorf("Fatal error config file: %s \n", configErr)
-		}
-		return err
+	if errors.As(err, &viper.ConfigFileNotFoundError{}) {
+		log.Errorf("config file err: %s ", err)
+		return nil
 	}
-	return nil
+
+	return err
 
 }
 

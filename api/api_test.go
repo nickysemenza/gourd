@@ -18,6 +18,7 @@ import (
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 func makeAPI(t *testing.T) *API {
@@ -132,7 +133,7 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	ctx := context.Background()
 	r, err := apiManager.RecipeFromFile(ctx, "../testdata/dep_1.yaml")
 	require.NoError(err)
-	err = apiManager.CreateRecipeDetails(ctx, r...)
+	_, err = apiManager.CreateRecipeDetails(ctx, r...)
 	require.NoError(err)
 }
 
@@ -143,7 +144,7 @@ func TestSearches(t *testing.T) {
 
 	rName := fmt.Sprintf("recipe-%s", common.ID(""))
 	iName := fmt.Sprintf("ing-%s", common.ID(""))
-	err := api.CreateRecipeDetails(ctx, RecipeDetailInput{
+	_, err := api.CreateRecipeDetails(ctx, RecipeDetailInput{
 		Name:     rName,
 		Sections: []RecipeSectionInput{{Ingredients: []SectionIngredientInput{{Kind: "ingredient", Name: &iName}}}},
 	})
@@ -208,5 +209,32 @@ func TestSync(t *testing.T) {
 	require.Len(res.Detail.Sections, 1)
 	require.Equal("bread", res.Detail.Sections[0].Ingredients[0].Ingredient.Ingredient.Name)
 	require.Equal("eat", res.Detail.Sections[0].Instructions[0].Instruction)
+}
+
+func TestInferredUnits(t *testing.T) {
+	require := require.New(t)
+	_, apiManager := makeHandler(t)
+	ctx := context.Background()
+
+	mappings, err := IngredientMappingFromFile(ctx, "../testdata/ingredient_fdc_mapping.yaml")
+	require.NoError(err)
+	err = apiManager.LoadIngredientMappings(ctx, mappings)
+	require.NoError(err)
+
+	r, err := apiManager.RecipeFromFile(ctx, "../testdata/plurals.txt")
+	require.NoError(err)
+
+	ids, err := apiManager.CreateRecipeDetails(ctx, r...)
+	require.NoError(err)
+	require.Len(ids, 1)
+	rd := ids[0]
+
+	res, err := apiManager.recipeById(ctx, rd)
+	require.NoError(err)
+
+	// assert that gram infer is correct
+	require.Contains(res.Detail.Sections[1].Ingredients[0].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52})
+	require.Contains(res.Detail.Sections[1].Ingredients[1].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 2})
+	require.Contains(res.Detail.Sections[1].Ingredients[2].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 3})
 
 }

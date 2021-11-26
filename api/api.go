@@ -414,14 +414,15 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
-func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetailInput) error {
+func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetailInput) (detailIDs []string, err error) {
 	for _, r := range recipes {
-		_, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
+		d, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
 		if err != nil {
-			return err
+			return nil, err
 		}
+		detailIDs = append(detailIDs, d.Detail.Id)
 	}
-	return nil
+	return
 }
 func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "CreateRecipe")

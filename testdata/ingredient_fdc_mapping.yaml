@@ -90,6 +90,13 @@
         unit: whole
         value: 1
       source: wf
+    - a:
+        unit: large
+        value: 1
+      b:
+        unit: grams
+        value: 52
+      source: misc
 - name: all purpose flour
   fdc_id: 804415
   aliases: ["flour", "all-purpose flour", "AP flour"]
