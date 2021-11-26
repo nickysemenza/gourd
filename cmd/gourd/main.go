@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/api"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -67,11 +66,12 @@ func init() {
 				if err != nil {
 					return err
 				}
-				res, err := s.APIManager.Notion.GetAll(context.Background())
+				// res, err := s.APIManager.Notion.GetAll(context.Background())
+				err = s.APIManager.Latex(context.Background())
 				if err != nil {
 					return err
 				}
-				spew.Dump(res)
+				// spew.Dump(res)
 				return nil
 			},
 		},

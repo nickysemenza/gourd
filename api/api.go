@@ -8,8 +8,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"net/http"
+	"os"
+	"strings"
+	"text/template"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
@@ -612,4 +616,96 @@ func (a *API) NotionTest(c echo.Context) error {
 		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusOK, res)
+}
+
+func (a *API) Latex(ctx context.Context) error {
+	apiR, err := a.recipeById(ctx, "rd_a64f96ff")
+	if err != nil {
+		return err
+	}
+
+	u := func(si []Amount) string {
+
+		if len(si) == 0 {
+			return ""
+		}
+		return si[0].Unit
+
+	}
+	aa := func(si []Amount) string {
+		if len(si) == 0 {
+			return ""
+		}
+		return fmt.Sprintf("%.2f", si[0].Value)
+
+	}
+
+	const templateText = `
+	\documentclass{article}
+	\usepackage{multirow}
+	\usepackage{booktabs}
+	\usepackage{graphicx}
+	\begin{document}
+\begin{table}[]
+\begin{tabular}{|l|rlll|l|}
+\hline
+\multirow{2}{*}{section} & \multicolumn{4}{c|}{ingredient}                                                                        & \multirow{2}{*}{instruction} \\ \cline{2-5}
+							& \multicolumn{1}{l|}{amout} & \multicolumn{1}{l|}{unit}  & \multicolumn{1}{l|}{name}  & adj             &                              \\ \hline
+{{range $i, $s := .Detail.Sections}}
+{{range $j, $ing := $s.Ingredients}}
+{{if eq $j 0 -}}
+\multirow{ {{$s.Ingredients | len}} }{*}{A}
+{{end}}
+& \multicolumn{1}{r|}{ {{$ing.Amounts| a }} }     & \multicolumn{1}{l|}{ {{$ing.Amounts| u }} }   & \multicolumn{1}{l|}{ {{$ing.Ingredient.Ingredient.Name}} }   &                 
+{{if eq $j 0 -}}
+& \multirow{ {{$s.Ingredients | len}} }{*}{\parbox[t]{10cm}{ {{ $s.Instructions | foo }} }}           \\ 
+{{else -}}
+& \\ 
+{{end}}
+
+{{ $length := len $s.Ingredients }} {{if (isLast $j $length)}}
+\hline
+{{else -}}
+\cline{2-5}
+{{end}}
+
+{{end}}
+{{end}}
+\end{tabular}
+\end{table}
+\end{document}
+`
+
+	foo := func(si []SectionInstruction) string {
+		i := []string{}
+		for _, x := range si {
+			i = append(i, x.Instruction)
+		}
+		return strings.Join(i, `\\ `)
+
+	}
+
+	funcMap := template.FuncMap{
+
+		"foo": foo,
+		"u":   u,
+		"a":   aa,
+		"isLast": func(index int, len int) bool {
+			return index+1 == len
+		},
+	}
+
+	// Create a template, add the function map, and parse the text.
+	tmpl, err := template.New("titleTest").Funcs(funcMap).Parse(templateText)
+	if err != nil {
+		log.Fatalf("parsing: %s", err)
+	}
+
+	// Run the template to verify the output.
+	err = tmpl.Execute(os.Stdout, apiR)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
