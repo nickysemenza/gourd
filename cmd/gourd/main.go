@@ -67,7 +67,8 @@ func init() {
 					return err
 				}
 				// res, err := s.APIManager.Notion.GetAll(context.Background())
-				err = s.APIManager.Latex(context.Background())
+				id := "rd_4b85d29a"
+				_, err = s.APIManager.Latex(context.Background(), id)
 				if err != nil {
 					return err
 				}

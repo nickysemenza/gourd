@@ -1182,6 +1182,55 @@ export const useCreateRecipes = (props: UseCreateRecipesProps) =>
     props
   );
 
+export interface GetLatexByRecipeIdPathParams {
+  /**
+   * The id of the recipe to retrieve
+   */
+  recipe_id: string;
+}
+
+export type GetLatexByRecipeIdProps = Omit<
+  GetProps<void, Error, void, GetLatexByRecipeIdPathParams>,
+  "path"
+> &
+  GetLatexByRecipeIdPathParams;
+
+/**
+ * recipe as latex
+ *
+ * todo
+ */
+export const GetLatexByRecipeId = ({
+  recipe_id,
+  ...props
+}: GetLatexByRecipeIdProps) => (
+  <Get<void, Error, void, GetLatexByRecipeIdPathParams>
+    path={`/recipes/${recipe_id}/latex`}
+    {...props}
+  />
+);
+
+export type UseGetLatexByRecipeIdProps = Omit<
+  UseGetProps<void, Error, void, GetLatexByRecipeIdPathParams>,
+  "path"
+> &
+  GetLatexByRecipeIdPathParams;
+
+/**
+ * recipe as latex
+ *
+ * todo
+ */
+export const useGetLatexByRecipeId = ({
+  recipe_id,
+  ...props
+}: UseGetLatexByRecipeIdProps) =>
+  useGet<void, Error, void, GetLatexByRecipeIdPathParams>(
+    (paramsInPath: GetLatexByRecipeIdPathParams) =>
+      `/recipes/${paramsInPath.recipe_id}/latex`,
+    { pathParams: { recipe_id }, ...props }
+  );
+
 export interface GetRecipeByIdPathParams {
   /**
    * The id of the recipe to retrieve

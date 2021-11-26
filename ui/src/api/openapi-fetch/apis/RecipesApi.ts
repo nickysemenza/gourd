@@ -43,6 +43,10 @@ export interface RecipesApiCreateRecipesRequest {
     recipeWrapperInput: RecipeWrapperInput;
 }
 
+export interface RecipesApiGetLatexByRecipeIdRequest {
+    recipeId: string;
+}
+
 export interface RecipesApiGetRecipeByIdRequest {
     recipeId: string;
 }
@@ -147,6 +151,46 @@ export class RecipesApi extends runtime.BaseAPI {
      */
     async createRecipes(requestParameters: RecipesApiCreateRecipesRequest): Promise<RecipeWrapper> {
         const response = await this.createRecipesRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * recipe as latex
+     */
+    async getLatexByRecipeIdRaw(requestParameters: RecipesApiGetLatexByRecipeIdRequest): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
+            throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getLatexByRecipeId.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/recipes/{recipe_id}/latex`.replace(`{${"recipe_id"}}`, encodeURIComponent(String(requestParameters.recipeId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * todo
+     * recipe as latex
+     */
+    async getLatexByRecipeId(requestParameters: RecipesApiGetLatexByRecipeIdRequest): Promise<Blob> {
+        const response = await this.getLatexByRecipeIdRaw(requestParameters);
         return await response.value();
     }
 

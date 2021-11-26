@@ -10,3 +10,7 @@ coverage:
     patch:
       default:
         informational: true
+ignore:
+  - "ui/src/api/"
+  - "rust/openapi/"
+  - "models"

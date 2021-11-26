@@ -42,7 +42,7 @@ import {
   SectionInstructionInput,
   SectionIngredientInput,
 } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
+import { getAPIURL, getOpenapiFetchConfig } from "../config";
 import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
 import ProgressiveImage from "../components/ProgressiveImage";
@@ -538,6 +538,11 @@ const RecipeDetail: React.FC = () => {
         </ul>
         {/* <Debug data={recipe.detail.other_versions} /> */}
       </div>
+      <iframe
+        src={`${getAPIURL()}/recipes/${recipe.detail.id}/latex`}
+        width="100%"
+        height="500px"
+      ></iframe>
     </div>
   );
 };

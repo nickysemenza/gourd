@@ -332,6 +332,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /recipes/{recipe_id}/latex:
+    get:
+      summary: recipe as latex
+      description: todo
+      operationId: get_latex_by_recipe_id
+      tags:
+        - recipes
+      parameters:
+        - name: recipe_id
+          in: path
+          required: true
+          description: The id of the recipe to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /recipes/{recipe_id}:
     get:
       summary: Info for a specific recipe
