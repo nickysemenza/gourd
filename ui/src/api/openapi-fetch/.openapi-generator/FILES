@@ -11,6 +11,7 @@ index.ts
 models/Amount.ts
 models/AuthResp.ts
 models/BrandedFood.ts
+models/EntitySummary.ts
 models/Food.ts
 models/FoodCategory.ts
 models/FoodDataType.ts
@@ -21,9 +22,12 @@ models/GooglePhotosAlbum.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
 models/IngredientKind.ts
+models/IngredientUsage.ts
 models/InlineObject.ts
+models/InlineObject1.ts
 models/InlineResponse200.ts
 models/InlineResponse2001.ts
+models/InlineResponse2002.ts
 models/Items.ts
 models/Meal.ts
 models/MealRecipe.ts
@@ -52,5 +56,6 @@ models/SectionInstructionInput.ts
 models/TimeRange.ts
 models/UnitConversionRequest.ts
 models/UnitMapping.ts
+models/UsageValue.ts
 models/index.ts
 runtime.ts

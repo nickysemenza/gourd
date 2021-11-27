@@ -209,6 +209,25 @@ func TestSync(t *testing.T) {
 	require.Len(res.Detail.Sections, 1)
 	require.Equal("bread", res.Detail.Sections[0].Ingredients[0].Ingredient.Ingredient.Name)
 	require.Equal("eat", res.Detail.Sections[0].Instructions[0].Instruction)
+
+	meals, err := apiManager.listMeals(ctx)
+	require.NoError(err)
+	require.Len(meals, 1)
+
+	l, err := apiManager.Latex(ctx, rd)
+	require.NoError(err)
+	require.Greater(len(l), 10000)
+
+}
+
+func mustSeedMappings(t *testing.T, apiManager *API) {
+	t.Helper()
+	require := require.New(t)
+	ctx := context.TODO()
+	mappings, err := IngredientMappingFromFile(ctx, "../testdata/ingredient_fdc_mapping.yaml")
+	require.NoError(err)
+	err = apiManager.LoadIngredientMappings(ctx, mappings)
+	require.NoError(err)
 }
 
 func TestInferredUnits(t *testing.T) {
@@ -216,10 +235,7 @@ func TestInferredUnits(t *testing.T) {
 	_, apiManager := makeHandler(t)
 	ctx := context.Background()
 
-	mappings, err := IngredientMappingFromFile(ctx, "../testdata/ingredient_fdc_mapping.yaml")
-	require.NoError(err)
-	err = apiManager.LoadIngredientMappings(ctx, mappings)
-	require.NoError(err)
+	mustSeedMappings(t, apiManager)
 
 	r, err := apiManager.RecipeFromFile(ctx, "../testdata/plurals.txt")
 	require.NoError(err)

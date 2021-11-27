@@ -71,6 +71,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 				si := SectionIngredient{
 					Id:        ingredient.ID,
 					Adjective: ingredient.Adjective.Ptr(),
+					Amounts:   []Amount{},
 				}
 				if ingredient.IngredientID.Valid {
 					si.Kind = IngredientKindIngredient
@@ -200,7 +201,7 @@ func (a *API) Misc(c echo.Context) error {
 
 	// items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
 	// items, err := a.Notion.PageById(ctx, "f6a5d0759d4a4becb95adf696b1cccb0")
-	items, err := a.IngredientUsage(ctx, []bar{{RecipeId: "rd_2dfbb24c"}})
+	items, err := a.IngredientUsage(ctx, []EntitySummary{{Id: "rd_2dfbb24c", Kind: IngredientKindRecipe}})
 
 	if err != nil {
 		return handleErr(c, err)

@@ -694,6 +694,52 @@ export interface RecipeDependency {
   ingredient_kind: IngredientKind;
 }
 
+/**
+ * name and id of something
+ */
+export interface EntitySummary {
+  /**
+   * recipe_detail or ingredient id
+   */
+  id: string;
+  /**
+   * recipe or ingredient name
+   */
+  name: string;
+  /**
+   * multiplier
+   */
+  multiplier: number;
+  kind: IngredientKind;
+}
+
+export interface IngredientUsage {
+  /**
+   * multiplier
+   */
+  multiplier: number;
+  /**
+   * multiple amounts to try
+   */
+  amounts: Amount[];
+  /**
+   * mappings of equivalent units
+   */
+  required_by: EntitySummary[];
+}
+
+export interface UsageValue {
+  /**
+   * multiplier
+   */
+  ings: IngredientUsage[];
+  /**
+   * amounts
+   */
+  sum: Amount[];
+  ing: EntitySummary;
+}
+
 export interface UnitConversionRequest {
   target?: "weight" | "volume" | "money" | "calories" | "other";
   /**
@@ -1319,6 +1365,49 @@ export type UseGetRecipesByIdsProps = Omit<
 export const useGetRecipesByIds = (props: UseGetRecipesByIdsProps) =>
   useGet<PaginatedRecipeWrappers, unknown, GetRecipesByIdsQueryParams, void>(
     `/recipes/bulk`,
+    props
+  );
+
+export interface SumRecipesResponse {
+  sums: UsageValue[];
+}
+
+export interface SumRecipesRequestBody {
+  inputs: EntitySummary[];
+}
+
+export type SumRecipesProps = Omit<
+  MutateProps<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>,
+  "path" | "verb"
+>;
+
+/**
+ * sum up recipes
+ *
+ * todo
+ */
+export const SumRecipes = (props: SumRecipesProps) => (
+  <Mutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>
+    verb="POST"
+    path={`/recipes/sum`}
+    {...props}
+  />
+);
+
+export type UseSumRecipesProps = Omit<
+  UseMutateProps<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>,
+  "path" | "verb"
+>;
+
+/**
+ * sum up recipes
+ *
+ * todo
+ */
+export const useSumRecipes = (props: UseSumRecipesProps) =>
+  useMutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>(
+    "POST",
+    `/recipes/sum`,
     props
   );
 

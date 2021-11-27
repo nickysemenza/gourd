@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ory/viper"
 )
 
 func (a *API) GetLatexByRecipeId(c echo.Context, recipeId string) error {
@@ -93,22 +94,22 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 \multirow{2}{*}{section} & \multicolumn{5}{c|}{ingredient}  & \multirow{2}{*}{instruction} \\ \cline{2-6}
 							& \multicolumn{1}{l|}{amount} & \multicolumn{1}{l|}{unit}  & \multicolumn{1}{l|}{grams}  & \multicolumn{1}{l|}{name}  & adj             &                              \\ \hline
 {{range $i, $s := .Detail.Sections}}
-{{range $j, $ing := $s.Ingredients}}
-{{if eq $j 0 -}}
-\multirow{ {{$s.Ingredients | len}} }{*}{A}
-{{end -}}
-& \multicolumn{1}{r|}{ {{$ing.Amounts| a }} }     & \multicolumn{1}{l|}{ {{$ing.Amounts| u }} } & \multicolumn{1}{l|}{ {{$ing.Amounts| g }} }   & \multicolumn{1}{l|}{ {{$ing | n}} }   &      \multicolumn{1}{l|}{ {{$ing | adj}} }           
-{{if eq $j 0 -}}
-& \multirow{ {{$s.Ingredients | len}} }{*}{\parbox[t]{10cm}{ {{ $s.Instructions | foo }} }}           \\ 
-{{else -}}
-& \\ 
-{{end -}}
-{{ $length := len $s.Ingredients }} {{if (isLast $j $length)}}
-\hline
-{{else -}}
-\cline{2-6}
-{{end -}}
-{{end -}}
+	{{range $j, $ing := $s.Ingredients}}
+		{{if eq $j 0 -}}
+			\multirow{ {{$s.Ingredients | len}} }{*}{A}
+			{{end -}}
+			& \multicolumn{1}{r|}{ {{$ing.Amounts| a }} }     & \multicolumn{1}{l|}{ {{$ing.Amounts| u }} } & \multicolumn{1}{l|}{ {{$ing.Amounts| g }} }   & \multicolumn{1}{l|}{ {{$ing | n}} }   &      \multicolumn{1}{l|}{ {{$ing | adj}} }           
+			{{if eq $j 0 -}}
+				& \multirow{ {{$s.Ingredients | len}} }{*}{\parbox[t]{10cm}{ {{ $s.Instructions | foo }} }}           \\ 
+			{{else -}}
+				& \\ 
+			{{end -}}
+			{{ $length := len $s.Ingredients }} {{if (isLast $j $length)}}
+			\hline
+		{{else -}}
+			\cline{2-6}
+		{{end -}}
+	{{end -}}
 {{end -}}
 \end{tabular}%
 }
@@ -163,13 +164,16 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	}
 	log.Println(dir)
 
-	cmd := exec.Command("pdflatex", "-jobname=gourd", "-output-directory", dir, file.Name())
+	viper.SetDefault("PDFLATEX_BINARY", "pdflatex")
+	viper.AutomaticEnv()
+	binary := viper.GetString("PDFLATEX_BINARY")
+	cmd := exec.Command(binary, "-jobname=gourd", "-output-directory", dir, file.Name())
 	cmd.Dir = dir
 	// cmd.Stdin = strings.NewReader(document)
 
 	err = cmd.Start()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error running %s: %w", binary, err)
 	}
 	err = cmd.Wait()
 	if err != nil {

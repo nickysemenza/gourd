@@ -114,6 +114,19 @@ type BrandedFood struct {
 	ServingSizeUnit     string  `json:"serving_size_unit"`
 }
 
+// name and id of something
+type EntitySummary struct {
+	// recipe_detail or ingredient id
+	Id   string         `json:"id"`
+	Kind IngredientKind `json:"kind"`
+
+	// multiplier
+	Multiplier float64 `json:"multiplier"`
+
+	// recipe or ingredient name
+	Name string `json:"name"`
+}
+
 // A generic error message
 type Error struct {
 	Message string `json:"message"`
@@ -230,6 +243,18 @@ type IngredientDetail struct {
 
 // IngredientKind defines model for IngredientKind.
 type IngredientKind string
+
+// IngredientUsage defines model for IngredientUsage.
+type IngredientUsage struct {
+	// multiple amounts to try
+	Amounts []Amount `json:"amounts"`
+
+	// multiplier
+	Multiplier float64 `json:"multiplier"`
+
+	// mappings of equivalent units
+	RequiredBy []EntitySummary `json:"required_by"`
+}
 
 // A generic list (for pagination use)
 type Items struct {
@@ -611,6 +636,18 @@ type UnitMapping struct {
 	Source *string `json:"source,omitempty"`
 }
 
+// UsageValue defines model for UsageValue.
+type UsageValue struct {
+	// name and id of something
+	Ing EntitySummary `json:"ing"`
+
+	// multiplier
+	Ings []IngredientUsage `json:"ings"`
+
+	// amounts
+	Sum []Amount `json:"sum"`
+}
+
 // LimitParam defines model for limitParam.
 type LimitParam int
 
@@ -712,6 +749,11 @@ type GetRecipesByIdsParams struct {
 	RecipeId []string `json:"recipe_id"`
 }
 
+// SumRecipesJSONBody defines parameters for SumRecipes.
+type SumRecipesJSONBody struct {
+	Inputs []EntitySummary `json:"inputs"`
+}
+
 // SearchParams defines parameters for Search.
 type SearchParams struct {
 	// The number of items to skip before starting to collect the result set.
@@ -735,3 +777,6 @@ type UpdateRecipesForMealJSONRequestBody UpdateRecipesForMealJSONBody
 
 // CreateRecipesJSONRequestBody defines body for CreateRecipes for application/json ContentType.
 type CreateRecipesJSONRequestBody CreateRecipesJSONBody
+
+// SumRecipesJSONRequestBody defines body for SumRecipes for application/json ContentType.
+type SumRecipesJSONRequestBody SumRecipesJSONBody

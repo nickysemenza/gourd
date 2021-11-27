@@ -36,7 +36,8 @@
     "editor.formatOnSave": true,
     "go.buildFlags": ["-tags", "integration"],
     "go.testEnvVars": {
-      "MIGRATIONS_DIR": "file://${workspaceFolder}/db/migrations"
+      "MIGRATIONS_DIR": "file://${workspaceFolder}/db/migrations",
+      "PDFLATEX_BINARY": "/Library/TeX/texbin/pdflatex"
       // "MIGRATIONS_DIR": "file://..//db/migrations"
     },
     "typescript.tsdk": "ui/node_modules/typescript/lib",

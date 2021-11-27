@@ -31,6 +31,7 @@ Class | Method | HTTP request | Description
  - [Amount](docs/Amount.md)
  - [AuthResp](docs/AuthResp.md)
  - [BrandedFood](docs/BrandedFood.md)
+ - [EntitySummary](docs/EntitySummary.md)
  - [Error](docs/Error.md)
  - [Food](docs/Food.md)
  - [FoodCategory](docs/FoodCategory.md)
@@ -42,9 +43,12 @@ Class | Method | HTTP request | Description
  - [Ingredient](docs/Ingredient.md)
  - [IngredientDetail](docs/IngredientDetail.md)
  - [IngredientKind](docs/IngredientKind.md)
+ - [IngredientUsage](docs/IngredientUsage.md)
  - [InlineObject](docs/InlineObject.md)
+ - [InlineObject1](docs/InlineObject1.md)
  - [InlineResponse200](docs/InlineResponse200.md)
  - [InlineResponse2001](docs/InlineResponse2001.md)
+ - [InlineResponse2002](docs/InlineResponse2002.md)
  - [Items](docs/Items.md)
  - [Meal](docs/Meal.md)
  - [MealRecipe](docs/MealRecipe.md)
@@ -72,6 +76,7 @@ Class | Method | HTTP request | Description
  - [TimeRange](docs/TimeRange.md)
  - [UnitConversionRequest](docs/UnitConversionRequest.md)
  - [UnitMapping](docs/UnitMapping.md)
+ - [UsageValue](docs/UsageValue.md)
 
 
 To get access to the crate's generated documentation, use:

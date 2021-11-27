@@ -368,7 +368,6 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         )}
       </TableCell>
       <TableCell>
-        {/* <ol className="list-decimal list-inside"> */}
         {section.instructions.map((instruction, y) => (
           <div key={y} className="flex font-serif">
             <div className="mr-4 w-4">

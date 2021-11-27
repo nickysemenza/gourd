@@ -410,6 +410,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedRecipeWrappers"
+  /recipes/sum:
+    post:
+      summary: sum up recipes
+      description: todo
+      operationId: sum_recipes
+      tags:
+        - recipes
+      requestBody:
+        description: sum stuff
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+              properties:
+                inputs:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/EntitySummary"
+      responses:
+        "200":
+          description: Newly converted recipe
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sums
+                properties:
+                  sums:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UsageValue"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
       summary: Converts an ingredient to a recipe, updating all recipes depending on it
@@ -1436,6 +1477,69 @@ components:
         ingredient_kind:
           description: what kind of ingredient
           $ref: "#/components/schemas/IngredientKind"
+    EntitySummary:
+      description: name and id of something
+      type: object
+      required:
+        - id
+        - name
+        - multiplier
+        - kind
+      properties:
+        id:
+          description: recipe_detail or ingredient id
+          type: string
+        name:
+          description: recipe or ingredient name
+          type: string
+        multiplier:
+          description: multiplier
+          type: number
+          format: double # float64
+        kind:
+          description: what kind of entity
+          $ref: "#/components/schemas/IngredientKind"
+    IngredientUsage:
+      type: object
+      required:
+        - amounts
+        - required_by
+        - multiplier
+      properties:
+        multiplier:
+          description: multiplier
+          type: number
+          format: double # float64
+        amounts:
+          description: multiple amounts to try
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        required_by:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/EntitySummary"
+    UsageValue:
+      type: object
+      required:
+        - ings
+        - sum
+        - ing
+      properties:
+        ings:
+          description: multiplier
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientUsage"
+        sum:
+          description: amounts
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        ing:
+          description: detail about it
+          $ref: "#/components/schemas/EntitySummary"
     UnitConversionRequest:
       type: object
       required:

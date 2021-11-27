@@ -21,7 +21,8 @@ func TestUsage(t *testing.T) {
 name: a
 ---
 1 tsp b
-1 gram b`)
+1 gram b
+1 tsp c`)
 	require.NoError(err)
 	r2, err := apiManager.RecipeFromText(ctx, `
 name: pep
@@ -41,7 +42,7 @@ name: pep
 	}}}})
 	require.NoError(err)
 
-	res, err := apiManager.IngredientUsage(ctx, []bar{{RecipeId: rd, Multiplier: 2}})
+	res, err := apiManager.IngredientUsage(ctx, []EntitySummary{{Id: rd, Multiplier: 2, Kind: IngredientKindRecipe}})
 	require.NoError(err)
 	spew.Dump(res)
 
@@ -50,6 +51,6 @@ name: pep
 	id := IngredientID(ing.Id)
 	require.Len(res[id].Sum, 1)
 	require.Equal(4.0, res[id].Sum[0].Value)
-	require.Equal("b", res[id].Name)
-	require.Equal(id, res[id].IngredientID)
+	require.Equal("b", res[id].Ing.Name)
+	require.Equal(string(id), res[id].Ing.Id)
 }

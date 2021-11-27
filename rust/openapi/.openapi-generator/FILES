@@ -9,6 +9,7 @@ src/lib.rs
 src/models/amount.rs
 src/models/auth_resp.rs
 src/models/branded_food.rs
+src/models/entity_summary.rs
 src/models/error.rs
 src/models/food.rs
 src/models/food_category.rs
@@ -20,9 +21,12 @@ src/models/google_photos_album.rs
 src/models/ingredient.rs
 src/models/ingredient_detail.rs
 src/models/ingredient_kind.rs
+src/models/ingredient_usage.rs
 src/models/inline_object.rs
+src/models/inline_object_1.rs
 src/models/inline_response_200.rs
 src/models/inline_response_200_1.rs
+src/models/inline_response_200_2.rs
 src/models/items.rs
 src/models/meal.rs
 src/models/meal_recipe.rs
@@ -51,3 +55,4 @@ src/models/section_instruction_input.rs
 src/models/time_range.rs
 src/models/unit_conversion_request.rs
 src/models/unit_mapping.rs
+src/models/usage_value.rs

@@ -12,15 +12,16 @@
 
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineObject {
-    #[serde(rename = "inputs")]
-    pub inputs: Vec<crate::models::EntitySummary>,
+pub struct InlineResponse2002 {
+    /// all
+    #[serde(rename = "items", skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<crate::models::RecipeDependency>>,
 }
 
-impl InlineObject {
-    pub fn new(inputs: Vec<crate::models::EntitySummary>) -> InlineObject {
-        InlineObject {
-            inputs,
+impl InlineResponse2002 {
+    pub fn new() -> InlineResponse2002 {
+        InlineResponse2002 {
+            items: None,
         }
     }
 }

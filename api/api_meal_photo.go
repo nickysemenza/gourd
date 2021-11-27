@@ -52,7 +52,7 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	ctx := c.Request().Context()
 	photos, err := a.DB().GetPhotos(ctx)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	items := a.googlePhotosFromDBPhoto(ctx, photos)
 
@@ -114,19 +114,28 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 	}
 	return items, nil
 }
-func (a *API) ListMeals(c echo.Context, params ListMealsParams) error {
-	ctx, span := a.tracer.Start(c.Request().Context(), "ListMeals")
+
+func (a *API) listMeals(ctx context.Context) ([]Meal, error) {
+	ctx, span := a.tracer.Start(ctx, "ListMeals")
 	defer span.End()
 
 	meals, err := a.DB().GetAllMeals(ctx)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
 	items, err := a.GetMealInfo(ctx, meals)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return nil, err
 	}
+	return items, nil
+}
+func (a *API) ListMeals(c echo.Context, _ ListMealsParams) error {
+	ctx := c.Request().Context()
 
+	items, err := a.listMeals(ctx)
+	if err != nil {
+		return handleErr(c, err)
+	}
 	resp := PaginatedMeals{
 		Meals: &items,
 	}
@@ -139,11 +148,11 @@ func (a *API) GetMealById(c echo.Context, mealId string) error {
 
 	meal, err := a.DB().GetMealById(ctx, mealId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	items, err := a.GetMealInfo(ctx, []db.Meal{*meal})
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	return c.JSON(http.StatusOK, items[0])

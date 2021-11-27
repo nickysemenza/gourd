@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    RecipeDependency,
-    RecipeDependencyFromJSON,
-    RecipeDependencyFromJSONTyped,
-    RecipeDependencyToJSON,
+    UsageValue,
+    UsageValueFromJSON,
+    UsageValueFromJSONTyped,
+    UsageValueToJSON,
 } from './';
 
 /**
@@ -27,11 +27,11 @@ import {
  */
 export interface InlineResponse2001 {
     /**
-     * all
-     * @type {Array<RecipeDependency>}
+     * 
+     * @type {Array<UsageValue>}
      * @memberof InlineResponse2001
      */
-    items?: Array<RecipeDependency>;
+    sums: Array<UsageValue>;
 }
 
 export function InlineResponse2001FromJSON(json: any): InlineResponse2001 {
@@ -44,7 +44,7 @@ export function InlineResponse2001FromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'items': !exists(json, 'items') ? undefined : ((json['items'] as Array<any>).map(RecipeDependencyFromJSON)),
+        'sums': ((json['sums'] as Array<any>).map(UsageValueFromJSON)),
     };
 }
 
@@ -57,7 +57,7 @@ export function InlineResponse2001ToJSON(value?: InlineResponse2001 | null): any
     }
     return {
         
-        'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(RecipeDependencyToJSON)),
+        'sums': ((value.sums as Array<any>).map(UsageValueToJSON)),
     };
 }
 

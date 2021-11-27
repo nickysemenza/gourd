@@ -15,9 +15,15 @@
 
 import * as runtime from '../runtime';
 import {
+    InlineObject,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     InlineResponse2001,
     InlineResponse2001FromJSON,
     InlineResponse2001ToJSON,
+    InlineResponse2002,
+    InlineResponse2002FromJSON,
+    InlineResponse2002ToJSON,
     PaginatedRecipeWrappers,
     PaginatedRecipeWrappersFromJSON,
     PaginatedRecipeWrappersToJSON,
@@ -64,6 +70,10 @@ export interface RecipesApiSearchRequest {
     name: string;
     offset?: number;
     limit?: number;
+}
+
+export interface RecipesApiSumRecipesRequest {
+    inlineObject: InlineObject;
 }
 
 /**
@@ -326,7 +336,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * recipe dependencies
      * Get foods
      */
-    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2001>> {
+    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2002>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -346,14 +356,14 @@ export class RecipesApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2002FromJSON(jsonValue));
     }
 
     /**
      * recipe dependencies
      * Get foods
      */
-    async recipeDependencies(): Promise<InlineResponse2001> {
+    async recipeDependencies(): Promise<InlineResponse2002> {
         const response = await this.recipeDependenciesRaw();
         return await response.value();
     }
@@ -407,6 +417,49 @@ export class RecipesApi extends runtime.BaseAPI {
      */
     async search(requestParameters: RecipesApiSearchRequest): Promise<SearchResult> {
         const response = await this.searchRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * sum up recipes
+     */
+    async sumRecipesRaw(requestParameters: RecipesApiSumRecipesRequest): Promise<runtime.ApiResponse<InlineResponse2001>> {
+        if (requestParameters.inlineObject === null || requestParameters.inlineObject === undefined) {
+            throw new runtime.RequiredError('inlineObject','Required parameter requestParameters.inlineObject was null or undefined when calling sumRecipes.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/recipes/sum`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: InlineObjectToJSON(requestParameters.inlineObject),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * sum up recipes
+     */
+    async sumRecipes(requestParameters: RecipesApiSumRecipesRequest): Promise<InlineResponse2001> {
+        const response = await this.sumRecipesRaw(requestParameters);
         return await response.value();
     }
 

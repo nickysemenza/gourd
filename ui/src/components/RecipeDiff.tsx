@@ -1,5 +1,11 @@
-import React from "react";
-import { RecipeDetail } from "../api/openapi-fetch";
+import React, { useEffect, useMemo } from "react";
+import {
+  EntitySummary,
+  IngredientKind,
+  RecipeDetail,
+  RecipesApi,
+  UsageValue,
+} from "../api/openapi-fetch";
 import {
   SectionIngredient,
   useListIngredients,
@@ -16,10 +22,15 @@ import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { useLocation } from "react-router-dom";
 import queryString from "query-string";
+import { getOpenapiFetchConfig } from "../config";
+import Debug from "./Debug";
 
 const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
-  const url = queryString.parse(useLocation().search).recipes;
-  const ids = url ? (Array.isArray(url) ? url : [url]) : [];
+  const loc = useLocation();
+  const ids = useMemo(() => {
+    const url = queryString.parse(loc.search).recipes;
+    return url ? (Array.isArray(url) ? url : [url]) : [];
+  }, [loc]);
 
   const { data } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
@@ -28,6 +39,28 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
     },
     // lazy: true,
   });
+  const [sums, setSums] = React.useState<UsageValue[]>([]);
+
+  useEffect(() => {
+    async function fetchMyAPI() {
+      const rAPI = new RecipesApi(getOpenapiFetchConfig());
+      let foo = await rAPI.sumRecipes({
+        inlineObject: {
+          inputs: ids.map((id) => {
+            let foo: EntitySummary = {
+              id: id,
+              kind: IngredientKind.RECIPE,
+              multiplier: 1.0,
+              name: "",
+            };
+            return foo;
+          }),
+        },
+      });
+      setSums(foo.sums);
+    }
+    fetchMyAPI();
+  }, [ids]);
 
   const recipes = data?.recipes || [];
   // let d1 = details[0];
@@ -81,13 +114,13 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   );
 
   return (
-    <div className="flex">
+    <div className="flex flex-col">
       <table className="table-auto border-collapse border-1 border-gray-500 w-full">
         <thead>
           <tr>
-            <th className="border border-gray-400">aa</th>
+            <th className="border border-gray-400">ingredient</th>
             {ids.map((id, i) => (
-              <th className="border border-gray-400">
+              <th className="border border-gray-400" key={i}>
                 <EntitySelector
                   showKind={["recipe"]}
                   placeholder={ids[i] || `"Pick a Recipe..."`}
@@ -99,11 +132,11 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
               </th>
             ))}
           </tr>
-          <td>aa</td>
-          {recipes.map((r) => (
-            <td className="border border-gray-400">
+          <th>recipe</th>
+          {recipes.map((r, i) => (
+            <th className="border border-gray-400" key={i}>
               <RecipeLink recipe={r.detail} />
-            </td>
+            </th>
           ))}
         </thead>
         <tbody>
@@ -127,6 +160,22 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
           ))}
         </tbody>
       </table>
+      <div className="">
+        <ul className="list-disc list-outside pl-4">
+          {sums.map((s, x) => (
+            <li key={x}>
+              {s.ing.name} (
+              {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")})<ul></ul>
+              <ul className="list-disc list-outside pl-4">
+                {s.ings.map((si, y) => (
+                  <li>{si.required_by.map((b) => b.name).join(" <- ")}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <Debug data={sums} />
     </div>
   );
 };

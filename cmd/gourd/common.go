@@ -94,6 +94,7 @@ func setupEnv() error {
 	viper.SetDefault("JAEGER_ENDPOINT", "http://localhost:14268/api/traces")
 	viper.SetDefault("BYPASS_AUTH", false)
 	viper.SetDefault("RS_URI", "http://localhost:8080/")
+	viper.SetDefault("PDFLATEX_BINARY", "pdflatex")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()

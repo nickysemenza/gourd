@@ -13,15 +13,14 @@
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct InlineResponse2001 {
-    /// all
-    #[serde(rename = "items", skip_serializing_if = "Option::is_none")]
-    pub items: Option<Vec<crate::models::RecipeDependency>>,
+    #[serde(rename = "sums")]
+    pub sums: Vec<crate::models::UsageValue>,
 }
 
 impl InlineResponse2001 {
-    pub fn new() -> InlineResponse2001 {
+    pub fn new(sums: Vec<crate::models::UsageValue>) -> InlineResponse2001 {
         InlineResponse2001 {
-            items: None,
+            sums,
         }
     }
 }

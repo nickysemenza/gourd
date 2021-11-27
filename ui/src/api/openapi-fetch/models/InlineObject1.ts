@@ -13,42 +13,35 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    EntitySummary,
-    EntitySummaryFromJSON,
-    EntitySummaryFromJSONTyped,
-    EntitySummaryToJSON,
-} from './';
-
 /**
  * 
  * @export
- * @interface InlineObject
+ * @interface InlineObject1
  */
-export interface InlineObject {
+export interface InlineObject1 {
     /**
      * 
-     * @type {Array<EntitySummary>}
-     * @memberof InlineObject
+     * @type {Array<string>}
+     * @memberof InlineObject1
      */
-    inputs: Array<EntitySummary>;
+    ingredient_ids: Array<string>;
 }
 
-export function InlineObjectFromJSON(json: any): InlineObject {
-    return InlineObjectFromJSONTyped(json, false);
+export function InlineObject1FromJSON(json: any): InlineObject1 {
+    return InlineObject1FromJSONTyped(json, false);
 }
 
-export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject {
+export function InlineObject1FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject1 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'inputs': ((json['inputs'] as Array<any>).map(EntitySummaryFromJSON)),
+        'ingredient_ids': json['ingredient_ids'],
     };
 }
 
-export function InlineObjectToJSON(value?: InlineObject | null): any {
+export function InlineObject1ToJSON(value?: InlineObject1 | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -57,7 +50,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
     }
     return {
         
-        'inputs': ((value.inputs as Array<any>).map(EntitySummaryToJSON)),
+        'ingredient_ids': value.ingredient_ids,
     };
 }
 
