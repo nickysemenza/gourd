@@ -35,34 +35,23 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		return nil, err
 	}
 
-	firstAmount := func(a []Amount, grams bool) *Amount {
-		for _, s := range a {
-			if s.Unit == "g" && grams {
-				return &s
-			}
-			if s.Unit != "g" && s.Unit != "$" && s.Unit != "kcal" && !grams {
-				return &s
-			}
-		}
-		return nil
-	}
-	u := func(si []Amount) string {
+	u := func(amounts []Amount) string {
 
-		if s := firstAmount(si, false); s != nil {
+		if s := firstAmount(amounts, false); s != nil {
 			return s.Unit
 		}
 		return ""
 
 	}
-	aa := func(a []Amount) string {
-		if s := firstAmount(a, false); s != nil {
+	aa := func(amounts []Amount) string {
+		if s := firstAmount(amounts, false); s != nil {
 			return fmt.Sprintf("%.2f", s.Value)
 		}
 		return ""
 
 	}
-	g := func(si []Amount) string {
-		if s := firstAmount(si, true); s != nil {
+	g := func(amounts []Amount) string {
+		if s := firstAmount(amounts, true); s != nil {
 			return fmt.Sprintf("%.2f", s.Value)
 		}
 		return ""
@@ -191,7 +180,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 			return nil, err
 		}
 
-		return nil, fmt.Errorf("%s\n%s", err, string(output))
+		return nil, fmt.Errorf("%w\n%s", err, string(output))
 	}
 	outFile := path.Join(dir, "gourd.pdf")
 	log.Println(outFile)

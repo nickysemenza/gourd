@@ -276,7 +276,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 			ins = append(ins, SectionInstruction{Id: i.Id, Instruction: i.Instruction})
 		}
 		for _, i := range d.Ingredients {
-			item := SectionIngredient{
+			si := SectionIngredient{
 				Id:        i.Id,
 				Adjective: i.Adjective.Ptr(),
 				Original:  i.Original.Ptr(),
@@ -284,7 +284,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				Amounts:   []Amount{},
 			}
 			for _, amt := range i.Amounts {
-				item.Amounts = append(item.Amounts, Amount{
+				si.Amounts = append(si.Amounts, Amount{
 					Unit:   amt.Unit,
 					Value:  amt.Value,
 					Source: zero.StringFrom("db").Ptr(),
@@ -293,36 +293,36 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 			}
 
 			if i.RawRecipe != nil {
-				item.Kind = "recipe"
+				si.Kind = "recipe"
 				r, err := a.transformRecipe(ctx, *i.RawRecipe, false)
 				if err != nil {
 					return nil, err
 				}
-				item.Recipe = r
+				si.Recipe = r
 			} else {
-				item.Kind = "ingredient"
+				si.Kind = "ingredient"
 				foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})
 				if err != nil {
 					return nil, err
 				}
 				// i := transformIngredient(*i.RawIngredient)
-				item.Ingredient = &foo[0]
+				si.Ingredient = &foo[0]
 
 				targets := []UnitConversionRequestTarget{UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney, UnitConversionRequestTargetVolume}
-				if !hasGrams(item.Amounts) {
+				if !hasGrams(si.Amounts) {
 					targets = append(targets, UnitConversionRequestTargetWeight)
 				}
 				for _, t := range targets {
-					err = a.enhance(ctx, t, &item)
+					err = a.enhance(ctx, t, &si)
 					if err != nil {
 						return nil, err
 					}
 				}
 			}
 			if i.SubsFor.Valid {
-				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], item)
+				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], si)
 			} else {
-				ing = append(ing, item)
+				ing = append(ing, si)
 			}
 		}
 		for x, i := range ing {

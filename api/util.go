@@ -57,6 +57,17 @@ func JSONBytesFromFile(ctx context.Context, inputPath string) ([][]byte, error) 
 
 	return output, nil
 }
+func (a *API) RecipeFromText(ctx context.Context, text string) (*RecipeDetailInput, error) {
+	ctx, span := a.tracer.Start(ctx, "RecipeFromText")
+	defer span.End()
+
+	output := RecipeDetailInput{}
+	err := a.R.Call(ctx, text, rs_client.RecipeDecode, &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode recipe: %w", err)
+	}
+	return &output, nil
+}
 
 // RecipeFromFile reads a recipe from json or yaml file
 func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetailInput, error) {
@@ -68,13 +79,12 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 		if err != nil {
 			return nil, fmt.Errorf("failed to read bytes: %w", err)
 		}
-		output := RecipeDetailInput{}
-		err = a.R.Call(ctx, string(data), rs_client.RecipeDecode, &output)
+		output, err := a.RecipeFromText(ctx, string(data))
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode recipe: %w", err)
 		}
 		output.Sources = &[]RecipeSource{{Title: &inputPath}}
-		return []RecipeDetailInput{output}, nil
+		return []RecipeDetailInput{*output}, nil
 	case ".json", ".yaml":
 		var output []RecipeDetailInput
 

@@ -128,6 +128,11 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		}
 		version = latestVersion.First().Version + 1
 		parentID = latestVersion.First().RecipeId
+
+		if len(r.Sections) == 0 {
+			log.Infof("no sections, modifying, so just returning")
+			return modifying, nil
+		}
 	}
 	r.Version = version
 	r.Id = common.ID("rd")

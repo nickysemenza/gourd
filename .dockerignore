@@ -10,5 +10,4 @@ openapi/
 usda/*
 .git/*
 ui/build
-rust/
 tmp_images/

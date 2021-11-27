@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredient) *IngredientDetail {
@@ -14,7 +15,9 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 		return nil
 	}
 	i := IngredientDetail{
-		Name: ingredient.Name,
+		Name:         ingredient.Name,
+		Recipes:      []RecipeDetail{},
+		UnitMappings: []UnitMapping{},
 	}
 	return &i
 }
@@ -68,7 +71,6 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 				si := SectionIngredient{
 					Id:        ingredient.ID,
 					Adjective: ingredient.Adjective.Ptr(),
-					// Instruction: ingredient.Instruction.String,
 				}
 				if ingredient.IngredientID.Valid {
 					si.Kind = IngredientKindIngredient
@@ -80,6 +82,19 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 						return nil, err
 					}
 					si.Recipe = &foo.Detail
+				}
+				amounts := []Amount{}
+				err := ingredient.Amounts.Unmarshal(&amounts)
+				if err != nil {
+					return nil, err
+				}
+				for _, amt := range amounts {
+					si.Amounts = append(si.Amounts, Amount{
+						Unit:   amt.Unit,
+						Value:  amt.Value,
+						Source: zero.StringFrom("db").Ptr(),
+					})
+					//todo: unit conversion restuests
 				}
 				s.Ingredients = append(s.Ingredients, si)
 			}
@@ -173,7 +188,7 @@ func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo,
 	}
 	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes), nil
 	// rw, err := a.recipeFromModel(ctx, recipe.R.Recipe)
-	// if err != nil {
+	// if err != nil {[]
 	// 	return nil, err
 	// }
 	// return rw, nil
@@ -184,7 +199,8 @@ func (a *API) Misc(c echo.Context) error {
 	defer span.End()
 
 	// items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
-	items, err := a.Notion.PageById(ctx, "f6a5d0759d4a4becb95adf696b1cccb0")
+	// items, err := a.Notion.PageById(ctx, "f6a5d0759d4a4becb95adf696b1cccb0")
+	items, err := a.IngredientUsage(ctx, []bar{{RecipeId: "rd_2dfbb24c"}})
 
 	if err != nil {
 		return handleErr(c, err)
