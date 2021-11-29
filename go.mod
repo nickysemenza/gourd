@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
-	github.com/Masterminds/squirrel v1.5.1
+	github.com/Masterminds/squirrel v1.5.2
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.3.0
 	github.com/cosmtrek/air v1.27.8
