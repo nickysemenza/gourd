@@ -31,7 +31,7 @@
     "dayjs": "1.10.7",
     "gourd_rs": "file:../rust/w/pkg",
     "graphviz-react": "1.2.0",
-    "highcharts": "9.3.1",
+    "highcharts": "9.3.2",
     "highcharts-react-official": "3.1.0",
     "immutability-helper": "3.1.1",
     "jwt-decode": "3.1.2",
