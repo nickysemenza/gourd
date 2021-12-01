@@ -455,3 +455,13 @@
       b:
         unit: grams
         value: 55
+- name: cilantro
+  # fdc_id:
+  aliases: ["coriander leaves"]
+  unit_mappings:
+    - a:
+        unit: bunch
+        value: 1
+      b:
+        unit: dollars
+        value: 1.99

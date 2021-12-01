@@ -127,7 +127,7 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 	meals := []NotionRecipe{}
 
 	filter := notionapi.CompoundFilter{
-		"and": {
+		notionapi.FilterOperatorAND: {
 			notionapi.PropertyFilter{
 				Property:    "Tags",
 				MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
@@ -135,10 +135,19 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 		},
 	}
 	if c.testOnly {
-		filter["and"] = append(filter["and"], notionapi.PropertyFilter{
-			Property:    "Tags",
-			MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
-		})
+		// testFilter := notionapi.PropertyFilter{
+		// 	Property:    "Tags",
+		// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
+		// }
+
+		yday := notionapi.Date(time.Now().AddDate(0, 0, -2))
+
+		testFilter := notionapi.PropertyFilter{
+			Property: "Date",
+			Date:     &notionapi.DateFilterCondition{OnOrAfter: &yday},
+		}
+
+		filter["and"] = append(filter["and"], testFilter)
 	}
 	for {
 		resp, err := c.db.Query(ctx, c.dbId, &notionapi.DatabaseQueryRequest{

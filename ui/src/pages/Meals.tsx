@@ -12,6 +12,9 @@ import { EntitySelector } from "../components/EntitySelector";
 import { pushMealRecipe } from "../components/RecipeEditorUtils";
 import { getOpenapiFetchConfig } from "../config";
 import { MealRecipeUpdateActionEnum, MealsApi } from "../api/openapi-fetch";
+import update from "immutability-helper";
+import queryString from "query-string";
+import { Link } from "react-router-dom";
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
     offset: 0,
@@ -34,7 +37,7 @@ const Meals: React.FC = () => {
     setVal(data?.meals || []);
   }, [data]);
   type i = typeof meals[0];
-
+  const [checked, setChecked] = useState(new Set<string>());
   const columns: Array<Column<i>> = React.useMemo(() => {
     const mApi = new MealsApi(getOpenapiFetchConfig());
     return [
@@ -49,14 +52,33 @@ const Meals: React.FC = () => {
         },
       },
       {
+        Header: "select",
+        Cell: (cell: CellProps<i>) => {
+          const { id } = cell.row.original;
+
+          return (
+            <div>
+              <input
+                type="checkbox"
+                className="form-checkbox"
+                checked={checked.has(id)}
+                onChange={(e) => {}}
+                onClick={() =>
+                  setChecked(
+                    update(
+                      checked,
+                      checked.has(id) ? { $remove: [id] } : { $add: [id] }
+                    )
+                  )
+                }
+              />
+            </div>
+          );
+        },
+      },
+      {
         Header: "name",
         accessor: "name",
-        // Cell: (cell: CellProps<i>) => {
-        //   const { ate_at } = cell.row.original;
-        //   const ago = dayjs(ate_at);
-
-        //   return <div>{ago.format("dddd, MMMM D, YYYY h:mm A")}</div>;
-        // },
       },
       {
         Header: "recipes",
@@ -121,7 +143,7 @@ const Meals: React.FC = () => {
         },
       },
     ];
-  }, [internalVal]);
+  }, [internalVal, checked]);
 
   return (
     <div>
@@ -134,6 +156,20 @@ const Meals: React.FC = () => {
         pageCount={data?.meta?.page_count || 1}
       />
       <Debug data={{ error }} />
+      {checked.size > 0 && (
+        <>
+          <Link
+            to={`/playground?${queryString.stringify({
+              recipes: internalVal
+                .filter((m) => checked.has(m.id))
+                .map((m) => (m.recipes || []).map((r) => r.recipe.id))
+                .flat(),
+            })}`}
+          >
+            Compare {checked.size} meals
+          </Link>
+        </>
+      )}
     </div>
   );
 };

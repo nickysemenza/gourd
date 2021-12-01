@@ -98,10 +98,12 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
     }
   });
 
+  const ingIds = [...Object.keys(byId)];
   const { data: ingredientDetails } = useListIngredients({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
-      ingredient_id: [...Object.keys(byId)],
+      ingredient_id: ingIds,
+      limit: ingIds.length || 0,
     },
     // lazy: true,
   });
@@ -132,29 +134,43 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
               </th>
             ))}
           </tr>
-          <th>recipe</th>
-          {recipes.map((r, i) => (
-            <th className="border border-gray-400" key={i}>
-              <RecipeLink recipe={r.detail} />
-            </th>
-          ))}
+          <tr>
+            <th>recipe</th>
+            {recipes.map((r, i) => (
+              <th className="border border-gray-400" key={i}>
+                <RecipeLink recipe={r.detail} />
+              </th>
+            ))}
+          </tr>
         </thead>
         <tbody>
           {Object.keys(byId).map((eachId) => (
-            <tr>
-              <td className="border border-gray-400">
+            <tr key={eachId}>
+              <td className="border border-gray-400" key={eachId}>
                 {/* {eachId} */}
                 {ing_hints[eachId]?.ingredient.name}
               </td>
               {byId[eachId].map((si, x) => {
                 if (!si) {
-                  return <td className="border border-gray-400"></td>;
+                  return (
+                    <td
+                      className="border border-gray-400"
+                      key={`${x}-${eachId}-nobp`}
+                    ></td>
+                  );
                 }
                 const grams = getGramsFromSI(si) || 0;
                 const bp = scaledRound(
                   (grams / totalFlourMass(recipes[x].detail.sections)) * 100
                 );
-                return <td className="border border-gray-400">{bp}%</td>;
+                return (
+                  <td
+                    className="border border-gray-400"
+                    key={`${x}-${eachId}-bp`}
+                  >
+                    {bp}%
+                  </td>
+                );
               })}
             </tr>
           ))}
@@ -165,10 +181,12 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
           {sums.map((s, x) => (
             <li key={x}>
               {s.ing.name} (
-              {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")})<ul></ul>
+              {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")})
               <ul className="list-disc list-outside pl-4">
                 {s.ings.map((si, y) => (
-                  <li>{si.required_by.map((b) => b.name).join(" <- ")}</li>
+                  <li key={`${x}`}>
+                    {si.required_by.map((b) => b.name).join(" <- ")}
+                  </li>
                 ))}
               </ul>
             </li>

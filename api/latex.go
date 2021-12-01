@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ory/viper"
+	"github.com/spf13/viper"
 )
 
 func (a *API) GetLatexByRecipeId(c echo.Context, recipeId string) error {
@@ -23,11 +23,6 @@ func (a *API) GetLatexByRecipeId(c echo.Context, recipeId string) error {
 		return handleErr(c, err)
 	}
 	return c.Blob(http.StatusOK, "application/pdf", res)
-	// w.Header().Set("Content-type", "application/pdf")
-	// if _, err := io.Copy(w, f); err != nil {
-	//     fmt.Println(err)
-	//     w.WriteHeader(500)
-	// }
 
 }
 func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
