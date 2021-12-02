@@ -19,6 +19,14 @@ import (
 
 // IngredientByName retrieves an ingredient by name, creating it if it does not exist.
 func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient, error) {
+	switch name {
+	case "full-fat Greek yoghurt", "full fat yogurt or whole milk":
+		name = "greek yogurt"
+	case "A small handful of coriander leave":
+		name = "coriander leaves"
+	case "double cream":
+		name = "heavy cream"
+	}
 	ingredient := &Ingredient{}
 	err := c.db.GetContext(ctx, ingredient, `SELECT * FROM ingredients
 	WHERE lower(name) = lower($1) LIMIT 1`, name)

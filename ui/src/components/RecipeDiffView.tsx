@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import {
   EntitySummary,
   IngredientKind,
-  RecipeDetail,
   RecipesApi,
   UsageValue,
 } from "../api/openapi-fetch";
@@ -13,6 +12,7 @@ import {
 } from "../api/openapi-hooks/api";
 import {
   flatIngredients,
+  getFooUnits,
   getGramsFromSI,
   IngDetailsById,
   totalFlourMass,
@@ -20,18 +20,9 @@ import {
 import { EntitySelector } from "./EntitySelector";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
-import { useLocation } from "react-router-dom";
-import queryString from "query-string";
 import { getOpenapiFetchConfig } from "../config";
-import Debug from "./Debug";
 
-const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
-  const loc = useLocation();
-  const ids = useMemo(() => {
-    const url = queryString.parse(loc.search).recipes;
-    return url ? (Array.isArray(url) ? url : [url]) : [];
-  }, [loc]);
-
+const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
   const { data } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
@@ -44,7 +35,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
   useEffect(() => {
     async function fetchMyAPI() {
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
-      let foo = await rAPI.sumRecipes({
+      let recipeSumResp = await rAPI.sumRecipes({
         inlineObject: {
           inputs: ids.map((id) => {
             let foo: EntitySummary = {
@@ -57,7 +48,7 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
           }),
         },
       });
-      setSums(foo.sums);
+      setSums(recipeSumResp.sums);
     }
     fetchMyAPI();
   }, [ids]);
@@ -115,14 +106,19 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
     }))
   );
 
+  const thClass =
+    "border p-4 dark:border-dark-5 whitespace-nowrap font-normal text-gray-900";
+  const tdClass = "border mx-4 px-2 py-1 dark:border-dark-5";
   return (
-    <div className="flex flex-col">
-      <table className="table-auto border-collapse border-1 border-gray-500 w-full">
+    <div className="flex flex-col mb-1 sm:mb-0 justify-between w-full">
+      <h2 className="text-2xl leading-tight ">Recipe Diff View</h2>
+      <h4 className="text-xs uppercase">comparing {recipes.length} recipes</h4>
+      <table className="table-auto p-4 bg-white shadow rounded-lg w-full">
         <thead>
           <tr>
-            <th className="border border-gray-400">ingredient</th>
+            <th className={thClass}>ingredient</th>
             {ids.map((id, i) => (
-              <th className="border border-gray-400" key={i}>
+              <th className={thClass} key={i}>
                 <EntitySelector
                   showKind={["recipe"]}
                   placeholder={ids[i] || `"Pick a Recipe..."`}
@@ -135,9 +131,9 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
             ))}
           </tr>
           <tr>
-            <th>recipe</th>
+            <th className={thClass}>recipe</th>
             {recipes.map((r, i) => (
-              <th className="border border-gray-400" key={i}>
+              <th className={thClass} key={i}>
                 <RecipeLink recipe={r.detail} />
               </th>
             ))}
@@ -145,30 +141,45 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
         </thead>
         <tbody>
           {Object.keys(byId).map((eachId) => (
-            <tr key={eachId}>
-              <td className="border border-gray-400" key={eachId}>
-                {/* {eachId} */}
+            <tr key={eachId} className="text-gray-700">
+              <td className={tdClass} key={eachId}>
                 {ing_hints[eachId]?.ingredient.name}
               </td>
               {byId[eachId].map((si, x) => {
                 if (!si) {
                   return (
                     <td
-                      className="border border-gray-400"
+                      className={`${tdClass} text-gray-500 bg-gray-100`}
                       key={`${x}-${eachId}-nobp`}
-                    ></td>
+                    >
+                      &mdash;
+                    </td>
                   );
                 }
                 const grams = getGramsFromSI(si) || 0;
-                const bp = scaledRound(
-                  (grams / totalFlourMass(recipes[x].detail.sections)) * 100
-                );
+                const bpRaw =
+                  (grams / totalFlourMass(recipes[x].detail.sections)) * 100 ||
+                  0;
+                const bp = scaledRound(bpRaw);
                 return (
                   <td
-                    className="border border-gray-400"
+                    className={`${tdClass} text-gray-500 
+                    ${bpRaw === 100 ? "bg-green-100" : ""}
+                     `}
                     key={`${x}-${eachId}-bp`}
                   >
-                    {bp}%
+                    <div className="flex justify-between">
+                      <div
+                        className={`${bpRaw === 0 ? "text-yellow-500" : ""}`}
+                      >
+                        {bp}%
+                      </div>
+                      <div>
+                        {getFooUnits(si)
+                          .map((a) => `${a.value} ${a.unit}`)
+                          .join(" | ")}
+                      </div>
+                    </div>
                   </td>
                 );
               })}
@@ -193,9 +204,9 @@ const RecipeDiff: React.FC<{ details: RecipeDetail[] }> = ({ details }) => {
           ))}
         </ul>
       </div>
-      <Debug data={sums} />
+      {/* <Debug data={sums} /> */}
     </div>
   );
 };
 
-export default RecipeDiff;
+export default RecipeDiffView;

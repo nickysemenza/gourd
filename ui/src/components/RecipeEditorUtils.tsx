@@ -564,6 +564,9 @@ export const isGram = (a: Amount) =>
 export const getGramsFromSI = (si: SectionIngredient) =>
   si.amounts.filter((a) => isGram(a)).pop()?.value || 0;
 
+export const getFooUnits = (si: SectionIngredient) =>
+  si.amounts.filter((a) => isGram(a) || isVolume(a));
+
 // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
 export const totalFlourMass = (sections: RecipeSection[]) => {
   const res = (sections || []).reduce(
@@ -576,7 +579,7 @@ export const totalFlourMass = (sections: RecipeSection[]) => {
         .reduce((acc, ingredient) => acc + getGramsFromSI(ingredient), 0),
     0
   );
-  if (res != 0) {
+  if (res !== 0) {
     return res;
   }
   // if there's no flour, use the largest one?

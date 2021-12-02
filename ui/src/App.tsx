@@ -16,6 +16,7 @@ import IngredientList from "./pages/IngredientList";
 import CreateRecipe from "./pages/CreateRecipe";
 import Food from "./pages/Food";
 import Playground from "./pages/Playground";
+import RecipeDiff from "./pages/RecipeDiff";
 
 import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
@@ -136,6 +137,9 @@ function App() {
                 </Route>
                 <Route path="/playground">
                   <Playground />
+                </Route>
+                <Route path="/diff">
+                  <RecipeDiff />
                 </Route>
                 <Route path="/graph">
                   <Graph />

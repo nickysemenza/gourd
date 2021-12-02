@@ -21,7 +21,17 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, Items) {
 	if l != nil {
 		limit = int(*l)
 	}
-	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, Items{Offset: offset, Limit: limit, PageNumber: (offset/limit + 1)}
+	items := Items{
+		Offset: offset,
+		Limit:  limit,
+	}
+	if limit == 0 {
+		items.PageNumber = 0
+	} else {
+		items.PageNumber = offset/limit + 1
+	}
+
+	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, items
 }
 
 func (l *Items) setTotalCount(count uint64) {

@@ -149,7 +149,7 @@ const RecipeList: React.FC = () => {
         {checked.size > 0 && (
           <>
             <Link
-              to={`/playground?${queryString.stringify({
+              to={`/diff?${queryString.stringify({
                 recipes: [...checked.keys()],
               })}`}
             >

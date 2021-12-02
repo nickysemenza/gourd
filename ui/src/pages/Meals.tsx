@@ -159,7 +159,7 @@ const Meals: React.FC = () => {
       {checked.size > 0 && (
         <>
           <Link
-            to={`/playground?${queryString.stringify({
+            to={`/diff?${queryString.stringify({
               recipes: internalVal
                 .filter((m) => checked.has(m.id))
                 .map((m) => (m.recipes || []).map((r) => r.recipe.id))

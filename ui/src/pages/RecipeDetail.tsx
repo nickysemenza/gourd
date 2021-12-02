@@ -542,6 +542,7 @@ const RecipeDetail: React.FC = () => {
         src={`${getAPIURL()}/recipes/${recipe.detail.id}/latex`}
         width="100%"
         height="500px"
+        title="pdf view"
       ></iframe>
     </div>
   );

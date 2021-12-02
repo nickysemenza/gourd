@@ -308,7 +308,7 @@ mod tests {
             Measure::from_string("12 foo".to_string())
                 .as_bare()
                 .unwrap(),
-            BareMeasurement::new("foo".to_string(), 12.0)
+            BareMeasurement::new("whole".to_string(), 12.0)
         );
     }
 
@@ -364,11 +364,11 @@ mod tests {
     fn test_convert_other() {
         assert_eq!(
             Measure::from_string("10.0 cents".to_string()),
-            Measure::from_string("1 egg".to_string())
+            Measure::from_string("1 whole".to_string())
                 .convert(
                     MeasureKind::Money,
                     vec![(
-                        Measure::from_string("12 eggs".to_string()),
+                        Measure::from_string("12 whole".to_string()),
                         Measure::from_string("1.20 dollar".to_string()),
                     )]
                 )

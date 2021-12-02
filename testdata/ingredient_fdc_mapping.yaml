@@ -110,7 +110,7 @@
       source: wf
 - name: kosher salt
   fdc_id: 705264
-  aliases: ["salt", "Coarse sea salt"]
+  aliases: ["salt", "Coarse sea salt", "Diamond Crystal kosher salt"]
   unit_mappings:
     - a:
         unit: lb

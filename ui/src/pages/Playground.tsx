@@ -5,14 +5,10 @@ import {
   UnitConversionRequest,
   UnitConversionRequestTargetEnum,
 } from "../api/openapi-fetch/models/UnitConversionRequest";
-import RecipeDiff from "../components/RecipeDiff";
 import { getAPIURL, getOpenapiFetchConfig } from "../config";
 import { WasmContext } from "../wasm";
 
-const Playground: React.FC = () => {
-  const url = getAPIURL();
-  const [r2, setR2] = useState<PaginatedRecipeWrappers>();
-
+const ParseTest: React.FC = () => {
   const w = useContext(WasmContext);
 
   useEffect(() => {
@@ -67,6 +63,12 @@ const Playground: React.FC = () => {
     // greet();
     // parse("2 cups flour");
   }, [w]);
+  return null;
+};
+
+const Playground: React.FC = () => {
+  const url = getAPIURL();
+  const [r2, setR2] = useState<PaginatedRecipeWrappers>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,7 +76,6 @@ const Playground: React.FC = () => {
       const result = await bar.listRecipes({});
       setR2(result);
     };
-
     fetchData();
   }, [url]);
 
@@ -84,7 +85,8 @@ const Playground: React.FC = () => {
       <Helmet>
         <title>playground | gourd</title>
       </Helmet>
-      <RecipeDiff details={r2.recipes[0].detail.other_versions || []} />
+      <h1>playground</h1>
+      <ParseTest />
     </div>
   );
 };
