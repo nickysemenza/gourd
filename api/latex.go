@@ -31,6 +31,29 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		return nil, err
 	}
 
+	// from https://github.com/anaseto/gofrundis/blob/master/escape/escape.go
+	var latexEscapes = []string{
+		"{", "\\{",
+		"}", "\\}",
+		"[", "[",
+		"]", "]",
+		"%", "\\%",
+		"&", "\\&",
+		"$", "\\$",
+		"#", "\\#",
+		"_", "\\_",
+		"^", "\\^{}",
+		"\\", "\\textbackslash{}",
+		"~", "\\~{}",
+		string('\xa0'), "~"}
+
+	var latexEscaper = strings.NewReplacer(latexEscapes...)
+
+	// LaTeX escapes special LaTeX characters.
+	esc := func(text string) string {
+		return latexEscaper.Replace(text)
+	}
+
 	u := func(amounts []Amount) string {
 
 		if s := firstAmount(amounts, false); s != nil {
@@ -115,7 +138,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	foo := func(si []SectionInstruction) string {
 		i := []string{}
 		for _, x := range si {
-			i = append(i, x.Instruction)
+			i = append(i, esc(x.Instruction))
 		}
 		return strings.Join(i, `\\ `)
 
@@ -129,6 +152,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		"g":   g,
 		"a":   aa,
 		"n":   n,
+		"esc": esc,
 		"isLast": func(index int, len int) bool {
 			return index+1 == len
 		},

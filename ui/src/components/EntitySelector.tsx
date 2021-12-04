@@ -24,7 +24,7 @@ export const EntitySelector: React.FC<{
   value,
   onChange,
   createKind = "ingredient",
-  placeholder = "Pick a Recipe/Ingredient...",
+  placeholder,
   showKind = ["ingredient", "recipe"],
 }) => {
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
@@ -134,7 +134,7 @@ export const EntitySelector: React.FC<{
     <div data-cy="name-input">
       <AsyncCreatableSelect
         styles={customStyles}
-        placeholder={placeholder}
+        placeholder={placeholder || `pick a ${showKind.join(" or ")}`}
         classNamePrefix="react-select"
         loadOptions={loadOptions}
         value={value}

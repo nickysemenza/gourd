@@ -361,6 +361,7 @@ const RecipeDetail: React.FC = () => {
         <div>
           {edit ? (
             <input
+              type="text"
               className="border-2 w-96"
               value={detail.name}
               onChange={(e) =>
@@ -398,6 +399,7 @@ const RecipeDetail: React.FC = () => {
                   <div className="flex">
                     {sourceTypes.map((key) => (
                       <input
+                        type="text"
                         className="border-2 w-96"
                         value={source[key]}
                         onChange={(e) =>

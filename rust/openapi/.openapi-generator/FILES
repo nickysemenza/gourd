@@ -24,6 +24,7 @@ src/models/ingredient_kind.rs
 src/models/ingredient_usage.rs
 src/models/inline_object.rs
 src/models/inline_object_1.rs
+src/models/inline_object_2.rs
 src/models/inline_response_200.rs
 src/models/inline_response_200_1.rs
 src/models/inline_response_200_2.rs

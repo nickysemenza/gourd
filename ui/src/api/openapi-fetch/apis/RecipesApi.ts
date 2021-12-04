@@ -18,6 +18,9 @@ import {
     InlineObject,
     InlineObjectFromJSON,
     InlineObjectToJSON,
+    InlineObject1,
+    InlineObject1FromJSON,
+    InlineObject1ToJSON,
     InlineResponse2001,
     InlineResponse2001FromJSON,
     InlineResponse2001ToJSON,
@@ -64,6 +67,10 @@ export interface RecipesApiGetRecipesByIdsRequest {
 export interface RecipesApiListRecipesRequest {
     offset?: number;
     limit?: number;
+}
+
+export interface RecipesApiScrapeRecipeRequest {
+    inlineObject1: InlineObject1;
 }
 
 export interface RecipesApiSearchRequest {
@@ -365,6 +372,49 @@ export class RecipesApi extends runtime.BaseAPI {
      */
     async recipeDependencies(): Promise<InlineResponse2002> {
         const response = await this.recipeDependenciesRaw();
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * scrape a recipe by URL
+     */
+    async scrapeRecipeRaw(requestParameters: RecipesApiScrapeRecipeRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
+        if (requestParameters.inlineObject1 === null || requestParameters.inlineObject1 === undefined) {
+            throw new runtime.RequiredError('inlineObject1','Required parameter requestParameters.inlineObject1 was null or undefined when calling scrapeRecipe.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/recipes/scrape`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: InlineObject1ToJSON(requestParameters.inlineObject1),
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeWrapperFromJSON(jsonValue));
+    }
+
+    /**
+     * todo
+     * scrape a recipe by URL
+     */
+    async scrapeRecipe(requestParameters: RecipesApiScrapeRecipeRequest): Promise<RecipeWrapper> {
+        const response = await this.scrapeRecipeRaw(requestParameters);
         return await response.value();
     }
 

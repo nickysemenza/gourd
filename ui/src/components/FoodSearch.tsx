@@ -68,6 +68,7 @@ const FoodSearch: React.FC<{
         {showSearch && (
           <div className="w-full">
             <input
+              type="text"
               className="border-2 border-gray-300"
               value={ingredientName}
               onChange={(e) => {

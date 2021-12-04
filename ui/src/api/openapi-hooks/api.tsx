@@ -1411,6 +1411,45 @@ export const useSumRecipes = (props: UseSumRecipesProps) =>
     props
   );
 
+export interface ScrapeRecipeRequestBody {
+  url: string;
+}
+
+export type ScrapeRecipeProps = Omit<
+  MutateProps<RecipeWrapper, Error, void, ScrapeRecipeRequestBody, void>,
+  "path" | "verb"
+>;
+
+/**
+ * scrape a recipe by URL
+ *
+ * todo
+ */
+export const ScrapeRecipe = (props: ScrapeRecipeProps) => (
+  <Mutate<RecipeWrapper, Error, void, ScrapeRecipeRequestBody, void>
+    verb="POST"
+    path={`/recipes/scrape`}
+    {...props}
+  />
+);
+
+export type UseScrapeRecipeProps = Omit<
+  UseMutateProps<RecipeWrapper, Error, void, ScrapeRecipeRequestBody, void>,
+  "path" | "verb"
+>;
+
+/**
+ * scrape a recipe by URL
+ *
+ * todo
+ */
+export const useScrapeRecipe = (props: UseScrapeRecipeProps) =>
+  useMutate<RecipeWrapper, Error, void, ScrapeRecipeRequestBody, void>(
+    "POST",
+    `/recipes/scrape`,
+    props
+  );
+
 export interface ConvertIngredientToRecipePathParams {
   /**
    * The id of the ingredient

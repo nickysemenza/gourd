@@ -12,15 +12,15 @@
 
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineObject1 {
-    #[serde(rename = "url")]
-    pub url: String,
+pub struct InlineObject2 {
+    #[serde(rename = "ingredient_ids")]
+    pub ingredient_ids: Vec<String>,
 }
 
-impl InlineObject1 {
-    pub fn new(url: String) -> InlineObject1 {
-        InlineObject1 {
-            url,
+impl InlineObject2 {
+    pub fn new(ingredient_ids: Vec<String>) -> InlineObject2 {
+        InlineObject2 {
+            ingredient_ids,
         }
     }
 }

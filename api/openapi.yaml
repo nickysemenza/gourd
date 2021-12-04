@@ -451,6 +451,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /recipes/scrape:
+    post:
+      summary: scrape a recipe by URL
+      description: todo
+      operationId: scrape_recipe
+      tags:
+        - recipes
+      requestBody:
+        description: sum stuff
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+      responses:
+        "201":
+          description: Newly created recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeWrapper"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
       summary: Converts an ingredient to a recipe, updating all recipes depending on it

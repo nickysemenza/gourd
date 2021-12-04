@@ -105,12 +105,8 @@ func init() {
 					return err
 				}
 				ctx := context.Background()
+				_, err = s.APIManager.Scrape(ctx, strings.Join(args, " "))
 
-				r, err := s.APIManager.FetchAndTransform(ctx, strings.Join(args, " "), s.APIManager.IngredientIdByName)
-				if err != nil {
-					return err
-				}
-				_, err = s.APIManager.CreateRecipe(ctx, r)
 				return err
 			},
 		},

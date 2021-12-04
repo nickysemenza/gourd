@@ -293,3 +293,30 @@ func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 	}
 	return c.JSON(http.StatusOK, foo[0])
 }
+
+func (a *API) Scrape(ctx context.Context, url string) (*RecipeWrapper, error) {
+	ctx, span := a.tracer.Start(ctx, "Scrape")
+	defer span.End()
+
+	r, err := a.FetchAndTransform(ctx, url, a.IngredientIdByName)
+	if err != nil {
+		return nil, err
+	}
+	return a.CreateRecipe(ctx, r)
+}
+func (a *API) ScrapeRecipe(c echo.Context) error {
+	ctx, span := a.tracer.Start(c.Request().Context(), "ScrapeRecipe")
+	defer span.End()
+
+	var i ScrapeRecipeJSONBody
+	if err := c.Bind(&i); err != nil {
+		err = fmt.Errorf("invalid format for input: %w", err)
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
+	r, err := a.Scrape(ctx, i.Url)
+	if err != nil {
+		return sendErr(c, http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, r)
+}

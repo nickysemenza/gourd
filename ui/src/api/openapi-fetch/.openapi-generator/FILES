@@ -25,6 +25,7 @@ models/IngredientKind.ts
 models/IngredientUsage.ts
 models/InlineObject.ts
 models/InlineObject1.ts
+models/InlineObject2.ts
 models/InlineResponse200.ts
 models/InlineResponse2001.ts
 models/InlineResponse2002.ts

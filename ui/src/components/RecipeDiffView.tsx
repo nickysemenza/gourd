@@ -113,7 +113,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     "border p-4 dark:border-dark-5 whitespace-nowrap font-normal text-gray-900";
   const tdClass = "border mx-4 px-2 py-1 dark:border-dark-5";
   return (
-    <div className="flex flex-col mb-1 sm:mb-0 justify-between w-full">
+    <div className="flex flex-col mb-1 sm:mb-0 justify-between w-100">
       <h2 className="text-2xl leading-tight ">Recipe Diff View</h2>
       <h4 className="text-xs uppercase">comparing {recipes.length} recipes</h4>
       <HideShowButton show={showBP} setVal={setShow} />

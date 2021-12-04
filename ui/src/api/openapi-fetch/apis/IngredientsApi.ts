@@ -21,9 +21,9 @@ import {
     IngredientDetail,
     IngredientDetailFromJSON,
     IngredientDetailToJSON,
-    InlineObject1,
-    InlineObject1FromJSON,
-    InlineObject1ToJSON,
+    InlineObject2,
+    InlineObject2FromJSON,
+    InlineObject2ToJSON,
     InlineResponse2002,
     InlineResponse2002FromJSON,
     InlineResponse2002ToJSON,
@@ -63,7 +63,7 @@ export interface IngredientsApiListIngredientsRequest {
 
 export interface IngredientsApiMergeIngredientsRequest {
     ingredientId: string;
-    inlineObject1: InlineObject1;
+    inlineObject2: InlineObject2;
 }
 
 export interface IngredientsApiSearchRequest {
@@ -305,8 +305,8 @@ export class IngredientsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling mergeIngredients.');
         }
 
-        if (requestParameters.inlineObject1 === null || requestParameters.inlineObject1 === undefined) {
-            throw new runtime.RequiredError('inlineObject1','Required parameter requestParameters.inlineObject1 was null or undefined when calling mergeIngredients.');
+        if (requestParameters.inlineObject2 === null || requestParameters.inlineObject2 === undefined) {
+            throw new runtime.RequiredError('inlineObject2','Required parameter requestParameters.inlineObject2 was null or undefined when calling mergeIngredients.');
         }
 
         const queryParameters: any = {};
@@ -328,7 +328,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InlineObject1ToJSON(requestParameters.inlineObject1),
+            body: InlineObject2ToJSON(requestParameters.inlineObject2),
         });
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IngredientFromJSON(jsonValue));

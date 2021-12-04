@@ -16,32 +16,32 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface InlineObject1
+ * @interface InlineObject2
  */
-export interface InlineObject1 {
+export interface InlineObject2 {
     /**
      * 
-     * @type {string}
-     * @memberof InlineObject1
+     * @type {Array<string>}
+     * @memberof InlineObject2
      */
-    url: string;
+    ingredient_ids: Array<string>;
 }
 
-export function InlineObject1FromJSON(json: any): InlineObject1 {
-    return InlineObject1FromJSONTyped(json, false);
+export function InlineObject2FromJSON(json: any): InlineObject2 {
+    return InlineObject2FromJSONTyped(json, false);
 }
 
-export function InlineObject1FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject1 {
+export function InlineObject2FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject2 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'url': json['url'],
+        'ingredient_ids': json['ingredient_ids'],
     };
 }
 
-export function InlineObject1ToJSON(value?: InlineObject1 | null): any {
+export function InlineObject2ToJSON(value?: InlineObject2 | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -50,7 +50,7 @@ export function InlineObject1ToJSON(value?: InlineObject1 | null): any {
     }
     return {
         
-        'url': value.url,
+        'ingredient_ids': value.ingredient_ids,
     };
 }
 

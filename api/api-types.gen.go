@@ -749,6 +749,11 @@ type GetRecipesByIdsParams struct {
 	RecipeId []string `json:"recipe_id"`
 }
 
+// ScrapeRecipeJSONBody defines parameters for ScrapeRecipe.
+type ScrapeRecipeJSONBody struct {
+	Url string `json:"url"`
+}
+
 // SumRecipesJSONBody defines parameters for SumRecipes.
 type SumRecipesJSONBody struct {
 	Inputs []EntitySummary `json:"inputs"`
@@ -777,6 +782,9 @@ type UpdateRecipesForMealJSONRequestBody UpdateRecipesForMealJSONBody
 
 // CreateRecipesJSONRequestBody defines body for CreateRecipes for application/json ContentType.
 type CreateRecipesJSONRequestBody CreateRecipesJSONBody
+
+// ScrapeRecipeJSONRequestBody defines body for ScrapeRecipe for application/json ContentType.
+type ScrapeRecipeJSONRequestBody ScrapeRecipeJSONBody
 
 // SumRecipesJSONRequestBody defines body for SumRecipes for application/json ContentType.
 type SumRecipesJSONRequestBody SumRecipesJSONBody
