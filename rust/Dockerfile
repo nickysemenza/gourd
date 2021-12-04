@@ -1,4 +1,4 @@
-FROM rust:1.56 as builder
+FROM rust:1.57 as builder
 ENV SQLX_OFFLINE true
 WORKDIR /work/rust
 RUN apt-get update
