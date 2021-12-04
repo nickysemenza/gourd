@@ -29,7 +29,7 @@ import {
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
-import { ButtonGroup, HideShow } from "../components/Button";
+import { ButtonGroup, HideShowHOC } from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
@@ -506,21 +506,21 @@ const RecipeDetail: React.FC = () => {
           ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
       </div>
       <p className="text-lg font-bold">raw</p>
-      <HideShow>
+      <HideShowHOC>
         <pre>
           {w.encode_recipe_text(
             toInput(recipe as unknown as RecipeWrapper).detail
           )}
         </pre>
-      </HideShow>
+      </HideShowHOC>
       <p className="text-lg font-bold">meals</p>
 
-      <HideShow>
+      <HideShowHOC>
         <Nutrition
           items={ingredientsWithNutrients}
           h={[...totalNutrients.keys()]}
         />
-      </HideShow>
+      </HideShowHOC>
 
       <div className="w-9/12 flex ">
         {(recipe.linked_photos || []).map((p) => (

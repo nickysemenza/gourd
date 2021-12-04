@@ -73,26 +73,31 @@ export const Pill2: React.FC<{ color: "red" | "green" }> = ({
   </span>
 );
 
-export const HideShow: React.FC = ({ children }) => {
+export const HideShowHOC: React.FC = ({ children }) => {
   const [show, setShow] = useState(false);
   return (
     <div>
-      <ButtonGroup
-        // compact
-        buttons={[
-          {
-            onClick: () => {
-              setShow(!show);
-            },
-            text: `${show ? "hide" : "show"}`,
-            IconLeft: show ? MinusCircle : PlusCircle,
-          },
-        ]}
-      />
-      {show && children}
+      <HideShowButton show={show} setVal={setShow} /> {show && children}
     </div>
   );
 };
+export const HideShowButton: React.FC<{
+  show: boolean;
+  setVal: (newVal: boolean) => void;
+}> = ({ show, setVal }) => (
+  <ButtonGroup
+    // compact
+    buttons={[
+      {
+        onClick: () => {
+          setVal(!show);
+        },
+        text: `${show ? "hide" : "show"}`,
+        IconLeft: show ? MinusCircle : PlusCircle,
+      },
+    ]}
+  />
+);
 
 export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({
   x,

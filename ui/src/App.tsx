@@ -78,7 +78,7 @@ const registerTracing = (url: string) => {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
   // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 };
-// registerTracing(getTracingURL());
+registerTracing(getTracingURL());
 
 const PrivateRoute = ({ children, ...rest }: RouteProps) => {
   return (

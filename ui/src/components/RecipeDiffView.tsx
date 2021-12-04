@@ -21,6 +21,7 @@ import { EntitySelector } from "./EntitySelector";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { getOpenapiFetchConfig } from "../config";
+import { HideShowButton } from "./Button";
 
 const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
   const { data } = useGetRecipesByIds({
@@ -30,6 +31,8 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     },
     // lazy: true,
   });
+
+  const [showBP, setShow] = React.useState(false);
   const [sums, setSums] = React.useState<UsageValue[]>([]);
 
   useEffect(() => {
@@ -113,12 +116,18 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     <div className="flex flex-col mb-1 sm:mb-0 justify-between w-full">
       <h2 className="text-2xl leading-tight ">Recipe Diff View</h2>
       <h4 className="text-xs uppercase">comparing {recipes.length} recipes</h4>
+      <HideShowButton show={showBP} setVal={setShow} />
       <table className="table-auto p-4 bg-white shadow rounded-lg w-full">
         <thead>
           <tr>
-            <th className={thClass}>ingredient</th>
+            <th rowSpan={2} className={thClass}>
+              ingredient
+            </th>
+            <th rowSpan={2} className={thClass}>
+              total
+            </th>
             {ids.map((id, i) => (
-              <th className={thClass} key={i}>
+              <th className={thClass} key={`h-${i}`}>
                 <EntitySelector
                   showKind={["recipe"]}
                   placeholder={ids[i] || `"Pick a Recipe..."`}
@@ -131,7 +140,6 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             ))}
           </tr>
           <tr>
-            <th className={thClass}>recipe</th>
             {recipes.map((r, i) => (
               <th className={thClass} key={i}>
                 <RecipeLink recipe={r.detail} />
@@ -140,10 +148,36 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
           </tr>
         </thead>
         <tbody>
+          {!ingredientDetails && (
+            <tr>
+              <td colSpan={ids.length + 2}>loading...</td>
+            </tr>
+          )}
           {Object.keys(byId).map((eachId) => (
             <tr key={eachId} className="text-gray-700">
               <td className={tdClass} key={eachId}>
                 {ing_hints[eachId]?.ingredient.name}
+              </td>
+              <td
+                className={`${tdClass} text-gray-500 bg-gray-100`}
+                key={`${eachId}-total`}
+              >
+                <div>
+                  {sums.length === 0 && "loading..."}
+                  {sums
+                    .filter(
+                      (s) =>
+                        s.ing.id === eachId ||
+                        ing_hints[eachId]?.children
+                          ?.map((c) => c.ingredient.id)
+                          .includes(s.ing.id)
+                    )
+                    .map((s, x) => (
+                      <div key={`${eachId}-sums-${x}`}>
+                        {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
+                      </div>
+                    ))}
+                </div>
               </td>
               {byId[eachId].map((si, x) => {
                 if (!si) {
@@ -164,16 +198,18 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                 return (
                   <td
                     className={`${tdClass} text-gray-500 
-                    ${bpRaw === 100 ? "bg-green-100" : ""}
+                    ${bpRaw === 100 && showBP ? "bg-green-100" : ""}
                      `}
                     key={`${x}-${eachId}-bp`}
                   >
                     <div className="flex justify-between">
-                      <div
-                        className={`${bpRaw === 0 ? "text-yellow-500" : ""}`}
-                      >
-                        {bp}%
-                      </div>
+                      {showBP && (
+                        <div
+                          className={`${bpRaw === 0 ? "text-yellow-500" : ""}`}
+                        >
+                          {bp}%
+                        </div>
+                      )}
                       <div>
                         {getFooUnits(si)
                           .map((a) => `${a.value} ${a.unit}`)
@@ -187,15 +223,15 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
           ))}
         </tbody>
       </table>
-      <div className="">
+      {/* <div className="">
         <ul className="list-disc list-outside pl-4">
           {sums.map((s, x) => (
-            <li key={x}>
+            <li key={`summap${x}`}>
               {s.ing.name} (
               {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")})
               <ul className="list-disc list-outside pl-4">
                 {s.ings.map((si, y) => (
-                  <li key={`${x}`}>
+                  <li key={`${y}`}>
                     {si.required_by.map((b) => b.name).join(" <- ")}
                   </li>
                 ))}
@@ -203,7 +239,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
       {/* <Debug data={sums} /> */}
     </div>
   );
