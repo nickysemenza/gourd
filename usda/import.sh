@@ -21,7 +21,8 @@ tables=(
 	nutrient
 	food_nutrient_source
 	food_nutrient_derivation
-	food_nutrient
+	# food_nutrient
+	food_nutrient_raw
 	measure_unit
 	food_portion
 	# food_protein_conversion_factor
@@ -56,6 +57,7 @@ if [[ -n "${CI:-}" ]]; then
   sleep 30
 fi
 
+cp "$1"food_nutrient.csv "$1"food_nutrient_raw.csv
 
 alias p='psql "${MY_SCRIPT_VARIABLE}"'
 
@@ -67,6 +69,7 @@ do
 done
 
 for f in "${tables[@]}"; do
+	# f=${f%"$_raw"}
     echo "$f"
     headers=$(head -n1 "$1""$f".csv | tr -d '"')
     tmp="$f:tmp"
@@ -74,6 +77,9 @@ for f in "${tables[@]}"; do
     p -c "\copy usda_$f($headers) from '$tmp.csv' (format csv, null \"NULL\", DELIMITER ',', HEADER);"
     rm "$tmp".csv
 done
+
+# copy from temp table to final
+p -c "insert into usda_food_nutrient (select * from usda_food_nutrient_raw where fdc_id in (select fdc_id from usda_food) and nutrient_id in (select id from usda_nutrient));"
 
 end_time="$(date -u +%s)"
 elapsed="$(($end_time-$start_time))"

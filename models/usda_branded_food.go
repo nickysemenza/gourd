@@ -36,6 +36,7 @@ type UsdaBrandedFood struct {
 	HouseholdServingFulltext null.String  `boil:"household_serving_fulltext" json:"household_serving_fulltext,omitempty" toml:"household_serving_fulltext" yaml:"household_serving_fulltext,omitempty"`
 	BrandedFoodCategory      null.String  `boil:"branded_food_category" json:"branded_food_category,omitempty" toml:"branded_food_category" yaml:"branded_food_category,omitempty"`
 	DataSource               null.String  `boil:"data_source" json:"data_source,omitempty" toml:"data_source" yaml:"data_source,omitempty"`
+	PackageWeight            null.String  `boil:"package_weight" json:"package_weight,omitempty" toml:"package_weight" yaml:"package_weight,omitempty"`
 	ModifiedDate             null.String  `boil:"modified_date" json:"modified_date,omitempty" toml:"modified_date" yaml:"modified_date,omitempty"`
 	AvailableDate            null.String  `boil:"available_date" json:"available_date,omitempty" toml:"available_date" yaml:"available_date,omitempty"`
 	DiscontinuedDate         null.String  `boil:"discontinued_date" json:"discontinued_date,omitempty" toml:"discontinued_date" yaml:"discontinued_date,omitempty"`
@@ -58,6 +59,7 @@ var UsdaBrandedFoodColumns = struct {
 	HouseholdServingFulltext string
 	BrandedFoodCategory      string
 	DataSource               string
+	PackageWeight            string
 	ModifiedDate             string
 	AvailableDate            string
 	DiscontinuedDate         string
@@ -75,6 +77,7 @@ var UsdaBrandedFoodColumns = struct {
 	HouseholdServingFulltext: "household_serving_fulltext",
 	BrandedFoodCategory:      "branded_food_category",
 	DataSource:               "data_source",
+	PackageWeight:            "package_weight",
 	ModifiedDate:             "modified_date",
 	AvailableDate:            "available_date",
 	DiscontinuedDate:         "discontinued_date",
@@ -94,6 +97,7 @@ var UsdaBrandedFoodTableColumns = struct {
 	HouseholdServingFulltext string
 	BrandedFoodCategory      string
 	DataSource               string
+	PackageWeight            string
 	ModifiedDate             string
 	AvailableDate            string
 	DiscontinuedDate         string
@@ -111,6 +115,7 @@ var UsdaBrandedFoodTableColumns = struct {
 	HouseholdServingFulltext: "usda_branded_food.household_serving_fulltext",
 	BrandedFoodCategory:      "usda_branded_food.branded_food_category",
 	DataSource:               "usda_branded_food.data_source",
+	PackageWeight:            "usda_branded_food.package_weight",
 	ModifiedDate:             "usda_branded_food.modified_date",
 	AvailableDate:            "usda_branded_food.available_date",
 	DiscontinuedDate:         "usda_branded_food.discontinued_date",
@@ -156,6 +161,7 @@ var UsdaBrandedFoodWhere = struct {
 	HouseholdServingFulltext whereHelpernull_String
 	BrandedFoodCategory      whereHelpernull_String
 	DataSource               whereHelpernull_String
+	PackageWeight            whereHelpernull_String
 	ModifiedDate             whereHelpernull_String
 	AvailableDate            whereHelpernull_String
 	DiscontinuedDate         whereHelpernull_String
@@ -173,6 +179,7 @@ var UsdaBrandedFoodWhere = struct {
 	HouseholdServingFulltext: whereHelpernull_String{field: "\"usda_branded_food\".\"household_serving_fulltext\""},
 	BrandedFoodCategory:      whereHelpernull_String{field: "\"usda_branded_food\".\"branded_food_category\""},
 	DataSource:               whereHelpernull_String{field: "\"usda_branded_food\".\"data_source\""},
+	PackageWeight:            whereHelpernull_String{field: "\"usda_branded_food\".\"package_weight\""},
 	ModifiedDate:             whereHelpernull_String{field: "\"usda_branded_food\".\"modified_date\""},
 	AvailableDate:            whereHelpernull_String{field: "\"usda_branded_food\".\"available_date\""},
 	DiscontinuedDate:         whereHelpernull_String{field: "\"usda_branded_food\".\"discontinued_date\""},
@@ -200,8 +207,8 @@ func (*usdaBrandedFoodR) NewStruct() *usdaBrandedFoodR {
 type usdaBrandedFoodL struct{}
 
 var (
-	usdaBrandedFoodAllColumns            = []string{"fdc_id", "brand_owner", "brand_name", "subbrand_name", "not_a_significant_source_of", "gtin_upc", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category", "data_source", "modified_date", "available_date", "discontinued_date", "market_country"}
-	usdaBrandedFoodColumnsWithoutDefault = []string{"fdc_id", "brand_owner", "brand_name", "subbrand_name", "not_a_significant_source_of", "gtin_upc", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category", "data_source", "modified_date", "available_date", "discontinued_date", "market_country"}
+	usdaBrandedFoodAllColumns            = []string{"fdc_id", "brand_owner", "brand_name", "subbrand_name", "not_a_significant_source_of", "gtin_upc", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category", "data_source", "package_weight", "modified_date", "available_date", "discontinued_date", "market_country"}
+	usdaBrandedFoodColumnsWithoutDefault = []string{"fdc_id", "brand_owner", "brand_name", "subbrand_name", "not_a_significant_source_of", "gtin_upc", "ingredients", "serving_size", "serving_size_unit", "household_serving_fulltext", "branded_food_category", "data_source", "package_weight", "modified_date", "available_date", "discontinued_date", "market_country"}
 	usdaBrandedFoodColumnsWithDefault    = []string{}
 	usdaBrandedFoodPrimaryKeyColumns     = []string{"fdc_id"}
 )

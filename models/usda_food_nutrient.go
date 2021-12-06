@@ -33,6 +33,7 @@ type UsdaFoodNutrient struct {
 	Min             null.Float32 `boil:"min" json:"min,omitempty" toml:"min" yaml:"min,omitempty"`
 	Max             null.Float32 `boil:"max" json:"max,omitempty" toml:"max" yaml:"max,omitempty"`
 	Median          null.Float32 `boil:"median" json:"median,omitempty" toml:"median" yaml:"median,omitempty"`
+	Loq             null.Float32 `boil:"loq" json:"loq,omitempty" toml:"loq" yaml:"loq,omitempty"`
 	Footnote        null.String  `boil:"footnote" json:"footnote,omitempty" toml:"footnote" yaml:"footnote,omitempty"`
 	MinYearAcquired null.String  `boil:"min_year_acquired" json:"min_year_acquired,omitempty" toml:"min_year_acquired" yaml:"min_year_acquired,omitempty"`
 
@@ -50,6 +51,7 @@ var UsdaFoodNutrientColumns = struct {
 	Min             string
 	Max             string
 	Median          string
+	Loq             string
 	Footnote        string
 	MinYearAcquired string
 }{
@@ -62,6 +64,7 @@ var UsdaFoodNutrientColumns = struct {
 	Min:             "min",
 	Max:             "max",
 	Median:          "median",
+	Loq:             "loq",
 	Footnote:        "footnote",
 	MinYearAcquired: "min_year_acquired",
 }
@@ -76,6 +79,7 @@ var UsdaFoodNutrientTableColumns = struct {
 	Min             string
 	Max             string
 	Median          string
+	Loq             string
 	Footnote        string
 	MinYearAcquired string
 }{
@@ -88,6 +92,7 @@ var UsdaFoodNutrientTableColumns = struct {
 	Min:             "usda_food_nutrient.min",
 	Max:             "usda_food_nutrient.max",
 	Median:          "usda_food_nutrient.median",
+	Loq:             "usda_food_nutrient.loq",
 	Footnote:        "usda_food_nutrient.footnote",
 	MinYearAcquired: "usda_food_nutrient.min_year_acquired",
 }
@@ -104,6 +109,7 @@ var UsdaFoodNutrientWhere = struct {
 	Min             whereHelpernull_Float32
 	Max             whereHelpernull_Float32
 	Median          whereHelpernull_Float32
+	Loq             whereHelpernull_Float32
 	Footnote        whereHelpernull_String
 	MinYearAcquired whereHelpernull_String
 }{
@@ -116,6 +122,7 @@ var UsdaFoodNutrientWhere = struct {
 	Min:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"min\""},
 	Max:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"max\""},
 	Median:          whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"median\""},
+	Loq:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"loq\""},
 	Footnote:        whereHelpernull_String{field: "\"usda_food_nutrient\".\"footnote\""},
 	MinYearAcquired: whereHelpernull_String{field: "\"usda_food_nutrient\".\"min_year_acquired\""},
 }
@@ -123,15 +130,21 @@ var UsdaFoodNutrientWhere = struct {
 // UsdaFoodNutrientRels is where relationship names are stored.
 var UsdaFoodNutrientRels = struct {
 	Derivation                      string
+	FDC                             string
+	Nutrient                        string
 	FoodNutrientUsdaSubSampleResult string
 }{
 	Derivation:                      "Derivation",
+	FDC:                             "FDC",
+	Nutrient:                        "Nutrient",
 	FoodNutrientUsdaSubSampleResult: "FoodNutrientUsdaSubSampleResult",
 }
 
 // usdaFoodNutrientR is where relationships are stored.
 type usdaFoodNutrientR struct {
 	Derivation                      *UsdaFoodNutrientDerivation `boil:"Derivation" json:"Derivation" toml:"Derivation" yaml:"Derivation"`
+	FDC                             *UsdaFood                   `boil:"FDC" json:"FDC" toml:"FDC" yaml:"FDC"`
+	Nutrient                        *UsdaNutrient               `boil:"Nutrient" json:"Nutrient" toml:"Nutrient" yaml:"Nutrient"`
 	FoodNutrientUsdaSubSampleResult *UsdaSubSampleResult        `boil:"FoodNutrientUsdaSubSampleResult" json:"FoodNutrientUsdaSubSampleResult" toml:"FoodNutrientUsdaSubSampleResult" yaml:"FoodNutrientUsdaSubSampleResult"`
 }
 
@@ -144,8 +157,8 @@ func (*usdaFoodNutrientR) NewStruct() *usdaFoodNutrientR {
 type usdaFoodNutrientL struct{}
 
 var (
-	usdaFoodNutrientAllColumns            = []string{"id", "fdc_id", "nutrient_id", "amount", "data_points", "derivation_id", "min", "max", "median", "footnote", "min_year_acquired"}
-	usdaFoodNutrientColumnsWithoutDefault = []string{"id", "fdc_id", "nutrient_id", "amount", "data_points", "derivation_id", "min", "max", "median", "footnote", "min_year_acquired"}
+	usdaFoodNutrientAllColumns            = []string{"id", "fdc_id", "nutrient_id", "amount", "data_points", "derivation_id", "min", "max", "median", "loq", "footnote", "min_year_acquired"}
+	usdaFoodNutrientColumnsWithoutDefault = []string{"id", "fdc_id", "nutrient_id", "amount", "data_points", "derivation_id", "min", "max", "median", "loq", "footnote", "min_year_acquired"}
 	usdaFoodNutrientColumnsWithDefault    = []string{}
 	usdaFoodNutrientPrimaryKeyColumns     = []string{"id"}
 )
@@ -439,6 +452,34 @@ func (o *UsdaFoodNutrient) Derivation(mods ...qm.QueryMod) usdaFoodNutrientDeriv
 	return query
 }
 
+// FDC pointed to by the foreign key.
+func (o *UsdaFoodNutrient) FDC(mods ...qm.QueryMod) usdaFoodQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"fdc_id\" = ?", o.FDCID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := UsdaFoods(queryMods...)
+	queries.SetFrom(query.Query, "\"usda_food\"")
+
+	return query
+}
+
+// Nutrient pointed to by the foreign key.
+func (o *UsdaFoodNutrient) Nutrient(mods ...qm.QueryMod) usdaNutrientQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"id\" = ?", o.NutrientID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := UsdaNutrients(queryMods...)
+	queries.SetFrom(query.Query, "\"usda_nutrient\"")
+
+	return query
+}
+
 // FoodNutrientUsdaSubSampleResult pointed to by the foreign key.
 func (o *UsdaFoodNutrient) FoodNutrientUsdaSubSampleResult(mods ...qm.QueryMod) usdaSubSampleResultQuery {
 	queryMods := []qm.QueryMod{
@@ -553,6 +594,222 @@ func (usdaFoodNutrientL) LoadDerivation(ctx context.Context, e boil.ContextExecu
 					foreign.R = &usdaFoodNutrientDerivationR{}
 				}
 				foreign.R.DerivationUsdaFoodNutrients = append(foreign.R.DerivationUsdaFoodNutrients, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadFDC allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (usdaFoodNutrientL) LoadFDC(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUsdaFoodNutrient interface{}, mods queries.Applicator) error {
+	var slice []*UsdaFoodNutrient
+	var object *UsdaFoodNutrient
+
+	if singular {
+		object = maybeUsdaFoodNutrient.(*UsdaFoodNutrient)
+	} else {
+		slice = *maybeUsdaFoodNutrient.(*[]*UsdaFoodNutrient)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &usdaFoodNutrientR{}
+		}
+		if !queries.IsNil(object.FDCID) {
+			args = append(args, object.FDCID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &usdaFoodNutrientR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.FDCID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.FDCID) {
+				args = append(args, obj.FDCID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`usda_food`),
+		qm.WhereIn(`usda_food.fdc_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load UsdaFood")
+	}
+
+	var resultSlice []*UsdaFood
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice UsdaFood")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for usda_food")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for usda_food")
+	}
+
+	if len(usdaFoodNutrientAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.FDC = foreign
+		if foreign.R == nil {
+			foreign.R = &usdaFoodR{}
+		}
+		foreign.R.FDCUsdaFoodNutrients = append(foreign.R.FDCUsdaFoodNutrients, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.FDCID, foreign.FDCID) {
+				local.R.FDC = foreign
+				if foreign.R == nil {
+					foreign.R = &usdaFoodR{}
+				}
+				foreign.R.FDCUsdaFoodNutrients = append(foreign.R.FDCUsdaFoodNutrients, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// LoadNutrient allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (usdaFoodNutrientL) LoadNutrient(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUsdaFoodNutrient interface{}, mods queries.Applicator) error {
+	var slice []*UsdaFoodNutrient
+	var object *UsdaFoodNutrient
+
+	if singular {
+		object = maybeUsdaFoodNutrient.(*UsdaFoodNutrient)
+	} else {
+		slice = *maybeUsdaFoodNutrient.(*[]*UsdaFoodNutrient)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &usdaFoodNutrientR{}
+		}
+		if !queries.IsNil(object.NutrientID) {
+			args = append(args, object.NutrientID)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &usdaFoodNutrientR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.NutrientID) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.NutrientID) {
+				args = append(args, obj.NutrientID)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`usda_nutrient`),
+		qm.WhereIn(`usda_nutrient.id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load UsdaNutrient")
+	}
+
+	var resultSlice []*UsdaNutrient
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice UsdaNutrient")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for usda_nutrient")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for usda_nutrient")
+	}
+
+	if len(usdaFoodNutrientAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.Nutrient = foreign
+		if foreign.R == nil {
+			foreign.R = &usdaNutrientR{}
+		}
+		foreign.R.NutrientUsdaFoodNutrients = append(foreign.R.NutrientUsdaFoodNutrients, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.NutrientID, foreign.ID) {
+				local.R.Nutrient = foreign
+				if foreign.R == nil {
+					foreign.R = &usdaNutrientR{}
+				}
+				foreign.R.NutrientUsdaFoodNutrients = append(foreign.R.NutrientUsdaFoodNutrients, local)
 				break
 			}
 		}
@@ -737,6 +994,166 @@ func (o *UsdaFoodNutrient) RemoveDerivation(ctx context.Context, exec boil.Conte
 			related.R.DerivationUsdaFoodNutrients[i] = related.R.DerivationUsdaFoodNutrients[ln-1]
 		}
 		related.R.DerivationUsdaFoodNutrients = related.R.DerivationUsdaFoodNutrients[:ln-1]
+		break
+	}
+	return nil
+}
+
+// SetFDC of the usdaFoodNutrient to the related item.
+// Sets o.R.FDC to related.
+// Adds o to related.R.FDCUsdaFoodNutrients.
+func (o *UsdaFoodNutrient) SetFDC(ctx context.Context, exec boil.ContextExecutor, insert bool, related *UsdaFood) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"usda_food_nutrient\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"fdc_id"}),
+		strmangle.WhereClause("\"", "\"", 2, usdaFoodNutrientPrimaryKeyColumns),
+	)
+	values := []interface{}{related.FDCID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.FDCID, related.FDCID)
+	if o.R == nil {
+		o.R = &usdaFoodNutrientR{
+			FDC: related,
+		}
+	} else {
+		o.R.FDC = related
+	}
+
+	if related.R == nil {
+		related.R = &usdaFoodR{
+			FDCUsdaFoodNutrients: UsdaFoodNutrientSlice{o},
+		}
+	} else {
+		related.R.FDCUsdaFoodNutrients = append(related.R.FDCUsdaFoodNutrients, o)
+	}
+
+	return nil
+}
+
+// RemoveFDC relationship.
+// Sets o.R.FDC to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *UsdaFoodNutrient) RemoveFDC(ctx context.Context, exec boil.ContextExecutor, related *UsdaFood) error {
+	var err error
+
+	queries.SetScanner(&o.FDCID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("fdc_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.FDC = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.FDCUsdaFoodNutrients {
+		if queries.Equal(o.FDCID, ri.FDCID) {
+			continue
+		}
+
+		ln := len(related.R.FDCUsdaFoodNutrients)
+		if ln > 1 && i < ln-1 {
+			related.R.FDCUsdaFoodNutrients[i] = related.R.FDCUsdaFoodNutrients[ln-1]
+		}
+		related.R.FDCUsdaFoodNutrients = related.R.FDCUsdaFoodNutrients[:ln-1]
+		break
+	}
+	return nil
+}
+
+// SetNutrient of the usdaFoodNutrient to the related item.
+// Sets o.R.Nutrient to related.
+// Adds o to related.R.NutrientUsdaFoodNutrients.
+func (o *UsdaFoodNutrient) SetNutrient(ctx context.Context, exec boil.ContextExecutor, insert bool, related *UsdaNutrient) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"usda_food_nutrient\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"nutrient_id"}),
+		strmangle.WhereClause("\"", "\"", 2, usdaFoodNutrientPrimaryKeyColumns),
+	)
+	values := []interface{}{related.ID, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.NutrientID, related.ID)
+	if o.R == nil {
+		o.R = &usdaFoodNutrientR{
+			Nutrient: related,
+		}
+	} else {
+		o.R.Nutrient = related
+	}
+
+	if related.R == nil {
+		related.R = &usdaNutrientR{
+			NutrientUsdaFoodNutrients: UsdaFoodNutrientSlice{o},
+		}
+	} else {
+		related.R.NutrientUsdaFoodNutrients = append(related.R.NutrientUsdaFoodNutrients, o)
+	}
+
+	return nil
+}
+
+// RemoveNutrient relationship.
+// Sets o.R.Nutrient to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *UsdaFoodNutrient) RemoveNutrient(ctx context.Context, exec boil.ContextExecutor, related *UsdaNutrient) error {
+	var err error
+
+	queries.SetScanner(&o.NutrientID, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("nutrient_id")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.Nutrient = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.NutrientUsdaFoodNutrients {
+		if queries.Equal(o.NutrientID, ri.NutrientID) {
+			continue
+		}
+
+		ln := len(related.R.NutrientUsdaFoodNutrients)
+		if ln > 1 && i < ln-1 {
+			related.R.NutrientUsdaFoodNutrients[i] = related.R.NutrientUsdaFoodNutrients[ln-1]
+		}
+		related.R.NutrientUsdaFoodNutrients = related.R.NutrientUsdaFoodNutrients[:ln-1]
 		break
 	}
 	return nil

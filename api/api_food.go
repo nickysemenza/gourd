@@ -140,31 +140,12 @@ func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) er
 
 	return nil
 }
-func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
-	ctx, span := a.tracer.Start(ctx, "getFoodById")
-	defer span.End()
-	food, err := a.DB().GetFood(ctx, fdcId)
-	if err != nil {
-		return nil, err
-	}
-	if food.FdcID == 0 {
-		return nil, nil // fmt.Errorf("could not find food with fdc id %d", fdcId)
-	}
 
-	f := Food{
-		Description: food.Description,
-		DataType:    FoodDataType(food.DataType),
-		FdcId:       food.FdcID,
-	}
-
-	err = a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
-	return &f, err
-}
 func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
 	defer span.End()
 
-	f, err := a.getFoodById(ctx, fdcId)
+	f, err := a.getFoodById2(ctx, fdcId)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}

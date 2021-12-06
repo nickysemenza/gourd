@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { EntitySelector } from "../components/EntitySelector";
 import { useHistory } from "react-router-dom";
-import { useScrapeRecipe } from "../api/openapi-hooks/api";
 import { ButtonGroup } from "../components/Button";
-import { Mutate } from "restful-react";
 import { RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 

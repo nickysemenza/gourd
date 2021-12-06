@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS usda_branded_food (
       CHECK(serving_size_unit IN ('g', 'ml')),
   "household_serving_fulltext" TEXT,
   "branded_food_category"      TEXT,
-  "data_source"                TEXT
-      CHECK(data_source IN ('GDSN', 'LI')),
+  "data_source"                TEXT,
+  "package_weight" TEXT,
   "modified_date"              TEXT,
   "available_date"             TEXT,
   "discontinued_date"          TEXT,
@@ -133,10 +133,26 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient_derivation (
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_derivation_source_id ON usda_food_nutrient_derivation (source_id);
 
 
+CREATE TABLE IF NOT EXISTS usda_food_nutrient_raw (
+  "id"                INT NOT NULL PRIMARY KEY,
+  "fdc_id"            INT, -- todo fk
+  "nutrient_id"       INT, -- todo fk
+  "amount"            REAL,
+  "data_points"       INT,
+  "derivation_id"     INT,
+  -- XXX Missing standard_error from Field Descriptions
+  "min"               REAL,
+  "max"               REAL,
+  "median"            REAL,
+  "loq"               REAL,
+  "footnote"          TEXT,
+  "min_year_acquired" TEXT
+  );
+
 CREATE TABLE IF NOT EXISTS usda_food_nutrient (
   "id"                INT NOT NULL PRIMARY KEY,
-  "fdc_id"            INT, -- REFERENCES usda_food(fdc_id),
-  "nutrient_id"       INT, -- REFERENCES usda_nutrient(id),
+  "fdc_id"            INT REFERENCES usda_food(fdc_id),
+  "nutrient_id"       INT REFERENCES usda_nutrient(id),
   "amount"            REAL,
   "data_points"       INT,
   "derivation_id"     INT REFERENCES usda_food_nutrient_derivation(id),
@@ -144,9 +160,11 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient (
   "min"               REAL,
   "max"               REAL,
   "median"            REAL,
+  "loq"               REAL,
   "footnote"          TEXT,
   "min_year_acquired" TEXT
   );
+  
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_nutrient_id    ON usda_food_nutrient (nutrient_id);
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_derivation_id  ON usda_food_nutrient (derivation_id);
 CREATE INDEX IF NOT EXISTS idx_food_nutrient_fcd_id  ON usda_food_nutrient (fdc_id); -- new

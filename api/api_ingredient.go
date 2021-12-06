@@ -2,14 +2,18 @@ package api
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/models"
 	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
@@ -95,11 +99,97 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	return items, nil
 }
+func (a *API) getFoodById2(ctx context.Context, fdcId int) (*Food, error) {
+	ctx, span := a.tracer.Start(ctx, "getFoodById2")
+	defer span.End()
+
+	foodRec, err := models.UsdaFoods(
+		qm.Where("fdc_id = ?", fdcId),
+		qm.Load(
+			qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients, models.UsdaFoodNutrientRels.Nutrient),
+		),
+		qm.Load(
+			qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood),
+		),
+		// qm.Load(
+		// 	qm.Rels(models.UsdaFoodRels.FoodCategory),
+		// ),
+		qm.Load(
+			qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions),
+		),
+	).One(ctx, a.db.DB())
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("failed to get food with id %d: %w", fdcId, err)
+	}
+
+	if foodRec == nil {
+		return nil, nil
+	}
+
+	f := Food{
+		FdcId:       foodRec.FDCID,
+		Description: foodRec.Description.String,
+		DataType:    FoodDataType(foodRec.DataType.String),
+	}
+
+	nutrients := []FoodNutrient{}
+	for _, fn := range foodRec.R.FDCUsdaFoodNutrients {
+		n := fn.R.Nutrient
+		if n == nil {
+			continue
+		}
+		nutrients = append(nutrients, FoodNutrient{
+			Amount:     float64(fn.Amount.Float32),
+			DataPoints: fn.DataPoints.Int,
+			Nutrient: Nutrient{
+				Id:       n.ID,
+				Name:     n.Name.String,
+				UnitName: FoodNutrientUnit(n.UnitName.String),
+			},
+		})
+
+	}
+	f.Nutrients = nutrients
+
+	if foodRec.R.FDCUsdaBrandedFood != nil {
+		brandInfo := foodRec.R.FDCUsdaBrandedFood
+		f.BrandedInfo = &BrandedFood{
+			BrandOwner:          brandInfo.BrandOwner.Ptr(),
+			BrandedFoodCategory: brandInfo.BrandedFoodCategory.Ptr(),
+			HouseholdServing:    brandInfo.HouseholdServingFulltext.Ptr(),
+			Ingredients:         brandInfo.Ingredients.Ptr(),
+			ServingSize:         float64(brandInfo.ServingSize.Float32),
+			ServingSizeUnit:     brandInfo.ServingSizeUnit.String,
+		}
+	}
+	// todo: FoodCategory{} but not super necessary
+
+	portions := []FoodPortion{}
+	for _, p := range foodRec.R.FDCUsdaFoodPortions {
+		portions = append(portions, FoodPortion{
+			Amount:             float64(p.Amount.Float32),
+			GramWeight:         float64(p.GramWeight.Float32),
+			Id:                 p.ID,
+			Modifier:           p.Modifier.String,
+			PortionDescription: p.PortionDescription.String,
+		})
+	}
+	f.Portions = &portions
+
+	m, err := a.UnitMappingsFromFood(ctx, &f)
+	if err != nil {
+		return nil, err
+	}
+	f.UnitMappings = m
+	return &f, nil
+}
+
 func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *IngredientDetail) (err error) {
 	ctx, span := a.tracer.Start(ctx, "enhanceWithFDC")
 	defer span.End()
 
-	food, err := a.getFoodById(ctx, int(fdcId))
+	food, err := a.getFoodById2(ctx, int(fdcId))
 	if err != nil {
 		return
 	}
@@ -109,13 +199,13 @@ func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *Ingredien
 
 	detail.Food = food
 	span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
-
-	var m []UnitMapping
-	m, err = a.UnitMappingsFromFood(ctx, food)
-	if err != nil {
-		return
-	}
-	detail.UnitMappings = append(detail.UnitMappings, m...)
+	// ??
+	// var m []UnitMapping
+	// m, err = a.UnitMappingsFromFood(ctx, food)
+	// if err != nil {
+	// 	return
+	// }
+	detail.UnitMappings = append(detail.UnitMappings, food.UnitMappings...)
 	return
 }
 func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {

@@ -34,6 +34,7 @@ var TableNames = struct {
 	UsdaFoodNutrient                 string
 	UsdaFoodNutrientConversionFactor string
 	UsdaFoodNutrientDerivation       string
+	UsdaFoodNutrientRaw              string
 	UsdaFoodNutrientSource           string
 	UsdaFoodPortion                  string
 	UsdaFoodProteinConversionFactor  string
@@ -84,6 +85,7 @@ var TableNames = struct {
 	UsdaFoodNutrient:                 "usda_food_nutrient",
 	UsdaFoodNutrientConversionFactor: "usda_food_nutrient_conversion_factor",
 	UsdaFoodNutrientDerivation:       "usda_food_nutrient_derivation",
+	UsdaFoodNutrientRaw:              "usda_food_nutrient_raw",
 	UsdaFoodNutrientSource:           "usda_food_nutrient_source",
 	UsdaFoodPortion:                  "usda_food_portion",
 	UsdaFoodProteinConversionFactor:  "usda_food_protein_conversion_factor",

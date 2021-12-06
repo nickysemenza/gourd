@@ -16,6 +16,7 @@ DROP TABLE usda_food_protein_conversion_factor;
 DROP TABLE usda_food_portion;
 DROP TABLE usda_measure_unit;
 DROP TABLE usda_food_nutrient;
+DROP TABLE usda_food_nutrient_raw;
 DROP TABLE usda_food_nutrient_derivation;
 DROP TABLE usda_food_nutrient_source;
 DROP TABLE usda_nutrient;

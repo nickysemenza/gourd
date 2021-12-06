@@ -80,13 +80,16 @@ var UsdaNutrientWhere = struct {
 
 // UsdaNutrientRels is where relationship names are stored.
 var UsdaNutrientRels = struct {
+	NutrientUsdaFoodNutrients         string
 	NutrientUsdaNutrientIncomingNames string
 }{
+	NutrientUsdaFoodNutrients:         "NutrientUsdaFoodNutrients",
 	NutrientUsdaNutrientIncomingNames: "NutrientUsdaNutrientIncomingNames",
 }
 
 // usdaNutrientR is where relationships are stored.
 type usdaNutrientR struct {
+	NutrientUsdaFoodNutrients         UsdaFoodNutrientSlice         `boil:"NutrientUsdaFoodNutrients" json:"NutrientUsdaFoodNutrients" toml:"NutrientUsdaFoodNutrients" yaml:"NutrientUsdaFoodNutrients"`
 	NutrientUsdaNutrientIncomingNames UsdaNutrientIncomingNameSlice `boil:"NutrientUsdaNutrientIncomingNames" json:"NutrientUsdaNutrientIncomingNames" toml:"NutrientUsdaNutrientIncomingNames" yaml:"NutrientUsdaNutrientIncomingNames"`
 }
 
@@ -380,6 +383,27 @@ func (q usdaNutrientQuery) Exists(ctx context.Context, exec boil.ContextExecutor
 	return count > 0, nil
 }
 
+// NutrientUsdaFoodNutrients retrieves all the usda_food_nutrient's UsdaFoodNutrients with an executor via nutrient_id column.
+func (o *UsdaNutrient) NutrientUsdaFoodNutrients(mods ...qm.QueryMod) usdaFoodNutrientQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"usda_food_nutrient\".\"nutrient_id\"=?", o.ID),
+	)
+
+	query := UsdaFoodNutrients(queryMods...)
+	queries.SetFrom(query.Query, "\"usda_food_nutrient\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"usda_food_nutrient\".*"})
+	}
+
+	return query
+}
+
 // NutrientUsdaNutrientIncomingNames retrieves all the usda_nutrient_incoming_name's UsdaNutrientIncomingNames with an executor via nutrient_id column.
 func (o *UsdaNutrient) NutrientUsdaNutrientIncomingNames(mods ...qm.QueryMod) usdaNutrientIncomingNameQuery {
 	var queryMods []qm.QueryMod
@@ -399,6 +423,104 @@ func (o *UsdaNutrient) NutrientUsdaNutrientIncomingNames(mods ...qm.QueryMod) us
 	}
 
 	return query
+}
+
+// LoadNutrientUsdaFoodNutrients allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (usdaNutrientL) LoadNutrientUsdaFoodNutrients(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUsdaNutrient interface{}, mods queries.Applicator) error {
+	var slice []*UsdaNutrient
+	var object *UsdaNutrient
+
+	if singular {
+		object = maybeUsdaNutrient.(*UsdaNutrient)
+	} else {
+		slice = *maybeUsdaNutrient.(*[]*UsdaNutrient)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &usdaNutrientR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &usdaNutrientR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.ID) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`usda_food_nutrient`),
+		qm.WhereIn(`usda_food_nutrient.nutrient_id in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load usda_food_nutrient")
+	}
+
+	var resultSlice []*UsdaFoodNutrient
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice usda_food_nutrient")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on usda_food_nutrient")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for usda_food_nutrient")
+	}
+
+	if len(usdaFoodNutrientAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.NutrientUsdaFoodNutrients = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &usdaFoodNutrientR{}
+			}
+			foreign.R.Nutrient = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.ID, foreign.NutrientID) {
+				local.R.NutrientUsdaFoodNutrients = append(local.R.NutrientUsdaFoodNutrients, foreign)
+				if foreign.R == nil {
+					foreign.R = &usdaFoodNutrientR{}
+				}
+				foreign.R.Nutrient = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadNutrientUsdaNutrientIncomingNames allows an eager lookup of values, cached into the
@@ -493,6 +615,133 @@ func (usdaNutrientL) LoadNutrientUsdaNutrientIncomingNames(ctx context.Context, 
 				foreign.R.Nutrient = local
 				break
 			}
+		}
+	}
+
+	return nil
+}
+
+// AddNutrientUsdaFoodNutrients adds the given related objects to the existing relationships
+// of the usda_nutrient, optionally inserting them as new records.
+// Appends related to o.R.NutrientUsdaFoodNutrients.
+// Sets related.R.Nutrient appropriately.
+func (o *UsdaNutrient) AddNutrientUsdaFoodNutrients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UsdaFoodNutrient) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.NutrientID, o.ID)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"usda_food_nutrient\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"nutrient_id"}),
+				strmangle.WhereClause("\"", "\"", 2, usdaFoodNutrientPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.NutrientID, o.ID)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &usdaNutrientR{
+			NutrientUsdaFoodNutrients: related,
+		}
+	} else {
+		o.R.NutrientUsdaFoodNutrients = append(o.R.NutrientUsdaFoodNutrients, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &usdaFoodNutrientR{
+				Nutrient: o,
+			}
+		} else {
+			rel.R.Nutrient = o
+		}
+	}
+	return nil
+}
+
+// SetNutrientUsdaFoodNutrients removes all previously related items of the
+// usda_nutrient replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.Nutrient's NutrientUsdaFoodNutrients accordingly.
+// Replaces o.R.NutrientUsdaFoodNutrients with related.
+// Sets related.R.Nutrient's NutrientUsdaFoodNutrients accordingly.
+func (o *UsdaNutrient) SetNutrientUsdaFoodNutrients(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*UsdaFoodNutrient) error {
+	query := "update \"usda_food_nutrient\" set \"nutrient_id\" = null where \"nutrient_id\" = $1"
+	values := []interface{}{o.ID}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.NutrientUsdaFoodNutrients {
+			queries.SetScanner(&rel.NutrientID, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.Nutrient = nil
+		}
+
+		o.R.NutrientUsdaFoodNutrients = nil
+	}
+	return o.AddNutrientUsdaFoodNutrients(ctx, exec, insert, related...)
+}
+
+// RemoveNutrientUsdaFoodNutrients relationships from objects passed in.
+// Removes related items from R.NutrientUsdaFoodNutrients (uses pointer comparison, removal does not keep order)
+// Sets related.R.Nutrient.
+func (o *UsdaNutrient) RemoveNutrientUsdaFoodNutrients(ctx context.Context, exec boil.ContextExecutor, related ...*UsdaFoodNutrient) error {
+	if len(related) == 0 {
+		return nil
+	}
+
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.NutrientID, nil)
+		if rel.R != nil {
+			rel.R.Nutrient = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("nutrient_id")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.NutrientUsdaFoodNutrients {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.NutrientUsdaFoodNutrients)
+			if ln > 1 && i < ln-1 {
+				o.R.NutrientUsdaFoodNutrients[i] = o.R.NutrientUsdaFoodNutrients[ln-1]
+			}
+			o.R.NutrientUsdaFoodNutrients = o.R.NutrientUsdaFoodNutrients[:ln-1]
+			break
 		}
 	}
 
