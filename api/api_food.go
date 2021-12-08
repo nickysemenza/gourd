@@ -2,150 +2,125 @@ package api
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 
 	"github.com/labstack/echo/v4"
+	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/models"
 	log "github.com/sirupsen/logrus"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (a *API) addDetailToFood(ctx context.Context, f *Food, categoryId int64) error {
-	ctx, span := a.tracer.Start(ctx, "addDetailToFood")
-	defer span.End()
-
-	fatalErrors := make(chan error)
-	wgDone := make(chan bool)
-
-	var wg sync.WaitGroup
-	wg.Add(3)
-
-	fdcId := f.FdcId
-
-	fNutrients := make([]FoodNutrient, 0)
-	go func() {
-		nutrientRows, err := a.DB().GetFoodNutrients(ctx, fdcId)
-		if err != nil {
-			fatalErrors <- err
-		}
-
-		nutrientIDs := make([]int, len(nutrientRows))
-		for x, nr := range nutrientRows {
-			nutrientIDs[x] = nr.NutrientID
-		}
-		nutrients, err := a.DB().GetNutrients(ctx, nutrientIDs...)
-		if err != nil {
-			fatalErrors <- err
-		}
-
-		nutrientsById := nutrients.ById()
-
-		for _, nr := range nutrientRows {
-			nDetail := nutrientsById[nr.NutrientID]
-			fNutrients = append(fNutrients, FoodNutrient{
-				Amount:     nr.Amount,
-				DataPoints: int(nr.DataPoints.Int64),
-				Nutrient: Nutrient{
-					Id:       nDetail.ID,
-					Name:     nDetail.Name,
-					UnitName: FoodNutrientUnit(nDetail.UnitName),
-				},
-			})
-		}
-		wg.Done()
-	}()
-
-	var brandInfoRes *BrandedFood
-
-	go func() {
-		brandInfo, err := a.DB().GetBrandInfo(ctx, fdcId)
-		if err != nil {
-			fatalErrors <- err
-		}
-		if brandInfo != nil && brandInfo.BrandOwner != nil && *brandInfo.BrandOwner != "" {
-			brandInfoRes = &BrandedFood{
-				BrandOwner:          brandInfo.BrandOwner,
-				BrandedFoodCategory: brandInfo.BrandedFoodCategory,
-				HouseholdServing:    brandInfo.HouseholdServing,
-				Ingredients:         brandInfo.Ingredients,
-				ServingSize:         brandInfo.ServingSize,
-				ServingSizeUnit:     brandInfo.ServingSizeUnit,
-			}
-		}
-		wg.Done()
-	}()
-	category, err := a.DB().GetCategory(ctx, categoryId)
-	if err != nil {
-		return err
-	}
-	if category != nil && category.Code != "" {
-		f.Category = &FoodCategory{
-			Code:        category.Code,
-			Description: category.Description,
-		}
-	}
-
-	apiPortions := make([]FoodPortion, 0)
-	go func() {
-		portions, err := a.DB().GetFoodPortions(ctx, fdcId)
-		if err != nil {
-			fatalErrors <- err
-		}
-
-		if portionsById, ok := portions.ByFdcId()[fdcId]; ok {
-
-			for _, p := range portionsById {
-				apiPortions = append(apiPortions, FoodPortion{
-					Amount:             p.Amount.Float64,
-					GramWeight:         p.GramWeight,
-					Id:                 p.Id,
-					Modifier:           p.Modifier.String,
-					PortionDescription: p.PortionDescription.String,
-				})
-			}
-		}
-		wg.Done()
-	}()
-
-	go func() {
-		wg.Wait()
-		close(wgDone)
-	}()
-
-	// Wait until either WaitGroup is done or an error is received through the channel
-	select {
-	case <-wgDone:
-		// carry on
-		break
-	case err := <-fatalErrors:
-		// close(fatalErrors)
-		err = fmt.Errorf("err on chann: %w", err)
-		log.Print(err)
-		return err
-	}
-	f.Nutrients = fNutrients
-	f.Portions = &apiPortions
-	f.BrandedInfo = brandInfoRes
-	m, err := a.UnitMappingsFromFood(ctx, f)
-	if err != nil {
-		return err
-	}
-	f.UnitMappings = append(f.UnitMappings, m...)
-	if len(f.UnitMappings) == 0 {
-		f.UnitMappings = []UnitMapping{}
-	}
-
-	return nil
+// from usda_food_category
+var catmap = map[int]FoodCategory{
+	1:  {Code: "0100", Description: " Dairy and Egg Products"},
+	2:  {Code: "0200", Description: " Spices and Herbs"},
+	3:  {Code: "0300", Description: " Baby Foods"},
+	4:  {Code: "0400", Description: " Fats and Oils"},
+	5:  {Code: "0500", Description: " Poultry Products"},
+	6:  {Code: "0600", Description: " Soups, Sauces, and Gravies"},
+	7:  {Code: "0700", Description: " Sausages and Luncheon Meats"},
+	8:  {Code: "0800", Description: " Breakfast Cereals"},
+	9:  {Code: "0900", Description: " Fruits and Fruit Juices"},
+	10: {Code: "1000", Description: " Pork Products"},
+	11: {Code: "1100", Description: " Vegetables and Vegetable Products"},
+	12: {Code: "1200", Description: " Nut and Seed Products"},
+	13: {Code: "1300", Description: " Beef Products"},
+	14: {Code: "1400", Description: " Beverages"},
+	15: {Code: "1500", Description: " Finfish and Shellfish Products"},
+	16: {Code: "1600", Description: " Legumes and Legume Products"},
+	17: {Code: "1700", Description: " Lamb, Veal, and Game Products"},
+	18: {Code: "1800", Description: " Baked Products"},
+	19: {Code: "1900", Description: " Sweets"},
+	20: {Code: "2000", Description: " Cereal Grains and Pasta"},
+	21: {Code: "2100", Description: " Fast Foods"},
+	22: {Code: "2200", Description: " Meals, Entrees, and Side Dishes"},
+	23: {Code: "2500", Description: " Snacks"},
+	24: {Code: "3500", Description: " American Indian/Alaska Native Foods"},
+	25: {Code: "3600", Description: " Restaurant Foods"},
+	26: {Code: "4500", Description: " Branded Food Products Database"},
+	27: {Code: "2600", Description: " Quality Control Materials"},
+	28: {Code: "1410", Description: " Alcoholic Beverages"},
 }
 
+func (a *API) foodFromRec(ctx context.Context, foodRec *models.UsdaFood) (*Food, error) {
+	if foodRec == nil {
+		return nil, nil
+	}
+
+	f := Food{
+		FdcId:       foodRec.FDCID,
+		Description: foodRec.Description.String,
+		DataType:    FoodDataType(foodRec.DataType.String),
+	}
+	if foodRec.FoodCategoryID.Valid {
+		cat, ok := catmap[foodRec.FoodCategoryID.Int]
+		if ok {
+			f.Category = &cat
+		}
+	}
+
+	nutrients := []FoodNutrient{}
+	for _, fn := range foodRec.R.FDCUsdaFoodNutrients {
+		n := fn.R.Nutrient
+		if n == nil {
+			continue
+		}
+		nutrients = append(nutrients, FoodNutrient{
+			Amount:     float64(fn.Amount.Float32),
+			DataPoints: fn.DataPoints.Int,
+			Nutrient: Nutrient{
+				Id:       n.ID,
+				Name:     n.Name.String,
+				UnitName: FoodNutrientUnit(n.UnitName.String),
+			},
+		})
+
+	}
+	f.Nutrients = nutrients
+
+	if foodRec.R.FDCUsdaBrandedFood != nil {
+		brandInfo := foodRec.R.FDCUsdaBrandedFood
+		f.BrandedInfo = &BrandedFood{
+			BrandOwner:          brandInfo.BrandOwner.Ptr(),
+			BrandedFoodCategory: brandInfo.BrandedFoodCategory.Ptr(),
+			HouseholdServing:    brandInfo.HouseholdServingFulltext.Ptr(),
+			Ingredients:         brandInfo.Ingredients.Ptr(),
+			ServingSize:         float64(brandInfo.ServingSize.Float32),
+			ServingSizeUnit:     brandInfo.ServingSizeUnit.String,
+		}
+	}
+
+	portions := []FoodPortion{}
+	for _, p := range foodRec.R.FDCUsdaFoodPortions {
+		portions = append(portions, FoodPortion{
+			Amount:             float64(p.Amount.Float32),
+			GramWeight:         float64(p.GramWeight.Float32),
+			Id:                 p.ID,
+			Modifier:           p.Modifier.String,
+			PortionDescription: p.PortionDescription.String,
+		})
+	}
+	f.Portions = &portions
+
+	m, err := a.UnitMappingsFromFood(ctx, &f)
+	if err != nil {
+		return nil, err
+	}
+	f.UnitMappings = m
+	return &f, nil
+}
 func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
 	defer span.End()
 
-	f, err := a.getFoodById2(ctx, fdcId)
+	f, err := a.getFoodById(ctx, fdcId)
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
@@ -159,16 +134,28 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodsByIds")
 	defer span.End()
 
-	foods, count, err := a.DB().FoodsByIds(ctx, params.FdcId)
+	foodRecs, err := models.UsdaFoods(
+		qm.Where("fdc_id = any(?)", pq.Array(params.FdcId)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
+			models.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).All(ctx, a.db.DB())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+		return err
 	}
+	items := []Food{}
+	for _, foodRec := range foodRecs {
+		f, err := a.foodFromRec(ctx, foodRec)
+		if err != nil {
+			return err
+		}
+		items = append(items, *f)
+	}
+
 	listMeta := Items{PageCount: 1}
-	listMeta.setTotalCount(count)
-	items, err := a.buildPaginatedFood(ctx, foods)
-	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
-	}
+	listMeta.setTotalCount(uint64(len(items)))
+
 	resp := PaginatedFoods{
 		Foods: &items,
 		Meta:  listMeta,
@@ -208,45 +195,56 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 
 }
 
-func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, error) {
-	items := make([]Food, len(foods))
-	var wg sync.WaitGroup
-	fatalErrors := make(chan error)
-	wgDone := make(chan bool)
+func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
+	ctx, span := a.tracer.Start(ctx, "getFoodById")
+	defer span.End()
 
-	for x := range foods {
-		wg.Add(1)
-		go func(i int) {
-			food := foods[i]
-			f := Food{
-				Description: food.Description,
-				DataType:    FoodDataType(food.DataType),
-				FdcId:       food.FdcID,
-				Nutrients:   make([]FoodNutrient, 0),
-			}
-			err := a.addDetailToFood(ctx, &f, food.CategoryID.Int64)
-			if err != nil {
-				fatalErrors <- err
-			}
-			items[i] = f
-			wg.Done()
-		}(x)
+	foodRec, err := models.UsdaFoods(
+		qm.Where("fdc_id = ?", fdcId),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
+			models.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).One(ctx, a.db.DB())
+
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, fmt.Errorf("failed to get food with id %d: %w", fdcId, err)
 	}
-	go func() {
-		wg.Wait()
-		close(wgDone)
-	}()
 
-	// Wait until either WaitGroup is done or an error is received through the channel
-	select {
-	case <-wgDone:
-		// carry on
-		break
-	case err := <-fatalErrors:
-		// close(fatalErrors)
+	f, err := a.foodFromRec(ctx, foodRec)
+	if err != nil {
 		return nil, err
 	}
 
+	return f, nil
+}
+
+func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, error) {
+	ctx, span := a.tracer.Start(ctx, "buildPaginatedFood")
+	defer span.End()
+
+	ids := []int{}
+	for _, food := range foods {
+		ids = append(ids, food.FdcID)
+	}
+	foodRecs, err := models.UsdaFoods(
+		qm.Where("fdc_id = any(?)", pq.Array(ids)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
+			models.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).All(ctx, a.db.DB())
+	if err != nil {
+		return nil, err
+	}
+	items := []Food{}
+	for _, foodRec := range foodRecs {
+		f, err := a.foodFromRec(ctx, foodRec)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, *f)
+	}
 	return items, nil
 
 }

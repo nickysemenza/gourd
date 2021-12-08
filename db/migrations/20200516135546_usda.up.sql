@@ -1,4 +1,4 @@
--- schema adepted from https://github.com/hogand/USDA-FoodData-SQLite3/blob/master/import_food_data.py#L89-L404
+-- schema adapted from https://github.com/hogand/USDA-FoodData-SQLite3/blob/master/import_food_data.py#L89-L404
 -- todo: 
 -- ERROR:  insert or update on table "usda_food" violates foreign key constraint "usda_food_food_category_id_fkey"
 -- DETAIL:  Key (food_category_id)=(9602) is not present in table "usda_food_category".
