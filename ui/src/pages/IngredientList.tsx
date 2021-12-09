@@ -63,7 +63,7 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { ingredient, children } = original;
           return (
-            <div className="flex flex-col w-4">
+            <div className="flex flex-col w-1/6">
               {showIDs && <Code>{original.ingredient.id}</Code>}
 
               <div className="text-md font-medium text-gray-900">
@@ -88,7 +88,7 @@ const IngredientList: React.FC = () => {
           const recipes = original.recipes || [];
           const children = original.children || [];
           return (
-            <div className="w-16">
+            <div className="w-1/6">
               <ul className="list-disc list-outside pl-4">
                 {recipes.map((r) => (
                   <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
@@ -120,7 +120,7 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { unit_mappings } = original;
           return (
-            <div className="flex flex-col w-8">
+            <div className="flex flex-col w-1/6">
               <UnitMappingList unit_mappings={unit_mappings} includeDot />
             </div>
           );
@@ -132,7 +132,7 @@ const IngredientList: React.FC = () => {
         Cell: ({ row: { original } }: CellProps<i>) => {
           const { ingredient } = original;
           return (
-            <div className="flex flex-col w-8">
+            <div className="flex flex-col w-1/6">
               <ButtonGroup
                 compact
                 buttons={[
@@ -159,7 +159,7 @@ const IngredientList: React.FC = () => {
         id: "food",
         Cell: ({ row: { original } }: CellProps<i>) => {
           return (
-            <div className="flex flex-col w-32">
+            <div className="flex flex-col w-1/2">
               <FoodSearch
                 enableSearch={onlyMissingFDC}
                 name={original.ingredient.name}

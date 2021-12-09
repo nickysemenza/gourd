@@ -12,10 +12,11 @@ import update from "immutability-helper";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
 import { ButtonGroup, Pill2 } from "../components/Button";
-import { PlusCircle } from "react-feather";
+import { Grid, List, PlusCircle } from "react-feather";
 import ProgressiveImage from "../components/ProgressiveImage";
 import { sumIngredients } from "../components/RecipeEditorUtils";
 import dayjs from "dayjs";
+import { RecipeGrid } from "../components/RecipeGrid";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -27,6 +28,7 @@ const RecipeList: React.FC = () => {
 
   const [params, setParams] = useState(initialParams);
   const [showOlder, setShowOlder] = useState(false);
+  const [grid, setGrid] = useState(false);
 
   const fetchData = React.useCallback((params: PaginationParameters) => {
     setParams(params);
@@ -93,9 +95,9 @@ const RecipeList: React.FC = () => {
       {
         Header: "meals",
         Cell: ({ row: { original } }: CellProps<i>) => (
-          <div className="w-9/12 flex ">
+          <div>
             {(original.linked_photos || []).map((p) => (
-              <ProgressiveImage photo={p} />
+              <ProgressiveImage photo={p} key={p.id} className="w-1/6" />
             ))}
           </div>
         ),
@@ -129,14 +131,38 @@ const RecipeList: React.FC = () => {
       <Helmet>
         <title>recipes | gourd</title>
       </Helmet>
-      <PaginatedTable
-        columns={columns}
-        data={data?.recipes || []}
-        fetchData={fetchData}
-        isLoading={false}
-        totalCount={data?.meta?.total_count || 0}
-        pageCount={data?.meta?.page_count || 1}
-      />
+
+      <div className="py-2">
+        <ButtonGroup
+          buttons={[
+            {
+              onClick: () => setGrid(true),
+              disabled: grid,
+              text: "grid",
+              IconLeft: Grid,
+            },
+            {
+              onClick: () => setGrid(false),
+              disabled: !grid,
+              text: "table",
+              IconLeft: List,
+            },
+          ]}
+        />
+      </div>
+      {grid ? (
+        <RecipeGrid recipes={recipes} />
+      ) : (
+        <PaginatedTable
+          columns={columns}
+          data={recipes}
+          fetchData={fetchData}
+          isLoading={false}
+          totalCount={data?.meta?.total_count || 0}
+          pageCount={data?.meta?.page_count || 1}
+        />
+      )}
+
       <div>
         <ButtonGroup
           compact

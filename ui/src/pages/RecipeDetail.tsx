@@ -526,7 +526,7 @@ const RecipeDetail: React.FC = () => {
 
       <div className="w-9/12 flex ">
         {(recipe.linked_photos || []).map((p) => (
-          <ProgressiveImage photo={p} maxWidth={200} />
+          <ProgressiveImage photo={p} className="w-1/6" />
         ))}
       </div>
       <div>

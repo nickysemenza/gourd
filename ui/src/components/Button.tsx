@@ -22,7 +22,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     compact ? "px-2" : "px-5"
   } text-indigo-100 transition-colors duration-150 text-sm
   bg-indigo-700 focus:shadow-outline hover:bg-indigo-800
-  disabled:bg-indigo-500 inline-flex items-center`;
+  disabled:bg-indigo-400 inline-flex items-center`;
   return (
     <div className="inline-flex" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {

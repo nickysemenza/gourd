@@ -31,30 +31,21 @@ const NavBar: React.FC = () => {
                 </div>
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-baseline space-x-4">
-                    {navItems.map((item) =>
-                      history.location.pathname.includes(item.path) ? (
-                        <Fragment key={item.path}>
-                          {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-                          <a
-                            href={`#${item.title}`}
-                            className="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
-                          >
-                            {item.title}
-                          </a>
-                        </Fragment>
-                      ) : (
-                        <Link
-                          // <a
-                          key={item.path}
-                          // href={`/${item.title}`}
-                          to={`/${item.path}`}
-                          // onClick={() => history.push("/" + item.path)}
-                          className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                        >
-                          {item.title}
-                        </Link>
-                      )
-                    )}
+                    {navItems.map((item) => (
+                      <Link
+                        // <a
+                        key={item.path}
+                        // href={`/${item.title}`}
+                        to={`/${item.path}`}
+                        // onClick={() => history.push("/" + item.path)}
+                        className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${
+                          history.location.pathname.includes(item.path) &&
+                          "bg-gray-900 text-white"
+                        }`}
+                      >
+                        {item.title}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -63,33 +63,29 @@ const FoodSearch: React.FC<{
   // force search on if no results
   const showSearch = enableSearch || results.length === 0;
   return (
-    <div className="">
-      <ul className="list-disc list-outside pl-4">
-        {showSearch && (
-          <div className="w-full">
-            <input
-              type="text"
-              className="border-2 border-gray-300"
-              value={ingredientName}
-              onChange={(e) => {
-                setIngredientName(e.target.value);
-              }}
-            />
-          </div>
-        )}
-        {items.map((r, x) => {
-          const isHighlighted = highlightId === r.fdc_id;
-          return (
-            <FoodRow
-              food={r}
-              isHighlighted={isHighlighted}
-              onLink={onLink}
-              x={x}
-              key={x}
-            />
-          );
-        })}
-      </ul>
+    <div className="w-3/12">
+      {showSearch && (
+        <input
+          type="text"
+          className="border-2 border-gray-300"
+          value={ingredientName}
+          onChange={(e) => {
+            setIngredientName(e.target.value);
+          }}
+        />
+      )}
+      {items.map((r, x) => {
+        const isHighlighted = highlightId === r.fdc_id;
+        return (
+          <FoodRow
+            food={r}
+            isHighlighted={isHighlighted}
+            onLink={onLink}
+            x={x}
+            key={x}
+          />
+        );
+      })}
       {/* <Debug data={foods.foods} /> */}
     </div>
   );
@@ -134,22 +130,22 @@ export const FoodRow: React.FC<{
       )}
     </div>
     <div className="flex flex-col p-1">
-      <div className="">{food.description}</div>{" "}
-      <div className="flex justify-between">
-        <p className="font-mono text-xs text-gray-500">{food.data_type}</p>
-        <p className="text-sm">{food.nutrients?.length} nutrients</p>
-      </div>
+      <div className="flex whitespace-normal">{food.description}</div>
+      <p className="font-mono text-xs text-gray-500">{food.data_type}</p>
+      <p className="text-sm">{food.nutrients?.length} nutrients</p>
       <UnitMappingList unit_mappings={food.unit_mappings} />
+      {!!food.branded_info && (
+        <div className="flex flex-col w-80">
+          {food.branded_info.brand_owner} <br />
+          <p className="text-sm italic">
+            {food.branded_info.branded_food_category}
+          </p>
+          <p className="text-xs text-gray-500 whitespace-normal">
+            {food.branded_info.ingredients}
+          </p>
+        </div>
+      )}
     </div>
-    {!!food.branded_info && (
-      <div>
-        {food.branded_info.brand_owner} <br />
-        <p className="text-sm italic">
-          {food.branded_info.branded_food_category}
-        </p>
-        <p className="text-xs text-gray-500">{food.branded_info.ingredients}</p>
-      </div>
-    )}
   </div>
 );
 
