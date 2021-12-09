@@ -42,6 +42,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		"$", "\\$",
 		"#", "\\#",
 		"_", "\\_",
+		"'", "\textquotesingle{}",
 		"^", "\\^{}",
 		"\\", "\\textbackslash{}",
 		"~", "\\~{}",

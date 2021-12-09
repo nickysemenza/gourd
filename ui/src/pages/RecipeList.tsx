@@ -23,12 +23,12 @@ const RecipeList: React.FC = () => {
   const [checked, setChecked] = useState(new Set<string>());
   let initialParams: PaginationParameters = {
     offset: 0,
-    limit: 2,
+    limit: 20,
   };
 
   const [params, setParams] = useState(initialParams);
   const [showOlder, setShowOlder] = useState(false);
-  const [grid, setGrid] = useState(false);
+  const [grid, setGrid] = useState(true);
 
   const fetchData = React.useCallback((params: PaginationParameters) => {
     setParams(params);
