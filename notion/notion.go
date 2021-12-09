@@ -89,7 +89,7 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 			date := dateProp.(*notionapi.DateProperty).Date.Start
 			if date != nil {
 				utcTime := time.Time(*date) //todo: this is slightly wrong
-				meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 9)).Ptr()
+				meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 0)).Ptr()
 			}
 		}
 		if tags, ok := page.Properties["Tags"]; ok {
@@ -140,7 +140,7 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 		// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
 		// }
 
-		yday := notionapi.Date(time.Now().AddDate(0, 0, -4))
+		yday := notionapi.Date(time.Now().AddDate(0, 0, -8))
 
 		testFilter := notionapi.PropertyFilter{
 			Property: "Date",

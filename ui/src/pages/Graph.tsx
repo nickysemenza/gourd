@@ -57,10 +57,14 @@ const Graph: React.FC = () => {
       networkgraph: {
         keys: ["from", "to"],
         layoutAlgorithm: {
-          enableSimulation: true,
+          // enableSimulation: true,
           // friction: -0.9,
           integration: "verlet",
-          linkLength: 100,
+          linkLength: 40,
+        },
+        marker: {
+          radius: 5,
+          lineWidth: 1,
         },
       },
     },
@@ -101,14 +105,12 @@ const Graph: React.FC = () => {
   return (
     <div>
       <div className="text-gray-900 flex">Graph</div>
-      <div
-        className="border border-indigo-600"
-        style={{ width: "1000px", height: "800px" }}
-      >
+      <div className="border border-indigo-600 w-full h-full">
         <HighchartsReact
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
+          height={500}
         />
       </div>
     </div>

@@ -42,13 +42,14 @@ const Meals: React.FC = () => {
     const mApi = new MealsApi(getOpenapiFetchConfig());
     return [
       {
-        Header: "ate_at",
+        Header: "Ate on",
         accessor: "ate_at",
         Cell: (cell: CellProps<i>) => {
           const { ate_at } = cell.row.original;
           const ago = dayjs(ate_at);
 
-          return <div>{ago.format("dddd, MMMM D, YYYY h:mm A")}</div>;
+          // return <div>{ago.format("ddd, MMM D, YYYY h:mm A Z")}</div>;
+          return <div>{ago.format("ddd, MMM D, YYYY")}</div>;
         },
       },
       {

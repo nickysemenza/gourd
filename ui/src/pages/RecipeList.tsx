@@ -15,6 +15,7 @@ import { ButtonGroup, Pill2 } from "../components/Button";
 import { PlusCircle } from "react-feather";
 import ProgressiveImage from "../components/ProgressiveImage";
 import { sumIngredients } from "../components/RecipeEditorUtils";
+import dayjs from "dayjs";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -103,7 +104,10 @@ const RecipeList: React.FC = () => {
       {
         Header: "created at",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          return original.detail.created_at;
+          const ago = dayjs(original.detail.created_at);
+
+          // return <div>{ago.format("ddd, MMM D, YYYY h:mm A Z")}</div>;
+          return <div>{ago.format("ddd, MMM D, YYYY")}</div>;
         },
       },
       ...(showIds
