@@ -1,10 +1,15 @@
 package image
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"image"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"os/exec"
+	"strings"
 
 	_ "image/gif"
 	_ "image/jpeg"
@@ -50,7 +55,44 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	}
 	defer resp.Body.Close()
 
-	m, format, err := image.Decode(resp.Body)
+	var img io.Reader
+	if strings.Contains(url, ".heic") {
+		// shell out to imagemagick for heic conversion
+		inputFile, err := ioutil.TempFile("", ".*.heic")
+		if err != nil {
+			return nil, err
+		}
+		defer inputFile.Close()
+		outputFile, err := ioutil.TempFile("", ".*.png")
+		if err != nil {
+			return nil, err
+		}
+		defer outputFile.Close()
+
+		_, err = io.Copy(inputFile, resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		cmd := exec.Command("convert", inputFile.Name(), outputFile.Name())
+		err = cmd.Start()
+		if err != nil {
+			return nil, err
+		}
+		err = cmd.Wait()
+		if err != nil {
+			return nil, err
+		}
+		rawImg, err := ioutil.ReadFile(outputFile.Name())
+		if err != nil {
+			return nil, err
+		}
+		img = bytes.NewReader(rawImg)
+	} else {
+		// jpg, png, gif
+		img = resp.Body
+	}
+
+	m, format, err := image.Decode(img)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get image %s %w:", url, err)
 	}

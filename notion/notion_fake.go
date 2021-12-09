@@ -78,6 +78,9 @@ func (f *fakeBlock) Get(context.Context, notionapi.BlockID) (notionapi.Block, er
 func (f *fakeBlock) Update(ctx context.Context, id notionapi.BlockID, request *notionapi.BlockUpdateRequest) (notionapi.Block, error) {
 	return nil, fmt.Errorf("not implemented")
 }
+func (f *fakeBlock) Delete(ctx context.Context, id notionapi.BlockID) (notionapi.Block, error) {
+	return nil, fmt.Errorf("not implemented")
+}
 
 type fakePage struct {
 	details map[notionapi.PageID]*notionapi.Page
@@ -107,8 +110,10 @@ func NewFakeNotion(t *testing.T) *Client {
 		children: map[notionapi.BlockID][]notionapi.Block{
 			"foo": {
 				&notionapi.ImageBlock{
-					Type: notionapi.BlockTypeImage,
-					ID:   "block1",
+					BasicBlock: notionapi.BasicBlock{
+						Type: notionapi.BlockTypeImage,
+						ID:   "block1",
+					},
 					Image: notionapi.Image{
 						File: &notionapi.FileObject{
 							URL: "https://picsum.photos/200/400",
@@ -116,8 +121,10 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 				},
 				&notionapi.CodeBlock{
-					Type: notionapi.BlockTypeCode,
-					ID:   "block2",
+					BasicBlock: notionapi.BasicBlock{
+						Type: notionapi.BlockTypeCode,
+						ID:   "block2",
+					},
 					Code: notionapi.Code{
 						Text: []notionapi.RichText{
 							{Text: notionapi.Text{Content: `name: toast
@@ -128,8 +135,10 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 				},
 				&notionapi.CodeBlock{
-					Type: notionapi.BlockTypeCode,
-					ID:   "block3",
+					BasicBlock: notionapi.BasicBlock{
+						Type: notionapi.BlockTypeCode,
+						ID:   "block3",
+					},
 					Code: notionapi.Code{
 						Text: []notionapi.RichText{
 							{Text: notionapi.Text{Content: "not a arecipe"}},
@@ -137,9 +146,12 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 				},
 				&notionapi.ChildPageBlock{
-					Object: notionapi.ObjectTypeBlock,
-					Type:   notionapi.BlockTypeChildPage,
-					ID:     "block4child",
+					BasicBlock: notionapi.BasicBlock{
+						Object: notionapi.ObjectTypeBlock,
+						Type:   notionapi.BlockTypeChildPage,
+						ID:     "block4child",
+					},
+
 					ChildPage: struct {
 						Title string "json:\"title\""
 					}{
@@ -149,8 +161,10 @@ func NewFakeNotion(t *testing.T) *Client {
 			},
 			"foo2": {
 				&notionapi.CodeBlock{
-					Type: notionapi.BlockTypeCode,
-					ID:   "block2",
+					BasicBlock: notionapi.BasicBlock{
+						Type: notionapi.BlockTypeCode,
+						ID:   "block2",
+					},
 					Code: notionapi.Code{
 						Text: []notionapi.RichText{
 							{Text: notionapi.Text{Content: `name: bar

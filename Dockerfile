@@ -13,8 +13,10 @@ RUN make bin/gourd
 
 FROM debian:stable
 RUN apt-get update
+RUN apt-get install -y imagemagick
 RUN apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 RUN which pdflatex
+RUN which imagemagick
 WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/db/migrations ./db/migrations

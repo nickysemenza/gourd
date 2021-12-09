@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/nickysemenza/gourd/common"
@@ -105,10 +104,6 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 				continue
 			}
 
-			if strings.Contains(nPhoto.URL, ".heic") {
-				l.Infof("skipping heic: %s", nPhoto.URL)
-				continue
-			}
 			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
 			if err != nil {
 				return err
