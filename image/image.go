@@ -73,6 +73,7 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 		if err != nil {
 			return nil, err
 		}
+		// nolint:gosec
 		cmd := exec.Command("convert", inputFile.Name(), outputFile.Name())
 		err = cmd.Start()
 		if err != nil {
