@@ -19,7 +19,7 @@ services:
         "-c",
         "log_destination=stderr",
         "-c",
-        "log_line_prefix=%t [%p]:[%l] user=%u, db=%d ",
+        "log_line_prefix=%t [%p]:[%l] user=%u, db=%d "
       ]
   jaeger:
     container_name: food-jaeger
@@ -38,7 +38,7 @@ services:
   collector:
     image: otel/opentelemetry-collector:0.41.0
     platform: linux/amd64
-    command: ["--config=/conf/collector-config.yaml"]
+    command: [ "--config=/conf/collector-config.yaml" ]
     volumes:
       - ./collector-config.yaml:/conf/collector-config.yaml
     ports:
@@ -60,6 +60,7 @@ services:
     ports:
       - "9090:9090"
   gourd:
+    platform: linux/amd64
     build:
       context: .
     depends_on:

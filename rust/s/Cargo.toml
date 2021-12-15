@@ -12,7 +12,8 @@ path = "src/main.rs"
 name = "gourd"
 
 [dependencies]
-actix-web = "4.0.0-beta.10"
+actix-web = "=4.0.0-beta.13"
+actix-http = "=3.0.0-beta.14"
 futures = "0.3"
 env_logger = "0.8"
 serde = { version = "1.0", features = ["derive"] }
@@ -21,10 +22,10 @@ serde_derive = "^1.0"
 serde_yaml = "0.8.21"
 url = "1.7"
 ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
-actix-web-opentelemetry = "0.11.0-beta.5"
+actix-web-opentelemetry = "0.11.0-beta.6"
 opentelemetry-jaeger = "0.15"
 opentelemetry = "0.16.0"
-sqlx = { version = "0.5.2", default-features = false, features = [ "runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate", "offline","bigdecimal","json"] }
+sqlx = { version = "0.5.7", default-features = false, features = [ "runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate", "offline","bigdecimal","json"] }
 serde-aux = "1.1.0"
 config = { version = "0.11.0", default-features = false, features = ["yaml"] }
 bigdecimal = { version = "0.2.0", features = ["serde"] }
@@ -46,4 +47,4 @@ version = "0.13.2"
 features = ["auto-initialize"]
 
 [dev-dependencies]
-actix-rt = "1"
+actix-rt = "2.5.0"

@@ -1,4 +1,4 @@
-FROM golang:1.17 AS builder
+FROM golang:1.17.0 AS builder
 
 
 # Copy the code from the host and compile it
@@ -9,14 +9,15 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
+RUN go mod vendor
 RUN make bin/gourd
 
 FROM debian:stable
 RUN apt-get update
-RUN apt-get install -y imagemagick
+# RUN apt-get install -y imagemagick
 RUN apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 RUN which pdflatex
-RUN which imagemagick
+# RUN which imagemagick
 WORKDIR /work
 COPY --from=builder /work/bin ./bin
 COPY --from=builder /work/db/migrations ./db/migrations

@@ -210,9 +210,9 @@ func TestSync(t *testing.T) {
 	require.Equal("bread", res.Detail.Sections[0].Ingredients[0].Ingredient.Ingredient.Name)
 	require.Equal("eat", res.Detail.Sections[0].Instructions[0].Instruction)
 
-	meals, err := apiManager.listMeals(ctx)
-	require.NoError(err)
-	require.Len(meals, 1)
+	// meals, err := apiManager.listMeals(ctx)
+	// require.NoError(err)
+	// require.Len(meals, 1)
 
 	l, err := apiManager.Latex(ctx, rd)
 	require.NoError(err)
