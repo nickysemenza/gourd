@@ -101,15 +101,6 @@ pub async fn foo(filename: &str, pool: &PgPool) -> anyhow::Result<()> {
 
     Ok(())
 }
-// }
-//
-// #[derive(Debug, Clone, Serialize)]
-// pub struct Ingredient {
-//     id: String,
-//     name: String,
-//     fdc_id: Option<i32>,
-//     parent: Option<String>,
-// }
 
 #[derive(Debug, Clone, Serialize, ormx::Table)]
 #[ormx(table = "ingredient_units", id = id, insertable, deletable)]

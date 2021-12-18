@@ -1,13 +1,14 @@
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { Menu as MenuIcon, X } from "react-feather";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { isLoggedIn, parseJWT } from "../config";
 import { Logo } from "./Logo";
 import { navItems } from "./navItems";
 
 const NavBar: React.FC = () => {
-  const history = useHistory();
+  const history = useNavigate();
+  const location = useLocation();
 
   function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
@@ -25,7 +26,7 @@ const NavBar: React.FC = () => {
                     src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
                     alt="Workflow"
                   /> */}
-                  <div onClick={() => history.push("/")}>
+                  <div onClick={() => history("/")}>
                     <Logo />
                   </div>
                 </div>
@@ -39,7 +40,7 @@ const NavBar: React.FC = () => {
                         to={`/${item.path}`}
                         // onClick={() => history.push("/" + item.path)}
                         className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${
-                          history.location.pathname.includes(item.path) &&
+                          location.pathname.includes(item.path) &&
                           "bg-gray-900 text-white"
                         }`}
                       >

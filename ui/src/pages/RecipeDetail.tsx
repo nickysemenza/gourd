@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import queryString from "query-string";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import RecipeDetailTable, {
   UpdateIngredientProps,
 } from "../components/RecipeDetailTable";
@@ -86,7 +86,7 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
 };
 const RecipeDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };
-  let history = useHistory();
+  let history = useNavigate();
   const { search } = useLocation();
   const values = queryString.parse(search) as { multiplier?: string };
   const { error, data } = useGetRecipeById({
@@ -148,7 +148,7 @@ const RecipeDetail: React.FC = () => {
       !multiplierTouched
     ) {
       setMultiplier(multiplierParam);
-      history.push(
+      history(
         `/recipe/${id}?${queryString.stringify({
           multiplier: multiplierParam,
         })}`
@@ -160,7 +160,7 @@ const RecipeDetail: React.FC = () => {
   const setMultiplierW = (m: number) => {
     setMultiplierTouched(true);
     setMultiplier(m);
-    history.push(`/recipe/${id}?${queryString.stringify({ multiplier: m })}`);
+    history(`/recipe/${id}?${queryString.stringify({ multiplier: m })}`);
   };
 
   //https://stackoverflow.com/a/26265095
@@ -189,9 +189,7 @@ const RecipeDetail: React.FC = () => {
       });
       // const updated = await post(recipe);
       setEdit(false);
-      history.push(
-        `/recipe/${updated.detail.id}?${queryString.stringify(values)}`
-      );
+      history(`/recipe/${updated.detail.id}?${queryString.stringify(values)}`);
     }
   };
 

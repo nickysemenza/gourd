@@ -5,10 +5,9 @@ import Test from "./Test";
 import RecipeList from "./pages/RecipeList";
 import {
   BrowserRouter as Router,
-  Switch,
   Route,
-  Redirect,
-  RouteProps,
+  Navigate,
+  Routes,
 } from "react-router-dom";
 import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
@@ -80,22 +79,15 @@ const registerTracing = (url: string) => {
 };
 registerTracing(getTracingURL());
 
-const PrivateRoute = ({ children, ...rest }: RouteProps) => {
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        isLoggedIn() || true ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location },
-            }}
-          />
-        )
-      }
+const RequireAuth = ({ children }: { children: JSX.Element }) => {
+  let authed = isLoggedIn() || true;
+  return authed ? (
+    children
+  ) : (
+    <Navigate
+      to={{
+        pathname: "/login",
+      }}
     />
   );
 };
@@ -116,47 +108,42 @@ function App() {
             <ToastContainer position="bottom-right" />
             <NavBar />
             <div className="lg:container lg:mx-auto">
-              <Switch>
-                <Route path="/recipe/:id">
-                  <RecipeDetail />
-                </Route>
-                <Route path="/recipes">
-                  <RecipeList />
-                </Route>
-                <Route path="/ingredients/:id">
-                  <IngredientDetail />
-                </Route>
-                <Route path="/ingredients">
-                  <IngredientList />
-                </Route>
-                <Route path="/create">
-                  <CreateRecipe />
-                </Route>
-                <Route path="/food">
-                  <Food />
-                </Route>
-                <Route path="/playground">
-                  <Playground />
-                </Route>
-                <Route path="/diff">
-                  <RecipeDiff />
-                </Route>
-                <Route path="/graph">
-                  <Graph />
-                </Route>
-                <PrivateRoute path="/photos">
-                  <Photos />
-                </PrivateRoute>
-                <PrivateRoute path="/meals">
-                  <Meals />
-                </PrivateRoute>
-                <PrivateRoute path="/albums">
-                  <Albums />
-                </PrivateRoute>
-                <Route path="/">
-                  <Test />
-                </Route>
-              </Switch>
+              <Routes>
+                <Route path="/recipe/:id" element={<RecipeDetail />} />
+                <Route path="/recipes" element={<RecipeList />} />
+                <Route path="/ingredients/:id" element={<IngredientDetail />} />
+                <Route path="/ingredients" element={<IngredientList />} />
+                <Route path="/create" element={<CreateRecipe />} />
+                <Route path="/food" element={<Food />} />
+                <Route path="/playground" element={<Playground />} />
+                <Route path="/diff" element={<RecipeDiff />} />
+                <Route path="/graph" element={<Graph />} />
+                <Route
+                  path="/photos"
+                  element={
+                    <RequireAuth>
+                      <Photos />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/meals"
+                  element={
+                    <RequireAuth>
+                      <Meals />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/albums"
+                  element={
+                    <RequireAuth>
+                      <Albums />
+                    </RequireAuth>
+                  }
+                />
+                <Route path="/" element={<Test />} />
+              </Routes>
             </div>
           </Router>
         </WasmContextProvider>

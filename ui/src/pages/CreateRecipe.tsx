@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { EntitySelector } from "../components/EntitySelector";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ButtonGroup } from "../components/Button";
 import { RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 
 const CreateRecipe: React.FC = () => {
-  let history = useHistory();
+  let history = useNavigate();
   const [ingredientName, setIngredientName] = useState("");
   return (
     <div>
@@ -14,7 +14,7 @@ const CreateRecipe: React.FC = () => {
         createKind="recipe"
         showKind={["recipe"]}
         onChange={(a) => {
-          history.push(`/recipe/${a.value}`);
+          history(`/recipe/${a.value}`);
           console.log(a);
         }}
       />
@@ -39,7 +39,7 @@ const CreateRecipe: React.FC = () => {
                   });
 
                   console.log({ recipe });
-                  history.push(`/recipe/${recipe.detail.id}`);
+                  history(`/recipe/${recipe.detail.id}`);
                 };
                 foo();
               },

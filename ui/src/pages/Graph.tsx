@@ -4,7 +4,7 @@ import HighchartsReact from "highcharts-react-official";
 import HighchartsNetworkGraph from "highcharts/modules/networkgraph";
 
 import { useRecipeDependencies } from "../api/openapi-hooks/api";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type CustomPoint = Highcharts.Point & {
   raw_kind: "ingredient" | "recipe";
@@ -15,7 +15,7 @@ const Graph: React.FC = () => {
   HighchartsNetworkGraph(Highcharts);
 
   const { data } = useRecipeDependencies({});
-  let history = useHistory();
+  let history = useNavigate();
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
   if (!data || !data.items) return null;
@@ -80,7 +80,7 @@ const Graph: React.FC = () => {
               var node = this as CustomPoint;
               console.log(node);
 
-              history.push(
+              history(
                 node.raw_kind === "recipe"
                   ? `/recipe/${node.raw_id}`
                   : `/ingredients/${node.raw_id}`
