@@ -5,7 +5,7 @@ use openapi::models::{
     SectionIngredientInput, SectionInstructionInput,
 };
 use serde::Deserialize;
-use tracing::{debug, error, span};
+use tracing::{debug, span};
 
 use crate::scraper;
 
@@ -54,12 +54,8 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     let _enter = root.enter();
 
     let i = gourd_common::parse_amount(&info.text);
-    if i.is_err() {
-        let msg = format!("{:?}", i.err().unwrap());
-        error!("parse error {}", msg);
-        return HttpResponse::BadRequest().body(msg);
-    }
-    let foo = web::Json(i.unwrap());
+
+    let foo = web::Json(i);
 
     HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
 }

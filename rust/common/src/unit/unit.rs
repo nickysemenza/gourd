@@ -158,7 +158,7 @@ const CENTS_TO_DOLLAR: f32 = 100.0;
 
 impl Measure {
     pub fn from_string(s: String) -> Measure {
-        let a = ingredient::parse_amount(s.as_str()).unwrap()[0].clone();
+        let a = ingredient::parse_amount(s.as_str())[0].clone();
         Measure::parse(BareMeasurement::new(singular(&a.unit), a.value))
     }
     pub fn normalize(&self) -> Measure {

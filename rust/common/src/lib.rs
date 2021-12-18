@@ -81,12 +81,12 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
         s2 = s2.replace("((", "(");
         s2 = s2.replace("))", ")");
     }
-    let i = dbg!(ingredient::from_str(s2.as_str(), true))?;
+    let i = dbg!(ingredient::from_str(s2.as_str()));
     Ok(section_ingredient_from_parsed(i, s))
 }
-pub fn parse_amount(s: &str) -> Result<Vec<ingredient::Amount>, String> {
+pub fn parse_amount(s: &str) -> Vec<ingredient::Amount> {
     let i = ingredient::parse_amount(s);
-    info!("parsed {} into {:?}", s, i.clone().unwrap_or(vec![]));
+    info!("parsed {} into {:?}", s, i.clone());
     return i;
 }
 fn get_grams_si(si: SectionIngredient) -> f64 {
