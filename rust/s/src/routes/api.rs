@@ -1,10 +1,7 @@
 use actix_web::{web, HttpResponse};
 use openapi::models::{Amount, IngredientKind, SectionIngredient};
-use sea_orm::entity::*;
 use serde::Serialize;
 use sqlx::PgPool;
-
-use crate::db;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct SI {
@@ -53,20 +50,8 @@ fn si_to_api(r: SI) -> SectionIngredient {
 pub async fn index(pool: web::Data<PgPool>) -> HttpResponse {
     let rows = get_test(&pool).await.unwrap();
     let data: Vec<SectionIngredient> = rows.into_iter().map(|r| si_to_api(r)).collect();
-    dbg!(data);
 
-    let conn = sea_orm::Database::connect("postgresql://gourd:gourd@localhost:5555/food")
-        .await
-        .unwrap();
-
-    let demo: Vec<(db::recipes::Model, Vec<db::recipe_details::Model>)> =
-        db::recipes::Entity::find()
-            .find_with_related(db::recipe_details::Entity)
-            .all(&conn)
-            .await
-            .unwrap();
-
-    HttpResponse::Ok().json(actix_web::web::Json(demo)) // <- send response
+    HttpResponse::Ok().json(actix_web::web::Json(data)) // <- send response
 }
 
 #[tracing::instrument]

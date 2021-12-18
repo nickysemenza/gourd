@@ -62,22 +62,11 @@ async fn main() -> std::io::Result<()> {
         application.run_until_stopped().await?;
     }
     initialize_tracing("gourd-cli");
-    if let Some(m) = matches.subcommand_matches("load_mappings") {
+    if let Some(_m) = matches.subcommand_matches("load_mappings") {
         let root = span!(tracing::Level::TRACE, "load_mappings",);
         let _enter = root.enter();
-
-        let connection_pool = gourd::startup::get_connection_pool(&configuration.database)
-            .await
-            .expect("Failed to connect to Postgres.");
-        let res = gourd::routes::get_test(&connection_pool).await;
-        info!("loaded some rows: {}", res.unwrap().len());
-        let mapping = m.value_of("MAPPING").expect("missing mapping file");
-        gourd::foo::foo(mapping, &connection_pool)
-            .await
-            .expect("read in file");
     }
     opentelemetry::global::force_flush_tracer_provider();
-    // opentelemetry_jaeger::f
 
     Ok(())
 }
