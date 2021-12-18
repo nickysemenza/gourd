@@ -20,15 +20,13 @@ export const RecipeLink: React.FC<Props> = ({
   <div className="inline-flex">
     <Link
       to={`/recipe/${id}?multiplier=${multiplier || 1}`}
-      className="link flex pr-0.5"
+      className={`font-bold link pr-0.5 underline decoration-blue-300 ${
+        is_latest_version ? "text-blue-800" : "text-blue-200"
+      }`}
     >
-      <div
-        className={`${is_latest_version ? "text-blue-800" : "text-blue-200"}`}
-      >
-        {name}
-      </div>
+      {name}
     </Link>
-    <div className="flex font-mono">v{version}</div>
+    <div className="flex font-mono small">v{version}</div>
     {multiplier && <div className="font-mono">@{multiplier}x</div>}
   </div>
 );

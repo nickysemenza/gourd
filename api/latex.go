@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,15 +11,23 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
+)
+
+var (
+	latexError = fmt.Errorf("latex error")
 )
 
 func (a *API) GetLatexByRecipeId(c echo.Context, recipeId string) error {
 	ctx := c.Request().Context()
 	res, err := a.Latex(ctx, recipeId)
 	if err != nil {
+		if errors.Is(err, latexError) {
+			return c.Blob(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
+		}
 		return handleErr(c, err)
 	}
 	return c.Blob(http.StatusOK, "application/pdf", res)
@@ -33,20 +41,26 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 
 	// from https://github.com/anaseto/gofrundis/blob/master/escape/escape.go
 	var latexEscapes = []string{
-		"{", "\\{",
-		"}", "\\}",
-		"[", "[",
-		"]", "]",
-		"%", "\\%",
-		"&", "\\&",
-		"$", "\\$",
-		"#", "\\#",
-		"_", "\\_",
-		"'", "\textquotesingle{}",
-		"^", "\\^{}",
-		"\\", "\\textbackslash{}",
-		"~", "\\~{}",
-		string('\xa0'), "~"}
+		// "{", "\\{",
+		// "}", "\\}",
+		// "[", "[",
+		// "]", "]",
+		"%", `\%`,
+		"&", `\&`,
+		"$", `\$`,
+		"#", `\#`,
+		"_", `\_`,
+		"'", `\textquotesingle{}`,
+		`"`, `\textquotesingle{}`,
+		"^", `\^{}`,
+		`\`, `\textbackslash{}`,
+		// todo: get vulgar frac mapping from rs?
+		"¾", `3/4`,
+		"¼", `1/4`,
+		"⅛", `1/8`,
+		// "~", "\\~{}",
+		// string('\xa0'), "~"
+	}
 
 	var latexEscaper = strings.NewReplacer(latexEscapes...)
 
@@ -87,7 +101,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	}
 	adj := func(si SectionIngredient) string {
 		if si.Adjective != nil {
-			return *si.Adjective
+			return esc(*si.Adjective)
 		}
 		return ""
 	}
@@ -112,8 +126,8 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 \hline
 \multirow{2}{*}{section} & \multicolumn{5}{c|}{ingredient}  & \multirow{2}{*}{instruction} \\ \cline{2-6}
 							& \multicolumn{1}{l|}{amount} & \multicolumn{1}{l|}{unit}  & \multicolumn{1}{l|}{grams}  & \multicolumn{1}{l|}{name}  & adj             &                              \\ \hline
-{{range $i, $s := .Detail.Sections}}
-	{{range $j, $ing := $s.Ingredients}}
+{{range $i, $s := .Detail.Sections -}}
+	{{range $j, $ing := $s.Ingredients -}}
 		{{if eq $j 0 -}}
 			\multirow{ {{$s.Ingredients | len}} }{*}{A}
 			{{end -}}
@@ -204,7 +218,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 			return nil, err
 		}
 
-		return nil, fmt.Errorf("%w\n%s", err, string(output))
+		return nil, fmt.Errorf("failed to generate latex: %s: %w", string(output), latexError)
 	}
 	outFile := path.Join(dir, "gourd.pdf")
 	log.Println(outFile)

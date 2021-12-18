@@ -84,6 +84,6 @@ export const TableInput: React.FC<TableInputProps> = ({
       />
     )
   ) : (
-    <p className="flex flex-wrap">{formatText(internalVal)}</p>
+    <p className="wrap">{formatText(internalVal)}</p>
   );
 };

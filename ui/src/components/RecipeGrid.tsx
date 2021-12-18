@@ -34,7 +34,7 @@ export const RecipeGrid: React.FC<{
                   className="object-cover w-full h-48"
                 />
               ) : (
-                <div className="object-cover w-full h-48 bg-gray-400" />
+                <div className="object-cover w-full h-48 bg-gradient-to-bl from-violet-400 to-fuchsia-200" />
               )}
               <div className="flex-grow border border-t-0 rounded-b">
                 <div className="p-5">
