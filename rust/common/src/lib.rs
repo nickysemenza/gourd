@@ -13,6 +13,7 @@ extern crate serde;
 pub mod codec;
 pub mod pan;
 pub mod unit;
+pub use ingredient;
 
 fn section_ingredient_from_parsed(
     i: ingredient::Ingredient,
