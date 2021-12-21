@@ -6,6 +6,7 @@ import {
 import { TimeRange } from "./api/openapi-fetch";
 import parse from "parse-duration";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
+import { RichItem } from "gourd_rs";
 
 export const getIngredient = (
   si: Partial<SectionIngredient>
@@ -18,6 +19,27 @@ export const getIngredient = (
   return { name: "" };
 };
 
+export const formatRichText = (text: RichItem[]) => {
+  return text.map((t, x) => {
+    if (t.kind === "Text") {
+      return t.value;
+    } else if (t.kind === "Amount") {
+      let val = t.value.pop();
+      return val ? (
+        <div
+          className="inline text-green-800 m-0 underline decoration-grey decoration-solid"
+          key={x}
+        >
+          {val.value}
+          {val.upper_value && `-${val.upper_value}`}{" "}
+          {val.unit !== "whole" && val.unit}
+        </div>
+      ) : null;
+    } else {
+      return null;
+    }
+  });
+};
 export const formatText = (text: React.ReactText) => {
   // regexr.com/5mt55
   const re = /[\d]+ ?(F|C|°|°F)/g;

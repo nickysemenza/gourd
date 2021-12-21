@@ -60,6 +60,11 @@ export function decode_recipe_text(r: string): any;
 * @returns {string}
 */
 export function make_dag(conversion_request: any): string;
+/**
+* @param {string} r
+* @returns {RichItem[]}
+*/
+export function rich(r: string): RichItem[];
 
 interface Ingredient {
     amounts: Amount[];
@@ -67,14 +72,18 @@ interface Ingredient {
     name: string;
   }
   
-  interface Amount {
-    unit: string;
-    value: number;
-  }
+interface Amount {
+  unit: string;
+  value: number;
+  upper_value?: number;
+}
 
-  interface CompactR {
-    Ing?: Ingredient;
-    Ins?: string;
-  }
+interface CompactR {
+  Ing?: Ingredient;
+  Ins?: string;
+}
+export type RichItem =
+  | { kind: "Text"; value: string }
+  | { kind: "Amount"; value: Amount[] }
 
 

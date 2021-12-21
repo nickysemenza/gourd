@@ -1,5 +1,6 @@
-import React from "react";
-import { formatText, scaledRound } from "../util";
+import React, { useContext } from "react";
+import { formatRichText, scaledRound } from "../util";
+import { WasmContext } from "../wasm";
 
 // <input> can't do onBlur?
 export type TallOrBlur =
@@ -34,6 +35,7 @@ export const TableInput: React.FC<TableInputProps> = ({
   onChange,
   ...props
 }) => {
+  const w = useContext(WasmContext);
   const controlledVal = (
     (!edit && pValue && scaledRound(pValue) && !value) ||
     value
@@ -84,6 +86,6 @@ export const TableInput: React.FC<TableInputProps> = ({
       />
     )
   ) : (
-    <p className="wrap">{formatText(internalVal)}</p>
+    <p>{w && formatRichText(w.rich(internalVal))}</p>
   );
 };

@@ -81,7 +81,10 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
 
     let sc_result = scraper::scrape_recipe(url);
     let res = scrape_result_to_recipe(sc_result.clone());
-    HttpResponse::Ok().json((sc_result, res))
+    let rich_text_tokens =
+        gourd_common::ingredient::rich_text::parse(sc_result.instructions.as_str())
+            .unwrap_or_default();
+    HttpResponse::Ok().json((sc_result, res, rich_text_tokens))
 }
 pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
     let sections = vec![RecipeSectionInput::new(

@@ -285,10 +285,16 @@ export function make_dag(conversion_request) {
     }
 }
 
-export function __wbindgen_string_new(arg0, arg1) {
-    var ret = getStringFromWasm0(arg0, arg1);
-    return addHeapObject(ret);
-};
+/**
+* @param {string} r
+* @returns {RichItem[]}
+*/
+export function rich(r) {
+    var ptr0 = passStringToWasm0(r, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    var len0 = WASM_VECTOR_LEN;
+    var ret = wasm.rich(ptr0, len0);
+    return takeObject(ret);
+}
 
 export function __wbindgen_json_parse(arg0, arg1) {
     var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
@@ -302,6 +308,11 @@ export function __wbindgen_json_serialize(arg0, arg1) {
     var len0 = WASM_VECTOR_LEN;
     getInt32Memory0()[arg0 / 4 + 1] = len0;
     getInt32Memory0()[arg0 / 4 + 0] = ptr0;
+};
+
+export function __wbindgen_string_new(arg0, arg1) {
+    var ret = getStringFromWasm0(arg0, arg1);
+    return addHeapObject(ret);
 };
 
 export function __wbg_new_693216e109162396() {

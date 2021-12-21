@@ -1,7 +1,7 @@
 mod utils;
 
 use gourd_common::{
-    convert_to, parse_unit_mappings, sum_ingredients,
+    convert_to, ingredient, parse_unit_mappings, sum_ingredients,
     unit::{make_graph, print_graph},
 };
 use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
@@ -13,33 +13,12 @@ use wasm_bindgen::prelude::*;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-// #[wasm_bindgen]
-// extern "C" {
-//     fn alert(s: &str);
-// }
-
-// #[wasm_bindgen]
-// pub fn greet() {
-//     alert("Hello, gourd!");
-// }
-
 #[wasm_bindgen]
 pub fn parse(input: &str) -> String {
     utils::set_panic_hook();
-    ingredient::from_str(input, true).unwrap().to_string()
+    ingredient::from_str(input).to_string()
     // return "foo".to_string();
 }
-
-// #[wasm_bindgen]
-// pub fn parse2(input: &str) -> IngredientA {
-//     let i = ingredient::from_str(input, true).unwrap();
-//     IngredientA {
-//         name: i.name,
-//         foo: true,
-//         amounts: i.amounts,
-//         modifier: i.modifier,
-//     }
-// }
 
 #[wasm_bindgen(typescript_custom_section)]
 const ITEXT_STYLE: &'static str = r#"
@@ -49,15 +28,19 @@ interface Ingredient {
     name: string;
   }
   
-  interface Amount {
-    unit: string;
-    value: number;
-  }
+interface Amount {
+  unit: string;
+  value: number;
+  upper_value?: number;
+}
 
-  interface CompactR {
-    Ing?: Ingredient;
-    Ins?: string;
-  }
+interface CompactR {
+  Ing?: Ingredient;
+  Ins?: string;
+}
+export type RichItem =
+  | { kind: "Text"; value: string }
+  | { kind: "Amount"; value: Amount[] }
 "#;
 
 #[wasm_bindgen]
@@ -70,17 +53,19 @@ extern "C" {
     pub type IAmounts;
     #[wasm_bindgen(typescript_type = "CompactR[][]")]
     pub type ICompactR;
+    #[wasm_bindgen(typescript_type = "RichItem[]")]
+    pub type RichItems;
 }
 
 #[wasm_bindgen]
 pub fn parse2(input: &str) -> Result<IIngredient, JsValue> {
-    let i = ingredient::from_str(input, true).unwrap();
+    let i = ingredient::from_str(input);
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
 #[wasm_bindgen]
 pub fn parse3(input: &str) -> JsValue {
-    let i = ingredient::from_str(input, true).unwrap();
+    let i = ingredient::from_str(input);
     JsValue::from_serde(&i).unwrap()
 }
 
@@ -116,7 +101,7 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
 #[wasm_bindgen]
 pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
     utils::set_panic_hook();
-    let i = ingredient::parse_amount(input).unwrap();
+    let i = ingredient::parse_amount(input);
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
@@ -152,16 +137,11 @@ pub fn make_dag(conversion_request: &JsValue) -> String {
     return print_graph(g);
 }
 
-// #[wasm_bindgen]
-// pub fn parse2(input: &str) -> Ingredient {
-//     ingredient(input).unwrap();
-// }
-
-// #[wasm_bindgen]
-// #[derive(Default)]
-// pub struct IngredientA {
-//     name: String,
-//     foo: bool,
-//     amounts: Vec<Amount>,
-//     modifier: Option<String>,
-// }
+#[wasm_bindgen]
+pub fn rich(r: String) -> Result<RichItems, JsValue> {
+    utils::set_panic_hook();
+    match ingredient::rich_text::parse(r.as_str()) {
+        Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),
+        Err(e) => Err(JsValue::from_str(&e.to_string())),
+    }
+}

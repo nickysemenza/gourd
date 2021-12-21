@@ -13,6 +13,7 @@ export function encode_recipe_text(a: number, b: number): void;
 export function encode_recipe_to_compact_json(a: number): number;
 export function decode_recipe_text(a: number, b: number): number;
 export function make_dag(a: number, b: number): void;
+export function rich(a: number, b: number): number;
 export function __wbindgen_malloc(a: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number): number;
 export function __wbindgen_add_to_stack_pointer(a: number): number;

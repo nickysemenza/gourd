@@ -27,6 +27,17 @@
       b:
         unit: gram
         value: 0.94
+- name: ground cinnamon
+  fdc_id: 171320
+  unit_mappings:
+    - &density_spices
+      a:
+        unit: tbsp
+        value: 1
+      b:
+        unit: grams
+        value: 9
+      source: misc
 - name: sugar
   fdc_id: 746784
   aliases: ["granulated sugar", "white sugar"]
@@ -38,7 +49,8 @@
         unit: dollars
         value: 3
       source: wf
-    - a:
+    - &density_sugar
+      a:
         unit: gram
         value: 200
       b:
@@ -178,7 +190,7 @@
 - name: pastry flour
   fdc_id: 532183
 - name: dark brown sugar
-  aliases: ["brown sugar"]
+  aliases: ["brown sugar", "light or dark brown sugar"]
   fdc_id: 577990
   unit_mappings:
     - a:
@@ -188,6 +200,7 @@
         unit: dollars
         value: 2.5
       source: wf
+    - *density_sugar
 - name: oats
   fdc_id: 538678
   unit_mappings:
@@ -465,3 +478,12 @@
       b:
         unit: dollars
         value: 1.99
+- name: curry powder
+  unit_mappings:
+    - *density_spices
+- name: ground ginger
+  unit_mappings:
+    - *density_spices
+- name: freshly grated nutmeg
+  unit_mappings:
+    - *density_spices

@@ -5,6 +5,7 @@ import {
   SectionIngredient,
 } from "../api/openapi-hooks/api";
 import {
+  formatRichText,
   formatTimeRange,
   getIngredient,
   parseTimeRange,
@@ -376,17 +377,20 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                 x={getGlobalInstructionNumber(recipe, x, y)}
               />
             </div>
-            <TableInput
-              data-cy="instruction-input"
-              width={72}
-              tall
-              edit={edit}
-              value={instruction.instruction}
-              onChange={(e) =>
-                setRecipe(updateInstruction(recipe, tweaks, x, y, e))
-              }
-            />
+            {edit && (
+              <TableInput
+                data-cy="instruction-input"
+                width={72}
+                tall
+                edit={edit}
+                value={instruction.instruction}
+                onChange={(e) =>
+                  setRecipe(updateInstruction(recipe, tweaks, x, y, e))
+                }
+              />
+            )}
             <div>{iActions(x, y, "instructions")}</div>
+            <p>{w && formatRichText(w.rich(instruction.instruction))}</p>
           </div>
         ))}
         {/* </ol> */}
