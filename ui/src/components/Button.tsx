@@ -24,7 +24,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   bg-indigo-700 focus:shadow-outline hover:bg-indigo-800
   disabled:bg-indigo-400 inline-flex items-center`;
   return (
-    <div className="inline-flex" role="group" aria-label="Button group">
+    <div className="inline-flex mx-1" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {
         const iconMargins = compact ? 1 : 3;
         const iconDim = compact ? 3 : 4;
@@ -81,22 +81,25 @@ export const HideShowHOC: React.FC = ({ children }) => {
     </div>
   );
 };
+
+export const makeHideShowButton = (
+  show: boolean,
+  setVal: (newVal: boolean) => void,
+  text?: string
+) => {
+  return {
+    onClick: () => {
+      setVal(!show);
+    },
+    text: `${text ? text : show ? "hide" : "show"}`,
+    IconLeft: show ? MinusCircle : PlusCircle,
+  };
+};
 export const HideShowButton: React.FC<{
   show: boolean;
   setVal: (newVal: boolean) => void;
 }> = ({ show, setVal }) => (
-  <ButtonGroup
-    // compact
-    buttons={[
-      {
-        onClick: () => {
-          setVal(!show);
-        },
-        text: `${show ? "hide" : "show"}`,
-        IconLeft: show ? MinusCircle : PlusCircle,
-      },
-    ]}
-  />
+  <ButtonGroup buttons={[makeHideShowButton(show, setVal)]} />
 );
 
 export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({

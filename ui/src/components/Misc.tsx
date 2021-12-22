@@ -20,8 +20,10 @@ export const RecipeLink: React.FC<Props> = ({
   <div className="inline-flex">
     <Link
       to={`/recipe/${id}?multiplier=${multiplier || 1}`}
-      className={`font-bold link pr-0.5 underline decoration-blue-300 ${
-        is_latest_version ? "text-blue-800" : "text-blue-200"
+      className={`font-bold pr-0.5 underline ${
+        is_latest_version
+          ? "decoration-blue-300 text-blue-800"
+          : "decoration-red-300 text-purple-400"
       }`}
     >
       {name}

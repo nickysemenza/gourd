@@ -63,6 +63,8 @@ export interface TableProps {
   tweaks: RecipeTweaks;
   hints: FoodsById;
   ing_hints: IngDetailsById;
+  showOriginalLine: boolean;
+  showKcalDollars: boolean;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
@@ -71,13 +73,13 @@ const RecipeDetailTable: React.FC<TableProps> = ({
   tweaks,
   hints,
   ing_hints,
+  showOriginalLine,
+  showKcalDollars,
 }) => {
   const { edit } = tweaks;
   const { sections } = recipe.detail;
   const flourMass = totalFlourMass(sections || []);
   const showBP = flourMass > 0;
-  const showOriginalLine = false;
-  const showKcalDollars = false;
 
   const w = useContext(WasmContext);
 

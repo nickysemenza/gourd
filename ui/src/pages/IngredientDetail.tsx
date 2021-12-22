@@ -27,14 +27,18 @@ const IngredientDetail: React.FC = () => {
   const { ingredient, food } = data;
   return (
     <div>
-      <h1>Ingredient</h1>
-      <h2>{id}</h2>
+      <div className=" flex flex-col my-1">
+        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+          {ingredient.name}
+        </h1>
+        <span className="text-gray-700 text-sm">{id}</span>
+      </div>
       <div className="flex flex-row">
-        <div>
+        <div className="w-6/12">
           <UnitConvertDemo detail={data} />
           <Debug data={data} />
         </div>
-        <div>
+        <div className="w-6/12">
           <FoodSearch
             name={ingredient.name}
             limit={20}

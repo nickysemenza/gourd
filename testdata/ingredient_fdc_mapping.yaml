@@ -487,3 +487,41 @@
 - name: freshly grated nutmeg
   unit_mappings:
     - *density_spices
+- name: coconut milk
+  fdc_id: 938090
+  aliases: ["unsweetened coconut milk"]
+  unit_mappings:
+    - a:
+        unit: can
+        value: 1
+      b:
+        unit: ml
+        value: 400
+    - a:
+        unit: can
+        value: 1
+      b:
+        unit: dollars
+        value: 2
+    - *density_liquid
+- name: coconut milk
+  fdc_id: 697474
+- name: curry paste
+  fdc_id: 382363
+- name: kabocha squash
+  fdc_id: 697474
+- name: jasmine rice
+  aliases: ["rice"]
+  fdc_id: 449959
+  unit_mappings:
+    - a:
+        unit: cents
+        value: 20
+      b:
+        unit: ounce
+        value: 1
+- name: water
+  aliases: ["tap water"]
+  fdc_id: 173647
+  unit_mappings:
+    - *density_liquid

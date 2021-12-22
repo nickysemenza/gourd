@@ -72,7 +72,6 @@ const PaginatedTable = <T extends object>({
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
                       <th
-                        // className="border border-gray-400"
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         {...column.getHeaderProps()}
                       >

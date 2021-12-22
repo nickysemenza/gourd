@@ -29,7 +29,12 @@ import {
   updateRecipeName,
   updateRecipeSource,
 } from "../components/RecipeEditorUtils";
-import { ButtonGroup, HideShowHOC } from "../components/Button";
+import {
+  ButtonGroup,
+  HideShowButton,
+  HideShowHOC,
+  makeHideShowButton,
+} from "../components/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
@@ -100,6 +105,8 @@ const RecipeDetail: React.FC = () => {
   const [override, setOverride] = useState<Override>();
   const [edit, setEdit] = useState(false);
   const [recipe, setRecipe] = useState(data);
+  const [showOriginalLine, setshowOriginalLine] = useState(false);
+  const [showKcalDollars, setshowKcalDollars] = useState(false);
 
   if (recipe)
     console.log({ recipe, a: toInput(recipe as unknown as RecipeWrapper) });
@@ -450,6 +457,20 @@ const RecipeDetail: React.FC = () => {
               },
             ]}
           />
+          <ButtonGroup
+            buttons={[
+              makeHideShowButton(
+                showOriginalLine,
+                setshowOriginalLine,
+                "original"
+              ),
+              makeHideShowButton(
+                showKcalDollars,
+                setshowKcalDollars,
+                "kcal/dollars"
+              ),
+            ]}
+          />
         </div>
       </div>
 
@@ -473,6 +494,8 @@ const RecipeDetail: React.FC = () => {
         updateIngredient={updateIngredient}
         recipe={recipe}
         setRecipe={setRecipe}
+        showOriginalLine={showOriginalLine}
+        showKcalDollars={showKcalDollars}
       />
       {/* <InstructionsListParser
         setDetail={(s) => {
