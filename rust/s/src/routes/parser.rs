@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan, unit::Measure};
 use openapi::models::{
-    IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
-    SectionIngredientInput, SectionInstructionInput, TimeRange,
+    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
+    SectionIngredientInput, SectionInstructionInput,
 };
 use serde::Deserialize;
 use tracing::{debug, span};
@@ -138,9 +138,12 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     ))
 }
 pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
-    let total_time_seconds = foo(sc_result.clone().instructions).as_raw().value;
+    let total_time_seconds = foo(sc_result.clone().instructions).as_raw();
     let sections = vec![RecipeSectionInput {
-        duration: Some(Box::new(TimeRange::new(total_time_seconds as i32, 0))),
+        duration: Some(Box::new(Amount::new(
+            total_time_seconds.unit,
+            total_time_seconds.value.into(),
+        ))),
         instructions: sc_result
             .instructions
             .split('\n')

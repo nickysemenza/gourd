@@ -112,7 +112,7 @@ export interface RecipeSection {
    * id
    */
   id: string;
-  duration?: TimeRange;
+  duration?: Amount;
   /**
    * x
    */
@@ -127,7 +127,7 @@ export interface RecipeSection {
  * A step in the recipe
  */
 export interface RecipeSectionInput {
-  duration?: TimeRange;
+  duration?: Amount;
   /**
    * x
    */
@@ -485,20 +485,6 @@ export interface Items {
    * Total number of pages available
    */
   page_count: number;
-}
-
-/**
- * A range of time or a specific duration of time (in seconds)
- */
-export interface TimeRange {
-  /**
-   * The minimum amount of seconds (or the total, if not a range)
-   */
-  min: number;
-  /**
-   * The maximum amount of seconds (if a range)
-   */
-  max: number;
 }
 
 /**

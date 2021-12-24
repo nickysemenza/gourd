@@ -89,7 +89,7 @@ func TestAPI(t *testing.T) {
 		w := 12.5
 		newRecipe := RecipeWrapper{
 			Detail: RecipeDetail{Name: rName,
-				Sections: []RecipeSection{{Duration: &TimeRange{Min: 3},
+				Sections: []RecipeSection{{Duration: &Amount{Value: 3},
 					Instructions: []SectionInstruction{{Instruction: "mix"}},
 					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &IngredientDetail{Ingredient: newIngredient}, Kind: "ingredient"}},
 				}}},

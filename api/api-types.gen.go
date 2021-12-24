@@ -465,8 +465,8 @@ type RecipeDetailInput struct {
 
 // A step in the recipe
 type RecipeSection struct {
-	// A range of time or a specific duration of time (in seconds)
-	Duration *TimeRange `json:"duration,omitempty"`
+	// amount and unit
+	Duration *Amount `json:"duration,omitempty"`
 
 	// id
 	Id string `json:"id"`
@@ -480,8 +480,8 @@ type RecipeSection struct {
 
 // A step in the recipe
 type RecipeSectionInput struct {
-	// A range of time or a specific duration of time (in seconds)
-	Duration *TimeRange `json:"duration,omitempty"`
+	// amount and unit
+	Duration *Amount `json:"duration,omitempty"`
 
 	// x
 	Ingredients []SectionIngredientInput `json:"ingredients"`
@@ -600,15 +600,6 @@ type SectionInstruction struct {
 type SectionInstructionInput struct {
 	// instruction
 	Instruction string `json:"instruction"`
-}
-
-// A range of time or a specific duration of time (in seconds)
-type TimeRange struct {
-	// The maximum amount of seconds (if a range)
-	Max int `json:"max"`
-
-	// The minimum amount of seconds (or the total, if not a range)
-	Min int `json:"min"`
 }
 
 // UnitConversionRequest defines model for UnitConversionRequest.

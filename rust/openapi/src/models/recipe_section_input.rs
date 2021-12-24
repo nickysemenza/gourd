@@ -15,7 +15,7 @@
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RecipeSectionInput {
     #[serde(rename = "duration", skip_serializing_if = "Option::is_none")]
-    pub duration: Option<Box<crate::models::TimeRange>>,
+    pub duration: Option<Box<crate::models::Amount>>,
     /// x
     #[serde(rename = "instructions")]
     pub instructions: Vec<crate::models::SectionInstructionInput>,

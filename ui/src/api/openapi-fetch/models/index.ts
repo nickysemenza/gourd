@@ -44,7 +44,6 @@ export * from './SectionIngredient';
 export * from './SectionIngredientInput';
 export * from './SectionInstruction';
 export * from './SectionInstructionInput';
-export * from './TimeRange';
 export * from './UnitConversionRequest';
 export * from './UnitMapping';
 export * from './UsageValue';

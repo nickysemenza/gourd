@@ -8,7 +8,7 @@ import {
   RecipeSource,
   RecipeWrapper,
   SectionIngredient,
-  TimeRange,
+  Amount as Amount2,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 import { wasm } from "../wasm";
@@ -190,7 +190,7 @@ export const addSection = (recipe: RecipeWrapper) =>
         $push: [
           {
             id: "",
-            duration: { min: 0, max: 0 },
+            duration: { value: 0, unit: "seconds" },
             ingredients: [],
             instructions: [],
           },
@@ -203,7 +203,7 @@ export const setDetail = (recipe: RecipeWrapper, detail: RecipeDetail) =>
 export const updateTimeRange = (
   recipe: RecipeWrapper,
   sectionID: number,
-  value?: TimeRange
+  value?: Amount2
 ) =>
   !!value
     ? update(recipe, {

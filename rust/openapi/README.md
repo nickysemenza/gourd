@@ -74,7 +74,6 @@ Class | Method | HTTP request | Description
  - [SectionIngredientInput](docs/SectionIngredientInput.md)
  - [SectionInstruction](docs/SectionInstruction.md)
  - [SectionInstructionInput](docs/SectionInstructionInput.md)
- - [TimeRange](docs/TimeRange.md)
  - [UnitConversionRequest](docs/UnitConversionRequest.md)
  - [UnitMapping](docs/UnitMapping.md)
  - [UsageValue](docs/UsageValue.md)

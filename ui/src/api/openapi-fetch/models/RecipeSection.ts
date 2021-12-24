@@ -14,6 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    Amount,
+    AmountFromJSON,
+    AmountFromJSONTyped,
+    AmountToJSON,
     SectionIngredient,
     SectionIngredientFromJSON,
     SectionIngredientFromJSONTyped,
@@ -22,10 +26,6 @@ import {
     SectionInstructionFromJSON,
     SectionInstructionFromJSONTyped,
     SectionInstructionToJSON,
-    TimeRange,
-    TimeRangeFromJSON,
-    TimeRangeFromJSONTyped,
-    TimeRangeToJSON,
 } from './';
 
 /**
@@ -42,10 +42,10 @@ export interface RecipeSection {
     id: string;
     /**
      * 
-     * @type {TimeRange}
+     * @type {Amount}
      * @memberof RecipeSection
      */
-    duration?: TimeRange;
+    duration?: Amount;
     /**
      * x
      * @type {Array<SectionInstruction>}
@@ -71,7 +71,7 @@ export function RecipeSectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'id': json['id'],
-        'duration': !exists(json, 'duration') ? undefined : TimeRangeFromJSON(json['duration']),
+        'duration': !exists(json, 'duration') ? undefined : AmountFromJSON(json['duration']),
         'instructions': ((json['instructions'] as Array<any>).map(SectionInstructionFromJSON)),
         'ingredients': ((json['ingredients'] as Array<any>).map(SectionIngredientFromJSON)),
     };
@@ -87,7 +87,7 @@ export function RecipeSectionToJSON(value?: RecipeSection | null): any {
     return {
         
         'id': value.id,
-        'duration': TimeRangeToJSON(value.duration),
+        'duration': AmountToJSON(value.duration),
         'instructions': ((value.instructions as Array<any>).map(SectionInstructionToJSON)),
         'ingredients': ((value.ingredients as Array<any>).map(SectionIngredientToJSON)),
     };

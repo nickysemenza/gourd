@@ -3,8 +3,8 @@ import {
   SectionIngredient,
   RecipeDetail,
   IngredientKind,
+  Amount,
 } from "./api/openapi-hooks/api";
-import { TimeRange } from "./api/openapi-fetch";
 import parse from "parse-duration";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
 import { RichItem } from "gourd_rs";
@@ -89,31 +89,35 @@ const formatSeconds = (seconds: number) => {
   vals.push(s > 0 ? `${s} sec` : null);
   return vals.join(" ");
 };
-export const formatTimeRange = (range?: TimeRange) => {
+export const formatTimeRange = (range?: Amount) => {
   if (!range) return "";
-  const { min, max } = range;
-  let items = [formatSeconds(min)];
-  if (max > 0 && max !== min) {
-    items.push(" - ", formatSeconds(max));
+  const { value, upper_value } = range;
+  let items = [formatSeconds(value)];
+  if (upper_value && upper_value !== value) {
+    items.push(" - ", formatSeconds(upper_value));
   }
   return items.join("");
 };
 
-export const parseTimeRange = (input: string): TimeRange | null => {
+export const parseTimeRange = (input: string): Amount | null => {
   const parts = input.split(" - ");
   if (parts.length === 0 || parts.length > 2) return null;
   return {
-    min: (parse(parts[0]) || 0) / 1000,
-    max: ((parts.length === 2 && parse(parts[1])) || 0) / 1000,
+    unit: "seconds",
+    value: (parse(parts[0]) || 0) / 1000,
+    upper_value: ((parts.length === 2 && parse(parts[1])) || 0) / 1000,
   };
 };
 
-export const sumTimeRanges = (ranges: (TimeRange | undefined)[]): TimeRange => {
-  let totalDuration: TimeRange = { min: 0, max: 0 };
+export const sumTimeRanges = (ranges: (Amount | undefined)[]): Amount => {
+  let totalDuration: Amount = { value: 0, unit: "seconds" };
   ranges.forEach((r) => {
     if (!!r) {
-      totalDuration.min += r.min;
-      totalDuration.max += r.max || r.min; // if max is 0, it means it's a finite and not a range, so use min
+      if (totalDuration.upper_value === undefined) {
+        totalDuration.upper_value = 0;
+      }
+      totalDuration.value += r.value;
+      totalDuration.upper_value += r.upper_value || r.value; // if max is 0, it means it's a finite and not a range, so use min
     }
   });
 
