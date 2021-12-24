@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -59,7 +60,12 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 				Id:           section.ID,
 				Ingredients:  []SectionIngredient{},
 				Instructions: []SectionInstruction{},
-				// Duration: ,
+			}
+			if section.DurationTimerange.Valid {
+				err := json.Unmarshal([]byte(section.DurationTimerange.JSON), &s.Duration)
+				if err != nil {
+					return nil, err
+				}
 			}
 			for _, instruction := range section.R.SectionRecipeSectionInstructions {
 				s.Instructions = append(s.Instructions, SectionInstruction{

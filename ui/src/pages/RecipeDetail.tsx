@@ -15,7 +15,7 @@ import {
   RecipeWrapper as RecipeWrapper2,
   Amount,
 } from "../api/openapi-hooks/api";
-import { formatTimeRange, scaledRound, sumTimeRanges } from "../util";
+import { formatTimeRange, getTotalDuration, scaledRound } from "../util";
 import {
   calCalc,
   countTotals,
@@ -31,7 +31,6 @@ import {
 } from "../components/RecipeEditorUtils";
 import {
   ButtonGroup,
-  HideShowButton,
   HideShowHOC,
   makeHideShowButton,
 } from "../components/Button";
@@ -336,9 +335,7 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const totalDuration = sumTimeRanges(
-    detail.sections.map((s) => s.duration).filter((t) => t !== undefined)
-  );
+  const totalDuration = getTotalDuration(detail.sections);
 
   const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
 

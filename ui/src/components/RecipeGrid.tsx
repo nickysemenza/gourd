@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { RecipeWrapper } from "../api/openapi-hooks/api";
+import { formatTimeRange, getTotalDuration } from "../util";
 import ProgressiveImage from "./ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";
 
@@ -16,6 +17,8 @@ export const RecipeGrid: React.FC<{
         sumIngredients(recipe.detail.sections).ingredients
       );
       const rec = Object.keys(sumIngredients(recipe.detail.sections).recipes);
+
+      const totalDuration = getTotalDuration(recipe.detail.sections);
 
       return (
         <Link
@@ -41,6 +44,9 @@ export const RecipeGrid: React.FC<{
                 <p className="text-sm text-gray-900">
                   {ing.length} ingredients | {rec.length} recipes
                 </p>
+                <div className="text-sm">
+                  Takes {formatTimeRange(totalDuration)}
+                </div>
               </div>
             </div>
           </div>

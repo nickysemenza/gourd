@@ -1,7 +1,6 @@
 import React from "react";
 import { ActionMeta, Styles, ValueType } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
-import { optionCSS } from "react-select/src/components/Option";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { blankRecipeWrapperInput, blankIngredient } from "../util";

@@ -1,9 +1,9 @@
 import {
   Ingredient,
   SectionIngredient,
-  RecipeDetail,
   IngredientKind,
   Amount,
+  RecipeSection,
 } from "./api/openapi-hooks/api";
 import parse from "parse-duration";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
@@ -93,31 +93,36 @@ export const formatTimeRange = (range?: Amount) => {
   if (!range) return "";
   const { value, upper_value } = range;
   let items = [formatSeconds(value)];
-  if (upper_value && upper_value !== value) {
+  if (upper_value) {
     items.push(" - ", formatSeconds(upper_value));
   }
   return items.join("");
 };
 
 export const parseTimeRange = (input: string): Amount | null => {
+  // todo: wasm this
   const parts = input.split(" - ");
   if (parts.length === 0 || parts.length > 2) return null;
   return {
     unit: "seconds",
     value: (parse(parts[0]) || 0) / 1000,
-    upper_value: ((parts.length === 2 && parse(parts[1])) || 0) / 1000,
+    upper_value: parts.length === 2 ? (parse(parts[1]) || 0) / 1000 : undefined,
   };
 };
 
 export const sumTimeRanges = (ranges: (Amount | undefined)[]): Amount => {
+  // todo: wasm this
   let totalDuration: Amount = { value: 0, unit: "seconds" };
   ranges.forEach((r) => {
     if (!!r) {
-      if (totalDuration.upper_value === undefined) {
-        totalDuration.upper_value = 0;
-      }
       totalDuration.value += r.value;
-      totalDuration.upper_value += r.upper_value || r.value; // if max is 0, it means it's a finite and not a range, so use min
+
+      if (r.upper_value !== undefined) {
+        if (totalDuration.upper_value === undefined) {
+          totalDuration.upper_value = 0;
+        }
+        totalDuration.upper_value += r.upper_value;
+      }
     }
   });
 
@@ -145,3 +150,6 @@ export const blankRecipeWrapperInput = (
 export const blankIngredient = (name: string): Ingredient => ({ name, id: "" });
 
 export const scaledRound = (x: number) => x.toFixed(x < 10 ? 2 : 0);
+
+export const getTotalDuration = (sections: RecipeSection[]) =>
+  sumTimeRanges(sections.map((s) => s.duration).filter((t) => t !== undefined));
