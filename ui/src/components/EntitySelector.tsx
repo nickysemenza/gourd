@@ -1,15 +1,17 @@
 import React from "react";
 import { ActionMeta, Styles, ValueType } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
+import { optionCSS } from "react-select/src/components/Option";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
 import { blankRecipeWrapperInput, blankIngredient } from "../util";
+import { Pill2 } from "./Button";
 import { IngredientKind } from "./RecipeEditorUtils";
 
 type Option = {
   label: string;
   value: string;
-  kind: IngredientKind;
+  kind?: IngredientKind;
   fdc_id: number | undefined;
   rd?: string;
 };
@@ -20,12 +22,14 @@ export const EntitySelector: React.FC<{
   createKind?: IngredientKind;
   showKind?: IngredientKind[];
   placeholder?: string;
+  tall?: boolean;
 }> = ({
   value,
   onChange,
   createKind = "ingredient",
   placeholder,
   showKind = ["ingredient", "recipe"],
+  tall = false,
 }) => {
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
   const rApi = new RecipesApi(getOpenapiFetchConfig());
@@ -38,7 +42,7 @@ export const EntitySelector: React.FC<{
       .filter((r) => r.detail.is_latest_version)
       .map((r) => {
         return {
-          label: `[r] ${r.detail.name} (v${r.detail.version})`,
+          label: `${r.detail.name} (v${r.detail.version})`,
           value: r.id,
           kind: "recipe",
           fdc_id: undefined,
@@ -47,7 +51,7 @@ export const EntitySelector: React.FC<{
       });
     const ingredientOptions: Option[] = (res.ingredients || []).map((i) => {
       return {
-        label: "[i]" + i.name,
+        label: i.name,
         value: i.id,
         kind: "ingredient",
         fdc_id: i.fdc_id,
@@ -97,17 +101,19 @@ export const EntitySelector: React.FC<{
     }
   };
 
+  const height = tall ? 40 : 24;
   const customStyles: Partial<Styles<Option, false>> = {
     // option: (provided, state) => ({
     //   ...provided,
-    //   borderBottom: "1px dotted pink",
-    //   color: state.isSelected ? "red" : "blue",
+    //   // borderBottom: "1px dotted pink",
+    //   // color: state.isSelected ? "red" : "blue",
     //   padding: 20,
+    //   width: "100%",
     // }),
     control: (base) => ({
       ...base,
-      height: 20,
-      minHeight: 20,
+      height: height,
+      minHeight: height,
     }),
     // singleValue: (provided, state) => {
     //   const opacity = state.isDisabled ? 0.5 : 1;
@@ -116,14 +122,14 @@ export const EntitySelector: React.FC<{
     //   return { ...provided, opacity, transition };
     // },
     valueContainer: (provided, state) => {
-      return { ...provided, height: 20, padding: "2px" };
+      return { ...provided, height: height, padding: "2px" };
     },
     dropdownIndicator: (provided, state) => {
       return { ...provided, padding: "2px" };
     },
     indicatorsContainer: (provided, state) => ({
       ...provided,
-      height: "20px",
+      height: height + "px",
     }),
     indicatorSeparator: (state) => ({
       display: "none",
@@ -138,7 +144,20 @@ export const EntitySelector: React.FC<{
         classNamePrefix="react-select"
         loadOptions={loadOptions}
         value={value}
-        formatCreateLabel={(val) => `create ${createKind}: ${val}`}
+        formatOptionLabel={(option, meta) => (
+          <div className="flex flex-row justify-between">
+            <div className="text-orange-600 font-bold pr-1">{option.label}</div>
+            {option.kind && <Pill2 color="green">{option.kind}</Pill2>}
+          </div>
+        )}
+        formatCreateLabel={(val) => (
+          <div className="flex flex-row">
+            <div className="text-green-600 font-bold pr-1">
+              create {createKind}:
+            </div>
+            <div> {val}</div>
+          </div>
+        )}
         // handleInputChange={(...a: any) => {
         //   console.log({ handle: a });
         // }}

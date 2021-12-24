@@ -20,6 +20,7 @@ const PaginatedTable = <T extends object>({
   data,
   pageCount: controlledPageCount,
   fetchData,
+  isLoading,
 }: TableProps<T>) => {
   // Use the state and functions returned from useTable to build your UI
   const {
@@ -67,7 +68,7 @@ const PaginatedTable = <T extends object>({
               {...getTableProps()}
               data-cy="recipe-table"
             >
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 {headerGroups.map((headerGroup) => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
                     {headerGroup.headers.map((column) => (
@@ -82,15 +83,22 @@ const PaginatedTable = <T extends object>({
                 ))}
               </thead>
               <tbody
-                className="bg-white divide-y divide-gray-200"
+                className="bg-white divide-y divide-gray-200 dark:divide-gray-700"
                 {...getTableBodyProps()}
               >
+                {isLoading && (
+                  <tr>
+                    <td colSpan={10} className="w-100 text-xl text-center h-16">
+                      loading...
+                    </td>
+                  </tr>
+                )}
                 {rows.map((row) => {
                   prepareRow(row);
                   return (
                     <tr
                       {...row.getRowProps()}
-                      className="bg-white odd:bg-gray-200"
+                      className="bg-gray-100 odd:bg-gray-200 dark:bg-slate-500 dark:odd:bg-slate-400"
                     >
                       {row.cells.map((cell) => {
                         return (

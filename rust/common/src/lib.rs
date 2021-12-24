@@ -197,7 +197,10 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     };
 }
 pub fn amount_to_measure(a: Amount) -> unit::Measure {
-    unit::Measure::parse(unit::BareMeasurement::new(a.unit, a.value as f32))
+    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value as f32))
+}
+pub fn amount_to_measure2(a: ingredient::Amount) -> unit::Measure {
+    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value as f32))
 }
 pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
     let m1 = m.as_bare()?;

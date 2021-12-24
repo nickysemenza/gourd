@@ -86,7 +86,6 @@ const FoodSearch: React.FC<{
           />
         );
       })}
-      {/* <Debug data={foods.foods} /> */}
     </div>
   );
 };
@@ -131,8 +130,8 @@ export const FoodRow: React.FC<{
     </div>
     <div className="flex flex-col p-1">
       <div className="flex whitespace-normal">{food.description}</div>
-      <div className="flex flex-row ">
-        <p className="font-mono text-xs text-gray-500">{food.data_type}</p>
+      <div className="flex flex-row">
+        <p className="font-mono text-xs">{food.data_type}</p>
         <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
       </div>
       <UnitMappingList unit_mappings={food.unit_mappings} />

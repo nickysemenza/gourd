@@ -61,7 +61,10 @@ export const UnitMappingList: React.FC<{
           )}
           <div className="w-60">
             {unit_mappings.map((m, x) => (
-              <div key={x} className="flex text-sm text-gray-700">
+              <div
+                key={x}
+                className="flex text-sm text-gray-700 dark:text-gray-400"
+              >
                 <p>
                   {scaledRound(m.a.value)} {m.a.unit}
                 </p>

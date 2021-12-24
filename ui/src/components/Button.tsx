@@ -27,7 +27,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     <div className="inline-flex mx-1" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {
         const iconMargins = compact ? 1 : 3;
-        const iconDim = compact ? 3 : 4;
+        const iconDim = compact ? 12 : 18;
         return (
           <button
             key={x}
@@ -38,17 +38,17 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
           >
             {!!IconLeft && (
               <IconLeft
-                className={`w-${iconDim} h-${iconDim} mr-${
-                  text ? iconMargins : 0
-                }`}
+                width={iconDim}
+                height={iconDim}
+                className={`mr-${text ? iconMargins : 0}`}
               />
             )}
             {text && <span>{text}</span>}
             {!!IconRight && (
               <IconRight
-                className={`w-${iconDim} h-${iconDim} ml-${
-                  text ? iconMargins : 0
-                }`}
+                width={iconDim}
+                height={iconDim}
+                className={`ml-${text ? iconMargins : 0}`}
               />
             )}
           </button>
@@ -67,7 +67,7 @@ export const Pill2: React.FC<{ color: "red" | "green" }> = ({
   color,
 }) => (
   <span
-    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-${color}-100 text-${color}-800`}
+    className={`px-1 h-5 inline-flex text-xs leading-5 font-semibold rounded-full bg-${color}-100 text-${color}-800`}
   >
     {children}
   </span>

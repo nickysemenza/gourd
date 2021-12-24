@@ -20,7 +20,7 @@ const Photos: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error } = useListPhotos({
+  const { data, error, loading } = useListPhotos({
     queryParams: params,
   });
 
@@ -53,7 +53,7 @@ const Photos: React.FC = () => {
         columns={columns}
         data={data?.photos || []}
         fetchData={fetchData}
-        isLoading={false}
+        isLoading={loading}
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />

@@ -9,8 +9,9 @@ const CreateRecipe: React.FC = () => {
   let history = useNavigate();
   const [ingredientName, setIngredientName] = useState("");
   return (
-    <div>
+    <div className="w-1/2">
       <EntitySelector
+        tall
         createKind="recipe"
         showKind={["recipe"]}
         onChange={(a) => {

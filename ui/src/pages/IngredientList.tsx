@@ -29,7 +29,7 @@ const IngredientList: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data } = useListIngredients({
+  const { data, loading } = useListIngredients({
     queryParams: params,
   });
 
@@ -196,7 +196,7 @@ const IngredientList: React.FC = () => {
         columns={columns}
         data={ingredients}
         fetchData={fetchData}
-        isLoading={false}
+        isLoading={loading}
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />

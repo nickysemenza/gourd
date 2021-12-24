@@ -2,21 +2,23 @@ import {
   Ingredient,
   SectionIngredient,
   RecipeDetail,
+  IngredientKind,
 } from "./api/openapi-hooks/api";
 import { TimeRange } from "./api/openapi-fetch";
 import parse from "parse-duration";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
 import { RichItem } from "gourd_rs";
 
-export const getIngredient = (
-  si: Partial<SectionIngredient>
-): { name: "" } | RecipeDetail | Ingredient => {
+export const getIngredient = (si: Partial<SectionIngredient>) => {
+  let name = "";
+  let kind: IngredientKind = "ingredient";
   if (si.recipe) {
-    return si.recipe;
+    name = si.recipe.name;
+    kind = "recipe";
   } else if (si.ingredient) {
-    return si.ingredient.ingredient;
+    name = si.ingredient.ingredient.name;
   }
-  return { name: "" };
+  return { name, kind };
 };
 
 export const formatRichText = (text: RichItem[]) => {

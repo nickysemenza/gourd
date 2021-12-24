@@ -1,32 +1,22 @@
 use std::fmt;
 
 use anyhow::bail;
+use ingredient::Amount;
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-#[derive(Clone, PartialEq, PartialOrd, Debug, Default, Serialize, Deserialize)]
-pub struct BareMeasurement {
-    pub unit: String,
-    pub value: f32,
-}
-
-impl BareMeasurement {
-    pub fn new(unit: String, value: f32) -> BareMeasurement {
-        BareMeasurement { unit, value }
-    }
-}
-
-#[derive(Clone, PartialEq, PartialOrd, Debug)]
+#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
 pub struct Measure(Unit, f32);
 
-#[derive(Clone, PartialEq, PartialOrd, Debug)]
+#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
 pub enum MeasureKind {
     Weight,
     Volume,
     Money,
     Calories,
     Other,
+    Time,
 }
 impl MeasureKind {
     pub fn from_str(s: &str) -> Self {
@@ -35,11 +25,12 @@ impl MeasureKind {
             "volume" => Self::Volume,
             "money" => Self::Money,
             "calories" => Self::Calories,
+            "time" => Self::Time,
             _ => Self::Other,
         }
     }
 }
-#[derive(Clone, PartialEq, PartialOrd, Debug, Eq, Hash)]
+#[derive(Clone, PartialEq, PartialOrd, Debug, Eq, Hash, Serialize, Deserialize)]
 pub enum Unit {
     Gram,
     Kilogram,
@@ -55,6 +46,10 @@ pub enum Unit {
     Cent,
     Dollar,
     KCal,
+    Day,
+    Hour,
+    Minute,
+    Second,
     Other(String),
 }
 
@@ -86,6 +81,10 @@ impl Unit {
             "cent" => Self::Cent,
 
             "calorie" | "cal" | "kcal" => Self::KCal,
+            "second" | "sec" | "s" => Self::Second,
+            "minute" | "min" => Self::Minute,
+            "hour" | "hr" => Self::Hour,
+            "day" => Self::Day,
             _ => Self::Other(s.to_string()),
         }
     }
@@ -105,6 +104,10 @@ impl Unit {
             Unit::Cent => "cent",
             Unit::Dollar => "$",
             Unit::KCal => "kcal",
+            Unit::Day => "day",
+            Unit::Hour => "hour",
+            Unit::Minute => "minute",
+            Unit::Second => "second",
             Unit::Other(s) => return singular(&s),
         }
         .to_string()
@@ -116,6 +119,7 @@ pub fn unit_from_measurekind(m: MeasureKind) -> Unit {
         MeasureKind::Volume => Unit::Milliliter,
         MeasureKind::Money => Unit::Cent,
         MeasureKind::Calories => Unit::KCal,
+        MeasureKind::Time => Unit::Second,
         MeasureKind::Other => Unit::Other("".to_string()),
     };
 }
@@ -156,16 +160,23 @@ const GRAM_TO_OZ: f32 = 28.3495;
 const OZ_TO_LB: f32 = 16.0;
 const CENTS_TO_DOLLAR: f32 = 100.0;
 
+const SEC_TO_MIN: f32 = 60.0;
+const SEC_TO_HOUR: f32 = 3600.0;
+const SEC_TO_DAY: f32 = 86400.0;
+
 impl Measure {
     pub fn from_string(s: String) -> Measure {
         let a = ingredient::parse_amount(s.as_str())[0].clone();
-        Measure::parse(BareMeasurement::new(singular(&a.unit), a.value))
+        Measure::parse(Amount::new(singular(&a.unit).as_str(), a.value))
     }
     pub fn normalize(&self) -> Measure {
         let foo = match &self.0 {
-            Unit::Teaspoon | Unit::Milliliter | Unit::Gram | Unit::Cent | Unit::KCal => {
-                return self.clone()
-            }
+            Unit::Teaspoon
+            | Unit::Milliliter
+            | Unit::Gram
+            | Unit::Cent
+            | Unit::KCal
+            | Unit::Second => return self.clone(),
             Unit::Other(x) => {
                 let x2 = x.clone();
                 let u2 = singular(&x2);
@@ -185,10 +196,19 @@ impl Measure {
             Unit::FluidOunce => (Unit::Teaspoon, self.1 * TSP_TO_FL_OZ),
 
             Unit::Dollar => (Unit::Cent, self.1 * CENTS_TO_DOLLAR),
+            Unit::Day => (Unit::Second, self.1 * SEC_TO_DAY),
+            Unit::Hour => (Unit::Second, self.1 * SEC_TO_HOUR),
+            Unit::Minute => (Unit::Second, self.1 * SEC_TO_MIN),
         };
         return Measure(foo.0, foo.1);
     }
-    pub fn parse(m: BareMeasurement) -> Measure {
+    pub fn add(&self, b: Measure) -> Result<Measure, anyhow::Error> {
+        if self.kind().unwrap() != b.kind().unwrap() {
+            return Err(anyhow::anyhow!("Cannot add measures of different kinds"));
+        }
+        Ok(Measure(self.0.clone(), self.1 + b.1))
+    }
+    pub fn parse(m: Amount) -> Measure {
         Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
     }
     pub fn kind(&self) -> Result<MeasureKind, anyhow::Error> {
@@ -197,6 +217,7 @@ impl Measure {
             Unit::Cent => Ok(MeasureKind::Money),
             Unit::Teaspoon | Unit::Milliliter => Ok(MeasureKind::Volume),
             Unit::KCal => Ok(MeasureKind::Calories),
+            Unit::Second => Ok(MeasureKind::Time),
             Unit::Other(_) => Ok(MeasureKind::Other),
             Unit::Kilogram
             | Unit::Liter
@@ -206,7 +227,10 @@ impl Measure {
             | Unit::FluidOunce
             | Unit::Ounce
             | Unit::Pound
-            | Unit::Dollar => bail!("unit not normalized: {:?}", self),
+            | Unit::Dollar
+            | Unit::Day
+            | Unit::Minute
+            | Unit::Hour => bail!("unit not normalized: {:?}", self),
         }
     }
 
@@ -246,8 +270,11 @@ impl Measure {
         debug!("{:?} -> {:?} ({} hops)", self, result, steps.len());
         return Some(result);
     }
+    pub fn as_raw(self) -> Amount {
+        Amount::new(&self.0.to_str(), self.1)
+    }
 
-    pub fn as_bare(self) -> anyhow::Result<BareMeasurement> {
+    pub fn as_bare(self) -> anyhow::Result<Amount> {
         let m = self.1;
         let (val, u, f) = match self.0 {
             Unit::Gram => (m, Unit::Gram, 1.0),
@@ -257,11 +284,17 @@ impl Measure {
                 m if { m < 3.0 } => (m, Unit::Teaspoon, 1.0),
                 m if { m < 12.0 } => (m, Unit::Tablespoon, TSP_TO_TBSP),
                 m if { m < CUP_TO_QUART * TSP_TO_CUP } => (m, Unit::Cup, TSP_TO_CUP),
-                _ => (m, Unit::Teaspoon, 1.0),
+                _ => (m, Unit::Quart, CUP_TO_QUART * TSP_TO_CUP),
             },
             Unit::Cent => (m, Unit::Dollar, CENTS_TO_DOLLAR),
             Unit::KCal => (m, Unit::KCal, 1.0),
-
+            Unit::Second => match m {
+                // only for these measurements to we convert to the best fit, others stay bare due to the nature of the values
+                m if { m < SEC_TO_MIN } => (m, Unit::Second, 1.0),
+                m if { m < SEC_TO_HOUR } => (m, Unit::Minute, SEC_TO_MIN),
+                m if { m < SEC_TO_DAY } => (m, Unit::Hour, SEC_TO_HOUR),
+                _ => (m, Unit::Day, SEC_TO_DAY),
+            },
             Unit::Other(o) => (m, Unit::Other(o), 1.0),
             Unit::Kilogram
             | Unit::Liter
@@ -271,9 +304,12 @@ impl Measure {
             | Unit::FluidOunce
             | Unit::Ounce
             | Unit::Pound
-            | Unit::Dollar => bail!("unit not normalized: {:?}", self),
+            | Unit::Dollar
+            | Unit::Minute
+            | Unit::Hour
+            | Unit::Day => bail!("unit not normalized: {:?}", self),
         };
-        return Ok(BareMeasurement::new(u.to_str(), val / f));
+        return Ok(Amount::new(&u.to_str(), val / f));
     }
 }
 pub fn singular(s: &str) -> String {
@@ -288,27 +324,24 @@ mod tests {
     fn test_measure() {
         let m1 = Measure::from_string("16 tbsp".to_string());
         assert_eq!(m1, Measure(Unit::Teaspoon, 48.0));
-        assert_eq!(
-            m1.as_bare().unwrap(),
-            BareMeasurement::new("cup".to_string(), 1.0)
-        );
+        assert_eq!(m1.as_bare().unwrap(), Amount::new("cup", 1.0));
         assert_eq!(
             Measure::from_string("25.2 grams".to_string())
                 .as_bare()
                 .unwrap(),
-            BareMeasurement::new("g".to_string(), 25.2)
+            Amount::new("g", 25.2)
         );
         assert_eq!(
             Measure::from_string("2500.2 grams".to_string())
                 .as_bare()
                 .unwrap(),
-            BareMeasurement::new("g".to_string(), 2500.2)
+            Amount::new("g", 2500.2)
         );
         assert_eq!(
             Measure::from_string("12 foo".to_string())
                 .as_bare()
                 .unwrap(),
-            BareMeasurement::new("whole".to_string(), 12.0)
+            Amount::new("whole", 12.0)
         );
     }
 

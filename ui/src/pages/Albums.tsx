@@ -6,7 +6,7 @@ import PaginatedTable from "../components/PaginatedTable";
 import { Code } from "../util";
 
 const Albums: React.FC = () => {
-  const { data, error } = useListAllAlbums({});
+  const { data, error, loading } = useListAllAlbums({});
 
   const columns = React.useMemo(
     () => [
@@ -44,7 +44,7 @@ const Albums: React.FC = () => {
         columns={columns}
         data={data?.albums || []}
         fetchData={() => {}}
-        isLoading={false}
+        isLoading={loading}
         totalCount={0}
         pageCount={1}
       />

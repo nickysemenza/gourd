@@ -27,7 +27,7 @@ const Meals: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error } = useListMeals({
+  const { data, error, loading } = useListMeals({
     queryParams: params,
   });
 
@@ -152,7 +152,7 @@ const Meals: React.FC = () => {
         columns={columns}
         data={internalVal}
         fetchData={fetchData}
-        isLoading={false}
+        isLoading={loading}
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />

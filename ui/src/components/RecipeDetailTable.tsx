@@ -202,7 +202,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               value={{
                 value: "",
                 label: getIngredient(ingredient).name,
-                kind: "recipe",
+                kind: getIngredient(ingredient).kind,
                 fdc_id: undefined,
               }}
               onChange={(a) => {
@@ -212,18 +212,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     x,
                     y,
                     { id: a.value, name: a.label, fdc_id: a.fdc_id },
-                    a.kind
+                    a.kind || "ingredient"
                   )
                 );
               }}
             />
           ) : (
-            <div className="text-gray-600">
+            <div className="text-gray-600 dark:text-zinc-200">
               {ingredient.kind === "recipe" && ingredient.recipe ? (
                 <RecipeLink recipe={ingredient.recipe} />
               ) : (
                 <div className="flex justify-between pr-1">
-                  {ingredient.ingredient?.ingredient.name}
+                  <p>{ingredient.ingredient?.ingredient.name}</p>
                   {hint && <IngredientPopover detail={hint} />}
                 </div>
               )}
@@ -437,7 +437,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="border-gray-900 shadow-xl bg-gray-100">
+      <div className="border-gray-900 shadow-xl bg-gray-100 dark:bg-gray-700">
         <TableRow header>
           <TableCell></TableCell>
           <TableCell>

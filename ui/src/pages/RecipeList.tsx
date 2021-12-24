@@ -34,7 +34,7 @@ const RecipeList: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error } = useListRecipes({
+  const { data, error, loading } = useListRecipes({
     queryParams: params,
   });
 
@@ -157,7 +157,7 @@ const RecipeList: React.FC = () => {
           columns={columns}
           data={recipes}
           fetchData={fetchData}
-          isLoading={false}
+          isLoading={loading}
           totalCount={data?.meta?.total_count || 0}
           pageCount={data?.meta?.page_count || 1}
         />
