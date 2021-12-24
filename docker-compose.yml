@@ -110,8 +110,8 @@ services:
       - "3001:3001"
     volumes:
       - ./.git:/work/.git
-      - ./ui/cypress:/work/cypress
-      - ./ui/coverage:/work/coverage
+      - ./ui/cypress:/work/ui/cypress
+      - ./ui/coverage:/work/ui/coverage
 
   usda:
     build:

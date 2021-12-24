@@ -5,7 +5,8 @@ use openapi::models::{
     RecipeDetail, SectionIngredient, SectionIngredientInput, UnitConversionRequest, UnitMapping,
 };
 use tracing::info;
-use unit::MeasureKind;
+
+use ingredient::unit::kind::MeasureKind;
 
 #[macro_use]
 extern crate serde;
@@ -173,16 +174,20 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     if req.input.len() == 0 {
         return None;
     }
-    return match amount_to_measure(req.input[0].clone())
-        .convert(target.clone(), equivalencies.clone())
-    {
+    return match unit::convert(
+        amount_to_measure(req.input[0].clone()),
+        target.clone(),
+        equivalencies.clone(),
+    ) {
         Some(a) => Some(measure_to_amount(a).unwrap()),
         None => {
             if target == MeasureKind::Weight {
                 // try again to convert to ml, and then use that as grams
-                return match amount_to_measure(req.input[0].clone())
-                    .convert(MeasureKind::Volume, equivalencies)
-                {
+                return match unit::convert(
+                    amount_to_measure(req.input[0].clone()),
+                    MeasureKind::Volume,
+                    equivalencies,
+                ) {
                     Some(a) => {
                         let mut a = measure_to_amount(a).unwrap();
                         a.unit = "gram".to_string();
@@ -197,10 +202,10 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     };
 }
 pub fn amount_to_measure(a: Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value as f32))
+    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value))
 }
 pub fn amount_to_measure2(a: ingredient::Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value as f32))
+    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value))
 }
 pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
     let m1 = m.as_bare()?;
@@ -209,7 +214,7 @@ pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
 pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     let mut amounts = vec![];
     for a in s.amounts.iter() {
-        amounts.push(ingredient::Amount::new(&a.unit, a.value as f32));
+        amounts.push(ingredient::Amount::new(&a.unit, a.value));
     }
 
     return ingredient::Ingredient {

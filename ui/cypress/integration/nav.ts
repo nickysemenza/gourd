@@ -6,6 +6,9 @@ import { navItems } from "../../src/components/navItems";
 import { COOKIE_NAME } from "../../src/config";
 
 context("smoke tests", () => {
+  beforeEach(() => {
+    cy.visit("/");
+  });
   it("navbar smoke test", () => {
     cy.setCookie(
       COOKIE_NAME,

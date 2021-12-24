@@ -89,7 +89,8 @@ fn foo(instructions: String) -> Measure {
                 for a in amt.into_iter() {
                     let m = gourd_common::amount_to_measure2(a);
                     amts.push(m.clone());
-                    if m.kind().unwrap() == gourd_common::unit::MeasureKind::Time {
+                    if m.kind().unwrap() == gourd_common::ingredient::unit::kind::MeasureKind::Time
+                    {
                         total_time = total_time.add(m).unwrap();
                     }
                 }

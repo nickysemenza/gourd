@@ -65,7 +65,7 @@
     "bezier-js": "4.0.3"
   },
   "scripts": {
-    "build:tailwind": "tailwind build src/tailwind.css -i src/tailwind.css -o src/tailwind.output.css",
+    "build:tailwind": "tailwind build -i src/tailwind.css -o src/tailwind.output.css",
     "watch:tailwind": "tailwind -i ./src/tailwind.css -o src/tailwind.output.css --watch",
     "prebuild": "run-s build:tailwind",
     "start": "npm-run-all build:tailwind --parallel watch:tailwind start:react",

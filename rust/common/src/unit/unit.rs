@@ -1,176 +1,108 @@
-use std::fmt;
-
 use anyhow::bail;
+use ingredient::unit::singular;
+use ingredient::unit::{kind::MeasureKind, Unit};
 use ingredient::Amount;
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
-pub struct Measure(Unit, f32);
+type MeasureGraph = Graph<Unit, f64>;
 
-#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
-pub enum MeasureKind {
-    Weight,
-    Volume,
-    Money,
-    Calories,
-    Other,
-    Time,
-}
-impl MeasureKind {
-    pub fn from_str(s: &str) -> Self {
-        match s {
-            "weight" => Self::Weight,
-            "volume" => Self::Volume,
-            "money" => Self::Money,
-            "calories" => Self::Calories,
-            "time" => Self::Time,
-            _ => Self::Other,
-        }
-    }
-}
-#[derive(Clone, PartialEq, PartialOrd, Debug, Eq, Hash, Serialize, Deserialize)]
-pub enum Unit {
-    Gram,
-    Kilogram,
-    Liter,
-    Milliliter,
-    Teaspoon,
-    Tablespoon,
-    Cup,
-    Quart,
-    FluidOunce,
-    Ounce,
-    Pound,
-    Cent,
-    Dollar,
-    KCal,
-    Day,
-    Hour,
-    Minute,
-    Second,
-    Other(String),
-}
-
-impl Unit {
-    pub fn normalize(self) -> Unit {
-        match self {
-            Unit::Other(x) => return Unit::Other(singular(&x)),
-            _ => return self,
-        }
-    }
-    pub fn from_str(s: &str) -> Self {
-        match s {
-            "gram" | "g" => Self::Gram,
-            "kilogram" | "kg" => Self::Kilogram,
-
-            "oz" | "ounce" => Self::Ounce,
-            "lb" | "pound" => Self::Pound,
-
-            "ml" => Self::Milliliter,
-            "l" => Self::Liter,
-
-            "tsp" | "teaspoon" => Self::Teaspoon,
-            "tbsp" | "tablespoon" => Self::Tablespoon,
-            "c" | "cup" => Self::Cup,
-            "q" | "quart" => Self::Quart,
-            "fl oz" | "fluid oz" => Self::FluidOunce,
-
-            "dollar" | "$" => Self::Dollar,
-            "cent" => Self::Cent,
-
-            "calorie" | "cal" | "kcal" => Self::KCal,
-            "second" | "sec" | "s" => Self::Second,
-            "minute" | "min" => Self::Minute,
-            "hour" | "hr" => Self::Hour,
-            "day" => Self::Day,
-            _ => Self::Other(s.to_string()),
-        }
-    }
-    pub fn to_str(self) -> String {
-        match self {
-            Unit::Gram => "g",
-            Unit::Kilogram => "kg",
-            Unit::Liter => "l",
-            Unit::Milliliter => "ml",
-            Unit::Teaspoon => "tsp",
-            Unit::Tablespoon => "tbsp",
-            Unit::Cup => "cup",
-            Unit::Quart => "quart",
-            Unit::FluidOunce => "fl oz",
-            Unit::Ounce => "oz",
-            Unit::Pound => "lb",
-            Unit::Cent => "cent",
-            Unit::Dollar => "$",
-            Unit::KCal => "kcal",
-            Unit::Day => "day",
-            Unit::Hour => "hour",
-            Unit::Minute => "minute",
-            Unit::Second => "second",
-            Unit::Other(s) => return singular(&s),
-        }
-        .to_string()
-    }
-}
-pub fn unit_from_measurekind(m: MeasureKind) -> Unit {
-    return match m {
-        MeasureKind::Weight => Unit::Gram,
-        MeasureKind::Volume => Unit::Milliliter,
-        MeasureKind::Money => Unit::Cent,
-        MeasureKind::Calories => Unit::KCal,
-        MeasureKind::Time => Unit::Second,
-        MeasureKind::Other => Unit::Other("".to_string()),
-    };
-}
-impl fmt::Display for Unit {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> Graph<Unit, f32> {
-    let mut g = Graph::<Unit, f32>::new();
+pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> MeasureGraph {
+    let mut g = Graph::<Unit, f64>::new();
 
     for (m_a, m_b) in mappings.into_iter() {
         let n_a = g
             .node_indices()
-            .find(|i| g[*i] == m_a.0)
-            .unwrap_or_else(|| g.add_node(m_a.0.clone().normalize()));
+            .find(|i| g[*i] == m_a.unit)
+            .unwrap_or_else(|| g.add_node(m_a.unit.clone().normalize()));
         let n_b = g
             .node_indices()
-            .find(|i| g[*i] == m_b.0)
-            .unwrap_or_else(|| g.add_node(m_b.0.clone().normalize()));
-        let _c1 = g.add_edge(n_a, n_b, m_b.1 / m_a.1);
-        let _c2 = g.add_edge(n_b, n_a, m_a.1 / m_b.1);
+            .find(|i| g[*i] == m_b.unit)
+            .unwrap_or_else(|| g.add_node(m_b.unit.clone().normalize()));
+        let _c1 = g.add_edge(n_a, n_b, m_b.value / m_a.value);
+        let _c2 = g.add_edge(n_b, n_a, m_a.value / m_b.value);
     }
     return g;
 }
-pub fn print_graph(g: Graph<Unit, f32>) -> String {
+pub fn print_graph(g: MeasureGraph) -> String {
     return format!("{}", petgraph::dot::Dot::new(&g));
 }
 
-// multiplication factors
-const TSP_TO_TBSP: f32 = 3.0;
-const TSP_TO_FL_OZ: f32 = 2.0;
-const G_TO_K: f32 = 1000.0;
-const CUP_TO_QUART: f32 = 4.0;
-const TSP_TO_CUP: f32 = 48.0;
-const GRAM_TO_OZ: f32 = 28.3495;
-const OZ_TO_LB: f32 = 16.0;
-const CENTS_TO_DOLLAR: f32 = 100.0;
+#[tracing::instrument(name = "unit::convert")]
+pub fn convert(
+    m: Measure,
+    target: MeasureKind,
+    mappings: Vec<(Measure, Measure)>,
+) -> Option<Measure> {
+    let g = make_graph(mappings);
 
-const SEC_TO_MIN: f32 = 60.0;
-const SEC_TO_HOUR: f32 = 3600.0;
-const SEC_TO_DAY: f32 = 86400.0;
+    let unit_a = m.unit.clone();
+    let unit_b = target.unit();
+
+    let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
+    let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
+
+    debug!("calculating {:?} to {:?}", n_a, n_b);
+    if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
+        debug!("convert failed for {:?}", m);
+        return None;
+    };
+
+    let steps = petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
+        .unwrap()
+        .1;
+    let mut res: f64 = m.value;
+    for x in 0..steps.len() - 1 {
+        let edge = g
+            .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
+            .unwrap();
+        res *= g.edge_weight(edge).unwrap();
+    }
+    let y = (res * 100.0).round() / 100.0;
+    let result = Measure::new(unit_b, y);
+    debug!("{:?} -> {:?} ({} hops)", m, result, steps.len());
+    return Some(result);
+}
+
+#[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
+pub struct Measure {
+    unit: Unit,
+    value: f64,
+    upper_value: Option<f64>,
+}
+
+// multiplication factors
+const TSP_TO_TBSP: f64 = 3.0;
+const TSP_TO_FL_OZ: f64 = 2.0;
+const G_TO_K: f64 = 1000.0;
+const CUP_TO_QUART: f64 = 4.0;
+const TSP_TO_CUP: f64 = 48.0;
+const GRAM_TO_OZ: f64 = 28.3495;
+const OZ_TO_LB: f64 = 16.0;
+const CENTS_TO_DOLLAR: f64 = 100.0;
+const SEC_TO_MIN: f64 = 60.0;
+const SEC_TO_HOUR: f64 = 3600.0;
+const SEC_TO_DAY: f64 = 86400.0;
 
 impl Measure {
+    pub fn new(unit: Unit, value: f64) -> Measure {
+        Measure {
+            unit,
+            value,
+            upper_value: None,
+        }
+    }
     pub fn from_string(s: String) -> Measure {
         let a = ingredient::parse_amount(s.as_str())[0].clone();
         Measure::parse(Amount::new(singular(&a.unit).as_str(), a.value))
     }
+    pub fn from_str(s: &str) -> Measure {
+        let a = ingredient::parse_amount(s)[0].clone();
+        Measure::parse(Amount::new(singular(&a.unit).as_str(), a.value))
+    }
     pub fn normalize(&self) -> Measure {
-        let foo = match &self.0 {
+        let foo = match &self.unit {
             Unit::Teaspoon
             | Unit::Milliliter
             | Unit::Gram
@@ -180,39 +112,39 @@ impl Measure {
             Unit::Other(x) => {
                 let x2 = x.clone();
                 let u2 = singular(&x2);
-                return Measure(Unit::Other(u2), self.1);
+                return Measure::new(Unit::Other(u2), self.value);
             }
 
-            Unit::Kilogram => (Unit::Gram, self.1 * G_TO_K),
+            Unit::Kilogram => (Unit::Gram, self.value * G_TO_K),
 
-            Unit::Ounce => (Unit::Gram, self.1 * GRAM_TO_OZ),
-            Unit::Pound => (Unit::Gram, self.1 * GRAM_TO_OZ * OZ_TO_LB),
+            Unit::Ounce => (Unit::Gram, self.value * GRAM_TO_OZ),
+            Unit::Pound => (Unit::Gram, self.value * GRAM_TO_OZ * OZ_TO_LB),
 
-            Unit::Liter => (Unit::Milliliter, self.1 * G_TO_K),
+            Unit::Liter => (Unit::Milliliter, self.value * G_TO_K),
 
-            Unit::Tablespoon => (Unit::Teaspoon, self.1 * TSP_TO_TBSP),
-            Unit::Cup => (Unit::Teaspoon, self.1 * TSP_TO_CUP),
-            Unit::Quart => (Unit::Teaspoon, self.1 * CUP_TO_QUART * TSP_TO_CUP),
-            Unit::FluidOunce => (Unit::Teaspoon, self.1 * TSP_TO_FL_OZ),
+            Unit::Tablespoon => (Unit::Teaspoon, self.value * TSP_TO_TBSP),
+            Unit::Cup => (Unit::Teaspoon, self.value * TSP_TO_CUP),
+            Unit::Quart => (Unit::Teaspoon, self.value * CUP_TO_QUART * TSP_TO_CUP),
+            Unit::FluidOunce => (Unit::Teaspoon, self.value * TSP_TO_FL_OZ),
 
-            Unit::Dollar => (Unit::Cent, self.1 * CENTS_TO_DOLLAR),
-            Unit::Day => (Unit::Second, self.1 * SEC_TO_DAY),
-            Unit::Hour => (Unit::Second, self.1 * SEC_TO_HOUR),
-            Unit::Minute => (Unit::Second, self.1 * SEC_TO_MIN),
+            Unit::Dollar => (Unit::Cent, self.value * CENTS_TO_DOLLAR),
+            Unit::Day => (Unit::Second, self.value * SEC_TO_DAY),
+            Unit::Hour => (Unit::Second, self.value * SEC_TO_HOUR),
+            Unit::Minute => (Unit::Second, self.value * SEC_TO_MIN),
         };
-        return Measure(foo.0, foo.1);
+        return Measure::new(foo.0, foo.1);
     }
     pub fn add(&self, b: Measure) -> Result<Measure, anyhow::Error> {
         if self.kind().unwrap() != b.kind().unwrap() {
             return Err(anyhow::anyhow!("Cannot add measures of different kinds"));
         }
-        Ok(Measure(self.0.clone(), self.1 + b.1))
+        Ok(Measure::new(self.unit.clone(), self.value + b.value))
     }
     pub fn parse(m: Amount) -> Measure {
-        Measure(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
+        Measure::new(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
     }
     pub fn kind(&self) -> Result<MeasureKind, anyhow::Error> {
-        match self.0 {
+        match self.unit {
             Unit::Gram => Ok(MeasureKind::Weight),
             Unit::Cent => Ok(MeasureKind::Money),
             Unit::Teaspoon | Unit::Milliliter => Ok(MeasureKind::Volume),
@@ -234,49 +166,13 @@ impl Measure {
         }
     }
 
-    #[tracing::instrument(name = "unit::convert")]
-    pub fn convert(
-        &self,
-        target: MeasureKind,
-        mappings: Vec<(Measure, Measure)>,
-    ) -> Option<Measure> {
-        let g = make_graph(mappings);
-
-        let unit_a = self.0.clone();
-        let unit_b = unit_from_measurekind(target);
-
-        let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
-        let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
-
-        debug!("calculating {:?} to {:?}", n_a, n_b);
-        if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
-            debug!("convert failed for {:?}", self);
-            return None;
-        };
-
-        let steps =
-            petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
-                .unwrap()
-                .1;
-        let mut res: f32 = self.1;
-        for x in 0..steps.len() - 1 {
-            let edge = g
-                .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
-                .unwrap();
-            res *= g.edge_weight(edge).unwrap();
-        }
-        let y = (res * 100.0).round() / 100.0;
-        let result = Measure(unit_b, y);
-        debug!("{:?} -> {:?} ({} hops)", self, result, steps.len());
-        return Some(result);
-    }
     pub fn as_raw(self) -> Amount {
-        Amount::new(&self.0.to_str(), self.1)
+        Amount::new(&self.unit.to_str(), self.value)
     }
 
     pub fn as_bare(self) -> anyhow::Result<Amount> {
-        let m = self.1;
-        let (val, u, f) = match self.0 {
+        let m = self.value;
+        let (val, u, f) = match self.unit {
             Unit::Gram => (m, Unit::Gram, 1.0),
             Unit::Milliliter => (m, Unit::Milliliter, 1.0),
             Unit::Teaspoon => match m {
@@ -312,9 +208,6 @@ impl Measure {
         return Ok(Amount::new(&u.to_str(), val / f));
     }
 }
-pub fn singular(s: &str) -> String {
-    s.strip_suffix("s").unwrap_or(s).to_lowercase()
-}
 
 #[cfg(test)]
 mod tests {
@@ -322,150 +215,129 @@ mod tests {
     use super::*;
     #[test]
     fn test_measure() {
-        let m1 = Measure::from_string("16 tbsp".to_string());
-        assert_eq!(m1, Measure(Unit::Teaspoon, 48.0));
+        let m1 = Measure::from_str("16 tbsp");
+        assert_eq!(m1, Measure::new(Unit::Teaspoon, 48.0));
         assert_eq!(m1.as_bare().unwrap(), Amount::new("cup", 1.0));
         assert_eq!(
-            Measure::from_string("25.2 grams".to_string())
-                .as_bare()
-                .unwrap(),
+            Measure::from_str("25.2 grams").as_bare().unwrap(),
             Amount::new("g", 25.2)
         );
         assert_eq!(
-            Measure::from_string("2500.2 grams".to_string())
-                .as_bare()
-                .unwrap(),
+            Measure::from_str("2500.2 grams").as_bare().unwrap(),
             Amount::new("g", 2500.2)
         );
         assert_eq!(
-            Measure::from_string("12 foo".to_string())
-                .as_bare()
-                .unwrap(),
+            Measure::from_str("12 foo").as_bare().unwrap(),
             Amount::new("whole", 12.0)
         );
     }
 
     #[test]
     fn test_convert() {
-        let m = Measure::from_string("1 tbsp".to_string());
-        let tbsp_dollars = (
-            Measure::from_string("2 tbsp".to_string()),
-            Measure::from_string("4 dollars".to_string()),
-        );
+        let m = Measure::from_str("1 tbsp");
+        let tbsp_dollars = (Measure::from_str("2 tbsp"), Measure::from_str("4 dollars"));
         assert_eq!(
-            Measure::from_string("2 dollars".to_string()),
-            m.convert(MeasureKind::Money, vec![tbsp_dollars.clone()])
-                .unwrap()
+            Measure::from_str("2 dollars"),
+            convert(m.clone(), MeasureKind::Money, vec![tbsp_dollars.clone()]).unwrap()
         );
 
-        assert!(m
-            .convert(MeasureKind::Volume, vec![tbsp_dollars.clone()])
-            .is_none());
+        assert!(convert(m, MeasureKind::Volume, vec![tbsp_dollars.clone()]).is_none());
     }
     #[test]
     fn test_convert_lb() {
-        let grams_dollars = (
-            Measure::from_string("1 gram".to_string()),
-            Measure::from_string("1 dollar".to_string()),
+        let grams_dollars = (Measure::from_str("1 gram"), Measure::from_str("1 dollar"));
+        assert_eq!(
+            Measure::from_str("2 dollars"),
+            convert(
+                Measure::from_str("2 grams"),
+                MeasureKind::Money,
+                vec![grams_dollars.clone()]
+            )
+            .unwrap()
         );
         assert_eq!(
-            Measure::from_string("2 dollars".to_string()),
-            Measure::from_string("2 grams".to_string())
-                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
-                .unwrap()
+            Measure::from_str("56.699 dollars"),
+            convert(
+                Measure::from_str("2 oz"),
+                MeasureKind::Money,
+                vec![grams_dollars.clone()]
+            )
+            .unwrap()
         );
         assert_eq!(
-            Measure::from_string("56.699 dollars".to_string()),
-            Measure::from_string("2 oz".to_string())
-                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
-                .unwrap()
+            Measure::from_str("226.796 dollars"),
+            convert(
+                Measure::from_str(".5 lb"),
+                MeasureKind::Money,
+                vec![grams_dollars.clone()]
+            )
+            .unwrap()
         );
         assert_eq!(
-            Measure::from_string("226.796 dollars".to_string()),
-            Measure::from_string(".5 lb".to_string())
-                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
-                .unwrap()
-        );
-        assert_eq!(
-            Measure::from_string("453.592 dollars".to_string()),
-            Measure::from_string("1 lb".to_string())
-                .convert(MeasureKind::Money, vec![grams_dollars.clone()])
-                .unwrap()
+            Measure::from_str("453.592 dollars"),
+            convert(
+                Measure::from_str("1 lb"),
+                MeasureKind::Money,
+                vec![grams_dollars.clone()]
+            )
+            .unwrap()
         );
     }
     #[test]
     fn test_convert_other() {
         assert_eq!(
-            Measure::from_string("10.0 cents".to_string()),
-            Measure::from_string("1 whole".to_string())
-                .convert(
-                    MeasureKind::Money,
-                    vec![(
-                        Measure::from_string("12 whole".to_string()),
-                        Measure::from_string("1.20 dollar".to_string()),
-                    )]
-                )
-                .unwrap()
+            Measure::from_str("10.0 cents"),
+            convert(
+                Measure::from_str("1 whole"),
+                MeasureKind::Money,
+                vec![(
+                    Measure::from_str("12 whole"),
+                    Measure::from_str("1.20 dollar"),
+                )]
+            )
+            .unwrap()
         );
     }
     #[test]
     fn test_convert_transitive() {
         assert_eq!(
-            Measure::from_string("1 cent".to_string()),
-            Measure::from_string("1 grams".to_string())
-                .convert(
-                    MeasureKind::Money,
-                    vec![
-                        (
-                            Measure::from_string("1 cent".to_string()),
-                            Measure::from_string("1 tsp".to_string()),
-                        ),
-                        (
-                            Measure::from_string("1 grams".to_string()),
-                            Measure::from_string("1 tsp".to_string()),
-                        ),
-                    ]
-                )
-                .unwrap()
+            Measure::from_str("1 cent"),
+            convert(
+                Measure::from_str("1 grams"),
+                MeasureKind::Money,
+                vec![
+                    (Measure::from_str("1 cent"), Measure::from_str("1 tsp"),),
+                    (Measure::from_str("1 grams"), Measure::from_str("1 tsp"),),
+                ]
+            )
+            .unwrap()
         );
         assert_eq!(
-            Measure::from_string("1 dollar".to_string()),
-            Measure::from_string("1 grams".to_string())
-                .convert(
-                    MeasureKind::Money,
-                    vec![
-                        (
-                            Measure::from_string("1 dollar".to_string()),
-                            Measure::from_string("1 cup".to_string()),
-                        ),
-                        (
-                            Measure::from_string("1 grams".to_string()),
-                            Measure::from_string("1 cup".to_string()),
-                        ),
-                    ]
-                )
-                .unwrap()
+            Measure::from_str("1 dollar"),
+            convert(
+                Measure::from_str("1 grams"),
+                MeasureKind::Money,
+                vec![
+                    (Measure::from_str("1 dollar"), Measure::from_str("1 cup"),),
+                    (Measure::from_str("1 grams"), Measure::from_str("1 cup"),),
+                ]
+            )
+            .unwrap()
         );
     }
     #[test]
     fn test_convert_kcal() {
         assert_eq!(
-            Measure::from_string("200 kcal".to_string()),
-            Measure::from_string("100 g".to_string())
-                .convert(
-                    MeasureKind::Calories,
-                    vec![
-                        (
-                            Measure::from_string("20 cups".to_string()),
-                            Measure::from_string("40 grams".to_string()),
-                        ),
-                        (
-                            Measure::from_string("20 grams".to_string()),
-                            Measure::from_string("40 kcal".to_string()),
-                        )
-                    ]
-                )
-                .unwrap()
+            Measure::from_str("200 kcal"),
+            convert(
+                Measure::from_str("100 g"),
+                MeasureKind::Calories,
+                vec![
+                    (Measure::from_str("20 cups"), Measure::from_str("40 grams"),),
+                    (Measure::from_str("20 grams"), Measure::from_str("40 kcal"),)
+                ]
+            )
+            .unwrap()
         );
     }
 }
