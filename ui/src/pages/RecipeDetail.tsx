@@ -335,7 +335,7 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const totalDuration = getTotalDuration(detail.sections);
+  const totalDuration = getTotalDuration(w, detail.sections);
 
   const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
 
@@ -388,7 +388,7 @@ const RecipeDetail: React.FC = () => {
               </div>
             )}
             <div className="text-sm">
-              Takes {formatTimeRange(totalDuration)}
+              Takes {formatTimeRange(w, totalDuration)}
             </div>
           </div>
           <div>

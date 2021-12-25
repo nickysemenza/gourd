@@ -1,10 +1,13 @@
 mod utils;
 
 use gourd_common::{
-    convert_to, ingredient, parse_unit_mappings, sum_ingredients,
-    unit::{make_graph, print_graph},
+    convert_to,
+    ingredient::{self, Amount},
+    parse_unit_mappings, sum_ingredients,
+    unit::{add_amounts, make_graph, print_graph},
 };
 use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
+use tracing::info;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -12,6 +15,19 @@ use wasm_bindgen::prelude::*;
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+#[wasm_bindgen(start)]
+pub fn start() -> Result<(), JsValue> {
+    // print pretty errors in wasm https://github.com/rustwasm/console_error_panic_hook
+    // This is not needed for tracing_wasm to work, but it is a common tool for getting proper error line numbers for panics.
+    console_error_panic_hook::set_once();
+
+    // Add this line:
+    tracing_wasm::set_as_global_default();
+
+    info!("hello");
+    Ok(())
+}
 
 #[wasm_bindgen]
 pub fn parse(input: &str) -> String {
@@ -144,4 +160,20 @@ pub fn rich(r: String) -> Result<RichItems, JsValue> {
         Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),
         Err(e) => Err(JsValue::from_str(&e.to_string())),
     }
+}
+
+#[wasm_bindgen]
+pub fn format_amount(amount: &IAmount) -> String {
+    utils::set_panic_hook();
+    let r: Amount = amount.into_serde().unwrap();
+    format!("{}", r)
+}
+
+#[wasm_bindgen]
+pub fn sum_amounts(amount: &IAmounts) -> IAmount {
+    utils::set_panic_hook();
+    let r: Vec<Amount> = amount.into_serde().unwrap();
+    let sum = add_amounts(r);
+    info!("sum {}", sum);
+    JsValue::from_serde(&sum).unwrap().into()
 }

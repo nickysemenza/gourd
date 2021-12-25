@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = { version = "0.2.73", features = ["serde-serialize"] }
+wasm-bindgen = { version = "0.2.78", features = ["serde-serialize"] }
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
 getrandom = { version = "0.2.3", features = ["js"] } # https://docs.rs/getrandom/0.2.3/getrandom/#supported-targets
@@ -29,6 +29,9 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 #
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = { version = "0.4.5", optional = true }
+
+tracing-wasm = "0.2.1"
+tracing = "0.1.28"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.23"

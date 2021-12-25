@@ -202,10 +202,18 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     };
 }
 pub fn amount_to_measure(a: Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value))
+    unit::Measure::parse(ingredient::Amount {
+        unit: a.unit,
+        value: a.value,
+        upper_value: a.upper_value,
+    })
 }
 pub fn amount_to_measure2(a: ingredient::Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount::new(a.unit.as_str(), a.value))
+    unit::Measure::parse(ingredient::Amount {
+        unit: a.unit,
+        value: a.value,
+        upper_value: a.upper_value,
+    })
 }
 pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
     let m1 = m.as_bare()?;
@@ -214,7 +222,11 @@ pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
 pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     let mut amounts = vec![];
     for a in s.amounts.iter() {
-        amounts.push(ingredient::Amount::new(&a.unit, a.value));
+        amounts.push(ingredient::Amount {
+            unit: a.unit.clone(),
+            value: a.value,
+            upper_value: a.upper_value,
+        });
     }
 
     return ingredient::Ingredient {

@@ -5,9 +5,9 @@ import {
   Amount,
   RecipeSection,
 } from "./api/openapi-hooks/api";
-import parse from "parse-duration";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
 import { RichItem } from "gourd_rs";
+import { wasm } from "./wasm";
 
 export const getIngredient = (si: Partial<SectionIngredient>) => {
   let name = "";
@@ -75,58 +75,16 @@ export const formatText = (text: React.ReactText) => {
   return pairs;
 };
 
-const formatSeconds = (seconds: number) => {
-  // https://stackoverflow.com/a/6312999
-  const secs = Math.round(seconds);
-  const h = Math.floor(secs / (60 * 60));
-  const divisor_for_minutes = secs % (60 * 60);
-  const m = Math.floor(divisor_for_minutes / 60);
-  const s = Math.ceil(divisor_for_minutes % 60);
-
-  let vals = [];
-  vals.push(h > 0 ? `${h} hr` : null);
-  vals.push(m > 0 ? `${m} min` : null);
-  vals.push(s > 0 ? `${s} sec` : null);
-  return vals.join(" ");
-};
-export const formatTimeRange = (range?: Amount) => {
-  if (!range) return "";
-  const { value, upper_value } = range;
-  let items = [formatSeconds(value)];
-  if (upper_value) {
-    items.push(" - ", formatSeconds(upper_value));
-  }
-  return items.join("");
+export const formatTimeRange = (w?: wasm, range?: Amount) => {
+  return w && range ? w.format_amount(range) : "";
 };
 
-export const parseTimeRange = (input: string): Amount | null => {
-  // todo: wasm this
-  const parts = input.split(" - ");
-  if (parts.length === 0 || parts.length > 2) return null;
-  return {
-    unit: "seconds",
-    value: (parse(parts[0]) || 0) / 1000,
-    upper_value: parts.length === 2 ? (parse(parts[1]) || 0) / 1000 : undefined,
-  };
-};
-
-export const sumTimeRanges = (ranges: (Amount | undefined)[]): Amount => {
-  // todo: wasm this
-  let totalDuration: Amount = { value: 0, unit: "seconds" };
-  ranges.forEach((r) => {
-    if (!!r) {
-      totalDuration.value += r.value;
-
-      if (r.upper_value !== undefined) {
-        if (totalDuration.upper_value === undefined) {
-          totalDuration.upper_value = 0;
-        }
-        totalDuration.upper_value += r.upper_value;
-      }
-    }
-  });
-
-  return totalDuration;
+export const sumTimeRanges = (
+  w: wasm,
+  ranges: (Amount | undefined)[]
+): Amount => {
+  let ranges2 = ranges.filter((r) => r !== undefined) as Amount[];
+  return w.sum_amounts(ranges2);
 };
 
 export const Code: React.FC = ({ children }) => (
@@ -151,5 +109,8 @@ export const blankIngredient = (name: string): Ingredient => ({ name, id: "" });
 
 export const scaledRound = (x: number) => x.toFixed(x < 10 ? 2 : 0);
 
-export const getTotalDuration = (sections: RecipeSection[]) =>
-  sumTimeRanges(sections.map((s) => s.duration).filter((t) => t !== undefined));
+export const getTotalDuration = (w: wasm, sections: RecipeSection[]) =>
+  sumTimeRanges(
+    w,
+    sections.map((s) => s.duration).filter((t) => t !== undefined)
+  );

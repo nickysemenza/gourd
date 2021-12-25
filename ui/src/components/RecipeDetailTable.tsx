@@ -8,7 +8,6 @@ import {
   formatRichText,
   formatTimeRange,
   getIngredient,
-  parseTimeRange,
   scaledRound,
 } from "../util";
 import { DndProvider } from "react-dnd";
@@ -337,11 +336,16 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           width={40}
           data-cy="time-input"
           edit={edit}
-          value={formatTimeRange(section.duration)}
+          value={formatTimeRange(w, section.duration)}
           blur
           onChange={(e) =>
+            w &&
             setRecipe(
-              updateTimeRange(recipe, x, parseTimeRange(e) || section.duration)
+              updateTimeRange(
+                recipe,
+                x,
+                w.parse_amount(e).pop() || section.duration
+              )
             )
           }
         />

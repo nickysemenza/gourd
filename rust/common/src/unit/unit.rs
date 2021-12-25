@@ -60,9 +60,26 @@ pub fn convert(
         res *= g.edge_weight(edge).unwrap();
     }
     let y = (res * 100.0).round() / 100.0;
-    let result = Measure::new(unit_b, y);
+    let result = Measure::new(
+        unit_b, y, None, // todo
+    );
     debug!("{:?} -> {:?} ({} hops)", m, result, steps.len());
     return Some(result);
+}
+pub fn add_opt_f64(a: Option<f64>, b: Option<f64>) -> Option<f64> {
+    match (a, b) {
+        (Some(a), Some(b)) => Some(a + b),
+        (None, None) => None,
+        (None, Some(_)) => b,
+        (Some(_), None) => a,
+    }
+}
+pub fn add_amounts(a: Vec<Amount>) -> Amount {
+    let mut m = Measure::from_str("0 seconds");
+    for x in a.into_iter() {
+        m = m.add(Measure::parse(x)).unwrap();
+    }
+    m.as_bare().unwrap()
 }
 
 #[derive(Clone, PartialEq, PartialOrd, Debug, Serialize, Deserialize)]
@@ -86,23 +103,31 @@ const SEC_TO_HOUR: f64 = 3600.0;
 const SEC_TO_DAY: f64 = 86400.0;
 
 impl Measure {
-    pub fn new(unit: Unit, value: f64) -> Measure {
+    pub fn new(unit: Unit, value: f64, upper_value: Option<f64>) -> Measure {
         Measure {
             unit,
             value,
-            upper_value: None,
+            upper_value,
         }
     }
     pub fn from_string(s: String) -> Measure {
         let a = ingredient::parse_amount(s.as_str())[0].clone();
-        Measure::parse(Amount::new(singular(&a.unit).as_str(), a.value))
+        Measure::parse(Amount {
+            unit: singular(&a.unit),
+            value: a.value,
+            upper_value: a.upper_value,
+        })
     }
     pub fn from_str(s: &str) -> Measure {
         let a = ingredient::parse_amount(s)[0].clone();
-        Measure::parse(Amount::new(singular(&a.unit).as_str(), a.value))
+        Measure::parse(Amount {
+            unit: singular(&a.unit),
+            value: a.value,
+            upper_value: a.upper_value,
+        })
     }
     pub fn normalize(&self) -> Measure {
-        let foo = match &self.unit {
+        let (unit, factor) = match &self.unit {
             Unit::Teaspoon
             | Unit::Milliliter
             | Unit::Gram
@@ -112,36 +137,57 @@ impl Measure {
             Unit::Other(x) => {
                 let x2 = x.clone();
                 let u2 = singular(&x2);
-                return Measure::new(Unit::Other(u2), self.value);
+                return Measure::new(Unit::Other(u2), self.value, self.upper_value);
             }
 
-            Unit::Kilogram => (Unit::Gram, self.value * G_TO_K),
+            Unit::Kilogram => (Unit::Gram, G_TO_K),
 
-            Unit::Ounce => (Unit::Gram, self.value * GRAM_TO_OZ),
-            Unit::Pound => (Unit::Gram, self.value * GRAM_TO_OZ * OZ_TO_LB),
+            Unit::Ounce => (Unit::Gram, GRAM_TO_OZ),
+            Unit::Pound => (Unit::Gram, GRAM_TO_OZ * OZ_TO_LB),
 
-            Unit::Liter => (Unit::Milliliter, self.value * G_TO_K),
+            Unit::Liter => (Unit::Milliliter, G_TO_K),
 
-            Unit::Tablespoon => (Unit::Teaspoon, self.value * TSP_TO_TBSP),
-            Unit::Cup => (Unit::Teaspoon, self.value * TSP_TO_CUP),
-            Unit::Quart => (Unit::Teaspoon, self.value * CUP_TO_QUART * TSP_TO_CUP),
-            Unit::FluidOunce => (Unit::Teaspoon, self.value * TSP_TO_FL_OZ),
+            Unit::Tablespoon => (Unit::Teaspoon, TSP_TO_TBSP),
+            Unit::Cup => (Unit::Teaspoon, TSP_TO_CUP),
+            Unit::Quart => (Unit::Teaspoon, CUP_TO_QUART * TSP_TO_CUP),
+            Unit::FluidOunce => (Unit::Teaspoon, TSP_TO_FL_OZ),
 
-            Unit::Dollar => (Unit::Cent, self.value * CENTS_TO_DOLLAR),
-            Unit::Day => (Unit::Second, self.value * SEC_TO_DAY),
-            Unit::Hour => (Unit::Second, self.value * SEC_TO_HOUR),
-            Unit::Minute => (Unit::Second, self.value * SEC_TO_MIN),
+            Unit::Dollar => (Unit::Cent, CENTS_TO_DOLLAR),
+            Unit::Day => (Unit::Second, SEC_TO_DAY),
+            Unit::Hour => (Unit::Second, SEC_TO_HOUR),
+            Unit::Minute => (Unit::Second, SEC_TO_MIN),
         };
-        return Measure::new(foo.0, foo.1);
+        return Measure {
+            unit,
+            value: self.value * factor,
+            upper_value: match self.upper_value {
+                Some(x) => Some(x * factor),
+                None => None,
+            },
+        };
     }
     pub fn add(&self, b: Measure) -> Result<Measure, anyhow::Error> {
         if self.kind().unwrap() != b.kind().unwrap() {
             return Err(anyhow::anyhow!("Cannot add measures of different kinds"));
         }
-        Ok(Measure::new(self.unit.clone(), self.value + b.value))
+        Ok(Measure {
+            unit: self.unit.clone(),
+            value: self.value + b.value,
+            upper_value: add_opt_f64(self.upper_value, b.upper_value),
+        })
+    }
+    pub fn recalc(&mut self) {
+        if self.upper_value.is_some() {
+            self.upper_value = Some(self.upper_value.unwrap() + self.value);
+        }
     }
     pub fn parse(m: Amount) -> Measure {
-        Measure::new(Unit::from_str(singular(m.unit.as_ref()).as_ref()), m.value).normalize()
+        Measure::new(
+            Unit::from_str(singular(m.unit.as_ref()).as_ref()),
+            m.value,
+            m.upper_value,
+        )
+        .normalize()
     }
     pub fn kind(&self) -> Result<MeasureKind, anyhow::Error> {
         match self.unit {
@@ -167,31 +213,34 @@ impl Measure {
     }
 
     pub fn as_raw(self) -> Amount {
-        Amount::new(&self.unit.to_str(), self.value)
+        Amount {
+            unit: self.unit.to_str(),
+            value: self.value,
+            upper_value: self.upper_value,
+        }
     }
 
     pub fn as_bare(self) -> anyhow::Result<Amount> {
-        let m = self.value;
-        let (val, u, f) = match self.unit {
-            Unit::Gram => (m, Unit::Gram, 1.0),
-            Unit::Milliliter => (m, Unit::Milliliter, 1.0),
-            Unit::Teaspoon => match m {
+        let (u, f) = match self.unit {
+            Unit::Gram => (Unit::Gram, 1.0),
+            Unit::Milliliter => (Unit::Milliliter, 1.0),
+            Unit::Teaspoon => match self.value {
                 // only for these measurements to we convert to the best fit, others stay bare due to the nature of the values
-                m if { m < 3.0 } => (m, Unit::Teaspoon, 1.0),
-                m if { m < 12.0 } => (m, Unit::Tablespoon, TSP_TO_TBSP),
-                m if { m < CUP_TO_QUART * TSP_TO_CUP } => (m, Unit::Cup, TSP_TO_CUP),
-                _ => (m, Unit::Quart, CUP_TO_QUART * TSP_TO_CUP),
+                m if { m < 3.0 } => (Unit::Teaspoon, 1.0),
+                m if { m < 12.0 } => (Unit::Tablespoon, TSP_TO_TBSP),
+                m if { m < CUP_TO_QUART * TSP_TO_CUP } => (Unit::Cup, TSP_TO_CUP),
+                _ => (Unit::Quart, CUP_TO_QUART * TSP_TO_CUP),
             },
-            Unit::Cent => (m, Unit::Dollar, CENTS_TO_DOLLAR),
-            Unit::KCal => (m, Unit::KCal, 1.0),
-            Unit::Second => match m {
+            Unit::Cent => (Unit::Dollar, CENTS_TO_DOLLAR),
+            Unit::KCal => (Unit::KCal, 1.0),
+            Unit::Second => match self.value {
                 // only for these measurements to we convert to the best fit, others stay bare due to the nature of the values
-                m if { m < SEC_TO_MIN } => (m, Unit::Second, 1.0),
-                m if { m < SEC_TO_HOUR } => (m, Unit::Minute, SEC_TO_MIN),
-                m if { m < SEC_TO_DAY } => (m, Unit::Hour, SEC_TO_HOUR),
-                _ => (m, Unit::Day, SEC_TO_DAY),
+                m if { m < SEC_TO_MIN } => (Unit::Second, 1.0),
+                m if { m < SEC_TO_HOUR } => (Unit::Minute, SEC_TO_MIN),
+                m if { m < SEC_TO_DAY } => (Unit::Hour, SEC_TO_HOUR),
+                _ => (Unit::Day, SEC_TO_DAY),
             },
-            Unit::Other(o) => (m, Unit::Other(o), 1.0),
+            Unit::Other(o) => (Unit::Other(o), 1.0),
             Unit::Kilogram
             | Unit::Liter
             | Unit::Tablespoon
@@ -205,7 +254,14 @@ impl Measure {
             | Unit::Hour
             | Unit::Day => bail!("unit not normalized: {:?}", self),
         };
-        return Ok(Amount::new(&u.to_str(), val / f));
+        return Ok(Amount {
+            unit: u.to_str(),
+            value: self.value / f,
+            upper_value: match self.upper_value {
+                Some(x) => Some(x / f),
+                None => None,
+            },
+        });
     }
 }
 
@@ -216,7 +272,7 @@ mod tests {
     #[test]
     fn test_measure() {
         let m1 = Measure::from_str("16 tbsp");
-        assert_eq!(m1, Measure::new(Unit::Teaspoon, 48.0));
+        assert_eq!(m1, Measure::new(Unit::Teaspoon, 48.0, None));
         assert_eq!(m1.as_bare().unwrap(), Amount::new("cup", 1.0));
         assert_eq!(
             Measure::from_str("25.2 grams").as_bare().unwrap(),
@@ -294,6 +350,18 @@ mod tests {
                     Measure::from_str("12 whole"),
                     Measure::from_str("1.20 dollar"),
                 )]
+            )
+            .unwrap()
+        );
+    }
+    #[test]
+    fn test_convert_range() {
+        assert_eq!(
+            Measure::from_str("5-10 dollars"),
+            convert(
+                Measure::from_str("1-2 whole"),
+                MeasureKind::Money,
+                vec![(Measure::from_str("4 whole"), Measure::from_str("20 dollar"),)]
             )
             .unwrap()
         );
