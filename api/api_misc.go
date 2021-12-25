@@ -41,7 +41,7 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) 
 	return items
 }
 func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
-	if recipe == nil {
+	if recipe == nil || len(recipe.R.RecipeDetails) == 0 {
 		return nil, nil
 	}
 	sections := []RecipeSection{}
@@ -139,6 +139,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 	recipes, err := models.Recipes(
 		// Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
 		// has many sections, has many ingredients, which can be ingredients or recipes
+		Load(models.RecipeRels.RecipeDetails, Where("recipe_details.deleted_at IS NULL")),
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,
@@ -174,7 +175,9 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, *rw)
+		if rw != nil {
+			items = append(items, *rw)
+		}
 	}
 	return items, nil
 }
