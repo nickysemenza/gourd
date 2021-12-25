@@ -52,16 +52,21 @@ pub fn convert(
     let steps = petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
         .unwrap()
         .1;
-    let mut res: f64 = m.value;
+    let mut factor: f64 = 1.0;
     for x in 0..steps.len() - 1 {
         let edge = g
             .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
             .unwrap();
-        res *= g.edge_weight(edge).unwrap();
+        factor *= g.edge_weight(edge).unwrap();
     }
-    let y = (res * 100.0).round() / 100.0;
+
     let result = Measure::new(
-        unit_b, y, None, // todo
+        unit_b,
+        (m.value * factor * 100.0).round() / 100.0,
+        match m.upper_value {
+            Some(x) => Some((x * factor * 100.0).round() / 100.0),
+            None => None,
+        },
     );
     debug!("{:?} -> {:?} ({} hops)", m, result, steps.len());
     return Some(result);
@@ -361,7 +366,7 @@ mod tests {
             convert(
                 Measure::from_str("1-2 whole"),
                 MeasureKind::Money,
-                vec![(Measure::from_str("4 whole"), Measure::from_str("20 dollar"),)]
+                vec![(Measure::from_str("4 whole"), Measure::from_str("20 dollar"))]
             )
             .unwrap()
         );

@@ -462,7 +462,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             index={x}
             id={section.id}
             moveCard={moveCard}
-            enable={edit}
+            enable={edit && sections.length > 1}
           >
             {renderRow(section, x)}
           </DragWrapper>

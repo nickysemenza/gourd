@@ -86,7 +86,7 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
   ) : (
     <Navigate
       to={{
-        pathname: "/login",
+        pathname: "login",
       }}
     />
   );
@@ -101,25 +101,26 @@ function App() {
         onError={onAPIError}
       >
         <WasmContextProvider>
+          <Helmet>
+            <title>gourd</title>
+          </Helmet>
+          <ToastContainer position="bottom-right" />
           <Router>
-            <Helmet>
-              <title>gourd</title>
-            </Helmet>
-            <ToastContainer position="bottom-right" />
             <NavBar />
             <div className="lg:container lg:mx-auto">
               <Routes>
-                <Route path="/recipe/:id" element={<RecipeDetail />} />
-                <Route path="/recipes" element={<RecipeList />} />
-                <Route path="/ingredients/:id" element={<IngredientDetail />} />
-                <Route path="/ingredients" element={<IngredientList />} />
-                <Route path="/create" element={<CreateRecipe />} />
-                <Route path="/food" element={<Food />} />
-                <Route path="/playground" element={<Playground />} />
-                <Route path="/diff" element={<RecipeDiff />} />
-                <Route path="/graph" element={<Graph />} />
+                <Route index element={<Test />} />
+                <Route path="recipe/:id" element={<RecipeDetail />} />
+                <Route path="recipes" element={<RecipeList />} />
+                <Route path="ingredients/:id" element={<IngredientDetail />} />
+                <Route path="ingredients" element={<IngredientList />} />
+                <Route path="create" element={<CreateRecipe />} />
+                <Route path="food" element={<Food />} />
+                <Route path="playground" element={<Playground />} />
+                <Route path="diff" element={<RecipeDiff />} />
+                <Route path="graph" element={<Graph />} />
                 <Route
-                  path="/photos"
+                  path="photos"
                   element={
                     <RequireAuth>
                       <Photos />
@@ -127,7 +128,7 @@ function App() {
                   }
                 />
                 <Route
-                  path="/meals"
+                  path="meals"
                   element={
                     <RequireAuth>
                       <Meals />
@@ -135,14 +136,13 @@ function App() {
                   }
                 />
                 <Route
-                  path="/albums"
+                  path="albums"
                   element={
                     <RequireAuth>
                       <Albums />
                     </RequireAuth>
                   }
                 />
-                <Route path="/" element={<Test />} />
               </Routes>
             </div>
           </Router>
