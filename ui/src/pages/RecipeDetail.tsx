@@ -59,6 +59,8 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
       name: r.detail.name,
       quantity: r.detail.quantity,
       unit: r.detail.unit,
+      sources: r.detail.sources,
+      servings: r.detail.servings,
       sections: r.detail.sections.map((s) => {
         const instructions: Array<SectionInstructionInput> = s.instructions.map(
           (i) => ({
