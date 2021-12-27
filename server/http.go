@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	sentryecho "github.com/getsentry/sentry-go/echo"
@@ -96,6 +97,17 @@ func (s *Server) Run(_ context.Context) error {
 
 	r.GET("/notion", s.APIManager.NotionTest)
 	r.GET("/misc", s.APIManager.Misc)
+
+	r.GET("/*", func(c echo.Context) error {
+		root := "ui/build"
+		fs := http.FileServer(http.Dir(root))
+		if _, err := os.Stat(root + c.Request().RequestURI); os.IsNotExist(err) {
+			http.StripPrefix(c.Request().RequestURI, fs).ServeHTTP(c.Response().Writer, c.Request())
+		} else {
+			fs.ServeHTTP(c.Response().Writer, c.Request())
+		}
+		return nil
+	})
 
 	log.Printf("running on: %s", s.GetBaseURL())
 	return http.ListenAndServe(s.getAddress(),
