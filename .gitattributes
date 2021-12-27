@@ -1,4 +1,5 @@
+# https://github.com/github/linguist/blob/master/docs/overrides.md
 *.sql linguist-language=SQL
-ui/src/api/* linguist-generated
-rust/openapi/* linguist-generated
+ui/src/api/** linguist-generated
+rust/openapi/** linguist-generated
 models/* linguist-generated
