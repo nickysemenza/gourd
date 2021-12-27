@@ -335,7 +335,7 @@ const RecipeDetail: React.FC = () => {
     }
   };
 
-  const totalDuration = getTotalDuration(detail.sections);
+  const totalDuration = getTotalDuration(w, detail.sections);
 
   const sourceTypes: (keyof RecipeSource)[] = ["url", "title", "page"];
 
@@ -354,6 +354,7 @@ const RecipeDetail: React.FC = () => {
     ?.filter((r) => r.is_latest_version)
     .pop();
 
+  const latexURL = `${getAPIURL()}/recipes/${recipe.detail.id}/latex`;
   return (
     <div>
       <Helmet>
@@ -388,7 +389,7 @@ const RecipeDetail: React.FC = () => {
               </div>
             )}
             <div className="text-sm">
-              Takes {formatTimeRange(totalDuration)}
+              Takes {formatTimeRange(w, totalDuration)}
             </div>
           </div>
           <div>
@@ -547,23 +548,30 @@ const RecipeDetail: React.FC = () => {
           <ProgressiveImage photo={p} className="w-1/6" />
         ))}
       </div>
-      <div>
-        <h3>other versions</h3>
-        <ul>
-          {recipe.detail.other_versions?.map((v) => (
-            <li key={`${v.id}@`}>
-              <RecipeLink recipe={v} />
-            </li>
-          ))}
-        </ul>
-        {/* <Debug data={recipe.detail.other_versions} /> */}
+      <div className="flex flex-row w-full">
+        <div className="w-4/12">
+          <h3>other versions</h3>
+          <ul>
+            {recipe.detail.other_versions?.map((v) => (
+              <li key={`${v.id}@`}>
+                <RecipeLink recipe={v} />
+              </li>
+            ))}
+          </ul>
+          {/* <Debug data={recipe.detail.other_versions} /> */}
+        </div>
+        <div className="w-8/12">
+          <a href={latexURL} target="_blank" rel="noreferrer" className="link">
+            open latex
+          </a>
+          <iframe
+            src={latexURL + "#navpanes=0&toolbar=0"}
+            width="100%"
+            height="900px"
+            title="pdf view"
+          ></iframe>
+        </div>
       </div>
-      <iframe
-        src={`${getAPIURL()}/recipes/${recipe.detail.id}/latex`}
-        width="100%"
-        height="500px"
-        title="pdf view"
-      ></iframe>
     </div>
   );
 };

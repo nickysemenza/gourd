@@ -1,6 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+*/
+export function start(): void;
+/**
 * @param {string} input
 * @returns {string}
 */
@@ -65,6 +68,16 @@ export function make_dag(conversion_request: any): string;
 * @returns {RichItem[]}
 */
 export function rich(r: string): RichItem[];
+/**
+* @param {Amount} amount
+* @returns {string}
+*/
+export function format_amount(amount: Amount): string;
+/**
+* @param {Amount[]} amount
+* @returns {Amount}
+*/
+export function sum_time_amounts(amount: Amount[]): Amount;
 
 interface Ingredient {
     amounts: Amount[];

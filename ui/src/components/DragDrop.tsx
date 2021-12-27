@@ -1,8 +1,9 @@
 import React, { useRef } from "react";
 import { useDrop, DropTargetMonitor, XYCoord, useDrag } from "react-dnd";
 
+const TypeSection = "recipe_section";
 export interface DragWrapperProps {
-  id: any;
+  id: string;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
   enable: boolean;
@@ -24,7 +25,7 @@ export const DragWrapper: React.FC<DragWrapperProps> = ({
   // https://github.com/react-dnd/react-dnd/blob/main/packages/examples-hooks/src/04-sortable/simple/Card.tsx
   const ref = useRef<HTMLDivElement>(null);
   const [, drop] = useDrop({
-    accept: "card1",
+    accept: TypeSection,
     hover(item: DragItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
         return;
@@ -76,7 +77,8 @@ export const DragWrapper: React.FC<DragWrapperProps> = ({
   });
 
   const [{ isDragging }, drag] = useDrag({
-    item: { type: "card1", id, index },
+    type: TypeSection,
+    item: () => ({ id, index }),
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),

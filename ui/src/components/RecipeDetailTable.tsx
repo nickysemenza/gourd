@@ -8,7 +8,6 @@ import {
   formatRichText,
   formatTimeRange,
   getIngredient,
-  parseTimeRange,
   scaledRound,
 } from "../util";
 import { DndProvider } from "react-dnd";
@@ -337,11 +336,16 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           width={40}
           data-cy="time-input"
           edit={edit}
-          value={formatTimeRange(section.duration)}
+          value={formatTimeRange(w, section.duration)}
           blur
           onChange={(e) =>
+            w &&
             setRecipe(
-              updateTimeRange(recipe, x, parseTimeRange(e) || section.duration)
+              updateTimeRange(
+                recipe,
+                x,
+                w.parse_amount(e).pop() || section.duration
+              )
             )
           }
         />
@@ -392,7 +396,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               />
             )}
             <div>{iActions(x, y, "instructions")}</div>
-            <p>{w && formatRichText(w.rich(instruction.instruction))}</p>
+            <p>{w && formatRichText(w, w.rich(instruction.instruction))}</p>
           </div>
         ))}
         {/* </ol> */}
@@ -458,7 +462,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             index={x}
             id={section.id}
             moveCard={moveCard}
-            enable={edit}
+            enable={edit && sections.length > 1}
           >
             {renderRow(section, x)}
           </DragWrapper>

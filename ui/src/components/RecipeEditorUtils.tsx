@@ -368,7 +368,12 @@ export const flatIngredients = (
       section.ingredients
         .map((ingredient) => [
           ingredient,
-          ...flatIngredients(ingredient.recipe?.sections || []),
+          ...flatIngredients(
+            // recurse to the recipes as long as they are the latest version?
+            (ingredient.recipe?.is_latest_version &&
+              ingredient.recipe?.sections) ||
+              []
+          ),
         ])
         .flat()
     )

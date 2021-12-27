@@ -146,6 +146,5 @@ func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId
 	if err != nil {
 		return nil, err
 	}
-	r.Detail.Sources = &[]RecipeSource{{Url: &addr}}
 	return &r, nil
 }

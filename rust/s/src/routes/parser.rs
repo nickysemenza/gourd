@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan, unit::Measure};
 use openapi::models::{
-    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
-    SectionIngredientInput, SectionInstructionInput,
+    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeSource,
+    RecipeWrapperInput, SectionIngredientInput, SectionInstructionInput,
 };
 use serde::Deserialize;
 use tracing::{debug, span};
@@ -75,9 +75,10 @@ pub async fn pans() -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
 
-fn foo(instructions: String) -> Measure {
+fn foo(instructions: String) -> (Measure, Vec<gourd_common::ingredient::rich_text::Chunk>) {
     let rich_text_tokens =
-        gourd_common::ingredient::rich_text::parse(instructions.as_str()).unwrap_or_default();
+        gourd_common::ingredient::rich_text::parse(instructions.replace("\n", "").as_str())
+            .unwrap_or_default();
 
     let mut amts = Vec::<gourd_common::unit::Measure>::new();
     let mut total_time =
@@ -87,7 +88,7 @@ fn foo(instructions: String) -> Measure {
         match token {
             gourd_common::ingredient::rich_text::Chunk::Amount(amt) => {
                 for a in amt.into_iter() {
-                    let m = gourd_common::amount_to_measure2(a);
+                    let m = dbg!(gourd_common::amount_to_measure2(dbg!(a)));
                     amts.push(m.clone());
                     if m.kind().unwrap() == gourd_common::ingredient::unit::kind::MeasureKind::Time
                     {
@@ -98,7 +99,8 @@ fn foo(instructions: String) -> Measure {
             _ => {}
         }
     }
-    total_time
+    total_time.recalc();
+    (total_time, rich_text_tokens)
 }
 #[tracing::instrument(name = "route::debug_scrape")]
 pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
@@ -106,29 +108,8 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
 
     let sc_result = scraper::scrape_recipe(url);
     let res = scrape_result_to_recipe(sc_result.clone());
-    let rich_text_tokens =
-        gourd_common::ingredient::rich_text::parse(sc_result.instructions.clone().as_str())
-            .unwrap_or_default();
 
-    // let mut amts = Vec::<gourd_common::unit::Measure>::new();
-    // let mut total_time =
-    //     gourd_common::unit::Measure::parse(gourd_common::ingredient::Amount::new("second", 0.0));
-
-    // for token in rich_text_tokens.clone().into_iter() {
-    //     match token {
-    //         gourd_common::ingredient::rich_text::Chunk::Amount(amt) => {
-    //             for a in amt.into_iter() {
-    //                 let m = gourd_common::amount_to_measure2(a);
-    //                 amts.push(m.clone());
-    //                 if m.kind().unwrap() == gourd_common::unit::MeasureKind::Time {
-    //                     total_time = total_time.add(m).unwrap();
-    //                 }
-    //             }
-    //         }
-    //         _ => {}
-    //     }
-    // }
-    let total_time = foo(sc_result.clone().instructions);
+    let (total_time, rich_text_tokens) = foo(sc_result.clone().instructions);
 
     HttpResponse::Ok().json((
         sc_result,
@@ -139,12 +120,15 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     ))
 }
 pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
-    let total_time_seconds = foo(sc_result.clone().instructions).as_raw();
+    let (time, _) = foo(sc_result.clone().instructions);
+    let total_time_seconds = time.as_raw();
     let sections = vec![RecipeSectionInput {
-        duration: Some(Box::new(Amount::new(
-            total_time_seconds.unit,
-            total_time_seconds.value.into(),
-        ))),
+        duration: Some(Box::new(Amount {
+            unit: total_time_seconds.unit,
+            value: total_time_seconds.value,
+            upper_value: total_time_seconds.upper_value,
+            source: Some("scraped sum".to_string()),
+        })),
         instructions: sc_result
             .instructions
             .split('\n')
@@ -163,7 +147,14 @@ pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrappe
             .collect(),
     }];
 
-    let detail = RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string());
+    let detail = RecipeDetailInput {
+        sources: Some(vec![RecipeSource {
+            url: Some(sc_result.url.clone()),
+            image_url: Some(sc_result.image.clone()),
+            ..RecipeSource::new()
+        }]),
+        ..RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string())
+    };
     return RecipeWrapperInput::new(detail);
 }
 #[tracing::instrument(name = "route::scrape")]

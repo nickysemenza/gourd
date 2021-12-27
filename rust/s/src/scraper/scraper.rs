@@ -7,11 +7,13 @@ pub struct ScrapeResult {
     pub instructions: String,
     pub title: String,
     pub url: String,
+    pub image: String,
 }
 
 #[tracing::instrument(name = "route::scrape_recipe")]
 pub fn scrape_recipe(url: &str) -> ScrapeResult {
-    let mut sc_result: (Vec<String>, String, String) = (vec![], "".to_string(), "".to_string());
+    let mut sc_result: (Vec<String>, String, String, String) =
+        (vec![], "".to_string(), "".to_string(), "".to_string());
     Python::with_gil(|py| {
         let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
 
@@ -22,7 +24,7 @@ pub fn scrape_recipe(url: &str) -> ScrapeResult {
 from recipe_scrapers import scrape_me            
 def sc(x,y):
     res = scrape_me(x,wild_mode=y)
-    return res.ingredients(), res.instructions(), res.title()
+    return res.ingredients(), res.instructions(), res.title(), res.image()
             "#,
             "recipe_scrape.py",
             "recipe_scrape",
@@ -43,5 +45,6 @@ def sc(x,y):
         instructions: sc_result.1,
         title: sc_result.2,
         url: url.to_string(),
+        image: sc_result.3,
     };
 }

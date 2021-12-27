@@ -36,6 +36,7 @@ type RecipeDetail struct {
 	IsLatestVersion null.Bool   `boil:"is_latest_version" json:"is_latest_version,omitempty" toml:"is_latest_version" yaml:"is_latest_version,omitempty"`
 	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
 	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	DeletedAt       null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *recipeDetailR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L recipeDetailL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -54,6 +55,7 @@ var RecipeDetailColumns = struct {
 	IsLatestVersion string
 	CreatedAt       string
 	UpdatedAt       string
+	DeletedAt       string
 }{
 	ID:              "id",
 	RecipeID:        "recipe_id",
@@ -67,6 +69,7 @@ var RecipeDetailColumns = struct {
 	IsLatestVersion: "is_latest_version",
 	CreatedAt:       "created_at",
 	UpdatedAt:       "updated_at",
+	DeletedAt:       "deleted_at",
 }
 
 var RecipeDetailTableColumns = struct {
@@ -82,6 +85,7 @@ var RecipeDetailTableColumns = struct {
 	IsLatestVersion string
 	CreatedAt       string
 	UpdatedAt       string
+	DeletedAt       string
 }{
 	ID:              "recipe_details.id",
 	RecipeID:        "recipe_details.recipe_id",
@@ -95,6 +99,7 @@ var RecipeDetailTableColumns = struct {
 	IsLatestVersion: "recipe_details.is_latest_version",
 	CreatedAt:       "recipe_details.created_at",
 	UpdatedAt:       "recipe_details.updated_at",
+	DeletedAt:       "recipe_details.deleted_at",
 }
 
 // Generated where
@@ -136,6 +141,7 @@ var RecipeDetailWhere = struct {
 	IsLatestVersion whereHelpernull_Bool
 	CreatedAt       whereHelpertime_Time
 	UpdatedAt       whereHelpertime_Time
+	DeletedAt       whereHelpernull_Time
 }{
 	ID:              whereHelperstring{field: "\"recipe_details\".\"id\""},
 	RecipeID:        whereHelperstring{field: "\"recipe_details\".\"recipe_id\""},
@@ -149,6 +155,7 @@ var RecipeDetailWhere = struct {
 	IsLatestVersion: whereHelpernull_Bool{field: "\"recipe_details\".\"is_latest_version\""},
 	CreatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"created_at\""},
 	UpdatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"updated_at\""},
+	DeletedAt:       whereHelpernull_Time{field: "\"recipe_details\".\"deleted_at\""},
 }
 
 // RecipeDetailRels is where relationship names are stored.
@@ -175,8 +182,8 @@ func (*recipeDetailR) NewStruct() *recipeDetailR {
 type recipeDetailL struct{}
 
 var (
-	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at", "updated_at"}
-	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version"}
+	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at", "updated_at", "deleted_at"}
+	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "deleted_at"}
 	recipeDetailColumnsWithDefault    = []string{"is_latest_version", "created_at", "updated_at"}
 	recipeDetailPrimaryKeyColumns     = []string{"id"}
 )

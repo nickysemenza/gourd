@@ -86,6 +86,6 @@ export const TableInput: React.FC<TableInputProps> = ({
       />
     )
   ) : (
-    <p>{w && formatRichText(w.rich(internalVal))}</p>
+    <p>{w && formatRichText(w, w.rich(internalVal))}</p>
   );
 };

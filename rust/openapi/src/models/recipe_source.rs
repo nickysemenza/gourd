@@ -23,6 +23,9 @@ pub struct RecipeSource {
     /// page number/section (if book)
     #[serde(rename = "page", skip_serializing_if = "Option::is_none")]
     pub page: Option<String>,
+    /// image url
+    #[serde(rename = "image_url", skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<String>,
 }
 
 impl RecipeSource {
@@ -32,6 +35,7 @@ impl RecipeSource {
             url: None,
             title: None,
             page: None,
+            image_url: None,
         }
     }
 }
