@@ -122,6 +122,12 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			IsLatestVersion: d.IsLatestVersion.Bool,
 			// OtherVersions:   &other,
 		}
+		if d.Source.Valid {
+			if err := json.Unmarshal([]byte(d.Source.JSON), &rd.Sources); err != nil {
+				return nil, err
+			}
+		}
+
 		if rd.IsLatestVersion {
 			rw.Detail = rd
 		} else {

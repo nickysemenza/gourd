@@ -37,6 +37,12 @@ export interface RecipeSource {
      * @memberof RecipeSource
      */
     page?: string;
+    /**
+     * image url
+     * @type {string}
+     * @memberof RecipeSource
+     */
+    image_url?: string;
 }
 
 export function RecipeSourceFromJSON(json: any): RecipeSource {
@@ -52,6 +58,7 @@ export function RecipeSourceFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'url': !exists(json, 'url') ? undefined : json['url'],
         'title': !exists(json, 'title') ? undefined : json['title'],
         'page': !exists(json, 'page') ? undefined : json['page'],
+        'image_url': !exists(json, 'image_url') ? undefined : json['image_url'],
     };
 }
 
@@ -67,6 +74,7 @@ export function RecipeSourceToJSON(value?: RecipeSource | null): any {
         'url': value.url,
         'title': value.title,
         'page': value.page,
+        'image_url': value.image_url,
     };
 }
 

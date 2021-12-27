@@ -1089,6 +1089,9 @@ components:
         page:
           description: page number/section (if book)
           type: string
+        image_url:
+          description: image url
+          type: string
     GooglePhotosAlbum:
       description: an album containing `Photo`
       type: object

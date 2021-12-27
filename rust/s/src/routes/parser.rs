@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{convert_to, pan, unit::Measure};
 use openapi::models::{
-    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeWrapperInput,
-    SectionIngredientInput, SectionInstructionInput,
+    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeSource,
+    RecipeWrapperInput, SectionIngredientInput, SectionInstructionInput,
 };
 use serde::Deserialize;
 use tracing::{debug, span};
@@ -147,7 +147,14 @@ pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrappe
             .collect(),
     }];
 
-    let detail = RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string());
+    let detail = RecipeDetailInput {
+        sources: Some(vec![RecipeSource {
+            url: Some(sc_result.url.clone()),
+            image_url: Some(sc_result.image.clone()),
+            ..RecipeSource::new()
+        }]),
+        ..RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string())
+    };
     return RecipeWrapperInput::new(detail);
 }
 #[tracing::instrument(name = "route::scrape")]

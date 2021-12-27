@@ -79,7 +79,7 @@ pub fn add_opt_f64(a: Option<f64>, b: Option<f64>) -> Option<f64> {
         (Some(_), None) => a,
     }
 }
-pub fn add_amounts(a: Vec<Amount>) -> Amount {
+pub fn add_time_amounts(a: Vec<Amount>) -> Amount {
     let mut m = Measure::from_str("0 seconds");
     for x in a.into_iter() {
         m = m.add(Measure::parse(x)).unwrap();

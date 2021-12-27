@@ -8,13 +8,19 @@ const ProgressiveImage: React.FC<{
   className?: string;
 }> = ({ photo, maxWidth = 40, className = "" }) => {
   const [loaded, setLoaded] = useState(false);
-  const { blur_hash, base_url, id, source } = photo;
+  const { blur_hash, width, height, base_url, id, source } = photo;
+  const scalingRatio = maxWidth / width;
+  const scaledHeight = scalingRatio * height;
   return (
-    <div>
+    <div
+    // style={{ width: maxWidth, height: scaledHeight }}
+    >
       {blur_hash && (!loaded || base_url === "") && (
         <Blurhash
           className={className}
           hash={blur_hash}
+          width={maxWidth}
+          height={scaledHeight}
           resolutionX={32}
           resolutionY={32}
           punch={1}
@@ -22,7 +28,6 @@ const ProgressiveImage: React.FC<{
       )}
       {base_url !== "" && (
         <img
-          hidden={!loaded}
           className={className}
           loading="lazy"
           onLoad={() => setLoaded(true)}
@@ -32,6 +37,8 @@ const ProgressiveImage: React.FC<{
             base_url
             // base_url.includes("notion") ? base_url : `${base_url}=w${maxWidth}`
           }
+          // width={maxWidth}
+          // height={scaledHeight}
           alt={`todo - ${source} ${id}`}
         />
       )}

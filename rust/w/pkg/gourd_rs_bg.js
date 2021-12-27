@@ -324,9 +324,9 @@ export function format_amount(amount) {
 * @param {Amount[]} amount
 * @returns {Amount}
 */
-export function sum_amounts(amount) {
+export function sum_time_amounts(amount) {
     try {
-        var ret = wasm.sum_amounts(addBorrowedObject(amount));
+        var ret = wasm.sum_time_amounts(addBorrowedObject(amount));
         return takeObject(ret);
     } finally {
         heap[stack_pointer++] = undefined;

@@ -492,6 +492,9 @@ type RecipeSectionInput struct {
 
 // where the recipe came from (i.e. book/website)
 type RecipeSource struct {
+	// image url
+	ImageUrl *string `json:"image_url,omitempty"`
+
 	// page number/section (if book)
 	Page *string `json:"page,omitempty"`
 

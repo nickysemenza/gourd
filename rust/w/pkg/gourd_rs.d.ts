@@ -77,7 +77,7 @@ export function format_amount(amount: Amount): string;
 * @param {Amount[]} amount
 * @returns {Amount}
 */
-export function sum_amounts(amount: Amount[]): Amount;
+export function sum_time_amounts(amount: Amount[]): Amount;
 
 interface Ingredient {
     amounts: Amount[];

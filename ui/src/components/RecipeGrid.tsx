@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { RecipeWrapper } from "../api/openapi-hooks/api";
+import { Photo, RecipeWrapper } from "../api/openapi-hooks/api";
 import { formatTimeRange, getTotalDuration } from "../util";
 import { WasmContext } from "../wasm";
 import ProgressiveImage from "./ProgressiveImage";
@@ -17,7 +17,15 @@ export const RecipeGrid: React.FC<{
     <div className="grid gap-5 row-gap-5 mb-8 lg:grid-cols-6 sm:grid-cols-2">
       {recipes.map((recipe) => {
         let lp = recipe.linked_photos || [];
-        let photo = lp.length > 0 ? lp[0] : undefined;
+        let rs = (recipe.detail.sources || []).filter(
+          (s) => s.image_url !== undefined
+        );
+        let photo: Photo | undefined =
+          lp.length > 0
+            ? lp[0]
+            : rs.length > 0
+            ? ({ base_url: rs[0].image_url || "" } as Photo)
+            : undefined;
 
         const ing = Object.keys(
           sumIngredients(recipe.detail.sections).ingredients

@@ -21,22 +21,27 @@ export const getIngredient = (si: Partial<SectionIngredient>) => {
   return { name, kind };
 };
 
-export const formatRichText = (text: RichItem[]) => {
+export const formatRichText = (w: wasm, text: RichItem[]) => {
   return text.map((t, x) => {
     if (t.kind === "Text") {
       return t.value;
     } else if (t.kind === "Amount") {
       let val = t.value.pop();
-      return val ? (
+      if (!val) {
+        return null;
+      }
+      if (val.unit === "whole") {
+        val.unit = "";
+      }
+      return (
         <div
           className="inline text-green-800 m-0 underline decoration-grey decoration-solid"
           key={x}
         >
-          {val.value}
-          {val.upper_value && `-${val.upper_value}`}{" "}
-          {val.unit !== "whole" && val.unit}
+          {/* // sum_time_amounts converts the units to the best scaled */}
+          {w.format_amount(val)}
         </div>
-      ) : null;
+      );
     } else {
       return null;
     }
@@ -76,7 +81,8 @@ export const formatText = (text: React.ReactText) => {
 };
 
 export const formatTimeRange = (w?: wasm, range?: Amount) => {
-  return w && range ? w.format_amount(range) : "";
+  // sum_time_amounts converts the units to the best scaled
+  return w && range ? w.format_amount(w.sum_time_amounts([range])) : "";
 };
 
 export const sumTimeRanges = (
@@ -84,7 +90,7 @@ export const sumTimeRanges = (
   ranges: (Amount | undefined)[]
 ): Amount => {
   let ranges2 = ranges.filter((r) => r !== undefined) as Amount[];
-  return w.sum_amounts(ranges2);
+  return w.sum_time_amounts(ranges2);
 };
 
 export const Code: React.FC = ({ children }) => (

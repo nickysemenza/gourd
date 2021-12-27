@@ -342,6 +342,10 @@ export interface RecipeSource {
    * page number/section (if book)
    */
   page?: string;
+  /**
+   * image url
+   */
+  image_url?: string;
 }
 
 /**

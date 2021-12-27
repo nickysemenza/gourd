@@ -4,7 +4,7 @@ use gourd_common::{
     convert_to,
     ingredient::{self, Amount},
     parse_unit_mappings, sum_ingredients,
-    unit::{add_amounts, make_graph, print_graph},
+    unit::{add_time_amounts, make_graph, print_graph},
 };
 use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
 use tracing::info;
@@ -170,10 +170,10 @@ pub fn format_amount(amount: &IAmount) -> String {
 }
 
 #[wasm_bindgen]
-pub fn sum_amounts(amount: &IAmounts) -> IAmount {
+pub fn sum_time_amounts(amount: &IAmounts) -> IAmount {
     utils::set_panic_hook();
     let r: Vec<Amount> = amount.into_serde().unwrap();
-    let sum = add_amounts(r);
+    let sum = add_time_amounts(r);
     info!("sum {}", sum);
     JsValue::from_serde(&sum).unwrap().into()
 }
