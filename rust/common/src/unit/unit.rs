@@ -4,7 +4,7 @@ use ingredient::unit::{kind::MeasureKind, Unit};
 use ingredient::Amount;
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
-use tracing::debug;
+use tracing::{debug, info};
 
 type MeasureGraph = Graph<Unit, f64>;
 
@@ -172,8 +172,17 @@ impl Measure {
         };
     }
     pub fn add(&self, b: Measure) -> Result<Measure, anyhow::Error> {
+        if let MeasureKind::Other = b.kind().unwrap() {
+            return Ok(self.clone());
+        }
+
+        info!("adding {:?} to {:?}", self, b);
         if self.kind().unwrap() != b.kind().unwrap() {
-            return Err(anyhow::anyhow!("Cannot add measures of different kinds"));
+            return Err(anyhow::anyhow!(
+                "Cannot add measures of different kinds: {:#?} {:?}",
+                self,
+                b
+            ));
         }
         Ok(Measure {
             unit: self.unit.clone(),
