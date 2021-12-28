@@ -13886,10 +13886,10 @@ responselike@^1.0.2:
   dependencies:
     lowercase-keys "^1.0.0"
 
-restful-react@15.9.3:
-  version "15.9.3"
-  resolved "https://registry.yarnpkg.com/restful-react/-/restful-react-15.9.3.tgz#93731a2171b837554d504101e0580bc94702fc7c"
-  integrity sha512-Eda9UyHgcsmO5GLmw+qprfeaHh5LgGlK4X+IWRZG/s45PM8/LXVfVz/3Y+46Z3kTugex9TmUKH0z9D8LacK7eA==
+restful-react@15.9.4:
+  version "15.9.4"
+  resolved "https://registry.yarnpkg.com/restful-react/-/restful-react-15.9.4.tgz#7c39f496165a252b26f479e7909ef40782ac5117"
+  integrity sha512-rrC68KMGVZ0GDxLfQR+6tbmUPL5rX1mni4GOzPVMsO9XFew2BWK107pZTi9z7UrFO7LElGOWaKMZrikyIiendQ==
   dependencies:
     case "^1.6.2"
     chalk "^3.0.0"
