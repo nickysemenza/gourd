@@ -62,7 +62,7 @@ export const TableInput: React.FC<TableInputProps> = ({
 
   const className = `border-2 border-dashedp-0 h-${tall ? 18 : 6} w-${width} ${
     highlight ? "border-blue-400" : "border-gray-200 dark:border-gray-400"
-  } disabled:border-red-100 hover:border-black ${
+  } disabled:border-red-200 hover:border-black ${
     softEdit && !edit && "bg-transparent"
   } focus:bg-gray-200`;
 

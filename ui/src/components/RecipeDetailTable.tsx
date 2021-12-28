@@ -396,7 +396,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               />
             )}
             <div>{iActions(x, y, "instructions")}</div>
-            <p>{w && formatRichText(w, w.rich(instruction.instruction))}</p>
+            <div>{w && formatRichText(w, w.rich(instruction.instruction))}</div>
           </div>
         ))}
         {/* </ol> */}

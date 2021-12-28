@@ -229,9 +229,7 @@ const RecipeDetail: React.FC = () => {
         </div>
         <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
           <p>{e.message}</p>
-          <p>
-            <Debug data={e.data} />
-          </p>
+          <Debug data={e.data} />
         </div>
       </div>
     );
