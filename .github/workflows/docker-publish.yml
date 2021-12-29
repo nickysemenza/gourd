@@ -8,19 +8,24 @@ name: Docker
 on:
   push:
     branches: [main, dev]
-    # Publish semver tags as releases.
-    paths:
-      - "Dockerfile.base" # only run if changed
-
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}-base
 
 jobs:
   build:
+    env:
+      # Use docker.io for Docker Hub if empty
+      REGISTRY: ghcr.io
+      # github.repository as <account>/<repo>
+      IMAGE_NAME: ${{ github.repository }}-${{ matrix.name }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - file: "Dockerfile.base"
+            name: "base"
+            context: .
+          - file: "usda/Dockerfile"
+            name: "usda"
+            context: "usda"
     permissions:
       contents: read
       packages: write
@@ -68,8 +73,8 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: .
-          file: Dockerfile.base
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

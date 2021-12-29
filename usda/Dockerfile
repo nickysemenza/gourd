@@ -1,7 +1,4 @@
-FROM debian:stable
-
-RUN apt-get update && apt-get install -y unzip postgresql
-
+FROM ghcr.io/nickysemenza/gourd-base:dev
 
 ADD https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_csv_2021-10-28.zip /tmp
 
