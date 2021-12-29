@@ -44,17 +44,13 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	if recipe == nil || len(recipe.R.RecipeDetails) == 0 {
 		return nil, nil
 	}
-	sections := []RecipeSection{}
 
-	// d := recipe.R.RecipeDetails[0]
 	rw := RecipeWrapper{
 		Id: recipe.ID,
-		// Detail: rd,
 	}
 	other := []RecipeDetail{}
-
 	for _, d := range recipe.R.RecipeDetails {
-
+		sections := make([]RecipeSection, 0)
 		for _, section := range d.R.RecipeSections {
 			s := RecipeSection{
 				Id:           section.ID,
@@ -120,7 +116,6 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			Version:         int64(d.Version),
 			Sections:        sections,
 			IsLatestVersion: d.IsLatestVersion.Bool,
-			// OtherVersions:   &other,
 		}
 		if d.Source.Valid {
 			if err := json.Unmarshal([]byte(d.Source.JSON), &rd.Sources); err != nil {
@@ -130,6 +125,9 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 
 		if rd.IsLatestVersion {
 			rw.Detail = rd
+			if d.DeletedAt.Valid {
+				return nil, nil
+			}
 		} else {
 			other = append(other, rd)
 		}
@@ -145,7 +143,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 	recipes, err := models.Recipes(
 		// Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
 		// has many sections, has many ingredients, which can be ingredients or recipes
-		Load(models.RecipeRels.RecipeDetails, Where("recipe_details.deleted_at IS NULL")),
+		Load(models.RecipeRels.RecipeDetails),
 		Load(Rels(models.RecipeRels.RecipeDetails,
 			models.RecipeDetailRels.RecipeSections,
 			models.RecipeSectionRels.SectionRecipeSectionIngredients,

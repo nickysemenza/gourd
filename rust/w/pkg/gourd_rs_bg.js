@@ -293,13 +293,18 @@ export function make_dag(conversion_request) {
 
 /**
 * @param {string} r
+* @param {any} ings
 * @returns {RichItem[]}
 */
-export function rich(r) {
-    var ptr0 = passStringToWasm0(r, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    var len0 = WASM_VECTOR_LEN;
-    var ret = wasm.rich(ptr0, len0);
-    return takeObject(ret);
+export function rich(r, ings) {
+    try {
+        var ptr0 = passStringToWasm0(r, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        var len0 = WASM_VECTOR_LEN;
+        var ret = wasm.rich(ptr0, len0, addBorrowedObject(ings));
+        return takeObject(ret);
+    } finally {
+        heap[stack_pointer++] = undefined;
+    }
 }
 
 /**

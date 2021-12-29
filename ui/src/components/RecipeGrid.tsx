@@ -14,7 +14,7 @@ export const RecipeGrid: React.FC<{
     return null;
   }
   return (
-    <div className="grid gap-5 row-gap-5 mb-8 lg:grid-cols-6 sm:grid-cols-2">
+    <div className="grid gap-5 row-gap-5 mb-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2">
       {recipes.map((recipe) => {
         let lp = recipe.linked_photos || [];
         let rs = (recipe.detail.sources || []).filter(
@@ -39,28 +39,30 @@ export const RecipeGrid: React.FC<{
             key={`recipegrid-${recipe.detail.id}`}
             to={`/recipe/${recipe.detail.id}`}
             aria-label="View Item"
-            className="inline-block overflow-hidden duration-300 transform bg-white dark:bg-stone-400 rounded shadow hover:-translate-y-2"
+            className="inline-block overflow-hidden duration-300 transform bg-white dark:bg-stone-400 shadow hover:-translate-y-2"
           >
             <div className="flex flex-col h-full">
               {photo !== undefined ? (
                 <ProgressiveImage
                   photo={photo}
-                  className="object-cover w-full h-48"
+                  className="object-cover w-full h-40"
                 />
               ) : (
-                <div className="object-cover w-full h-48 bg-gradient-to-bl from-violet-400 to-fuchsia-200 dark:from-violet-800 dark:to-fuchsia-400" />
+                <div className="object-cover w-full h-40 bg-gradient-to-r from-green-300 to-blue-300 dark:from-violet-800 dark:to-fuchsia-400" />
               )}
-              <div className="flex-grow border dark:border-stone-400 border-t-0 rounded-b">
-                <div className="p-5">
-                  <h6 className="mb-2 font-semibold leading-5 text-lg">
-                    {recipe.detail.name}
-                  </h6>
-                  <p className="text-sm text-gray-900">
-                    {ing.length} ingredients | {rec.length} recipes
-                  </p>
+              <div className="flex-grow border dark:border-stone-400 border-t-0">
+                <div className="p-5 flex flex-col justify-between h-full">
+                  <div>
+                    <h1 className="mb-2 font-semibold leading-5 text-m">
+                      {recipe.detail.name}
+                    </h1>
+                    <p className="text-sm text-gray-900">
+                      {ing.length} ingredients | {rec.length} recipes
+                    </p>
+                  </div>
                   {totalDuration.value > 0 && (
-                    <div className="text-sm">
-                      Takes {formatTimeRange(w, totalDuration)}
+                    <div className="text-xs text-gray-700 ">
+                      takes {formatTimeRange(w, totalDuration)}
                     </div>
                   )}
                 </div>

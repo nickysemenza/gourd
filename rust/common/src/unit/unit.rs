@@ -138,6 +138,8 @@ impl Measure {
             | Unit::Gram
             | Unit::Cent
             | Unit::KCal
+            | Unit::Farhenheit
+            | Unit::Celcius // todo: convert to farhenheit?
             | Unit::Second => return self.clone(),
             Unit::Other(x) => {
                 let x2 = x.clone();
@@ -210,6 +212,7 @@ impl Measure {
             Unit::Teaspoon | Unit::Milliliter => Ok(MeasureKind::Volume),
             Unit::KCal => Ok(MeasureKind::Calories),
             Unit::Second => Ok(MeasureKind::Time),
+            Unit::Farhenheit | Unit::Celcius => Ok(MeasureKind::Temperature), // todo: convert to farhenheit?
             Unit::Other(_) => Ok(MeasureKind::Other),
             Unit::Kilogram
             | Unit::Liter
@@ -264,6 +267,8 @@ impl Measure {
             | Unit::Ounce
             | Unit::Pound
             | Unit::Dollar
+            | Unit::Farhenheit
+            | Unit::Celcius // todo: convert to farhenheit?
             | Unit::Minute
             | Unit::Hour
             | Unit::Day => bail!("unit not normalized: {:?}", self),

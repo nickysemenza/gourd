@@ -25,6 +25,15 @@ export const formatRichText = (w: wasm, text: RichItem[]) => {
   return text.map((t, x) => {
     if (t.kind === "Text") {
       return t.value;
+    } else if (t.kind === "Ing") {
+      return (
+        <div
+          className="inline text-orange-800 m-0 underline decoration-grey decoration-solid"
+          key={x + "a"}
+        >
+          {t.value}
+        </div>
+      );
     } else if (t.kind === "Amount") {
       let val = t.value.pop();
       if (!val) {
@@ -118,5 +127,5 @@ export const scaledRound = (x: number) => x.toFixed(x < 10 ? 2 : 0);
 export const getTotalDuration = (w: wasm, sections: RecipeSection[]) =>
   sumTimeRanges(
     w,
-    sections.map((s) => s.duration).filter((t) => t !== undefined)
+    (sections || []).map((s) => s.duration).filter((t) => t !== undefined)
   );

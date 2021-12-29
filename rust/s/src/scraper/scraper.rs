@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use pyo3::{types::PyModule, PyAny, Python};
 use serde::Serialize;
 
@@ -11,10 +12,10 @@ pub struct ScrapeResult {
 }
 
 #[tracing::instrument(name = "route::scrape_recipe")]
-pub fn scrape_recipe(url: &str) -> ScrapeResult {
+pub fn scrape_recipe(url: &str) -> Result<ScrapeResult> {
     let mut sc_result: (Vec<String>, String, String, String) =
         (vec![], "".to_string(), "".to_string(), "".to_string());
-    Python::with_gil(|py| {
+    Python::with_gil(|py| -> Result<()> {
         let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
 
         dbg!(syspath);
@@ -29,22 +30,24 @@ def sc(x,y):
             "recipe_scrape.py",
             "recipe_scrape",
         )
-        .unwrap();
+        .context("failed to build py")?;
 
         dbg!(activators);
         sc_result = activators
             .getattr("sc")
-            .unwrap()
+            .context("failed to get attribute")?
             .call((url.clone(), true), None)
-            .unwrap()
+            .context("failed to call")?
             .extract()
-            .unwrap();
-    });
-    return ScrapeResult {
+            .context("failed to extract")?;
+        Ok(())
+    })
+    .context("failed to parse")?;
+    Ok(ScrapeResult {
         ingredients: sc_result.0,
         instructions: sc_result.1,
         title: sc_result.2,
         url: url.to_string(),
         image: sc_result.3,
-    };
+    })
 }

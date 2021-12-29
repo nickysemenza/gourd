@@ -56,6 +56,7 @@ interface CompactR {
 }
 export type RichItem =
   | { kind: "Text"; value: string }
+  | { kind: "Ing"; value: string }
   | { kind: "Amount"; value: Amount[] }
 "#;
 
@@ -154,9 +155,11 @@ pub fn make_dag(conversion_request: &JsValue) -> String {
 }
 
 #[wasm_bindgen]
-pub fn rich(r: String) -> Result<RichItems, JsValue> {
+pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     utils::set_panic_hook();
-    match ingredient::rich_text::parse(r.as_str()) {
+    let ings2: Vec<String> = ings.into_serde().unwrap();
+    info!("rich2: {:?}", ings2);
+    match ingredient::rich_text::parse(r.as_str(), ings2) {
         Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),
         Err(e) => Err(JsValue::from_str(&e.to_string())),
     }

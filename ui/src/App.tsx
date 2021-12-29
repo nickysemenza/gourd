@@ -44,6 +44,7 @@ import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const registerTracing = (url: string) => {
   if (url === "") return;
@@ -108,42 +109,47 @@ function App() {
           <Router>
             <NavBar />
             <div className="lg:container lg:mx-auto">
-              <Routes>
-                <Route index element={<Test />} />
-                <Route path="recipe/:id" element={<RecipeDetail />} />
-                <Route path="recipes" element={<RecipeList />} />
-                <Route path="ingredients/:id" element={<IngredientDetail />} />
-                <Route path="ingredients" element={<IngredientList />} />
-                <Route path="create" element={<CreateRecipe />} />
-                <Route path="food" element={<Food />} />
-                <Route path="playground" element={<Playground />} />
-                <Route path="diff" element={<RecipeDiff />} />
-                <Route path="graph" element={<Graph />} />
-                <Route
-                  path="photos"
-                  element={
-                    <RequireAuth>
-                      <Photos />
-                    </RequireAuth>
-                  }
-                />
-                <Route
-                  path="meals"
-                  element={
-                    <RequireAuth>
-                      <Meals />
-                    </RequireAuth>
-                  }
-                />
-                <Route
-                  path="albums"
-                  element={
-                    <RequireAuth>
-                      <Albums />
-                    </RequireAuth>
-                  }
-                />
-              </Routes>
+              <ErrorBoundary>
+                <Routes>
+                  <Route index element={<Test />} />
+                  <Route path="recipe/:id" element={<RecipeDetail />} />
+                  <Route path="recipes" element={<RecipeList />} />
+                  <Route
+                    path="ingredients/:id"
+                    element={<IngredientDetail />}
+                  />
+                  <Route path="ingredients" element={<IngredientList />} />
+                  <Route path="create" element={<CreateRecipe />} />
+                  <Route path="food" element={<Food />} />
+                  <Route path="playground" element={<Playground />} />
+                  <Route path="diff" element={<RecipeDiff />} />
+                  <Route path="graph" element={<Graph />} />
+                  <Route
+                    path="photos"
+                    element={
+                      <RequireAuth>
+                        <Photos />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="meals"
+                    element={
+                      <RequireAuth>
+                        <Meals />
+                      </RequireAuth>
+                    }
+                  />
+                  <Route
+                    path="albums"
+                    element={
+                      <RequireAuth>
+                        <Albums />
+                      </RequireAuth>
+                    }
+                  />
+                </Routes>
+              </ErrorBoundary>
             </div>
           </Router>
         </WasmContextProvider>

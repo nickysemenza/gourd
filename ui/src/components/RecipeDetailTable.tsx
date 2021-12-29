@@ -38,8 +38,15 @@ import {
   getGramsFromSI,
   isGram,
   isVolume,
+  flatIngredients,
 } from "./RecipeEditorUtils";
-import { ArrowDown, ArrowUp, PlusCircle, XSquare } from "react-feather";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  PlusCircle,
+  XSquare,
+} from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
 import { WasmContext } from "../wasm";
@@ -319,10 +326,13 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             )}
           </div>
         </div>
-        {showOriginalLine && !!ingredient.original && (
-          <div className="italic text-xs pb-2">
-            original: {ingredient.original} ({w && w.parse(ingredient.original)}
-            )
+        {showOriginalLine && ingredient.original && (
+          <div className="italic text-xs inline-flex">
+            <div className="text-slate-700 mr-1">{ingredient.original}</div>
+            <ArrowRight className="pb-2" width={10} />
+            <div className="text-green-800">
+              {w && w.parse(ingredient.original)}
+            </div>
           </div>
         )}
       </div>
@@ -396,7 +406,18 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               />
             )}
             <div>{iActions(x, y, "instructions")}</div>
-            <div>{w && formatRichText(w, w.rich(instruction.instruction))}</div>
+            <div>
+              {w &&
+                formatRichText(
+                  w,
+                  w.rich(
+                    instruction.instruction,
+                    flatIngredients(sections).map(
+                      (i) => i.ingredient?.ingredient.name || "flour"
+                    )
+                  )
+                )}
+            </div>
           </div>
         ))}
         {/* </ol> */}
@@ -441,7 +462,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="border-gray-900 shadow-xl bg-gray-100 dark:bg-gray-700">
+      <div className="border-gray-400 shadow-xl bg-white dark:bg-gray-700">
         <TableRow header>
           <TableCell></TableCell>
           <TableCell>
@@ -488,7 +509,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 export default RecipeDetailTable;
 
 const TableCell: React.FC = ({ children }) => (
-  <div className="border-solid border border-gray-600 p-1">{children}</div>
+  <div className="border-solid border border-gray-300 p-1">{children}</div>
 );
 const TableRow: React.FC<{ header?: boolean }> = ({
   children,

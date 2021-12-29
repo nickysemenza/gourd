@@ -14,19 +14,17 @@ const NavBar: React.FC = () => {
     return classes.filter(Boolean).join(" ");
   }
   return (
-    <Disclosure as="nav" className="bg-gray-800 mb-2">
+    <Disclosure as="nav" className="bg-white dark:bg-gray-800 mb-2">
       {({ open }) => (
         <>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  {/* <img
-                    className="h-8 w-8"
-                    src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg"
-                    alt="Workflow"
-                  /> */}
-                  <div onClick={() => history("/")}>
+                  <div
+                    onClick={() => history("/")}
+                    className="duration-300 transform hover:rotate-45"
+                  >
                     <Logo />
                   </div>
                 </div>
@@ -34,14 +32,11 @@ const NavBar: React.FC = () => {
                   <div className="ml-10 flex items-baseline space-x-4">
                     {navItems.map((item) => (
                       <Link
-                        // <a
                         key={item.path}
-                        // href={`/${item.title}`}
-                        to={`/${item.path}`}
-                        // onClick={() => history.push("/" + item.path)}
-                        className={`text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium ${
+                        to={item.path}
+                        className={`text-gray-400 dark:hover:text-white px-3 py-2  text-sm font-medium ${
                           location.pathname.includes(item.path) &&
-                          "bg-gray-900 text-white"
+                          "dark:bg-gray-900 text-gray-800 dark:text-white"
                         }`}
                       >
                         {item.title}

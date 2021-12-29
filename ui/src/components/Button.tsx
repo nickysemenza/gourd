@@ -20,19 +20,19 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
 }) => {
   const baseStyles = `${compact ? "h-5" : "h-8"}  ${
     compact ? "px-2" : "px-5"
-  } text-indigo-100 transition-colors duration-150 text-sm
-  bg-indigo-700 focus:shadow-outline hover:bg-indigo-800
-  disabled:bg-indigo-400 inline-flex items-center`;
+  } text-violet-100 transition-colors duration-150 text-sm
+  bg-violet-700 focus:shadow-outline hover:bg-violet-800
+  disabled:bg-violet-400 inline-flex items-center`;
   return (
     <div className="inline-flex mx-1" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {
-        const iconMargins = compact ? 1 : 3;
+        const iconMargins = compact ? 1 : 3.5;
         const iconDim = compact ? 12 : 18;
         return (
           <button
             key={x}
-            className={`${baseStyles} ${x === 0 && "rounded-l-lg"} ${
-              x === buttons.length - 1 && "rounded-r-lg"
+            className={`${baseStyles} ${x === 0 && "rounded-l"} ${
+              x === buttons.length - 1 && "rounded-r"
             }`}
             {...props}
           >
@@ -43,7 +43,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
                 className={`mr-${text ? iconMargins : 0}`}
               />
             )}
-            {text && <span>{text}</span>}
+            {text && <span className="mx-1">{text}</span>}
             {!!IconRight && (
               <IconRight
                 width={iconDim}
@@ -58,7 +58,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   );
 };
 export const Pill: React.FC = ({ children }) => (
-  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-blue-200 text-blue-800 rounded-full">
+  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-violet-200 text-violet-800 rounded-full">
     {children}
   </span>
 );

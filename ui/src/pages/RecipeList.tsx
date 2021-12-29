@@ -23,7 +23,7 @@ const RecipeList: React.FC = () => {
   const [checked, setChecked] = useState(new Set<string>());
   let initialParams: PaginationParameters = {
     offset: 0,
-    limit: 30,
+    limit: 40,
   };
 
   const [params, setParams] = useState(initialParams);

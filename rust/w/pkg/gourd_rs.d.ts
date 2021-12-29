@@ -65,9 +65,10 @@ export function decode_recipe_text(r: string): any;
 export function make_dag(conversion_request: any): string;
 /**
 * @param {string} r
+* @param {any} ings
 * @returns {RichItem[]}
 */
-export function rich(r: string): RichItem[];
+export function rich(r: string, ings: any): RichItem[];
 /**
 * @param {Amount} amount
 * @returns {string}
@@ -97,6 +98,7 @@ interface CompactR {
 }
 export type RichItem =
   | { kind: "Text"; value: string }
+  | { kind: "Ing"; value: string }
   | { kind: "Amount"; value: Amount[] }
 
 
