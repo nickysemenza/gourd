@@ -1,0 +1,115 @@
+name: Test + Deploy
+on: push
+jobs:
+  golangci:
+    name: golang lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2.5.2
+        with:
+          version: latest
+  test-e2e:
+    name: e2e Cypress Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.17", "1.18.0-beta1"]
+    # container: debian
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+          stable: ${{ !contains(matrix.go, 'beta') }} # https://github.com/actions/setup-go/issues/176
+      - name: install deps
+        run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
+      - run: docker-compose pull
+      - run: docker-compose build gourd
+      - name: docker-compose build
+        run: docker-compose build --parallel
+      - run: go mod vendor
+      - name: start postgres db
+        run: docker-compose up -d db
+      - name: migrate db
+        run: sleep 5 && make migrate
+      - name: start rust server
+        run: docker-compose up -d rs
+      - name: smoke test rust server
+        run: curl -v http://localhost:8080/parse?text=1%20cup
+      - name: go integration tests
+        run: make integration-test-go
+        env:
+          MIGRATIONS_DIR: file://../db/migrations
+          PDFLATEX_BINARY: /usr/bin/pdflatex
+      - uses: codecov/codecov-action@v2
+      # - name: run usda import
+      # run: docker-compose run usda
+      - name: seed db with testdata
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5555
+        run: make seed-testdata
+      - name: run cypress
+        run: docker-compose run ui
+      - name: Archive cypress results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-results
+          path: ui/cypress/
+          if-no-files-found: error
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
+  test-rust:
+    name: rust test
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+      SQLX_OFFLINE: true # https://github.com/launchbadge/sqlx/tree/master/sqlx-cli#force-building-in-offline-mode
+    steps:
+      - uses: actions/checkout@v2
+      - name: cargo build
+        run: cargo build --verbose
+        working-directory: rust
+      - name: cargo test
+        run: cargo test --verbose
+        working-directory: rust
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          args: -t 120 --manifest-path rust/Cargo.toml --output-dir rust/.cov --avoid-cfg-tarpaulin --out Xml -- --test-threads 1
+          version: "latest"
+
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          directory: rust/.cov
+          path_to_write_report: rust/.cov/codecov_report.txt
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report-
+          path: rust/.cov
+  deploy:
+    needs: ["test-e2e", "test-rust", "golangci"]
+    # if: github.ref == 'refs/heads/main'
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: curl -L https://fly.io/install.sh | sh
+      - uses: superfly/flyctl-actions@master
+        name: deploy API
+        with:
+          args: "deploy"
+          # https://github.com/superfly/flyctl/issues/400
+      - run: "/home/runner/.fly/bin/flyctl deploy --config ui/ --dockerfile ui/Dockerfile  . -v"
+        name: deploy UI
