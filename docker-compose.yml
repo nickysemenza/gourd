@@ -114,8 +114,10 @@ services:
       - ./ui/coverage:/work/ui/coverage
 
   usda:
-    build:
-      context: usda
+    # doesn't change much so can just use most recent image
+    image: ghcr.io/nickysemenza/gourd-usda:dev
+    # build:
+    # context: usda
     depends_on:
       - gourd
       - db
