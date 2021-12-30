@@ -51,6 +51,7 @@ import { RecipeLink } from "../components/Misc";
 import { Alert } from "../components/Alert";
 import ProgressiveImage from "../components/ProgressiveImage";
 import Debug from "../components/Debug";
+import { NYTView } from "../components/NYTView";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
@@ -108,6 +109,7 @@ const RecipeDetail: React.FC = () => {
   const [recipe, setRecipe] = useState(data);
   const [showOriginalLine, setshowOriginalLine] = useState(false);
   const [showKcalDollars, setshowKcalDollars] = useState(false);
+  const [showAltView, setshowAltView] = useState(false);
 
   if (recipe)
     console.log({ recipe, a: toInput(recipe as unknown as RecipeWrapper) });
@@ -356,197 +358,210 @@ const RecipeDetail: React.FC = () => {
 
   const latexURL = `${getAPIURL()}/recipes/${recipe.detail.id}/latex`;
   return (
-    <div>
+    <div className="px-1">
       <Helmet>
         <title>{recipe.detail.name} | gourd</title>
       </Helmet>
-      <div className="lg:flex lg:items-center lg:justify-between mb-2 ">
-        <div>
-          {edit ? (
-            <input
-              type="text"
-              className="border-2 w-96"
-              value={detail.name}
-              onChange={(e) =>
-                setRecipe(updateRecipeName(recipe, e.target.value))
-              }
-            ></input>
-          ) : (
-            <div className="text-gray-900 flex">
-              <h2 className="text-2xl font-bold leading-7 ">{detail.name}</h2>
-              {!!detail.version && (
-                <h4 className="text-small self-end pl-1">
-                  version {detail.version}
-                </h4>
-              )}
-            </div>
-          )}
-
-          <div className="flex flex-col">
-            {detail.unit !== "" && (
-              <div className="text-sm text-gray-600">
-                Makes {detail.quantity} {detail.unit}
-              </div>
-            )}
-            <div className="text-sm">
-              Takes {formatTimeRange(w, totalDuration)}
-            </div>
-          </div>
+      <div className="divide-y">
+        <div className="lg:flex lg:items-center lg:justify-between mb-2">
           <div>
-            {(detail.sources || []).map((source, i) => (
-              <div className="flex text-gray-600 space-x-1" key={i}>
-                <div className="text-xs font-bold uppercase self-center">
-                  from:
-                </div>
-                {edit ? (
-                  <div className="flex">
-                    {sourceTypes.map((key) => (
-                      <input
-                        type="text"
-                        className="border-2 w-96"
-                        value={source[key]}
-                        onChange={(e) =>
-                          setRecipe(
-                            updateRecipeSource(recipe, i, e.target.value, key)
-                          )
-                        }
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex space-x-1">
-                    {!!source.url && (
-                      <a
-                        href={source.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-indigo-600 underline"
-                      >
-                        {source.url}
-                      </a>
-                    )}
-                    {!!source.title && <div>{source.title}</div>}
-                    {!!source.page && <div>(pg. {source.page})</div>}
-                  </div>
+            {edit ? (
+              <input
+                type="text"
+                className="border-2 w-96"
+                value={detail.name}
+                onChange={(e) =>
+                  setRecipe(updateRecipeName(recipe, e.target.value))
+                }
+              ></input>
+            ) : (
+              <div className="text-gray-900 flex">
+                <h2 className="text-2xl font-bold leading-7 ">{detail.name}</h2>
+                {!!detail.version && (
+                  <h4 className="text-small self-end pl-1">
+                    version {detail.version}
+                  </h4>
                 )}
               </div>
-            ))}
+            )}
+
+            <div className="flex flex-col">
+              {detail.unit !== "" && (
+                <div className="text-sm text-gray-600">
+                  Makes {detail.quantity} {detail.unit}
+                </div>
+              )}
+              <div className="text-sm">
+                Takes {formatTimeRange(w, totalDuration)}
+              </div>
+            </div>
+            <div>
+              {(detail.sources || []).map((source, i) => (
+                <div className="flex text-gray-600 space-x-1" key={i}>
+                  <div className="text-xs font-bold uppercase self-center">
+                    from:
+                  </div>
+                  {edit ? (
+                    <div className="flex">
+                      {sourceTypes.map((key) => (
+                        <input
+                          type="text"
+                          className="border-2 w-96"
+                          value={source[key]}
+                          onChange={(e) =>
+                            setRecipe(
+                              updateRecipeSource(recipe, i, e.target.value, key)
+                            )
+                          }
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex space-x-1">
+                      {!!source.url && (
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-indigo-600 underline"
+                        >
+                          {source.url}
+                        </a>
+                      )}
+                      {!!source.title && <div>{source.title}</div>}
+                      {!!source.page && <div>(pg. {source.page})</div>}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col self-end justify-end items-end gap-1">
+            <ButtonGroup
+              buttons={[
+                {
+                  onClick: resetMultiplier,
+                  disabled: multiplier === 1,
+                  text: "reset",
+                  IconLeft: X,
+                },
+                {
+                  onClick: saveUpdate,
+                  disabled: !edit,
+                  text: "save",
+                  IconLeft: Save,
+                },
+                {
+                  onClick: toggleEdit,
+                  text: edit ? "view" : "edit",
+                  IconLeft: edit ? Eye : Edit,
+                },
+              ]}
+            />
+            <ButtonGroup
+              buttons={[
+                makeHideShowButton(
+                  showOriginalLine,
+                  setshowOriginalLine,
+                  "original"
+                ),
+                makeHideShowButton(
+                  showKcalDollars,
+                  setshowKcalDollars,
+                  "kcal/dollars"
+                ),
+                makeHideShowButton(showAltView, setshowAltView, "view"),
+              ]}
+            />
           </div>
         </div>
-        <div className="self-start">
-          <ButtonGroup
-            buttons={[
-              {
-                onClick: resetMultiplier,
-                disabled: multiplier === 1,
-                text: "reset",
-                IconLeft: X,
-              },
-              {
-                onClick: saveUpdate,
-                disabled: !edit,
-                text: "save",
-                IconLeft: Save,
-              },
-              {
-                onClick: toggleEdit,
-                text: edit ? "view" : "edit",
-                IconLeft: edit ? Eye : Edit,
-              },
-            ]}
-          />
-          <ButtonGroup
-            buttons={[
-              makeHideShowButton(
-                showOriginalLine,
-                setshowOriginalLine,
-                "original"
-              ),
-              makeHideShowButton(
-                showKcalDollars,
-                setshowKcalDollars,
-                "kcal/dollars"
-              ),
-            ]}
-          />
-        </div>
-      </div>
 
-      {newerVersion && (
-        <Alert
-          title="Newer version available"
-          line={
-            <p>
-              newest version is
-              <RecipeLink recipe={newerVersion} multiplier={multiplier} />, this
-              is version{recipe.detail.version}
-            </p>
-          }
-        />
-      )}
-
-      <RecipeDetailTable
-        hints={hints}
-        ing_hints={ing_hints}
-        tweaks={tweaks}
-        updateIngredient={updateIngredient}
-        recipe={recipe}
-        setRecipe={setRecipe}
-        showOriginalLine={showOriginalLine}
-        showKcalDollars={showKcalDollars}
-      />
-      {/* <InstructionsListParser
+        {newerVersion && (
+          <Alert
+            title="Newer version available"
+            line={
+              <p>
+                newest version is
+                <RecipeLink recipe={newerVersion} multiplier={multiplier} />,
+                this is version{recipe.detail.version}
+              </p>
+            }
+          />
+        )}
+        {showAltView ? (
+          <NYTView recipe={recipe} />
+        ) : (
+          <RecipeDetailTable
+            hints={hints}
+            ing_hints={ing_hints}
+            tweaks={tweaks}
+            updateIngredient={updateIngredient}
+            recipe={recipe}
+            setRecipe={setRecipe}
+            showOriginalLine={showOriginalLine}
+            showKcalDollars={showKcalDollars}
+          />
+        )}
+        {/* <InstructionsListParser
         setDetail={(s) => {
           setRecipe(setDetail(recipe, s));
           setEdit(true);
         }}
       /> */}
-      <p className="text-lg font-bold">totals</p>
-      <div>
-        calories: {totalCal}
-        {totalCal > 0 &&
-          quantity > 0 &&
-          ` (${scaledRound(totalCal / quantity)} per ${singular(unit)})`}
-      </div>
-      <div>
-        kcal: {totalKCal}
-        {totalKCal &&
-          quantity > 0 &&
-          ` (${scaledRound(totalKCal / quantity)} per ${singular(unit)})`}
-      </div>
-      <div>
-        dollars: {totalDollars}
-        {totalDollars &&
-          quantity > 0 &&
-          ` (${scaledRound(totalDollars / quantity)} per ${singular(unit)})`}
-      </div>
-      <div>
-        grams: {totalGrams}
-        {totalGrams &&
-          quantity > 0 &&
-          ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
-      </div>
-      <p className="text-lg font-bold">raw</p>
-      <HideShowHOC>
-        <pre>
-          {w.encode_recipe_text(
-            toInput(recipe as unknown as RecipeWrapper).detail
-          )}
-        </pre>
-      </HideShowHOC>
-      <p className="text-lg font-bold">meals</p>
+        <div>
+          <p className="text-lg font-bold">totals</p>
+          <div>
+            calories: {totalCal}
+            {totalCal > 0 &&
+              quantity > 0 &&
+              ` (${scaledRound(totalCal / quantity)} per ${singular(unit)})`}
+          </div>
+          <div>
+            kcal: {totalKCal}
+            {totalKCal &&
+              quantity > 0 &&
+              ` (${scaledRound(totalKCal / quantity)} per ${singular(unit)})`}
+          </div>
+          <div>
+            dollars: {totalDollars}
+            {totalDollars &&
+              quantity > 0 &&
+              ` (${scaledRound(totalDollars / quantity)} per ${singular(
+                unit
+              )})`}
+          </div>
+          <div>
+            grams: {totalGrams}
+            {totalGrams &&
+              quantity > 0 &&
+              ` (${scaledRound(totalGrams / quantity)} per ${singular(unit)})`}
+          </div>
+        </div>
+        <div>
+          <p className="text-lg font-bold">raw</p>
+          <HideShowHOC>
+            <pre>
+              {w.encode_recipe_text(
+                toInput(recipe as unknown as RecipeWrapper).detail
+              )}
+            </pre>
+          </HideShowHOC>
+          <p className="text-lg font-bold">meals</p>
 
-      <HideShowHOC>
-        <Nutrition
-          items={ingredientsWithNutrients}
-          h={[...totalNutrients.keys()]}
-        />
-      </HideShowHOC>
-
-      <div className="w-9/12 flex ">
-        {(recipe.linked_photos || []).map((p) => (
-          <ProgressiveImage photo={p} className="w-1/6" />
-        ))}
+          <HideShowHOC>
+            <Nutrition
+              items={ingredientsWithNutrients}
+              h={[...totalNutrients.keys()]}
+            />
+          </HideShowHOC>
+        </div>
+        <div>
+          <div className="w-9/12 flex ">
+            {(recipe.linked_photos || []).map((p) => (
+              <ProgressiveImage photo={p} className="w-1/6" />
+            ))}
+          </div>
+        </div>
       </div>
       <div className="flex flex-row w-full">
         <div className="w-4/12">

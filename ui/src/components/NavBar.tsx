@@ -14,10 +14,13 @@ const NavBar: React.FC = () => {
     return classes.filter(Boolean).join(" ");
   }
   return (
-    <Disclosure as="nav" className="bg-white dark:bg-gray-800 mb-2">
+    <Disclosure
+      as="nav"
+      className="bg-white dark:bg-gray-800 mb-2 w-100 border-b border-gray-500"
+    >
       {({ open }) => (
         <>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">

@@ -52,8 +52,9 @@ const FoodSearch: React.FC<{
     branded_info: undefined,
   };
   const results = foods?.foods || [];
+  const reallyLoading = loading && results.length === 0;
   const items = [
-    ...(loading && results.length === 0 ? Array(5).fill(placeholder) : []),
+    ...(reallyLoading ? Array(5).fill(placeholder) : []),
     ...(addon && results.filter((f) => f.fdc_id === addon.fdc_id).length === 0
       ? [addon]
       : []),
@@ -83,6 +84,7 @@ const FoodSearch: React.FC<{
             onLink={onLink}
             x={x}
             key={x}
+            loading={reallyLoading}
           />
         );
       })}
@@ -94,60 +96,67 @@ export const FoodRow: React.FC<{
   isHighlighted?: boolean;
   x?: number;
   onLink?: (fdc_id: number) => void;
-}> = ({ food, isHighlighted = false, x = 0, onLink }) => (
-  <div
-    style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
-    className={`border ${
-      isHighlighted ? "border-red-600 " : "border-indigo-600"
-    } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
-    key={`${food.fdc_id}@${x}`}
-  >
-    <div className="flex flex-col p-1">
-      <Code>{food.fdc_id}</Code>
-      <a
-        href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdc_id}/nutrients`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-sm pr-1 underline text-blue-800"
-      >
-        view
-      </a>
-      {onLink !== undefined && (
-        <ButtonGroup
-          compact
-          buttons={[
-            {
-              onClick: () => {
-                onLink(food.fdc_id);
+  loading: boolean;
+}> = ({ food, isHighlighted = false, x = 0, onLink, loading }) => {
+  const loadingClass =
+    (loading && "h-2 bg-gray-400 rounded animate-pulse") || "";
+  return (
+    <div
+      style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
+      className={`border ${
+        isHighlighted ? "border-red-600 " : "border-indigo-600"
+      } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
+      key={`${food.fdc_id}@${x}`}
+    >
+      <div className="flex flex-col p-1">
+        <Code>{food.fdc_id}</Code>
+        <a
+          href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdc_id}/nutrients`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm pr-1 underline text-blue-800"
+        >
+          view
+        </a>
+        {onLink !== undefined && (
+          <ButtonGroup
+            compact
+            buttons={[
+              {
+                onClick: () => {
+                  onLink(food.fdc_id);
+                },
+                text: "link",
+                disabled: isHighlighted,
+                IconLeft: PlusCircle,
               },
-              text: "link",
-              disabled: isHighlighted,
-              IconLeft: PlusCircle,
-            },
-          ]}
-        />
-      )}
-    </div>
-    <div className="flex flex-col p-1">
-      <div className="flex whitespace-normal">{food.description}</div>
-      <div className="flex flex-row">
-        <p className="font-mono text-xs">{food.data_type}</p>
-        <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
+            ]}
+          />
+        )}
       </div>
-      <UnitMappingList unit_mappings={food.unit_mappings} />
-      {!!food.branded_info && (
-        <div className="flex flex-col w-80">
-          {food.branded_info.brand_owner} <br />
-          <p className="text-sm italic">
-            {food.branded_info.branded_food_category}
-          </p>
-          <p className="text-xs text-gray-500 whitespace-normal">
-            {food.branded_info.ingredients}
-          </p>
+      <div className="flex flex-col p-1">
+        <div className="flex whitespace-normal">{food.description}</div>
+        <div className="flex flex-row">
+          <p className="font-mono text-xs">{food.data_type}</p>
+          <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
         </div>
-      )}
+        <UnitMappingList unit_mappings={food.unit_mappings} />
+        {(food.branded_info || loading) && (
+          <div className={`flex flex-col w-80 ${loadingClass}`}>
+            {food.branded_info?.brand_owner} <br />
+            <p className={`text-sm italic ${loadingClass}`}>
+              {food.branded_info?.branded_food_category}
+            </p>
+            <div
+              className={`text-xs text-gray-500 whitespace-normal ${loadingClass}`}
+            >
+              {food.branded_info?.ingredients}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default FoodSearch;

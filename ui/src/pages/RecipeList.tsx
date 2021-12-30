@@ -127,7 +127,7 @@ const RecipeList: React.FC = () => {
   );
 
   return (
-    <div>
+    <div className="bg-[#f2f3ef]">
       <Helmet>
         <title>recipes | gourd</title>
       </Helmet>

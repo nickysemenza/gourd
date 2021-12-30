@@ -4,23 +4,17 @@ import { Photo } from "../api/openapi-hooks/api";
 
 const ProgressiveImage: React.FC<{
   photo: Photo;
-  maxWidth?: number;
   className?: string;
-}> = ({ photo, maxWidth = 40, className = "" }) => {
+}> = ({ photo, className = "" }) => {
   const [loaded, setLoaded] = useState(false);
-  const { blur_hash, width, height, base_url, id, source } = photo;
-  const scalingRatio = maxWidth / width;
-  const scaledHeight = scalingRatio * height;
+  const { blur_hash, base_url, id, source } = photo;
   return (
-    <div
-    // style={{ width: maxWidth, height: scaledHeight }}
-    >
+    <div className="transition-opacity">
       {blur_hash && (!loaded || base_url === "") && (
         <Blurhash
           className={className}
           hash={blur_hash}
-          width={maxWidth}
-          height={scaledHeight}
+          width="100%"
           resolutionX={32}
           resolutionY={32}
           punch={1}

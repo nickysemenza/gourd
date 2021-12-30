@@ -52,32 +52,33 @@ export const UnitMappingList: React.FC<{
       console.error({ e });
     }
   }
+  if (!unit_mappings || !w) return null;
   return (
-    <>
-      {unit_mappings && w && (
-        <>
-          {dot !== "" && includeDot && (
-            <Graphviz dot={dot} options={{ width: 250, height: null }} />
-          )}
-          <div className="w-60">
-            {unit_mappings.map((m, x) => (
-              <div
-                key={x}
-                className="flex text-sm text-gray-700 dark:text-gray-400"
-              >
-                <p>
-                  {scaledRound(m.a.value)} {m.a.unit}
-                </p>
-                <p className="text-center px-1">=</p>
-                <p>
-                  {scaledRound(m.b.value)} {m.b.unit}
-                </p>
-                <p className="text-xs pl-1">{m.source}</p>
-              </div>
-            ))}
-          </div>
-        </>
+    <div>
+      {dot !== "" && includeDot && (
+        <Graphviz
+          dot={dot}
+          options={{ width: 300, height: null }}
+          className="w-full"
+        />
       )}
-    </>
+      <div className="w-60">
+        {unit_mappings.map((m, x) => (
+          <div
+            key={x}
+            className="flex text-sm text-gray-700 dark:text-gray-400"
+          >
+            <p>
+              {scaledRound(m.a.value)} {m.a.unit}
+            </p>
+            <p className="text-center px-1">=</p>
+            <p>
+              {scaledRound(m.b.value)} {m.b.unit}
+            </p>
+            <p className="text-xs pl-1">{m.source}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };

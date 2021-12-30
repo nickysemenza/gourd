@@ -54,7 +54,7 @@ const IngredientPopover: React.FC<{ detail: IngredientDetail }> = ({
                         <span className="text-sm font-medium text-gray-900">
                           USDA food info
                         </span>
-                        <FoodRow food={food} />
+                        <FoodRow food={food} loading={false} />
                       </div>
                     )}
                   </div>
