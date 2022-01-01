@@ -196,8 +196,15 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)
 				meal.Photos = append(meal.Photos, NotionPhoto{URL: i.Image.File.URL, BlockID: i.ID.String()})
-			case "column", "column_list":
-				i := block.(*notionapi.UnsupportedBlock)
+			case notionapi.BlockTypeColumnList:
+				i := block.(*notionapi.ColumnListBlock)
+				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(i.ID), meal)
+				if err != nil {
+					return nil, err
+				}
+				meal.Photos = append(meal.Photos, foo.Photos...)
+			case notionapi.BlockTypeColumn:
+				i := block.(*notionapi.ColumnBlock)
 				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(i.ID), meal)
 				if err != nil {
 					return nil, err
