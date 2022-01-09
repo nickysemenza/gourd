@@ -183,8 +183,14 @@ pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrappe
 #[tracing::instrument(name = "route::scrape")]
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
     let url = info.text.as_str();
-    let sc_result = scraper::scrape_recipe(url).unwrap();
-    let res = scrape_result_to_recipe(sc_result);
+    let sc_result = match scraper::scrape_recipe(url) {
+        Ok(s) => s,
+        Err(e) => {
+            error!("{:#?}", e);
+            return HttpResponse::InternalServerError().json(format!("{:#?}", e));
+        }
+    };
+    let res = scrape_result_to_recipe(sc_result.clone());
 
     debug!("scraped {}", url.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response

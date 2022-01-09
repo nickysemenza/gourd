@@ -1,0 +1,8 @@
+
+## parse
+http://localhost:8080/parse?text=1-2%20cups
+
+
+### scrape
+
+http://localhost:8080/debug/scrape?url=https://cooking.nytimes.com/recipes/1022674-chewy-gingerbread-cookies
