@@ -62,7 +62,7 @@
     "wasm-loader": "1.3.0"
   },
   "resolutions": {
-    "bezier-js": "4.1.1"
+    "bezier-js": "5.1.0"
   },
   "scripts": {
     "build:tailwind": "tailwind build -i src/tailwind.css -o src/tailwind.output.css",
