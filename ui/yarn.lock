@@ -3014,10 +3014,10 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.23":
-  version "2.4.23"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.23.tgz#0772f8eaa45bb3eaa3780270c95982be7c1b7e08"
-  integrity sha512-kdKkpqbItv/npf8Ll/u129DpL/W6YlQB9F37K44TG0yq5/B6wnasm990ln1IkbCGCyLXR5Opt6cz1k6vn7V9lQ==
+"@openapitools/openapi-generator-cli@2.4.24":
+  version "2.4.24"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.24.tgz#aaffdca16e193ca6393c11eef3004343a1576ec1"
+  integrity sha512-WTniuRPJ3LB9dQfw1J+puh3m5dRrH/QZVMOsJoY31wUNsFLDANr5laFp1GI7EsAG19rvJz6qTxkS5nfTSad3SA==
   dependencies:
     "@nestjs/common" "8.2.4"
     "@nestjs/core" "8.2.4"
@@ -3032,7 +3032,7 @@
     inquirer "8.2.0"
     lodash "4.17.21"
     reflect-metadata "0.1.13"
-    rxjs "7.5.1"
+    rxjs "7.5.2"
     tslib "2.0.3"
 
 "@opentelemetry/api-metrics@0.24.0":
@@ -13992,10 +13992,10 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
-rxjs@7.5.1:
-  version "7.5.1"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.1.tgz#af73df343cbcab37628197f43ea0c8256f54b157"
-  integrity sha512-KExVEeZWxMZnZhUZtsJcFwz8IvPvgu4G2Z2QyqjZQzUGr32KDYuSxrEYO4w3tFFNbfLozcrKUTvTPi+E9ywJkQ==
+rxjs@7.5.2:
+  version "7.5.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-7.5.2.tgz#11e4a3a1dfad85dbf7fb6e33cbba17668497490b"
+  integrity sha512-PwDt186XaL3QN5qXj/H9DGyHhP3/RYYgZZwqBv9Tv8rsAaiwFH1IsJJlcgD37J7UW5a6O67qX0KWKS3/pu0m4w==
   dependencies:
     tslib "^2.1.0"
 
