@@ -28,6 +28,7 @@
         unit: gram
         value: 0.94
 - name: ground cinnamon
+  aliases: ["cinnamon"]
   fdc_id: 171320
   unit_mappings:
     - &density_spices
@@ -38,6 +39,14 @@
         unit: grams
         value: 9
       source: misc
+    - &cost_spices
+      a:
+        unit: tbsp
+        value: 7
+      b:
+        unit: dollars
+        value: 4
+      source: estimate
 - name: sugar
   fdc_id: 746784
   aliases: ["granulated sugar", "white sugar"]
@@ -77,7 +86,38 @@
         unit: dollars
         value: 7.99
       source: yaml
-
+- name: egg yolk
+  fdc_id: 748236
+  unit_mappings:
+    - a:
+        unit: whole # haha
+        value: 12
+      b:
+        unit: dollars
+        value: 3
+      source: wf
+    - a:
+        unit: whole
+        value: 1
+      b:
+        unit: grams
+        value: 18
+- name: egg white
+  fdc_id: 747997
+  unit_mappings:
+    - a:
+        unit: whole # haha
+        value: 12
+      b:
+        unit: dollars
+        value: 3
+      source: wf
+    - a:
+        unit: whole
+        value: 1
+      b:
+        unit: grams
+        value: 34
 - name: eggs
   aliases: ["egg"]
   fdc_id: 748967
@@ -122,7 +162,14 @@
       source: wf
 - name: kosher salt
   fdc_id: 705264
-  aliases: ["salt", "Coarse sea salt", "Diamond Crystal kosher salt"]
+  aliases:
+    [
+      "salt",
+      "Coarse sea salt",
+      "Diamond Crystal kosher salt",
+      "fine sea salt",
+      "sea salt",
+    ]
   unit_mappings:
     - a:
         unit: lb
@@ -481,12 +528,15 @@
 - name: curry powder
   unit_mappings:
     - *density_spices
+    - *cost_spices
 - name: ground ginger
   unit_mappings:
     - *density_spices
+    - *cost_spices
 - name: freshly grated nutmeg
   unit_mappings:
     - *density_spices
+    - *cost_spices
 - name: coconut milk
   fdc_id: 938090
   aliases: ["unsweetened coconut milk"]
@@ -525,3 +575,12 @@
   fdc_id: 173647
   unit_mappings:
     - *density_liquid
+- name: muscovado sugar
+  fdc_id: 2034101
+  unit_mappings:
+    - a:
+        unit: cents
+        value: 56
+      b:
+        unit: ounce
+        value: 1
