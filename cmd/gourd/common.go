@@ -97,6 +97,8 @@ func setupEnv() error {
 	viper.SetDefault("PDFLATEX_BINARY", "pdflatex")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+
 	err := viper.ReadInConfig()
 	if errors.As(err, &viper.ConfigFileNotFoundError{}) {
 		log.Errorf("config file err: %s ", err)
@@ -113,8 +115,6 @@ func setupMisc() error {
 	if err != nil {
 		return err
 	}
-
-	viper.AutomaticEnv()
 
 	level, err := log.ParseLevel(viper.GetString("LOG_LEVEL"))
 	if err != nil {

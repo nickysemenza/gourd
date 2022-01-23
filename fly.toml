@@ -3,22 +3,25 @@ app = "gourd"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
+[env]
+JAEGER_ENDPOINT = "http://tracing.internal:14268/api/traces"
+
 [[services]]
-  internal_port = 4242
-  protocol = "tcp"
+internal_port = 4242
+protocol = "tcp"
 
-  [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
+[services.concurrency]
+hard_limit = 25
+soft_limit = 20
 
-  [[services.ports]]
-    handlers = ["http"]
-    port = "80"
+[[services.ports]]
+handlers = ["http"]
+port = "80"
 
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = "443"
+[[services.ports]]
+handlers = ["tls", "http"]
+port = "443"
 
-  [[services.tcp_checks]]
-    interval = 10000
-    timeout = 2000
+[[services.tcp_checks]]
+interval = 10000
+timeout = 2000

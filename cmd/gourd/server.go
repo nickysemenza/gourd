@@ -29,12 +29,17 @@ func getDBConn() (*sql.DB, error) {
 		instrumentedsql.WithTracer(NewTracer(true)),
 		instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
 	))
-	dbConn, err := sql.Open("instrumented-postgres", db.ConnnectionString(
+	dsn := db.ConnnectionString(
 		viper.GetString("DB_HOST"),
 		viper.GetString("DB_USER"),
 		viper.GetString("DB_PASSWORD"),
 		viper.GetString("DB_DBNAME"),
-		viper.GetInt64("DB_PORT")))
+		viper.GetInt64("DB_PORT"))
+	if dsnEnv := viper.GetString("DATABASE_URL"); dsnEnv != "" {
+		dsn = dsnEnv + "?sslmode=disable"
+	}
+	log.Info("connecting to db: ", dsn)
+	dbConn, err := sql.Open("instrumented-postgres", dsn)
 	return dbConn, err
 }
 func makeServer() (*server.Server, error) {
