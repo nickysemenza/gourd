@@ -2,7 +2,7 @@ mod utils;
 
 use gourd_common::{
     convert_to,
-    ingredient::{self, Amount},
+    ingredient::{Amount, IngredientParser},
     parse_unit_mappings, sum_ingredients,
     unit::{add_time_amounts, make_graph, print_graph},
 };
@@ -32,7 +32,7 @@ pub fn start() -> Result<(), JsValue> {
 #[wasm_bindgen]
 pub fn parse(input: &str) -> String {
     utils::set_panic_hook();
-    ingredient::from_str(input).to_string()
+    gourd_common::ingredient::from_str(input).to_string()
     // return "foo".to_string();
 }
 
@@ -76,13 +76,13 @@ extern "C" {
 
 #[wasm_bindgen]
 pub fn parse2(input: &str) -> Result<IIngredient, JsValue> {
-    let i = ingredient::from_str(input);
+    let i = gourd_common::ingredient::from_str(input);
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
 #[wasm_bindgen]
 pub fn parse3(input: &str) -> JsValue {
-    let i = ingredient::from_str(input);
+    let i = gourd_common::ingredient::from_str(input);
     JsValue::from_serde(&i).unwrap()
 }
 
@@ -94,7 +94,7 @@ pub fn parse4(input: &str) -> JsValue {
 
 #[wasm_bindgen]
 pub fn format_ingredient(val: &IIngredient) -> String {
-    let i: ingredient::Ingredient = val.into_serde().unwrap();
+    let i: gourd_common::ingredient::Ingredient = val.into_serde().unwrap();
     return i.to_string();
 }
 
@@ -118,7 +118,8 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
 #[wasm_bindgen]
 pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
     utils::set_panic_hook();
-    let i = ingredient::parse_amount(input);
+    let ip = IngredientParser::new();
+    let i = ip.parse_amount(input);
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
@@ -159,7 +160,11 @@ pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     utils::set_panic_hook();
     let ings2: Vec<String> = ings.into_serde().unwrap();
     info!("rich2: {:?}", ings2);
-    match ingredient::rich_text::parse(r.as_str(), ings2) {
+    let rtp = gourd_common::ingredient::rich_text::RichParser {
+        ingredient_names: ings2,
+        ip: gourd_common::ingredient::IngredientParser::new(),
+    };
+    match rtp.parse(r.as_str()) {
         Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),
         Err(e) => Err(JsValue::from_str(&e.to_string())),
     }

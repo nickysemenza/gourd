@@ -7,6 +7,7 @@ use openapi::models::{
 use tracing::info;
 
 use ingredient::unit::kind::MeasureKind;
+use ingredient::IngredientParser;
 
 #[macro_use]
 extern crate serde;
@@ -87,7 +88,7 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Vec<ingredient::Amount> {
-    let i = ingredient::parse_amount(s);
+    let i = (IngredientParser::new()).parse_amount(s);
     info!("parsed {} into {:?}", s, i.clone());
     return i;
 }

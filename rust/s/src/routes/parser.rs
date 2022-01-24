@@ -91,11 +91,13 @@ fn foo(sc: ScrapeResult) -> (Measure, Vec<gourd_common::ingredient::rich_text::C
         })
         .collect();
     info!("hints {:#?}", hints);
-    let rich_text_tokens = gourd_common::ingredient::rich_text::parse(
-        sc.instructions.replace("\n", "").as_str(),
-        hints,
-    )
-    .unwrap_or_default();
+    let rtp = gourd_common::ingredient::rich_text::RichParser {
+        ingredient_names: hints,
+        ip: gourd_common::ingredient::IngredientParser::new(),
+    };
+    let rich_text_tokens = rtp
+        .parse(sc.instructions.replace("\n", "").as_str())
+        .unwrap_or_default();
 
     let mut amts = Vec::<gourd_common::unit::Measure>::new();
     let mut total_time =
