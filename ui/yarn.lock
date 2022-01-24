@@ -2961,20 +2961,20 @@
   resolved "https://registry.yarnpkg.com/@jsep-plugin/ternary/-/ternary-1.0.2.tgz#5e60a31df7086b2d8429a94d7e466b36db7775eb"
   integrity sha512-hoCxJW/uVT1z9LGsZr1t2m7XNmE5k8w2P+5hfegVOuy9bQFrFESRe/XSd+KZ4eAbGnTkyHqOPct2LTa9qFUrMQ==
 
-"@nestjs/common@8.2.4":
-  version "8.2.4"
-  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-8.2.4.tgz#a13f270a6ac2119b1a3f5aec0428fea535233bcb"
-  integrity sha512-zb6Y//Rd7tRsMsY2qDvX7qk/msr6sBid7V9YNvdePzGNYfMOvtwgNoqtHgbq2F6V4kCtMO7slmmM4/zptSghiQ==
+"@nestjs/common@8.2.5":
+  version "8.2.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/common/-/common-8.2.5.tgz#6630d446ee6e925476d2401a71b647c00c75dfa9"
+  integrity sha512-8VOZmHcCyhBtfvxehDfudsCrNghUoqDpZA5W8d/PUhMgz4Y1eT0M2ENBIuxr3C3j1vLypFOo30La2ymfQlOC8Q==
   dependencies:
     axios "0.24.0"
     iterare "1.2.1"
     tslib "2.3.1"
     uuid "8.3.2"
 
-"@nestjs/core@8.2.4":
-  version "8.2.4"
-  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.2.4.tgz#d8cb54f7bd5530de1f162a649c2b63852c91c8df"
-  integrity sha512-CWyS5Rj5tUxwtTGKkGei+ii6CvkGNhuo5hbKGBkCK3McfAMwpCq2pYDjSEFAqn6R2ylL4H3U5H9WU6OWJD1cVw==
+"@nestjs/core@8.2.5":
+  version "8.2.5"
+  resolved "https://registry.yarnpkg.com/@nestjs/core/-/core-8.2.5.tgz#3c4322bf72bbb934909d5d43218b0f321ec949b8"
+  integrity sha512-R0vp0VlAQFP7qBTZMzMspwOCO6MpsMJON/MsrfHVGgZS5Sd5DInfboWhe2COPnAr+VAT0o4FAKObW08Pdb5hMg==
   dependencies:
     "@nuxtjs/opencollective" "0.3.2"
     fast-safe-stringify "2.1.1"
@@ -3014,13 +3014,13 @@
     consola "^2.15.0"
     node-fetch "^2.6.1"
 
-"@openapitools/openapi-generator-cli@2.4.24":
-  version "2.4.24"
-  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.24.tgz#aaffdca16e193ca6393c11eef3004343a1576ec1"
-  integrity sha512-WTniuRPJ3LB9dQfw1J+puh3m5dRrH/QZVMOsJoY31wUNsFLDANr5laFp1GI7EsAG19rvJz6qTxkS5nfTSad3SA==
+"@openapitools/openapi-generator-cli@2.4.25":
+  version "2.4.25"
+  resolved "https://registry.yarnpkg.com/@openapitools/openapi-generator-cli/-/openapi-generator-cli-2.4.25.tgz#af94ce7284e7a41c5769ca36b7a01a946cbd1596"
+  integrity sha512-n2RExPLkscjgjryEW+SbhJNs22LHsCLIlBtD5FaZsW84tTcii2YcbyHOIfz9xAoNKbpshk2hgxjtnXqTK92mGg==
   dependencies:
-    "@nestjs/common" "8.2.4"
-    "@nestjs/core" "8.2.4"
+    "@nestjs/common" "8.2.5"
+    "@nestjs/core" "8.2.5"
     "@nuxtjs/opencollective" "0.3.2"
     chalk "4.1.2"
     commander "8.3.0"
