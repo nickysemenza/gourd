@@ -3,9 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 
-	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -20,50 +18,11 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 )
 
-func initTracer() error {
-	endpoint := viper.GetString("JAEGER_ENDPOINT")
-	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
-	// Create and install Jaeger export pipeline
-	if projectID != "" {
-		// google cloud trace
-		// env: GOOGLE_CLOUD_PROJECT=xx GOOGLE_APPLICATION_CREDENTIALS=x.json
-		// exporter, err := texporter.NewExporter(texporter.WithProjectID(projectID))
-		// if err != nil {
-		// 	return fmt.Errorf("texporter.NewExporter: %w", err)
-		// }
-		exporter, err := texporter.New(texporter.WithProjectID(projectID))
-		if err != nil {
-			return fmt.Errorf("texporter.NewExporter: %w", err)
-		}
-		tp := tracesdk.NewTracerProvider(
-			tracesdk.WithBatcher(exporter),
-		)
-
-		// tp := tracesdk.NewTracerProvider(tracesdk.WithSyncer(exporter))
-
-		otel.SetTracerProvider(tp)
-	} else if endpoint != "" {
-		tp, err := tracerProvider(endpoint)
-		if err != nil {
-			return err
-		}
-		otel.SetTracerProvider(tp)
-
-		otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
-			propagation.TraceContext{},
-			propagation.Baggage{},
-			jaegerp.Jaeger{},
-		))
-		return err
-	}
-
-	return nil
-}
-func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
+func initTracer(url, name, env string) error {
 	// Create the Jaeger exporter
 	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	tp := tracesdk.NewTracerProvider(
 		// Always be sure to batch in production.
@@ -72,11 +31,18 @@ func tracerProvider(url string) (*tracesdk.TracerProvider, error) {
 		// Record information about this application in an Resource.
 		tracesdk.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String("gourd"),
-			attribute.String("environment", "dev"),
+			semconv.ServiceNameKey.String(name),
+			attribute.String("environment", env),
 		)),
 	)
-	return tp, nil
+	otel.SetTracerProvider(tp)
+
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(
+		propagation.TraceContext{},
+		propagation.Baggage{},
+		jaegerp.Jaeger{},
+	))
+	return nil
 }
 
 func setupEnv() error {
@@ -123,7 +89,7 @@ func setupMisc() error {
 	log.SetLevel(level)
 
 	// tracing
-	if err := initTracer(); err != nil {
+	if err := initTracer(viper.GetString("JAEGER_ENDPOINT"), "gourd", "dev"); err != nil {
 		err := fmt.Errorf("failed to init tracer: %w", err)
 		return err
 	}
