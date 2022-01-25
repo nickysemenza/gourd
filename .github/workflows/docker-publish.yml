@@ -71,7 +71,7 @@ jobs:
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
         id: build-and-push
-        uses: docker/build-push-action@604f033158cc23bb0aa20cd1742ac95c460d3abf
+        uses: docker/build-push-action@253376207c6d437a5505432020b1e90c3f94b348
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.file }}
