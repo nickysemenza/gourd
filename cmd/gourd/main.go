@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/nickysemenza/gourd/api"
+	"github.com/nickysemenza/gourd/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
@@ -18,7 +19,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer func() {
-		log.Info("cleaning up tracer")
+		log.Debug("cleaning up tracer")
 		err := otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
 		if err != nil {
 			log.Error(err)
@@ -100,12 +101,19 @@ func init() {
 			Short: "scrape a recipe",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s, err := makeServer()
+				url := strings.Join(args, " ")
+				ctx := context.Background()
+
+				ctx, span := otel.Tracer("client").Start(ctx, "scrape")
+				defer span.End()
+
+				c, err := client.New("http://localhost:4242/api/")
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
-				_, err = s.APIManager.Scrape(ctx, strings.Join(args, " "))
+				res, err := c.ScrapeRecipeWithResponse(ctx, api.ScrapeRecipeJSONRequestBody{Url: url})
+
+				log.Println(res.JSON201.Detail.Id)
 
 				return err
 			},
@@ -128,6 +136,37 @@ func init() {
 
 				err = s.APIManager.LoadIngredientMappings(ctx, mappings)
 				return err
+			},
+		},
+		&cobra.Command{
+			Use: "list-recipes",
+			RunE: func(cmd *cobra.Command, args []string) error {
+				ctx := context.Background()
+
+				ctx, span := otel.Tracer("client").Start(ctx, "listrecipes")
+				defer span.End()
+
+				c, err := client.New("http://localhost:4242/api/")
+				if err != nil {
+					return err
+				}
+
+				var l api.LimitParam = 10
+				resp, err := c.ListRecipesWithResponse(ctx, &api.ListRecipesParams{Limit: &l})
+				if err != nil {
+					return err
+				}
+				var sb strings.Builder
+
+				for _, r := range *resp.JSON200.Recipes {
+					sb.WriteString(fmt.Sprintf("# %s \n `v%d` (%s)\n", r.Detail.Name, r.Detail.Version, r.Detail.Id))
+				}
+				res, err := glamour.Render(sb.String(), "dark")
+				if err != nil {
+					return err
+				}
+				fmt.Print(res)
+				return nil
 			},
 		},
 		&cobra.Command{

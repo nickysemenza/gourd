@@ -314,5 +314,5 @@ func (a *API) ScrapeRecipe(c echo.Context) error {
 	if err != nil {
 		return sendErr(c, http.StatusInternalServerError, err)
 	}
-	return c.JSON(http.StatusOK, r)
+	return c.JSON(http.StatusCreated, r)
 }

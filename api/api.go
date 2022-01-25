@@ -1,6 +1,6 @@
 //go:generate ../bin/oapi-codegen --package api --generate server,spec -o api-server.gen.go openapi.yaml
 //go:generate ../bin/oapi-codegen --package api --generate types,skip-prune -o api-types.gen.go openapi.yaml
-// todo go:generate ../bin/oapi-codegen --package api --generate client -o api-client.gen.go openapi.yaml
+//go:generate ../bin/oapi-codegen --package api --generate client -o api-client.gen.go openapi.yaml
 
 package api
 
