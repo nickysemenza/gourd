@@ -32,7 +32,7 @@ require (
 	github.com/mitchellh/go-server-timing v1.0.1
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/neko-neko/echo-logrus/v2 v2.0.1
-	github.com/ory/go-acc v0.2.6
+	github.com/ory/go-acc v0.2.7
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
