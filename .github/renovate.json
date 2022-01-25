@@ -6,7 +6,7 @@
       "automerge": true
     }
   ],
-  "cargo": {
+  "patch": {
     "enabled": false
   },
   "prHourlyLimit": 5,
