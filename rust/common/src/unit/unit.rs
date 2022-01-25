@@ -2,10 +2,11 @@ use anyhow::bail;
 use ingredient::unit::singular;
 use ingredient::unit::{kind::MeasureKind, Unit};
 use ingredient::Amount;
-use ingredient::IngredientParser;
 use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
+
+use crate::new_ingredient_parser;
 type MeasureGraph = Graph<Unit, f64>;
 
 pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> MeasureGraph {
@@ -116,7 +117,7 @@ impl Measure {
         }
     }
     pub fn from_string(s: String) -> Measure {
-        let a = (IngredientParser::new()).parse_amount(s.as_str())[0].clone();
+        let a = new_ingredient_parser().parse_amount(s.as_str())[0].clone();
         Measure::parse(Amount {
             unit: singular(&a.unit),
             value: a.value,
@@ -124,7 +125,7 @@ impl Measure {
         })
     }
     pub fn from_str(s: &str) -> Measure {
-        let a = (IngredientParser::new()).parse_amount(s)[0].clone();
+        let a = new_ingredient_parser().parse_amount(s)[0].clone();
         Measure::parse(Amount {
             unit: singular(&a.unit),
             value: a.value,

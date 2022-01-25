@@ -88,7 +88,7 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Vec<ingredient::Amount> {
-    let i = (IngredientParser::new()).parse_amount(s);
+    let i = new_ingredient_parser().parse_amount(s);
     info!("parsed {} into {:?}", s, i.clone());
     return i;
 }
@@ -375,4 +375,8 @@ mod tests {
         .collect();
         assert_eq!(sum_ingredients(r), (HashMap::new(), expected));
     }
+}
+
+pub fn new_ingredient_parser() -> IngredientParser {
+    IngredientParser::new()
 }

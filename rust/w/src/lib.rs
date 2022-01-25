@@ -2,7 +2,7 @@ mod utils;
 
 use gourd_common::{
     convert_to,
-    ingredient::{Amount, IngredientParser},
+    ingredient::Amount,
     parse_unit_mappings, sum_ingredients,
     unit::{add_time_amounts, make_graph, print_graph},
 };
@@ -118,7 +118,7 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
 #[wasm_bindgen]
 pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
     utils::set_panic_hook();
-    let ip = IngredientParser::new();
+    let ip = gourd_common::new_ingredient_parser();
     let i = ip.parse_amount(input);
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
@@ -162,7 +162,7 @@ pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     info!("rich2: {:?}", ings2);
     let rtp = gourd_common::ingredient::rich_text::RichParser {
         ingredient_names: ings2,
-        ip: gourd_common::ingredient::IngredientParser::new(),
+        ip: gourd_common::new_ingredient_parser(),
     };
     match rtp.parse(r.as_str()) {
         Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),

@@ -93,7 +93,7 @@ fn foo(sc: ScrapeResult) -> (Measure, Vec<gourd_common::ingredient::rich_text::C
     info!("hints {:#?}", hints);
     let rtp = gourd_common::ingredient::rich_text::RichParser {
         ingredient_names: hints,
-        ip: gourd_common::ingredient::IngredientParser::new(),
+        ip: gourd_common::new_ingredient_parser(),
     };
     let rich_text_tokens = rtp
         .parse(sc.instructions.replace("\n", "").as_str())
