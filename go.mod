@@ -6,7 +6,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.0
 	github.com/Masterminds/squirrel v1.5.2
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/charmbracelet/glamour v0.3.0
+	github.com/charmbracelet/glamour v0.5.0
 	github.com/cosmtrek/air v1.27.8
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.9.1
@@ -80,7 +80,7 @@ require (
 	github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/OpenPeeDeeP/depguard v1.0.1 // indirect
-	github.com/alecthomas/chroma v0.9.4 // indirect
+	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211106134809-412da89146f2 // indirect
 	github.com/ashanbrown/forbidigo v1.2.0 // indirect
@@ -227,7 +227,7 @@ require (
 	github.com/mbilski/exhaustivestruct v1.2.0 // indirect
 	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517 // indirect
 	github.com/mgechev/revive v1.1.2 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.16 // indirect
+	github.com/microcosm-cc/bluemonday v1.0.17 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/moricho/tparallel v0.2.1 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
@@ -290,7 +290,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.2 // indirect
 	github.com/yeya24/promlinter v0.1.0 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	github.com/yuin/goldmark v1.4.2 // indirect
+	github.com/yuin/goldmark v1.4.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mongodb.org/mongo-driver v1.7.4 // indirect
