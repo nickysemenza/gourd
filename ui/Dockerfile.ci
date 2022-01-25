@@ -6,7 +6,7 @@ WORKDIR /work/rust/w
 RUN pwd && ls
 RUN wasm-pack build
 
-FROM cypress/included:9.2.1
+FROM cypress/included:9.3.1
 COPY --from=builder /work/rust/w/pkg /work/rust/w/pkg
 WORKDIR /work/ui
 COPY ui/yarn.lock .
