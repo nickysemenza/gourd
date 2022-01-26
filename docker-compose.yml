@@ -96,22 +96,22 @@ services:
     ports:
       - "8080:8080"
 
-  ui:
-    build:
-      context: .
-      dockerfile: ui/Dockerfile.ci
-    stdin_open: true
-    depends_on:
-      - gourd
-    environment:
-      REACT_APP_API_URL: http://gourd:4242
-      CI: "true"
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./.git:/work/.git
-      - ./ui/cypress:/work/ui/cypress
-      - ./ui/coverage:/work/ui/coverage
+  # ui:
+  #   build:
+  #     context: .
+  #     dockerfile: ui/Dockerfile.ci
+  #   stdin_open: true
+  #   depends_on:
+  #     - gourd
+  #   environment:
+  #     REACT_APP_API_URL: http://gourd:4242
+  #     CI: "true"
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./.git:/work/.git
+  #     - ./ui/cypress:/work/ui/cypress
+  #     - ./ui/coverage:/work/ui/coverage
 
   usda:
     # doesn't change much so can just use most recent image

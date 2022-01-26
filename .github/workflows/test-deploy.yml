@@ -16,7 +16,6 @@ jobs:
     strategy:
       matrix:
         go: ["1.18.0-beta1"]
-    # container: debian
     steps:
       - uses: actions/checkout@v2
       - name: Set up Go
@@ -28,32 +27,40 @@ jobs:
       - run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
       - run: go mod vendor
       - run: docker-compose pull
-      - run: docker-compose build gourd
-      - name: docker-compose build
-        run: docker-compose build --parallel
+      - run: docker-compose build --parallel
       - name: start postgres db
         run: docker-compose up -d db
       - name: migrate db
         run: sleep 5 && make migrate
-      - name: start rust server
-        run: docker-compose up -d rs
+      - name: start rust + go servers
+        run: docker-compose up -d rs gourd
       - name: smoke test rust server
-        run: curl -v http://localhost:8080/parse?text=1%20cup
+        run: |
+          curl -v http://localhost:8080/parse?text=1%20cup
+          curl -v http://localhost:8080/debug/scrape?url=https://thewoksoflife.com/ma-po-tofu-real-deal/
       - name: go integration tests
         run: make integration-test-go
         env:
           MIGRATIONS_DIR: file://../db/migrations
           PDFLATEX_BINARY: /usr/bin/pdflatex
       - uses: codecov/codecov-action@v2
-      # - name: run usda import
-      # run: docker-compose run usda
       - name: seed db with testdata
         env:
           DB_HOST: localhost
           DB_PORT: 5555
         run: make seed-testdata
-      - name: run cypress
-        run: docker-compose run ui
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: ui/
+          start: yarn run build:tailwind, yarn run start:integration
+          wait-on: "http://localhost:3001"
+          config: baseUrl=http://localhost:3001
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: 265312e3-7b8c-4031-ad0a-5f825b95cfce
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: codecov/codecov-action@v2
       - name: Archive cypress results
         uses: actions/upload-artifact@v2
         if: always()
@@ -69,7 +76,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CARGO_TERM_COLOR: always
-      SQLX_OFFLINE: true # https://github.com/launchbadge/sqlx/tree/master/sqlx-cli#force-building-in-offline-mode
     steps:
       - uses: actions/checkout@v2
       - name: cargo build
@@ -88,8 +94,7 @@ jobs:
         uses: codecov/codecov-action@v2.1.0
         with:
           directory: rust/.cov
-          path_to_write_report: rust/.cov/codecov_report.txt
-
+          # path_to_write_report: rust/.cov/codecov_report.txt
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
         with:

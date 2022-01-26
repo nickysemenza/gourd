@@ -11,6 +11,8 @@ context("Basic Create, List, Edit test", () => {
 
   it("creates a new recipe", function () {
     // https://stackoverflow.com/a/63844955
+    cy.intercept("POST", "/api/recipes").as("makeRecipeFromDropdown");
+
     cy.contains("create").click();
     cy.get("div[data-cy=name-input]")
       .find(".react-select__control")
@@ -21,7 +23,9 @@ context("Basic Create, List, Edit test", () => {
       .find(".react-select__option") // find all options
       .first()
       .click(); // click on first options
-    cy.wait(1000);
+    cy.wait("@makeRecipeFromDropdown")
+      .its("response.statusCode")
+      .should("eq", 201);
     cy.url().should("include", "/recipe/");
     // cy.contains(`create recipe: ${newName}`).click({ force: true });
   });
@@ -36,15 +40,17 @@ context("Basic Create, List, Edit test", () => {
     cy.contains("add ingredient").click();
     cy.get("input[data-cy=grams-input]").first().type("{selectall}4");
 
+    cy.intercept("/api/search?name=" + newIngredient).as("ingredientDropdown");
     let foo = cy.get("div[data-cy=name-input]");
     foo
       .find(".react-select__single-value")
       .click()
       // foo.find("input").first().
       .type(`${newIngredient}`);
-    cy.wait(500);
+    cy.wait("@ingredientDropdown").its("response.statusCode").should("eq", 200);
     cy.contains(`create ingredient: ${newIngredient}`);
 
+    cy.intercept("POST", "/api/ingredients").as("makeIngredient");
     cy.get("div[data-cy=name-input]")
       .find(".react-select__option") // find all options
       // .find(".react-select__single-value") // find all options
@@ -52,7 +58,7 @@ context("Basic Create, List, Edit test", () => {
       .click(); // click on first options
 
     // cy.get("div[data-cy=name-input]").first().type(`{enter}`);
-    cy.wait(500);
+    cy.wait("@makeIngredient").its("response.statusCode").should("eq", 201);
     cy.contains("add instruction").click();
     cy.get("textarea[data-cy=instruction-input]").first().type("mix");
     cy.contains("save").click();

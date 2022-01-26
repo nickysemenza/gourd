@@ -117,9 +117,6 @@ cy:
 
 
 
-# rust
-rs: 
-	cd rust/s && cargo sqlx prepare -- --bin gourd
 dev-rs:
 	cd rust && RUST_BACKTRACE=1 cargo watch -x 'run server'
 generate-wasm:

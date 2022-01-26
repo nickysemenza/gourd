@@ -19,7 +19,6 @@ context("smoke tests", () => {
       .filter((i) => i.title !== "graph")
       .forEach((item) => {
         cy.contains(item.title).click();
-        cy.wait(500);
         cy.url().should("include", item.path);
       });
   });
