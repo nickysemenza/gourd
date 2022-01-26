@@ -12,7 +12,7 @@ ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch 
 openapi = {path = "../openapi"}
 # ingredient = { path = "../../../ingredient-parser" }
 anyhow = "1.0"
-petgraph = "0.5.1"
+petgraph = "0.6.0"
 serde = {version = "1.0", features = ["derive"]}
 tracing = "0.1.28"
 
