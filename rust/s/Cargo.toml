@@ -34,7 +34,7 @@ url = "1.7"
 
 [dependencies.pyo3]
 features = ["auto-initialize"]
-version = "0.13.2"
+version = "0.15.1"
 
 [dev-dependencies]
 actix-rt = "2.6.0"
