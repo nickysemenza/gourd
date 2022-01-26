@@ -1,5 +1,4 @@
 FROM rust:1.58 as builder
-ENV SQLX_OFFLINE true
 WORKDIR /work/rust
 RUN apt-get update
 RUN apt-get install -y pip libpython3.9-dev

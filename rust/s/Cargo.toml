@@ -16,10 +16,8 @@ actix-router = "=0.5.0-beta.4"
 actix-web = "=4.0.0-beta.13"
 actix-web-opentelemetry = "0.11.0-beta.6"
 anyhow = "1.0"
-bigdecimal = {version = "0.2.0", features = ["serde"]}
 clap = "2.34.0"
 config = {version = "0.11.0", default-features = false, features = ["yaml"]}
-env_logger = "0.9"
 futures = "0.3"
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
@@ -29,8 +27,6 @@ serde = {version = "1.0", features = ["derive"]}
 serde-aux = "1.1.0"
 serde_derive = "^1.0"
 serde_json = "1.0"
-serde_yaml = "0.8.21"
-sqlx = {version = "0.5.7", default-features = false, features = ["runtime-actix-rustls", "macros", "postgres", "uuid", "chrono", "migrate", "offline", "bigdecimal", "json"]}
 tracing = "0.1.28"
 tracing-opentelemetry = "0.15.0"
 tracing-subscriber = "0.2.24"
