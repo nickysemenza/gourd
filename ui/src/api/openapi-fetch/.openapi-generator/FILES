@@ -22,6 +22,8 @@ models/GooglePhotosAlbum.ts
 models/Ingredient.ts
 models/IngredientDetail.ts
 models/IngredientKind.ts
+models/IngredientMapping.ts
+models/IngredientMappingsPayload.ts
 models/IngredientUsage.ts
 models/InlineObject.ts
 models/InlineObject1.ts

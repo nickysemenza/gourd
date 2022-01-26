@@ -141,6 +141,11 @@ type ClientInterface interface {
 
 	UpdateRecipesForMeal(ctx context.Context, mealId string, body UpdateRecipesForMealJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// LoadIngredientMappings request with any body
+	LoadIngredientMappingsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	LoadIngredientMappings(ctx context.Context, body LoadIngredientMappingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListPhotos request
 	ListPhotos(ctx context.Context, params *ListPhotosParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -381,6 +386,30 @@ func (c *Client) UpdateRecipesForMealWithBody(ctx context.Context, mealId string
 
 func (c *Client) UpdateRecipesForMeal(ctx context.Context, mealId string, body UpdateRecipesForMealJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRecipesForMealRequest(c.Server, mealId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) LoadIngredientMappingsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLoadIngredientMappingsRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) LoadIngredientMappings(ctx context.Context, body LoadIngredientMappingsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewLoadIngredientMappingsRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1228,6 +1257,46 @@ func NewUpdateRecipesForMealRequestWithBody(server string, mealId string, conten
 	return req, nil
 }
 
+// NewLoadIngredientMappingsRequest calls the generic LoadIngredientMappings builder with application/json body
+func NewLoadIngredientMappingsRequest(server string, body LoadIngredientMappingsJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewLoadIngredientMappingsRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewLoadIngredientMappingsRequestWithBody generates requests for LoadIngredientMappings with any type of body
+func NewLoadIngredientMappingsRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/meta/load_ingredient_mappings")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListPhotosRequest generates requests for ListPhotos
 func NewListPhotosRequest(server string, params *ListPhotosParams) (*http.Request, error) {
 	var err error
@@ -1754,6 +1823,11 @@ type ClientWithResponsesInterface interface {
 
 	UpdateRecipesForMealWithResponse(ctx context.Context, mealId string, body UpdateRecipesForMealJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateRecipesForMealResponse, error)
 
+	// LoadIngredientMappings request with any body
+	LoadIngredientMappingsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoadIngredientMappingsResponse, error)
+
+	LoadIngredientMappingsWithResponse(ctx context.Context, body LoadIngredientMappingsJSONRequestBody, reqEditors ...RequestEditorFn) (*LoadIngredientMappingsResponse, error)
+
 	// ListPhotos request
 	ListPhotosWithResponse(ctx context.Context, params *ListPhotosParams, reqEditors ...RequestEditorFn) (*ListPhotosResponse, error)
 
@@ -2137,6 +2211,28 @@ func (r UpdateRecipesForMealResponse) StatusCode() int {
 	return 0
 }
 
+type LoadIngredientMappingsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+}
+
+// Status returns HTTPResponse.Status
+func (r LoadIngredientMappingsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r LoadIngredientMappingsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListPhotosResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -2501,6 +2597,23 @@ func (c *ClientWithResponses) UpdateRecipesForMealWithResponse(ctx context.Conte
 		return nil, err
 	}
 	return ParseUpdateRecipesForMealResponse(rsp)
+}
+
+// LoadIngredientMappingsWithBodyWithResponse request with arbitrary body returning *LoadIngredientMappingsResponse
+func (c *ClientWithResponses) LoadIngredientMappingsWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*LoadIngredientMappingsResponse, error) {
+	rsp, err := c.LoadIngredientMappingsWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseLoadIngredientMappingsResponse(rsp)
+}
+
+func (c *ClientWithResponses) LoadIngredientMappingsWithResponse(ctx context.Context, body LoadIngredientMappingsJSONRequestBody, reqEditors ...RequestEditorFn) (*LoadIngredientMappingsResponse, error) {
+	rsp, err := c.LoadIngredientMappings(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseLoadIngredientMappingsResponse(rsp)
 }
 
 // ListPhotosWithResponse request returning *ListPhotosResponse
@@ -3089,6 +3202,32 @@ func ParseUpdateRecipesForMealResponse(rsp *http.Response) (*UpdateRecipesForMea
 			return nil, err
 		}
 		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseLoadIngredientMappingsResponse parses an HTTP response from a LoadIngredientMappingsWithResponse call
+func ParseLoadIngredientMappingsResponse(rsp *http.Response) (*LoadIngredientMappingsResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &LoadIngredientMappingsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 

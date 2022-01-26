@@ -19,6 +19,9 @@ import (
 
 // IngredientByName retrieves an ingredient by name, creating it if it does not exist.
 func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient, error) {
+	ctx, span := c.tracer.Start(ctx, "IngredientByName")
+	defer span.End()
+
 	switch name {
 	case "full-fat Greek yoghurt", "full fat yogurt or whole milk":
 		name = "greek yogurt"

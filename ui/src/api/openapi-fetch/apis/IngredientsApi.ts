@@ -21,6 +21,9 @@ import {
     IngredientDetail,
     IngredientDetailFromJSON,
     IngredientDetailToJSON,
+    IngredientMappingsPayload,
+    IngredientMappingsPayloadFromJSON,
+    IngredientMappingsPayloadToJSON,
     InlineObject2,
     InlineObject2FromJSON,
     InlineObject2ToJSON,
@@ -59,6 +62,10 @@ export interface IngredientsApiListIngredientsRequest {
     offset?: number;
     limit?: number;
     ingredientId?: Array<string>;
+}
+
+export interface IngredientsApiLoadIngredientMappingsRequest {
+    ingredientMappingsPayload: IngredientMappingsPayload;
 }
 
 export interface IngredientsApiMergeIngredientsRequest {
@@ -293,6 +300,49 @@ export class IngredientsApi extends runtime.BaseAPI {
      */
     async listIngredients(requestParameters: IngredientsApiListIngredientsRequest): Promise<PaginatedIngredients> {
         const response = await this.listIngredientsRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     * todo
+     * load mappings
+     */
+    async loadIngredientMappingsRaw(requestParameters: IngredientsApiLoadIngredientMappingsRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.ingredientMappingsPayload === null || requestParameters.ingredientMappingsPayload === undefined) {
+            throw new runtime.RequiredError('ingredientMappingsPayload','Required parameter requestParameters.ingredientMappingsPayload was null or undefined when calling loadIngredientMappings.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/meta/load_ingredient_mappings`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: IngredientMappingsPayloadToJSON(requestParameters.ingredientMappingsPayload),
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * todo
+     * load mappings
+     */
+    async loadIngredientMappings(requestParameters: IngredientsApiLoadIngredientMappingsRequest): Promise<object> {
+        const response = await this.loadIngredientMappingsRaw(requestParameters);
         return await response.value();
     }
 

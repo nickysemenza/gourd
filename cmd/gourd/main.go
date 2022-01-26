@@ -25,7 +25,10 @@ func main() {
 			log.Error(err)
 		}
 	}()
-	err := rootCmd.Execute()
+	ctx, span := otel.Tracer("client").Start(context.Background(), "main")
+	defer span.End()
+
+	err := rootCmd.ExecuteContext(ctx)
 	if err != nil {
 		log.Error(err)
 	}
@@ -55,8 +58,8 @@ func init() {
 		&cobra.Command{
 			Use:   "server",
 			Short: "Run the server",
-			Run: func(cmd *cobra.Command, args []string) {
-				runServer()
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return runServer(cmd.Context())
 			},
 		},
 		&cobra.Command{
@@ -85,9 +88,8 @@ func init() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
 
-				err = s.APIManager.DoSync(ctx)
+				err = s.APIManager.DoSync(cmd.Context())
 				if err != nil {
 					return err
 				}
@@ -102,9 +104,8 @@ func init() {
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				url := strings.Join(args, " ")
-				ctx := context.Background()
 
-				ctx, span := otel.Tracer("client").Start(ctx, "scrape")
+				ctx, span := otel.Tracer("client").Start(cmd.Context(), "scrape")
 				defer span.End()
 
 				c, err := client.New("http://localhost:4242/api/")
@@ -123,27 +124,32 @@ func init() {
 			Short: "Load ingredient -> fdc mappings from afile",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s, err := makeServer()
-				if err != nil {
-					return err
-				}
-				ctx := context.Background()
+
+				ctx, span := otel.Tracer("client").Start(cmd.Context(), "load-mappings")
+				defer span.End()
 
 				mappings, err := api.IngredientMappingFromFile(ctx, strings.Join(args, ""))
 				if err != nil {
 					return err
 				}
 
-				err = s.APIManager.LoadIngredientMappings(ctx, mappings)
-				return err
+				c, err := client.New("http://localhost:4242/api/")
+				if err != nil {
+					return err
+				}
+				_, err = c.LoadIngredientMappings(ctx, api.LoadIngredientMappingsJSONRequestBody{IngredientMappings: mappings})
+				if err != nil {
+					return err
+				}
+				log.Infof("loaded %d mappings", len(mappings))
+				return nil
 			},
 		},
 		&cobra.Command{
 			Use: "list-recipes",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := context.Background()
 
-				ctx, span := otel.Tracer("client").Start(ctx, "listrecipes")
+				ctx, span := otel.Tracer("client").Start(cmd.Context(), "listrecipes")
 				defer span.End()
 
 				c, err := client.New("http://localhost:4242/api/")
@@ -178,8 +184,8 @@ func init() {
 				if err != nil {
 					return err
 				}
-				ctx := context.Background()
 
+				ctx := cmd.Context()
 				recipes, err := s.APIManager.RecipeFromFile(ctx, strings.Join(args, " "))
 				if err != nil {
 					return err

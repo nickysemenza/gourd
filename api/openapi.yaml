@@ -278,6 +278,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /meta/load_ingredient_mappings:
+    post:
+      summary: load mappings
+      description: todo
+      operationId: load_ingredient_mappings
+      tags:
+        - ingredients
+      requestBody:
+        description: Creates a ingredient by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngredientMappingsPayload"
+      responses:
+        "200":
+          description: "success"
+          content:
+            application/json:
+              schema:
+                type: object
   /recipes:
     get:
       summary: List all recipes
@@ -1055,6 +1076,38 @@ components:
         source:
           description: source of the mapping
           type: string
+    IngredientMappingsPayload:
+      description: list of IngredientMapping
+      type: object
+      required:
+        - ingredient_mappings
+      properties:
+        ingredient_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientMapping"
+    IngredientMapping:
+      description: details about ingredients
+      type: object
+      required:
+        - name
+        - aliases
+        - unit_mappings
+      properties:
+        name:
+          type: string
+        fdc_id:
+          type: integer
+        aliases:
+          type: array
+          items:
+            type: string
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
     Amount:
       description: amount and unit
       type: object

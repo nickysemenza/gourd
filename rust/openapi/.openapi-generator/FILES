@@ -21,6 +21,8 @@ src/models/google_photos_album.rs
 src/models/ingredient.rs
 src/models/ingredient_detail.rs
 src/models/ingredient_kind.rs
+src/models/ingredient_mapping.rs
+src/models/ingredient_mappings_payload.rs
 src/models/ingredient_usage.rs
 src/models/inline_object.rs
 src/models/inline_object_1.rs

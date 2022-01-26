@@ -36,7 +36,7 @@ name: pep
 	rd := ids[1]
 	fmt.Println(rd)
 
-	err = apiManager.LoadIngredientMappings(ctx, []IngredientMapping{{Name: "b", UnitMappings: []UnitMapping{{
+	err = apiManager.loadIngredientMappings(ctx, []IngredientMapping{{Name: "b", UnitMappings: []UnitMapping{{
 		A: Amount{Value: 1, Unit: "tsp"},
 		B: Amount{Value: 3, Unit: "g"},
 	}}}})

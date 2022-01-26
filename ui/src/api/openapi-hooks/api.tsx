@@ -305,6 +305,29 @@ export interface UnitMapping {
 }
 
 /**
+ * list of IngredientMapping
+ */
+export interface IngredientMappingsPayload {
+  /**
+   * mappings of equivalent units
+   */
+  ingredient_mappings: IngredientMapping[];
+}
+
+/**
+ * details about ingredients
+ */
+export interface IngredientMapping {
+  name: string;
+  fdc_id?: number;
+  aliases: string[];
+  /**
+   * mappings of equivalent units
+   */
+  unit_mappings: UnitMapping[];
+}
+
+/**
  * amount and unit
  */
 export interface Amount {
@@ -1138,6 +1161,67 @@ export const useCreateIngredients = (props: UseCreateIngredientsProps) =>
     `/ingredients`,
     props
   );
+
+export interface LoadIngredientMappingsResponse {
+  [key: string]: any;
+}
+
+export type LoadIngredientMappingsProps = Omit<
+  MutateProps<
+    LoadIngredientMappingsResponse,
+    unknown,
+    void,
+    IngredientMappingsPayload,
+    void
+  >,
+  "path" | "verb"
+>;
+
+/**
+ * load mappings
+ *
+ * todo
+ */
+export const LoadIngredientMappings = (props: LoadIngredientMappingsProps) => (
+  <Mutate<
+    LoadIngredientMappingsResponse,
+    unknown,
+    void,
+    IngredientMappingsPayload,
+    void
+  >
+    verb="POST"
+    path={`/meta/load_ingredient_mappings`}
+    {...props}
+  />
+);
+
+export type UseLoadIngredientMappingsProps = Omit<
+  UseMutateProps<
+    LoadIngredientMappingsResponse,
+    unknown,
+    void,
+    IngredientMappingsPayload,
+    void
+  >,
+  "path" | "verb"
+>;
+
+/**
+ * load mappings
+ *
+ * todo
+ */
+export const useLoadIngredientMappings = (
+  props: UseLoadIngredientMappingsProps
+) =>
+  useMutate<
+    LoadIngredientMappingsResponse,
+    unknown,
+    void,
+    IngredientMappingsPayload,
+    void
+  >("POST", `/meta/load_ingredient_mappings`, props);
 
 export interface ListRecipesQueryParams {
   /**

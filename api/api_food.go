@@ -259,7 +259,24 @@ func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, p
 	return c.JSON(http.StatusCreated, nil)
 }
 
-func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMapping) error {
+func (a *API) LoadIngredientMappings(c echo.Context) error {
+	ctx := c.Request().Context()
+	var r IngredientMappingsPayload
+	if err := c.Bind(&r); err != nil {
+		err = fmt.Errorf("invalid format for input: %w", err)
+		return handleErr(c, err)
+	}
+
+	if err := a.loadIngredientMappings(ctx, r.IngredientMappings); err != nil {
+		return handleErr(c, err)
+	}
+	return c.JSON(http.StatusAccepted, nil)
+}
+
+func (a *API) loadIngredientMappings(ctx context.Context, mapping []IngredientMapping) error {
+	ctx, span := a.tracer.Start(ctx, "loadIngredientMappings")
+	defer span.End()
+
 	for _, m := range mapping {
 
 		ing, err := a.DB().IngredientByName(ctx, m.Name)
@@ -267,9 +284,11 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			return err
 		}
 
-		err = a.DB().AssociateFoodWithIngredient(ctx, ing.Id, m.FdcID)
-		if err != nil {
-			return err
+		if m.FdcId != nil {
+			err = a.DB().AssociateFoodWithIngredient(ctx, ing.Id, *m.FdcId)
+			if err != nil {
+				return err
+			}
 		}
 
 		childIds := []string{}
@@ -302,7 +321,7 @@ func (a *API) LoadIngredientMappings(ctx context.Context, mapping []IngredientMa
 			}
 			loadedPairs += num
 		}
-		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcID, ing.Id, loadedPairs, actualPairs)
+		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcId, ing.Id, loadedPairs, actualPairs)
 
 	}
 	return nil

@@ -76,9 +76,7 @@ func setupEnv() error {
 }
 
 func setupMisc() error {
-	// env vars
-	err := setupEnv()
-	if err != nil {
+	if err := setupEnv(); err != nil {
 		return err
 	}
 
@@ -87,6 +85,7 @@ func setupMisc() error {
 		return err
 	}
 	log.SetLevel(level)
+	log.SetReportCaller(true)
 
 	// tracing
 	if err := initTracer(viper.GetString("JAEGER_ENDPOINT"), "gourd", "dev"); err != nil {

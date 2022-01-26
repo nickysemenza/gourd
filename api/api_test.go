@@ -226,7 +226,7 @@ func mustSeedMappings(t *testing.T, apiManager *API) {
 	ctx := context.TODO()
 	mappings, err := IngredientMappingFromFile(ctx, "../testdata/ingredient_fdc_mapping.yaml")
 	require.NoError(err)
-	err = apiManager.LoadIngredientMappings(ctx, mappings)
+	err = apiManager.loadIngredientMappings(ctx, mappings)
 	require.NoError(err)
 }
 

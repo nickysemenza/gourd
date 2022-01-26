@@ -12,6 +12,8 @@ export * from './GooglePhotosAlbum';
 export * from './Ingredient';
 export * from './IngredientDetail';
 export * from './IngredientKind';
+export * from './IngredientMapping';
+export * from './IngredientMappingsPayload';
 export * from './IngredientUsage';
 export * from './InlineObject';
 export * from './InlineObject1';

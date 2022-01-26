@@ -96,12 +96,11 @@ func makeServer() (*server.Server, error) {
 	// server
 	return s, nil
 }
-func runServer() {
-	ctx := context.Background()
+func runServer(ctx context.Context) error {
 	s, err := makeServer()
 	if err != nil {
 		err := fmt.Errorf("failed to make server: %w", err)
 		log.Fatal(err)
 	}
-	log.Fatal(s.Run(ctx))
+	return s.Run(ctx)
 }

@@ -43,6 +43,8 @@ Class | Method | HTTP request | Description
  - [Ingredient](docs/Ingredient.md)
  - [IngredientDetail](docs/IngredientDetail.md)
  - [IngredientKind](docs/IngredientKind.md)
+ - [IngredientMapping](docs/IngredientMapping.md)
+ - [IngredientMappingsPayload](docs/IngredientMappingsPayload.md)
  - [IngredientUsage](docs/IngredientUsage.md)
  - [InlineObject](docs/InlineObject.md)
  - [InlineObject1](docs/InlineObject1.md)

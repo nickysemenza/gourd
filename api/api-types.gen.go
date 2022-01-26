@@ -244,6 +244,22 @@ type IngredientDetail struct {
 // IngredientKind defines model for IngredientKind.
 type IngredientKind string
 
+// details about ingredients
+type IngredientMapping struct {
+	Aliases []string `json:"aliases"`
+	FdcId   *int     `json:"fdc_id,omitempty"`
+	Name    string   `json:"name"`
+
+	// mappings of equivalent units
+	UnitMappings []UnitMapping `json:"unit_mappings"`
+}
+
+// list of IngredientMapping
+type IngredientMappingsPayload struct {
+	// mappings of equivalent units
+	IngredientMappings []IngredientMapping `json:"ingredient_mappings"`
+}
+
 // IngredientUsage defines model for IngredientUsage.
 type IngredientUsage struct {
 	// multiple amounts to try
@@ -716,6 +732,9 @@ type ListMealsParams struct {
 // UpdateRecipesForMealJSONBody defines parameters for UpdateRecipesForMeal.
 type UpdateRecipesForMealJSONBody MealRecipeUpdate
 
+// LoadIngredientMappingsJSONBody defines parameters for LoadIngredientMappings.
+type LoadIngredientMappingsJSONBody IngredientMappingsPayload
+
 // ListPhotosParams defines parameters for ListPhotos.
 type ListPhotosParams struct {
 	// The number of items to skip before starting to collect the result set.
@@ -773,6 +792,9 @@ type MergeIngredientsJSONRequestBody MergeIngredientsJSONBody
 
 // UpdateRecipesForMealJSONRequestBody defines body for UpdateRecipesForMeal for application/json ContentType.
 type UpdateRecipesForMealJSONRequestBody UpdateRecipesForMealJSONBody
+
+// LoadIngredientMappingsJSONRequestBody defines body for LoadIngredientMappings for application/json ContentType.
+type LoadIngredientMappingsJSONRequestBody LoadIngredientMappingsJSONBody
 
 // CreateRecipesJSONRequestBody defines body for CreateRecipes for application/json ContentType.
 type CreateRecipesJSONRequestBody CreateRecipesJSONBody
