@@ -36,17 +36,19 @@ import IngredientDetail from "./pages/IngredientDetail";
 import { WasmContextProvider } from "./wasm";
 import Graph from "./pages/Graph";
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
-
-import { WebTracerProvider } from "@opentelemetry/web";
+import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
 import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
-import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+import {
+  BatchSpanProcessor,
+  SimpleSpanProcessor,
+} from "@opentelemetry/sdk-trace-base";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-const registerTracing = (url: string) => {
+const registerTracing = (url: string, batch: boolean) => {
   if (url === "") return;
   console.info("enabled tracing", url);
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
@@ -57,7 +59,6 @@ const registerTracing = (url: string) => {
     headers: {
       "Content-Type": "application/json",
     },
-    // serviceName: "auto-instrumentations-web",
   });
 
   const provider = new WebTracerProvider();
@@ -74,11 +75,13 @@ const registerTracing = (url: string) => {
     // propagator: new B3Propagator(),
     propagator: new JaegerPropagator(),
   });
-
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-  // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+  if (batch) {
+    provider.addSpanProcessor(new BatchSpanProcessor(exporter));
+  } else {
+    provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  }
 };
-registerTracing(getTracingURL());
+registerTracing(getTracingURL(), true);
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   let authed = isLoggedIn() || true;
