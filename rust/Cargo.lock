@@ -430,7 +430,6 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits",
- "time 0.1.43",
  "winapi",
 ]
 
@@ -1719,9 +1718,9 @@ dependencies = [
 
 [[package]]
 name = "serde-aux"
-version = "1.1.0"
+version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "905f2fc9f3d1574e8b5923a58118240021f01d4e239673937ffb9f42707a4f22"
+checksum = "93abf9799c576f004252b2a05168d58527fb7c54de12e94b4d12fe3475ffad24"
 dependencies = [
  "chrono",
  "serde",
@@ -1969,16 +1968,6 @@ dependencies = [
  "log",
  "ordered-float",
  "threadpool",
-]
-
-[[package]]
-name = "time"
-version = "0.1.43"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
-dependencies = [
- "libc",
- "winapi",
 ]
 
 [[package]]
