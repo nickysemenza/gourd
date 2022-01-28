@@ -3,6 +3,10 @@ app = "gourd"
 kill_signal = "SIGINT"
 kill_timeout = 5
 
+
+[build]
+image = "ghcr.io/nickysemenza/gourd-api-go:dev"
+
 [env]
 JAEGER_ENDPOINT = "http://tracing.internal:14268/api/traces"
 

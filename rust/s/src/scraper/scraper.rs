@@ -16,7 +16,7 @@ pub fn scrape_recipe(url: &str) -> Result<ScrapeResult> {
     let mut sc_result: (Vec<String>, String, String, String) =
         (vec![], "".to_string(), "".to_string(), "".to_string());
     Python::with_gil(|py| -> Result<()> {
-        let syspath: &PyAny = py.import("sys").unwrap().get("path").unwrap();
+        let syspath: &PyAny = py.import("sys").unwrap().getattr("path").unwrap();
 
         dbg!(syspath);
         let activators = PyModule::from_code(

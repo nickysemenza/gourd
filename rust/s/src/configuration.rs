@@ -1,6 +1,6 @@
 // use crate::domain::SubscriberEmail;
 use serde_aux::field_attributes::deserialize_number_from_string;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 
 #[derive(serde::Deserialize, Clone, Debug)]
 pub struct Settings {
@@ -15,30 +15,35 @@ pub struct ApplicationSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    let mut settings = config::Config::default();
-    let base_path = std::env::current_dir().expect("Failed to determine the current directory");
-    let configuration_directory = base_path.join("s-configuration");
+    // let base_path = std::env::current_dir().expect("Failed to determine the current directory");
+    // let configuration_directory = base_path.join("s-configuration");
 
-    // Read the "default" configuration file
-    settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
+    // // Read the "default" configuration file
+    // settings.merge(config::File::from(configuration_directory.join("base")).required(true))?;
 
-    // Detect the running environment.
-    // Default to `local` if unspecified.
-    let environment: Environment = std::env::var("APP_ENVIRONMENT")
-        .unwrap_or_else(|_| "local".into())
-        .try_into()
-        .expect("Failed to parse APP_ENVIRONMENT.");
+    // // Detect the running environment.
+    // // Default to `local` if unspecified.
+    // let environment: Environment = std::env::var("APP_ENVIRONMENT")
+    //     .unwrap_or_else(|_| "local".into())
+    //     .try_into()
+    //     .expect("Failed to parse APP_ENVIRONMENT.");
 
-    // Layer on the environment-specific values.
-    settings.merge(
-        config::File::from(configuration_directory.join(environment.as_str())).required(true),
-    )?;
+    // // Layer on the environment-specific values.
+    // settings.merge(
+    //     config::File::from(configuration_directory.join(environment.as_str())).required(true),
+    // )?;
 
-    // Add in settings from environment variables (with a prefix of APP and '__' as separator)
-    // E.g. `APP_APPLICATION__PORT=5001 would set `Settings.application.port`
-    settings.merge(config::Environment::with_prefix("app").separator("__"))?;
+    // // Add in settings from environment variables (with a prefix of APP and '__' as separator)
+    // // E.g. `APP_APPLICATION__PORT=5001 would set `Settings.application.port`
+    // settings.merge(config::Environment::with_prefix("app").separator("__"))?;
 
-    settings.try_into()
+    // settings.try_into()
+    Ok(Settings {
+        application: ApplicationSettings {
+            port: 8080,
+            host: "0.0.0.0".to_string(),
+        },
+    })
 }
 
 /// The possible runtime environment for our application.
