@@ -39,7 +39,7 @@ pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
     let root = span!(tracing::Level::TRACE, "decode_recipe",);
     let _enter = root.enter();
 
-    let detail = gourd_common::codec::decode_recipe(info.text.to_string());
+    let detail = gourd_common::codec::decode_recipe(info.text.to_string()).unwrap();
 
     let foo = web::Json(detail);
 
@@ -75,7 +75,9 @@ pub async fn pans() -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
 
-fn foo(sc: ScrapeResult) -> (Measure, Vec<gourd_common::ingredient::rich_text::Chunk>) {
+fn parse_scrape_result(
+    sc: ScrapeResult,
+) -> (Measure, Vec<gourd_common::ingredient::rich_text::Chunk>) {
     let hints = sc
         .ingredients
         .iter()
@@ -134,7 +136,7 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     };
     let res = scrape_result_to_recipe(sc_result.clone());
 
-    let (total_time, rich_text_tokens) = foo(sc_result.clone());
+    let (total_time, rich_text_tokens) = parse_scrape_result(sc_result.clone());
 
     HttpResponse::Ok().json((
         sc_result,
@@ -145,7 +147,7 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     ))
 }
 pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
-    let (time, _) = foo(sc_result.clone());
+    let (time, _) = parse_scrape_result(sc_result.clone());
     let total_time_seconds = time.as_raw();
     let sections = vec![RecipeSectionInput {
         duration: Some(Box::new(Amount {
