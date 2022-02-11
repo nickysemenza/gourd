@@ -1,18 +1,9 @@
 use anyhow::{Context, Result};
+use gourd_common::codec::{CompactRecipe, CompactRecipeMeta, CompactRecipeSection};
 use pyo3::{types::PyModule, PyAny, Python};
-use serde::Serialize;
-
-#[derive(Debug, Clone, Serialize)]
-pub struct ScrapeResult {
-    pub ingredients: Vec<String>,
-    pub instructions: String,
-    pub title: String,
-    pub url: String,
-    pub image: String,
-}
 
 #[tracing::instrument(name = "route::scrape_recipe")]
-pub fn scrape_recipe(url: &str) -> Result<ScrapeResult> {
+pub fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
     let mut sc_result: (Vec<String>, String, String, String) =
         (vec![], "".to_string(), "".to_string(), "".to_string());
     Python::with_gil(|py| -> Result<()> {
@@ -43,11 +34,23 @@ def sc(x,y):
         Ok(())
     })
     .context("failed to parse")?;
-    Ok(ScrapeResult {
-        ingredients: sc_result.0,
-        instructions: sc_result.1,
-        title: sc_result.2,
-        url: url.to_string(),
-        image: sc_result.3,
+
+    Ok(CompactRecipe {
+        sections: vec![CompactRecipeSection {
+            ingredients: sc_result
+                .0
+                .into_iter()
+                .map(|i| (i.to_string(), gourd_common::ingredient::from_str(&i)))
+                .collect(),
+            instructions: sc_result.1.split('\n').map(|i| i.to_string()).collect(),
+        }],
+        meta: CompactRecipeMeta {
+            name: sc_result.2,
+            image: match sc_result.3 == "" {
+                true => None,
+                false => Some(sc_result.3),
+            },
+            url: Some(url.to_string()),
+        },
     })
 }

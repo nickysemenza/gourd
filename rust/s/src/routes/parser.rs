@@ -1,13 +1,10 @@
 use actix_web::{web, HttpResponse};
-use gourd_common::{convert_to, pan, unit::Measure};
-use openapi::models::{
-    Amount, IngredientKind, RecipeDetailInput, RecipeSectionInput, RecipeSource,
-    RecipeWrapperInput, SectionIngredientInput, SectionInstructionInput,
-};
+use gourd_common::{codec::expand_recipe, convert_to, pan};
+use openapi::models::RecipeWrapperInput;
 use serde::Deserialize;
-use tracing::{debug, error, info, span};
+use tracing::{debug, error, span};
 
-use crate::scraper::{self, ScrapeResult};
+use crate::scraper::{self};
 
 #[derive(Deserialize, Debug)]
 pub struct Info {
@@ -75,54 +72,6 @@ pub async fn pans() -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
 
-fn parse_scrape_result(
-    sc: ScrapeResult,
-) -> (Measure, Vec<gourd_common::ingredient::rich_text::Chunk>) {
-    let hints = sc
-        .ingredients
-        .iter()
-        .map(|x| {
-            let _x = 1;
-            gourd_common::parse_ingredient(&x)
-                .unwrap_or(SectionIngredientInput::new(
-                    IngredientKind::Ingredient,
-                    vec![],
-                ))
-                .name
-                .unwrap_or("aaaaa".to_string())
-        })
-        .collect();
-    info!("hints {:#?}", hints);
-    let rtp = gourd_common::ingredient::rich_text::RichParser {
-        ingredient_names: hints,
-        ip: gourd_common::new_ingredient_parser(),
-    };
-    let rich_text_tokens = rtp
-        .parse(sc.instructions.replace("\n", "").as_str())
-        .unwrap_or_default();
-
-    let mut amts = Vec::<gourd_common::unit::Measure>::new();
-    let mut total_time =
-        gourd_common::unit::Measure::parse(gourd_common::ingredient::Amount::new("second", 0.0));
-
-    for token in rich_text_tokens.clone().into_iter() {
-        match token {
-            gourd_common::ingredient::rich_text::Chunk::Amount(amt) => {
-                for a in amt.into_iter() {
-                    let m = dbg!(gourd_common::amount_to_measure2(dbg!(a)));
-                    amts.push(m.clone());
-                    if m.kind().unwrap() == gourd_common::ingredient::unit::kind::MeasureKind::Time
-                    {
-                        total_time = total_time.add(m).unwrap();
-                    }
-                }
-            }
-            _ => {}
-        }
-    }
-    total_time.recalc();
-    (total_time, rich_text_tokens)
-}
 #[tracing::instrument(name = "route::debug_scrape")]
 pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     let url = info.url.as_str();
@@ -134,56 +83,11 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
             return HttpResponse::InternalServerError().json(format!("{:#?}", e));
         }
     };
-    let res = scrape_result_to_recipe(sc_result.clone());
+    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap());
 
-    let (total_time, rich_text_tokens) = parse_scrape_result(sc_result.clone());
-
-    HttpResponse::Ok().json((
-        sc_result,
-        res,
-        rich_text_tokens,
-        // amts,
-        total_time.as_bare().unwrap(),
-    ))
+    HttpResponse::Ok().json((sc_result, res))
 }
-pub fn scrape_result_to_recipe(sc_result: scraper::ScrapeResult) -> RecipeWrapperInput {
-    let (time, _) = parse_scrape_result(sc_result.clone());
-    let total_time_seconds = time.as_raw();
-    let sections = vec![RecipeSectionInput {
-        duration: Some(Box::new(Amount {
-            unit: total_time_seconds.unit,
-            value: total_time_seconds.value,
-            upper_value: total_time_seconds.upper_value,
-            source: Some("scraped sum".to_string()),
-        })),
-        instructions: sc_result
-            .instructions
-            .split('\n')
-            .map(|x| SectionInstructionInput::new(x.to_string()))
-            .collect(),
-        ingredients: sc_result
-            .ingredients
-            .iter()
-            .map(|x| {
-                let _x = 1;
-                gourd_common::parse_ingredient(&x).unwrap_or(SectionIngredientInput::new(
-                    IngredientKind::Ingredient,
-                    vec![],
-                ))
-            })
-            .collect(),
-    }];
 
-    let detail = RecipeDetailInput {
-        sources: Some(vec![RecipeSource {
-            url: Some(sc_result.url.clone()),
-            image_url: Some(sc_result.image.clone()),
-            ..RecipeSource::new()
-        }]),
-        ..RecipeDetailInput::new(sections, sc_result.title, 0, "".to_string())
-    };
-    return RecipeWrapperInput::new(detail);
-}
 #[tracing::instrument(name = "route::scrape")]
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
     let url = info.text.as_str();
@@ -194,7 +98,8 @@ pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
             return HttpResponse::InternalServerError().json(format!("{:#?}", e));
         }
     };
-    let res = scrape_result_to_recipe(sc_result.clone());
+
+    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap());
 
     debug!("scraped {}", url.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response

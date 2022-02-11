@@ -11,15 +11,15 @@ use crate::{
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub enum CompactRecipeLine {
-    Ing((String, ingredient::Ingredient)),
-    Ins(String),
+pub struct CompactRecipeSection {
+    pub ingredients: Vec<(String, ingredient::Ingredient)>,
+    pub instructions: Vec<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompactRecipe {
     pub meta: CompactRecipeMeta,
-    pub sections: Vec<Vec<CompactRecipeLine>>,
+    pub sections: Vec<CompactRecipeSection>,
 }
 impl CompactRecipe {
     pub fn to_string(self) -> Result<String, anyhow::Error> {
@@ -30,14 +30,12 @@ impl CompactRecipe {
         res.push_str(SEP);
         dbg!(res.clone());
         for s in self.sections.into_iter() {
-            for i in s.into_iter() {
-                res.push_str(
-                    match i {
-                        CompactRecipeLine::Ing((_, ing)) => ing.to_string(),
-                        CompactRecipeLine::Ins(ins) => format!(";{}", ins),
-                    }
-                    .as_str(),
-                );
+            for (_i, ing) in s.ingredients.into_iter() {
+                res.push_str(ing.to_string().as_str());
+                res.push('\n');
+            }
+            for i in s.instructions.into_iter() {
+                res.push_str(format!(";{}", i).as_str());
                 res.push('\n');
             }
             res.push('\n');
@@ -57,17 +55,18 @@ impl CompactRecipe {
                 .collect::<Vec<&str>>()
                 .iter()
                 .map(|section_text_chunk| {
-                    section_text_chunk
-                        .split("\n")
-                        // .collect::<Vec<&str>>()
-                        .into_iter()
-                        .map(|l| match l.strip_prefix(";") {
-                            Some(i) => CompactRecipeLine::Ins(i.to_string()),
-                            None => {
-                                CompactRecipeLine::Ing((l.to_string(), ingredient::from_str(l)))
-                            }
-                        })
-                        .collect()
+                    let mut s = CompactRecipeSection {
+                        ingredients: vec![],
+                        instructions: vec![],
+                    };
+                    section_text_chunk.split("\n").into_iter().for_each(|l| {
+                        match l.strip_prefix(";") {
+                            Some(i) => s.instructions.push(i.to_string()),
+                            None => s.ingredients.push((l.to_string(), ingredient::from_str(l))),
+                        }
+                    });
+                    // .collect();
+                    s
                 })
                 .collect(),
         };
@@ -77,28 +76,39 @@ impl CompactRecipe {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompactRecipeMeta {
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image: Option<String>,
 }
 // condense down recipe detail input into a compact recipe
 pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
     let mut sections = Vec::new();
     for s in r.sections.iter() {
-        let mut sec = Vec::new();
+        let mut sec = CompactRecipeSection {
+            ingredients: vec![],
+            instructions: vec![],
+        };
         for ing in s.ingredients.clone().into_iter() {
             let mut ing2 = ing.clone();
             ing2.amounts
                 .retain(|a| a.source.as_ref().unwrap_or(&"".to_string()) != "calculated");
-            sec.push(CompactRecipeLine::Ing((
+            sec.ingredients.push((
                 ing2.clone().original.unwrap_or_default(),
                 si_to_ingredient(ing2),
-            )));
+            ));
         }
         for ins in s.instructions.iter() {
-            sec.push(CompactRecipeLine::Ins(ins.instruction.clone()));
+            sec.instructions.push(ins.instruction.clone());
         }
         sections.push(sec);
     }
     return CompactRecipe {
-        meta: CompactRecipeMeta { name: r.name },
+        meta: CompactRecipeMeta {
+            name: r.name,
+            url: None,
+            image: None,
+        },
         sections,
     };
 }
@@ -122,39 +132,33 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Erro
             let mut ingredients = vec![];
             let mut total_time = unit::Measure::parse(ingredient::Amount::new("second", 0.0));
             let rtp = ingredient::rich_text::RichParser {
-                ingredient_names: vec![],
+                ingredient_names: vec!["todo".to_string()],
                 ip: new_ingredient_parser(),
             };
-            for line in s.into_iter() {
-                match line {
-                    CompactRecipeLine::Ing((original, ing)) => {
-                        ingredients.push(section_ingredient_from_parsed(ing, &original))
-                    }
-                    CompactRecipeLine::Ins(i) => {
-                        let rich_text_tokens = rtp.clone().parse(&i).unwrap_or_default();
+            for (original, ing) in s.ingredients.into_iter() {
+                ingredients.push(section_ingredient_from_parsed(ing, &original))
+            }
+            for i in s.instructions.into_iter() {
+                let rich_text_tokens = rtp.clone().parse(&i).unwrap_or_default();
 
-                        for token in rich_text_tokens.clone().into_iter() {
-                            match token {
-                                ingredient::rich_text::Chunk::Amount(amt) => {
-                                    for a in amt.into_iter() {
-                                        let m = dbg!(amount_to_measure2(dbg!(a)));
-                                        if m.kind().unwrap()
-                                            == ingredient::unit::kind::MeasureKind::Time
-                                        {
-                                            total_time = total_time.add(m).unwrap();
-                                        }
-                                    }
+                for token in rich_text_tokens.clone().into_iter() {
+                    match token {
+                        ingredient::rich_text::Chunk::Amount(amt) => {
+                            for a in amt.into_iter() {
+                                let m = dbg!(amount_to_measure2(dbg!(a)));
+                                if m.kind().unwrap() == ingredient::unit::kind::MeasureKind::Time {
+                                    total_time = total_time.add(m).unwrap();
                                 }
-                                _ => {}
                             }
                         }
-                        instructions.push(SectionInstructionInput::new(
-                            i.strip_prefix(" ")
-                                .unwrap_or(&i) // trim leading space if exsists to support `;` or `; `
-                                .to_string(),
-                        ))
+                        _ => {}
                     }
-                };
+                }
+                instructions.push(SectionInstructionInput::new(
+                    i.strip_prefix(" ")
+                        .unwrap_or(&i) // trim leading space if exsists to support `;` or `; `
+                        .to_string(),
+                ))
             }
             // ??
             // total_time.recalc();
