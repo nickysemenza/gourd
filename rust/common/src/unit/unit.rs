@@ -72,14 +72,7 @@ pub fn convert(
     debug!("{:?} -> {:?} ({} hops)", m, result, steps.len());
     return Some(result);
 }
-pub fn add_opt_f64(a: Option<f64>, b: Option<f64>) -> Option<f64> {
-    match (a, b) {
-        (Some(a), Some(b)) => Some(a + b),
-        (None, None) => None,
-        (None, Some(_)) => b,
-        (Some(_), None) => a,
-    }
-}
+
 pub fn add_time_amounts(a: Vec<Amount>) -> Amount {
     let mut m = Measure::from_str("0 seconds");
     for x in a.into_iter() {
@@ -175,11 +168,12 @@ impl Measure {
         };
     }
     pub fn add(&self, b: Measure) -> Result<Measure, anyhow::Error> {
+        info!("adding {:?} to {:?}", self, b);
+
         if let MeasureKind::Other = b.kind().unwrap() {
             return Ok(self.clone());
         }
 
-        info!("adding {:?} to {:?}", self, b);
         if self.kind().unwrap() != b.kind().unwrap() {
             return Err(anyhow::anyhow!(
                 "Cannot add measures of different kinds: {:#?} {:?}",
@@ -190,13 +184,13 @@ impl Measure {
         Ok(Measure {
             unit: self.unit.clone(),
             value: self.value + b.value,
-            upper_value: add_opt_f64(self.upper_value, b.upper_value),
+            upper_value: match (self.upper_value, b.upper_value) {
+                (Some(a), Some(b)) => Some(a + b),
+                (None, None) => None,
+                (None, Some(b)) => Some(self.value + b),
+                (Some(a), None) => Some(a + b.value),
+            },
         })
-    }
-    pub fn recalc(&mut self) {
-        if self.upper_value.is_some() {
-            self.upper_value = Some(self.upper_value.unwrap() + self.value);
-        }
     }
     pub fn parse(m: Amount) -> Measure {
         Measure::new(
@@ -426,6 +420,15 @@ mod tests {
                 ]
             )
             .unwrap()
+        );
+    }
+    #[test]
+    fn test_add() {
+        assert_eq!(
+            Measure::from_str("10 minutes")
+                .add(Measure::from_str("2-3 minutes"))
+                .unwrap(),
+            Measure::from_str("12-13 minutes"),
         );
     }
 }

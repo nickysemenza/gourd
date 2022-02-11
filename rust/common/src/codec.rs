@@ -1,4 +1,5 @@
 use anyhow::bail;
+use ingredient::rich_text::Chunk;
 use openapi::models::{
     Amount, RecipeDetail, RecipeDetailInput, RecipeSection, RecipeSectionInput, SectionIngredient,
     SectionIngredientInput, SectionInstruction, SectionInstructionInput,
@@ -12,7 +13,7 @@ use crate::{
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompactRecipeSection {
-    pub ingredients: Vec<(String, ingredient::Ingredient)>,
+    pub ingredients: Vec<String>,
     pub instructions: Vec<String>,
 }
 
@@ -21,6 +22,16 @@ pub struct CompactRecipe {
     pub meta: CompactRecipeMeta,
     pub sections: Vec<CompactRecipeSection>,
 }
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct CompactRecipeMeta {
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub image: Option<String>,
+}
+
 impl CompactRecipe {
     pub fn to_string(self) -> Result<String, anyhow::Error> {
         let mut res = String::new();
@@ -30,8 +41,8 @@ impl CompactRecipe {
         res.push_str(SEP);
         dbg!(res.clone());
         for s in self.sections.into_iter() {
-            for (_i, ing) in s.ingredients.into_iter() {
-                res.push_str(ing.to_string().as_str());
+            for i in s.ingredients.into_iter() {
+                res.push_str(&i);
                 res.push('\n');
             }
             for i in s.instructions.into_iter() {
@@ -55,31 +66,22 @@ impl CompactRecipe {
                 .collect::<Vec<&str>>()
                 .iter()
                 .map(|section_text_chunk| {
-                    let mut s = CompactRecipeSection {
+                    let mut section = CompactRecipeSection {
                         ingredients: vec![],
                         instructions: vec![],
                     };
                     section_text_chunk.split("\n").into_iter().for_each(|l| {
                         match l.strip_prefix(";") {
-                            Some(i) => s.instructions.push(i.to_string()),
-                            None => s.ingredients.push((l.to_string(), ingredient::from_str(l))),
+                            Some(i) => section.instructions.push(i.to_string()),
+                            None => section.ingredients.push(l.to_string()),
                         }
                     });
-                    // .collect();
-                    s
+                    section
                 })
                 .collect(),
         };
         Ok(compact)
     }
-}
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct CompactRecipeMeta {
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub image: Option<String>,
 }
 // condense down recipe detail input into a compact recipe
 pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
@@ -93,10 +95,7 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
             let mut ing2 = ing.clone();
             ing2.amounts
                 .retain(|a| a.source.as_ref().unwrap_or(&"".to_string()) != "calculated");
-            sec.ingredients.push((
-                ing2.clone().original.unwrap_or_default(),
-                si_to_ingredient(ing2),
-            ));
+            sec.ingredients.push(si_to_ingredient(ing2).to_string());
         }
         for ins in s.instructions.iter() {
             sec.instructions.push(ins.instruction.clone());
@@ -118,12 +117,15 @@ pub fn encode_recipe(r: RecipeDetailInput) -> Result<String, anyhow::Error> {
     let compact = compact_recipe(r);
     compact.to_string()
 }
-pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
+pub fn decode_recipe(r: String) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), anyhow::Error> {
     let compact = CompactRecipe::from_string(r)?;
     expand_recipe(compact)
 }
 const SEP: &str = "---\n";
-pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Error> {
+pub fn expand_recipe(
+    r: CompactRecipe,
+) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), anyhow::Error> {
+    let mut rtt: Vec<Vec<Chunk>> = vec![];
     let sections = r
         .sections
         .into_iter()
@@ -131,21 +133,30 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Erro
             let mut instructions = vec![];
             let mut ingredients = vec![];
             let mut total_time = unit::Measure::parse(ingredient::Amount::new("second", 0.0));
+
+            for ing in s.ingredients.into_iter() {
+                ingredients.push(section_ingredient_from_parsed(
+                    ingredient::from_str(&ing),
+                    &ing,
+                ))
+            }
             let rtp = ingredient::rich_text::RichParser {
-                ingredient_names: vec!["todo".to_string()],
+                ingredient_names: ingredients
+                    .iter()
+                    .map(|i| i.name.clone())
+                    .filter_map(|x| x)
+                    .collect(),
                 ip: new_ingredient_parser(),
             };
-            for (original, ing) in s.ingredients.into_iter() {
-                ingredients.push(section_ingredient_from_parsed(ing, &original))
-            }
             for i in s.instructions.into_iter() {
-                let rich_text_tokens = rtp.clone().parse(&i).unwrap_or_default();
+                let rich_text_tokens = dbg!(rtp.clone().parse(&i).unwrap_or_default());
+                rtt.push(rich_text_tokens.clone());
 
-                for token in rich_text_tokens.clone().into_iter() {
+                for token in rich_text_tokens.into_iter() {
                     match token {
                         ingredient::rich_text::Chunk::Amount(amt) => {
                             for a in amt.into_iter() {
-                                let m = dbg!(amount_to_measure2(dbg!(a)));
+                                let m = amount_to_measure2(a.clone());
                                 if m.kind().unwrap() == ingredient::unit::kind::MeasureKind::Time {
                                     total_time = total_time.add(m).unwrap();
                                 }
@@ -160,8 +171,6 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Erro
                         .to_string(),
                 ))
             }
-            // ??
-            // total_time.recalc();
             let total_time_seconds = total_time.as_raw();
             RecipeSectionInput {
                 duration: match total_time_seconds.value == 0.0 {
@@ -178,11 +187,9 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Erro
         })
         .collect();
 
-    Ok(RecipeDetailInput::new(
-        sections,
-        r.meta.name,
-        0,
-        "".to_string(),
+    Ok((
+        RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string()),
+        rtt,
     ))
 }
 // turn the text block back into a recipe
@@ -316,7 +323,7 @@ name: cake
             dbg!(encode_recipe(recipe_to_input(r.clone()))).unwrap(),
             raw
         );
-        let decoded = decode_recipe(raw.to_string()).unwrap();
+        let decoded = decode_recipe(raw.to_string()).unwrap().0;
         assert_eq!(dbg!(decoded), dbg!(recipe_to_input(r)));
     }
     #[test]
@@ -350,7 +357,7 @@ name: cookies
 100 g / 0.5 recipe CS Pecan Brittle
 100 g / 1 cup oats
 ;add to mixer";
-        let recipe = decode_recipe(r.to_string()).unwrap();
+        let recipe = decode_recipe(r.to_string()).unwrap().0;
         assert_eq!(r, encode_recipe(recipe).unwrap());
     }
 }

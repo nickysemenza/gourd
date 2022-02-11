@@ -36,7 +36,9 @@ pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
     let root = span!(tracing::Level::TRACE, "decode_recipe",);
     let _enter = root.enter();
 
-    let detail = gourd_common::codec::decode_recipe(info.text.to_string()).unwrap();
+    let detail = gourd_common::codec::decode_recipe(info.text.to_string())
+        .unwrap()
+        .0;
 
     let foo = web::Json(detail);
 
@@ -83,9 +85,10 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
             return HttpResponse::InternalServerError().json(format!("{:#?}", e));
         }
     };
-    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap());
+    let a = expand_recipe(sc_result.clone()).unwrap();
+    let res = RecipeWrapperInput::new(a.clone().0);
 
-    HttpResponse::Ok().json((sc_result, res))
+    HttpResponse::Ok().json((sc_result, a.1, res))
 }
 
 #[tracing::instrument(name = "route::scrape")]
@@ -99,7 +102,7 @@ pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
         }
     };
 
-    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap());
+    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap().0);
 
     debug!("scraped {}", url.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response

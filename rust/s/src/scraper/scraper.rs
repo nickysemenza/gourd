@@ -37,11 +37,7 @@ def sc(x,y):
 
     Ok(CompactRecipe {
         sections: vec![CompactRecipeSection {
-            ingredients: sc_result
-                .0
-                .into_iter()
-                .map(|i| (i.to_string(), gourd_common::ingredient::from_str(&i)))
-                .collect(),
+            ingredients: sc_result.0.into_iter().map(|i| i.to_string()).collect(),
             instructions: sc_result.1.split('\n').map(|i| i.to_string()).collect(),
         }],
         meta: CompactRecipeMeta {
