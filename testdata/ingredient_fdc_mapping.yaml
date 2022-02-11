@@ -234,6 +234,16 @@
         unit: dollars
         value: 7
       source: amazon
+- name: instant yeast
+  fdc_id: 1601203
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 1
+      b:
+        unit: dollars
+        value: 7
+      source: amazon
 - name: pastry flour
   fdc_id: 532183
 - name: dark brown sugar
@@ -297,7 +307,25 @@
   fdc_id: 774134
   aliases: ["light soy sauce"]
 - name: bread flour
-  fdc_id: 558694
+  fdc_id: 790146
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 5
+      b:
+        unit: dollars
+        value: 6
+      source: wf
+- name: whole wheat flour
+  fdc_id: 790085
+  unit_mappings:
+    - a:
+        unit: lb
+        value: 5
+      b:
+        unit: dollars
+        value: 6
+      source: wf
 - name: cornmeal
   fdc_id: 519412
 - name: blueberries

@@ -77,6 +77,7 @@ fn section_ingredient_from_parsed(
         ..SectionIngredientInput::new(kind, amounts)
     };
 }
+//todo: put this in ing parser project
 pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     let mut s2 = s.to_string();
     if s2.contains("((") {

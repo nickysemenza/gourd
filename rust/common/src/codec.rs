@@ -6,21 +6,75 @@ use openapi::models::{
 use tracing::trace;
 
 use crate::{
-    amount_to_measure2, new_ingredient_parser, parse_ingredient, si_to_ingredient, unit::unit,
+    amount_to_measure2, new_ingredient_parser, section_ingredient_from_parsed, si_to_ingredient,
+    unit::unit,
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum CompactRecipeLine {
-    Ing(ingredient::Ingredient),
+    Ing((String, ingredient::Ingredient)),
     Ins(String),
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompactRecipe {
     pub meta: CompactRecipeMeta,
     pub sections: Vec<Vec<CompactRecipeLine>>,
 }
-#[derive(Serialize, Deserialize)]
+impl CompactRecipe {
+    pub fn to_string(self) -> Result<String, anyhow::Error> {
+        let mut res = String::new();
+
+        let section1 = serde_yaml::to_string(&self.meta)?;
+        res.push_str(&section1);
+        res.push_str(SEP);
+        dbg!(res.clone());
+        for s in self.sections.into_iter() {
+            for i in s.into_iter() {
+                res.push_str(
+                    match i {
+                        CompactRecipeLine::Ing((_, ing)) => ing.to_string(),
+                        CompactRecipeLine::Ins(ins) => format!(";{}", ins),
+                    }
+                    .as_str(),
+                );
+                res.push('\n');
+            }
+            res.push('\n');
+        }
+        Ok(res.trim_end().to_string())
+    }
+    pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
+        trace!("decoding {}", r);
+        let parts: Vec<&str> = r.trim_start_matches(SEP).split(SEP).collect();
+        if parts.len() != 2 {
+            bail!("expected 2 parts");
+        }
+        let compact = CompactRecipe {
+            meta: serde_yaml::from_str(parts[0])?,
+            sections: parts[1]
+                .split("\n\n")
+                .collect::<Vec<&str>>()
+                .iter()
+                .map(|section_text_chunk| {
+                    section_text_chunk
+                        .split("\n")
+                        // .collect::<Vec<&str>>()
+                        .into_iter()
+                        .map(|l| match l.strip_prefix(";") {
+                            Some(i) => CompactRecipeLine::Ins(i.to_string()),
+                            None => {
+                                CompactRecipeLine::Ing((l.to_string(), ingredient::from_str(l)))
+                            }
+                        })
+                        .collect()
+                })
+                .collect(),
+        };
+        Ok(compact)
+    }
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CompactRecipeMeta {
     pub name: String,
 }
@@ -33,7 +87,10 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
             let mut ing2 = ing.clone();
             ing2.amounts
                 .retain(|a| a.source.as_ref().unwrap_or(&"".to_string()) != "calculated");
-            sec.push(CompactRecipeLine::Ing(si_to_ingredient(ing2)));
+            sec.push(CompactRecipeLine::Ing((
+                ing2.clone().original.unwrap_or_default(),
+                si_to_ingredient(ing2),
+            )));
         }
         for ins in s.instructions.iter() {
             sec.push(CompactRecipeLine::Ins(ins.instruction.clone()));
@@ -48,41 +105,17 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
 
 // turn the recipe into a text block
 pub fn encode_recipe(r: RecipeDetailInput) -> Result<String, anyhow::Error> {
-    let mut res = String::new();
     let compact = compact_recipe(r);
-
-    let section1 = serde_yaml::to_string(&compact.meta)?;
-    res.push_str(&section1);
-    res.push_str(SEP);
-    dbg!(res.clone());
-    for s in compact.sections.into_iter() {
-        for i in s.into_iter() {
-            res.push_str(
-                match i {
-                    CompactRecipeLine::Ing(ing) => ing.to_string(),
-                    CompactRecipeLine::Ins(ins) => format!(";{}", ins),
-                }
-                .as_str(),
-            );
-            res.push('\n');
-        }
-        res.push('\n');
-    }
-    Ok(res.trim_end().to_string())
+    compact.to_string()
+}
+pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
+    let compact = CompactRecipe::from_string(r)?;
+    expand_recipe(compact)
 }
 const SEP: &str = "---\n";
-// turn the text block back into a recipe
-pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
-    trace!("decoding {}", r);
-    let parts: Vec<&str> = r.trim_start_matches(SEP).split(SEP).collect();
-    if parts.len() != 2 {
-        bail!("expected 2 parts");
-    }
-    let meta: CompactRecipeMeta = serde_yaml::from_str(parts[0])?;
-
-    let raw_sections: Vec<&str> = dbg!(parts).last().unwrap().split("\n\n").collect();
-
-    let sections = dbg!(raw_sections)
+pub fn expand_recipe(r: CompactRecipe) -> Result<RecipeDetailInput, anyhow::Error> {
+    let sections = r
+        .sections
         .into_iter()
         .map(|s| {
             let mut instructions = vec![];
@@ -92,11 +125,13 @@ pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
                 ingredient_names: vec![],
                 ip: new_ingredient_parser(),
             };
-            let lines: Vec<&str> = s.split("\n").collect();
-            for line in lines.into_iter() {
-                match dbg!(line).strip_prefix(";") {
-                    Some(i) => {
-                        let rich_text_tokens = rtp.clone().parse(i.clone()).unwrap_or_default();
+            for line in s.into_iter() {
+                match line {
+                    CompactRecipeLine::Ing((original, ing)) => {
+                        ingredients.push(section_ingredient_from_parsed(ing, &original))
+                    }
+                    CompactRecipeLine::Ins(i) => {
+                        let rich_text_tokens = rtp.clone().parse(&i).unwrap_or_default();
 
                         for token in rich_text_tokens.clone().into_iter() {
                             match token {
@@ -113,15 +148,12 @@ pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
                                 _ => {}
                             }
                         }
-
                         instructions.push(SectionInstructionInput::new(
                             i.strip_prefix(" ")
-                                .unwrap_or(i) // trim leading space if exsists to support `;` or `; `
+                                .unwrap_or(&i) // trim leading space if exsists to support `;` or `; `
                                 .to_string(),
                         ))
                     }
-
-                    None => ingredients.push(parse_ingredient(line).unwrap()),
                 };
             }
             // ??
@@ -144,11 +176,13 @@ pub fn decode_recipe(r: String) -> Result<RecipeDetailInput, anyhow::Error> {
 
     Ok(RecipeDetailInput::new(
         sections,
-        meta.name,
+        r.meta.name,
         0,
         "".to_string(),
     ))
 }
+// turn the text block back into a recipe
+
 pub fn section_to_input(s: &RecipeSection) -> RecipeSectionInput {
     RecipeSectionInput::new(
         s.instructions
@@ -193,19 +227,6 @@ pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
         r.unit,
     )
 }
-// pub fn recipe_from_input(r: RecipeDetailInput) -> RecipeDetail {
-//     RecipeDetail::new(
-//         r.id,
-//         // r.sections,
-//         vec![], // TODO!
-//         r.name,
-//         r.quantity,
-//         r.unit,
-//         0,
-//         false,
-//         "".to_string(),
-//     )
-// }
 
 #[cfg(test)]
 mod tests {
