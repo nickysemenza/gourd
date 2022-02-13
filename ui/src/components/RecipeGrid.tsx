@@ -65,6 +65,11 @@ export const RecipeGrid: React.FC<{
                       takes {formatTimeRange(w, totalDuration)}
                     </div>
                   )}
+                  <ul className="list-disc">
+                    {(recipe.linked_meals || []).map((m) => (
+                      <li className="text-xs"> {m.name}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>

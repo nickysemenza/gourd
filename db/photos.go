@@ -267,7 +267,10 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 			continue
 		}
 
-		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time, fmt.Sprintf("meal on %s", m.AteAt.Time))
+		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time,
+			// fmt.Sprintf("meal on %s", m.AteAt.Time),
+			m.AteAt.Time.Format("Mon Jan 2"),
+		)
 		if err != nil {
 			return err
 		}

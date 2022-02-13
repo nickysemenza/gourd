@@ -137,6 +137,14 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	items := a.imagesFromModel(ctx, recipe.R.NotionRecipes)
 	rw.LinkedPhotos = &items
 
+	linkedMeals := []Meal{}
+	for _, m := range recipe.R.MealRecipes {
+		linkedMeals = append(linkedMeals, Meal{
+			Id:   m.R.Meal.ID,
+			Name: m.R.Meal.Name,
+		})
+	}
+	rw.LinkedMeals = &linkedMeals
 	return &rw, nil
 }
 func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeWrapper, error) {
@@ -164,6 +172,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.Image,
 		)),
+		Load(Rels(models.RecipeRels.MealRecipes, models.MealRecipeRels.Meal)),
 		OrderBy("recipes.created_at DESC"),
 		Limit(int(limit)),
 		Offset(int(offset)),
@@ -201,11 +210,7 @@ func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo,
 		return nil, err
 	}
 	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes), nil
-	// rw, err := a.recipeFromModel(ctx, recipe.R.Recipe)
-	// if err != nil {[]
-	// 	return nil, err
-	// }
-	// return rw, nil
+
 }
 
 func (a *API) Misc(c echo.Context) error {
