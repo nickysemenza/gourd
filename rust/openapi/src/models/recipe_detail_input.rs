@@ -35,6 +35,9 @@ pub struct RecipeDetailInput {
     /// when it created / updated
     #[serde(rename = "date", skip_serializing_if = "Option::is_none")]
     pub date: Option<String>,
+    /// tags
+    #[serde(rename = "tags", skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
 }
 
 impl RecipeDetailInput {
@@ -48,6 +51,7 @@ impl RecipeDetailInput {
             quantity,
             unit,
             date: None,
+            tags: None,
         }
     }
 }

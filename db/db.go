@@ -12,6 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/dgraph-io/ristretto"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	servertiming "github.com/mitchellh/go-server-timing"
 	"github.com/nickysemenza/gourd/common"
 	"go.opentelemetry.io/otel"
@@ -84,10 +85,11 @@ type RecipeDetail struct {
 	Version       int64       `db:"version"`
 	LatestVersion bool        `db:"is_latest_version"`
 	Sections      []Section
-	Ingredient    zero.String `db:"ingredient_id"` // sometimes, from FK
-	CreatedAt     time.Time   `db:"created_at"`
-	UpdatedAt     time.Time   `db:"updated_at"`
-	DeletedAt     zero.Time   `db:"deleted_at"`
+	Ingredient    zero.String    `db:"ingredient_id"` // sometimes, from FK
+	CreatedAt     time.Time      `db:"created_at"`
+	UpdatedAt     time.Time      `db:"updated_at"`
+	DeletedAt     zero.Time      `db:"deleted_at"`
+	Tags          pq.StringArray `db:"tags"`
 }
 
 // Section represents a Section
@@ -292,4 +294,8 @@ func (c *Client) execTx(ctx context.Context, tx *sql.Tx, q sq.Sqlizer) (sql.Resu
 	}
 	span.SetAttributes(attribute.Int64("rows_affected", rows))
 	return res, nil
+}
+
+type NotionRecipeMeta struct {
+	Tags []string `json:"tags"`
 }

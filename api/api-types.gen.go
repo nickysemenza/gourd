@@ -448,6 +448,9 @@ type RecipeDetail struct {
 	// book or websites
 	Sources *[]RecipeSource `json:"sources,omitempty"`
 
+	// tags
+	Tags []string `json:"tags"`
+
 	// serving unit
 	Unit string `json:"unit"`
 
@@ -474,6 +477,9 @@ type RecipeDetailInput struct {
 
 	// book or websites
 	Sources *[]RecipeSource `json:"sources,omitempty"`
+
+	// tags
+	Tags *[]string `json:"tags,omitempty"`
 
 	// serving unit
 	Unit string `json:"unit"`

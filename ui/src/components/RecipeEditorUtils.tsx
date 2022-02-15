@@ -60,6 +60,7 @@ export const updateIngredientInfo = (
                         quantity: 0,
                         unit: "",
                         sections: [],
+                        tags: [],
                         version: 0,
                         is_latest_version: false,
                         created_at: "",

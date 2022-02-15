@@ -91,7 +91,7 @@ func init() {
 
 				err = s.APIManager.DoSync(cmd.Context())
 				if err != nil {
-					return err
+					return fmt.Errorf("sync: %w", err)
 				}
 
 				return nil

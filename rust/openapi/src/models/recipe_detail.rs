@@ -47,11 +47,14 @@ pub struct RecipeDetail {
     /// Other versions
     #[serde(rename = "other_versions", skip_serializing_if = "Option::is_none")]
     pub other_versions: Option<Vec<crate::models::RecipeDetail>>,
+    /// tags
+    #[serde(rename = "tags")]
+    pub tags: Vec<String>,
 }
 
 impl RecipeDetail {
     /// A revision of a recipe
-    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String) -> RecipeDetail {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String, tags: Vec<String>) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,
@@ -64,6 +67,7 @@ impl RecipeDetail {
             is_latest_version,
             created_at,
             other_versions: None,
+            tags,
         }
     }
 }

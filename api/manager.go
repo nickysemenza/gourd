@@ -8,10 +8,11 @@ import (
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/models"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
-	"gopkg.in/guregu/null.v4/zero"
+	"github.com/volatiletech/null/v8"
 )
 
 func (a *API) DB() *db.Client {
@@ -33,7 +34,7 @@ func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, r
 	return
 }
 
-func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe) (*db.NotionRecipe, error) {
+func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe) (*models.NotionRecipe, error) {
 	ctx, span := a.tracer.Start(ctx, "notionRecipeToDB")
 	defer span.End()
 
@@ -53,6 +54,8 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 	}
 	output.Name = nRecipe.Title
 	output.Date = nRecipe.Time
+	nRecipe.Tags = append(nRecipe.Tags, "notion")
+	output.Tags = &nRecipe.Tags
 
 	r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
 	if err != nil {
@@ -66,12 +69,15 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 			return nil, err
 		}
 	}
-	return &db.NotionRecipe{
+	nr := models.NotionRecipe{
 		PageID:    nRecipe.PageID,
 		PageTitle: nRecipe.Title,
-		AteAt:     zero.TimeFromPtr(nRecipe.Time),
-		Recipe:    zero.StringFrom(r.Id),
-	}, nil
+		AteAt:     null.TimeFromPtr(nRecipe.Time),
+		RecipeID:  null.StringFrom(r.Id),
+	}
+	m := db.NotionRecipeMeta{Tags: nRecipe.Tags}
+	nr.Meta.Marshal(m)
+	return &nr, nil
 }
 func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
@@ -81,7 +87,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 		return err
 	}
 
-	var notionRecipes []db.NotionRecipe
+	var notionRecipes []models.NotionRecipe
 	var notionImages []db.NotionImage
 	var images []db.Image
 	for _, nRecipe := range nRecipes {
@@ -155,19 +161,19 @@ func (a *API) DoSync(ctx context.Context) error {
 	defer span.End()
 
 	if err := a.syncRecipeFromNotion(ctx); err != nil {
-		return err
+		return fmt.Errorf("notion: %w", err)
 	}
 	log.Infof("synced recipes from notion")
 	if err := a.DB().SyncNotionMealFromNotionRecipe(ctx); err != nil {
-		return err
+		return fmt.Errorf("notion meal: %w", err)
 	}
 	if a.GPhotos != nil {
 		if err := a.GPhotos.SyncAlbums(ctx); err != nil {
-			return err
+			return fmt.Errorf("gphotos: %w", err)
 		}
 	}
 	if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
-		return err
+		return fmt.Errorf("gphotos meal: %w", err)
 	}
 	log.Infof("sync complete in %s", time.Since(now))
 	return nil

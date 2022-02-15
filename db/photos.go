@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/models"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
 )
@@ -212,16 +213,17 @@ func (c *Client) DoesNotionImageExist(ctx context.Context, blockID string) (exis
 	return res != nil, err
 }
 
-func (c *Client) SaveNotionRecipes(ctx context.Context, items []NotionRecipe) (err error) {
+func (c *Client) SaveNotionRecipes(ctx context.Context, items []models.NotionRecipe) (err error) {
 	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
 	defer span.End()
 
-	q := c.psql.Insert("notion_recipe").Columns("page_id", "page_title", "ate_at", "recipe_id")
 	for _, r := range items {
-		q = q.Values(r.PageID, r.PageTitle, r.AteAt, r.Recipe)
+		r.LastSeen = time.Now()
+		err := r.Upsert(ctx, c.db, true, []string{"page_id"}, boil.Whitelist("page_title", "recipe_id", "last_seen", "meta"), boil.Infer())
+		if err != nil {
+			return err
+		}
 	}
-	q = q.Suffix("ON CONFLICT (page_id) DO UPDATE SET last_seen = ?, page_title = excluded.page_title, recipe_id = excluded.recipe_id", time.Now())
-	_, err = c.execContext(ctx, q)
 
 	return
 }

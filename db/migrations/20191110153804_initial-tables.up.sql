@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "created_at" timestamp NOT NULL DEFAULT now(),
   "updated_at" timestamp NOT NULL DEFAULT now(),
   "deleted_at" timestamp,
+  "tags" TEXT [],
   PRIMARY KEY ("id"),
   unique("recipe_id", "version")
 );

@@ -11,6 +11,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/common"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
@@ -180,8 +181,8 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 
 	_, err = c.execTx(ctx, tx, c.psql.
 		Insert(recipeDetailsTable).
-		Columns("id", "recipe_id", "name", "version", "is_latest_version", "source", "created_at").
-		Values(r.Id, r.RecipeId, r.Name, r.Version, true, r.Source, date))
+		Columns("id", "recipe_id", "name", "version", "is_latest_version", "source", "created_at", "tags").
+		Values(r.Id, r.RecipeId, r.Name, r.Version, true, r.Source, date, pq.Array(r.Tags)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert new recipe details row: %w", err)
 	}

@@ -929,6 +929,7 @@ components:
         - version
         - is_latest_version
         - created_at
+        - tags
       properties:
         id:
           description: id
@@ -973,6 +974,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RecipeDetail"
+        tags:
+          description: tags
+          type: array
+          items:
+            type: string
     RecipeDetailInput:
       description: A revision of a recipe
       type: object
@@ -1010,6 +1016,11 @@ components:
           description: when it created / updated
           type: string
           format: date-time
+        tags:
+          description: tags
+          type: array
+          items:
+            type: string
     Ingredient:
       description: "An Ingredient"
       type: object

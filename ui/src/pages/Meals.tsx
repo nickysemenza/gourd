@@ -109,6 +109,7 @@ const Meals: React.FC = () => {
                       id: a.value,
                       name: a.label,
                       sections: [],
+                      tags: [],
                       quantity: 1,
                       unit: "",
                       version: 0,

@@ -210,6 +210,10 @@ export interface RecipeDetail {
    * Other versions
    */
   other_versions?: RecipeDetail[];
+  /**
+   * tags
+   */
+  tags: string[];
 }
 
 /**
@@ -244,6 +248,10 @@ export interface RecipeDetailInput {
    * when it created / updated
    */
   date?: string;
+  /**
+   * tags
+   */
+  tags?: string[];
 }
 
 /**

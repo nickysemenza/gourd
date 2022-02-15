@@ -19,24 +19,26 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
+	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // RecipeDetail is an object representing the database table.
 type RecipeDetail struct {
-	ID              string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	RecipeID        string      `boil:"recipe_id" json:"recipe_id" toml:"recipe_id" yaml:"recipe_id"`
-	Name            string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Equipment       null.String `boil:"equipment" json:"equipment,omitempty" toml:"equipment" yaml:"equipment,omitempty"`
-	Source          null.JSON   `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
-	Servings        null.Int    `boil:"servings" json:"servings,omitempty" toml:"servings" yaml:"servings,omitempty"`
-	Quantity        null.Int    `boil:"quantity" json:"quantity,omitempty" toml:"quantity" yaml:"quantity,omitempty"`
-	Unit            null.String `boil:"unit" json:"unit,omitempty" toml:"unit" yaml:"unit,omitempty"`
-	Version         int         `boil:"version" json:"version" toml:"version" yaml:"version"`
-	IsLatestVersion null.Bool   `boil:"is_latest_version" json:"is_latest_version,omitempty" toml:"is_latest_version" yaml:"is_latest_version,omitempty"`
-	CreatedAt       time.Time   `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
-	UpdatedAt       time.Time   `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
-	DeletedAt       null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	ID              string            `boil:"id" json:"id" toml:"id" yaml:"id"`
+	RecipeID        string            `boil:"recipe_id" json:"recipe_id" toml:"recipe_id" yaml:"recipe_id"`
+	Name            string            `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Equipment       null.String       `boil:"equipment" json:"equipment,omitempty" toml:"equipment" yaml:"equipment,omitempty"`
+	Source          null.JSON         `boil:"source" json:"source,omitempty" toml:"source" yaml:"source,omitempty"`
+	Servings        null.Int          `boil:"servings" json:"servings,omitempty" toml:"servings" yaml:"servings,omitempty"`
+	Quantity        null.Int          `boil:"quantity" json:"quantity,omitempty" toml:"quantity" yaml:"quantity,omitempty"`
+	Unit            null.String       `boil:"unit" json:"unit,omitempty" toml:"unit" yaml:"unit,omitempty"`
+	Version         int               `boil:"version" json:"version" toml:"version" yaml:"version"`
+	IsLatestVersion null.Bool         `boil:"is_latest_version" json:"is_latest_version,omitempty" toml:"is_latest_version" yaml:"is_latest_version,omitempty"`
+	CreatedAt       time.Time         `boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt       time.Time         `boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
+	DeletedAt       null.Time         `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	Tags            types.StringArray `boil:"tags" json:"tags,omitempty" toml:"tags" yaml:"tags,omitempty"`
 
 	R *recipeDetailR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L recipeDetailL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -56,6 +58,7 @@ var RecipeDetailColumns = struct {
 	CreatedAt       string
 	UpdatedAt       string
 	DeletedAt       string
+	Tags            string
 }{
 	ID:              "id",
 	RecipeID:        "recipe_id",
@@ -70,6 +73,7 @@ var RecipeDetailColumns = struct {
 	CreatedAt:       "created_at",
 	UpdatedAt:       "updated_at",
 	DeletedAt:       "deleted_at",
+	Tags:            "tags",
 }
 
 var RecipeDetailTableColumns = struct {
@@ -86,6 +90,7 @@ var RecipeDetailTableColumns = struct {
 	CreatedAt       string
 	UpdatedAt       string
 	DeletedAt       string
+	Tags            string
 }{
 	ID:              "recipe_details.id",
 	RecipeID:        "recipe_details.recipe_id",
@@ -100,6 +105,7 @@ var RecipeDetailTableColumns = struct {
 	CreatedAt:       "recipe_details.created_at",
 	UpdatedAt:       "recipe_details.updated_at",
 	DeletedAt:       "recipe_details.deleted_at",
+	Tags:            "recipe_details.tags",
 }
 
 // Generated where
@@ -128,6 +134,32 @@ func (w whereHelpernull_Bool) GTE(x null.Bool) qm.QueryMod {
 func (w whereHelpernull_Bool) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_Bool) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
+type whereHelpertypes_StringArray struct{ field string }
+
+func (w whereHelpertypes_StringArray) EQ(x types.StringArray) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpertypes_StringArray) NEQ(x types.StringArray) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpertypes_StringArray) LT(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertypes_StringArray) LTE(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertypes_StringArray) GT(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertypes_StringArray) GTE(x types.StringArray) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpertypes_StringArray) IsNull() qm.QueryMod { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpertypes_StringArray) IsNotNull() qm.QueryMod {
+	return qmhelper.WhereIsNotNull(w.field)
+}
+
 var RecipeDetailWhere = struct {
 	ID              whereHelperstring
 	RecipeID        whereHelperstring
@@ -142,6 +174,7 @@ var RecipeDetailWhere = struct {
 	CreatedAt       whereHelpertime_Time
 	UpdatedAt       whereHelpertime_Time
 	DeletedAt       whereHelpernull_Time
+	Tags            whereHelpertypes_StringArray
 }{
 	ID:              whereHelperstring{field: "\"recipe_details\".\"id\""},
 	RecipeID:        whereHelperstring{field: "\"recipe_details\".\"recipe_id\""},
@@ -156,6 +189,7 @@ var RecipeDetailWhere = struct {
 	CreatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"created_at\""},
 	UpdatedAt:       whereHelpertime_Time{field: "\"recipe_details\".\"updated_at\""},
 	DeletedAt:       whereHelpernull_Time{field: "\"recipe_details\".\"deleted_at\""},
+	Tags:            whereHelpertypes_StringArray{field: "\"recipe_details\".\"tags\""},
 }
 
 // RecipeDetailRels is where relationship names are stored.
@@ -182,8 +216,8 @@ func (*recipeDetailR) NewStruct() *recipeDetailR {
 type recipeDetailL struct{}
 
 var (
-	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at", "updated_at", "deleted_at"}
-	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "deleted_at"}
+	recipeDetailAllColumns            = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "is_latest_version", "created_at", "updated_at", "deleted_at", "tags"}
+	recipeDetailColumnsWithoutDefault = []string{"id", "recipe_id", "name", "equipment", "source", "servings", "quantity", "unit", "version", "deleted_at", "tags"}
 	recipeDetailColumnsWithDefault    = []string{"is_latest_version", "created_at", "updated_at"}
 	recipeDetailPrimaryKeyColumns     = []string{"id"}
 	recipeDetailGeneratedColumns      = []string{}
