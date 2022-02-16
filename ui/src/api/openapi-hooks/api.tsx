@@ -251,7 +251,7 @@ export interface RecipeDetailInput {
   /**
    * tags
    */
-  tags?: string[];
+  tags: string[];
 }
 
 /**
@@ -486,6 +486,14 @@ export interface SearchResult {
  */
 export interface Error {
   message: string;
+}
+
+/**
+ * config data
+ */
+export interface ConfigData {
+  google_scopes: string;
+  google_client_id: string;
 }
 
 /**
@@ -814,6 +822,33 @@ export const useAuthLogin = (props: UseAuthLoginProps) =>
     `/auth`,
     props
   );
+
+export type GetConfigProps = Omit<
+  GetProps<ConfigData, Error, void, void>,
+  "path"
+>;
+
+/**
+ * Get app config
+ *
+ * todo
+ */
+export const GetConfig = (props: GetConfigProps) => (
+  <Get<ConfigData, Error, void, void> path={`/config`} {...props} />
+);
+
+export type UseGetConfigProps = Omit<
+  UseGetProps<ConfigData, Error, void, void>,
+  "path"
+>;
+
+/**
+ * Get app config
+ *
+ * todo
+ */
+export const useGetConfig = (props: UseGetConfigProps) =>
+  useGet<ConfigData, Error, void, void>(`/config`, props);
 
 export interface ListPhotosQueryParams {
   /**

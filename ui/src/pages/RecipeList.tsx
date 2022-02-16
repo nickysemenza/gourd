@@ -95,7 +95,7 @@ const RecipeList: React.FC = () => {
       {
         Header: "meals",
         Cell: ({ row: { original } }: CellProps<i>) => (
-          <div>
+          <div className="flex flex-row">
             {(original.linked_photos || []).map((p) => (
               <ProgressiveImage photo={p} key={p.id} className="w-1/6" />
             ))}

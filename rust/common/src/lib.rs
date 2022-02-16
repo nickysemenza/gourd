@@ -366,6 +366,7 @@ mod tests {
             0,
             false,
             "".to_string(),
+            vec![],
         );
         let expected: HashMap<String, Vec<SectionIngredient>> = [
             ("a".to_string(), vec![si_1.clone()]),

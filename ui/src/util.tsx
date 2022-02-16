@@ -117,6 +117,7 @@ export const blankRecipeWrapperInput = (
     quantity: 0,
     unit: "",
     sections: [],
+    tags: [],
   },
   id,
 });

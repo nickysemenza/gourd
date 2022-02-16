@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/models"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
@@ -57,12 +58,12 @@ type Image struct {
 }
 
 type NotionRecipe struct {
-	PageID    string `db:"page_id"`
-	PageTitle string `db:"page_title"`
-	// Meta      string      `db:"meta"`
-	LastSeen time.Time   `db:"last_seen"`
-	Recipe   zero.String `db:"recipe_id"`
-	AteAt    zero.Time   `db:"ate_at"`
+	PageID    string      `db:"page_id"`
+	PageTitle string      `db:"page_title"`
+	Meta      null.JSON   `db:"meta"`
+	LastSeen  time.Time   `db:"last_seen"`
+	Recipe    zero.String `db:"recipe_id"`
+	AteAt     zero.Time   `db:"ate_at"`
 }
 
 func (c *Client) UpsertPhotos(ctx context.Context, photos []GPhoto) error {
@@ -256,7 +257,7 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	q := c.psql.Select("page_id", "ate_at", "recipe_id").From("notion_recipe").
+	q := c.psql.Select("page_id", "ate_at", "recipe_id", "meta").From("notion_recipe").
 		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal_id": nil})
 	var missingMeals []NotionRecipe
 	err := c.selectContext(ctx, q, &missingMeals)
@@ -268,10 +269,20 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 		if !m.AteAt.Valid {
 			continue
 		}
+		var meta NotionRecipeMeta
+		err := m.Meta.Unmarshal(&meta)
+		if err != nil {
+			return err
+		}
+		suffix := "meal"
+		for _, t := range meta.Tags {
+			if t == "dinner" {
+				suffix = t
+			}
+		}
 
 		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time,
-			// fmt.Sprintf("meal on %s", m.AteAt.Time),
-			m.AteAt.Time.Format("Mon Jan 2"),
+			fmt.Sprintf("%s %s", m.AteAt.Time.Add(time.Hour*-24).Format("Mon Jan 2"), suffix),
 		)
 		if err != nil {
 			return err

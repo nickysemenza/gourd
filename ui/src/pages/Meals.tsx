@@ -136,7 +136,7 @@ const Meals: React.FC = () => {
           const { photos } = cell.row.original;
           // https://developers.google.com/meals/library/guides/access-media-items#image-base-urls
           return (
-            <div className="flex flex-wrap">
+            <div className="flex flex-row">
               {photos.map((photo: Photo) => (
                 <ProgressiveImage photo={photo} />
               ))}

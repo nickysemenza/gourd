@@ -62,6 +62,7 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
       unit: r.detail.unit,
       sources: r.detail.sources,
       servings: r.detail.servings,
+      tags: r.detail.tags,
       sections: r.detail.sections.map((s) => {
         const instructions: Array<SectionInstructionInput> = s.instructions.map(
           (i) => ({
@@ -558,7 +559,7 @@ const RecipeDetail: React.FC = () => {
         <div>
           <div className="w-9/12 flex ">
             {(recipe.linked_photos || []).map((p) => (
-              <ProgressiveImage photo={p} className="w-1/6" />
+              <ProgressiveImage photo={p} className="w-52" />
             ))}
           </div>
         </div>

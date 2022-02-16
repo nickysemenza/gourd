@@ -1,6 +1,7 @@
 export * from './Amount';
 export * from './AuthResp';
 export * from './BrandedFood';
+export * from './ConfigData';
 export * from './EntitySummary';
 export * from './Food';
 export * from './FoodCategory';

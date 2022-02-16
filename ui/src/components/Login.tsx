@@ -6,16 +6,15 @@ import {
   GoogleLoginResponseOffline,
   useGoogleLogin,
 } from "react-google-login";
-import { AuthResp, AuthenticationApi } from "../api/openapi-fetch";
+import { AuthResp, AuthenticationApi, ConfigData } from "../api/openapi-fetch";
 import {
   COOKIE_NAME,
-  getConfig,
   getName,
   getOpenapiFetchConfig,
   isLoggedIn,
 } from "../config";
 
-const Login: React.FC = () => {
+const Login: React.FC<{ config: ConfigData }> = ({ config }) => {
   const api = new AuthenticationApi(getOpenapiFetchConfig());
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_cookies, setCookie] = useCookies([COOKIE_NAME]);
@@ -39,11 +38,11 @@ const Login: React.FC = () => {
   const onFailure = async (error: any) => {
     console.log("error", error);
   };
-  const { google } = getConfig();
+
   const { signIn, loaded } = useGoogleLogin({
     onSuccess,
     // onAutoLoadFinished,
-    clientId: google.client_id,
+    clientId: config?.google_client_id || "",
     // cookiePolicy,
     // loginHint,
     // hostedDomain,
@@ -54,7 +53,7 @@ const Login: React.FC = () => {
     // discoveryDocs,
     onFailure,
     // uxMode,
-    scope: google.scopes,
+    scope: config?.google_scopes || "",
     accessType: "offline",
     responseType: "code",
     // jsSrc,
@@ -63,7 +62,7 @@ const Login: React.FC = () => {
   });
 
   const loggedIn = isLoggedIn();
-  return (
+  return config ? (
     <div>
       {!loggedIn ? (
         loaded && <button onClick={signIn}>login</button>
@@ -72,7 +71,7 @@ const Login: React.FC = () => {
       )}
       {/* <Debug data={{ auth, cookies }} /> */}
     </div>
-  );
+  ) : null;
 };
 
 export default Login;

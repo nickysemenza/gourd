@@ -31,6 +31,7 @@ Class | Method | HTTP request | Description
  - [Amount](docs/Amount.md)
  - [AuthResp](docs/AuthResp.md)
  - [BrandedFood](docs/BrandedFood.md)
+ - [ConfigData](docs/ConfigData.md)
  - [EntitySummary](docs/EntitySummary.md)
  - [Error](docs/Error.md)
  - [Food](docs/Food.md)

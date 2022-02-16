@@ -114,6 +114,12 @@ type BrandedFood struct {
 	ServingSizeUnit     string  `json:"serving_size_unit"`
 }
 
+// config data
+type ConfigData struct {
+	GoogleClientId string `json:"google_client_id"`
+	GoogleScopes   string `json:"google_scopes"`
+}
+
 // name and id of something
 type EntitySummary struct {
 	// recipe_detail or ingredient id
@@ -479,7 +485,7 @@ type RecipeDetailInput struct {
 	Sources *[]RecipeSource `json:"sources,omitempty"`
 
 	// tags
-	Tags *[]string `json:"tags,omitempty"`
+	Tags []string `json:"tags"`
 
 	// serving unit
 	Unit string `json:"unit"`

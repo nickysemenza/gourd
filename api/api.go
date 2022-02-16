@@ -202,7 +202,7 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 		return nil, err
 	}
 	dbr.Source = zero.StringFrom(string(source))
-	dbr.Tags = *r.Detail.Tags
+	dbr.Tags = r.Detail.Tags
 
 	for _, s := range r.Detail.Sections {
 		if len(s.Ingredients) == 0 && len(s.Instructions) == 0 {
@@ -612,6 +612,14 @@ func (a *API) NotionTest(c echo.Context) error {
 	res, err := a.Notion.GetAll(ctx)
 	if err != nil {
 		return handleErr(c, err)
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
+func (a *API) GetConfig(c echo.Context) error {
+	res := ConfigData{
+		GoogleClientId: a.Google.GetClientID(),
+		GoogleScopes:   "profile email https://www.googleapis.com/auth/photoslibrary.readonly",
 	}
 	return c.JSON(http.StatusOK, res)
 }

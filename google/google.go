@@ -22,6 +22,9 @@ type Client struct {
 }
 
 func (c *Client) GetOauth() *oauth2.Config { return &c.oc }
+func (c *Client) GetClientID() string {
+	return c.oc.ClientID
+}
 
 func New(db *db.Client, clientID, clientSecret, redirectURL string) *Client {
 	oc := oauth2.Config{

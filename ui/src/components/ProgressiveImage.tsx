@@ -5,7 +5,7 @@ import { Photo } from "../api/openapi-hooks/api";
 const ProgressiveImage: React.FC<{
   photo: Photo;
   className?: string;
-}> = ({ photo, className = "" }) => {
+}> = ({ photo, className = "w-60" }) => {
   const [loaded, setLoaded] = useState(false);
   const { blur_hash, base_url, id, source } = photo;
   return (

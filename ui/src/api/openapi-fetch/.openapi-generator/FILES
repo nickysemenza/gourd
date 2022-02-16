@@ -6,11 +6,13 @@ apis/IngredientsApi.ts
 apis/MealsApi.ts
 apis/PhotosApi.ts
 apis/RecipesApi.ts
+apis/SystemApi.ts
 apis/index.ts
 index.ts
 models/Amount.ts
 models/AuthResp.ts
 models/BrandedFood.ts
+models/ConfigData.ts
 models/EntitySummary.ts
 models/Food.ts
 models/FoodCategory.ts

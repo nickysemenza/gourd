@@ -1,5 +1,5 @@
 import Cookies from "universal-cookie";
-import { Configuration } from "./api/openapi-fetch";
+import { Configuration, SystemApi } from "./api/openapi-fetch";
 import jwt_decode from "jwt-decode";
 import { toast } from "react-toastify";
 
@@ -7,16 +7,10 @@ export const getAPIURL = () => getBaseURL() + "/api";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;
 export const getTracingURL = () => process.env.REACT_APP_TRACING_URL || "";
 
-export const getConfig = () => {
-  // TODO: load this all from API + cache it
-  return {
-    google: {
-      scopes:
-        "profile email https://www.googleapis.com/auth/photoslibrary.readonly",
-      client_id:
-        "520431142247-bcog816pfdh6bctlvbreh3i3urhpidv5.apps.googleusercontent.com",
-    },
-  };
+export const getConfig = async () => {
+  const a = new SystemApi(getOpenapiFetchConfig());
+  let config = await a.getConfig();
+  return config;
 };
 
 export const COOKIE_NAME = "gourd-jwt";

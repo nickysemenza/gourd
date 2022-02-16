@@ -55,7 +55,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 	output.Name = nRecipe.Title
 	output.Date = nRecipe.Time
 	nRecipe.Tags = append(nRecipe.Tags, "notion")
-	output.Tags = &nRecipe.Tags
+	output.Tags = nRecipe.Tags
 
 	r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
 	if err != nil {
@@ -76,8 +76,8 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 		RecipeID:  null.StringFrom(r.Id),
 	}
 	m := db.NotionRecipeMeta{Tags: nRecipe.Tags}
-	nr.Meta.Marshal(m)
-	return &nr, nil
+	err = nr.Meta.Marshal(m)
+	return &nr, err
 }
 func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")

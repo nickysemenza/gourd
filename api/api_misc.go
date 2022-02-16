@@ -22,7 +22,7 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 	}
 	return &i
 }
-func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) []Photo {
+func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, gp models.GphotosPhotoSlice) []Photo {
 	items := []Photo{}
 	for _, notionRecipe := range nr {
 		for _, notionImage := range notionRecipe.R.PageNotionImages {
@@ -38,6 +38,20 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice) 
 			})
 		}
 	}
+
+	for _, gPhoto := range gp {
+		url := a.ImageStore.GetImageURL(ctx, gPhoto.R.Image.ID)
+		items = append(items, Photo{
+			Id:       gPhoto.ImageID,
+			Created:  gPhoto.LastSeen,
+			BlurHash: &gPhoto.R.Image.BlurHash,
+			Width:    300,
+			Height:   400,
+			BaseUrl:  url,
+			Source:   PhotoSourceGoogle,
+		})
+	}
+
 	return items
 }
 func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
@@ -138,16 +152,20 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	}
 	rw.Detail.OtherVersions = &other
 
-	items := a.imagesFromModel(ctx, recipe.R.NotionRecipes)
-	rw.LinkedPhotos = &items
-
+	gp := models.GphotosPhotoSlice{}
 	linkedMeals := []Meal{}
 	for _, m := range recipe.R.MealRecipes {
+		for _, x := range m.R.Meal.R.MealGphotos {
+			gp = append(gp, x.R.Gphoto)
+		}
 		linkedMeals = append(linkedMeals, Meal{
 			Id:   m.R.Meal.ID,
 			Name: m.R.Meal.Name,
 		})
 	}
+	images := a.imagesFromModel(ctx, recipe.R.NotionRecipes, gp)
+	rw.LinkedPhotos = &images
+
 	rw.LinkedMeals = &linkedMeals
 	return &rw, nil
 }
@@ -176,7 +194,12 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.Image,
 		)),
-		Load(Rels(models.RecipeRels.MealRecipes, models.MealRecipeRels.Meal)),
+		Load(Rels(models.RecipeRels.MealRecipes,
+			models.MealRecipeRels.Meal,
+			models.MealRels.MealGphotos,
+			models.MealGphotoRels.Gphoto,
+			models.GphotosPhotoRels.Image,
+		)),
 		OrderBy("recipes.created_at DESC"),
 		Limit(int(limit)),
 		Offset(int(offset)),
@@ -208,12 +231,27 @@ func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo,
 			models.NotionRecipeRels.PageNotionImages,
 			models.NotionImageRels.Image,
 		)),
+		Load(Rels(models.RecipeDetailRels.Recipe,
+			models.RecipeRels.MealRecipes,
+			models.MealRecipeRels.Meal,
+			models.MealRels.MealGphotos,
+			models.MealGphotoRels.Gphoto,
+			models.GphotosPhotoRels.Image,
+		)),
 	).
 		One(ctx, a.db.DB())
 	if err != nil {
 		return nil, err
 	}
-	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes), nil
+	gp := models.GphotosPhotoSlice{}
+	for _, m := range rd.R.Recipe.R.MealRecipes {
+		for _, x := range m.R.Meal.R.MealGphotos {
+			gp = append(gp, x.R.Gphoto)
+		}
+
+	}
+
+	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes, gp), nil
 
 }
 

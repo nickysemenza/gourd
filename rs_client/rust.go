@@ -38,6 +38,7 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 	url := fmt.Sprintf("%s%s?text=%s", c.baseurl, kind, url.QueryEscape(text))
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req.Header.Add("User-Agent", "gourd")
 
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 
@@ -71,6 +72,7 @@ func (c *Client) ConvertUnit(ctx context.Context, body, target interface{}) erro
 
 	req, _ := http.NewRequestWithContext(ctx, "POST", url, payloadBuf)
 	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("User-Agent", "gourd")
 
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 

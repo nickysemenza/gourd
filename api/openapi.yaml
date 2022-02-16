@@ -58,6 +58,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /config:
+    get:
+      summary: Get app config
+      description: todo
+      operationId: get_config
+      tags:
+        - system
+      responses:
+        "200":
+          description: Config data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigData"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /photos:
     get:
       summary: List all photos
@@ -987,6 +1007,7 @@ components:
         - quantity
         - unit
         - sections
+        - tags
       properties:
         sections:
           description: sections of the recipe
@@ -1278,6 +1299,17 @@ components:
           type: string
       example:
         message: "Something went wrong"
+    ConfigData:
+      type: object
+      description: config data
+      required:
+        - google_scopes
+        - google_client_id
+      properties:
+        google_scopes:
+          type: string
+        google_client_id:
+          type: string
     AuthResp:
       type: object
       description: todo

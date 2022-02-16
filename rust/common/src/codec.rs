@@ -188,7 +188,7 @@ pub fn expand_recipe(
         .collect();
 
     Ok((
-        RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string()),
+        RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string(), vec![]),
         rtt,
     ))
 }
@@ -236,6 +236,7 @@ pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
         r.name,
         r.quantity,
         r.unit,
+        r.tags,
     )
 }
 
@@ -307,6 +308,7 @@ mod tests {
             0,
             false,
             "".to_string(),
+            vec![],
         );
         let raw = "---
 name: cake

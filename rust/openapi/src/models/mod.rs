@@ -4,6 +4,8 @@ pub mod auth_resp;
 pub use self::auth_resp::AuthResp;
 pub mod branded_food;
 pub use self::branded_food::BrandedFood;
+pub mod config_data;
+pub use self::config_data::ConfigData;
 pub mod entity_summary;
 pub use self::entity_summary::EntitySummary;
 pub mod error;

@@ -88,8 +88,9 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		if dateProp, ok := page.Properties["Date"]; ok {
 			date := dateProp.(*notionapi.DateProperty).Date.Start
 			if date != nil {
-				utcTime := time.Time(*date) //todo: this is slightly wrong
-				meal.Time = zero.TimeFrom(utcTime.Add(time.Hour * 0)).Ptr()
+				utcTime := time.Time(*date)
+				dinnerTime := utcTime.Add(time.Hour * (3 + 24))
+				meal.Time = zero.TimeFrom(dinnerTime).Ptr()
 			}
 		}
 		if tags, ok := page.Properties["Tags"]; ok {
