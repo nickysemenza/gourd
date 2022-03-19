@@ -141,9 +141,9 @@ get-detail/%:
 seed-testdata: bin/gourd
 	./testdata/seed.sh
 
-devdata: seed-testdata album-seed
-	./usda/import.sh ~/Downloads/FoodData_Central_csv_2020-04-29/
-	
-album-seed: 
-	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food');"
+devdata: seed-testdata sync
+	./usda/import.sh ~/Downloads/FoodData_Central_csv_2021-10-28/
+sync:
 	./bin/gourd sync
+insert-album: 	
+	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food');"

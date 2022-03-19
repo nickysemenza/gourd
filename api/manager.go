@@ -86,12 +86,12 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Infof("got %d notion recipes", len(nRecipes))
 
 	var notionRecipes []models.NotionRecipe
 	var notionImages []db.NotionImage
 	var images []db.Image
 	for _, nRecipe := range nRecipes {
-
 		dbnr, err := a.notionRecipeToDB(ctx, nRecipe)
 		if err != nil {
 			return err

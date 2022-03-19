@@ -55,6 +55,22 @@ type NotionRecipe struct {
 	Children  []NotionRecipe `json:"children,omitempty"`
 }
 
+func removeDuplicateValues(intSlice []NotionPhoto) []NotionPhoto {
+	keys := make(map[string]bool)
+	list := []NotionPhoto{}
+
+	// If the key(values of the slice) is not equal
+	// to the already present value in new slice (list)
+	// then we append it. else we jump on another element.
+	for _, entry := range intSlice {
+		if _, value := keys[entry.BlockID]; !value {
+			keys[entry.BlockID] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 // nolint: exhaustive
 func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *NotionRecipe, err error) {
 	switch page.Object {
@@ -162,6 +178,9 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 
 		for _, page := range resp.Results {
 			span.AddEvent("page", trace.WithAttributes(attribute.String("page", spew.Sdump(page))))
+			// if page.ID.String() != "e19dd5c9-5894-4bbc-b048-76e4293e32c0" {
+			// 	continue
+			// }
 			meal, err := c.processPage(ctx, page)
 			if err != nil {
 				return nil, err
@@ -190,26 +209,24 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 		}
 
 		for _, block := range children.Results {
+			blockID := block.GetID().String()
 			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
-			log.WithField("page_id", pageID).Infof("\tfound notion %s", block.GetType())
+			l := log.WithField("page_id", pageID).
+				WithField("block_id", blockID)
+			l.
+				Infof("\tfound notion %s", block.GetType())
 			// nolint: exhaustive
 			switch block.GetType() {
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)
-				meal.Photos = append(meal.Photos, NotionPhoto{URL: i.Image.File.URL, BlockID: i.ID.String()})
-			case notionapi.BlockTypeColumnList:
-				i := block.(*notionapi.ColumnListBlock)
-				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(i.ID), meal)
+				l.Infof("appending via image")
+				meal.Photos = append(meal.Photos, NotionPhoto{URL: i.Image.File.URL, BlockID: blockID})
+			case notionapi.BlockTypeColumnList, notionapi.BlockTypeColumn:
+				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(blockID), meal)
 				if err != nil {
 					return nil, err
 				}
-				meal.Photos = append(meal.Photos, foo.Photos...)
-			case notionapi.BlockTypeColumn:
-				i := block.(*notionapi.ColumnBlock)
-				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(i.ID), meal)
-				if err != nil {
-					return nil, err
-				}
+				l.Infof("appending via col")
 				meal.Photos = append(meal.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
@@ -235,6 +252,8 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 			break
 		}
 	}
+
+	meal.Photos = removeDuplicateValues(meal.Photos)
 	return &meal, nil
 
 }
