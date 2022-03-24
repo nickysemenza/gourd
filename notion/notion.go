@@ -157,11 +157,11 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 		// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
 		// }
 
-		yday := notionapi.Date(time.Now().AddDate(0, 0, -15))
+		daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -15))
 
 		testFilter := notionapi.PropertyFilter{
 			Property: "Date",
-			Date:     &notionapi.DateFilterCondition{OnOrAfter: &yday},
+			Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
 		}
 
 		filter["and"] = append(filter["and"], testFilter)
