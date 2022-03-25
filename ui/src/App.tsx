@@ -81,7 +81,7 @@ const registerTracing = (url: string, batch: boolean) => {
     provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
   }
 };
-registerTracing(getTracingURL(), true);
+// registerTracing(getTracingURL(), true);
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   let authed = isLoggedIn() || true;

@@ -6,5 +6,6 @@
     "runMode": 2,
     "openMode": 0
   },
+  "chromeWebSecurity": false,
   "projectId": "hf26uf"
 }
