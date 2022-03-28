@@ -17,7 +17,7 @@ const Test: React.FC = () => {
             Gourd Recipe Database
           </h2>
           <div className="mt-2 text-center text-sm text-gray-600">
-            {config && <Login config={config} />}
+            {config && config.google_client_id && <Login config={config} />}
           </div>
         </div>
       </div>

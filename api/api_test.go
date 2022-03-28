@@ -214,9 +214,9 @@ func TestSync(t *testing.T) {
 	// require.NoError(err)
 	// require.Len(meals, 1)
 
-	l, err := apiManager.Latex(ctx, rd)
-	require.NoError(err)
-	require.Greater(len(l), 10000)
+	// l, err := apiManager.Latex(ctx, rd)
+	// require.NoError(err)
+	// require.Greater(len(l), 10000)
 
 }
 
