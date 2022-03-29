@@ -5,7 +5,7 @@ jobs:
     name: golang lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
         with:
@@ -17,7 +17,7 @@ jobs:
       matrix:
         go: ["1.18"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -77,7 +77,7 @@ jobs:
     env:
       CARGO_TERM_COLOR: always
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: cargo build
         run: cargo build --verbose
         working-directory: rust
@@ -109,7 +109,7 @@ jobs:
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: curl -L https://fly.io/install.sh | sh
       - uses: superfly/flyctl-actions@master
         env:
