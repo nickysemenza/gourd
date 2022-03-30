@@ -7,6 +7,5 @@ rust/w/target
 openapi/
 .terraform/*
 usda/*
-.git/*
 ui/build
 tmp_images/
