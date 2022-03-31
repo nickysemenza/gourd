@@ -8,7 +8,9 @@ const Playground: React.FC = () => {
   const loc = useLocation();
   const ids = useMemo(() => {
     const url = queryString.parse(loc.search).recipes;
-    return url ? (Array.isArray(url) ? url : [url]) : [];
+    const a = url ? (Array.isArray(url) ? url : [url]) : [];
+    let u = a.filter((x) => x !== null) as string[];
+    return u;
   }, [loc]);
 
   return (
