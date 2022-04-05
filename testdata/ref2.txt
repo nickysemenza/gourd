@@ -1,0 +1,6 @@
+name: refB
+---
+100g flour
+100g egg
+100g milk
+0.5 recipe refA

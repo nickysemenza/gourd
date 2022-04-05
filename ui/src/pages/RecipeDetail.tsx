@@ -19,6 +19,7 @@ import { formatTimeRange, getTotalDuration, scaledRound } from "../util";
 import {
   calCalc,
   countTotals,
+  extractIngredientID,
   flatIngredients,
   FoodsById,
   getFDCIds,
@@ -138,8 +139,7 @@ const RecipeDetail: React.FC = () => {
     queryParams: {
       ingredient_id: [
         ...flatIngredients(recipe?.detail.sections || []).map(
-          (i) =>
-            i.ingredient?.ingredient.parent || i.ingredient?.ingredient.id || ""
+          (i) => extractIngredientID(i) || ""
         ),
         "",
       ],

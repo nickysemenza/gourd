@@ -9,20 +9,27 @@ import {
   SectionIngredient,
   useListIngredients,
   useGetRecipesByIds,
+  RecipeDetail,
 } from "../api/openapi-hooks/api";
 import {
   flatIngredients,
-  getFooUnits,
+  getMeasureUnitsFromSI,
   getGramsFromSI,
   IngDetailsById,
   totalFlourMass,
+  extractIngredientID,
 } from "./RecipeEditorUtils";
 import { EntitySelector } from "./EntitySelector";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { getOpenapiFetchConfig } from "../config";
 import { HideShowButton } from "./Button";
+import Debug from "./Debug";
 
+interface Foo {
+  si: SectionIngredient | undefined;
+  multiplier: number;
+}
 const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
   const { data } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
@@ -31,6 +38,8 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     },
     // lazy: true,
   });
+
+  const MULTIPLIER_TODO = 0.5;
 
   const [showBP, setShow] = React.useState(false);
   const [sums, setSums] = React.useState<UsageValue[]>([]);
@@ -44,7 +53,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             let foo: EntitySummary = {
               id: id,
               kind: IngredientKind.RECIPE,
-              multiplier: 1.0,
+              multiplier: MULTIPLIER_TODO,
               name: "",
             };
             return foo;
@@ -62,37 +71,41 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
   const recipesIngredients = recipes.map((r) =>
     flatIngredients(r.detail.sections)
   );
-  const allIds = recipesIngredients
-    .map((r) =>
-      r.map(
-        (si) => si.ingredient?.ingredient.parent || si.ingredient?.ingredient.id
-      )
+  const allSIIDs = recipesIngredients
+    .map((sectionIngredients) =>
+      sectionIngredients.map((si) => extractIngredientID(si, true))
     )
     .flat()
     .filter(function (item, pos, a) {
       return a.indexOf(item) === pos && item !== undefined;
     });
+  console.log({ recipesIngredients, allSIIDs });
 
-  let byId: Record<string, (SectionIngredient | undefined)[]> = {};
-  allIds.forEach((eachId) => {
-    let res: (SectionIngredient | undefined)[] = [];
+  let sectionIngredientByID: Record<string, Foo[]> = {};
+  allSIIDs.forEach((eachId) => {
+    let res: Foo[] = [];
     recipesIngredients.forEach((r) => {
       let result: SectionIngredient | undefined = undefined;
+      let multiplier = 1.0;
       r.forEach((si) => {
-        const id =
-          si.ingredient?.ingredient.parent || si.ingredient?.ingredient.id;
-        if (id === eachId) {
+        if (si.kind == "recipe") {
+          // if its a recipe, scale the child ingredients accordingly
+          multiplier =
+            si.amounts.filter((a) => a.unit === "recipe").pop()?.value || 1;
+        }
+        const ingredientID = extractIngredientID(si);
+        if (ingredientID === eachId) {
           result = si;
         }
       });
-      res.push(result);
+      res.push({ si: result, multiplier });
     });
     if (eachId) {
-      byId[eachId] = res;
+      sectionIngredientByID[eachId] = res;
     }
   });
 
-  const ingIds = [...Object.keys(byId)];
+  const ingIds = [...Object.keys(sectionIngredientByID)];
   const { data: ingredientDetails } = useListIngredients({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
@@ -133,7 +146,6 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                   placeholder={ids[i] || `"Pick a Recipe..."`}
                   onChange={async (a) => {
                     console.log(a);
-                    // setIds(update(ids, { [i]: { $set: a.rd || "" } }));
                   }}
                 />
               </th>
@@ -142,7 +154,23 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
           <tr>
             {recipes.map((r, i) => (
               <th className={thClass} key={i}>
-                <RecipeLink recipe={r.detail} />
+                <RecipeLink recipe={r.detail} multiplier={MULTIPLIER_TODO} />
+                <div className="">
+                  {recipesIngredients[i]
+                    .filter((i) => i.kind === "recipe")
+                    .map((si) => (
+                      <div className="text-xs" key={si.id}>
+                        <div className="italic">includes</div>
+                        <RecipeLink
+                          recipe={si.recipe as unknown as RecipeDetail}
+                          multiplier={
+                            si.amounts.filter((a) => a.unit === "recipe").pop()
+                              ?.value || 1
+                          }
+                        />
+                      </div>
+                    ))}
+                </div>
               </th>
             ))}
           </tr>
@@ -153,7 +181,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
               <td colSpan={ids.length + 2}>loading...</td>
             </tr>
           )}
-          {Object.keys(byId).map((eachId) => (
+          {Object.keys(sectionIngredientByID).map((eachId) => (
             <tr key={eachId} className="text-gray-700">
               <td className={tdClass} key={eachId}>
                 {ing_hints[eachId]?.ingredient.name}
@@ -179,8 +207,8 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                     ))}
                 </div>
               </td>
-              {byId[eachId].map((si, x) => {
-                if (!si) {
+              {sectionIngredientByID[eachId].map((si, x) => {
+                if (!si.si) {
                   return (
                     <td
                       className={`${tdClass} text-gray-500 bg-gray-100`}
@@ -190,7 +218,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                     </td>
                   );
                 }
-                const grams = getGramsFromSI(si) || 0;
+                const grams = getGramsFromSI(si.si) || 0;
                 const bpRaw =
                   (grams / totalFlourMass(recipes[x].detail.sections)) * 100 ||
                   0;
@@ -211,8 +239,13 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                         </div>
                       )}
                       <div>
-                        {getFooUnits(si)
-                          .map((a) => `${a.value} ${a.unit}`)
+                        {getMeasureUnitsFromSI(si.si)
+                          .map(
+                            (a) =>
+                              `${a.value * MULTIPLIER_TODO * si.multiplier} ${
+                                a.unit
+                              }`
+                          )
                           .join(" | ")}
                       </div>
                     </div>

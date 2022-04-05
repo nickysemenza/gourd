@@ -157,9 +157,17 @@ func (a *API) singleIngredientUsage(ctx context.Context, d EntitySummary) (Usage
 				pVal.Ings = append(pVal.Ings, usage)
 				u[id] = pVal
 			} else if i.Kind == IngredientKindRecipe {
+				var subRecipeMultiplier float64 = 1.0
+				for _, x := range i.Amounts {
+					if x.Unit == "recipe" {
+						subRecipeMultiplier = x.Value
+						break
+					}
+				}
+				subRecipeMultiplier *= d.Multiplier
 				ru, err := a.singleIngredientUsage(ctx, EntitySummary{
 					Id:         i.Recipe.Id,
-					Multiplier: 1, // todo
+					Multiplier: subRecipeMultiplier,
 					Kind:       IngredientKindRecipe,
 				})
 				if err != nil {

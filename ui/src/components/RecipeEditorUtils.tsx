@@ -553,13 +553,22 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
 export const getHint = (
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById
-): IngredientDetail | undefined => {
-  const ingredientId =
-    ingredient?.ingredient?.ingredient.parent ||
-    ingredient?.ingredient?.ingredient.id ||
-    "";
-  const hint = ing_hints[ingredientId];
-  return !!hint ? hint : undefined;
+): IngredientDetail | undefined =>
+  ing_hints[extractIngredientID(ingredient) || ""] || undefined;
+
+export const extractIngredientID = (
+  ingredient?: SectionIngredient,
+  includeRecipe: boolean = false
+) => {
+  if (ingredient === undefined) {
+    return undefined;
+  }
+  let ing =
+    ingredient.ingredient?.ingredient.parent ||
+    ingredient.ingredient?.ingredient.id;
+  if (ing) {
+    return ing;
+  }
 };
 
 export const isCal = (a: Amount) => a.unit === "kcal";
@@ -570,7 +579,7 @@ export const isGram = (a: Amount) =>
 export const getGramsFromSI = (si: SectionIngredient) =>
   si.amounts.filter((a) => isGram(a)).pop()?.value || 0;
 
-export const getFooUnits = (si: SectionIngredient) =>
+export const getMeasureUnitsFromSI = (si: SectionIngredient) =>
   si.amounts.filter((a) => isGram(a) || isVolume(a));
 
 // for baker's percentage cauclation we need the total mass of all flours (which together are '100%')
