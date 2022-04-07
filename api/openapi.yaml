@@ -454,7 +454,7 @@ paths:
   /recipes/sum:
     post:
       summary: sum up recipes
-      description: todo
+      description: sums up the given recipes
       operationId: sum_recipes
       tags:
         - recipes
@@ -1571,7 +1571,7 @@ components:
       type: string
       enum: [ingredient, recipe]
     RecipeDependency:
-      description: node?
+      description: represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
       type: object
       required:
         - recipe_id
@@ -1596,7 +1596,7 @@ components:
           description: what kind of ingredient
           $ref: "#/components/schemas/IngredientKind"
     EntitySummary:
-      description: name and id of something
+      description: holds name/id and multiplier for a Kind of entity
       type: object
       required:
         - id
@@ -1618,6 +1618,7 @@ components:
           description: what kind of entity
           $ref: "#/components/schemas/IngredientKind"
     IngredientUsage:
+      description: todo
       type: object
       required:
         - amounts
@@ -1640,6 +1641,7 @@ components:
             $ref: "#/components/schemas/EntitySummary"
     UsageValue:
       type: object
+      description: holds information
       required:
         - ings
         - sum

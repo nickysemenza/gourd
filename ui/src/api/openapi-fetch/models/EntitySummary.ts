@@ -21,7 +21,7 @@ import {
 } from './';
 
 /**
- * name and id of something
+ * holds name/id and multiplier for a Kind of entity
  * @export
  * @interface EntitySummary
  */

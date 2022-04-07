@@ -29,7 +29,7 @@ import {
 } from './';
 
 /**
- * 
+ * holds information
  * @export
  * @interface UsageValue
  */

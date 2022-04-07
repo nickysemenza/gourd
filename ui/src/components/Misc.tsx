@@ -10,7 +10,7 @@ import { scaledRound } from "../util";
 import { WasmContext } from "../wasm";
 
 export interface Props {
-  recipe: RecipeDetail;
+  recipe: Pick<RecipeDetail, "id" | "name" | "version" | "is_latest_version">;
   multiplier?: number;
 }
 export const RecipeLink: React.FC<Props> = ({

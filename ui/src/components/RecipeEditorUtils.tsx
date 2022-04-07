@@ -603,3 +603,16 @@ export const totalFlourMass = (sections: RecipeSection[]) => {
     .pop();
   return biggest ? getGramsFromSI(biggest) : 0;
 };
+
+// if an ingredient is a recipe, then 'recipe' is a special unit
+// that's then used as the multiplier for scaling the sub-recipe
+export const getMultiplierFromRecipe = (
+  si: SectionIngredient,
+  globalMultiplier: number
+) => {
+  if (si.kind !== "recipe") {
+    throw new Error(`SI ${si.id} is not a recipe!`);
+  }
+  const val = si.amounts.filter((a) => a.unit === "recipe").pop()?.value || 1;
+  return val * globalMultiplier;
+};

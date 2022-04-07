@@ -471,7 +471,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
-     * todo
+     * sums up the given recipes
      * sum up recipes
      */
     async sumRecipesRaw(requestParameters: RecipesApiSumRecipesRequest): Promise<runtime.ApiResponse<InlineResponse2001>> {
@@ -505,7 +505,7 @@ export class RecipesApi extends runtime.BaseAPI {
     }
 
     /**
-     * todo
+     * sums up the given recipes
      * sum up recipes
      */
     async sumRecipes(requestParameters: RecipesApiSumRecipesRequest): Promise<InlineResponse2001> {

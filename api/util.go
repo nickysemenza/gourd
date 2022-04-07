@@ -141,3 +141,14 @@ func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId
 	}
 	return &r, nil
 }
+
+// Coalesce returns the first non-zero provided
+func Coalesce[T string | int | float64](i ...T) T {
+	var zeroVal T
+	for _, s := range i {
+		if s != zeroVal {
+			return s
+		}
+	}
+	return zeroVal
+}

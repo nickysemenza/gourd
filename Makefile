@@ -87,7 +87,7 @@ docker-push: docker-build
 # openAPI
 
 validate-openapi: api/openapi.yaml
-	./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
+	# ./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js api/openapi.yaml -c api/.validaterc -v
 
 openapi: validate-openapi api/openapi.yaml bin/oapi-codegen
 	rm -rf ui/src/api/openapi-fetch

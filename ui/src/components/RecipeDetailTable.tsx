@@ -39,6 +39,7 @@ import {
   isGram,
   isVolume,
   flatIngredients,
+  getMultiplierFromRecipe,
 } from "./RecipeEditorUtils";
 import {
   ArrowDown,
@@ -226,7 +227,13 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           ) : (
             <div className="text-gray-600 dark:text-zinc-200">
               {ingredient.kind === "recipe" && ingredient.recipe ? (
-                <RecipeLink recipe={ingredient.recipe} />
+                <RecipeLink
+                  recipe={ingredient.recipe}
+                  multiplier={getMultiplierFromRecipe(
+                    ingredient,
+                    tweaks.multiplier
+                  )}
+                />
               ) : (
                 <div className="flex justify-between pr-1">
                   <p>{ingredient.ingredient?.ingredient.name}</p>

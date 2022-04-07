@@ -21,7 +21,7 @@ import {
 } from './';
 
 /**
- * node?
+ * represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
  * @export
  * @interface RecipeDependency
  */

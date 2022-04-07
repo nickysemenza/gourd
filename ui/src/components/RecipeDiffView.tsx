@@ -18,6 +18,7 @@ import {
   IngDetailsById,
   totalFlourMass,
   extractIngredientID,
+  getMultiplierFromRecipe,
 } from "./RecipeEditorUtils";
 import { EntitySelector } from "./EntitySelector";
 import { RecipeLink } from "./Misc";
@@ -39,6 +40,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     // lazy: true,
   });
 
+  // const MULTIPLIER_TODO = 1.0;
   const MULTIPLIER_TODO = 0.5;
 
   const [showBP, setShow] = React.useState(false);
@@ -88,10 +90,9 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
       let result: SectionIngredient | undefined = undefined;
       let multiplier = 1.0;
       r.forEach((si) => {
-        if (si.kind == "recipe") {
+        if (si.kind === "recipe") {
           // if its a recipe, scale the child ingredients accordingly
-          multiplier =
-            si.amounts.filter((a) => a.unit === "recipe").pop()?.value || 1;
+          multiplier = getMultiplierFromRecipe(si, 1);
         }
         const ingredientID = extractIngredientID(si);
         if (ingredientID === eachId) {
@@ -163,10 +164,10 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                         <div className="italic">includes</div>
                         <RecipeLink
                           recipe={si.recipe as unknown as RecipeDetail}
-                          multiplier={
-                            si.amounts.filter((a) => a.unit === "recipe").pop()
-                              ?.value || 1
-                          }
+                          multiplier={getMultiplierFromRecipe(
+                            si,
+                            MULTIPLIER_TODO
+                          )}
                         />
                       </div>
                     ))}
@@ -181,99 +182,110 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
               <td colSpan={ids.length + 2}>loading...</td>
             </tr>
           )}
-          {Object.keys(sectionIngredientByID).map((eachId) => (
-            <tr key={eachId} className="text-gray-700">
-              <td className={tdClass} key={eachId}>
-                {ing_hints[eachId]?.ingredient.name}
-              </td>
-              <td
-                className={`${tdClass} text-gray-500 bg-gray-100`}
-                key={`${eachId}-total`}
-              >
-                <div>
-                  {sums.length === 0 && "loading..."}
-                  {sums
-                    .filter(
-                      (s) =>
-                        s.ing.id === eachId ||
-                        ing_hints[eachId]?.children
-                          ?.map((c) => c.ingredient.id)
-                          .includes(s.ing.id)
-                    )
-                    .map((s, x) => (
-                      <div key={`${eachId}-sums-${x}`}>
+          {Object.keys(sectionIngredientByID).map((sectionIngID) => {
+            // sums that are related to the current ingredient, or a child of it.
+            const ingSums = sums.filter(
+              (s) =>
+                s.ing.id === sectionIngID ||
+                ing_hints[sectionIngID]?.children
+                  ?.map((c) => c.ingredient.id)
+                  .includes(s.ing.id)
+            );
+            return (
+              <tr key={sectionIngID} className="text-gray-700">
+                <td className={tdClass} key={sectionIngID}>
+                  {ing_hints[sectionIngID]?.ingredient.name}
+                </td>
+                <td
+                  className={`${tdClass} text-gray-500 bg-gray-100`}
+                  key={`${sectionIngID}-total`}
+                >
+                  <div>
+                    {sums.length === 0 && "loading..."}
+                    {ingSums.map((s, x) => (
+                      <div key={`${sectionIngID}-sums-${x}`}>
                         {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
+                        <ul className="list-disc list-outside pl-4">
+                          {s.ings.map((iu) => (
+                            <li>
+                              {/* {iu.required_by.map((r) => r.name).join(" via ")} */}
+                              <div className="flex">
+                                {iu.required_by.map((r) => (
+                                  <div className="mx-1 flex">
+                                    <RecipeLink
+                                      multiplier={r.multiplier}
+                                      recipe={{
+                                        name: r.name,
+                                        id: r.id,
+                                        version: 0,
+                                        is_latest_version: false,
+                                      }}
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <ul className="list-disc list-outside pl-4">
+                                {iu.amounts.map((a) => (
+                                  <li>
+                                    {`${a.value} ${a.unit}`} @ {iu.multiplier}x
+                                  </li>
+                                ))}
+                              </ul>
+                            </li>
+                          ))}
+                        </ul>
+                        {/* <Debug data={s} compact /> */}
                       </div>
                     ))}
-                </div>
-              </td>
-              {sectionIngredientByID[eachId].map((si, x) => {
-                if (!si.si) {
+                  </div>
+                </td>
+                {sectionIngredientByID[sectionIngID].map((si, x) => {
+                  if (!si.si) {
+                    return (
+                      <td
+                        className={`${tdClass} text-gray-500 bg-gray-100`}
+                        key={`${x}-${sectionIngID}-nobp`}
+                      >
+                        &mdash;
+                      </td>
+                    );
+                  }
+                  const grams = getGramsFromSI(si.si) || 0;
+                  const bpRaw =
+                    (grams / totalFlourMass(recipes[x].detail.sections)) *
+                      100 || 0;
+                  const bp = scaledRound(bpRaw);
                   return (
                     <td
-                      className={`${tdClass} text-gray-500 bg-gray-100`}
-                      key={`${x}-${eachId}-nobp`}
-                    >
-                      &mdash;
-                    </td>
-                  );
-                }
-                const grams = getGramsFromSI(si.si) || 0;
-                const bpRaw =
-                  (grams / totalFlourMass(recipes[x].detail.sections)) * 100 ||
-                  0;
-                const bp = scaledRound(bpRaw);
-                return (
-                  <td
-                    className={`${tdClass} text-gray-500 
+                      className={`${tdClass} text-gray-500 
                     ${bpRaw === 100 && showBP ? "bg-green-100" : ""}
                      `}
-                    key={`${x}-${eachId}-bp`}
-                  >
-                    <div className="flex justify-between">
-                      {showBP && (
-                        <div
-                          className={`${bpRaw === 0 ? "text-yellow-500" : ""}`}
-                        >
-                          {bp}%
+                      key={`${x}-${sectionIngID}-bp`}
+                    >
+                      <div className="flex justify-between">
+                        {showBP && (
+                          <div
+                            className={`${
+                              bpRaw === 0 ? "text-yellow-500" : ""
+                            }`}
+                          >
+                            {bp}%
+                          </div>
+                        )}
+                        <div>
+                          {getMeasureUnitsFromSI(si.si)
+                            .map((a) => `${a.value * si.multiplier} ${a.unit}`)
+                            .join(" | ")}
                         </div>
-                      )}
-                      <div>
-                        {getMeasureUnitsFromSI(si.si)
-                          .map(
-                            (a) =>
-                              `${a.value * MULTIPLIER_TODO * si.multiplier} ${
-                                a.unit
-                              }`
-                          )
-                          .join(" | ")}
                       </div>
-                    </div>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-      {/* <div className="">
-        <ul className="list-disc list-outside pl-4">
-          {sums.map((s, x) => (
-            <li key={`summap${x}`}>
-              {s.ing.name} (
-              {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")})
-              <ul className="list-disc list-outside pl-4">
-                {s.ings.map((si, y) => (
-                  <li key={`${y}`}>
-                    {si.required_by.map((b) => b.name).join(" <- ")}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div> */}
-      {/* <Debug data={sums} /> */}
     </div>
   );
 };

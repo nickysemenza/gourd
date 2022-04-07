@@ -701,7 +701,7 @@ export type FoodNutrientUnit =
 export type IngredientKind = "ingredient" | "recipe";
 
 /**
- * node?
+ * represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
  */
 export interface RecipeDependency {
   /**
@@ -724,7 +724,7 @@ export interface RecipeDependency {
 }
 
 /**
- * name and id of something
+ * holds name/id and multiplier for a Kind of entity
  */
 export interface EntitySummary {
   /**
@@ -742,6 +742,9 @@ export interface EntitySummary {
   kind: IngredientKind;
 }
 
+/**
+ * todo
+ */
 export interface IngredientUsage {
   /**
    * multiplier
@@ -757,6 +760,9 @@ export interface IngredientUsage {
   required_by: EntitySummary[];
 }
 
+/**
+ * holds information
+ */
 export interface UsageValue {
   /**
    * multiplier
@@ -1501,7 +1507,7 @@ export type SumRecipesProps = Omit<
 /**
  * sum up recipes
  *
- * todo
+ * sums up the given recipes
  */
 export const SumRecipes = (props: SumRecipesProps) => (
   <Mutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>
@@ -1519,7 +1525,7 @@ export type UseSumRecipesProps = Omit<
 /**
  * sum up recipes
  *
- * todo
+ * sums up the given recipes
  */
 export const useSumRecipes = (props: UseSumRecipesProps) =>
   useMutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>(

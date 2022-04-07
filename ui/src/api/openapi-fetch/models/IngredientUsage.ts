@@ -25,7 +25,7 @@ import {
 } from './';
 
 /**
- * 
+ * todo
  * @export
  * @interface IngredientUsage
  */

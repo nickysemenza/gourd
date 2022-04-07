@@ -11,11 +11,12 @@ import (
 
 type IngredientID string
 
-func (r *RecipeDetail) summary() EntitySummary {
+func (r *RecipeDetail) summary(multiplier float64) EntitySummary {
 	return EntitySummary{
-		Name: r.Name,
-		Id:   r.Id,
-		Kind: IngredientKindRecipe,
+		Name:       r.Name,
+		Id:         r.Id,
+		Kind:       IngredientKindRecipe,
+		Multiplier: multiplier,
 	}
 }
 
@@ -53,13 +54,13 @@ func (a *API) SumRecipes(c echo.Context) error {
 
 type UsageSummary map[IngredientID]UsageValue
 
-func (a *API) IngredientUsage(ctx context.Context, details []EntitySummary) (UsageSummary, error) {
+func (a *API) IngredientUsage(ctx context.Context, inputRecipes []EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientUsage")
 	defer span.End()
 	u := make(map[IngredientID]UsageValue)
 
-	for _, d := range details {
-		ru, err := a.singleIngredientUsage(ctx, d)
+	for _, inputRecipe := range inputRecipes {
+		ru, err := a.singleIngredientUsage(ctx, inputRecipe)
 		if err != nil {
 			return nil, err
 		}
@@ -119,32 +120,30 @@ func (a *API) IngredientUsage(ctx context.Context, details []EntitySummary) (Usa
 
 }
 
-func (a *API) singleIngredientUsage(ctx context.Context, d EntitySummary) (UsageSummary, error) {
+func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "singleIngredientUsage")
 	defer span.End()
 
-	if d.Kind != IngredientKindRecipe {
-		return nil, fmt.Errorf("bad kind: %s", d.Kind)
+	if inputRecipe.Kind != IngredientKindRecipe {
+		return nil, fmt.Errorf("bad kind: %s", inputRecipe.Kind)
 	}
-	res, err := a.recipeById(ctx, d.Id)
+	res, err := a.recipeById(ctx, inputRecipe.Id)
 	if err != nil {
 		return nil, err
 	}
-	if d.Multiplier == 0 {
-		d.Multiplier = 1
-	}
-	u := make(map[IngredientID]UsageValue)
+	inputRecipe.Multiplier = Coalesce(inputRecipe.Multiplier, 1)
+	totalSum := make(UsageSummary)
 	for _, s := range res.Detail.Sections {
 		for _, i := range s.Ingredients {
 			if i.Kind == IngredientKindIngredient {
 				detail := i.Ingredient
 				usage := IngredientUsage{
 					Amounts:    i.Amounts,
-					Multiplier: d.Multiplier,
-					RequiredBy: []EntitySummary{res.Detail.summary()},
+					Multiplier: inputRecipe.Multiplier,
+					RequiredBy: []EntitySummary{res.Detail.summary(inputRecipe.Multiplier)},
 				}
 				id := IngredientID(detail.Ingredient.Id)
-				pVal, ok := u[id]
+				pVal, ok := totalSum[id]
 				if !ok {
 					pVal = UsageValue{
 						Ing: EntitySummary{
@@ -154,18 +153,20 @@ func (a *API) singleIngredientUsage(ctx context.Context, d EntitySummary) (Usage
 						},
 					}
 				}
+				// usage.Amounts = removeCalculatedAmounts(usage.Amounts)
+
 				pVal.Ings = append(pVal.Ings, usage)
-				u[id] = pVal
+				totalSum[id] = pVal
 			} else if i.Kind == IngredientKindRecipe {
 				var subRecipeMultiplier float64 = 1.0
-				for _, x := range i.Amounts {
-					if x.Unit == "recipe" {
-						subRecipeMultiplier = x.Value
+				for _, a := range i.Amounts {
+					if a.Unit == "recipe" {
+						subRecipeMultiplier = a.Value
 						break
 					}
 				}
-				subRecipeMultiplier *= d.Multiplier
-				ru, err := a.singleIngredientUsage(ctx, EntitySummary{
+				subRecipeMultiplier *= inputRecipe.Multiplier
+				usageSummaryForRecipe, err := a.singleIngredientUsage(ctx, EntitySummary{
 					Id:         i.Recipe.Id,
 					Multiplier: subRecipeMultiplier,
 					Kind:       IngredientKindRecipe,
@@ -174,35 +175,50 @@ func (a *API) singleIngredientUsage(ctx context.Context, d EntitySummary) (Usage
 					return nil, err
 				}
 
-				for k, v := range ru {
-					pVal, ok := u[k]
+				for ingID, eachIngUsage := range usageSummaryForRecipe {
+					totalIngUsage, ok := totalSum[ingID]
 					if !ok {
-						pVal = UsageValue{
-							Ing: v.Ing,
+						totalIngUsage = UsageValue{
+							Ing: eachIngUsage.Ing,
 						}
 					}
-					for x := range v.Ings {
-						v.Ings[x].RequiredBy = append(v.Ings[x].RequiredBy, res.Detail.summary())
+					for x := range eachIngUsage.Ings {
+						eachIngUsage.Ings[x].RequiredBy = append(eachIngUsage.Ings[x].RequiredBy, res.Detail.summary(subRecipeMultiplier))
 					}
-					pVal.Ings = append(pVal.Ings, v.Ings...)
-					u[k] = pVal
+					totalIngUsage.Ings = append(totalIngUsage.Ings, eachIngUsage.Ings...)
+					totalSum[ingID] = totalIngUsage
 				}
 			}
 		}
 	}
-	return u, nil
+	return totalSum, nil
 }
 func (a Amount) IsGram() bool {
 	return a.Unit == "g" || strings.HasPrefix(a.Unit, "gr")
+}
+func (a Amount) IsCalculated() bool {
+	if a.Source != nil && *a.Source == "calculated" {
+		return true
+	}
+	return a.Unit == "$" || a.Unit == "kcal"
 }
 func firstAmount(a []Amount, grams bool) *Amount {
 	for _, s := range a {
 		if s.IsGram() && grams {
 			return &s
 		}
-		if !s.IsGram() && s.Unit != "$" && s.Unit != "kcal" && !grams {
+		if !s.IsGram() && !s.IsCalculated() && !grams {
 			return &s
 		}
 	}
 	return nil
+}
+func removeCalculatedAmounts(a []Amount) []Amount {
+	var out []Amount
+	for _, s := range a {
+		if !s.IsCalculated() {
+			out = append(out, s)
+		}
+	}
+	return out
 }

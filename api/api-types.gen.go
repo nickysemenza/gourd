@@ -120,7 +120,7 @@ type ConfigData struct {
 	GoogleScopes   string `json:"google_scopes"`
 }
 
-// name and id of something
+// holds name/id and multiplier for a Kind of entity
 type EntitySummary struct {
 	// recipe_detail or ingredient id
 	Id   string         `json:"id"`
@@ -266,7 +266,7 @@ type IngredientMappingsPayload struct {
 	IngredientMappings []IngredientMapping `json:"ingredient_mappings"`
 }
 
-// IngredientUsage defines model for IngredientUsage.
+// todo
 type IngredientUsage struct {
 	// multiple amounts to try
 	Amounts []Amount `json:"amounts"`
@@ -409,7 +409,7 @@ type Photo struct {
 // where the photo came from
 type PhotoSource string
 
-// node?
+// represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
 type RecipeDependency struct {
 	// id
 	IngredientId   string         `json:"ingredient_id"`
@@ -658,9 +658,9 @@ type UnitMapping struct {
 	Source *string `json:"source,omitempty"`
 }
 
-// UsageValue defines model for UsageValue.
+// holds information
 type UsageValue struct {
-	// name and id of something
+	// holds name/id and multiplier for a Kind of entity
 	Ing EntitySummary `json:"ing"`
 
 	// multiplier
