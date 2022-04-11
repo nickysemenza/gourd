@@ -104,7 +104,7 @@
     "@openapitools/openapi-generator-cli": "2.4.26",
     "@testing-library/jest-dom": "5.16.3",
     "@testing-library/react": "12.1.4",
-    "@testing-library/user-event": "14.0.0",
+    "@testing-library/user-event": "14.1.0",
     "autoprefixer": "10.4.4",
     "chokidar-cli": "3.0.0",
     "cypress": "9.5.3",
