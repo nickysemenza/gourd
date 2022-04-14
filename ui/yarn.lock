@@ -2751,10 +2751,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ibm-cloud/openapi-ruleset@0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.12.0.tgz#a0e5a5858b57e5a8792fb1dce84ab4d7cf0a636f"
-  integrity sha512-m/yluFFeNAFjlsHHlFN8F1yqvEL6oBxTpb5y4CRa7/eiu97fukb6gQyELMu2XjUkBk0NF5es44Qn3bNJQl5S5Q==
+"@ibm-cloud/openapi-ruleset@0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.14.0.tgz#784c2027e278b18e331a3d4cecbc9e38be9b5dcf"
+  integrity sha512-ZOCtUK9XFJDxUZrKDojoenr/qsAVz+OMtVWRsQm4lcrDzArckDsBfonmRyqTusoZE+zEwXBOPvYjsuawnrUcCQ==
   dependencies:
     "@stoplight/spectral-formats" "^1.1.0"
     "@stoplight/spectral-functions" "^1.6.1"
@@ -9447,12 +9447,12 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-ibm-openapi-validator@0.63.0:
-  version "0.63.0"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.63.0.tgz#df4674c01b10929bc4162037b939fc5602a3f65f"
-  integrity sha512-RTH8XSm0En90rq1h8jnafN1eZvFvGDzE86R80YqSs0NJL6HU2z5bhjSMTbFKFpt78KIe1bmg0+6DVTINaUfBEA==
+ibm-openapi-validator@0.65.0:
+  version "0.65.0"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.65.0.tgz#80252d3930db15f236c192f12ebcd54c7a8c13ad"
+  integrity sha512-Ih8aZmWLzBODt3gJUC3gChB3uhN0+Sjm2KfxDLbaBbNBqmqk9u4i2wwMpnXraEhhzRofOFzzMQb03ng0PhodGw==
   dependencies:
-    "@ibm-cloud/openapi-ruleset" "0.12.0"
+    "@ibm-cloud/openapi-ruleset" "0.14.0"
     "@stoplight/spectral-cli" "^6.3.0"
     "@stoplight/spectral-core" "^1.11.0"
     "@stoplight/spectral-parsers" "^1.0.1"
