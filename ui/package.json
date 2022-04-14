@@ -21,7 +21,7 @@
     "@types/node": "17.0.23",
     "@types/pluralize": "0.0.29",
     "@types/query-string": "6.3.0",
-    "@types/react": "17.0.43",
+    "@types/react": "18.0.5",
     "@types/react-dom": "17.0.14",
     "@types/react-helmet": "6.1.5",
     "@types/react-router-dom": "5.3.3",
