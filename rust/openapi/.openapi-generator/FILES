@@ -9,6 +9,9 @@ src/lib.rs
 src/models/amount.rs
 src/models/auth_resp.rs
 src/models/branded_food.rs
+src/models/compact_recipe.rs
+src/models/compact_recipe_meta.rs
+src/models/compact_recipe_section.rs
 src/models/config_data.rs
 src/models/entity_summary.rs
 src/models/error.rs

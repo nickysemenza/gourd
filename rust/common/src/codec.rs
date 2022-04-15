@@ -1,7 +1,8 @@
 use anyhow::bail;
 use ingredient::rich_text::Chunk;
 use openapi::models::{
-    Amount, RecipeDetail, RecipeDetailInput, RecipeSection, RecipeSectionInput, SectionIngredient,
+    Amount, CompactRecipe, CompactRecipeMeta, CompactRecipeSection, RecipeDetail,
+    RecipeDetailInput, RecipeSection, RecipeSectionInput, SectionIngredient,
     SectionIngredientInput, SectionInstruction, SectionInstructionInput,
 };
 use tracing::trace;
@@ -11,77 +12,54 @@ use crate::{
     unit::unit,
 };
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct CompactRecipeSection {
-    pub ingredients: Vec<String>,
-    pub instructions: Vec<String>,
-}
+pub fn to_string(cr: CompactRecipe) -> Result<String, anyhow::Error> {
+    let mut res = String::new();
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct CompactRecipe {
-    pub meta: CompactRecipeMeta,
-    pub sections: Vec<CompactRecipeSection>,
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct CompactRecipeMeta {
-    pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub url: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub image: Option<String>,
-}
-
-impl CompactRecipe {
-    pub fn to_string(self) -> Result<String, anyhow::Error> {
-        let mut res = String::new();
-
-        let section1 = serde_yaml::to_string(&self.meta)?;
-        res.push_str(&section1);
-        res.push_str(SEP);
-        dbg!(res.clone());
-        for s in self.sections.into_iter() {
-            for i in s.ingredients.into_iter() {
-                res.push_str(&i);
-                res.push('\n');
-            }
-            for i in s.instructions.into_iter() {
-                res.push_str(format!(";{}", i).as_str());
-                res.push('\n');
-            }
+    let section1 = serde_yaml::to_string(&cr.meta)?;
+    res.push_str(&section1);
+    res.push_str(SEP);
+    dbg!(res.clone());
+    for s in cr.sections.into_iter() {
+        for i in s.ingredients.into_iter() {
+            res.push_str(&i);
             res.push('\n');
         }
-        Ok(res.trim_end().to_string())
-    }
-    pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
-        trace!("decoding {}", r);
-        let parts: Vec<&str> = r.trim_start_matches(SEP).split(SEP).collect();
-        if parts.len() != 2 {
-            bail!("expected 2 parts");
+        for i in s.instructions.into_iter() {
+            res.push_str(format!(";{}", i).as_str());
+            res.push('\n');
         }
-        let compact = CompactRecipe {
-            meta: serde_yaml::from_str(parts[0])?,
-            sections: parts[1]
-                .split("\n\n")
-                .collect::<Vec<&str>>()
-                .iter()
-                .map(|section_text_chunk| {
-                    let mut section = CompactRecipeSection {
-                        ingredients: vec![],
-                        instructions: vec![],
-                    };
-                    section_text_chunk.split("\n").into_iter().for_each(|l| {
-                        match l.strip_prefix(";") {
-                            Some(i) => section.instructions.push(i.to_string()),
-                            None => section.ingredients.push(l.to_string()),
-                        }
-                    });
-                    section
-                })
-                .collect(),
-        };
-        Ok(compact)
+        res.push('\n');
     }
+    Ok(res.trim_end().to_string())
+}
+pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
+    trace!("decoding {}", r);
+    let parts: Vec<&str> = r.trim_start_matches(SEP).split(SEP).collect();
+    if parts.len() != 2 {
+        bail!("expected 2 parts");
+    }
+    let compact = CompactRecipe {
+        meta: serde_yaml::from_str(parts[0])?,
+        sections: parts[1]
+            .split("\n\n")
+            .collect::<Vec<&str>>()
+            .iter()
+            .map(|section_text_chunk| {
+                let mut section = CompactRecipeSection {
+                    ingredients: vec![],
+                    instructions: vec![],
+                };
+                section_text_chunk.split("\n").into_iter().for_each(|l| {
+                    match l.strip_prefix(";") {
+                        Some(i) => section.instructions.push(i.to_string()),
+                        None => section.ingredients.push(l.to_string()),
+                    }
+                });
+                section
+            })
+            .collect(),
+    };
+    Ok(compact)
 }
 // condense down recipe detail input into a compact recipe
 pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
@@ -103,11 +81,11 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
         sections.push(sec);
     }
     return CompactRecipe {
-        meta: CompactRecipeMeta {
+        meta: Box::new(CompactRecipeMeta {
             name: r.name,
             url: None,
             image: None,
-        },
+        }),
         sections,
     };
 }
@@ -115,10 +93,10 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
 // turn the recipe into a text block
 pub fn encode_recipe(r: RecipeDetailInput) -> Result<String, anyhow::Error> {
     let compact = compact_recipe(r);
-    compact.to_string()
+    to_string(compact)
 }
 pub fn decode_recipe(r: String) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), anyhow::Error> {
-    let compact = CompactRecipe::from_string(r)?;
+    let compact = from_string(r)?;
     expand_recipe(compact)
 }
 const SEP: &str = "---\n";

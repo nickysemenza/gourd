@@ -114,6 +114,25 @@ type BrandedFood struct {
 	ServingSizeUnit     string  `json:"serving_size_unit"`
 }
 
+// CompactRecipe defines model for CompactRecipe.
+type CompactRecipe struct {
+	Meta     CompactRecipeMeta      `json:"meta"`
+	Sections []CompactRecipeSection `json:"sections"`
+}
+
+// CompactRecipeMeta defines model for CompactRecipeMeta.
+type CompactRecipeMeta struct {
+	Image *string `json:"image,omitempty"`
+	Name  string  `json:"name"`
+	Url   *string `json:"url,omitempty"`
+}
+
+// CompactRecipeSection defines model for CompactRecipeSection.
+type CompactRecipeSection struct {
+	Ingredients  []string `json:"ingredients"`
+	Instructions []string `json:"instructions"`
+}
+
 // config data
 type ConfigData struct {
 	GoogleClientId string `json:"google_client_id"`

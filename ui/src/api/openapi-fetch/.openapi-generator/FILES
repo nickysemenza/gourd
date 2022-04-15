@@ -12,6 +12,9 @@ index.ts
 models/Amount.ts
 models/AuthResp.ts
 models/BrandedFood.ts
+models/CompactRecipe.ts
+models/CompactRecipeMeta.ts
+models/CompactRecipeSection.ts
 models/ConfigData.ts
 models/EntitySummary.ts
 models/Food.ts

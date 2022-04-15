@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use gourd_common::codec::{CompactRecipe, CompactRecipeMeta, CompactRecipeSection};
+use openapi::models::{CompactRecipe, CompactRecipeMeta, CompactRecipeSection};
 use pyo3::{types::PyModule, PyAny, Python};
 
 #[tracing::instrument(name = "route::scrape_recipe")]
@@ -40,13 +40,13 @@ def sc(x,y):
             ingredients: sc_result.0.into_iter().map(|i| i.to_string()).collect(),
             instructions: sc_result.1.split('\n').map(|i| i.to_string()).collect(),
         }],
-        meta: CompactRecipeMeta {
+        meta: Box::new(CompactRecipeMeta {
             name: sc_result.2,
             image: match sc_result.3 == "" {
                 true => None,
                 false => Some(sc_result.3),
             },
             url: Some(url.to_string()),
-        },
+        }),
     })
 }

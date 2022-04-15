@@ -787,6 +787,22 @@ export interface UnitConversionRequest {
   unit_mappings: UnitMapping[];
 }
 
+export interface CompactRecipeSection {
+  ingredients: string[];
+  instructions: string[];
+}
+
+export interface CompactRecipeMeta {
+  name: string;
+  url?: string;
+  image?: string;
+}
+
+export interface CompactRecipe {
+  meta: CompactRecipeMeta;
+  sections: CompactRecipeSection[];
+}
+
 export interface AuthLoginQueryParams {
   /**
    * Google code

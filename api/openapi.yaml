@@ -1679,6 +1679,43 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/UnitMapping"
+    CompactRecipeSection:
+      type: object
+      required:
+        - ingredients
+        - instructions
+      properties:
+        ingredients:
+          type: array
+          items:
+            type: string
+        instructions:
+          type: array
+          items:
+            type: string
+    CompactRecipeMeta:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        image:
+          type: string
+    CompactRecipe:
+      type: object
+      required:
+        - meta
+        - sections
+      properties:
+        meta:
+          $ref: "#/components/schemas/CompactRecipeMeta"
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompactRecipeSection"
   parameters:
     offsetParam:
       in: query
