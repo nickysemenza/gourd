@@ -68,6 +68,14 @@ func (a *API) RecipeFromText(ctx context.Context, text string) (*RecipeDetailInp
 	}
 	return &output, nil
 }
+func (a *API) RecipeFromCompact(ctx context.Context, cr CompactRecipe) (*RecipeWrapperInput, error) {
+	output := RecipeWrapperInput{}
+	err := a.R.Post(ctx, "codec/expand", cr, &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode recipe: %w", err)
+	}
+	return &output, nil
+}
 
 // RecipeFromFile reads a recipe from json or yaml file
 func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetailInput, error) {

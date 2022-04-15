@@ -27,21 +27,20 @@ import { getOpenapiFetchConfig } from "../config";
 import { HideShowButton } from "./Button";
 import Debug from "./Debug";
 
-interface Foo {
+interface SIWithMultiplier {
   si: SectionIngredient | undefined;
   multiplier: number;
 }
-const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
+const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
+  entitiesToDiff,
+}) => {
   const { data } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
-      recipe_id: ids,
+      recipe_id: entitiesToDiff.map((x) => x.id),
     },
     // lazy: true,
   });
-
-  // const MULTIPLIER_TODO = 1.0;
-  const MULTIPLIER_TODO = 0.5;
 
   const [showBP, setShow] = React.useState(false);
   const [sums, setSums] = React.useState<UsageValue[]>([]);
@@ -51,11 +50,11 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
       let recipeSumResp = await rAPI.sumRecipes({
         inlineObject: {
-          inputs: ids.map((id) => {
+          inputs: entitiesToDiff.map((id, x) => {
             let foo: EntitySummary = {
-              id: id,
+              id: id.id,
               kind: IngredientKind.RECIPE,
-              multiplier: MULTIPLIER_TODO,
+              multiplier: id.multiplier,
               name: "",
             };
             return foo;
@@ -65,7 +64,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
       setSums(recipeSumResp.sums);
     }
     fetchMyAPI();
-  }, [ids]);
+  }, [entitiesToDiff]);
 
   const recipes = data?.recipes || [];
   // let d1 = details[0];
@@ -83,9 +82,9 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
     });
   console.log({ recipesIngredients, allSIIDs });
 
-  let sectionIngredientByID: Record<string, Foo[]> = {};
+  let sectionIngredientByID: Record<string, SIWithMultiplier[]> = {};
   allSIIDs.forEach((eachId) => {
-    let res: Foo[] = [];
+    let res: SIWithMultiplier[] = [];
     recipesIngredients.forEach((r) => {
       let result: SectionIngredient | undefined = undefined;
       let multiplier = 1.0;
@@ -140,11 +139,11 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             <th rowSpan={2} className={thClass}>
               total
             </th>
-            {ids.map((id, i) => (
+            {entitiesToDiff.map((id, i) => (
               <th className={thClass} key={`h-${i}`}>
                 <EntitySelector
                   showKind={["recipe"]}
-                  placeholder={ids[i] || `"Pick a Recipe..."`}
+                  placeholder={entitiesToDiff[i].id || `"Pick a Recipe..."`}
                   onChange={async (a) => {
                     console.log(a);
                   }}
@@ -153,33 +152,36 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             ))}
           </tr>
           <tr>
-            {recipes.map((r, i) => (
-              <th className={thClass} key={i}>
-                <RecipeLink recipe={r.detail} multiplier={MULTIPLIER_TODO} />
-                <div className="">
-                  {recipesIngredients[i]
-                    .filter((i) => i.kind === "recipe")
-                    .map((si) => (
-                      <div className="text-xs" key={si.id}>
-                        <div className="italic">includes</div>
-                        <RecipeLink
-                          recipe={si.recipe as unknown as RecipeDetail}
-                          multiplier={getMultiplierFromRecipe(
-                            si,
-                            MULTIPLIER_TODO
-                          )}
-                        />
-                      </div>
-                    ))}
-                </div>
-              </th>
-            ))}
+            {recipes.map((r, i) => {
+              const MULTIPLIER_TODO = entitiesToDiff[i].multiplier;
+              return (
+                <th className={thClass} key={i}>
+                  <RecipeLink recipe={r.detail} multiplier={MULTIPLIER_TODO} />
+                  <div className="">
+                    {recipesIngredients[i]
+                      .filter((i) => i.kind === "recipe")
+                      .map((si) => (
+                        <div className="text-xs" key={si.id}>
+                          <div className="italic">includes</div>
+                          <RecipeLink
+                            recipe={si.recipe as unknown as RecipeDetail}
+                            multiplier={getMultiplierFromRecipe(
+                              si,
+                              MULTIPLIER_TODO
+                            )}
+                          />
+                        </div>
+                      ))}
+                  </div>
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody>
           {!ingredientDetails && (
             <tr>
-              <td colSpan={ids.length + 2}>loading...</td>
+              <td colSpan={entitiesToDiff.length + 2}>loading...</td>
             </tr>
           )}
           {Object.keys(sectionIngredientByID).map((sectionIngID) => {
@@ -234,7 +236,7 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
                             </li>
                           ))}
                         </ul>
-                        {/* <Debug data={s} compact /> */}
+                        <Debug data={s} compact />
                       </div>
                     ))}
                   </div>

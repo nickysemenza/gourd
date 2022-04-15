@@ -49,6 +49,10 @@ fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
             .route("/scrape", web::get().to(parser::scrape))
             .route("/pans", web::get().to(parser::pans))
             .route("/debug/scrape", web::get().to(parser::debug_scrape))
+            .route(
+                "/codec/expand",
+                web::post().to(parser::expand_compact_to_input),
+            )
     })
     .listen(listener)?
     .run();

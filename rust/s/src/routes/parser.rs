@@ -1,6 +1,6 @@
 use actix_web::{web, HttpResponse};
 use gourd_common::{codec::expand_recipe, convert_to, pan};
-use openapi::models::RecipeWrapperInput;
+use openapi::models::{CompactRecipe, RecipeWrapperInput};
 use serde::Deserialize;
 use tracing::{debug, error, span};
 
@@ -106,6 +106,12 @@ pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
 
     debug!("scraped {}", url.clone());
     HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
+}
+
+#[tracing::instrument(name = "route::expand_compact_to_input")]
+pub async fn expand_compact_to_input(cr: web::Json<CompactRecipe>) -> HttpResponse {
+    let res = RecipeWrapperInput::new(expand_recipe(cr.clone()).unwrap().0);
+    HttpResponse::Ok().json(res)
 }
 
 #[cfg(test)]

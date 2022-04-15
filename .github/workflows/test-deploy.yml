@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-          stable: ${{ !contains(matrix.go, 'beta') }} # https://github.com/actions/setup-go/issues/176
       # - run: sudo apt-get update
       # - run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
       - run: go mod vendor

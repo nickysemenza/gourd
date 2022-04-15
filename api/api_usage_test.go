@@ -11,40 +11,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func mustInsert(t *testing.T, a *API, cr CompactRecipe) string {
+	t.Helper()
+	ctx := context.Background()
+
+	r, err := a.RecipeFromCompact(ctx, cr)
+	require.NoError(t, err)
+
+	ids, err := a.CreateRecipeDetails(ctx, r.Detail)
+	require.NoError(t, err)
+	return ids[0]
+}
+func newCompact(name string, ingredients, instructions []string) CompactRecipe {
+	return CompactRecipe{
+		Meta: CompactRecipeMeta{Name: name},
+		Sections: []CompactRecipeSection{{
+			Ingredients:  ingredients,
+			Instructions: instructions,
+		}},
+	}
+}
 func TestUsage(t *testing.T) {
 	require := require.New(t)
 	_, apiManager := makeHandler(t)
 	ctx := context.Background()
 
-	r, err := apiManager.RecipeFromText(ctx, `
-name: sub
----
-1 tsp salt
-1 gram salt
-1 gram sugar
-1 tsp pepper
-1 gram pepper
-1 tsp common`)
-	require.NoError(err)
-	r2, err := apiManager.RecipeFromText(ctx, `
-name: main
----
-1 tsp pepper
-1 gram pepper
-1 recipe sub
-1 gram common`)
-	require.NoError(err)
-	r3, err := apiManager.RecipeFromText(ctx, `
-name: smallmain
----
-0.5 recipe sub
-1 gram common`)
-	require.NoError(err)
-	ids, err := apiManager.CreateRecipeDetails(ctx, *r, *r2, *r3)
-	require.NoError(err)
-	require.Len(ids, 3)
-	rdMain := ids[1]
-	rdSMallMain := ids[2]
+	mustInsert(t, apiManager, newCompact("sub", []string{
+		"1 tsp salt",
+		"1 gram salt",
+		"1 gram sugar",
+		"1 tsp pepper",
+		"1 gram pepper",
+		"1 tsp common",
+	}, []string{}))
+
+	rdMain := mustInsert(t, apiManager, newCompact("main", []string{
+		"1 tsp pepper",
+		"1 gram pepper",
+		"1 recipe sub",
+		"1 gram common"},
+		[]string{}))
+	rdSMallMain := mustInsert(t, apiManager, newCompact("smallmain", []string{
+		"0.5 recipe sub",
+		"1 gram common",
+	}, []string{}))
 
 	require.NoError(apiManager.loadIngredientMappings(ctx, []IngredientMapping{
 		{Name: "salt", UnitMappings: []UnitMapping{{

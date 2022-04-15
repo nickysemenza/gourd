@@ -60,24 +60,34 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 func (c *Client) ConvertUnit(ctx context.Context, body, target interface{}) error {
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
 	defer span.End()
-	url := fmt.Sprintf("%sconvert", c.baseurl)
 
+	return c.Post(ctx, "convert", body, target)
+}
+
+func (c *Client) Post(ctx context.Context, route string, body, target interface{}) error {
+
+	route = c.baseurl + route
+
+	ctx, span := otel.Tracer("rs_client").Start(ctx, "post")
+	defer span.End()
 	payloadBuf := new(bytes.Buffer)
 	err := json.NewEncoder(payloadBuf).Encode(body)
 	if err != nil {
 		return err
 	}
 
-	span.AddEvent("sending", trace.WithAttributes(attribute.String("recipe", spew.Sdump(body))))
+	span.AddEvent("sending", trace.WithAttributes(attribute.String("body", spew.Sdump(body))))
+	defer func() {
+		span.AddEvent("got", trace.WithAttributes(attribute.String("target", spew.Sdump(target))))
+	}()
 
-	req, _ := http.NewRequestWithContext(ctx, "POST", url, payloadBuf)
+	req, _ := http.NewRequestWithContext(ctx, "POST", route, payloadBuf)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "gourd")
 
 	client := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 
 	res, err := client.Do(req)
-	log.WithError(err).Debugf("rs: convert %v", body)
 	if err != nil {
 		return err
 	}
