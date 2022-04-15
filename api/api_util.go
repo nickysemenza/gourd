@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -42,6 +43,7 @@ func (l *Items) setTotalCount(count uint64) {
 
 func sendErr(c echo.Context, code int, err error) error {
 	trace.SpanFromContext(c.Request().Context()).AddEvent(fmt.Sprintf("error: %v", err))
+	logrus.WithField("code", code).WithField("route", c.Request().URL).Errorf("http err: %v", err)
 	return c.JSON(code, Error{
 		Message: err.Error(),
 	})

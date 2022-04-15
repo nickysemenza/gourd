@@ -2418,10 +2418,8 @@ func (r ScrapeRecipeResponse) StatusCode() int {
 type SumRecipesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *struct {
-		Sums []UsageValue `json:"sums"`
-	}
-	JSONDefault *Error
+	JSON200      *SumsResponse
+	JSONDefault  *Error
 }
 
 // Status returns HTTPResponse.Status
@@ -3517,9 +3515,7 @@ func ParseSumRecipesResponse(rsp *http.Response) (*SumRecipesResponse, error) {
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest struct {
-			Sums []UsageValue `json:"sums"`
-		}
+		var dest SumsResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

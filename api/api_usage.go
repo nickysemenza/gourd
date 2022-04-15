@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/exp/maps"
 )
 
 type IngredientID string
@@ -29,18 +30,24 @@ func (a *API) SumRecipes(c echo.Context) error {
 		err = fmt.Errorf("invalid format for input: %w", err)
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	res, err := a.IngredientUsage(ctx, r.Inputs)
+	ingredientSums, err := a.IngredientUsage(ctx, r.Inputs...)
 	if err != nil {
 		return handleErr(c, err)
 	}
 
-	type Sumresp struct {
-		Sums []UsageValue `json:"sums"`
+	s := SumsResponse{
+		Sums: maps.Values(ingredientSums),
 	}
-	s := Sumresp{}
 
-	for _, v := range res {
-		s.Sums = append(s.Sums, v)
+	for _, eachRecipe := range r.Inputs {
+		recipeSpecific, err := a.IngredientUsage(ctx, eachRecipe)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		if s.ByRecipe.AdditionalProperties == nil {
+			s.ByRecipe.AdditionalProperties = make(map[string][]UsageValue)
+		}
+		s.ByRecipe.AdditionalProperties[eachRecipe.Id] = maps.Values(recipeSpecific)
 	}
 	return c.JSON(http.StatusOK, s)
 
@@ -57,10 +64,10 @@ func (u UsageSummary) add(ingId IngredientID, usageVal UsageValue) {
 	u[ingId] = pVal
 }
 
-func (a *API) IngredientUsage(ctx context.Context, inputRecipes []EntitySummary) (UsageSummary, error) {
+func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientUsage")
 	defer span.End()
-	u := make(UsageSummary)
+	summary := make(UsageSummary)
 
 	for _, inputRecipe := range inputRecipes {
 		ru, err := a.singleIngredientUsage(ctx, inputRecipe)
@@ -68,12 +75,12 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes []EntitySummary)
 			return nil, err
 		}
 		for ingId, usageVal := range ru {
-			u.add(ingId, usageVal)
+			summary.add(ingId, usageVal)
 		}
 	}
 
 	// sum the things
-	for ingredientId, v := range u {
+	for ingredientId, v := range summary {
 		if v.Sum == nil {
 			v.Sum = []Amount{}
 		}
@@ -104,11 +111,11 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes []EntitySummary)
 
 		}
 
-		u[ingredientId] = v
+		summary[ingredientId] = v
 
 	}
 
-	return u, nil
+	return summary, nil
 
 }
 
@@ -131,8 +138,7 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 			switch si.Kind {
 			case IngredientKindIngredient:
 				ing := si.Ingredient.Ingredient
-				// todo: enable this, breaks tests
-				// si.Amounts = removeCalculatedAmounts(si.Amounts)
+				si.Amounts = removeCalculatedAmounts(si.Amounts)
 
 				totalSum.add(IngredientID(ing.Id), UsageValue{
 					Meta: EntitySummary{
@@ -171,8 +177,10 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 				for ingID, eachIngUsage := range usageSummaryForRecipe {
 
 					for x := range eachIngUsage.Ings {
-						eachIngUsage.Ings[x].RequiredBy = append(eachIngUsage.Ings[x].RequiredBy,
-							recipe.Detail.summary(subRecipeMultiplier),
+						// prepend bc it's like a call stack
+						eachIngUsage.Ings[x].RequiredBy = append(
+							[]EntitySummary{recipe.Detail.summary(subRecipeMultiplier)},
+							eachIngUsage.Ings[x].RequiredBy...,
 						)
 					}
 					totalSum.add(ingID, eachIngUsage)
@@ -186,10 +194,8 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 func (a Amount) IsGram() bool {
 	return a.Unit == "g" || strings.HasPrefix(a.Unit, "gr")
 }
-func (a Amount) IsCalculated() bool {
-	if a.Source != nil && *a.Source == "calculated" {
-		return true
-	}
+
+func (a Amount) IsMoneyKCal() bool {
 	return a.Unit == "$" || a.Unit == "kcal"
 }
 func firstAmount(a []Amount, grams bool) *Amount {
@@ -197,19 +203,19 @@ func firstAmount(a []Amount, grams bool) *Amount {
 		if s.IsGram() && grams {
 			return &s
 		}
-		if !s.IsGram() && !s.IsCalculated() && !grams {
+		if !s.IsGram() && !s.IsMoneyKCal() && !grams {
 			return &s
 		}
 	}
 	return nil
 }
 
-// func removeCalculatedAmounts(a []Amount) []Amount {
-// 	var out []Amount
-// 	for _, s := range a {
-// 		if !s.IsCalculated() {
-// 			out = append(out, s)
-// 		}
-// 	}
-// 	return out
-// }
+func removeCalculatedAmounts(a []Amount) []Amount {
+	var out []Amount
+	for _, s := range a {
+		if !s.IsMoneyKCal() {
+			out = append(out, s)
+		}
+	}
+	return out
+}

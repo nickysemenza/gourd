@@ -478,14 +478,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - sums
-                properties:
-                  sums:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/UsageValue"
+                $ref: "#/components/schemas/SumsResponse"
         default:
           description: unexpected error
           content:
@@ -1679,6 +1672,23 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/UnitMapping"
+    SumsResponse:
+      type: object
+      required:
+        - sums
+        - by_recipe
+      properties:
+        sums:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UsageValue"
+        by_recipe:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/UsageValue"
     CompactRecipeSection:
       type: object
       required:

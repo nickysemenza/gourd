@@ -35,7 +35,6 @@ models/InlineObject1.ts
 models/InlineObject2.ts
 models/InlineResponse200.ts
 models/InlineResponse2001.ts
-models/InlineResponse2002.ts
 models/Items.ts
 models/Meal.ts
 models/MealRecipe.ts
@@ -61,6 +60,7 @@ models/SectionIngredient.ts
 models/SectionIngredientInput.ts
 models/SectionInstruction.ts
 models/SectionInstructionInput.ts
+models/SumsResponse.ts
 models/UnitConversionRequest.ts
 models/UnitMapping.ts
 models/UsageValue.ts

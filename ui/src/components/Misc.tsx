@@ -28,7 +28,8 @@ export const RecipeLink: React.FC<Props> = ({
     >
       {name}
     </Link>
-    <div className="flex font-mono small">v{version}</div>
+    {/* -1 is used to signal version is unknown */}
+    {version >= 0 && <div className="flex font-mono small">v{version}</div>}
     {multiplier && <div className="font-mono">@{multiplier}x</div>}
   </div>
 );

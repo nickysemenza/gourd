@@ -787,6 +787,16 @@ export interface UnitConversionRequest {
   unit_mappings: UnitMapping[];
 }
 
+export interface SumsResponse {
+  /**
+   * mappings of equivalent units
+   */
+  sums: UsageValue[];
+  by_recipe: {
+    [key: string]: UsageValue[];
+  };
+}
+
 export interface CompactRecipeSection {
   ingredients: string[];
   instructions: string[];
@@ -1507,16 +1517,12 @@ export const useGetRecipesByIds = (props: UseGetRecipesByIdsProps) =>
     props
   );
 
-export interface SumRecipesResponse {
-  sums: UsageValue[];
-}
-
 export interface SumRecipesRequestBody {
   inputs: EntitySummary[];
 }
 
 export type SumRecipesProps = Omit<
-  MutateProps<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>,
+  MutateProps<SumsResponse, Error, void, SumRecipesRequestBody, void>,
   "path" | "verb"
 >;
 
@@ -1526,7 +1532,7 @@ export type SumRecipesProps = Omit<
  * sums up the given recipes
  */
 export const SumRecipes = (props: SumRecipesProps) => (
-  <Mutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>
+  <Mutate<SumsResponse, Error, void, SumRecipesRequestBody, void>
     verb="POST"
     path={`/recipes/sum`}
     {...props}
@@ -1534,7 +1540,7 @@ export const SumRecipes = (props: SumRecipesProps) => (
 );
 
 export type UseSumRecipesProps = Omit<
-  UseMutateProps<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>,
+  UseMutateProps<SumsResponse, Error, void, SumRecipesRequestBody, void>,
   "path" | "verb"
 >;
 
@@ -1544,7 +1550,7 @@ export type UseSumRecipesProps = Omit<
  * sums up the given recipes
  */
 export const useSumRecipes = (props: UseSumRecipesProps) =>
-  useMutate<SumRecipesResponse, Error, void, SumRecipesRequestBody, void>(
+  useMutate<SumsResponse, Error, void, SumRecipesRequestBody, void>(
     "POST",
     `/recipes/sum`,
     props

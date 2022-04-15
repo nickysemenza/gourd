@@ -1,0 +1,40 @@
+
+@rustHostname = http://localhost:8080
+@apiHostname = http://localhost:4242 
+
+@name = codec exxpand
+POST {{rustHostname}}/codec/expand
+Content-Type: application/json
+
+{
+	"meta": {"name":"test"},
+	"sections": [{
+		"instructions": [],
+		"ingredients": ["1 tsp salt", "1 tsp pepper"]
+	}]
+}
+
+###
+
+@name = ingredient-sum
+POST {{apiHostname}}/api/recipes/sum
+Content-Type: application/json
+
+{
+	"inputs":[
+		{
+			"id":"rd_8bcb9c73",
+			"multiplier":1,
+			"kind":"recipe"
+		}
+		]}
+## parse
+{{rustHostname}}/parse?text=1-2%20cups
+
+
+### scrape
+
+{{rustHostname}}/debug/scrape?url=https://cooking.nytimes.com/recipes/1022674-chewy-gingerbread-cookies
+
+
+

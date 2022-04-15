@@ -27,9 +27,9 @@ import {
     InlineObject2,
     InlineObject2FromJSON,
     InlineObject2ToJSON,
-    InlineResponse2002,
-    InlineResponse2002FromJSON,
-    InlineResponse2002ToJSON,
+    InlineResponse2001,
+    InlineResponse2001FromJSON,
+    InlineResponse2001ToJSON,
     PaginatedIngredients,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
@@ -397,7 +397,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * recipe dependencies
      * Get foods
      */
-    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2002>> {
+    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2001>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -417,14 +417,14 @@ export class IngredientsApi extends runtime.BaseAPI {
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2002FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
     }
 
     /**
      * recipe dependencies
      * Get foods
      */
-    async recipeDependencies(): Promise<InlineResponse2002> {
+    async recipeDependencies(): Promise<InlineResponse2001> {
         const response = await this.recipeDependenciesRaw();
         return await response.value();
     }

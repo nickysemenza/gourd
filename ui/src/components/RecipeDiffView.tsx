@@ -3,6 +3,7 @@ import {
   EntitySummary,
   IngredientKind,
   RecipesApi,
+  SumsResponse,
   UsageValue,
 } from "../api/openapi-fetch";
 import {
@@ -43,7 +44,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   });
 
   const [showBP, setShow] = React.useState(false);
-  const [sums, setSums] = React.useState<UsageValue[]>([]);
+  const [sumResp, setSumResp] = React.useState<SumsResponse>();
 
   useEffect(() => {
     async function fetchMyAPI() {
@@ -61,7 +62,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
           }),
         },
       });
-      setSums(recipeSumResp.sums);
+      setSumResp(recipeSumResp);
     }
     fetchMyAPI();
   }, [entitiesToDiff]);
@@ -185,14 +186,8 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
             </tr>
           )}
           {Object.keys(sectionIngredientByID).map((sectionIngID) => {
+            let s = sumResp?.sums || [];
             // sums that are related to the current ingredient, or a child of it.
-            const ingSums = sums.filter(
-              (s) =>
-                s.meta.id === sectionIngID ||
-                ing_hints[sectionIngID]?.children
-                  ?.map((c) => c.ingredient.id)
-                  .includes(s.meta.id)
-            );
             return (
               <tr key={sectionIngID} className="text-gray-700">
                 <td className={tdClass} key={sectionIngID}>
@@ -203,50 +198,21 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
                   key={`${sectionIngID}-total`}
                 >
                   <div>
-                    {sums.length === 0 && "loading..."}
-                    {ingSums.map((s, x) => (
-                      <div key={`${sectionIngID}-sums-${x}`}>
-                        {s.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
-                        <ul className="list-disc list-outside pl-4">
-                          {s.ings.map((iu) => (
-                            <li>
-                              {/* {iu.required_by.map((r) => r.name).join(" via ")} */}
-                              <div className="flex">
-                                {iu.required_by.map((r) => (
-                                  <div className="mx-1 flex">
-                                    <RecipeLink
-                                      multiplier={r.multiplier}
-                                      recipe={{
-                                        name: r.name,
-                                        id: r.id,
-                                        version: 0,
-                                        is_latest_version: false,
-                                      }}
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                              <ul className="list-disc list-outside pl-4">
-                                {iu.amounts.map((a) => (
-                                  <li>
-                                    {`${a.value} ${a.unit}`} @ {iu.multiplier}x
-                                  </li>
-                                ))}
-                              </ul>
-                            </li>
-                          ))}
-                        </ul>
-                        <Debug data={s} compact />
-                      </div>
+                    {s.length === 0 && "loading..."}
+                    {filterIngSums(s, sectionIngID, ing_hints).map((s, x) => (
+                      <UsageValueShow
+                        key={`${sectionIngID}-sums-${x}`}
+                        uv={s}
+                      />
                     ))}
                   </div>
                 </td>
-                {sectionIngredientByID[sectionIngID].map((si, x) => {
+                {sectionIngredientByID[sectionIngID].map((si, columnIndex) => {
                   if (!si.si) {
                     return (
                       <td
                         className={`${tdClass} text-gray-500 bg-gray-100`}
-                        key={`${x}-${sectionIngID}-nobp`}
+                        key={`${columnIndex}-${sectionIngID}-nobp`}
                       >
                         &mdash;
                       </td>
@@ -254,30 +220,44 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
                   }
                   const grams = getGramsFromSI(si.si) || 0;
                   const bpRaw =
-                    (grams / totalFlourMass(recipes[x].detail.sections)) *
+                    (grams /
+                      totalFlourMass(recipes[columnIndex].detail.sections)) *
                       100 || 0;
                   const bp = scaledRound(bpRaw);
                   return (
                     <td
                       className={`${tdClass} text-gray-500 
-                    ${bpRaw === 100 && showBP ? "bg-green-100" : ""}
+                    ${bpRaw === 100 && showBP ? "bg-green-100" : ""} 
                      `}
-                      key={`${x}-${sectionIngID}-bp`}
+                      key={`${columnIndex}-${sectionIngID}-bp`}
                     >
-                      <div className="flex justify-between">
-                        {showBP && (
-                          <div
-                            className={`${
-                              bpRaw === 0 ? "text-yellow-500" : ""
-                            }`}
-                          >
-                            {bp}%
+                      <div className="flex content-start flex-col">
+                        <div className="flex justify-between">
+                          {showBP && (
+                            <div
+                              className={`${
+                                bpRaw === 0 ? "text-yellow-500" : ""
+                              }`}
+                            >
+                              {bp}%
+                            </div>
+                          )}
+                          <div>
+                            {getMeasureUnitsFromSI(si.si)
+                              .map(
+                                (a) => `${a.value * si.multiplier} ${a.unit}`
+                              )
+                              .join(" | ")}
                           </div>
-                        )}
+                        </div>
+                        <hr />
                         <div>
-                          {getMeasureUnitsFromSI(si.si)
-                            .map((a) => `${a.value * si.multiplier} ${a.unit}`)
-                            .join(" | ")}
+                          {sumResp &&
+                            filterIngSums(
+                              sumResp.by_recipe[recipes[columnIndex].detail.id],
+                              sectionIngID,
+                              ing_hints
+                            ).map((x, i) => <UsageValueShow uv={x} key={i} />)}
                         </div>
                       </div>
                     </td>
@@ -293,3 +273,57 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
 };
 
 export default RecipeDiffView;
+
+const UsageValueShow: React.FC<{ uv: UsageValue }> = ({ uv }) => (
+  <div>
+    {uv.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
+    <ul className="list-disc list-outside pl-4">
+      {uv.ings.map((iu) => (
+        <li>
+          <div className="flex">
+            <div className="flex m-1">
+              {iu.multiplier}×
+              <div className="flex">
+                {iu.amounts.map((a) => `${a.value} ${a.unit}`).join(" or ")}
+              </div>
+            </div>
+            <div className="flex">
+              [
+              {iu.required_by.map((r, x) => (
+                <div className="flex">
+                  <RecipeLink
+                    multiplier={r.multiplier}
+                    recipe={{
+                      name: r.name,
+                      id: r.id,
+                      version: -1,
+                      is_latest_version: true,
+                    }}
+                  />
+                  {iu.required_by.length - 1 > x && (
+                    <div className="text-sm italic px-1">includes</div>
+                  )}
+                </div>
+              ))}
+              ]
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+    {/* <Debug data={uv} compact /> */}
+  </div>
+);
+
+const filterIngSums = (
+  s: UsageValue[],
+  sectionIngID: string,
+  ing_hints: IngDetailsById
+) =>
+  s.filter(
+    (s) =>
+      s.meta.id === sectionIngID ||
+      ing_hints[sectionIngID]?.children
+        ?.map((c) => c.ingredient.id)
+        .includes(s.meta.id)
+  );

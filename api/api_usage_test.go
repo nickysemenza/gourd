@@ -7,7 +7,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,18 +41,37 @@ func TestUsage(t *testing.T) {
 		"1 gram sugar",
 		"1 tsp pepper",
 		"1 gram pepper",
-		"1 tsp common",
+		"1 tsp water",
 	}, []string{}))
 
+	// rdMain is a recipe that has 1 recipe of sub
+	// should end up with:
+	// salt:
+	//   from main: 1tsp = 3 gram + 1 gram
+	//   from sub: n/a
+	//   TOTAL: 4 gram
+	// sugar:
+	//   from main: n/a
+	//   from sub: 1 gram
+	//   TOTAL: 1 gram
+	// pepper:
+	//   from main: 1 tsp + 1 gram
+	//   from sub: 1 tsp + 1 gram
+	//   TOTAL: 2 tsp + 2 gram pepper
+	// water:
+	//   from main: 1 gram
+	//   from sub: 1 tsp = 1 gram
+	//   TOTAL: 2 gram
 	rdMain := mustInsert(t, apiManager, newCompact("main", []string{
 		"1 tsp pepper",
 		"1 gram pepper",
 		"1 recipe sub",
-		"1 gram common"},
+		"1 gram water"},
 		[]string{}))
+
 	rdSMallMain := mustInsert(t, apiManager, newCompact("smallmain", []string{
 		"0.5 recipe sub",
-		"1 gram common",
+		"1 gram water",
 	}, []string{}))
 
 	require.NoError(apiManager.loadIngredientMappings(ctx, []IngredientMapping{
@@ -61,33 +79,48 @@ func TestUsage(t *testing.T) {
 			A: Amount{Value: 1, Unit: "tsp"},
 			B: Amount{Value: 3, Unit: "g"},
 		}}},
-		{Name: "common", UnitMappings: []UnitMapping{{
+		{Name: "water", UnitMappings: []UnitMapping{{
 			A: Amount{Value: 1, Unit: "tsp"},
 			B: Amount{Value: 1, Unit: "g"},
 		}}},
 	}))
 
-	{
-		res, err := apiManager.IngredientUsage(ctx, []EntitySummary{{Id: rdMain, Multiplier: 2, Kind: IngredientKindRecipe}})
-		require.NoError(err)
+	for _, mult := range []float64{1, 0.5, 2.0} {
+		{
+			res, err := apiManager.IngredientUsage(ctx, EntitySummary{Id: rdMain, Multiplier: mult, Kind: IngredientKindRecipe})
+			require.NoError(err)
 
-		require.Equal(2.0, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value, "sugar should be double the original")
-		require.Equal(4.0, firstAmount(res[ingID(t, apiManager, "common")].Sum, true).Value, "common should be double the original")
+			// should only have grams
+			require.Equal(1*mult, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value)
+			require.Nil(firstAmount(res[ingID(t, apiManager, "sugar")].Sum, false))
 
-		ingSalt := ingID(t, apiManager, "salt")
-		// require.Len(res[ingSalt].Sum, 1)
-		saltGrams := firstAmount(res[ingSalt].Sum, true)
-		require.Equal(8.0, saltGrams.Value, spew.Sdump(saltGrams))
-		require.Equal("salt", res[ingSalt].Meta.Name)
-		require.Equal(string(ingSalt), res[ingSalt].Meta.Id)
-	}
-	{
-		res, err := apiManager.IngredientUsage(ctx, []EntitySummary{{Id: rdSMallMain, Kind: IngredientKindRecipe}})
-		require.NoError(err)
+			// should only have grams
+			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
+			require.Nil(firstAmount(res[ingID(t, apiManager, "water")].Sum, false))
 
-		require.Equal(0.5, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value, "sugar should be double the original")
-		require.Equal(1.5, firstAmount(res[ingID(t, apiManager, "common")].Sum, true).Value, "common should be double the original")
-		spew.Dump(res)
+			// should have both grams and non grams
+			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, true).Value)
+			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, false).Value)
+
+			ingSalt := ingID(t, apiManager, "salt")
+			// should only have grams
+			require.Equal(4*mult, firstAmount(res[ingSalt].Sum, true).Value)
+			require.Nil(firstAmount(res[ingSalt].Sum, false))
+			require.Equal("salt", res[ingSalt].Meta.Name)
+			require.Equal(string(ingSalt), res[ingSalt].Meta.Id)
+		}
+		{
+			res, err := apiManager.IngredientUsage(ctx, EntitySummary{Id: rdSMallMain, Multiplier: mult, Kind: IngredientKindRecipe})
+			require.NoError(err)
+
+			require.Equal(mult*1.5, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
+			require.Equal(mult*0.5, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value)
+
+			// should have both grams and non grams
+			require.Equal(.5*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, true).Value)
+			require.Equal(.5*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, false).Value)
+
+		}
 
 	}
 }

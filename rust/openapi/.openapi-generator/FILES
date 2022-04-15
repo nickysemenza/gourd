@@ -33,7 +33,6 @@ src/models/inline_object_1.rs
 src/models/inline_object_2.rs
 src/models/inline_response_200.rs
 src/models/inline_response_200_1.rs
-src/models/inline_response_200_2.rs
 src/models/items.rs
 src/models/meal.rs
 src/models/meal_recipe.rs
@@ -59,6 +58,7 @@ src/models/section_ingredient.rs
 src/models/section_ingredient_input.rs
 src/models/section_instruction.rs
 src/models/section_instruction_input.rs
+src/models/sums_response.rs
 src/models/unit_conversion_request.rs
 src/models/unit_mapping.rs
 src/models/usage_value.rs

@@ -12,13 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { exists, mapValues } from "../runtime";
 import {
-    RecipeDetailInput,
-    RecipeDetailInputFromJSON,
-    RecipeDetailInputFromJSONTyped,
-    RecipeDetailInputToJSON,
-} from './';
+  RecipeDetailInput,
+  RecipeDetailInputFromJSON,
+  RecipeDetailInputFromJSONTyped,
+  RecipeDetailInputToJSON,
+} from "./";
 
 /**
  * A recipe with subcomponents
@@ -26,47 +26,48 @@ import {
  * @interface RecipeWrapperInput
  */
 export interface RecipeWrapperInput {
-    /**
-     * id
-     * @type {string}
-     * @memberof RecipeWrapperInput
-     */
-    id?: string;
-    /**
-     * 
-     * @type {RecipeDetailInput}
-     * @memberof RecipeWrapperInput
-     */
-    detail: RecipeDetailInput;
+  /**
+   * id
+   * @type {string}
+   * @memberof RecipeWrapperInput
+   */
+  id?: string;
+  /**
+   *
+   * @type {RecipeDetailInput}
+   * @memberof RecipeWrapperInput
+   */
+  detail: RecipeDetailInput;
 }
 
 export function RecipeWrapperInputFromJSON(json: any): RecipeWrapperInput {
-    return RecipeWrapperInputFromJSONTyped(json, false);
+  return RecipeWrapperInputFromJSONTyped(json, false);
 }
 
-export function RecipeWrapperInputFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeWrapperInput {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-        
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'detail': RecipeDetailInputFromJSON(json['detail']),
-    };
+export function RecipeWrapperInputFromJSONTyped(
+  json: any,
+  ignoreDiscriminator: boolean
+): RecipeWrapperInput {
+  if (json === undefined || json === null) {
+    return json;
+  }
+  return {
+    id: !exists(json, "id") ? undefined : json["id"],
+    detail: RecipeDetailInputFromJSON(json["detail"]),
+  };
 }
 
-export function RecipeWrapperInputToJSON(value?: RecipeWrapperInput | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-        
-        'id': value.id,
-        'detail': RecipeDetailInputToJSON(value.detail),
-    };
+export function RecipeWrapperInputToJSON(
+  value?: RecipeWrapperInput | null
+): any {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+  return {
+    id: value.id,
+    detail: RecipeDetailInputToJSON(value.detail),
+  };
 }
-
-

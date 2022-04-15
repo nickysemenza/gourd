@@ -261,7 +261,7 @@ func (a *API) Misc(c echo.Context) error {
 
 	// items, err := a.imagesFromRecipeDetailId(ctx, "rd_08c6db27")
 	// items, err := a.Notion.PageById(ctx, "f6a5d0759d4a4becb95adf696b1cccb0")
-	items, err := a.IngredientUsage(ctx, []EntitySummary{{Id: "rd_2dfbb24c", Kind: IngredientKindRecipe}})
+	items, err := a.IngredientUsage(ctx, EntitySummary{Id: "rd_2dfbb24c", Kind: IngredientKindRecipe})
 
 	if err != nil {
 		return handleErr(c, err)
