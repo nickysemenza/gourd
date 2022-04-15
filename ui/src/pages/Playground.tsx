@@ -82,6 +82,7 @@ const Playground: React.FC = () => {
   if (!r2 || !r2.recipes) return null;
   return (
     <div className="grid grid-cols-2 gap-4">
+      {/* @ts-ignore */}
       <Helmet>
         <title>playground | gourd</title>
       </Helmet>

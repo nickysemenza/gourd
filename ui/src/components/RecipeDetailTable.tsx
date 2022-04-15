@@ -515,10 +515,12 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 };
 export default RecipeDetailTable;
 
-const TableCell: React.FC = ({ children }) => (
+const TableCell: React.FC<{
+  children?: React.ReactNode;
+}> = ({ children }) => (
   <div className="border-solid border border-gray-300 p-1">{children}</div>
 );
-const TableRow: React.FC<{ header?: boolean }> = ({
+const TableRow: React.FC<{ header?: boolean; children?: React.ReactNode }> = ({
   children,
   header = false,
 }) => (

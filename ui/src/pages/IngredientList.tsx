@@ -177,6 +177,7 @@ const IngredientList: React.FC = () => {
 
   return (
     <>
+      {/* @ts-ignore */}
       <Helmet>
         <title>ingredients | gourd</title>
       </Helmet>

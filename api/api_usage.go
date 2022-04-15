@@ -213,12 +213,13 @@ func firstAmount(a []Amount, grams bool) *Amount {
 	}
 	return nil
 }
-func removeCalculatedAmounts(a []Amount) []Amount {
-	var out []Amount
-	for _, s := range a {
-		if !s.IsCalculated() {
-			out = append(out, s)
-		}
-	}
-	return out
-}
+
+// func removeCalculatedAmounts(a []Amount) []Amount {
+// 	var out []Amount
+// 	for _, s := range a {
+// 		if !s.IsCalculated() {
+// 			out = append(out, s)
+// 		}
+// 	}
+// 	return out
+// }

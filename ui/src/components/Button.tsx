@@ -57,15 +57,17 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
     </div>
   );
 };
-export const Pill: React.FC = ({ children }) => (
+export const Pill: React.FC<{
+  children?: React.ReactNode;
+}> = ({ children }) => (
   <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-violet-200 text-violet-800 rounded">
     {children}
   </span>
 );
-export const Pill2: React.FC<{ color: "red" | "green" }> = ({
-  children,
-  color,
-}) => (
+export const Pill2: React.FC<{
+  color: "red" | "green";
+  children?: React.ReactNode;
+}> = ({ children, color }) => (
   <span
     className={`px-1 h-5 inline-flex text-xs leading-5 font-semibold rounded-full bg-${color}-100 text-${color}-800`}
   >
@@ -73,7 +75,9 @@ export const Pill2: React.FC<{ color: "red" | "green" }> = ({
   </span>
 );
 
-export const HideShowHOC: React.FC = ({ children }) => {
+export const HideShowHOC: React.FC<{
+  children?: React.ReactNode;
+}> = ({ children }) => {
   const [show, setShow] = useState(false);
   return (
     <div>

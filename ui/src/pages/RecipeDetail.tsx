@@ -360,6 +360,7 @@ const RecipeDetail: React.FC = () => {
   const latexURL = `${getAPIURL()}/recipes/${recipe.detail.id}/latex`;
   return (
     <div className="px-1">
+      {/* @ts-ignore */}
       <Helmet>
         <title>{recipe.detail.name} | gourd</title>
       </Helmet>

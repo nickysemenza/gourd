@@ -76,6 +76,7 @@ const PaginatedTable = <T extends object>({
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                         {...column.getHeaderProps()}
                       >
+                        {/* @ts-ignore */}
                         {column.render("Header")}
                       </th>
                     ))}
@@ -106,6 +107,7 @@ const PaginatedTable = <T extends object>({
                             className="px-6 py-4 whitespace-nowrap"
                             {...cell.getCellProps()}
                           >
+                            {/* @ts-ignore */}
                             {cell.render("Cell")}
                           </td>
                         );

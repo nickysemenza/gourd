@@ -7,6 +7,7 @@ export interface DragWrapperProps {
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
   enable: boolean;
+  children?: React.ReactNode;
 }
 
 interface DragItem {

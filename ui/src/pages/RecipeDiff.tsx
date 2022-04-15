@@ -15,6 +15,7 @@ const Playground: React.FC = () => {
 
   return (
     <div>
+      {/* @ts-ignore */}
       <Helmet>
         <title>diff | gourd</title>
       </Helmet>

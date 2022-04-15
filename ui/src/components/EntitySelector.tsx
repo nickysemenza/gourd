@@ -137,6 +137,7 @@ export const EntitySelector: React.FC<{
 
   return (
     <div data-cy="name-input">
+      {/* @ts-ignore */}
       <AsyncCreatableSelect
         styles={customStyles}
         placeholder={placeholder || `pick a ${showKind.join(" or ")}`}

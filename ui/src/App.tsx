@@ -99,12 +99,14 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
 function App() {
   return (
     <CookiesProvider>
+      {/* @ts-ignore */}
       <RestfulProvider
         base={getAPIURL()}
         onRequest={onAPIRequest}
         onError={onAPIError}
       >
         <WasmContextProvider>
+          {/* @ts-ignore */}
           <Helmet>
             <title>gourd</title>
           </Helmet>

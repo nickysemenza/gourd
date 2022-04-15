@@ -128,6 +128,7 @@ const RecipeList: React.FC = () => {
 
   return (
     <div className="bg-[#f2f3ef]">
+      {/* @ts-ignore */}
       <Helmet>
         <title>recipes | gourd</title>
       </Helmet>
