@@ -679,11 +679,11 @@ type UnitMapping struct {
 
 // holds information
 type UsageValue struct {
-	// holds name/id and multiplier for a Kind of entity
-	Ing EntitySummary `json:"ing"`
-
 	// multiplier
 	Ings []IngredientUsage `json:"ings"`
+
+	// holds name/id and multiplier for a Kind of entity
+	Meta EntitySummary `json:"meta"`
 
 	// amounts
 	Sum []Amount `json:"sum"`

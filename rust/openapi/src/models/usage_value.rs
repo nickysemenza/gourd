@@ -20,17 +20,17 @@ pub struct UsageValue {
     /// amounts
     #[serde(rename = "sum")]
     pub sum: Vec<crate::models::Amount>,
-    #[serde(rename = "ing")]
-    pub ing: Box<crate::models::EntitySummary>,
+    #[serde(rename = "meta")]
+    pub meta: Box<crate::models::EntitySummary>,
 }
 
 impl UsageValue {
     /// holds information
-    pub fn new(ings: Vec<crate::models::IngredientUsage>, sum: Vec<crate::models::Amount>, ing: crate::models::EntitySummary) -> UsageValue {
+    pub fn new(ings: Vec<crate::models::IngredientUsage>, sum: Vec<crate::models::Amount>, meta: crate::models::EntitySummary) -> UsageValue {
         UsageValue {
             ings,
             sum,
-            ing: Box::new(ing),
+            meta: Box::new(meta),
         }
     }
 }

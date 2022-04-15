@@ -20,12 +20,6 @@ func (r *RecipeDetail) summary(multiplier float64) EntitySummary {
 	}
 }
 
-// type UsageValue struct {
-// 	Ings []IngredientUsage
-// 	Sum  []Amount
-// 	Ing  EntitySummary
-// }
-
 func (a *API) SumRecipes(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "SumRecipes")
 	defer span.End()
@@ -54,65 +48,63 @@ func (a *API) SumRecipes(c echo.Context) error {
 
 type UsageSummary map[IngredientID]UsageValue
 
+func (u UsageSummary) add(ingId IngredientID, usageVal UsageValue) {
+	pVal, ok := u[ingId]
+	if !ok {
+		pVal.Meta = usageVal.Meta
+	}
+	pVal.Ings = append(pVal.Ings, usageVal.Ings...)
+	u[ingId] = pVal
+}
+
 func (a *API) IngredientUsage(ctx context.Context, inputRecipes []EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientUsage")
 	defer span.End()
-	u := make(map[IngredientID]UsageValue)
+	u := make(UsageSummary)
 
 	for _, inputRecipe := range inputRecipes {
 		ru, err := a.singleIngredientUsage(ctx, inputRecipe)
 		if err != nil {
 			return nil, err
 		}
-		for k, v := range ru {
-			pVal, ok := u[k]
-			if !ok {
-				pVal.Ing = v.Ing
-			}
-			pVal.Ings = append(pVal.Ings, v.Ings...)
-			u[k] = pVal
+		for ingId, usageVal := range ru {
+			u.add(ingId, usageVal)
 		}
 	}
 
 	// sum the things
-	for k, v := range u {
+	for ingredientId, v := range u {
 		if v.Sum == nil {
 			v.Sum = []Amount{}
 		}
 		for _, i := range v.Ings {
-			fa := firstAmount(i.Amounts, true)
-			fb := firstAmount(i.Amounts, false)
-			added := false
-			if fa != nil {
-
-				for x, a := range v.Sum {
-					if a.Unit == fa.Unit {
-						a.Value += (fa.Value * i.Multiplier)
-						v.Sum[x] = a
+			// for each of the 'usages' (times they appear in recipes) of the current ingredient,
+			// try this with both grams and then non-grams:
+			//	 iterate through each of the current sums for the
+			//	 ingredient, and add the current usage to the sum if the unit matches,
+			// 	 otherwise create a new one.
+			for _, a := range []*Amount{firstAmount(i.Amounts, true), firstAmount(i.Amounts, false)} {
+				if a == nil {
+					continue
+				}
+				added := false
+				for x, each := range v.Sum {
+					if each.Unit == a.Unit {
+						each.Value += (a.Value * i.Multiplier)
+						v.Sum[x] = each
 						added = true
 						break
 					}
 				}
 				if !added {
-					v.Sum = append(v.Sum, Amount{Unit: fa.Unit, Value: fa.Value * i.Multiplier})
+					v.Sum = append(v.Sum, Amount{Unit: a.Unit, Value: a.Value * i.Multiplier})
 				}
-			} else if fb != nil {
-				for x, a := range v.Sum {
-					if a.Unit == fb.Unit {
-						a.Value += (fb.Value * i.Multiplier)
-						v.Sum[x] = a
-						added = true
-						break
-					}
-				}
-				if !added {
-					v.Sum = append(v.Sum, Amount{Unit: fb.Unit, Value: fb.Value * i.Multiplier})
-				}
+				break
 			}
 
 		}
 
-		u[k] = v
+		u[ingredientId] = v
 
 	}
 
@@ -127,47 +119,48 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 	if inputRecipe.Kind != IngredientKindRecipe {
 		return nil, fmt.Errorf("bad kind: %s", inputRecipe.Kind)
 	}
-	res, err := a.recipeById(ctx, inputRecipe.Id)
+	recipe, err := a.recipeById(ctx, inputRecipe.Id)
 	if err != nil {
 		return nil, err
 	}
 	inputRecipe.Multiplier = Coalesce(inputRecipe.Multiplier, 1)
 	totalSum := make(UsageSummary)
-	for _, s := range res.Detail.Sections {
-		for _, i := range s.Ingredients {
-			if i.Kind == IngredientKindIngredient {
-				detail := i.Ingredient
-				usage := IngredientUsage{
-					Amounts:    i.Amounts,
-					Multiplier: inputRecipe.Multiplier,
-					RequiredBy: []EntitySummary{res.Detail.summary(inputRecipe.Multiplier)},
-				}
-				id := IngredientID(detail.Ingredient.Id)
-				pVal, ok := totalSum[id]
-				if !ok {
-					pVal = UsageValue{
-						Ing: EntitySummary{
-							Kind: IngredientKindIngredient,
-							Id:   string(id),
-							Name: detail.Ingredient.Name,
-						},
-					}
-				}
-				// usage.Amounts = removeCalculatedAmounts(usage.Amounts)
+	for _, section := range recipe.Detail.Sections {
+		for _, si := range section.Ingredients {
+			// for each of the ingredient line items in the recipe
+			switch si.Kind {
+			case IngredientKindIngredient:
+				ing := si.Ingredient.Ingredient
+				// todo: enable this, breaks tests
+				// si.Amounts = removeCalculatedAmounts(si.Amounts)
 
-				pVal.Ings = append(pVal.Ings, usage)
-				totalSum[id] = pVal
-			} else if i.Kind == IngredientKindRecipe {
+				totalSum.add(IngredientID(ing.Id), UsageValue{
+					Meta: EntitySummary{
+						Kind: IngredientKindIngredient,
+						Id:   ing.Id,
+						Name: ing.Name,
+					},
+					Ings: []IngredientUsage{{
+						Amounts:    si.Amounts,
+						Multiplier: inputRecipe.Multiplier,
+						RequiredBy: []EntitySummary{recipe.Detail.summary(inputRecipe.Multiplier)},
+					}},
+				})
+
+			case IngredientKindRecipe:
 				var subRecipeMultiplier float64 = 1.0
-				for _, a := range i.Amounts {
+				for _, a := range si.Amounts {
 					if a.Unit == "recipe" {
+						// special case adjusting multiplier to 0.5 from "1/2 recipe foo"
 						subRecipeMultiplier = a.Value
 						break
 					}
 				}
 				subRecipeMultiplier *= inputRecipe.Multiplier
+
+				// recurse into the sub-recipe
 				usageSummaryForRecipe, err := a.singleIngredientUsage(ctx, EntitySummary{
-					Id:         i.Recipe.Id,
+					Id:         si.Recipe.Id,
 					Multiplier: subRecipeMultiplier,
 					Kind:       IngredientKindRecipe,
 				})
@@ -176,17 +169,14 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 				}
 
 				for ingID, eachIngUsage := range usageSummaryForRecipe {
-					totalIngUsage, ok := totalSum[ingID]
-					if !ok {
-						totalIngUsage = UsageValue{
-							Ing: eachIngUsage.Ing,
-						}
-					}
+
 					for x := range eachIngUsage.Ings {
-						eachIngUsage.Ings[x].RequiredBy = append(eachIngUsage.Ings[x].RequiredBy, res.Detail.summary(subRecipeMultiplier))
+						eachIngUsage.Ings[x].RequiredBy = append(eachIngUsage.Ings[x].RequiredBy,
+							recipe.Detail.summary(subRecipeMultiplier),
+						)
 					}
-					totalIngUsage.Ings = append(totalIngUsage.Ings, eachIngUsage.Ings...)
-					totalSum[ingID] = totalIngUsage
+					totalSum.add(ingID, eachIngUsage)
+
 				}
 			}
 		}

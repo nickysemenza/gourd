@@ -772,7 +772,7 @@ export interface UsageValue {
    * amounts
    */
   sum: Amount[];
-  ing: EntitySummary;
+  meta: EntitySummary;
 }
 
 export interface UnitConversionRequest {

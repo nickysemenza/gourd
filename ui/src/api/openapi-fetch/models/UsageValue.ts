@@ -51,7 +51,7 @@ export interface UsageValue {
      * @type {EntitySummary}
      * @memberof UsageValue
      */
-    ing: EntitySummary;
+    meta: EntitySummary;
 }
 
 export function UsageValueFromJSON(json: any): UsageValue {
@@ -66,7 +66,7 @@ export function UsageValueFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'ings': ((json['ings'] as Array<any>).map(IngredientUsageFromJSON)),
         'sum': ((json['sum'] as Array<any>).map(AmountFromJSON)),
-        'ing': EntitySummaryFromJSON(json['ing']),
+        'meta': EntitySummaryFromJSON(json['meta']),
     };
 }
 
@@ -81,7 +81,7 @@ export function UsageValueToJSON(value?: UsageValue | null): any {
         
         'ings': ((value.ings as Array<any>).map(IngredientUsageToJSON)),
         'sum': ((value.sum as Array<any>).map(AmountToJSON)),
-        'ing': EntitySummaryToJSON(value.ing),
+        'meta': EntitySummaryToJSON(value.meta),
     };
 }
 

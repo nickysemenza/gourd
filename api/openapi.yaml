@@ -1645,7 +1645,7 @@ components:
       required:
         - ings
         - sum
-        - ing
+        - meta
       properties:
         ings:
           description: multiplier
@@ -1657,7 +1657,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Amount"
-        ing:
+        meta:
           description: detail about it
           $ref: "#/components/schemas/EntitySummary"
     UnitConversionRequest:

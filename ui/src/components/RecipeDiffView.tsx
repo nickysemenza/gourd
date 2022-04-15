@@ -186,10 +186,10 @@ const RecipeDiffView: React.FC<{ ids: string[] }> = ({ ids }) => {
             // sums that are related to the current ingredient, or a child of it.
             const ingSums = sums.filter(
               (s) =>
-                s.ing.id === sectionIngID ||
+                s.meta.id === sectionIngID ||
                 ing_hints[sectionIngID]?.children
                   ?.map((c) => c.ingredient.id)
-                  .includes(s.ing.id)
+                  .includes(s.meta.id)
             );
             return (
               <tr key={sectionIngID} className="text-gray-700">

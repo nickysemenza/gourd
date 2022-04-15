@@ -22,11 +22,15 @@ name: sub
 1 tsp salt
 1 gram salt
 1 gram sugar
+1 tsp pepper
+1 gram pepper
 1 tsp common`)
 	require.NoError(err)
 	r2, err := apiManager.RecipeFromText(ctx, `
 name: main
 ---
+1 tsp pepper
+1 gram pepper
 1 recipe sub
 1 gram common`)
 	require.NoError(err)
@@ -64,8 +68,8 @@ name: smallmain
 		// require.Len(res[ingSalt].Sum, 1)
 		saltGrams := firstAmount(res[ingSalt].Sum, true)
 		require.Equal(8.0, saltGrams.Value, spew.Sdump(saltGrams))
-		require.Equal("salt", res[ingSalt].Ing.Name)
-		require.Equal(string(ingSalt), res[ingSalt].Ing.Id)
+		require.Equal("salt", res[ingSalt].Meta.Name)
+		require.Equal(string(ingSalt), res[ingSalt].Meta.Id)
 	}
 	{
 		res, err := apiManager.IngredientUsage(ctx, []EntitySummary{{Id: rdSMallMain, Kind: IngredientKindRecipe}})
@@ -73,6 +77,7 @@ name: smallmain
 
 		require.Equal(0.5, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value, "sugar should be double the original")
 		require.Equal(1.5, firstAmount(res[ingID(t, apiManager, "common")].Sum, true).Value, "common should be double the original")
+		spew.Dump(res)
 
 	}
 }
