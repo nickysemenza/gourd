@@ -106,7 +106,7 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary
 				if !added {
 					v.Sum = append(v.Sum, Amount{Unit: a.Unit, Value: a.Value * i.Multiplier})
 				}
-				break
+				// break
 			}
 
 		}

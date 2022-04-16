@@ -25,7 +25,7 @@ import { EntitySelector } from "./EntitySelector";
 import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { getOpenapiFetchConfig } from "../config";
-import { HideShowButton } from "./Button";
+import { HideShowButton, Pill2 } from "./Button";
 import Debug from "./Debug";
 
 interface SIWithMultiplier {
@@ -35,7 +35,7 @@ interface SIWithMultiplier {
 const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   entitiesToDiff,
 }) => {
-  const { data } = useGetRecipesByIds({
+  const { data, loading: recipeLoading } = useGetRecipesByIds({
     queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
       recipe_id: entitiesToDiff.map((x) => x.id),
@@ -45,9 +45,12 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
 
   const [showBP, setShow] = React.useState(false);
   const [sumResp, setSumResp] = React.useState<SumsResponse>();
+  const [sumsLoading, setSumsLoading] = React.useState(true);
 
+  const loading = recipeLoading || sumsLoading;
   useEffect(() => {
     async function fetchMyAPI() {
+      setSumsLoading(true);
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
       let recipeSumResp = await rAPI.sumRecipes({
         inlineObject: {
@@ -62,6 +65,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
           }),
         },
       });
+      setSumsLoading(false);
       setSumResp(recipeSumResp);
     }
     fetchMyAPI();
@@ -157,8 +161,12 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
               const MULTIPLIER_TODO = entitiesToDiff[i].multiplier;
               return (
                 <th className={thClass} key={i}>
-                  <RecipeLink recipe={r.detail} multiplier={MULTIPLIER_TODO} />
-                  <div className="">
+                  <div className="flex flex-col w-1/2">
+                    <RecipeLink
+                      recipe={r.detail}
+                      multiplier={MULTIPLIER_TODO}
+                    />
+
                     {recipesIngredients[i]
                       .filter((i) => i.kind === "recipe")
                       .map((si) => (
@@ -180,92 +188,124 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
           </tr>
         </thead>
         <tbody>
-          {!ingredientDetails && (
+          {/* nothing loaded yet, just show 1 loading row */}
+          {loading ? (
             <tr>
               <td colSpan={entitiesToDiff.length + 2}>loading...</td>
             </tr>
-          )}
-          {Object.keys(sectionIngredientByID).map((sectionIngID) => {
-            let s = sumResp?.sums || [];
-            // sums that are related to the current ingredient, or a child of it.
-            return (
-              <tr key={sectionIngID} className="text-gray-700">
-                <td className={tdClass} key={sectionIngID}>
-                  {ing_hints[sectionIngID]?.ingredient.name}
-                </td>
-                <td
-                  className={`${tdClass} text-gray-500 bg-gray-100`}
-                  key={`${sectionIngID}-total`}
-                >
-                  <div>
-                    {s.length === 0 && "loading..."}
-                    {filterIngSums(s, sectionIngID, ing_hints).map((s, x) => (
-                      <UsageValueShow
-                        key={`${sectionIngID}-sums-${x}`}
-                        uv={s}
-                      />
-                    ))}
-                  </div>
-                </td>
-                {sectionIngredientByID[sectionIngID].map((si, columnIndex) => {
-                  if (!si.si) {
-                    return (
-                      <td
-                        className={`${tdClass} text-gray-500 bg-gray-100`}
-                        key={`${columnIndex}-${sectionIngID}-nobp`}
-                      >
-                        &mdash;
-                      </td>
-                    );
-                  }
-                  const grams = getGramsFromSI(si.si) || 0;
-                  const bpRaw =
-                    (grams /
-                      totalFlourMass(recipes[columnIndex].detail.sections)) *
-                      100 || 0;
-                  const bp = scaledRound(bpRaw);
-                  return (
-                    <td
-                      className={`${tdClass} text-gray-500 
+          ) : (
+            // each row is an ingredient
+            Object.keys(sectionIngredientByID).map((sectionIngID) => {
+              return (
+                <tr key={sectionIngID} className="text-gray-700">
+                  <td className={tdClass} key={sectionIngID}>
+                    {ing_hints[sectionIngID]?.ingredient.name}
+                  </td>
+                  <td
+                    className={`${tdClass} text-gray-500 bg-gray-100`}
+                    key={`${sectionIngID}-total`}
+                  >
+                    <div>
+                      {loading && "loading..."}
+                      {filterIngSums(
+                        sumResp?.sums,
+                        sectionIngID,
+                        ing_hints
+                      ).map((s, x) => (
+                        <UsageValueShow
+                          key={`${sectionIngID}-sums-${x}`}
+                          uv={s}
+                          pos={"start"}
+                        />
+                      ))}
+                    </div>
+                  </td>
+                  {sectionIngredientByID[sectionIngID].map(
+                    (si, columnIndex) => {
+                      if (!si.si) {
+                        return (
+                          <td
+                            className={`${tdClass} text-gray-500 bg-gray-100`}
+                            key={`${columnIndex}-${sectionIngID}-nobp`}
+                          >
+                            &mdash;
+                          </td>
+                        );
+                      }
+                      const grams = getGramsFromSI(si.si) || 0;
+                      const bpRaw =
+                        (grams /
+                          totalFlourMass(
+                            recipes[columnIndex].detail.sections
+                          )) *
+                          100 || 0;
+                      const bp = scaledRound(bpRaw);
+                      return (
+                        <td
+                          className={`${tdClass} text-gray-500 
                     ${bpRaw === 100 && showBP ? "bg-green-100" : ""} 
                      `}
-                      key={`${columnIndex}-${sectionIngID}-bp`}
-                    >
-                      <div className="flex content-start flex-col">
-                        <div className="flex justify-between">
-                          {showBP && (
-                            <div
-                              className={`${
-                                bpRaw === 0 ? "text-yellow-500" : ""
-                              }`}
-                            >
-                              {bp}%
+                          key={`${columnIndex}-${sectionIngID}-bp`}
+                        >
+                          <div className="flex content-start flex-col">
+                            <div className="flex justify-between old-sum-cell">
+                              {showBP && (
+                                <div
+                                  className={`${
+                                    bpRaw === 0 ? "text-yellow-500" : ""
+                                  }`}
+                                >
+                                  {bp}%
+                                </div>
+                              )}
+                              <div>
+                                {getMeasureUnitsFromSI(si.si)
+                                  .map(
+                                    (a) =>
+                                      `${a.value * si.multiplier} ${a.unit}`
+                                  )
+                                  .join(" | ")}
+                              </div>
+                              <Pill2 color="red">old</Pill2>
                             </div>
-                          )}
-                          <div>
-                            {getMeasureUnitsFromSI(si.si)
-                              .map(
-                                (a) => `${a.value * si.multiplier} ${a.unit}`
-                              )
-                              .join(" | ")}
+                            <hr />
+
+                            <div className="flex justify-between new-sum-cell">
+                              {showBP && (
+                                <div
+                                  className={`${
+                                    bpRaw === 0 ? "text-yellow-500" : ""
+                                  }`}
+                                >
+                                  {bp}%
+                                </div>
+                              )}
+                              <div>
+                                {sumResp &&
+                                  filterIngSums(
+                                    sumResp.by_recipe[
+                                      recipes[columnIndex].detail.id
+                                    ],
+                                    sectionIngID,
+                                    ing_hints
+                                  ).map((x, i) => (
+                                    <UsageValueShow
+                                      uv={x}
+                                      key={i}
+                                      pos={showBP ? "end" : "start"}
+                                    />
+                                  ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <hr />
-                        <div>
-                          {sumResp &&
-                            filterIngSums(
-                              sumResp.by_recipe[recipes[columnIndex].detail.id],
-                              sectionIngID,
-                              ing_hints
-                            ).map((x, i) => <UsageValueShow uv={x} key={i} />)}
-                        </div>
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+                        </td>
+                      );
+                    }
+                  )}
+                </tr>
+              );
+            })
+          )}
         </tbody>
       </table>
     </div>
@@ -274,23 +314,28 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
 
 export default RecipeDiffView;
 
-const UsageValueShow: React.FC<{ uv: UsageValue }> = ({ uv }) => (
-  <div>
-    {uv.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
-    <ul className="list-disc list-outside pl-4">
-      {uv.ings.map((iu) => (
-        <li>
-          <div className="flex">
-            <div className="flex m-1">
-              {iu.multiplier}×
+const UsageValueShow: React.FC<{ uv: UsageValue; pos: "start" | "end" }> = ({
+  uv,
+  pos,
+}) => (
+  <div className="flex flex-col">
+    <div className={`flex justify-${pos} mb-3`}>
+      {uv.sum.map((a) => `${a.value} ${a.unit}`).join(" + ")}
+    </div>
+    <div className="pl-2">
+      {uv.ings.map((iu, x) => (
+        <div key={x}>
+          <div className="grid grid-cols-3 gap-1">
+            <div className="flex justify-end">
+              <div className="text-xs align-text-bottom">{iu.multiplier}×</div>
               <div className="flex">
                 {iu.amounts.map((a) => `${a.value} ${a.unit}`).join(" or ")}
               </div>
             </div>
-            <div className="flex">
-              [
+            <div className="flex flex-col col-span-2">
               {iu.required_by.map((r, x) => (
                 <div className="flex">
+                  {x > 0 && <div className="text-sm italic px-1">incl.</div>}
                   <RecipeLink
                     multiplier={r.multiplier}
                     recipe={{
@@ -300,30 +345,28 @@ const UsageValueShow: React.FC<{ uv: UsageValue }> = ({ uv }) => (
                       is_latest_version: true,
                     }}
                   />
-                  {iu.required_by.length - 1 > x && (
-                    <div className="text-sm italic px-1">includes</div>
-                  )}
                 </div>
               ))}
-              ]
             </div>
           </div>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
     {/* <Debug data={uv} compact /> */}
   </div>
 );
-
+// sums that are related to the current ingredient, or a child of it.
 const filterIngSums = (
-  s: UsageValue[],
+  s: UsageValue[] | undefined,
   sectionIngID: string,
   ing_hints: IngDetailsById
 ) =>
-  s.filter(
-    (s) =>
-      s.meta.id === sectionIngID ||
-      ing_hints[sectionIngID]?.children
-        ?.map((c) => c.ingredient.id)
-        .includes(s.meta.id)
-  );
+  s
+    ? s.filter(
+        (s) =>
+          s.meta.id === sectionIngID ||
+          ing_hints[sectionIngID]?.children
+            ?.map((c) => c.ingredient.id)
+            .includes(s.meta.id)
+      )
+    : [];

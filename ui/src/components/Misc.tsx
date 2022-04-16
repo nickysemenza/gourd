@@ -17,7 +17,7 @@ export const RecipeLink: React.FC<Props> = ({
   recipe: { name, version, is_latest_version, id },
   multiplier,
 }) => (
-  <div className="inline-flex">
+  <span className="inline-block">
     <Link
       to={`/recipe/${id}?multiplier=${multiplier || 1}`}
       className={`font-bold pr-0.5 underline ${
@@ -29,9 +29,11 @@ export const RecipeLink: React.FC<Props> = ({
       {name}
     </Link>
     {/* -1 is used to signal version is unknown */}
-    {version >= 0 && <div className="flex font-mono small">v{version}</div>}
-    {multiplier && <div className="font-mono">@{multiplier}x</div>}
-  </div>
+    {version >= 0 && <div className="inline font-mono text-sm">v{version}</div>}
+    {multiplier && (
+      <div className="inline font-mono text-sm">@{multiplier}x</div>
+    )}
+  </span>
 );
 
 export const UnitMappingList: React.FC<{

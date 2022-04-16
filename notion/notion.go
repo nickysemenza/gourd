@@ -157,7 +157,7 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 		// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
 		// }
 
-		daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -15))
+		daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -25))
 
 		testFilter := notionapi.PropertyFilter{
 			Property: "Date",
