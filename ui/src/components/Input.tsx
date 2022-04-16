@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { formatRichText, scaledRound } from "../util";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 
 // <input> can't do onBlur?
 export type TallOrBlur =

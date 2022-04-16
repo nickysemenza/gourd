@@ -127,6 +127,7 @@ pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
 #[wasm_bindgen]
 pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
     utils::set_panic_hook();
+    // info!("detail: {:?}", recipe_detail);
     let r: RecipeDetailInput = recipe_detail.into_serde().unwrap();
     gourd_common::codec::encode_recipe(r).unwrap()
 }

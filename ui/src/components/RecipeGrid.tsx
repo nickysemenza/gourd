@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Photo, RecipeWrapper } from "../api/openapi-hooks/api";
 import { formatTimeRange, getTotalDuration } from "../util";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 import ProgressiveImage from "./ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";
 

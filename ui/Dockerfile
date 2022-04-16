@@ -8,10 +8,10 @@ RUN wasm-pack build w
 
 # Stage 1 - the build process
 FROM node:buster-slim as build-deps
-COPY --from=builder /work/rust/w/pkg /work/rust/w/pkg
 WORKDIR /work/ui
 COPY ui/package.json ui/yarn.lock ./
 RUN yarn
+COPY --from=builder /work/rust/w/pkg /work/ui/src/wasm
 COPY ui ./
 RUN yarn build
 

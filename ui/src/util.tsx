@@ -6,8 +6,7 @@ import {
   RecipeSection,
 } from "./api/openapi-hooks/api";
 import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
-import { RichItem } from "gourd_rs";
-import { wasm } from "./wasm";
+import { wasm, RichItem } from "./wasmContext";
 
 export const getIngredient = (si: Partial<SectionIngredient>) => {
   let name = "";

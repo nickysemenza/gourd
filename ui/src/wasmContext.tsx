@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 
-export type wasm = typeof import("gourd_rs");
+export type { RichItem, Amount } from "./wasm/gourd_rs";
+export type wasm = typeof import("./wasm/gourd_rs");
 
 export const WasmContext = createContext<wasm | undefined>(undefined);
 
@@ -12,7 +13,7 @@ export const WasmContextProvider: React.FC<{
   useEffect(() => {
     const fetchWasm = async () => {
       console.time("wasm-load");
-      const wasm = await import("gourd_rs");
+      const wasm = await import("./wasm/gourd_rs");
       setState(wasm);
       console.timeEnd("wasm-load");
     };

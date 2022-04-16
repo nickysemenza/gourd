@@ -50,7 +50,7 @@ import {
 } from "react-feather";
 import { RecipeLink } from "./Misc";
 import { EntitySelector } from "./EntitySelector";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 import { TableInput } from "./Input";
 import IngredientPopover from "./IngredientPopover";
 

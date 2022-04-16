@@ -33,7 +33,7 @@ import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import IngredientDetail from "./pages/IngredientDetail";
-import { WasmContextProvider } from "./wasm";
+import { WasmContextProvider } from "./wasmContext";
 import Graph from "./pages/Graph";
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
@@ -81,7 +81,7 @@ const registerTracing = (url: string, batch: boolean) => {
     provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
   }
 };
-// registerTracing(getTracingURL(), true);
+registerTracing(getTracingURL(), true);
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   let authed = isLoggedIn() || true;

@@ -38,7 +38,7 @@ import {
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../components/Nutrition";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 import { Helmet } from "react-helmet";
 import {
   RecipesApi,

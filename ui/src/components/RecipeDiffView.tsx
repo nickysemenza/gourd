@@ -26,7 +26,6 @@ import { RecipeLink } from "./Misc";
 import { scaledRound } from "../util";
 import { getOpenapiFetchConfig } from "../config";
 import { HideShowButton, Pill2 } from "./Button";
-import Debug from "./Debug";
 
 interface SIWithMultiplier {
   si: SectionIngredient | undefined;

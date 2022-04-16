@@ -1,4 +1,3 @@
-import { Amount } from "gourd_rs";
 import React, { useContext } from "react";
 import {
   UnitConversionRequestTargetEnum,
@@ -8,7 +7,7 @@ import {
   IngredientDetail,
   UnitConversionRequest,
 } from "../api/openapi-hooks/api";
-import { wasm, WasmContext } from "../wasm";
+import { wasm, WasmContext, Amount } from "../wasmContext";
 import Debug from "./Debug";
 import { TableInput } from "./Input";
 

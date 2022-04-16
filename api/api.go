@@ -73,6 +73,7 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		Unit:            dbr.Unit.String,
 		Sections:        sections,
 		CreatedAt:       dbr.CreatedAt,
+		Tags:            []string{},
 	}
 	if dbr.Source.Valid {
 		if err := json.Unmarshal([]byte(dbr.Source.String), &rd.Sources); err != nil {

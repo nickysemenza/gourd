@@ -29,7 +29,6 @@
     "@types/react-table": "7.7.10",
     "blurhash": "1.1.5",
     "dayjs": "1.11.0",
-    "gourd_rs": "file:../rust/w/pkg",
     "graphviz-react": "1.2.0",
     "highcharts": "10.0.0",
     "highcharts-react-official": "3.1.0",
@@ -81,7 +80,10 @@
     "test:integration": "start-server-and-test start:integration http://localhost:3001 cy:run:integration"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "ignorePatterns": [
+      "src/wasm/*"
+    ]
   },
   "browserslist": {
     "production": [

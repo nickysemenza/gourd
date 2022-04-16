@@ -6,7 +6,7 @@ import {
   UnitConversionRequestTargetEnum,
 } from "../api/openapi-fetch/models/UnitConversionRequest";
 import { getAPIURL, getOpenapiFetchConfig } from "../config";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 
 const ParseTest: React.FC = () => {
   const w = useContext(WasmContext);

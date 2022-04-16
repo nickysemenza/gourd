@@ -11,7 +11,7 @@ import {
   Amount as Amount2,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
-import { wasm } from "../wasm";
+import { wasm } from "../wasmContext";
 import { Amount } from "../api/openapi-fetch";
 export type Override = {
   sectionID: number;

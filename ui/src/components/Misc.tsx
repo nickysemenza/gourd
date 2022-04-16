@@ -7,7 +7,7 @@ import {
 } from "../api/openapi-fetch";
 import { RecipeDetail, UnitMapping } from "../api/openapi-hooks/api";
 import { scaledRound } from "../util";
-import { WasmContext } from "../wasm";
+import { WasmContext } from "../wasmContext";
 
 export interface Props {
   recipe: Pick<RecipeDetail, "id" | "name" | "version" | "is_latest_version">;

@@ -122,7 +122,7 @@ dev-rs:
 generate-wasm:
 	cd rust && wasm-pack build w
 wasm-dev: generate-wasm
-	cp -r rust/w/pkg/ ui/node_modules/gourd_rs/
+	cp -r rust/w/pkg/ ui/src/wasm/
 
 test-rs:
 	cd rust && cargo test

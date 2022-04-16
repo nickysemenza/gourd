@@ -25,6 +25,8 @@ jobs:
       # - run: sudo apt-get update
       # - run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
       - run: go mod vendor
+      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - run: make wasm-dev
       - run: docker-compose pull
       - run: docker-compose build --parallel
       - name: start postgres db
