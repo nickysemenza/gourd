@@ -43,7 +43,7 @@ jobs:
         env:
           MIGRATIONS_DIR: file://../db/migrations
           PDFLATEX_BINARY: /usr/bin/pdflatex
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
       - name: seed db with testdata
         env:
           DB_HOST: localhost
@@ -60,7 +60,7 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: 265312e3-7b8c-4031-ad0a-5f825b95cfce
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
       - name: Archive cypress results
         uses: actions/upload-artifact@v3
         if: always()
@@ -91,7 +91,7 @@ jobs:
           version: "latest"
 
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v2.1.0
+        uses: codecov/codecov-action@v3.0.0
         with:
           directory: rust/.cov
           # path_to_write_report: rust/.cov/codecov_report.txt
