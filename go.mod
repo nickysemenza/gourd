@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/glamour v0.5.0
 	github.com/cosmtrek/air v1.29.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/deepmap/oapi-codegen v1.9.1
+	github.com/deepmap/oapi-codegen v1.10.0
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.4.0 // indirect
@@ -58,6 +58,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	sigs.k8s.io/yaml v1.3.0
 )
+
+require golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect
@@ -310,10 +312,9 @@ require (
 	go.opentelemetry.io/otel/metric v0.28.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
-	golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220414153411-bcd21879b8fd // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
-	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/net v0.0.0-20220418201149-a630d4f3e7a2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
