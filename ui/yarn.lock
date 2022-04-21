@@ -2751,14 +2751,15 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ibm-cloud/openapi-ruleset@0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.17.0.tgz#5e35a41bdba8a46eb526801b47ee875abc7877b3"
-  integrity sha512-n2sHaqeitlojm6W5RJGPZNUpZgzqMOeoKIV1wPaAybDkltt1dWiAOlcNrn9wDGkeGX/mddys2Af95C2uM+CP4w==
+"@ibm-cloud/openapi-ruleset@0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.21.0.tgz#317175e2c7232a7e38a7bb6943643ff35ab1d079"
+  integrity sha512-biBNclgb3JdBynQv2aseitthuo3ugnuTEqqVy24vDaQTw4cpYKPwvqgpGsUTyVgLuRjUZ/GjDLvM0ySR/Q/ulQ==
   dependencies:
     "@stoplight/spectral-formats" "^1.1.0"
     "@stoplight/spectral-functions" "^1.6.1"
     "@stoplight/spectral-rulesets" "^1.6.0"
+    lodash "^4.17.21"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -9449,12 +9450,12 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-ibm-openapi-validator@0.68.0:
-  version "0.68.0"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.68.0.tgz#f9f7db2972147c8f94dab6de556788235dcddde1"
-  integrity sha512-LhdMCyXIpbGON6NEQ0mNMw9CDk+5A5bPWii9/c6I9WSqe+J79PBBzQYStfrWMsRaxgLhrRLxBHkGA71T26okcw==
+ibm-openapi-validator@0.72.1:
+  version "0.72.1"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.72.1.tgz#e8d093f8370515ad1c6ed3ac28a161ef80b3e237"
+  integrity sha512-MjaMysgcYVYfoqMlFosjdN01d7e5GMPz+vDz+yC97xzpCaYzd189YRCU4xXhnjvT7jBzAE1vcQmTy0Ytww31cA==
   dependencies:
-    "@ibm-cloud/openapi-ruleset" "0.17.0"
+    "@ibm-cloud/openapi-ruleset" "0.21.0"
     "@stoplight/spectral-cli" "^6.3.0"
     "@stoplight/spectral-core" "^1.11.0"
     "@stoplight/spectral-parsers" "^1.0.1"
