@@ -90,23 +90,28 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary
 			//	 iterate through each of the current sums for the
 			//	 ingredient, and add the current usage to the sum if the unit matches,
 			// 	 otherwise create a new one.
-			for _, a := range []*Amount{firstAmount(i.Amounts, true), firstAmount(i.Amounts, false)} {
-				if a == nil {
+			for _, amt := range []*Amount{firstAmount(i.Amounts, true), firstAmount(i.Amounts, false)} {
+				if amt == nil {
 					continue
+				}
+				amt2, err := a.NormalizeAmount(ctx, *amt)
+				if err != nil {
+					return nil, err
 				}
 				added := false
 				for x, each := range v.Sum {
-					if each.Unit == a.Unit {
-						each.Value += (a.Value * i.Multiplier)
+
+					if each.Unit == amt2.Unit {
+						each.Value += (amt2.Value * i.Multiplier)
 						v.Sum[x] = each
 						added = true
 						break
 					}
 				}
 				if !added {
-					v.Sum = append(v.Sum, Amount{Unit: a.Unit, Value: a.Value * i.Multiplier})
+					v.Sum = append(v.Sum, Amount{Unit: amt2.Unit, Value: amt2.Value * i.Multiplier})
 				}
-				// break
+				break
 			}
 
 		}

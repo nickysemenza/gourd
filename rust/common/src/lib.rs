@@ -203,6 +203,15 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
         }
     };
 }
+pub fn tmp_normalize(a: Amount) -> Amount {
+    let m = amount_to_measure(a.clone()).as_raw();
+    return Amount {
+        unit: m.unit,
+        value: m.value,
+        upper_value: m.upper_value,
+        source: a.source.clone(),
+    };
+}
 pub fn amount_to_measure(a: Amount) -> unit::Measure {
     unit::Measure::parse(ingredient::Amount {
         unit: a.unit,

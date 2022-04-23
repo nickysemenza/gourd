@@ -41,7 +41,7 @@ func TestUsage(t *testing.T) {
 		"1 gram sugar",
 		"1 tsp pepper",
 		"1 gram pepper",
-		"1 tsp water",
+		"1 tbsp water",
 	}, []string{}))
 
 	// rdMain is a recipe that has 1 recipe of sub
@@ -60,8 +60,8 @@ func TestUsage(t *testing.T) {
 	//   TOTAL: 2 tsp + 2 gram pepper
 	// water:
 	//   from main: 1 gram
-	//   from sub: 1 tsp = 1 gram
-	//   TOTAL: 2 gram
+	//   from sub: 1 tbsp = 3 tsp = 3 gram
+	//   TOTAL: 4 gram
 	rdMain := mustInsert(t, apiManager, newCompact("main", []string{
 		"1 tsp pepper",
 		"1 gram pepper",
@@ -71,7 +71,7 @@ func TestUsage(t *testing.T) {
 
 	rdSMallMain := mustInsert(t, apiManager, newCompact("smallmain", []string{
 		"0.5 recipe sub",
-		"1 gram water",
+		"1 tsp water",
 	}, []string{}))
 
 	require.NoError(apiManager.loadIngredientMappings(ctx, []IngredientMapping{
@@ -95,7 +95,7 @@ func TestUsage(t *testing.T) {
 			require.Nil(firstAmount(res[ingID(t, apiManager, "sugar")].Sum, false))
 
 			// should only have grams
-			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
+			require.Equal(4*mult, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
 			// require.Nil(firstAmount(res[ingID(t, apiManager, "water")].Sum, false))
 
 			// should have both grams and non grams
@@ -113,7 +113,7 @@ func TestUsage(t *testing.T) {
 			res, err := apiManager.IngredientUsage(ctx, EntitySummary{Id: rdSMallMain, Multiplier: mult, Kind: IngredientKindRecipe})
 			require.NoError(err)
 
-			require.Equal(mult*1.5, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
+			require.Equal(mult*2.5, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
 			require.Equal(mult*0.5, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value)
 
 			// should have both grams and non grams

@@ -53,6 +53,10 @@ fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
                 "/codec/expand",
                 web::post().to(parser::expand_compact_to_input),
             )
+            .route(
+                "/normalize_amount",
+                web::post().to(parser::normalize_amount),
+            )
     })
     .listen(listener)?
     .run();
