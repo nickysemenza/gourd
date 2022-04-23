@@ -76,6 +76,14 @@ func (a *API) RecipeFromCompact(ctx context.Context, cr CompactRecipe) (*RecipeW
 	}
 	return &output, nil
 }
+func (a *API) NormalizeAmount(ctx context.Context, amt Amount) (*Amount, error) {
+	output := Amount{}
+	err := a.R.Post(ctx, "normalize_amount", amt, &output)
+	if err != nil {
+		return nil, fmt.Errorf("failed to normalize recipe: %w", err)
+	}
+	return &output, nil
+}
 
 // RecipeFromFile reads a recipe from json or yaml file
 func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetailInput, error) {
