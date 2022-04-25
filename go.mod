@@ -40,8 +40,8 @@ require (
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
 	github.com/volatiletech/null/v8 v8.1.2
-	github.com/volatiletech/sqlboiler/v4 v4.10.1
-	github.com/volatiletech/strmangle v0.0.3
+	github.com/volatiletech/sqlboiler/v4 v4.11.0
+	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.31.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.31.0
