@@ -224,8 +224,8 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 				meal.Photos = append(meal.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
-				if len(i.Code.Text) > 0 {
-					if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
+				if len(i.Code.RichText) > 0 {
+					if text := i.Code.RichText[0].Text.Content; strings.HasPrefix(text, "name:") {
 						meal.Raw = text
 					}
 				} else {
