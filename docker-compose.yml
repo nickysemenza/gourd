@@ -21,6 +21,17 @@ services:
         "-c",
         "log_line_prefix=%t [%p]:[%l] user=%u, db=%d "
       ]
+  usda_db:
+    image: postgres:14.2
+    volumes:
+      - ./usda/migrate-up.sql:/docker-entrypoint-initdb.d/migrate.sql
+    restart: always
+    ports:
+      - "5556:5432"
+    environment:
+      POSTGRES_USER: gourd
+      POSTGRES_PASSWORD: gourd
+      POSTGRES_DB: usda
   jaeger:
     container_name: food-jaeger
     environment:
@@ -69,8 +80,8 @@ services:
       - rs
     restart: always
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
+      DATABASE_URL: postgres://gourd:gourd@db:5432/food
+      DATABASE_URL_USDA: postgres://gourd:gourd@usda_db:5432/usda
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
       RS_URI: http://rs:8080/
       BYPASS_AUTH: "true"
@@ -90,8 +101,6 @@ services:
       - ./rust/s-configuration/base.yaml:/work/rust/s/s-configuration/base.yaml
       - ./rs-ci2.yaml:/work/rust/s/s-configuration/local.yaml
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     ports:
       - "8080:8080"

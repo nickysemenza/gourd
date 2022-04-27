@@ -381,14 +381,14 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 
 	count, err := models.Recipes().Count(ctx, a.db.DB())
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+		return handleErr(c, err)
 	}
 
 	listMeta.setTotalCount(uint64(count))
 
 	items, err := a.RecipeListV2(ctx, limit, offset)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+		return handleErr(c, err)
 	}
 
 	resp := PaginatedRecipeWrappers{

@@ -25,7 +25,7 @@ all: bin/gourd
 test: unit-test-go lint-go test-rs
 
 dev-env:
-	docker-compose up -d db collector
+	docker-compose up -d db usda_db collector
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
 # db
@@ -106,7 +106,11 @@ openapi-docs:
 	npx @redocly/openapi-cli preview-docs api/openapi.yaml -p 8081
 
 gen-db:
+	rm -rf models/
+	rm -rf usdamodels/
 	sqlboiler psql --relation-tag rel
+	cd usda && sqlboiler psql --relation-tag rel --pkgname usdamodels --output ../usdamodels 
+
 
 # frontend
 dev-ui:

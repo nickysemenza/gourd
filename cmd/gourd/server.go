@@ -21,37 +21,34 @@ import (
 	"github.com/nickysemenza/gourd/server"
 )
 
-func getDBConn() (*sql.DB, error) {
-	sql.Register("instrumented-postgres", instrumentedsql.WrapDriver(&pq.Driver{},
+func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
+	driver := "instrumented-postgres-" + string(kind)
+	sql.Register(driver, instrumentedsql.WrapDriver(&pq.Driver{},
 		instrumentedsql.WithLogger(instrumentedsql.LoggerFunc(func(ctx context.Context, msg string, keyvals ...interface{}) {
-			log.WithContext(ctx).WithFields(log.Fields{"client": "db"}).Debugf("%s %v", msg, keyvals)
+			log.WithContext(ctx).WithFields(log.Fields{"client": "db", "kind": string(kind)}).Debugf("%s %v", msg, keyvals)
 		})),
 		instrumentedsql.WithTracer(NewTracer(true)),
 		instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
 	))
-	dsn := db.ConnnectionString(
-		viper.GetString("DB_HOST"),
-		viper.GetString("DB_USER"),
-		viper.GetString("DB_PASSWORD"),
-		viper.GetString("DB_DBNAME"),
-		viper.GetInt64("DB_PORT"))
-	if dsnEnv := viper.GetString("DATABASE_URL"); dsnEnv != "" {
-		dsn = dsnEnv + "?sslmode=disable"
-	}
+
 	log.Info("connecting to db: ", dsn)
-	dbConn, err := sql.Open("instrumented-postgres", dsn)
+	dbConn, err := sql.Open(driver, dsn)
 	return dbConn, err
 }
 func makeServer() (*server.Server, error) {
 
 	// postgres database
-	dbConn, err := getDBConn()
+	dbConn, err := getDBConn(viper.GetString("DATABASE_URL")+"?sslmode=disable", db.Gourd)
 	if err != nil {
 		err := fmt.Errorf("failed to init db conn: %w", err)
 		log.Fatal(err)
 	}
-	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
-	// defer dbConn.Close()
+
+	dbConnUSDA, err := getDBConn(viper.GetString("DATABASE_URL_USDA")+"?sslmode=disable", db.USDA)
+	if err != nil {
+		err := fmt.Errorf("failed to init db conn: %w", err)
+		log.Fatal(err)
+	}
 
 	dbClient, err := db.New(dbConn, db.Gourd)
 	if err != nil {
@@ -59,7 +56,7 @@ func makeServer() (*server.Server, error) {
 		log.Fatal(err)
 	}
 
-	dbClientUSDA, err := db.New(dbConn, db.USDA)
+	dbClientUSDA, err := db.New(dbConnUSDA, db.USDA)
 	if err != nil {
 		err := fmt.Errorf("failed to init db: %w", err)
 		log.Fatal(err)

@@ -1,8 +1,8 @@
 no-tests = true
 [psql]
-  dbname = "food"
+  dbname = "usda"
   host   = "localhost"
-  port   = 5555
+  port   = 5556
   user   = "gourd"
   pass   = "gourd"
   sslmode = "disable"

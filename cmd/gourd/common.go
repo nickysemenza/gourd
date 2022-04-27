@@ -47,11 +47,8 @@ func initTracer(url, name, env string) error {
 
 func setupEnv() error {
 	viper.SetDefault("LOG_LEVEL", "info")
-	viper.SetDefault("DB_HOST", "localhost")
-	viper.SetDefault("DB_PORT", 5555)
-	viper.SetDefault("DB_USER", "gourd")
-	viper.SetDefault("DB_PASSWORD", "gourd")
-	viper.SetDefault("DB_DBNAME", "food")
+	viper.SetDefault("DATABASE_URL", "postgres://gourd:gourd@localhost:5555/food")
+	viper.SetDefault("DATABASE_URL_USDA", "postgres://gourd:gourd@localhost:5556/usda")
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
 	viper.SetDefault("PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "30s")

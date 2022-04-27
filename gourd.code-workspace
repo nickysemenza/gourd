@@ -50,6 +50,16 @@
         "database": "food",
         "username": "gourd",
         "password": "gourd"
+      },
+      {
+        "previewLimit": 50,
+        "server": "localhost",
+        "port": 5556,
+        "driver": "PostgreSQL",
+        "name": "usda",
+        "database": "usda",
+        "username": "gourd",
+        "password": "gourd"
       }
     ],
     "yaml.schemas": {
