@@ -230,8 +230,13 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 				meal.Photos = append(meal.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
-				if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
-					meal.Raw = text
+				if len(i.Code.RichText) > 0 {
+					if text := i.Code.RichText[0].Text.Content; strings.HasPrefix(text, "name:") {
+						meal.Raw = text
+					}
+				} else {
+					l.Errorf("found code block with no text")
+					spew.Dump(i)
 				}
 			case notionapi.BlockTypeChildPage:
 				// treat as top level page?
