@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -30,12 +31,20 @@ const (
 	ingredientsTable   = "ingredients"
 )
 
+type Kind string
+
+const (
+	Gourd Kind = "gourd"
+	USDA  Kind = "usda"
+)
+
 // Client is a database client
 type Client struct {
 	db     *sqlx.DB
 	psql   sq.StatementBuilderType
 	cache  *ristretto.Cache
 	tracer trace.Tracer
+	kind   Kind
 }
 
 func (c *Client) DB() *sqlx.DB {
@@ -157,7 +166,7 @@ type IngredientUnitMapping struct {
 }
 
 // New creates a new Client.
-func New(dbConn *sql.DB) (*Client, error) {
+func New(dbConn *sql.DB, kind Kind) (*Client, error) {
 	dbx := sqlx.NewDb(dbConn, "postgres")
 	if err := dbx.Ping(); err != nil {
 		return nil, err
@@ -178,6 +187,7 @@ func New(dbConn *sql.DB) (*Client, error) {
 		psql:   sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		cache:  cache,
 		tracer: otel.Tracer("db"),
+		kind:   kind,
 	}, nil
 }
 
@@ -207,7 +217,15 @@ func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
 	}
 	return nil
 }
-
+func (c *Client) lintQuery(query string) error {
+	hasUSDA := strings.Contains(query, "usda_")
+	if hasUSDA && c.kind != USDA {
+		return fmt.Errorf("tried to query usda on wrong db: %s", c.kind)
+	} else if !hasUSDA && c.kind == USDA {
+		return fmt.Errorf("tried to query non-usda on wrong usda: %s", c.kind)
+	}
+	return nil
+}
 func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {
 	ctx, span := c.tracer.Start(ctx, "getContext")
 	defer span.End()
@@ -215,6 +233,9 @@ func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interf
 	query, args, err := q.ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
+	}
+	if err := c.lintQuery(query); err != nil {
+		return err
 	}
 	err = c.db.GetContext(ctx, dest, query, args...)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -234,6 +255,9 @@ func (c *Client) selectContext(ctx context.Context, q sq.SelectBuilder, dest int
 	query, args, err := q.ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
+	}
+	if err := c.lintQuery(query); err != nil {
+		return err
 	}
 	err = c.db.SelectContext(ctx, dest, query, args...)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
@@ -280,6 +304,9 @@ func (c *Client) execTx(ctx context.Context, tx *sql.Tx, q sq.Sqlizer) (sql.Resu
 	if err != nil {
 		span.RecordError(err)
 		return nil, fmt.Errorf("failed to build query: %w", err)
+	}
+	if err := c.lintQuery(query); err != nil {
+		return nil, err
 	}
 
 	res, err := tx.ExecContext(ctx, query, args...)

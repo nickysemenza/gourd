@@ -176,7 +176,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 			}
 		}
 	}
-	foods, count, err := a.DB().SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
+	foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
 	}

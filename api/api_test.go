@@ -23,10 +23,11 @@ import (
 
 func makeAPI(t *testing.T) *API {
 	t.Helper()
-	tdb := db.NewTestDB(t)
+	tdb := db.NewTestDB(t, db.Gourd)
+	tdb2 := db.NewTestDB(t, db.USDA)
 	i, err := image.NewLocalImageStore("aa")
 	require.NoError(t, err)
-	apiManager := New(tdb,
+	apiManager := New(tdb, tdb2,
 		nil, nil,
 		rs_client.New("http://localhost:8080/"),
 		notion.NewFakeNotion(t), i)

@@ -53,7 +53,13 @@ func makeServer() (*server.Server, error) {
 	dbConn.SetMaxOpenConns(viper.GetInt("DB_MAX_OPEN_CONNS"))
 	// defer dbConn.Close()
 
-	dbClient, err := db.New(dbConn)
+	dbClient, err := db.New(dbConn, db.Gourd)
+	if err != nil {
+		err := fmt.Errorf("failed to init db: %w", err)
+		log.Fatal(err)
+	}
+
+	dbClientUSDA, err := db.New(dbConn, db.USDA)
 	if err != nil {
 		err := fmt.Errorf("failed to init db: %w", err)
 		log.Fatal(err)
@@ -90,7 +96,7 @@ func makeServer() (*server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	m := api.New(dbClient, gClient, auth, r, n, i)
+	m := api.New(dbClient, dbClientUSDA, gClient, auth, r, n, i)
 	s.APIManager = m
 
 	// server
