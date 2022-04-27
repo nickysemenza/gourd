@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/models"
+	"github.com/nickysemenza/gourd/usdamodels"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
@@ -49,7 +49,7 @@ var catmap = map[int]FoodCategory{
 	28: {Code: "1410", Description: " Alcoholic Beverages"},
 }
 
-func (a *API) foodFromRec(ctx context.Context, foodRec *models.UsdaFood) (*Food, error) {
+func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*Food, error) {
 	if foodRec == nil {
 		return nil, nil
 	}
@@ -134,21 +134,21 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodsByIds")
 	defer span.End()
 
-	foodRecs, err := models.UsdaFoods(
+	foodRecs, err := usdamodels.UsdaFoods(
 		qm.Where("fdc_id = any(?)", pq.Array(params.FdcId)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
-			models.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).All(ctx, a.db.DB())
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
+			usdamodels.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).All(ctx, a.usdaDb.DB())
 	if err != nil {
-		return err
+		return handleErr(c, err)
 	}
 	items := []Food{}
 	for _, foodRec := range foodRecs {
 		f, err := a.foodFromRec(ctx, foodRec)
 		if err != nil {
-			return err
+			return handleErr(c, err)
 		}
 		items = append(items, *f)
 	}
@@ -178,7 +178,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	}
 	foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+		return handleErr(c, err)
 	}
 	listMeta.setTotalCount(count)
 
@@ -199,13 +199,13 @@ func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
 	ctx, span := a.tracer.Start(ctx, "getFoodById")
 	defer span.End()
 
-	foodRec, err := models.UsdaFoods(
+	foodRec, err := usdamodels.UsdaFoods(
 		qm.Where("fdc_id = ?", fdcId),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
-			models.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).One(ctx, a.db.DB())
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
+			usdamodels.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).One(ctx, a.usdaDb.DB())
 
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, fmt.Errorf("failed to get food with id %d: %w", fdcId, err)
@@ -227,13 +227,13 @@ func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, 
 	for _, food := range foods {
 		ids = append(ids, food.FdcID)
 	}
-	foodRecs, err := models.UsdaFoods(
+	foodRecs, err := usdamodels.UsdaFoods(
 		qm.Where("fdc_id = any(?)", pq.Array(ids)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodNutrients,
-			models.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(models.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).All(ctx, a.db.DB())
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
+			usdamodels.UsdaFoodNutrientRels.Nutrient)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
+		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
+	).All(ctx, a.usdaDb.DB())
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, p
 	defer span.End()
 	err := a.DB().AssociateFoodWithIngredient(ctx, ingredientId, params.FdcId)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Error{Message: err.Error()})
+		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusCreated, nil)
 }

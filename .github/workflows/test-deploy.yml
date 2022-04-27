@@ -30,7 +30,7 @@ jobs:
       - run: docker-compose pull
       - run: docker-compose build --parallel
       - name: start postgres db
-        run: docker-compose up -d db
+        run: docker-compose up -d db usda_db
       - name: migrate db
         run: sleep 5 && make migrate
       - name: start rust + go servers
@@ -47,8 +47,8 @@ jobs:
       - uses: codecov/codecov-action@v3
       - name: seed db with testdata
         env:
-          DB_HOST: localhost
-          DB_PORT: 5555
+          DATABASE_URL: postgres://gourd:gourd@localhost:5555/food
+          DATABASE_URL_USDA: postgres://gourd:gourd@localhost:5556/usda
         run: make seed-testdata
       - name: Cypress run
         uses: cypress-io/github-action@v2

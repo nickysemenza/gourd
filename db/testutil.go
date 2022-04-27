@@ -14,25 +14,25 @@ import (
 
 // NewTestDB makes a test DB.
 func NewTestDB(t *testing.T, kind Kind) *Client {
-	viper.SetDefault("DB_HOST", "localhost")
-	viper.SetDefault("DB_PORT", 5555)
-	viper.SetDefault("DB_USER", "gourd")
-	viper.SetDefault("DB_PASSWORD", "gourd")
-	viper.SetDefault("DB_DBNAME", "food")
+	viper.SetDefault("DATABASE_URL", "postgres://gourd:gourd@localhost:5555/food")
+	viper.SetDefault("DATABASE_URL_USDA", "postgres://gourd:gourd@localhost:5556/usda")
 	viper.AutomaticEnv()
 
-	dbConn, err := sql.Open("postgres", ConnnectionString(
-		viper.GetString("DB_HOST"),
-		viper.GetString("DB_USER"),
-		viper.GetString("DB_PASSWORD"),
-		viper.GetString("DB_DBNAME"),
-		viper.GetInt64("DB_PORT")))
+	var dsn string
+	if kind == USDA {
+		dsn = viper.GetString("DATABASE_URL_USDA") + "?sslmode=disable"
+	} else {
+		dsn = viper.GetString("DATABASE_URL") + "?sslmode=disable"
+	}
+	dbConn, err := sql.Open("postgres", dsn)
 	require.NoError(t, err)
 
-	err = AutoMigrate(dbConn, false)
-	require.NoError(t, err)
-	err = AutoMigrate(dbConn, true)
-	require.NoError(t, err)
+	if kind == Gourd {
+		err = AutoMigrate(dbConn, false)
+		require.NoError(t, err)
+		err = AutoMigrate(dbConn, true)
+		require.NoError(t, err)
+	}
 
 	d, err := New(dbConn, kind)
 	require.NoError(t, err)

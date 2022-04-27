@@ -47,7 +47,7 @@ start_time="$(date -u +%s)"
 # https://stackoverflow.com/questions/39296472/how-to-check-if-an-environment-variable-exists-and-get-its-value
 # https://stackoverflow.com/questions/7832080/test-if-a-variable-is-set-in-bash-when-using-set-o-nounset
 if [[ -z "${DB_DSN:-}" ]]; then
-  MY_SCRIPT_VARIABLE="postgresql://gourd:gourd@localhost:5555/food"
+  MY_SCRIPT_VARIABLE="postgresql://gourd:gourd@localhost:5556/usda"
 else
   MY_SCRIPT_VARIABLE="${DB_DSN}"
 fi
