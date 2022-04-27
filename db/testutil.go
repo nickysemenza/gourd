@@ -13,7 +13,7 @@ import (
 )
 
 // NewTestDB makes a test DB.
-func NewTestDB(t *testing.T) *Client {
+func NewTestDB(t *testing.T, kind Kind) *Client {
 	viper.SetDefault("DB_HOST", "localhost")
 	viper.SetDefault("DB_PORT", 5555)
 	viper.SetDefault("DB_USER", "gourd")
@@ -34,7 +34,7 @@ func NewTestDB(t *testing.T) *Client {
 	err = AutoMigrate(dbConn, true)
 	require.NoError(t, err)
 
-	d, err := New(dbConn)
+	d, err := New(dbConn, kind)
 	require.NoError(t, err)
 	return d
 }
