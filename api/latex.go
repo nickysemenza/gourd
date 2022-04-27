@@ -201,7 +201,13 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	viper.SetDefault("PDFLATEX_BINARY", "pdflatex")
 	viper.AutomaticEnv()
 	binary := viper.GetString("PDFLATEX_BINARY")
-	cmd := exec.Command(binary, "-jobname=gourd", "-output-directory", dir, file.Name())
+
+	ctx, span := a.tracer.Start(ctx, "latexCommand")
+	defer span.End()
+
+	jobName := "gourd"
+
+	cmd := exec.CommandContext(ctx, binary, "-jobname="+jobName, "-output-directory", dir, file.Name())
 	cmd.Dir = dir
 	// cmd.Stdin = strings.NewReader(document)
 
@@ -212,15 +218,14 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	err = cmd.Wait()
 	if err != nil {
 		// The actual error is useless, do provide a better one.
-
-		output, err := ioutil.ReadFile(path.Join(dir, "gourd.log"))
+		output, err := ioutil.ReadFile(path.Join(dir, jobName+".log"))
 		if err != nil {
 			return nil, err
 		}
 
 		return nil, fmt.Errorf("failed to generate latex: %s: %w", string(output), latexError)
 	}
-	outFile := path.Join(dir, "gourd.pdf")
+	outFile := path.Join(dir, jobName+".pdf")
 	log.Println(outFile)
 
 	output, err := ioutil.ReadFile(outFile)

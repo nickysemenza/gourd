@@ -613,7 +613,7 @@ func (a *API) NotionTest(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
 	defer span.End()
 
-	res, err := a.Notion.GetAll(ctx)
+	res, err := a.Notion.GetAll(ctx, 45)
 	if err != nil {
 		return handleErr(c, err)
 	}

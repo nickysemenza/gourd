@@ -136,7 +136,7 @@ func (c *Client) PageById(ctx context.Context, id notionapi.PageID) (*NotionReci
 	return c.processPage(ctx, *page)
 	// return page, nil
 }
-func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
+func (c *Client) GetAll(ctx context.Context, lookbackDays int) ([]NotionRecipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "Dump")
 	defer span.End()
 
@@ -151,21 +151,15 @@ func (c *Client) GetAll(ctx context.Context) ([]NotionRecipe, error) {
 			},
 		},
 	}
-	if c.testOnly {
-		// testFilter := notionapi.PropertyFilter{
-		// 	Property:    "Tags",
-		// 	MultiSelect: &notionapi.MultiSelectFilterCondition{Contains: "test"},
-		// }
 
-		daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -25))
+	daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -lookbackDays))
 
-		testFilter := notionapi.PropertyFilter{
-			Property: "Date",
-			Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
-		}
-
-		filter["and"] = append(filter["and"], testFilter)
+	testFilter := notionapi.PropertyFilter{
+		Property: "Date",
+		Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
 	}
+
+	filter["and"] = append(filter["and"], testFilter)
 	for {
 		resp, err := c.db.Query(ctx, c.dbId, &notionapi.DatabaseQueryRequest{
 			CompoundFilter: &filter,
@@ -230,8 +224,13 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 				meal.Photos = append(meal.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
-				if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
-					meal.Raw = text
+				if len(i.Code.Text) > 0 {
+					if text := i.Code.Text[0].Text.Content; strings.HasPrefix(text, "name:") {
+						meal.Raw = text
+					}
+				} else {
+					l.Errorf("found code block with no text")
+					spew.Dump(i)
 				}
 			case notionapi.BlockTypeChildPage:
 				// treat as top level page?

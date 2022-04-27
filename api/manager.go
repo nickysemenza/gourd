@@ -79,10 +79,10 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 	err = nr.Meta.Marshal(m)
 	return &nr, err
 }
-func (a *API) syncRecipeFromNotion(ctx context.Context) error {
+func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
 	defer span.End()
-	nRecipes, err := a.Notion.GetAll(ctx)
+	nRecipes, err := a.Notion.GetAll(ctx, lookbackDays)
 	if err != nil {
 		return err
 	}
@@ -155,12 +155,12 @@ func (a *API) syncRecipeFromNotion(ctx context.Context) error {
 	return nil
 }
 
-func (a *API) DoSync(ctx context.Context) error {
+func (a *API) DoSync(ctx context.Context, lookbackDays int) error {
 	now := time.Now()
 	ctx, span := a.tracer.Start(ctx, "DoSync")
 	defer span.End()
 
-	if err := a.syncRecipeFromNotion(ctx); err != nil {
+	if err := a.syncRecipeFromNotion(ctx, lookbackDays); err != nil {
 		return fmt.Errorf("notion: %w", err)
 	}
 	log.Infof("synced recipes from notion")

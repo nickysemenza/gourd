@@ -197,7 +197,7 @@ func TestSync(t *testing.T) {
 	require := require.New(t)
 	apiManager := makeAPI(t)
 	ctx := context.Background()
-	err := apiManager.DoSync(ctx)
+	err := apiManager.DoSync(ctx, 14)
 	require.NoError(err)
 
 	items, err := apiManager.RecipeListV2(ctx, 10, 0)

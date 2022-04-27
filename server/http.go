@@ -95,7 +95,7 @@ func (s *Server) Run(_ context.Context) error {
 		return c.JSON(http.StatusOK, spec)
 	})
 
-	r.GET("/notion", s.APIManager.NotionTest)
+	r.GET("/debug/notion", s.APIManager.NotionTest)
 	r.GET("/misc", s.APIManager.Misc)
 
 	r.GET("/*", func(c echo.Context) error {

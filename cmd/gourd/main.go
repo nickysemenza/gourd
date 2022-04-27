@@ -88,8 +88,9 @@ func init() {
 				if err != nil {
 					return err
 				}
+				lookbackDays := 30
 
-				err = s.APIManager.DoSync(cmd.Context())
+				err = s.APIManager.DoSync(cmd.Context(), lookbackDays)
 				if err != nil {
 					return fmt.Errorf("sync: %w", err)
 				}
