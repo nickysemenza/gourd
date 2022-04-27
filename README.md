@@ -12,7 +12,6 @@ Gourd is a recipe database that can be used for meal planning and generating ing
 
 [![codecov](https://codecov.io/gh/nickysemenza/gourd/branch/master/graph/badge.svg)](https://codecov.io/gh/nickysemenza/gourd)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nickysemenza/gourd)](https://goreportcard.com/report/github.com/nickysemenza/gourd)
-[![CircleCI](https://circleci.com/gh/nickysemenza/gourd.svg?style=svg)](https://circleci.com/gh/nickysemenza/gourd)
 [![GoDoc](https://godoc.org/github.com/nickysemenza/gourd?status.svg)](https://pkg.go.dev/github.com/nickysemenza/gourd)
 
 ## features
