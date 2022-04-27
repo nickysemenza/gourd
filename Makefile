@@ -124,9 +124,9 @@ cy:
 dev-rs:
 	cd rust && RUST_BACKTRACE=1 cargo watch -x 'run server'
 generate-wasm:
-	cd rust && wasm-pack build w
+	cd rust && wasm-pack build wasm
 wasm-dev: generate-wasm
-	cp -r rust/w/pkg/ ui/src/wasm/
+	cp -r rust/wasm/pkg/ ui/src/wasm/
 
 test-rs:
 	cd rust && cargo test

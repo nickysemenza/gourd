@@ -1,8 +1,8 @@
 [workspace]
 
 members = [
-    "w",
-    "s",
+    "wasm",
+    "server",
     "common",
     "openapi",
 ]

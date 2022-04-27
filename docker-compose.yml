@@ -97,9 +97,6 @@ services:
       - db
       - jaeger
     restart: always
-    volumes:
-      - ./rust/s-configuration/base.yaml:/work/rust/s/s-configuration/base.yaml
-      - ./rs-ci2.yaml:/work/rust/s/s-configuration/local.yaml
     environment:
       JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     ports:
