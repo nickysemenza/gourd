@@ -345,6 +345,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       </div>
     );
   };
+  const allIngredients: string[] = flatIngredients(sections)
+    .map((i) =>
+      [
+        i.ingredient?.ingredient.name || "flour",
+        i.ingredient?.children?.map((i) => i.ingredient.name || "flour") || [],
+      ].flat()
+    )
+    .flat();
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>
@@ -413,17 +421,17 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               />
             )}
             <div>{iActions(x, y, "instructions")}</div>
-            <div>
-              {w &&
-                formatRichText(
-                  w,
-                  w.rich(
-                    instruction.instruction,
-                    flatIngredients(sections).map(
-                      (i) => i.ingredient?.ingredient.name || "flour"
-                    )
-                  )
-                )}
+            <div className="py-1">
+              <div>
+                {w &&
+                  formatRichText(
+                    w,
+                    w.rich(instruction.instruction, allIngredients)
+                  )}
+              </div>
+              <div className={w && "text-gray-500"}>
+                {!w || (showOriginalLine && instruction.instruction)}
+              </div>
             </div>
           </div>
         ))}

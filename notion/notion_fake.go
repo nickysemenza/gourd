@@ -126,7 +126,7 @@ func NewFakeNotion(t *testing.T) *Client {
 						ID:   "block2",
 					},
 					Code: notionapi.Code{
-						Text: []notionapi.RichText{
+						RichText: []notionapi.RichText{
 							{Text: notionapi.Text{Content: `name: toast
 ---
 1 recipe bar
@@ -140,7 +140,7 @@ func NewFakeNotion(t *testing.T) *Client {
 						ID:   "block3",
 					},
 					Code: notionapi.Code{
-						Text: []notionapi.RichText{
+						RichText: []notionapi.RichText{
 							{Text: notionapi.Text{Content: "not a arecipe"}},
 						},
 					},
@@ -166,7 +166,7 @@ func NewFakeNotion(t *testing.T) *Client {
 						ID:   "block2",
 					},
 					Code: notionapi.Code{
-						Text: []notionapi.RichText{
+						RichText: []notionapi.RichText{
 							{Text: notionapi.Text{Content: `name: bar
 ---
 1 slice bread
