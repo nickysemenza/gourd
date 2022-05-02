@@ -239,11 +239,11 @@ func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) err
 
 	detail, err := a.DB().IngredientToRecipe(ctx, ingredientId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	tr, err := a.transformRecipe(ctx, *detail, true)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, tr)
@@ -261,12 +261,12 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 
 	err := a.DB().MergeIngredients(ctx, ingredientId, r.IngredientIds)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
@@ -278,14 +278,14 @@ func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 
 	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	if ing == nil {
 		return sendErr(c, http.StatusNotFound, fmt.Errorf("no ingredient with id %s", ingredientId))
 	}
 	foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*ing})
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusOK, foo[0])
 }
@@ -312,7 +312,7 @@ func (a *API) ScrapeRecipe(c echo.Context) error {
 
 	r, err := a.Scrape(ctx, i.Url)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusCreated, r)
 }

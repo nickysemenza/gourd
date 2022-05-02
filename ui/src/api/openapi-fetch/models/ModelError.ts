@@ -25,6 +25,12 @@ export interface ModelError {
      * @memberof ModelError
      */
     message: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelError
+     */
+    trace_id?: string;
 }
 
 export function ModelErrorFromJSON(json: any): ModelError {
@@ -38,6 +44,7 @@ export function ModelErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'message': json['message'],
+        'trace_id': !exists(json, 'trace_id') ? undefined : json['trace_id'],
     };
 }
 
@@ -51,6 +58,7 @@ export function ModelErrorToJSON(value?: ModelError | null): any {
     return {
         
         'message': value.message,
+        'trace_id': value.trace_id,
     };
 }
 

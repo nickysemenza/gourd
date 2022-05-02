@@ -156,7 +156,8 @@ type EntitySummary struct {
 
 // A generic error message
 type Error struct {
-	Message string `json:"message"`
+	Message string  `json:"message"`
+	TraceId *string `json:"trace_id,omitempty"`
 }
 
 // A top level food

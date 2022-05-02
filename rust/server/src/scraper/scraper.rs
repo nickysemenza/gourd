@@ -35,18 +35,20 @@ def sc(x,y):
     })
     .context("failed to parse")?;
 
+    let meta = CompactRecipeMeta {
+        name: sc_result.2,
+        image: match sc_result.3 == "" {
+            true => None,
+            false => Some(sc_result.3),
+        },
+        url: Some(url.to_string()),
+    };
+
     Ok(CompactRecipe {
         sections: vec![CompactRecipeSection {
             ingredients: sc_result.0.into_iter().map(|i| i.to_string()).collect(),
             instructions: sc_result.1.split('\n').map(|i| i.to_string()).collect(),
         }],
-        meta: Box::new(CompactRecipeMeta {
-            name: sc_result.2,
-            image: match sc_result.3 == "" {
-                true => None,
-                false => Some(sc_result.3),
-            },
-            url: Some(url.to_string()),
-        }),
+        meta: Box::new(meta),
     })
 }

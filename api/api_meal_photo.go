@@ -170,7 +170,7 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 	case MealRecipeUpdateActionAdd:
 		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, r.Multiplier)
 		if err != nil {
-			return sendErr(c, http.StatusInternalServerError, err)
+			return handleErr(c, err)
 		}
 		return a.GetMealById(c, mealId)
 	case MealRecipeUpdateActionRemove:

@@ -1290,6 +1290,8 @@ components:
       properties:
         message:
           type: string
+        trace_id:
+          type: string
       example:
         message: "Something went wrong"
     ConfigData:

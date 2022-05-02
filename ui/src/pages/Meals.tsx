@@ -138,7 +138,7 @@ const Meals: React.FC = () => {
           return (
             <div className="flex flex-row">
               {photos.map((photo: Photo) => (
-                <ProgressiveImage photo={photo} />
+                <ProgressiveImage photo={photo} key={photo.id} />
               ))}
             </div>
           );

@@ -486,6 +486,7 @@ export interface SearchResult {
  */
 export interface Error {
   message: string;
+  trace_id?: string;
 }
 
 /**

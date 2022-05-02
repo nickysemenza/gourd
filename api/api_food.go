@@ -10,6 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
+	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/usdamodels"
 	log "github.com/sirupsen/logrus"
@@ -122,10 +123,10 @@ func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 
 	f, err := a.getFoodById(ctx, fdcId)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	if f == nil {
-		return c.JSON(http.StatusNotFound, nil)
+		return handleErr(c, fmt.Errorf("failed to load food %v: %w", fdcId, common.ErrNotFound))
 	}
 
 	return c.JSON(http.StatusOK, *f)
@@ -184,7 +185,7 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 
 	items, err := a.buildPaginatedFood(ctx, foods)
 	if err != nil {
-		return sendErr(c, http.StatusInternalServerError, err)
+		return handleErr(c, err)
 	}
 	resp := PaginatedFoods{
 		Foods: &items,

@@ -303,6 +303,11 @@
 - name: green onion
   fdc_id: 795983
   aliases: ["scallions"]
+- name: onion
+  fdc_id: 790646
+  aliases: ["white onion", "yellow onion"]
+- name: red onion
+  fdc_id: 790577
 - name: soy sauce
   fdc_id: 774134
   aliases: ["light soy sauce"]
@@ -356,6 +361,23 @@
         value: 1
       b:
         unit: clove
+        value: 8
+      source: wf
+- name: garlic cloves
+  fdc_id: 363696
+  unit_mappings:
+    - a:
+        unit: head
+        value: 1
+      b:
+        unit: dollars
+        value: 0.75
+      source: wf
+    - a:
+        unit: head
+        value: 1
+      b:
+        unit: whole
         value: 8
       source: wf
 - name: dried pasta

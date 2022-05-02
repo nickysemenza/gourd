@@ -53,6 +53,7 @@ import { Alert } from "../components/Alert";
 import ProgressiveImage from "../components/ProgressiveImage";
 import Debug from "../components/Debug";
 import { NYTView } from "../components/NYTView";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
@@ -490,20 +491,22 @@ const RecipeDetail: React.FC = () => {
             }
           />
         )}
-        {showAltView ? (
-          <NYTView recipe={recipe} />
-        ) : (
-          <RecipeDetailTable
-            hints={hints}
-            ing_hints={ing_hints}
-            tweaks={tweaks}
-            updateIngredient={updateIngredient}
-            recipe={recipe}
-            setRecipe={setRecipe}
-            showOriginalLine={showOriginalLine}
-            showKcalDollars={showKcalDollars}
-          />
-        )}
+        <ErrorBoundary>
+          {showAltView ? (
+            <NYTView recipe={recipe} />
+          ) : (
+            <RecipeDetailTable
+              hints={hints}
+              ing_hints={ing_hints}
+              tweaks={tweaks}
+              updateIngredient={updateIngredient}
+              recipe={recipe}
+              setRecipe={setRecipe}
+              showOriginalLine={showOriginalLine}
+              showKcalDollars={showKcalDollars}
+            />
+          )}
+        </ErrorBoundary>
         {/* <InstructionsListParser
         setDetail={(s) => {
           setRecipe(setDetail(recipe, s));
@@ -560,7 +563,7 @@ const RecipeDetail: React.FC = () => {
         <div>
           <div className="w-9/12 flex ">
             {(recipe.linked_photos || []).map((p) => (
-              <ProgressiveImage photo={p} className="w-52" />
+              <ProgressiveImage photo={p} className="w-52" key={p.id} />
             ))}
           </div>
         </div>

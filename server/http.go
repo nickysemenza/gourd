@@ -44,7 +44,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(otelecho.Middleware("gourd-server"))
 	r.Use(middleware.CORS())
 	r.Use(mw2.Logger())
-	r.Use(middleware.RequestID())
+	// r.Use(middleware.RequestID())
 	r.Use(sentryecho.New(sentryecho.Options{Repanic: true}))
 	r.Use(middleware.Recover())
 	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
@@ -171,10 +171,8 @@ func writeJSON(w http.ResponseWriter, status int, payload interface{}) {
 func TraceIDHeader(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ctx := c.Request().Context()
-		sc := trace.SpanContextFromContext(ctx)
-		if sc.IsValid() {
-
-			c.Response().Header().Set(echo.HeaderXRequestID, sc.TraceID().String())
+		if id := api.GetTraceID(ctx); id != "" {
+			c.Response().Header().Set(echo.HeaderXRequestID, id)
 		}
 		return next(c)
 	}

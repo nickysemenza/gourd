@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -42,10 +43,13 @@ func (l *Items) setTotalCount(count uint64) {
 }
 
 func sendErr(c echo.Context, code int, err error) error {
-	trace.SpanFromContext(c.Request().Context()).AddEvent(fmt.Sprintf("error: %v", err))
+	ctx := c.Request().Context()
+	trace.SpanFromContext(ctx).AddEvent(fmt.Sprintf("error: %v", err))
 	logrus.WithField("code", code).WithField("route", c.Request().URL).Errorf("http err: %v", err)
+	t := GetTraceID(ctx)
 	return c.JSON(code, Error{
 		Message: err.Error(),
+		TraceId: &t,
 	})
 }
 
@@ -55,4 +59,12 @@ func handleErr(c echo.Context, err error) error {
 	}
 	return sendErr(c, http.StatusInternalServerError, err)
 
+}
+
+func GetTraceID(ctx context.Context) string {
+	sc := trace.SpanContextFromContext(ctx)
+	if sc.IsValid() {
+		return sc.TraceID().String()
+	}
+	return ""
 }

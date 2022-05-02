@@ -16,6 +16,8 @@
 pub struct Error {
     #[serde(rename = "message")]
     pub message: String,
+    #[serde(rename = "trace_id", skip_serializing_if = "Option::is_none")]
+    pub trace_id: Option<String>,
 }
 
 impl Error {
@@ -23,6 +25,7 @@ impl Error {
     pub fn new(message: String) -> Error {
         Error {
             message,
+            trace_id: None,
         }
     }
 }
