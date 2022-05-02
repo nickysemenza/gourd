@@ -474,7 +474,7 @@ type RecipeDetail struct {
 	Servings *int64 `json:"servings,omitempty"`
 
 	// book or websites
-	Sources *[]RecipeSource `json:"sources,omitempty"`
+	Sources []RecipeSource `json:"sources"`
 
 	// tags
 	Tags []string `json:"tags"`

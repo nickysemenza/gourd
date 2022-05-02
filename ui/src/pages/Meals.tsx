@@ -115,6 +115,7 @@ const Meals: React.FC = () => {
                       version: 0,
                       is_latest_version: false,
                       created_at: "",
+                      sources: [],
                     })
                   );
                 }}

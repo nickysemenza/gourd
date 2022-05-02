@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strings"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
@@ -23,9 +24,11 @@ import (
 	"github.com/nickysemenza/gourd/models"
 	"github.com/nickysemenza/gourd/notion"
 	"github.com/nickysemenza/gourd/rs_client"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -463,6 +466,21 @@ func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, 
 		return nil, err
 	}
 	full.LinkedPhotos = &p
+
+	if slices.Contains(r.Tags, "notion") {
+		// add notion links as sources as well
+		notionRecipes, err := models.NotionRecipes(qm.Where("recipe_id = ?", r.RecipeId)).All(ctx, a.db.DB())
+		if err != nil {
+			return nil, err
+		}
+		notionSOurces := []RecipeSource{}
+		for _, n := range notionRecipes {
+			url := fmt.Sprintf("https://notion.so/%s", strings.ReplaceAll(n.PageID, "-", ""))
+			notionSOurces = append(notionSOurces, RecipeSource{Url: &url})
+		}
+		full.Detail.Sources = append(full.Detail.Sources, notionSOurces...)
+
+	}
 	return full, nil
 }
 

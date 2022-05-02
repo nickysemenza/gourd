@@ -181,7 +181,7 @@ export interface RecipeDetail {
   /**
    * book or websites
    */
-  sources?: RecipeSource[];
+  sources: RecipeSource[];
   /**
    * num servings
    */

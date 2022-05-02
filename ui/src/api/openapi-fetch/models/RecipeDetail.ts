@@ -53,7 +53,7 @@ export interface RecipeDetail {
      * @type {Array<RecipeSource>}
      * @memberof RecipeDetail
      */
-    sources?: Array<RecipeSource>;
+    sources: Array<RecipeSource>;
     /**
      * num servings
      * @type {number}
@@ -117,7 +117,7 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'id': json['id'],
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'name': json['name'],
-        'sources': !exists(json, 'sources') ? undefined : ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
+        'sources': ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
         'servings': !exists(json, 'servings') ? undefined : json['servings'],
         'quantity': json['quantity'],
         'unit': json['unit'],
@@ -141,7 +141,7 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'id': value.id,
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'name': value.name,
-        'sources': value.sources === undefined ? undefined : ((value.sources as Array<any>).map(RecipeSourceToJSON)),
+        'sources': ((value.sources as Array<any>).map(RecipeSourceToJSON)),
         'servings': value.servings,
         'quantity': value.quantity,
         'unit': value.unit,

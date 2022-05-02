@@ -370,6 +370,7 @@ mod tests {
                 vec![si_1.clone(), si_2.clone(), si_3.clone()],
             )],
             "".to_string(),
+            vec![],
             0,
             "".to_string(),
             0,

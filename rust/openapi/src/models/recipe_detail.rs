@@ -24,8 +24,8 @@ pub struct RecipeDetail {
     #[serde(rename = "name")]
     pub name: String,
     /// book or websites
-    #[serde(rename = "sources", skip_serializing_if = "Option::is_none")]
-    pub sources: Option<Vec<crate::models::RecipeSource>>,
+    #[serde(rename = "sources")]
+    pub sources: Vec<crate::models::RecipeSource>,
     /// num servings
     #[serde(rename = "servings", skip_serializing_if = "Option::is_none")]
     pub servings: Option<i64>,
@@ -54,12 +54,12 @@ pub struct RecipeDetail {
 
 impl RecipeDetail {
     /// A revision of a recipe
-    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String, tags: Vec<String>) -> RecipeDetail {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, sources: Vec<crate::models::RecipeSource>, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String, tags: Vec<String>) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,
             name,
-            sources: None,
+            sources,
             servings: None,
             quantity,
             unit,

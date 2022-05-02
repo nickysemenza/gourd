@@ -59,7 +59,7 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require golang.org/x/exp v0.0.0-20220414153411-bcd21879b8fd
+require golang.org/x/exp v0.0.0-20220428152302-39d4317da171
 
 require (
 	4d63.com/gochecknoglobals v0.1.0 // indirect

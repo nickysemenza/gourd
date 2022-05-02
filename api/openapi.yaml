@@ -936,6 +936,7 @@ components:
       required:
         - id
         - name
+        - sources
         - quantity
         - unit
         - sections
