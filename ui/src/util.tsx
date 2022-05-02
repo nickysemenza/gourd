@@ -41,6 +41,9 @@ export const formatRichText = (w: wasm, text: RichItem[]) => {
       if (val.unit === "whole") {
         val.unit = "";
       }
+      if (val.value === null) {
+        val.value = 0;
+      }
       return (
         <div
           className="inline text-green-800 m-0 underline decoration-grey decoration-solid"

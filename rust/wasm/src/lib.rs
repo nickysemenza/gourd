@@ -7,7 +7,7 @@ use gourd_common::{
     unit::{add_time_amounts, make_graph, print_graph},
 };
 use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
-use tracing::info;
+use tracing::{error, info};
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -65,6 +65,7 @@ extern "C" {
     #[wasm_bindgen(typescript_type = "Ingredient")]
     pub type IIngredient;
     #[wasm_bindgen(typescript_type = "Amount")]
+    #[derive(Debug)]
     pub type IAmount;
     #[wasm_bindgen(typescript_type = "Amount[]")]
     pub type IAmounts;
@@ -174,8 +175,14 @@ pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
 #[wasm_bindgen]
 pub fn format_amount(amount: &IAmount) -> String {
     utils::set_panic_hook();
-    let r: Amount = amount.into_serde().unwrap();
-    format!("{}", r)
+    let a1: Result<Amount, _> = amount.into_serde();
+    match a1 {
+        Ok(a) => format!("{}", a),
+        Err(e) => {
+            error!("failed to format {:#?}: {:?}", amount, e);
+            format!("{}", e)
+        }
+    }
 }
 
 #[wasm_bindgen]

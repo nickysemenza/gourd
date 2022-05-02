@@ -39,7 +39,9 @@ export const RecipeGrid: React.FC<{
             key={`recipegrid-${recipe.detail.id}`}
             to={`/recipe/${recipe.detail.id}`}
             aria-label="View Item"
-            className="inline-block overflow-hidden duration-300 transform bg-white dark:bg-stone-400 shadow hover:-translate-y-2"
+            className={`inline-block overflow-hidden duration-300 transform ${
+              ing.length > 0 ? "bg-white" : "bg-red-200"
+            } dark:bg-stone-400 shadow hover:-translate-y-2`}
           >
             <div className="flex flex-col h-full">
               {photo !== undefined ? (

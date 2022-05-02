@@ -2,6 +2,7 @@ import Cookies from "universal-cookie";
 import { Configuration, SystemApi } from "./api/openapi-fetch";
 import jwt_decode from "jwt-decode";
 import { toast } from "react-toastify";
+import { json } from "stream/consumers";
 
 export const getAPIURL = () => getBaseURL() + "/api";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;
@@ -39,8 +40,12 @@ export const onAPIError = (
 ) => {
   console.log(err);
   const apiErr: Error = err.data;
-  const traceId = response?.headers.get("x-request-id");
-  toast.error(`${err.message} ${apiErr.message} ${traceId}`);
+  toast.error(
+    <div>
+      <div className="font-bold">{err.message}</div>
+      <div>{apiErr.message}</div>
+    </div>
+  );
 };
 
 export const parseJWT = (): JWT | undefined => {

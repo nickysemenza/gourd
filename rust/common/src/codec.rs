@@ -36,7 +36,7 @@ pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
     trace!("decoding {}", r);
     let parts: Vec<&str> = r.trim_start_matches(SEP).split(SEP).collect();
     if parts.len() != 2 {
-        bail!("expected 2 parts");
+        bail!("expected 2 parts: {:#?}", parts);
     }
     let compact = CompactRecipe {
         meta: serde_yaml::from_str(parts[0])?,
