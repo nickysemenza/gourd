@@ -29,7 +29,7 @@ serde_derive = "^1.0"
 serde_json = "1.0"
 tracing = "0.1.28"
 tracing-opentelemetry = "0.15.0"
-tracing-subscriber = "0.2.24"
+tracing-subscriber = "0.3.11"
 url = "1.7"
 
 [dependencies.pyo3]
