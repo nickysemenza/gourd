@@ -125,7 +125,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			Name:      d.Name,
 			Quantity:  int64(d.Quantity.Int),
 			// Servings:  int64(d.Servings.Int),
-			// Sources:   d.Source,
+			Sources:         []RecipeSource{},
 			Unit:            d.Unit.String,
 			Version:         int64(d.Version),
 			Sections:        sections,
@@ -136,7 +136,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			rd.Tags = []string{}
 		}
 		if d.Source.Valid {
-			if err := json.Unmarshal([]byte(d.Source.JSON), &rd.Sources); err != nil {
+			if err := d.Source.Unmarshal(&rd.Sources); err != nil {
 				return nil, err
 			}
 		}

@@ -25,7 +25,7 @@ all: bin/gourd
 test: unit-test-go lint-go test-rs
 
 dev-env:
-	docker-compose up -d db usda_db collector
+	docker-compose up -d db usda collector
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c air.conf
 # db

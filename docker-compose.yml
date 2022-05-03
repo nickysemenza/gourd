@@ -125,8 +125,8 @@ services:
     # build:
     # context: usda
     depends_on:
-      - gourd
-      - db
+      # - gourd
+      - usda_db
     environment:
-      DB_DSN: postgresql://gourd:gourd@db:5432/food
+      DB_DSN: postgresql://gourd:gourd@usda_db:5432/usda
       CI: "true"
