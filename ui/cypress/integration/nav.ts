@@ -3,7 +3,7 @@
 /// <reference types="cypress" />
 
 import { navItems } from "../../src/components/navItems";
-import { COOKIE_NAME } from "../../src/config";
+import { COOKIE_NAME } from "../../src/auth";
 
 context("smoke tests", () => {
   beforeEach(() => {

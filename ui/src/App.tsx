@@ -21,13 +21,7 @@ import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import {
-  getAPIURL,
-  isLoggedIn,
-  onAPIRequest,
-  onAPIError,
-  getTracingURL,
-} from "./config";
+import { getAPIURL, onAPIRequest, onAPIError, getTracingURL } from "./config";
 import { CookiesProvider } from "react-cookie";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,6 +41,7 @@ import {
   SimpleSpanProcessor,
 } from "@opentelemetry/sdk-trace-base";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { isLoggedIn } from "./auth";
 
 const registerTracing = (url: string, batch: boolean) => {
   if (url === "") return;
