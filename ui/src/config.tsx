@@ -2,7 +2,6 @@ import Cookies from "universal-cookie";
 import { Configuration, SystemApi } from "./api/openapi-fetch";
 import jwt_decode from "jwt-decode";
 import { toast } from "react-toastify";
-import { json } from "stream/consumers";
 
 export const getAPIURL = () => getBaseURL() + "/api";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;
