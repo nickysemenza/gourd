@@ -9,7 +9,7 @@ import (
 
 func TestSmoke(t *testing.T) {
 	c := NewFakeNotion(t)
-	res, err := c.GetAll(context.Background(), 14)
+	res, err := c.GetAll(context.Background(), 14, "")
 	require.NoError(t, err)
 	require.Len(t, res, 1)
 	require.Equal(t, res[0].Title, "page1title")

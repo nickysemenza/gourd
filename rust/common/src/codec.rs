@@ -2,7 +2,7 @@ use anyhow::bail;
 use ingredient::rich_text::Chunk;
 use openapi::models::{
     Amount, CompactRecipe, CompactRecipeMeta, CompactRecipeSection, RecipeDetail,
-    RecipeDetailInput, RecipeSection, RecipeSectionInput, SectionIngredient,
+    RecipeDetailInput, RecipeSection, RecipeSectionInput, RecipeSource, SectionIngredient,
     SectionIngredientInput, SectionInstruction, SectionInstructionInput,
 };
 use tracing::trace;
@@ -99,6 +99,20 @@ pub fn decode_recipe(r: String) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), 
     let compact = from_string(r)?;
     expand_recipe(compact)
 }
+// handle some cases that the parser can't yet
+pub fn fixup_ingredient_line_item(ing: String) -> String {
+    ing.replace("Vegetable, canola or coconut oil", "Vegetable oil,")
+        .replace(
+            "Diamond Crystal kosher salt or 1 teaspoon table salt (4g)",
+            "Diamond Crystal kosher salt",
+        )
+        .replace("unrefined or light brown sugar", "brown sugar")
+        .replace(
+            "fresh Thai basil leaves or regular basil leaves",
+            "thai basil",
+        )
+        .replace("Egg, (s)", "egg")
+}
 const SEP: &str = "---\n";
 pub fn expand_recipe(
     r: CompactRecipe,
@@ -114,7 +128,7 @@ pub fn expand_recipe(
 
             for ing in s.ingredients.into_iter() {
                 ingredients.push(section_ingredient_from_parsed(
-                    ingredient::from_str(&ing),
+                    ingredient::from_str(&fixup_ingredient_line_item(ing.clone())),
                     &ing,
                 ))
             }
@@ -124,7 +138,7 @@ pub fn expand_recipe(
                     .map(|i| i.name.clone())
                     .filter_map(|x| x)
                     .collect(),
-                ip: new_ingredient_parser(),
+                ip: new_ingredient_parser(true),
             };
             for i in s.instructions.into_iter() {
                 let rich_text_tokens = dbg!(rtp.clone().parse(&i).unwrap_or_default());
@@ -166,7 +180,16 @@ pub fn expand_recipe(
         .collect();
 
     Ok((
-        RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string(), vec![]),
+        RecipeDetailInput {
+            sources: match r.meta.url {
+                Some(u) => Some(vec![RecipeSource {
+                    url: Some(u),
+                    ..RecipeSource::new()
+                }]),
+                None => None,
+            },
+            ..RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string(), vec![])
+        },
         rtt,
     ))
 }

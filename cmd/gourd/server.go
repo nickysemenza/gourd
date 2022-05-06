@@ -88,7 +88,7 @@ func makeServer() (*server.Server, error) {
 	}
 
 	r := rs_client.New(viper.GetString("RS_URI"))
-	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"), viper.GetBool("notion_test_only"))
+	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
 	i, err := image.NewLocalImageStore(s.GetBaseURL())
 	if err != nil {
 		return nil, err

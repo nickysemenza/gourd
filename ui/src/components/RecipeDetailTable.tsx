@@ -352,7 +352,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         i.ingredient?.children?.map((i) => i.ingredient.name || "flour") || [],
       ].flat()
     )
-    .flat();
+    .flat()
+    .map((i) => i.toLowerCase());
   const renderRow = (section: RecipeSection, x: number) => (
     <TableRow key={x}>
       <TableCell>

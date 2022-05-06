@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strconv"
 	"strings"
 
 	sq "github.com/Masterminds/squirrel"
@@ -634,7 +635,16 @@ func (a *API) NotionTest(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
 	defer span.End()
 
-	res, err := a.Notion.GetAll(ctx, 45)
+	daysSince := 45
+	if daysSinceStr := c.QueryParam("days_since"); daysSinceStr != "" {
+		var err error
+		daysSince, err = strconv.Atoi(daysSinceStr)
+		if err != nil {
+			return handleErr(c, err)
+		}
+	}
+
+	res, err := a.Notion.GetAll(ctx, daysSince, c.QueryParam("page_id"))
 	if err != nil {
 		return handleErr(c, err)
 	}

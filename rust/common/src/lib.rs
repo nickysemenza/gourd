@@ -89,7 +89,7 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     Ok(section_ingredient_from_parsed(i, s))
 }
 pub fn parse_amount(s: &str) -> Vec<ingredient::Amount> {
-    let i = new_ingredient_parser().parse_amount(s);
+    let i = new_ingredient_parser(false).parse_amount(s);
     info!("parsed {} into {:?}", s, i.clone());
     return i;
 }
@@ -389,6 +389,6 @@ mod tests {
     }
 }
 
-pub fn new_ingredient_parser() -> IngredientParser {
-    IngredientParser::new()
+pub fn new_ingredient_parser(is_rich_text: bool) -> IngredientParser {
+    IngredientParser::new(is_rich_text)
 }

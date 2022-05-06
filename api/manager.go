@@ -34,7 +34,7 @@ func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, r
 	return
 }
 
-func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe) (*models.NotionRecipe, error) {
+func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*models.NotionRecipe, error) {
 	ctx, span := a.tracer.Start(ctx, "notionRecipeToDB")
 	defer span.End()
 
@@ -82,7 +82,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.NotionRecipe)
 func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
 	defer span.End()
-	nRecipes, err := a.Notion.GetAll(ctx, lookbackDays)
+	nRecipes, err := a.Notion.GetAll(ctx, lookbackDays, "")
 	if err != nil {
 		return err
 	}

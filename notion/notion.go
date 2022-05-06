@@ -17,47 +17,54 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
+// Client is a notio nclient
 type Client struct {
-	// client   *notionapi.Client
-	dbId     notionapi.DatabaseID
-	block    notionapi.BlockService
-	db       notionapi.DatabaseService
-	page     notionapi.PageService
-	testOnly bool
+	dbID  notionapi.DatabaseID
+	block notionapi.BlockService
+	db    notionapi.DatabaseService
+	page  notionapi.PageService
 }
 
-func New(token, database string, testOnly bool) *Client {
+// New makes a notion client
+func New(token, database string) *Client {
 	hClient := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	client := notionapi.NewClient(notionapi.Token(token), notionapi.WithHTTPClient(&hClient))
 	return &Client{
-		// client:   client,
-		dbId:     notionapi.DatabaseID(database),
-		db:       client.Database,
-		block:    client.Block,
-		page:     client.Page,
-		testOnly: testOnly,
+		dbID:  notionapi.DatabaseID(database),
+		db:    client.Database,
+		block: client.Block,
+		page:  client.Page,
 	}
 }
 
-type NotionPhoto struct {
+// Photo holds a photo from notion
+type Photo struct {
 	BlockID string `json:"block_id,omitempty"`
 	URL     string `json:"url,omitempty"`
 }
-type NotionRecipe struct {
-	Title     string         `json:"title,omitempty"`
-	Time      *time.Time     `json:"time,omitempty"`
-	Tags      []string       `json:"tags,omitempty"`
-	Photos    []NotionPhoto  `json:"photos,omitempty"`
-	PageID    string         `json:"page_id,omitempty"`
-	NotionURL string         `json:"notion_url,omitempty"`
-	SourceURL string         `json:"source_url,omitempty"`
-	Raw       string         `json:"raw,omitempty"`
-	Children  []NotionRecipe `json:"children,omitempty"`
+
+// Recipe holds notion recipe page
+type Recipe struct {
+	Title     string     `json:"title,omitempty"`
+	Time      *time.Time `json:"time,omitempty"`
+	Tags      []string   `json:"tags,omitempty"`
+	Photos    []Photo    `json:"photos,omitempty"`
+	PageID    string     `json:"page_id,omitempty"`
+	NotionURL string     `json:"notion_url,omitempty"`
+	SourceURL string     `json:"source_url,omitempty"`
+	Raw       string     `json:"raw,omitempty"`
+	Children  []Recipe   `json:"children,omitempty"`
+	Debug     []string   `json:"debug,omitempty"`
 }
 
-func removeDuplicateValues(intSlice []NotionPhoto) []NotionPhoto {
+func (r *Recipe) addDebug(l *log.Entry, format string, args ...interface{}) {
+	l.Infof(format, args...)
+	r.Debug = append(r.Debug, fmt.Sprintf(format, args...))
+}
+
+func removeDuplicateValues(intSlice []Photo) []Photo {
 	keys := make(map[string]bool)
-	list := []NotionPhoto{}
+	list := []Photo{}
 
 	// If the key(values of the slice) is not equal
 	// to the already present value in new slice (list)
@@ -72,7 +79,8 @@ func removeDuplicateValues(intSlice []NotionPhoto) []NotionPhoto {
 }
 
 // nolint: exhaustive
-func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *NotionRecipe, err error) {
+func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *Recipe, err error) {
+
 	switch page.Object {
 	case "column_list", notionapi.ObjectTypePage:
 		var name string
@@ -94,38 +102,42 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 			return nil, nil
 		}
 		name = nameProp.(*notionapi.TitleProperty).Title[0].Text.Content
-		meal := NotionRecipe{
+		r := Recipe{
 			Title:     name,
 			PageID:    page.ID.String(),
 			NotionURL: page.URL,
 		}
-		log.WithField("page_id", meal.PageID).Info(meal.Title)
+		l := log.WithField("page_id", r.PageID)
+		r.addDebug(l, "processing page %s (%s)", r.PageID, page.Object)
+		l.Info(r.Title)
 
 		if dateProp, ok := page.Properties["Date"]; ok {
 			date := dateProp.(*notionapi.DateProperty).Date.Start
 			if date != nil {
 				utcTime := time.Time(*date)
 				dinnerTime := utcTime.Add(time.Hour * (3 + 24))
-				meal.Time = zero.TimeFrom(dinnerTime).Ptr()
+				r.Time = zero.TimeFrom(dinnerTime).Ptr()
 			}
 		}
 		if tags, ok := page.Properties["Tags"]; ok {
 			for _, ms := range tags.(*notionapi.MultiSelectProperty).MultiSelect {
-				meal.Tags = append(meal.Tags, ms.Name)
+				r.Tags = append(r.Tags, ms.Name)
 			}
 		}
 		if url, ok := page.Properties["source"]; ok {
-			meal.SourceURL = url.(*notionapi.URLProperty).URL
+			r.SourceURL = url.(*notionapi.URLProperty).URL
 		}
 
 		// on each page, get all the blocks that are images
-		return c.detailsFromPage(ctx, page.ID, meal)
+		return c.detailsFromPage(ctx, page.ID, r)
 
 	default:
 		return nil, fmt.Errorf("unknown page type %s", page.Object)
 	}
 }
-func (c *Client) PageById(ctx context.Context, id notionapi.PageID) (*NotionRecipe, error) {
+
+// PageByID gets page by id
+func (c *Client) PageByID(ctx context.Context, id notionapi.PageID) (*Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "PageById")
 	defer span.End()
 
@@ -136,12 +148,16 @@ func (c *Client) PageById(ctx context.Context, id notionapi.PageID) (*NotionReci
 	return c.processPage(ctx, *page)
 	// return page, nil
 }
-func (c *Client) GetAll(ctx context.Context, lookbackDays int) ([]NotionRecipe, error) {
+
+// GetAll looks back the specified number of days. shortcut to filter by a single page id
+func (c *Client) GetAll(ctx context.Context, lookbackDays int, pageID string) ([]Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "Dump")
 	defer span.End()
 
 	var cursor notionapi.Cursor
-	meals := []NotionRecipe{}
+	recipes := []Recipe{}
+
+	daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -lookbackDays))
 
 	filter := notionapi.CompoundFilter{
 		notionapi.FilterOperatorAND: {
@@ -149,19 +165,15 @@ func (c *Client) GetAll(ctx context.Context, lookbackDays int) ([]NotionRecipe, 
 				Property:    "Tags",
 				MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
 			},
+			notionapi.PropertyFilter{
+				Property: "Date",
+				Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
+			},
 		},
 	}
 
-	daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -lookbackDays))
-
-	testFilter := notionapi.PropertyFilter{
-		Property: "Date",
-		Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
-	}
-
-	filter["and"] = append(filter["and"], testFilter)
 	for {
-		resp, err := c.db.Query(ctx, c.dbId, &notionapi.DatabaseQueryRequest{
+		resp, err := c.db.Query(ctx, c.dbID, &notionapi.DatabaseQueryRequest{
 			CompoundFilter: &filter,
 			PageSize:       100,
 			StartCursor:    cursor,
@@ -172,26 +184,26 @@ func (c *Client) GetAll(ctx context.Context, lookbackDays int) ([]NotionRecipe, 
 
 		for _, page := range resp.Results {
 			span.AddEvent("page", trace.WithAttributes(attribute.String("page", spew.Sdump(page))))
-			// if page.ID.String() != "e19dd5c9-5894-4bbc-b048-76e4293e32c0" {
-			// 	continue
-			// }
-			meal, err := c.processPage(ctx, page)
+			if pageID != "" && page.ID.String() != pageID {
+				continue
+			}
+			recipe, err := c.processPage(ctx, page)
 			if err != nil {
 				return nil, err
 			}
-			if meal != nil {
-				meals = append(meals, *meal)
+			if recipe != nil {
+				recipes = append(recipes, *recipe)
 			}
 		}
 		cursor = resp.NextCursor
 		if !resp.HasMore {
-			return meals, nil
+			return recipes, nil
 		}
 	}
 
 }
 
-func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, meal NotionRecipe) (*NotionRecipe, error) {
+func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, r Recipe) (*Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "detailsFromPage")
 	defer span.End()
 
@@ -203,46 +215,67 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 		}
 
 		for _, block := range children.Results {
+			spew.Dump(block)
 			blockID := block.GetID().String()
 			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
 			l := log.WithField("page_id", pageID).
 				WithField("block_id", blockID)
-			l.
-				Infof("\tfound notion %s", block.GetType())
-			// nolint: exhaustive
+			r.addDebug(l, "\tfound notion %s", block.GetType())
 			switch block.GetType() {
 			case notionapi.BlockTypeImage:
 				i := block.(*notionapi.ImageBlock)
-				l.Infof("appending via image")
-				meal.Photos = append(meal.Photos, NotionPhoto{URL: i.Image.File.URL, BlockID: blockID})
+				r.addDebug(l, "found an image")
+				r.Photos = append(r.Photos, Photo{URL: i.Image.File.URL, BlockID: blockID})
 			case notionapi.BlockTypeColumnList, notionapi.BlockTypeColumn:
-				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(blockID), meal)
+				r.addDebug(l, "will get details from %s", block.GetType())
+				foo, err := c.detailsFromPage(ctx, notionapi.ObjectID(blockID), r)
 				if err != nil {
 					return nil, err
 				}
-				l.Infof("appending via col")
-				meal.Photos = append(meal.Photos, foo.Photos...)
+				r.Photos = append(r.Photos, foo.Photos...)
 			case notionapi.BlockTypeCode:
 				i := block.(*notionapi.CodeBlock)
 				if len(i.Code.RichText) > 0 {
 					if text := i.Code.RichText[0].Text.Content; strings.HasPrefix(text, "name:") {
-						meal.Raw = text
+						r.addDebug(l, "found code block")
+						r.Raw = text
 					}
 				} else {
-					l.Errorf("found code block with no text")
+					r.addDebug(l, "found code block with no text")
 					spew.Dump(i)
 				}
 			case notionapi.BlockTypeChildPage:
 				// treat as top level page?
-
+				r.addDebug(l, "found child page")
 				i := block.(*notionapi.ChildPageBlock)
-				foo, err := c.PageById(ctx, notionapi.PageID(i.ID))
+				foo, err := c.PageByID(ctx, notionapi.PageID(i.ID))
 				if err != nil {
 					return nil, err
 				}
 				if foo != nil {
-					meal.Children = append(meal.Children, *foo)
+					r.Children = append(r.Children, *foo)
 				}
+			case notionapi.BlockTypeLinkToPage:
+				i := block.(*notionapi.LinkToPageBlock)
+				linkedTo, err := c.PageByID(ctx, i.LinkToPage.PageID)
+				if err != nil {
+					return nil, err
+				}
+				if linkedTo != nil {
+					r.addDebug(l, "linked to page %s, using that as raw/source", linkedTo.PageID)
+					r.Raw = linkedTo.Raw
+					r.Children = append(r.Children, linkedTo.Children...)
+					r.SourceURL = linkedTo.SourceURL
+				}
+			case notionapi.BlockCallout, notionapi.BlockQuote, notionapi.BlockTypeBookmark,
+				notionapi.BlockTypeBreadcrumb, notionapi.BlockTypeBulletedListItem, notionapi.BlockTypeChildDatabase,
+				notionapi.BlockTypeDivider, notionapi.BlockTypeEmbed, notionapi.BlockTypeEquation, notionapi.BlockTypeFile,
+				notionapi.BlockTypeHeading1, notionapi.BlockTypeHeading2, notionapi.BlockTypeHeading3, notionapi.BlockTypeLinkPreview,
+				notionapi.BlockTypeNumberedListItem, notionapi.BlockTypeParagraph, notionapi.BlockTypePdf,
+				notionapi.BlockTypeSyncedBlock, notionapi.BlockTypeTableBlock, notionapi.BlockTypeTableOfContents,
+				notionapi.BlockTypeTableRowBlock, notionapi.BlockTypeTemplate, notionapi.BlockTypeToDo,
+				notionapi.BlockTypeToggle, notionapi.BlockTypeUnsupported, notionapi.BlockTypeVideo:
+				// not supported
 			}
 		}
 
@@ -252,7 +285,7 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 		}
 	}
 
-	meal.Photos = removeDuplicateValues(meal.Photos)
-	return &meal, nil
+	r.Photos = removeDuplicateValues(r.Photos)
+	return &r, nil
 
 }

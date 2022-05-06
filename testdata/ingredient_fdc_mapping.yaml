@@ -225,6 +225,7 @@
         value: 2
       source: wf
 - name: active dry yeast
+  aliases: ["yeast"]
   fdc_id: 368813
   unit_mappings:
     - a:
@@ -336,8 +337,8 @@
 - name: blueberries
   fdc_id: 732876
 - name: canned tomatoes
-  # fdc_id: 605142
-  upc: 725342260133
+  fdc_id: 1860992
+  # upc: 725342260133
   unit_mappings:
     - a:
         unit: oz

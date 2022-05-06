@@ -102,6 +102,7 @@ func (f *fakePage) Update(context.Context, notionapi.PageID, *notionapi.PageUpda
 	return nil, fmt.Errorf("not implemented")
 }
 
+// NewFakeNotion makes a fake
 func NewFakeNotion(t *testing.T) *Client {
 	t.Helper()
 

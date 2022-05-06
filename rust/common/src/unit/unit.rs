@@ -110,7 +110,7 @@ impl Measure {
         }
     }
     pub fn from_string(s: String) -> Measure {
-        let a = new_ingredient_parser().parse_amount(s.as_str())[0].clone();
+        let a = new_ingredient_parser(false).parse_amount(s.as_str())[0].clone();
         Measure::parse(Amount {
             unit: singular(&a.unit),
             value: a.value,
@@ -118,7 +118,7 @@ impl Measure {
         })
     }
     pub fn from_str(s: &str) -> Measure {
-        let a = new_ingredient_parser().parse_amount(s)[0].clone();
+        let a = new_ingredient_parser(false).parse_amount(s)[0].clone();
         Measure::parse(Amount {
             unit: singular(&a.unit),
             value: a.value,
@@ -134,7 +134,7 @@ impl Measure {
             | Unit::KCal
             | Unit::Farhenheit
             | Unit::Celcius // todo: convert to farhenheit?
-            // | Unit::Inch
+            | Unit::Inch
             | Unit::Second => return self.clone(),
             Unit::Other(x) => {
                 let x2 = x.clone();
@@ -209,7 +209,7 @@ impl Measure {
             Unit::KCal => Ok(MeasureKind::Calories),
             Unit::Second => Ok(MeasureKind::Time),
             Unit::Farhenheit | Unit::Celcius => Ok(MeasureKind::Temperature), // todo: convert to farhenheit?
-            // Unit::Inch => Ok(MeasureKind::Length),
+            Unit::Inch => Ok(MeasureKind::Length),
             Unit::Other(_) => Ok(MeasureKind::Other),
             Unit::Kilogram
             | Unit::Liter
@@ -254,7 +254,7 @@ impl Measure {
                 m if { m < SEC_TO_DAY } => (Unit::Hour, SEC_TO_HOUR),
                 _ => (Unit::Day, SEC_TO_DAY),
             },
-            // Unit::Inch => (Unit::Inch, 1.0),
+            Unit::Inch => (Unit::Inch, 1.0),
             Unit::Other(o) => (Unit::Other(o), 1.0),
             Unit::Kilogram
             | Unit::Liter
