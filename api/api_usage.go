@@ -10,6 +10,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// IngredientID is an alias
 type IngredientID string
 
 func (r *RecipeDetail) summary(multiplier float64) EntitySummary {
@@ -21,6 +22,7 @@ func (r *RecipeDetail) summary(multiplier float64) EntitySummary {
 	}
 }
 
+// SumRecipes sums the amounts of ingredients in the recipes
 func (a *API) SumRecipes(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "SumRecipes")
 	defer span.End()
@@ -53,6 +55,7 @@ func (a *API) SumRecipes(c echo.Context) error {
 
 }
 
+// UsageSummary is a map of ingredient ids to their value
 type UsageSummary map[IngredientID]UsageValue
 
 func (u UsageSummary) add(ingId IngredientID, usageVal UsageValue) {
@@ -64,6 +67,7 @@ func (u UsageSummary) add(ingId IngredientID, usageVal UsageValue) {
 	u[ingId] = pVal
 }
 
+// IngredientUsage calculate usage for provided recipes
 func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientUsage")
 	defer span.End()
@@ -74,13 +78,13 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary
 		if err != nil {
 			return nil, err
 		}
-		for ingId, usageVal := range ru {
-			summary.add(ingId, usageVal)
+		for ingID, usageVal := range ru {
+			summary.add(ingID, usageVal)
 		}
 	}
 
 	// sum the things
-	for ingredientId, v := range summary {
+	for ingredientID, v := range summary {
 		if v.Sum == nil {
 			v.Sum = []Amount{}
 		}
@@ -116,7 +120,7 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary
 
 		}
 
-		summary[ingredientId] = v
+		summary[ingredientID] = v
 
 	}
 
@@ -159,7 +163,7 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 				})
 
 			case IngredientKindRecipe:
-				var subRecipeMultiplier float64 = 1.0
+				subRecipeMultiplier := 1.0
 				for _, a := range si.Amounts {
 					if a.Unit == "recipe" {
 						// special case adjusting multiplier to 0.5 from "1/2 recipe foo"
@@ -196,10 +200,13 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 	}
 	return totalSum, nil
 }
+
+// IsGram checks if the unit is gram
 func (a Amount) IsGram() bool {
 	return a.Unit == "g" || strings.HasPrefix(a.Unit, "gr")
 }
 
+// IsMoneyKCal checks if the unit is money or kcalories
 func (a Amount) IsMoneyKCal() bool {
 	return a.Unit == "$" || a.Unit == "kcal"
 }

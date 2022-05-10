@@ -129,7 +129,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 
 }
 
-// IngredientMapping is todo
+// IngredientMappingFromFile is todo
 func IngredientMappingFromFile(ctx context.Context, inputPath string) ([]IngredientMapping, error) {
 	jsonBytes, err := JSONBytesFromFile(ctx, inputPath)
 	if err != nil {

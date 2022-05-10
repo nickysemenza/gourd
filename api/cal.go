@@ -31,14 +31,9 @@ func (a *API) CalTest(c echo.Context) error {
 		event.SetModifiedAt(time.Now())
 		event.SetStartAt(t)
 		event.SetEndAt(t.Add(time.Hour))
-		// event.SetEndAt(time.Now())
 		event.SetSummary(fmt.Sprintf("%s - %s", r.Title, strings.Join(r.Tags, ", ")))
-		// event.SetLocation("Address")
-		// event.SetDescription("Description")
 		event.SetURL(r.NotionURL)
-		event.AddRrule(fmt.Sprintf("FREQ=YEARLY;BYMONTH=%d;BYMONTHDAY=%d", time.Now().Month(), time.Now().Day()))
 		event.SetOrganizer("sender@domain", ics.WithCN("This Machine"))
-		event.AddAttendee("reciever or participant", ics.CalendarUserTypeIndividual, ics.ParticipationStatusNeedsAction, ics.ParticipationRoleReqParticipant, ics.WithRSVP(true))
 
 		cal.AddVEvent(event)
 	}
