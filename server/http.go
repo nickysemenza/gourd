@@ -96,6 +96,7 @@ func (s *Server) Run(_ context.Context) error {
 	})
 
 	r.GET("/debug/notion", s.APIManager.NotionTest)
+	r.GET("/debug/cal", s.APIManager.CalTest)
 	r.GET("/misc", s.APIManager.Misc)
 
 	r.GET("/*", func(c echo.Context) error {
