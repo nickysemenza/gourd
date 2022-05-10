@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -8,25 +9,44 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/otel"
+	"google.golang.org/grpc/credentials"
 
 	jaegerp "go.opentelemetry.io/contrib/propagators/jaeger"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 )
 
-func initTracer(url, name, env string) error {
+func initTracer(jaegerURL, honeycombKey, name, env string) error {
 	// Create the Jaeger exporter
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+
+	var exp tracesdk.SpanExporter
+	var err error
+	if jaegerURL != "" {
+		exp, err = jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(jaegerURL)))
+
+	} else if honeycombKey != "" {
+		opts := []otlptracegrpc.Option{
+			otlptracegrpc.WithEndpoint("api.honeycomb.io:443"),
+			otlptracegrpc.WithHeaders(map[string]string{
+				"x-honeycomb-team": honeycombKey,
+			}),
+			otlptracegrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, "")),
+		}
+		exp, err = otlptrace.New(context.Background(), otlptracegrpc.NewClient(opts...))
+	}
 	if err != nil {
 		return err
 	}
 	tp := tracesdk.NewTracerProvider(
 		// Always be sure to batch in production.
 		tracesdk.WithBatcher(exp),
+		// tracesdk.WithSpanProcessor(tracesdk.NewBatchSpanProcessor(exp)),
 		tracesdk.WithSampler(tracesdk.AlwaysSample()),
 		// Record information about this application in an Resource.
 		tracesdk.WithResource(resource.NewWithAttributes(
@@ -85,7 +105,7 @@ func setupMisc() error {
 	log.SetReportCaller(true)
 
 	// tracing
-	if err := initTracer(viper.GetString("JAEGER_ENDPOINT"), "gourd", "dev"); err != nil {
+	if err := initTracer(viper.GetString("JAEGER_ENDPOINT"), viper.GetString("HONEYCOMB_KEY"), "gourd", "dev"); err != nil {
 		err := fmt.Errorf("failed to init tracer: %w", err)
 		return err
 	}
