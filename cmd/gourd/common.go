@@ -88,6 +88,7 @@ func setupEnv() error {
 		return nil
 	}
 
+	viper.Debug()
 	return err
 
 }

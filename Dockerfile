@@ -9,8 +9,8 @@ FROM rust:1.60 as builder-wasm
 WORKDIR /work/rust
 RUN cargo install wasm-pack
 COPY rust/ .
-COPY Makefile .
 WORKDIR /work
+COPY Makefile .
 RUN make generate-wasm
 
 FROM node as build-ui
