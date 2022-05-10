@@ -3,7 +3,6 @@ bin/*
 rust/target/*
 rust/pkg/*
 rust/**/target/*
-rust/w/target
 openapi/
 .terraform/*
 usda/*

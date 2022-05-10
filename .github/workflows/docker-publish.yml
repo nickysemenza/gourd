@@ -8,7 +8,11 @@ name: Docker
 on:
   push:
     branches: [main, dev]
-
+    paths:
+      - "Dockerfile.base"
+      - "rust/Dockerfile"
+      - "Dockerfile"
+      - "usda/Dockerfile"
 jobs:
   build:
     env:
@@ -43,6 +47,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Get specific changed files
+        id: changed_files
+        uses: tj-actions/changed-files@v19
+        with:
+          files: ${{ matrix.file }}
       # # Install the cosign tool except on PR
       # # https://github.com/sigstore/cosign-installer
       # - name: Install cosign
@@ -78,6 +87,7 @@ jobs:
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@8c76bb76c29ef1a323204893a39e7e0413e831d3
+        if: steps.changed_files.outputs.any_modified == 'true'
         with:
           context: ${{ matrix.context }}
           file: ${{ matrix.file }}

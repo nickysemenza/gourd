@@ -1,21 +1,31 @@
-FROM golang:1.18 AS builder
+FROM golang:1.18 AS builder-go
 
-
-# Copy the code from the host and compile it
 WORKDIR /work
-# COPY go.mod . 
-# COPY go.sum .
-# # Get dependancies - will also be cached if we won't change mod/sum
-# RUN go mod download
-
 COPY . .
 RUN go mod vendor
 RUN make bin/gourd
+
+FROM rust:1.60 as builder-wasm
+WORKDIR /work/rust
+RUN cargo install wasm-pack
+COPY rust/ .
+COPY Makefile .
+WORKDIR /work
+RUN make generate-wasm
+
+FROM node as build-ui
+WORKDIR /work/ui
+COPY ui/package.json ui/yarn.lock ./
+RUN yarn
+COPY --from=builder-wasm /work/rust/wasm/pkg /work/ui/src/wasm
+COPY ui ./
+RUN yarn build
 
 FROM ghcr.io/nickysemenza/gourd-base:dev
 RUN which pdflatex
 RUN which magick
 WORKDIR /work
-COPY --from=builder /work/bin ./bin
-COPY --from=builder /work/db/migrations ./db/migrations
+COPY --from=builder-go /work/bin ./bin
+COPY --from=builder-go /work/db/migrations ./db/migrations
+COPY --from=build-ui /work/ui/build ./ui/build
 ENTRYPOINT ["./bin/gourd","server"]
