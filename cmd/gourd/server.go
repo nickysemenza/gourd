@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -31,6 +32,9 @@ func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
 		instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
 	))
 
+	if !strings.Contains(dsn, "sslmode=disable") {
+		dsn += "?sslmode=disable"
+	}
 	log.Info("connecting to db: ", dsn)
 	dbConn, err := sql.Open(driver, dsn)
 	return dbConn, err
@@ -38,13 +42,13 @@ func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
 func makeServer() (*server.Server, error) {
 
 	// postgres database
-	dbConn, err := getDBConn(viper.GetString("DATABASE_URL")+"?sslmode=disable", db.Gourd)
+	dbConn, err := getDBConn(viper.GetString("DATABASE_URL"), db.Gourd)
 	if err != nil {
 		err := fmt.Errorf("failed to init db conn: %w", err)
 		log.Fatal(err)
 	}
 
-	dbConnUSDA, err := getDBConn(viper.GetString("DATABASE_URL_USDA")+"?sslmode=disable", db.USDA)
+	dbConnUSDA, err := getDBConn(viper.GetString("DATABASE_URL_USDA"), db.USDA)
 	if err != nil {
 		err := fmt.Errorf("failed to init db conn: %w", err)
 		log.Fatal(err)
