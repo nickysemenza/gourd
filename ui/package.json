@@ -101,7 +101,7 @@
     "path": "path-browserify"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "3.9.12",
+    "@cypress/code-coverage": "3.10.0",
     "@cypress/instrument-cra": "1.4.0",
     "@openapitools/openapi-generator-cli": "2.5.1",
     "@testing-library/jest-dom": "5.16.4",
