@@ -3,6 +3,7 @@
   "packageRules": [
     {
       "updateTypes": ["minor", "patch", "pin", "digest"],
+      "automergeType": "branch",
       "automerge": true
     }
   ],
