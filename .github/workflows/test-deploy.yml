@@ -51,7 +51,7 @@ jobs:
           DATABASE_URL_USDA: postgres://gourd:gourd@localhost:5556/usda
         run: make seed-testdata
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           working-directory: ui/
           start: yarn run build:tailwind, yarn run start:integration
