@@ -1,2 +1,2 @@
 # https://github.com/hhursev/recipe-scrapers
-recipe-scrapers==14.2.0
+recipe-scrapers==14.3.0
