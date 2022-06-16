@@ -194,6 +194,7 @@
   unit_mappings:
     - *density_liquid
 - name: baking soda
+  aliases: ["BS"]
   fdc_id: 741258
   unit_mappings:
     - a:
@@ -204,6 +205,7 @@
         value: 2
       source: tjs
 - name: baking powder
+  aliases: ["BP"]
   fdc_id: 600789
   unit_mappings:
     - a:

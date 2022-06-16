@@ -64,6 +64,7 @@
     ],
     "yaml.schemas": {
       "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json": "openapi.yaml"
-    }
+    },
+    "go.testTimeout": "60s"
   }
 }

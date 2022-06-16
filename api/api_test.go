@@ -250,8 +250,17 @@ func TestInferredUnits(t *testing.T) {
 	require.NoError(err)
 
 	// assert that gram infer is correct
-	require.Contains(res.Detail.Sections[1].Ingredients[0].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52})
-	require.Contains(res.Detail.Sections[1].Ingredients[1].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 2})
-	require.Contains(res.Detail.Sections[1].Ingredients[2].Amounts, Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 3})
+	require.Contains(
+		res.Detail.Sections[1].Ingredients[0].Amounts,
+		Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52},
+	)
+	require.Contains(
+		res.Detail.Sections[1].Ingredients[1].Amounts,
+		Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 2},
+	)
+	require.Contains(
+		res.Detail.Sections[1].Ingredients[2].Amounts,
+		Amount{Source: zero.StringFrom("calculated").Ptr(), Unit: "g", Value: 52 * 3},
+	)
 
 }

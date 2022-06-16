@@ -10,26 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func mustInsert(t *testing.T, a *API, cr CompactRecipe) string {
-	t.Helper()
-	ctx := context.Background()
-
-	r, err := a.RecipeFromCompact(ctx, cr)
-	require.NoError(t, err)
-
-	ids, err := a.CreateRecipeDetails(ctx, r.Detail)
-	require.NoError(t, err)
-	return ids[0]
-}
-func newCompact(name string, ingredients, instructions []string) CompactRecipe {
-	return CompactRecipe{
-		Meta: CompactRecipeMeta{Name: name},
-		Sections: []CompactRecipeSection{{
-			Ingredients:  ingredients,
-			Instructions: instructions,
-		}},
-	}
-}
 func TestUsage(t *testing.T) {
 	require := require.New(t)
 	_, apiManager := makeHandler(t)
@@ -123,11 +103,4 @@ func TestUsage(t *testing.T) {
 		}
 
 	}
-}
-
-func ingID(t *testing.T, apiManager *API, name string) IngredientID {
-	t.Helper()
-	ing, err := apiManager.DB().IngredientByName(context.TODO(), name)
-	require.NoError(t, err)
-	return IngredientID(ing.Id)
 }

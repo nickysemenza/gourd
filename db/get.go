@@ -53,6 +53,17 @@ func (r Ingredients) ByParent() map[string][]Ingredient {
 	}
 	return m
 }
+
+func (r Ingredients) ByChild(i Ingredient) []Ingredient {
+	m := Ingredients{}
+	for _, x := range r {
+		if x.Parent.String == i.Id || i.Parent.String == x.Id {
+			m = append(m, x)
+		}
+	}
+	return m
+}
+
 func (r Ingredients) IdsByParent(id string) []string {
 	m := []string{}
 	if x, ok := r.ByParent()[id]; ok {
@@ -451,11 +462,23 @@ func (c *Client) GetIngredients(ctx context.Context, name string, ids []string, 
 		return q
 	})
 }
-func (c *Client) GetIngrientsParent(ctx context.Context, parent ...string) (Ingredients, uint64, error) {
+func (c *Client) GetIngrientsParent(ctx context.Context, parent ...Ingredient) (Ingredients, uint64, error) {
 	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
 	defer span.End()
+	parentIDs := []string{}
+	childIDs := []string{}
+	for _, x := range parent {
+		parentIDs = append(parentIDs, x.Id)
+		if x.Parent.Valid {
+			childIDs = append(childIDs, x.Parent.String)
+		}
+	}
+
 	return c.getIngredients(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.Where(sq.Eq{"parent_ingredient_id": parent})
+		return q.Where(sq.Or{
+			sq.Eq{"parent_ingredient_id": parentIDs},
+			sq.Eq{"id": childIDs},
+		})
 	})
 }
 

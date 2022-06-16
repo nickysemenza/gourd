@@ -47,12 +47,13 @@ func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) 
 
 	span.AddEvent("ingredient-params", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
 
-	parent, _, err := a.DB().GetIngrientsParent(ctx, ingredientIds...)
+	parent, _, err := a.DB().GetIngrientsParent(ctx, ing...)
 	if err != nil {
 		return nil, err
 	}
 	for _, i := range parent {
 		ingredientIds = append(ingredientIds, i.Id)
+		ing = append(ing, i)
 	}
 
 	span.AddEvent("ingredient-plus-parent", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
@@ -199,14 +200,16 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredients, linkedRecipes db.RecipeDetails) (*IngredientDetail, error) {
+func (a *API) makeDetail(ctx context.Context, i db.Ingredient, bulkParent db.Ingredients, bulkLinked db.RecipeDetails) (*IngredientDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "makeDetail")
 	defer span.End()
 
+	span.AddEvent("parent", trace.WithAttributes(attribute.String("parent", spew.Sdump(bulkParent))))
+
 	// find linked ingredients
 	same := []IngredientDetail{}
-	for _, x := range parent.ByParent()[i.Id] {
-		d, err := a.makeDetail(ctx, x, parent, linkedRecipes)
+	for _, eachParent := range bulkParent.ByChild(i) {
+		d, err := a.makeDetail(ctx, eachParent, bulkParent, bulkLinked)
 		if err != nil {
 			return nil, err
 		}
@@ -215,8 +218,8 @@ func (a *API) makeDetail(ctx context.Context, i db.Ingredient, parent db.Ingredi
 
 	// find linked recipes
 	recipes := []RecipeDetail{}
-	for _, x := range linkedRecipes.ByIngredientId()[i.Id] {
-		tr, err := a.transformRecipe(ctx, x, false)
+	for _, eachLinked := range bulkLinked.ByIngredientId()[i.Id] {
+		tr, err := a.transformRecipe(ctx, eachLinked, false)
 		if err != nil {
 			return nil, err
 		}
@@ -272,22 +275,35 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 	return c.JSON(http.StatusCreated, transformIngredient(*ing))
 }
 
+func (a *API) ingredientById(ctx context.Context, ingredientId IngredientID) (*IngredientDetail, error) {
+	ctx, span := a.tracer.Start(ctx, "IngredientById")
+	defer span.End()
+
+	ing, err := a.DB().GetIngredientById(ctx, string(ingredientId))
+	if err != nil {
+		return nil, err
+	}
+	if ing == nil {
+		return nil, nil
+	}
+	foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*ing})
+	if err != nil {
+		return nil, err
+	}
+	return &foo[0], err
+}
 func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetIngredientById")
 	defer span.End()
 
-	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
+	ing, err := a.ingredientById(ctx, IngredientID(ingredientId))
 	if err != nil {
 		return handleErr(c, err)
 	}
 	if ing == nil {
 		return sendErr(c, http.StatusNotFound, fmt.Errorf("no ingredient with id %s", ingredientId))
 	}
-	foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*ing})
-	if err != nil {
-		return handleErr(c, err)
-	}
-	return c.JSON(http.StatusOK, foo[0])
+	return c.JSON(http.StatusOK, ing)
 }
 
 func (a *API) Scrape(ctx context.Context, url string) (*RecipeWrapper, error) {
