@@ -73,11 +73,7 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
         );
         const ingredients: Array<SectionIngredientInput> = s.ingredients.map(
           (i) => ({
-            name:
-              i.ingredient?.name ||
-              i.ingredient?.ingredient.name ||
-              i.recipe?.name ||
-              undefined,
+            name: i.ingredient?.ingredient.name || i.recipe?.name || undefined,
             amounts: i.amounts,
             kind: i.kind,
             target_id: i.ingredient?.ingredient.id || i.recipe?.id || "",

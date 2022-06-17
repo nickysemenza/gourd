@@ -259,9 +259,6 @@ type IngredientDetail struct {
 	// An Ingredient
 	Ingredient Ingredient `json:"ingredient"`
 
-	// Ingredient name
-	Name string `json:"name"`
-
 	// Recipes referencing this ingredient
 	Recipes []RecipeDetail `json:"recipes"`
 

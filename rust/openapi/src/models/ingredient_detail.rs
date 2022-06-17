@@ -14,9 +14,6 @@
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct IngredientDetail {
-    /// Ingredient name
-    #[serde(rename = "name")]
-    pub name: String,
     #[serde(rename = "ingredient")]
     pub ingredient: Box<crate::models::Ingredient>,
     /// Recipes referencing this ingredient
@@ -34,9 +31,8 @@ pub struct IngredientDetail {
 
 impl IngredientDetail {
     /// An Ingredient
-    pub fn new(name: String, ingredient: crate::models::Ingredient, recipes: Vec<crate::models::RecipeDetail>, unit_mappings: Vec<crate::models::UnitMapping>) -> IngredientDetail {
+    pub fn new(ingredient: crate::models::Ingredient, recipes: Vec<crate::models::RecipeDetail>, unit_mappings: Vec<crate::models::UnitMapping>) -> IngredientDetail {
         IngredientDetail {
-            name,
             ingredient: Box::new(ingredient),
             recipes,
             children: None,

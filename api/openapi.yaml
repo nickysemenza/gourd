@@ -1060,15 +1060,11 @@ components:
       description: "An Ingredient"
       type: object
       required:
-        - name
         - ingredient
         - recipes
         # - children
         - unit_mappings
       properties:
-        name:
-          description: Ingredient name
-          type: string
         ingredient:
           $ref: "#/components/schemas/Ingredient"
         recipes:

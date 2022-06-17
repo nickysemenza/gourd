@@ -249,7 +249,6 @@ pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
 #[allow(dead_code)]
 fn bare_detail(name: String) -> IngredientDetail {
     IngredientDetail::new(
-        "".to_string(),
         Ingredient::new("".to_string(), name.to_string()),
         vec![],
         vec![],
@@ -325,7 +324,6 @@ mod tests {
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
-                "foo".to_string(),
                 Ingredient::new("a".to_string(), "foo".to_string()),
                 vec![],
                 vec![],
@@ -338,7 +336,6 @@ mod tests {
         };
         let si_2 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
-                "bar".to_string(),
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],
@@ -351,7 +348,6 @@ mod tests {
         };
         let si_3 = SectionIngredient {
             ingredient: Some(Box::new(IngredientDetail::new(
-                "bar".to_string(),
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],

@@ -39,12 +39,6 @@ import {
  */
 export interface IngredientDetail {
     /**
-     * Ingredient name
-     * @type {string}
-     * @memberof IngredientDetail
-     */
-    name: string;
-    /**
      * 
      * @type {Ingredient}
      * @memberof IngredientDetail
@@ -86,7 +80,6 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'name': json['name'],
         'ingredient': IngredientFromJSON(json['ingredient']),
         'recipes': ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
@@ -104,7 +97,6 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
     }
     return {
         
-        'name': value.name,
         'ingredient': IngredientToJSON(value.ingredient),
         'recipes': ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),

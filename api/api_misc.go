@@ -16,7 +16,6 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 		return nil
 	}
 	i := IngredientDetail{
-		Name:         ingredient.Name,
 		Recipes:      []RecipeDetail{},
 		UnitMappings: []UnitMapping{},
 	}

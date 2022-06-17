@@ -72,7 +72,6 @@ export const updateIngredientInfo = (
                 $set:
                   kind === "ingredient"
                     ? {
-                        name,
                         ingredient: { id, name, fdc_id },
                         recipes: [],
                         children: [],
