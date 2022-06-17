@@ -7,16 +7,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//nolint: unused
-func extractNames(inp []IngredientDetail) (res []string) {
+// ExtractNames pulls names out of ingredient detail
+func ExtractNames(inp []IngredientDetail) (res []string) {
 	for _, x := range inp {
 		res = append(res, x.Ingredient.Name)
 	}
 	return
 }
 
-//nolint: unused
-func mustInsert(t *testing.T, a *API, cr CompactRecipe) string {
+// MustInsert inserts a CompactRecipe
+func MustInsert(t *testing.T, a *API, cr CompactRecipe) string {
 	t.Helper()
 	ctx := context.Background()
 
@@ -28,8 +28,8 @@ func mustInsert(t *testing.T, a *API, cr CompactRecipe) string {
 	return ids[0]
 }
 
-//nolint: unused
-func newCompact(name string, ingredients, instructions []string) CompactRecipe {
+// NewCompact builds a compact recipe
+func NewCompact(name string, ingredients, instructions []string) CompactRecipe {
 	return CompactRecipe{
 		Meta: CompactRecipeMeta{Name: name},
 		Sections: []CompactRecipeSection{{
@@ -39,8 +39,8 @@ func newCompact(name string, ingredients, instructions []string) CompactRecipe {
 	}
 }
 
-//nolint: unused
-func ingID(t *testing.T, apiManager *API, name string) IngredientID {
+// IngIDFromName turns name to id
+func IngIDFromName(t *testing.T, apiManager *API, name string) IngredientID {
 	t.Helper()
 	ing, err := apiManager.DB().IngredientByName(context.TODO(), name)
 	require.NoError(t, err)

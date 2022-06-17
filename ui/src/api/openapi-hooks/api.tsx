@@ -280,9 +280,6 @@ export interface Ingredient {
  * An Ingredient
  */
 export interface IngredientDetail {
-  /**
-   * Ingredient name
-   */
   ingredient: Ingredient;
   /**
    * Recipes referencing this ingredient

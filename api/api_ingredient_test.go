@@ -25,8 +25,8 @@ func TestChildrenParentIngredients(t *testing.T) {
 		},
 	))
 
-	ingA := ingID(t, apiManager, "a")
-	ingB := ingID(t, apiManager, "b")
+	ingA := IngIDFromName(t, apiManager, "a")
+	ingB := IngIDFromName(t, apiManager, "b")
 	// ingC := ingID(t, apiManager, "c")
 
 	resA, err := apiManager.ingredientById(ctx, ingA)
@@ -36,11 +36,11 @@ func TestChildrenParentIngredients(t *testing.T) {
 	// resC, err := apiManager.ingredientById(ctx, ingC)
 	// require.NoError(err)
 
-	require.Equal([]string{"b"}, extractNames(*resA.Children))
-	require.Equal([]string{"a"}, extractNames(*resB.Children))
+	require.Equal([]string{"b"}, ExtractNames(*resA.Children))
+	require.Equal([]string{"a"}, ExtractNames(*resB.Children))
 	// require.Equal([]string{"b"}, extractNames(*resC.Children))
 
-	rd := mustInsert(t, apiManager, newCompact("main", []string{
+	rd := MustInsert(t, apiManager, NewCompact("main", []string{
 		"1 gram a",
 		"1 gram b",
 	},
@@ -55,7 +55,7 @@ func TestChildrenParentIngredients(t *testing.T) {
 	require.Equal("b", ings[1].Ingredient.Ingredient.Name)
 	// require.Equal("c", ings[2].Ingredient.Ingredient.Name)
 
-	require.Equal([]string{"b"}, extractNames(*ings[0].Ingredient.Children))
-	require.Equal([]string{"a"}, extractNames(*ings[1].Ingredient.Children))
+	require.Equal([]string{"b"}, ExtractNames(*ings[0].Ingredient.Children))
+	require.Equal([]string{"a"}, ExtractNames(*ings[1].Ingredient.Children))
 	// require.Equal([]string{"b"}, extractNames(*ings[2].Ingredient.Children))
 }

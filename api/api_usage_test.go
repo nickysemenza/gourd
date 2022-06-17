@@ -15,7 +15,7 @@ func TestUsage(t *testing.T) {
 	_, apiManager := makeHandler(t)
 	ctx := context.Background()
 
-	mustInsert(t, apiManager, newCompact("sub", []string{
+	MustInsert(t, apiManager, NewCompact("sub", []string{
 		"1 tsp salt",
 		"1 gram salt",
 		"1 gram sugar",
@@ -42,14 +42,14 @@ func TestUsage(t *testing.T) {
 	//   from main: 1 gram
 	//   from sub: 1 tbsp = 3 tsp = 3 gram
 	//   TOTAL: 4 gram
-	rdMain := mustInsert(t, apiManager, newCompact("main", []string{
+	rdMain := MustInsert(t, apiManager, NewCompact("main", []string{
 		"1 tsp pepper",
 		"1 gram pepper",
 		"1 recipe sub",
 		"1 gram water"},
 		[]string{}))
 
-	rdSMallMain := mustInsert(t, apiManager, newCompact("smallmain", []string{
+	rdSMallMain := MustInsert(t, apiManager, NewCompact("smallmain", []string{
 		"0.5 recipe sub",
 		"1 tsp water",
 	}, []string{}))
@@ -71,18 +71,18 @@ func TestUsage(t *testing.T) {
 			require.NoError(err)
 
 			// should only have grams
-			require.Equal(1*mult, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value)
-			require.Nil(firstAmount(res[ingID(t, apiManager, "sugar")].Sum, false))
+			require.Equal(1*mult, firstAmount(res[IngIDFromName(t, apiManager, "sugar")].Sum, true).Value)
+			require.Nil(firstAmount(res[IngIDFromName(t, apiManager, "sugar")].Sum, false))
 
 			// should only have grams
-			require.Equal(4*mult, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
+			require.Equal(4*mult, firstAmount(res[IngIDFromName(t, apiManager, "water")].Sum, true).Value)
 			// require.Nil(firstAmount(res[ingID(t, apiManager, "water")].Sum, false))
 
 			// should have both grams and non grams
-			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, true).Value)
-			require.Equal(2*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, false).Value)
+			require.Equal(2*mult, firstAmount(res[IngIDFromName(t, apiManager, "pepper")].Sum, true).Value)
+			require.Equal(2*mult, firstAmount(res[IngIDFromName(t, apiManager, "pepper")].Sum, false).Value)
 
-			ingSalt := ingID(t, apiManager, "salt")
+			ingSalt := IngIDFromName(t, apiManager, "salt")
 			// should only have grams
 			require.Equal(4*mult, firstAmount(res[ingSalt].Sum, true).Value)
 			// require.Nil(firstAmount(res[ingSalt].Sum, false))
@@ -93,12 +93,12 @@ func TestUsage(t *testing.T) {
 			res, err := apiManager.IngredientUsage(ctx, EntitySummary{Id: rdSMallMain, Multiplier: mult, Kind: IngredientKindRecipe})
 			require.NoError(err)
 
-			require.Equal(mult*2.5, firstAmount(res[ingID(t, apiManager, "water")].Sum, true).Value)
-			require.Equal(mult*0.5, firstAmount(res[ingID(t, apiManager, "sugar")].Sum, true).Value)
+			require.Equal(mult*2.5, firstAmount(res[IngIDFromName(t, apiManager, "water")].Sum, true).Value)
+			require.Equal(mult*0.5, firstAmount(res[IngIDFromName(t, apiManager, "sugar")].Sum, true).Value)
 
 			// should have both grams and non grams
-			require.Equal(.5*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, true).Value)
-			require.Equal(.5*mult, firstAmount(res[ingID(t, apiManager, "pepper")].Sum, false).Value)
+			require.Equal(.5*mult, firstAmount(res[IngIDFromName(t, apiManager, "pepper")].Sum, true).Value)
+			require.Equal(.5*mult, firstAmount(res[IngIDFromName(t, apiManager, "pepper")].Sum, false).Value)
 
 		}
 
