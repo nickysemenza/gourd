@@ -60,7 +60,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
 export const Pill: React.FC<{
   children?: React.ReactNode;
 }> = ({ children }) => (
-  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-violet-200 text-violet-800 rounded">
+  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-violet-200 text-violet-800 rounded-lg">
     {children}
   </span>
 );

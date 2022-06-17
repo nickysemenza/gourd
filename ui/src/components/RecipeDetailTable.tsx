@@ -478,7 +478,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="border-gray-400 shadow-xl bg-white dark:bg-gray-700">
+      <div className="border-gray-200 shadow-xl bg-white dark:bg-gray-700">
         <TableRow header>
           <TableCell></TableCell>
           <TableCell>

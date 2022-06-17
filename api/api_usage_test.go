@@ -54,7 +54,7 @@ func TestUsage(t *testing.T) {
 		"1 tsp water",
 	}, []string{}))
 
-	require.NoError(apiManager.loadIngredientMappings(ctx, []IngredientMapping{
+	require.NoError(apiManager.insertIngredientMappings(ctx, []IngredientMapping{
 		{Name: "salt", UnitMappings: []UnitMapping{{
 			A: Amount{Value: 1, Unit: "tsp"},
 			B: Amount{Value: 3, Unit: "g"},

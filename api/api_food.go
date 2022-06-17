@@ -15,6 +15,7 @@ import (
 	"github.com/nickysemenza/gourd/usdamodels"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -268,16 +269,35 @@ func (a *API) LoadIngredientMappings(c echo.Context) error {
 		return handleErr(c, err)
 	}
 
-	if err := a.loadIngredientMappings(ctx, r.IngredientMappings); err != nil {
+	if err := a.insertIngredientMappings(ctx, r.IngredientMappings); err != nil {
 		return handleErr(c, err)
 	}
 	return c.JSON(http.StatusAccepted, nil)
 }
 
-func (a *API) loadIngredientMappings(ctx context.Context, mapping []IngredientMapping) error {
-	ctx, span := a.tracer.Start(ctx, "loadIngredientMappings")
+type IngredientMappings []IngredientMapping
+
+func (m IngredientMappings) Valdiate() error {
+	var names, aliases []string
+	for _, each := range m {
+		names = append(names, each.Name)
+		aliases = append(aliases, each.Aliases...)
+	}
+	for _, x := range names {
+		if slices.Contains(aliases, x) {
+			return fmt.Errorf("Validate: %s is a top level and an alias", x)
+		}
+	}
+	return nil
+}
+
+func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMappings) error {
+	ctx, span := a.tracer.Start(ctx, "insertIngredientMappings")
 	defer span.End()
 
+	if err := mapping.Valdiate(); err != nil {
+		return err
+	}
 	for _, m := range mapping {
 
 		ing, err := a.DB().IngredientByName(ctx, m.Name)

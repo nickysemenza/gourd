@@ -18,44 +18,44 @@ func TestChildrenParentIngredients(t *testing.T) {
 	_, apiManager := makeHandler(t)
 	ctx := context.Background()
 
-	require.NoError(apiManager.loadIngredientMappings(ctx,
+	require.NoError(apiManager.insertIngredientMappings(ctx,
 		[]IngredientMapping{
 			{Name: "a", Aliases: []string{"b"}},
-			{Name: "b", Aliases: []string{"c"}},
+			// {Name: "b", Aliases: []string{"c"}},
 		},
 	))
 
 	ingA := ingID(t, apiManager, "a")
 	ingB := ingID(t, apiManager, "b")
-	ingC := ingID(t, apiManager, "c")
+	// ingC := ingID(t, apiManager, "c")
 
 	resA, err := apiManager.ingredientById(ctx, ingA)
 	require.NoError(err)
 	resB, err := apiManager.ingredientById(ctx, ingB)
 	require.NoError(err)
-	resC, err := apiManager.ingredientById(ctx, ingC)
-	require.NoError(err)
+	// resC, err := apiManager.ingredientById(ctx, ingC)
+	// require.NoError(err)
 
 	require.Equal([]string{"b"}, extractNames(*resA.Children))
-	require.Equal([]string{"a", "c"}, extractNames(*resB.Children))
-	require.Equal([]string{"b"}, extractNames(*resC.Children))
+	require.Equal([]string{"a"}, extractNames(*resB.Children))
+	// require.Equal([]string{"b"}, extractNames(*resC.Children))
 
 	rd := mustInsert(t, apiManager, newCompact("main", []string{
 		"1 gram a",
 		"1 gram b",
-		"1 gram c"},
+	},
 		[]string{}))
 
 	wrapper, err := apiManager.recipeById(ctx, rd)
 	require.NoError(err)
 	spew.Dump(wrapper)
 	ings := wrapper.Detail.Sections[0].Ingredients
-	require.Len(ings, 3)
+	require.Len(ings, 2)
 	require.Equal("a", ings[0].Ingredient.Ingredient.Name)
 	require.Equal("b", ings[1].Ingredient.Ingredient.Name)
-	require.Equal("c", ings[2].Ingredient.Ingredient.Name)
+	// require.Equal("c", ings[2].Ingredient.Ingredient.Name)
 
 	require.Equal([]string{"b"}, extractNames(*ings[0].Ingredient.Children))
-	require.Equal([]string{"a", "c"}, extractNames(*ings[1].Ingredient.Children))
-	require.Equal([]string{"b"}, extractNames(*ings[2].Ingredient.Children))
+	require.Equal([]string{"a"}, extractNames(*ings[1].Ingredient.Children))
+	// require.Equal([]string{"b"}, extractNames(*ings[2].Ingredient.Children))
 }
