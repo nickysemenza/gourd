@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
@@ -86,10 +87,32 @@ func (a *API) NormalizeAmount(ctx context.Context, amt Amount) (*Amount, error) 
 }
 
 // RecipeFromFile reads a recipe from json or yaml file
-func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDetailInput, error) {
-	ext := filepath.Ext(inputPath)
-	log.Infof("loading %s (%s)", inputPath, ext)
-	switch ext {
+func (a *API) RecipeFromFile(ctx context.Context, inputPath string) (output []RecipeDetailInput, error error) {
+	if strings.HasSuffix(inputPath, "/") {
+		// import as directory
+		dirEntries, err := os.ReadDir(inputPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read: %w", err)
+		}
+		for _, entry := range dirEntries {
+			file := filepath.Join(inputPath, entry.Name())
+			switch filepath.Ext(file) {
+			case ".txt", ".json", ".yaml":
+				recipe, err := a.RecipeFromFile(ctx, file)
+				if err != nil {
+					return nil, fmt.Errorf("failed to read: %w", err)
+				}
+				output = append(output, recipe...)
+			default:
+				continue
+			}
+
+		}
+		return
+	}
+	log.Infof("loading %s", inputPath)
+
+	switch filepath.Ext(inputPath) {
 	case ".txt":
 		data, err := bytesFromFile(ctx, inputPath)
 		if err != nil {
@@ -102,7 +125,6 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 		output.Sources = &[]RecipeSource{{Title: &inputPath}}
 		return []RecipeDetailInput{*output}, nil
 	case ".json", ".yaml":
-		var output []RecipeDetailInput
 
 		jsonBytes, err := JSONBytesFromFile(ctx, inputPath)
 		if err != nil {
@@ -122,7 +144,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) ([]RecipeDet
 			r.Sources = &[]RecipeSource{{Title: &inputPath}}
 			output = append(output, r)
 		}
-		return output, nil
+		return
 	default:
 		return nil, fmt.Errorf("unknown extension: %s", inputPath)
 	}
