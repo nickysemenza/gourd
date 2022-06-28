@@ -20,10 +20,58 @@ import {
     ConfigDataToJSON,
 } from '../models';
 
+export interface SystemApiDoSyncRequest {
+    lookbackDays: number;
+}
+
 /**
  * 
  */
 export class SystemApi extends runtime.BaseAPI {
+
+    /**
+     * todo
+     * perform sync
+     */
+    async doSyncRaw(requestParameters: SystemApiDoSyncRequest): Promise<runtime.ApiResponse<object>> {
+        if (requestParameters.lookbackDays === null || requestParameters.lookbackDays === undefined) {
+            throw new runtime.RequiredError('lookbackDays','Required parameter requestParameters.lookbackDays was null or undefined when calling doSync.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.lookbackDays !== undefined) {
+            queryParameters['lookback_days'] = requestParameters.lookbackDays;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/sync`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * todo
+     * perform sync
+     */
+    async doSync(requestParameters: SystemApiDoSyncRequest): Promise<object> {
+        const response = await this.doSyncRaw(requestParameters);
+        return await response.value();
+    }
 
     /**
      * todo

@@ -879,6 +879,47 @@ export type UseGetConfigProps = Omit<
 export const useGetConfig = (props: UseGetConfigProps) =>
   useGet<ConfigData, Error, void, void>(`/config`, props);
 
+export interface DoSyncResponse {
+  [key: string]: any;
+}
+
+export interface DoSyncQueryParams {
+  /**
+   * how many days to lookback
+   */
+  lookback_days: number;
+}
+
+export type DoSyncProps = Omit<
+  GetProps<DoSyncResponse, Error, DoSyncQueryParams, void>,
+  "path"
+>;
+
+/**
+ * perform sync
+ *
+ * todo
+ */
+export const DoSync = (props: DoSyncProps) => (
+  <Get<DoSyncResponse, Error, DoSyncQueryParams, void>
+    path={`/sync`}
+    {...props}
+  />
+);
+
+export type UseDoSyncProps = Omit<
+  UseGetProps<DoSyncResponse, Error, DoSyncQueryParams, void>,
+  "path"
+>;
+
+/**
+ * perform sync
+ *
+ * todo
+ */
+export const useDoSync = (props: UseDoSyncProps) =>
+  useGet<DoSyncResponse, Error, DoSyncQueryParams, void>(`/sync`, props);
+
 export interface ListPhotosQueryParams {
   /**
    * The number of items to skip before starting to collect the result set.

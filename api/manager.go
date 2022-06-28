@@ -3,8 +3,10 @@ package api
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
@@ -155,7 +157,15 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error 
 	return nil
 }
 
-func (a *API) DoSync(ctx context.Context, lookbackDays int) error {
+func (a *API) DoSync(c echo.Context, params DoSyncParams) error {
+	ctx := c.Request().Context()
+	err := a.Sync(ctx, params.LookbackDays)
+	if err != nil {
+		return handleErr(c, err)
+	}
+	return c.JSON(http.StatusOK, nil)
+}
+func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	now := time.Now()
 	ctx, span := a.tracer.Start(ctx, "DoSync")
 	defer span.End()

@@ -78,6 +78,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /sync:
+    get:
+      summary: perform sync
+      description: todo
+      operationId: do_sync
+      tags:
+        - system
+      parameters:
+        - name: lookback_days
+          in: query
+          required: true
+          description: how many days to lookback
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Config data
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /photos:
     get:
       summary: List all photos

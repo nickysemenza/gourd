@@ -828,6 +828,12 @@ type SearchParams struct {
 	Name NameParam `json:"name"`
 }
 
+// DoSyncParams defines parameters for DoSync.
+type DoSyncParams struct {
+	// how many days to lookback
+	LookbackDays int `json:"lookback_days"`
+}
+
 // CreateIngredientsJSONRequestBody defines body for CreateIngredients for application/json ContentType.
 type CreateIngredientsJSONRequestBody CreateIngredientsJSONBody
 

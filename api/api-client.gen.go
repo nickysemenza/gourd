@@ -181,6 +181,9 @@ type ClientInterface interface {
 
 	// Search request
 	Search(ctx context.Context, params *SearchParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DoSync request
+	DoSync(ctx context.Context, params *DoSyncParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) ListAllAlbums(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -569,6 +572,18 @@ func (c *Client) GetLatexByRecipeId(ctx context.Context, recipeId string, reqEdi
 
 func (c *Client) Search(ctx context.Context, params *SearchParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSearchRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DoSync(ctx context.Context, params *DoSyncParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDoSyncRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1771,6 +1786,49 @@ func NewSearchRequest(server string, params *SearchParams) (*http.Request, error
 	return req, nil
 }
 
+// NewDoSyncRequest generates requests for DoSync
+func NewDoSyncRequest(server string, params *DoSyncParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/sync")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	queryValues := queryURL.Query()
+
+	if queryFrag, err := runtime.StyleParamWithLocation("form", true, "lookback_days", runtime.ParamLocationQuery, params.LookbackDays); err != nil {
+		return nil, err
+	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+		return nil, err
+	} else {
+		for k, v := range parsed {
+			for _, v2 := range v {
+				queryValues.Add(k, v2)
+			}
+		}
+	}
+
+	queryURL.RawQuery = queryValues.Encode()
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1905,6 +1963,9 @@ type ClientWithResponsesInterface interface {
 
 	// Search request
 	SearchWithResponse(ctx context.Context, params *SearchParams, reqEditors ...RequestEditorFn) (*SearchResponse, error)
+
+	// DoSync request
+	DoSyncWithResponse(ctx context.Context, params *DoSyncParams, reqEditors ...RequestEditorFn) (*DoSyncResponse, error)
 }
 
 type ListAllAlbumsResponse struct {
@@ -2506,6 +2567,29 @@ func (r SearchResponse) StatusCode() int {
 	return 0
 }
 
+type DoSyncResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *map[string]interface{}
+	JSONDefault  *Error
+}
+
+// Status returns HTTPResponse.Status
+func (r DoSyncResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DoSyncResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // ListAllAlbumsWithResponse request returning *ListAllAlbumsResponse
 func (c *ClientWithResponses) ListAllAlbumsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllAlbumsResponse, error) {
 	rsp, err := c.ListAllAlbums(ctx, reqEditors...)
@@ -2794,6 +2878,15 @@ func (c *ClientWithResponses) SearchWithResponse(ctx context.Context, params *Se
 		return nil, err
 	}
 	return ParseSearchResponse(rsp)
+}
+
+// DoSyncWithResponse request returning *DoSyncResponse
+func (c *ClientWithResponses) DoSyncWithResponse(ctx context.Context, params *DoSyncParams, reqEditors ...RequestEditorFn) (*DoSyncResponse, error) {
+	rsp, err := c.DoSync(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDoSyncResponse(rsp)
 }
 
 // ParseListAllAlbumsResponse parses an HTTP response from a ListAllAlbumsWithResponse call
@@ -3608,6 +3701,39 @@ func ParseSearchResponse(rsp *http.Response) (*SearchResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest SearchResult
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDoSyncResponse parses an HTTP response from a DoSyncWithResponse call
+func ParseDoSyncResponse(rsp *http.Response) (*DoSyncResponse, error) {
+	bodyBytes, err := ioutil.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DoSyncResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest map[string]interface{}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
