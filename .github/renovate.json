@@ -2,17 +2,15 @@
   "extends": ["config:base"],
   "packageRules": [
     {
-      "updateTypes": ["minor", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "pin", "major"],
       "automergeType": "branch",
       "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["patch", "digest"],
+      "enabled": false
     }
   ],
-  "patch": {
-    "enabled": false
-  },
-  "digest": {
-    "enabled": false
-  },
   "prHourlyLimit": 5,
   "timezone": "America/Los_Angeles",
   "dependencyDashboard": true,
