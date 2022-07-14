@@ -2275,10 +2275,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ibm-cloud/openapi-ruleset@0.30.0":
-  version "0.30.0"
-  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.30.0.tgz#aaae18d9e351456df09f9084f1cf2763c0395d1c"
-  integrity sha512-rV+se+ja8wvn3piOjP1Ly5vAuvvZuNnlUu4+FlmQwLI/4wRgO1PpScoRUp9GFphtn6r8ZXa31TNDVp7fnLGbYg==
+"@ibm-cloud/openapi-ruleset@0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-0.32.0.tgz#343c05273790a7c5e452adcea50af6066eb2df2e"
+  integrity sha512-fX017Qvc6Df5t2gVWXipi4xKzM/PRzK5KBdoZF13+yl9Ua617cloKBgP8703A45pQyUG4BFJVZTspY7Q26ohUg==
   dependencies:
     "@stoplight/spectral-formats" "^1.1.0"
     "@stoplight/spectral-functions" "^1.6.1"
@@ -8602,12 +8602,12 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-ibm-openapi-validator@0.81.0:
-  version "0.81.0"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.81.0.tgz#7fc32051f04345fec4938a721c17b7b58d3a2fb6"
-  integrity sha512-y2/7un3cyPa3JH8oRTBt/nZhMX+crS7312UcZPHlOXLWAHrwc59QUBL8HbA3rKM0OoLs8UZ2whBRe1qtd8IE9w==
+ibm-openapi-validator@0.83.0:
+  version "0.83.0"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.83.0.tgz#7fd2aa4d1aef9b8e340c3160f17db9598bbc5c0e"
+  integrity sha512-EzJAmK5EeLp0vs7/oIXwcQ5SD6Dc9uI96nXYLZYbvhs4HuCjnLXYhAsCzGR/2aoGhlsIFmJ/OJEP0ztDnSmPvA==
   dependencies:
-    "@ibm-cloud/openapi-ruleset" "0.30.0"
+    "@ibm-cloud/openapi-ruleset" "0.32.0"
     "@stoplight/spectral-cli" "^6.3.0"
     "@stoplight/spectral-core" "^1.11.0"
     "@stoplight/spectral-parsers" "^1.0.1"
@@ -8625,7 +8625,6 @@ ibm-openapi-validator@0.81.0:
     pad "^2.3.0"
     require-all "^3.0.0"
     semver "^5.7.1"
-    update-notifier "^4.1.3"
     validator "^13.7.0"
     yaml-js "^0.2.3"
 
