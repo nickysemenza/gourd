@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -67,7 +67,7 @@ func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.Me
 		return nil, fmt.Errorf("batchGet failed: %w", err)
 	}
 	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("batchGet failed: %w", err)
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -179,7 +178,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		return nil, err
 	}
 
-	file, err := ioutil.TempFile("", id+".*.tex")
+	file, err := os.CreateTemp("", id+".*.tex")
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +191,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 		return nil, err
 	}
 
-	dir, err := ioutil.TempDir("", "text-")
+	dir, err := os.MkdirTemp("", "text-")
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +217,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	err = cmd.Wait()
 	if err != nil {
 		// The actual error is useless, do provide a better one.
-		output, err := ioutil.ReadFile(path.Join(dir, jobName+".log"))
+		output, err := os.ReadFile(path.Join(dir, jobName+".log"))
 		if err != nil {
 			return nil, err
 		}
@@ -228,7 +227,7 @@ func (a *API) Latex(ctx context.Context, id string) ([]byte, error) {
 	outFile := path.Join(dir, jobName+".pdf")
 	log.Println(outFile)
 
-	output, err := ioutil.ReadFile(outFile)
+	output, err := os.ReadFile(outFile)
 	if err != nil {
 		return nil, err
 	}

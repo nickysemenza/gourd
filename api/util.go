@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -25,7 +25,7 @@ func bytesFromFile(_ context.Context, inputPath string) ([]byte, error) {
 	// defer the closing of our jsonFile so that we can parse it later on
 	defer inputFile.Close()
 
-	return ioutil.ReadAll(inputFile)
+	return io.ReadAll(inputFile)
 
 }
 func JSONBytesFromFile(ctx context.Context, inputPath string) ([][]byte, error) {

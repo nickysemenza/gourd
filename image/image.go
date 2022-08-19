@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"image"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -58,12 +58,12 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 	var img io.Reader
 	if strings.Contains(url, ".heic") {
 		// shell out to imagemagick for heic conversion
-		inputFile, err := ioutil.TempFile("", ".*.heic")
+		inputFile, err := os.CreateTemp("", ".*.heic")
 		if err != nil {
 			return nil, err
 		}
 		defer inputFile.Close()
-		outputFile, err := ioutil.TempFile("", ".*.png")
+		outputFile, err := os.CreateTemp("", ".*.png")
 		if err != nil {
 			return nil, err
 		}
@@ -83,7 +83,7 @@ func GetFromURL(ctx context.Context, url string) (image.Image, error) {
 		if err != nil {
 			return nil, err
 		}
-		rawImg, err := ioutil.ReadFile(outputFile.Name())
+		rawImg, err := os.ReadFile(outputFile.Name())
 		if err != nil {
 			return nil, err
 		}
