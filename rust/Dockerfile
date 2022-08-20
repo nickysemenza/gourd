@@ -1,4 +1,4 @@
-FROM rust:1.62 as builder
+FROM rust:1.63 as builder
 WORKDIR /work/rust
 RUN apt-get update
 RUN apt-get install -y pip libpython3.9-dev
