@@ -103,7 +103,7 @@ jobs:
           path: rust/.cov
   deploy:
     needs: ["test-e2e", "test-rust", "golangci"]
-    # if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
