@@ -49,7 +49,7 @@ jobs:
 
       - name: Get specific changed files
         id: changed_files
-        uses: tj-actions/changed-files@v23
+        uses: tj-actions/changed-files@v27
         with:
           files: ${{ matrix.file }}
       # # Install the cosign tool except on PR
