@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -13,7 +14,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-func AutoMigrate(dbConn *sql.DB, up bool) error {
+func AutoMigrate(_ context.Context, dbConn *sql.DB, up bool) error {
+	//nolint: contextcheck
 	driver, err := postgres.WithInstance(dbConn, &postgres.Config{})
 	if err != nil {
 		return err

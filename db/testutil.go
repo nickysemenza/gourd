@@ -4,6 +4,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"testing"
 
@@ -27,10 +28,11 @@ func NewTestDB(t *testing.T, kind Kind) *Client {
 	dbConn, err := sql.Open("postgres", dsn)
 	require.NoError(t, err)
 
+	ctx := context.Background()
 	if kind == Gourd {
-		err = AutoMigrate(dbConn, false)
+		err = AutoMigrate(ctx, dbConn, false)
 		require.NoError(t, err)
-		err = AutoMigrate(dbConn, true)
+		err = AutoMigrate(ctx, dbConn, true)
 		require.NoError(t, err)
 	}
 

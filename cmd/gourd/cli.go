@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -46,12 +45,13 @@ func init() {
 			Use:   "tmp",
 			Short: "misc",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s, err := makeServer()
+				ctx := cmd.Context()
+				s, err := makeServer(ctx)
 				if err != nil {
 					return err
 				}
 				id := "rd_4b85d29a"
-				_, err = s.APIManager.Latex(context.Background(), id)
+				_, err = s.APIManager.Latex(ctx, id)
 				if err != nil {
 					return err
 				}
@@ -157,12 +157,12 @@ func init() {
 			Short: "import a recipe",
 			Args:  cobra.MinimumNArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				s, err := makeServer()
+				ctx := cmd.Context()
+				s, err := makeServer(ctx)
 				if err != nil {
 					return err
 				}
 
-				ctx := cmd.Context()
 				recipes, err := s.APIManager.RecipeFromFile(ctx, strings.Join(args, " "))
 				if err != nil {
 					return err

@@ -39,7 +39,7 @@ func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
 	dbConn, err := sql.Open(driver, dsn)
 	return dbConn, err
 }
-func makeServer() (*server.Server, error) {
+func makeServer(ctx context.Context) (*server.Server, error) {
 
 	// postgres database
 	dbConn, err := getDBConn(viper.GetString("DATABASE_URL"), db.Gourd)
@@ -67,7 +67,7 @@ func makeServer() (*server.Server, error) {
 	}
 
 	// postgres db/migrations
-	if err := db.AutoMigrate(dbConn, true); err != nil {
+	if err := db.AutoMigrate(ctx, dbConn, true); err != nil {
 		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func makeServer() (*server.Server, error) {
 	return s, nil
 }
 func runServer(ctx context.Context) error {
-	s, err := makeServer()
+	s, err := makeServer(ctx)
 	if err != nil {
 		err := fmt.Errorf("failed to make server: %w", err)
 		log.Fatal(err)

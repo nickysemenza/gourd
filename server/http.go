@@ -111,8 +111,8 @@ func (s *Server) Run(_ context.Context) error {
 	})
 
 	log.Printf("running on: %s", s.GetBaseURL())
+	// nolint: gosec
 	return http.ListenAndServe(s.getAddress(),
-		// nolint: contextcheck
 		wrapHandler(http.TimeoutHandler(r, s.HTTPTimeout, "timeout")),
 	)
 }
