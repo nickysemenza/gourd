@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "6.4.5",
-    "@headlessui/react": "1.6.6",
+    "@headlessui/react": "1.7.0",
     "@opentelemetry/api": "1.2.0",
     "@opentelemetry/auto-instrumentations-web": "0.30.0",
     "@opentelemetry/context-zone": "1.6.0",
