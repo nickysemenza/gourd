@@ -8,7 +8,7 @@ use opentelemetry::sdk::{
 };
 use tracing::{info, span};
 // use tracing_subscriber::subscribe::CollectExt;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 extern crate clap;
 use clap::{App, Arg, SubCommand};
@@ -90,6 +90,7 @@ fn initialize_tracing(s: &str) {
     let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
     tracing_subscriber::registry()
+        .with(EnvFilter::from_default_env())
         .with(tracing_subscriber::fmt::layer())
         .with(opentelemetry)
         .try_init()

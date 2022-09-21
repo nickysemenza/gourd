@@ -1,9 +1,7 @@
 FROM rust:1.63 as builder
 WORKDIR /work/rust
 RUN apt-get update
-RUN apt-get install -y pip libpython3.9-dev
 COPY rust/ .
-RUN pip install -r requirements.txt
 WORKDIR /work/rust/s
 RUN pwd && ls
 RUN cargo build

@@ -78,7 +78,7 @@ pub async fn pans() -> HttpResponse {
 pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     let url = info.url.as_str();
 
-    let sc_result = match scraper::scrape_recipe(url) {
+    let sc_result = match scraper::scrape_recipe(url).await {
         Ok(s) => s,
         Err(e) => {
             error!("{:#?}", e);
@@ -94,7 +94,7 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
 #[tracing::instrument(name = "route::scrape")]
 pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
     let url = info.text.as_str();
-    let sc_result = match scraper::scrape_recipe(url) {
+    let sc_result = match scraper::scrape_recipe(url).await {
         Ok(s) => s,
         Err(e) => {
             error!("{:#?}", e);

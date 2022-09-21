@@ -31,10 +31,11 @@ tracing = "0.1.28"
 tracing-opentelemetry = "0.15.0"
 tracing-subscriber = "0.2.24"
 url = "2.3"
+recipe-scraper = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "scraper"}
 
-[dependencies.pyo3]
-features = ["auto-initialize"]
-version = "0.17.0"
 
 [dev-dependencies]
 actix-rt = "2.7.0"
+
+# [patch."https://github.com/nickysemenza/ingredient-parser"]
+# recipe-scraper = { path = "../../../ingredient-parser/recipe-scraper" }
