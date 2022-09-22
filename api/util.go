@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nickysemenza/gourd/rs_client"
+	"github.com/nickysemenza/gourd/clients/rs_client"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"sigs.k8s.io/yaml"

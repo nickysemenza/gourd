@@ -1,3 +1,0 @@
-database:
-  port: 5432
-  host: db

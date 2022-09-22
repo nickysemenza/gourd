@@ -7,8 +7,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
+	"github.com/nickysemenza/gourd/clients/rs_client"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"

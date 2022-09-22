@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/client"
+	"github.com/nickysemenza/gourd/clients/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"

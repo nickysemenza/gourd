@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/nickysemenza/gourd/clients/notion"
+	"github.com/nickysemenza/gourd/clients/rs_client"
 	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/models"
-	"github.com/nickysemenza/gourd/notion"
-	"github.com/nickysemenza/gourd/rs_client"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 )

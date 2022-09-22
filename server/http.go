@@ -21,8 +21,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/auth"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/internal/auth"
 )
 
 // Server represents a server
