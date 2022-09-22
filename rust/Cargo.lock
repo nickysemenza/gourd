@@ -1852,7 +1852,7 @@ dependencies = [
 [[package]]
 name = "recipe-scraper"
 version = "0.1.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=scraper#3e79d752fe9194b90fcb962fc616dfb819994a1f"
+source = "git+https://github.com/nickysemenza/ingredient-parser?branch=scraper#006adcda0520d6aead11853bc455158c66c1d0c5"
 dependencies = [
  "reqwest",
  "reqwest-middleware",

@@ -37,5 +37,3 @@ recipe-scraper = {git = "https://github.com/nickysemenza/ingredient-parser", bra
 [dev-dependencies]
 actix-rt = "2.7.0"
 
-# [patch."https://github.com/nickysemenza/ingredient-parser"]
-# recipe-scraper = { path = "../../../ingredient-parser/recipe-scraper" }

@@ -14,3 +14,8 @@ split-debuginfo = "unpacked"
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
+
+
+# [patch."https://github.com/nickysemenza/ingredient-parser"]
+# recipe-scraper = { path = "../../ingredient-parser/recipe-scraper" }
+# ingredient = { path = "../../ingredient-parser/ingredient-parser" }
