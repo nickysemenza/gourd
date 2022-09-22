@@ -12,4 +12,4 @@
 ./bin/gourd import testdata/pasta.txt
 
 
-./bin/gourd load-ingredients data/ingredient_fdc_mapping.yaml
+./bin/gourd load-ingredients deploy/ingredient_fdc_mapping.yaml
