@@ -15,7 +15,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	servertiming "github.com/mitchellh/go-server-timing"
-	"github.com/nickysemenza/gourd/common"
+	"github.com/nickysemenza/gourd/internal/common"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"

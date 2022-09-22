@@ -14,9 +14,9 @@ import (
 	echo_middleware "github.com/labstack/echo/v4/middleware"
 	"github.com/nickysemenza/gourd/clients/notion"
 	"github.com/nickysemenza/gourd/clients/rs_client"
-	"github.com/nickysemenza/gourd/common"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/image"
+	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/image"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/guregu/null.v4/zero"
 )

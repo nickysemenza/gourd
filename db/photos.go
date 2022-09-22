@@ -9,7 +9,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
-	"github.com/nickysemenza/gourd/common"
+	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"

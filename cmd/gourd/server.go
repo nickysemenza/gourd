@@ -17,9 +17,9 @@ import (
 	"github.com/nickysemenza/gourd/clients/notion"
 	"github.com/nickysemenza/gourd/clients/rs_client"
 	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/image"
 	"github.com/nickysemenza/gourd/internal/auth"
-	"github.com/nickysemenza/gourd/server"
+	"github.com/nickysemenza/gourd/internal/image"
+	"github.com/nickysemenza/gourd/internal/server"
 )
 
 func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {

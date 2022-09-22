@@ -12,7 +12,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/lib/pq"
-	"github.com/nickysemenza/gourd/common"
+	"github.com/nickysemenza/gourd/internal/common"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -44,7 +44,7 @@ func (c *Client) IngredientByName(ctx context.Context, name string) (*Ingredient
 	return ingredient, err
 }
 
-//nolint: funlen
+// nolint: funlen
 func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) error {
 	q := c.psql.
 		Update(recipeDetailsTable).Where(sq.Eq{"id": r.Id}).Set("name", r.Name).
