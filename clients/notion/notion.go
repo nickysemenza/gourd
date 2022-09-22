@@ -159,24 +159,22 @@ func (c *Client) GetAll(ctx context.Context, lookbackDays int, pageID string) ([
 
 	daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -lookbackDays))
 
-	filter := notionapi.CompoundFilter{
-		notionapi.FilterOperatorAND: {
-			notionapi.PropertyFilter{
-				Property:    "Tags",
-				MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
-			},
-			notionapi.PropertyFilter{
-				Property: "Date",
-				Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
-			},
+	filter := notionapi.AndCompoundFilter{
+		notionapi.PropertyFilter{
+			Property:    "Tags",
+			MultiSelect: &notionapi.MultiSelectFilterCondition{DoesNotContain: "dining"},
+		},
+		notionapi.PropertyFilter{
+			Property: "Date",
+			Date:     &notionapi.DateFilterCondition{OnOrAfter: &daysAgo},
 		},
 	}
 
 	for {
 		resp, err := c.db.Query(ctx, c.dbID, &notionapi.DatabaseQueryRequest{
-			CompoundFilter: &filter,
-			PageSize:       100,
-			StartCursor:    cursor,
+			Filter:      &filter,
+			PageSize:    100,
+			StartCursor: cursor,
 		})
 		if err != nil {
 			return nil, err

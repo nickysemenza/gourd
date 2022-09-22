@@ -30,10 +30,10 @@ func (f *fakeDB) Query(context.Context, notionapi.DatabaseID, *notionapi.Databas
 				},
 				Properties: map[string]notionapi.Property{
 					"Name": &notionapi.TitleProperty{
-						Title: []notionapi.RichText{{Text: notionapi.Text{Content: "page1title"}}},
+						Title: []notionapi.RichText{{Text: &notionapi.Text{Content: "page1title"}}},
 					},
 					"Date": &notionapi.DateProperty{
-						Date: notionapi.DateObject{Start: &time},
+						Date: &notionapi.DateObject{Start: &time},
 					},
 					"Source": &notionapi.URLProperty{
 						URL: "https://test.com",
@@ -128,7 +128,7 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 					Code: notionapi.Code{
 						RichText: []notionapi.RichText{
-							{Text: notionapi.Text{Content: `name: toast
+							{Text: &notionapi.Text{Content: `name: toast
 ---
 1 recipe bar
 ; toast`}},
@@ -142,7 +142,7 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 					Code: notionapi.Code{
 						RichText: []notionapi.RichText{
-							{Text: notionapi.Text{Content: "not a arecipe"}},
+							{Text: &notionapi.Text{Content: "not a arecipe"}},
 						},
 					},
 				},
@@ -168,7 +168,7 @@ func NewFakeNotion(t *testing.T) *Client {
 					},
 					Code: notionapi.Code{
 						RichText: []notionapi.RichText{
-							{Text: notionapi.Text{Content: `name: bar
+							{Text: &notionapi.Text{Content: `name: bar
 ---
 1 slice bread
 ; eat`}},
@@ -188,7 +188,7 @@ func NewFakeNotion(t *testing.T) *Client {
 				},
 				Properties: map[string]notionapi.Property{
 					"title": &notionapi.TitleProperty{
-						Title: []notionapi.RichText{{Text: notionapi.Text{Content: "subpagetitle"}}},
+						Title: []notionapi.RichText{{Text: &notionapi.Text{Content: "subpagetitle"}}},
 					},
 				},
 			},
