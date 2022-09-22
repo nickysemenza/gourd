@@ -14,32 +14,34 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PaginatedRecipeWrappers,
+  RecipeDependencies200Response,
+  RecipeDetail,
+  RecipeWrapper,
+  RecipeWrapperInput,
+  ScrapeRecipeRequest,
+  SearchResult,
+  SumRecipesRequest,
+  SumsResponse,
+} from '../models';
 import {
-    InlineObject,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
-    InlineObject1,
-    InlineObject1FromJSON,
-    InlineObject1ToJSON,
-    InlineResponse2001,
-    InlineResponse2001FromJSON,
-    InlineResponse2001ToJSON,
-    PaginatedRecipeWrappers,
     PaginatedRecipeWrappersFromJSON,
     PaginatedRecipeWrappersToJSON,
-    RecipeDetail,
+    RecipeDependencies200ResponseFromJSON,
+    RecipeDependencies200ResponseToJSON,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
-    RecipeWrapper,
     RecipeWrapperFromJSON,
     RecipeWrapperToJSON,
-    RecipeWrapperInput,
     RecipeWrapperInputFromJSON,
     RecipeWrapperInputToJSON,
-    SearchResult,
+    ScrapeRecipeRequestFromJSON,
+    ScrapeRecipeRequestToJSON,
     SearchResultFromJSON,
     SearchResultToJSON,
-    SumsResponse,
+    SumRecipesRequestFromJSON,
+    SumRecipesRequestToJSON,
     SumsResponseFromJSON,
     SumsResponseToJSON,
 } from '../models';
@@ -69,8 +71,8 @@ export interface RecipesApiListRecipesRequest {
     limit?: number;
 }
 
-export interface RecipesApiScrapeRecipeRequest {
-    inlineObject1: InlineObject1;
+export interface RecipesApiScrapeRecipeOperationRequest {
+    scrapeRecipeRequest: ScrapeRecipeRequest;
 }
 
 export interface RecipesApiSearchRequest {
@@ -79,8 +81,8 @@ export interface RecipesApiSearchRequest {
     limit?: number;
 }
 
-export interface RecipesApiSumRecipesRequest {
-    inlineObject: InlineObject;
+export interface RecipesApiSumRecipesOperationRequest {
+    sumRecipesRequest: SumRecipesRequest;
 }
 
 /**
@@ -92,7 +94,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it
      */
-    async convertIngredientToRecipeRaw(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
+    async convertIngredientToRecipeRaw(requestParameters: RecipesApiConvertIngredientToRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling convertIngredientToRecipe.');
         }
@@ -114,7 +116,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
     }
@@ -123,8 +125,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it
      */
-    async convertIngredientToRecipe(requestParameters: RecipesApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
-        const response = await this.convertIngredientToRecipeRaw(requestParameters);
+    async convertIngredientToRecipe(requestParameters: RecipesApiConvertIngredientToRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeDetail> {
+        const response = await this.convertIngredientToRecipeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -132,7 +134,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Create a recipe
      */
-    async createRecipesRaw(requestParameters: RecipesApiCreateRecipesRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
+    async createRecipesRaw(requestParameters: RecipesApiCreateRecipesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeWrapper>> {
         if (requestParameters.recipeWrapperInput === null || requestParameters.recipeWrapperInput === undefined) {
             throw new runtime.RequiredError('recipeWrapperInput','Required parameter requestParameters.recipeWrapperInput was null or undefined when calling createRecipes.');
         }
@@ -157,7 +159,7 @@ export class RecipesApi extends runtime.BaseAPI {
             headers: headerParameters,
             query: queryParameters,
             body: RecipeWrapperInputToJSON(requestParameters.recipeWrapperInput),
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeWrapperFromJSON(jsonValue));
     }
@@ -166,8 +168,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Create a recipe
      */
-    async createRecipes(requestParameters: RecipesApiCreateRecipesRequest): Promise<RecipeWrapper> {
-        const response = await this.createRecipesRaw(requestParameters);
+    async createRecipes(requestParameters: RecipesApiCreateRecipesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeWrapper> {
+        const response = await this.createRecipesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -175,7 +177,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * recipe as latex
      */
-    async getLatexByRecipeIdRaw(requestParameters: RecipesApiGetLatexByRecipeIdRequest): Promise<runtime.ApiResponse<Blob>> {
+    async getLatexByRecipeIdRaw(requestParameters: RecipesApiGetLatexByRecipeIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
         if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
             throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getLatexByRecipeId.');
         }
@@ -197,7 +199,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.BlobApiResponse(response);
     }
@@ -206,8 +208,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * recipe as latex
      */
-    async getLatexByRecipeId(requestParameters: RecipesApiGetLatexByRecipeIdRequest): Promise<Blob> {
-        const response = await this.getLatexByRecipeIdRaw(requestParameters);
+    async getLatexByRecipeId(requestParameters: RecipesApiGetLatexByRecipeIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.getLatexByRecipeIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -215,7 +217,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Info for a specific recipe
      */
-    async getRecipeByIdRaw(requestParameters: RecipesApiGetRecipeByIdRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
+    async getRecipeByIdRaw(requestParameters: RecipesApiGetRecipeByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeWrapper>> {
         if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
             throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getRecipeById.');
         }
@@ -237,7 +239,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeWrapperFromJSON(jsonValue));
     }
@@ -246,8 +248,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Info for a specific recipe
      */
-    async getRecipeById(requestParameters: RecipesApiGetRecipeByIdRequest): Promise<RecipeWrapper> {
-        const response = await this.getRecipeByIdRaw(requestParameters);
+    async getRecipeById(requestParameters: RecipesApiGetRecipeByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeWrapper> {
+        const response = await this.getRecipeByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -255,7 +257,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * get recipes by ids
      * Get recipes
      */
-    async getRecipesByIdsRaw(requestParameters: RecipesApiGetRecipesByIdsRequest): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
+    async getRecipesByIdsRaw(requestParameters: RecipesApiGetRecipesByIdsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
         if (requestParameters.recipeId === null || requestParameters.recipeId === undefined) {
             throw new runtime.RequiredError('recipeId','Required parameter requestParameters.recipeId was null or undefined when calling getRecipesByIds.');
         }
@@ -281,7 +283,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipeWrappersFromJSON(jsonValue));
     }
@@ -290,8 +292,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * get recipes by ids
      * Get recipes
      */
-    async getRecipesByIds(requestParameters: RecipesApiGetRecipesByIdsRequest): Promise<PaginatedRecipeWrappers> {
-        const response = await this.getRecipesByIdsRaw(requestParameters);
+    async getRecipesByIds(requestParameters: RecipesApiGetRecipesByIdsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedRecipeWrappers> {
+        const response = await this.getRecipesByIdsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -299,7 +301,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * List all recipes
      */
-    async listRecipesRaw(requestParameters: RecipesApiListRecipesRequest): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
+    async listRecipesRaw(requestParameters: RecipesApiListRecipesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedRecipeWrappers>> {
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -325,7 +327,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedRecipeWrappersFromJSON(jsonValue));
     }
@@ -334,8 +336,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * List all recipes
      */
-    async listRecipes(requestParameters: RecipesApiListRecipesRequest): Promise<PaginatedRecipeWrappers> {
-        const response = await this.listRecipesRaw(requestParameters);
+    async listRecipes(requestParameters: RecipesApiListRecipesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedRecipeWrappers> {
+        const response = await this.listRecipesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -343,7 +345,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * recipe dependencies
      * Get foods
      */
-    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2001>> {
+    async recipeDependenciesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeDependencies200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -361,17 +363,17 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDependencies200ResponseFromJSON(jsonValue));
     }
 
     /**
      * recipe dependencies
      * Get foods
      */
-    async recipeDependencies(): Promise<InlineResponse2001> {
-        const response = await this.recipeDependenciesRaw();
+    async recipeDependencies(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeDependencies200Response> {
+        const response = await this.recipeDependenciesRaw(initOverrides);
         return await response.value();
     }
 
@@ -379,9 +381,9 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * scrape a recipe by URL
      */
-    async scrapeRecipeRaw(requestParameters: RecipesApiScrapeRecipeRequest): Promise<runtime.ApiResponse<RecipeWrapper>> {
-        if (requestParameters.inlineObject1 === null || requestParameters.inlineObject1 === undefined) {
-            throw new runtime.RequiredError('inlineObject1','Required parameter requestParameters.inlineObject1 was null or undefined when calling scrapeRecipe.');
+    async scrapeRecipeRaw(requestParameters: RecipesApiScrapeRecipeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeWrapper>> {
+        if (requestParameters.scrapeRecipeRequest === null || requestParameters.scrapeRecipeRequest === undefined) {
+            throw new runtime.RequiredError('scrapeRecipeRequest','Required parameter requestParameters.scrapeRecipeRequest was null or undefined when calling scrapeRecipe.');
         }
 
         const queryParameters: any = {};
@@ -403,8 +405,8 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InlineObject1ToJSON(requestParameters.inlineObject1),
-        });
+            body: ScrapeRecipeRequestToJSON(requestParameters.scrapeRecipeRequest),
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeWrapperFromJSON(jsonValue));
     }
@@ -413,8 +415,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * scrape a recipe by URL
      */
-    async scrapeRecipe(requestParameters: RecipesApiScrapeRecipeRequest): Promise<RecipeWrapper> {
-        const response = await this.scrapeRecipeRaw(requestParameters);
+    async scrapeRecipe(requestParameters: RecipesApiScrapeRecipeOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeWrapper> {
+        const response = await this.scrapeRecipeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -422,7 +424,7 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Search recipes and ingredients
      */
-    async searchRaw(requestParameters: RecipesApiSearchRequest): Promise<runtime.ApiResponse<SearchResult>> {
+    async searchRaw(requestParameters: RecipesApiSearchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SearchResult>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
         }
@@ -456,7 +458,7 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SearchResultFromJSON(jsonValue));
     }
@@ -465,8 +467,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * todo
      * Search recipes and ingredients
      */
-    async search(requestParameters: RecipesApiSearchRequest): Promise<SearchResult> {
-        const response = await this.searchRaw(requestParameters);
+    async search(requestParameters: RecipesApiSearchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SearchResult> {
+        const response = await this.searchRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -474,9 +476,9 @@ export class RecipesApi extends runtime.BaseAPI {
      * sums up the given recipes
      * sum up recipes
      */
-    async sumRecipesRaw(requestParameters: RecipesApiSumRecipesRequest): Promise<runtime.ApiResponse<SumsResponse>> {
-        if (requestParameters.inlineObject === null || requestParameters.inlineObject === undefined) {
-            throw new runtime.RequiredError('inlineObject','Required parameter requestParameters.inlineObject was null or undefined when calling sumRecipes.');
+    async sumRecipesRaw(requestParameters: RecipesApiSumRecipesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SumsResponse>> {
+        if (requestParameters.sumRecipesRequest === null || requestParameters.sumRecipesRequest === undefined) {
+            throw new runtime.RequiredError('sumRecipesRequest','Required parameter requestParameters.sumRecipesRequest was null or undefined when calling sumRecipes.');
         }
 
         const queryParameters: any = {};
@@ -498,8 +500,8 @@ export class RecipesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InlineObjectToJSON(requestParameters.inlineObject),
-        });
+            body: SumRecipesRequestToJSON(requestParameters.sumRecipesRequest),
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SumsResponseFromJSON(jsonValue));
     }
@@ -508,8 +510,8 @@ export class RecipesApi extends runtime.BaseAPI {
      * sums up the given recipes
      * sum up recipes
      */
-    async sumRecipes(requestParameters: RecipesApiSumRecipesRequest): Promise<SumsResponse> {
-        const response = await this.sumRecipesRaw(requestParameters);
+    async sumRecipes(requestParameters: RecipesApiSumRecipesOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SumsResponse> {
+        const response = await this.sumRecipesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

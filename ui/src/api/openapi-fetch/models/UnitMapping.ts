@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-} from './';
+} from './Amount';
 
 /**
  * mappings
@@ -44,6 +44,17 @@ export interface UnitMapping {
      * @memberof UnitMapping
      */
     source?: string;
+}
+
+/**
+ * Check if a given object implements the UnitMapping interface.
+ */
+export function instanceOfUnitMapping(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "a" in value;
+    isInstance = isInstance && "b" in value;
+
+    return isInstance;
 }
 
 export function UnitMappingFromJSON(json: any): UnitMapping {
@@ -76,5 +87,4 @@ export function UnitMappingToJSON(value?: UnitMapping | null): any {
         'source': value.source,
     };
 }
-
 

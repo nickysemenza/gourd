@@ -13,20 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    EntitySummary,
+} from './Amount';
+import type { EntitySummary } from './EntitySummary';
+import {
     EntitySummaryFromJSON,
     EntitySummaryFromJSONTyped,
     EntitySummaryToJSON,
-    IngredientUsage,
+} from './EntitySummary';
+import type { IngredientUsage } from './IngredientUsage';
+import {
     IngredientUsageFromJSON,
     IngredientUsageFromJSONTyped,
     IngredientUsageToJSON,
-} from './';
+} from './IngredientUsage';
 
 /**
  * holds information
@@ -52,6 +56,18 @@ export interface UsageValue {
      * @memberof UsageValue
      */
     meta: EntitySummary;
+}
+
+/**
+ * Check if a given object implements the UsageValue interface.
+ */
+export function instanceOfUsageValue(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ings" in value;
+    isInstance = isInstance && "sum" in value;
+    isInstance = isInstance && "meta" in value;
+
+    return isInstance;
 }
 
 export function UsageValueFromJSON(json: any): UsageValue {
@@ -84,5 +100,4 @@ export function UsageValueToJSON(value?: UsageValue | null): any {
         'meta': EntitySummaryToJSON(value.meta),
     };
 }
-
 

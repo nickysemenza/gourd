@@ -13,24 +13,30 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    IngredientDetail,
+} from './Amount';
+import type { IngredientDetail } from './IngredientDetail';
+import {
     IngredientDetailFromJSON,
     IngredientDetailFromJSONTyped,
     IngredientDetailToJSON,
-    IngredientKind,
+} from './IngredientDetail';
+import type { IngredientKind } from './IngredientKind';
+import {
     IngredientKindFromJSON,
     IngredientKindFromJSONTyped,
     IngredientKindToJSON,
-    RecipeDetail,
+} from './IngredientKind';
+import type { RecipeDetail } from './RecipeDetail';
+import {
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
-} from './';
+} from './RecipeDetail';
 
 /**
  * Ingredients in a single section
@@ -94,6 +100,18 @@ export interface SectionIngredient {
     substitutes?: Array<SectionIngredient>;
 }
 
+/**
+ * Check if a given object implements the SectionIngredient interface.
+ */
+export function instanceOfSectionIngredient(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "kind" in value;
+    isInstance = isInstance && "amounts" in value;
+
+    return isInstance;
+}
+
 export function SectionIngredientFromJSON(json: any): SectionIngredient {
     return SectionIngredientFromJSONTyped(json, false);
 }
@@ -136,5 +154,4 @@ export function SectionIngredientToJSON(value?: SectionIngredient | null): any {
         'substitutes': value.substitutes === undefined ? undefined : ((value.substitutes as Array<any>).map(SectionIngredientToJSON)),
     };
 }
-
 

@@ -13,24 +13,30 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Food } from './Food';
 import {
-    Food,
     FoodFromJSON,
     FoodFromJSONTyped,
     FoodToJSON,
-    Ingredient,
+} from './Food';
+import type { Ingredient } from './Ingredient';
+import {
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    RecipeDetail,
+} from './Ingredient';
+import type { RecipeDetail } from './RecipeDetail';
+import {
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
-    UnitMapping,
+} from './RecipeDetail';
+import type { UnitMapping } from './UnitMapping';
+import {
     UnitMappingFromJSON,
     UnitMappingFromJSONTyped,
     UnitMappingToJSON,
-} from './';
+} from './UnitMapping';
 
 /**
  * An Ingredient
@@ -70,6 +76,18 @@ export interface IngredientDetail {
     unit_mappings: Array<UnitMapping>;
 }
 
+/**
+ * Check if a given object implements the IngredientDetail interface.
+ */
+export function instanceOfIngredientDetail(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ingredient" in value;
+    isInstance = isInstance && "recipes" in value;
+    isInstance = isInstance && "unit_mappings" in value;
+
+    return isInstance;
+}
+
 export function IngredientDetailFromJSON(json: any): IngredientDetail {
     return IngredientDetailFromJSONTyped(json, false);
 }
@@ -104,5 +122,4 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
-
 

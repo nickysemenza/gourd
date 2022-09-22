@@ -57,6 +57,17 @@ export interface BrandedFood {
     branded_food_category?: string;
 }
 
+/**
+ * Check if a given object implements the BrandedFood interface.
+ */
+export function instanceOfBrandedFood(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "serving_size" in value;
+    isInstance = isInstance && "serving_size_unit" in value;
+
+    return isInstance;
+}
+
 export function BrandedFoodFromJSON(json: any): BrandedFood {
     return BrandedFoodFromJSONTyped(json, false);
 }
@@ -93,5 +104,4 @@ export function BrandedFoodToJSON(value?: BrandedFood | null): any {
         'branded_food_category': value.branded_food_category,
     };
 }
-
 

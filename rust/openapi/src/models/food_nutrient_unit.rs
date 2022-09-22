@@ -13,36 +13,42 @@
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum FoodNutrientUnit {
     #[serde(rename = "UG")]
-    UG,
+    Ug,
     #[serde(rename = "G")]
     G,
     #[serde(rename = "IU")]
-    IU,
+    Iu,
     #[serde(rename = "kJ")]
     KJ,
     #[serde(rename = "KCAL")]
-    KCAL,
+    Kcal,
     #[serde(rename = "MG")]
-    MG,
+    Mg,
     #[serde(rename = "MG_ATE")]
-    MGATE,
+    MgAte,
     #[serde(rename = "SP_GR")]
-    SPGR,
+    SpGr,
 
 }
 
 impl ToString for FoodNutrientUnit {
     fn to_string(&self) -> String {
         match self {
-            Self::UG => String::from("UG"),
+            Self::Ug => String::from("UG"),
             Self::G => String::from("G"),
-            Self::IU => String::from("IU"),
+            Self::Iu => String::from("IU"),
             Self::KJ => String::from("kJ"),
-            Self::KCAL => String::from("KCAL"),
-            Self::MG => String::from("MG"),
-            Self::MGATE => String::from("MG_ATE"),
-            Self::SPGR => String::from("SP_GR"),
+            Self::Kcal => String::from("KCAL"),
+            Self::Mg => String::from("MG"),
+            Self::MgAte => String::from("MG_ATE"),
+            Self::SpGr => String::from("SP_GR"),
         }
+    }
+}
+
+impl Default for FoodNutrientUnit {
+    fn default() -> FoodNutrientUnit {
+        Self::Ug
     }
 }
 

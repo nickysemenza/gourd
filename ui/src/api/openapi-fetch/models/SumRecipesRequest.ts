@@ -13,32 +13,42 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { EntitySummary } from './EntitySummary';
 import {
-    EntitySummary,
     EntitySummaryFromJSON,
     EntitySummaryFromJSONTyped,
     EntitySummaryToJSON,
-} from './';
+} from './EntitySummary';
 
 /**
  * 
  * @export
- * @interface InlineObject
+ * @interface SumRecipesRequest
  */
-export interface InlineObject {
+export interface SumRecipesRequest {
     /**
      * 
      * @type {Array<EntitySummary>}
-     * @memberof InlineObject
+     * @memberof SumRecipesRequest
      */
     inputs: Array<EntitySummary>;
 }
 
-export function InlineObjectFromJSON(json: any): InlineObject {
-    return InlineObjectFromJSONTyped(json, false);
+/**
+ * Check if a given object implements the SumRecipesRequest interface.
+ */
+export function instanceOfSumRecipesRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "inputs" in value;
+
+    return isInstance;
 }
 
-export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject {
+export function SumRecipesRequestFromJSON(json: any): SumRecipesRequest {
+    return SumRecipesRequestFromJSONTyped(json, false);
+}
+
+export function SumRecipesRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): SumRecipesRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -48,7 +58,7 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function InlineObjectToJSON(value?: InlineObject | null): any {
+export function SumRecipesRequestToJSON(value?: SumRecipesRequest | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -60,5 +70,4 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
         'inputs': ((value.inputs as Array<any>).map(EntitySummaryToJSON)),
     };
 }
-
 

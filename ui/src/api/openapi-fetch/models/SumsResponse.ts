@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { UsageValue } from './UsageValue';
 import {
-    UsageValue,
     UsageValueFromJSON,
     UsageValueFromJSONTyped,
     UsageValueToJSON,
-} from './';
+} from './UsageValue';
 
 /**
  * 
@@ -38,6 +38,17 @@ export interface SumsResponse {
      * @memberof SumsResponse
      */
     by_recipe: { [key: string]: Array<UsageValue>; };
+}
+
+/**
+ * Check if a given object implements the SumsResponse interface.
+ */
+export function instanceOfSumsResponse(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "sums" in value;
+    isInstance = isInstance && "by_recipe" in value;
+
+    return isInstance;
 }
 
 export function SumsResponseFromJSON(json: any): SumsResponse {
@@ -68,5 +79,4 @@ export function SumsResponseToJSON(value?: SumsResponse | null): any {
         'by_recipe': value.by_recipe,
     };
 }
-
 

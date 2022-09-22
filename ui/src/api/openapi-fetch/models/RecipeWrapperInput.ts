@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { RecipeDetailInput } from './RecipeDetailInput';
 import {
-    RecipeDetailInput,
     RecipeDetailInputFromJSON,
     RecipeDetailInputFromJSONTyped,
     RecipeDetailInputToJSON,
-} from './';
+} from './RecipeDetailInput';
 
 /**
  * A recipe with subcomponents
@@ -38,6 +38,16 @@ export interface RecipeWrapperInput {
      * @memberof RecipeWrapperInput
      */
     detail: RecipeDetailInput;
+}
+
+/**
+ * Check if a given object implements the RecipeWrapperInput interface.
+ */
+export function instanceOfRecipeWrapperInput(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "detail" in value;
+
+    return isInstance;
 }
 
 export function RecipeWrapperInputFromJSON(json: any): RecipeWrapperInput {
@@ -68,5 +78,4 @@ export function RecipeWrapperInputToJSON(value?: RecipeWrapperInput | null): any
         'detail': RecipeDetailInputToJSON(value.detail),
     };
 }
-
 

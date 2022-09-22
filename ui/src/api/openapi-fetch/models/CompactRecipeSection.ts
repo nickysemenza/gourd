@@ -33,6 +33,17 @@ export interface CompactRecipeSection {
     instructions: Array<string>;
 }
 
+/**
+ * Check if a given object implements the CompactRecipeSection interface.
+ */
+export function instanceOfCompactRecipeSection(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ingredients" in value;
+    isInstance = isInstance && "instructions" in value;
+
+    return isInstance;
+}
+
 export function CompactRecipeSectionFromJSON(json: any): CompactRecipeSection {
     return CompactRecipeSectionFromJSONTyped(json, false);
 }
@@ -61,5 +72,4 @@ export function CompactRecipeSectionToJSON(value?: CompactRecipeSection | null):
         'instructions': value.instructions,
     };
 }
-
 

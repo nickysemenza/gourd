@@ -51,6 +51,20 @@ export interface FoodPortion {
     gram_weight: number;
 }
 
+/**
+ * Check if a given object implements the FoodPortion interface.
+ */
+export function instanceOfFoodPortion(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "amount" in value;
+    isInstance = isInstance && "portion_description" in value;
+    isInstance = isInstance && "modifier" in value;
+    isInstance = isInstance && "gram_weight" in value;
+
+    return isInstance;
+}
+
 export function FoodPortionFromJSON(json: any): FoodPortion {
     return FoodPortionFromJSONTyped(json, false);
 }
@@ -85,5 +99,4 @@ export function FoodPortionToJSON(value?: FoodPortion | null): any {
         'gram_weight': value.gram_weight,
     };
 }
-
 

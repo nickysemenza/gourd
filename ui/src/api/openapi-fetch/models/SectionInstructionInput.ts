@@ -27,6 +27,16 @@ export interface SectionInstructionInput {
     instruction: string;
 }
 
+/**
+ * Check if a given object implements the SectionInstructionInput interface.
+ */
+export function instanceOfSectionInstructionInput(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "instruction" in value;
+
+    return isInstance;
+}
+
 export function SectionInstructionInputFromJSON(json: any): SectionInstructionInput {
     return SectionInstructionInputFromJSONTyped(json, false);
 }
@@ -53,5 +63,4 @@ export function SectionInstructionInputToJSON(value?: SectionInstructionInput | 
         'instruction': value.instruction,
     };
 }
-
 

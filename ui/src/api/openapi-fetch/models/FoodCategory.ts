@@ -33,6 +33,17 @@ export interface FoodCategory {
     description: string;
 }
 
+/**
+ * Check if a given object implements the FoodCategory interface.
+ */
+export function instanceOfFoodCategory(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "code" in value;
+    isInstance = isInstance && "description" in value;
+
+    return isInstance;
+}
+
 export function FoodCategoryFromJSON(json: any): FoodCategory {
     return FoodCategoryFromJSONTyped(json, false);
 }
@@ -61,5 +72,4 @@ export function FoodCategoryToJSON(value?: FoodCategory | null): any {
         'description': value.description,
     };
 }
-
 

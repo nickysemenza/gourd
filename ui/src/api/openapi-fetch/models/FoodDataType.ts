@@ -12,21 +12,23 @@
  * Do not edit the class manually.
  */
 
+
 /**
  * 
  * @export
- * @enum {string}
  */
-export enum FoodDataType {
-    FOUNDATION_FOOD = 'foundation_food',
-    SAMPLE_FOOD = 'sample_food',
-    MARKET_ACQUISITION = 'market_acquisition',
-    SURVEY_FNDDS_FOOD = 'survey_fndds_food',
-    SUB_SAMPLE_FOOD = 'sub_sample_food',
-    AGRICULTURAL_ACQUISITION = 'agricultural_acquisition',
-    SR_LEGACY_FOOD = 'sr_legacy_food',
-    BRANDED_FOOD = 'branded_food'
-}
+export const FoodDataType = {
+    FOUNDATION_FOOD: 'foundation_food',
+    SAMPLE_FOOD: 'sample_food',
+    MARKET_ACQUISITION: 'market_acquisition',
+    SURVEY_FNDDS_FOOD: 'survey_fndds_food',
+    SUB_SAMPLE_FOOD: 'sub_sample_food',
+    AGRICULTURAL_ACQUISITION: 'agricultural_acquisition',
+    SR_LEGACY_FOOD: 'sr_legacy_food',
+    BRANDED_FOOD: 'branded_food'
+} as const;
+export type FoodDataType = typeof FoodDataType[keyof typeof FoodDataType];
+
 
 export function FoodDataTypeFromJSON(json: any): FoodDataType {
     return FoodDataTypeFromJSONTyped(json, false);

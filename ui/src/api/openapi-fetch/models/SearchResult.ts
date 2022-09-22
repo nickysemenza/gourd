@@ -13,20 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Ingredient } from './Ingredient';
 import {
-    Ingredient,
     IngredientFromJSON,
     IngredientFromJSONTyped,
     IngredientToJSON,
-    Items,
+} from './Ingredient';
+import type { Items } from './Items';
+import {
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
-    RecipeWrapper,
+} from './Items';
+import type { RecipeWrapper } from './RecipeWrapper';
+import {
     RecipeWrapperFromJSON,
     RecipeWrapperFromJSONTyped,
     RecipeWrapperToJSON,
-} from './';
+} from './RecipeWrapper';
 
 /**
  * A search result wrapper, which contains ingredients and recipes
@@ -52,6 +56,15 @@ export interface SearchResult {
      * @memberof SearchResult
      */
     meta?: Items;
+}
+
+/**
+ * Check if a given object implements the SearchResult interface.
+ */
+export function instanceOfSearchResult(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function SearchResultFromJSON(json: any): SearchResult {
@@ -84,5 +97,4 @@ export function SearchResultToJSON(value?: SearchResult | null): any {
         'meta': ItemsToJSON(value.meta),
     };
 }
-
 

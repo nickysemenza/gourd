@@ -14,14 +14,16 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  Meal,
+  MealRecipeUpdate,
+  PaginatedMeals,
+} from '../models';
 import {
-    Meal,
     MealFromJSON,
     MealToJSON,
-    MealRecipeUpdate,
     MealRecipeUpdateFromJSON,
     MealRecipeUpdateToJSON,
-    PaginatedMeals,
     PaginatedMealsFromJSON,
     PaginatedMealsToJSON,
 } from '../models';
@@ -49,7 +51,7 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * Info for a specific meal
      */
-    async getMealByIdRaw(requestParameters: MealsApiGetMealByIdRequest): Promise<runtime.ApiResponse<Meal>> {
+    async getMealByIdRaw(requestParameters: MealsApiGetMealByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Meal>> {
         if (requestParameters.mealId === null || requestParameters.mealId === undefined) {
             throw new runtime.RequiredError('mealId','Required parameter requestParameters.mealId was null or undefined when calling getMealById.');
         }
@@ -71,7 +73,7 @@ export class MealsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MealFromJSON(jsonValue));
     }
@@ -80,8 +82,8 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * Info for a specific meal
      */
-    async getMealById(requestParameters: MealsApiGetMealByIdRequest): Promise<Meal> {
-        const response = await this.getMealByIdRaw(requestParameters);
+    async getMealById(requestParameters: MealsApiGetMealByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Meal> {
+        const response = await this.getMealByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -89,7 +91,7 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * List all meals
      */
-    async listMealsRaw(requestParameters: MealsApiListMealsRequest): Promise<runtime.ApiResponse<PaginatedMeals>> {
+    async listMealsRaw(requestParameters: MealsApiListMealsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedMeals>> {
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -115,7 +117,7 @@ export class MealsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedMealsFromJSON(jsonValue));
     }
@@ -124,8 +126,8 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * List all meals
      */
-    async listMeals(requestParameters: MealsApiListMealsRequest): Promise<PaginatedMeals> {
-        const response = await this.listMealsRaw(requestParameters);
+    async listMeals(requestParameters: MealsApiListMealsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedMeals> {
+        const response = await this.listMealsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -133,7 +135,7 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * Update the recipes associated with a given meal
      */
-    async updateRecipesForMealRaw(requestParameters: MealsApiUpdateRecipesForMealRequest): Promise<runtime.ApiResponse<Meal>> {
+    async updateRecipesForMealRaw(requestParameters: MealsApiUpdateRecipesForMealRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Meal>> {
         if (requestParameters.mealId === null || requestParameters.mealId === undefined) {
             throw new runtime.RequiredError('mealId','Required parameter requestParameters.mealId was null or undefined when calling updateRecipesForMeal.');
         }
@@ -162,7 +164,7 @@ export class MealsApi extends runtime.BaseAPI {
             headers: headerParameters,
             query: queryParameters,
             body: MealRecipeUpdateToJSON(requestParameters.mealRecipeUpdate),
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MealFromJSON(jsonValue));
     }
@@ -171,8 +173,8 @@ export class MealsApi extends runtime.BaseAPI {
      * todo
      * Update the recipes associated with a given meal
      */
-    async updateRecipesForMeal(requestParameters: MealsApiUpdateRecipesForMealRequest): Promise<Meal> {
-        const response = await this.updateRecipesForMealRaw(requestParameters);
+    async updateRecipesForMeal(requestParameters: MealsApiUpdateRecipesForMealRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Meal> {
+        const response = await this.updateRecipesForMealRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

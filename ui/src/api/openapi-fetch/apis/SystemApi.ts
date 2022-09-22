@@ -14,8 +14,10 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  ConfigData,
+} from '../models';
 import {
-    ConfigData,
     ConfigDataFromJSON,
     ConfigDataToJSON,
 } from '../models';
@@ -33,7 +35,7 @@ export class SystemApi extends runtime.BaseAPI {
      * todo
      * perform sync
      */
-    async doSyncRaw(requestParameters: SystemApiDoSyncRequest): Promise<runtime.ApiResponse<object>> {
+    async doSyncRaw(requestParameters: SystemApiDoSyncRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters.lookbackDays === null || requestParameters.lookbackDays === undefined) {
             throw new runtime.RequiredError('lookbackDays','Required parameter requestParameters.lookbackDays was null or undefined when calling doSync.');
         }
@@ -59,7 +61,7 @@ export class SystemApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -68,8 +70,8 @@ export class SystemApi extends runtime.BaseAPI {
      * todo
      * perform sync
      */
-    async doSync(requestParameters: SystemApiDoSyncRequest): Promise<object> {
-        const response = await this.doSyncRaw(requestParameters);
+    async doSync(requestParameters: SystemApiDoSyncRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.doSyncRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -77,7 +79,7 @@ export class SystemApi extends runtime.BaseAPI {
      * todo
      * Get app config
      */
-    async getConfigRaw(): Promise<runtime.ApiResponse<ConfigData>> {
+    async getConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ConfigData>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -95,7 +97,7 @@ export class SystemApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => ConfigDataFromJSON(jsonValue));
     }
@@ -104,8 +106,8 @@ export class SystemApi extends runtime.BaseAPI {
      * todo
      * Get app config
      */
-    async getConfig(): Promise<ConfigData> {
-        const response = await this.getConfigRaw();
+    async getConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ConfigData> {
+        const response = await this.getConfigRaw(initOverrides);
         return await response.value();
     }
 

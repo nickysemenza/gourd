@@ -12,7 +12,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct MealRecipeUpdate {
     /// Recipe Id
     #[serde(rename = "recipe_id")]
@@ -43,5 +43,11 @@ pub enum Action {
     Add,
     #[serde(rename = "remove")]
     Remove,
+}
+
+impl Default for Action {
+    fn default() -> Action {
+        Self::Add
+    }
 }
 

@@ -13,32 +13,41 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { GooglePhotosAlbum } from './GooglePhotosAlbum';
 import {
-    GooglePhotosAlbum,
     GooglePhotosAlbumFromJSON,
     GooglePhotosAlbumFromJSONTyped,
     GooglePhotosAlbumToJSON,
-} from './';
+} from './GooglePhotosAlbum';
 
 /**
  * 
  * @export
- * @interface InlineResponse200
+ * @interface ListAllAlbums200Response
  */
-export interface InlineResponse200 {
+export interface ListAllAlbums200Response {
     /**
      * The list of albums
      * @type {Array<GooglePhotosAlbum>}
-     * @memberof InlineResponse200
+     * @memberof ListAllAlbums200Response
      */
     albums?: Array<GooglePhotosAlbum>;
 }
 
-export function InlineResponse200FromJSON(json: any): InlineResponse200 {
-    return InlineResponse200FromJSONTyped(json, false);
+/**
+ * Check if a given object implements the ListAllAlbums200Response interface.
+ */
+export function instanceOfListAllAlbums200Response(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
-export function InlineResponse200FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse200 {
+export function ListAllAlbums200ResponseFromJSON(json: any): ListAllAlbums200Response {
+    return ListAllAlbums200ResponseFromJSONTyped(json, false);
+}
+
+export function ListAllAlbums200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): ListAllAlbums200Response {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -48,7 +57,7 @@ export function InlineResponse200FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function InlineResponse200ToJSON(value?: InlineResponse200 | null): any {
+export function ListAllAlbums200ResponseToJSON(value?: ListAllAlbums200Response | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -60,5 +69,4 @@ export function InlineResponse200ToJSON(value?: InlineResponse200 | null): any {
         'albums': value.albums === undefined ? undefined : ((value.albums as Array<any>).map(GooglePhotosAlbumToJSON)),
     };
 }
-
 

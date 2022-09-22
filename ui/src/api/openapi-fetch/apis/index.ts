@@ -1,3 +1,5 @@
+/* tslint:disable */
+/* eslint-disable */
 export * from './AlbumsApi';
 export * from './AuthenticationApi';
 export * from './FoodsApi';

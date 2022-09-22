@@ -12,7 +12,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct PaginatedPhotos {
     #[serde(rename = "photos", skip_serializing_if = "Option::is_none")]
     pub photos: Option<Vec<crate::models::Photo>>,

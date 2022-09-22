@@ -11,7 +11,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct UnitConversionRequest {
     #[serde(rename = "target", skip_serializing_if = "Option::is_none")]
     pub target: Option<Target>,
@@ -46,5 +46,11 @@ pub enum Target {
     Calories,
     #[serde(rename = "other")]
     Other,
+}
+
+impl Default for Target {
+    fn default() -> Target {
+        Self::Weight
+    }
 }
 

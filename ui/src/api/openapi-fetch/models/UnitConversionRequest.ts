@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    UnitMapping,
+} from './Amount';
+import type { UnitMapping } from './UnitMapping';
+import {
     UnitMappingFromJSON,
     UnitMappingFromJSONTyped,
     UnitMappingToJSON,
-} from './';
+} from './UnitMapping';
 
 /**
  * 
@@ -50,16 +52,29 @@ export interface UnitConversionRequest {
     unit_mappings: Array<UnitMapping>;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum UnitConversionRequestTargetEnum {
-    WEIGHT = 'weight',
-    VOLUME = 'volume',
-    MONEY = 'money',
-    CALORIES = 'calories',
-    OTHER = 'other'
+ * @export
+ */
+export const UnitConversionRequestTargetEnum = {
+    WEIGHT: 'weight',
+    VOLUME: 'volume',
+    MONEY: 'money',
+    CALORIES: 'calories',
+    OTHER: 'other'
+} as const;
+export type UnitConversionRequestTargetEnum = typeof UnitConversionRequestTargetEnum[keyof typeof UnitConversionRequestTargetEnum];
+
+
+/**
+ * Check if a given object implements the UnitConversionRequest interface.
+ */
+export function instanceOfUnitConversionRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "input" in value;
+    isInstance = isInstance && "unit_mappings" in value;
+
+    return isInstance;
 }
 
 export function UnitConversionRequestFromJSON(json: any): UnitConversionRequest {
@@ -92,5 +107,4 @@ export function UnitConversionRequestToJSON(value?: UnitConversionRequest | null
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
-
 

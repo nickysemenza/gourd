@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { RecipeDetail } from './RecipeDetail';
 import {
-    RecipeDetail,
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
-} from './';
+} from './RecipeDetail';
 
 /**
  * A recipe that's part of a meal (a recipe at a specific amount)
@@ -38,6 +38,17 @@ export interface MealRecipe {
      * @memberof MealRecipe
      */
     recipe: RecipeDetail;
+}
+
+/**
+ * Check if a given object implements the MealRecipe interface.
+ */
+export function instanceOfMealRecipe(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "multiplier" in value;
+    isInstance = isInstance && "recipe" in value;
+
+    return isInstance;
 }
 
 export function MealRecipeFromJSON(json: any): MealRecipe {
@@ -68,5 +79,4 @@ export function MealRecipeToJSON(value?: MealRecipe | null): any {
         'recipe': RecipeDetailToJSON(value.recipe),
     };
 }
-
 

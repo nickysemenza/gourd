@@ -39,13 +39,27 @@ export interface MealRecipeUpdate {
     action: MealRecipeUpdateActionEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum MealRecipeUpdateActionEnum {
-    ADD = 'add',
-    REMOVE = 'remove'
+ * @export
+ */
+export const MealRecipeUpdateActionEnum = {
+    ADD: 'add',
+    REMOVE: 'remove'
+} as const;
+export type MealRecipeUpdateActionEnum = typeof MealRecipeUpdateActionEnum[keyof typeof MealRecipeUpdateActionEnum];
+
+
+/**
+ * Check if a given object implements the MealRecipeUpdate interface.
+ */
+export function instanceOfMealRecipeUpdate(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "recipe_id" in value;
+    isInstance = isInstance && "multiplier" in value;
+    isInstance = isInstance && "action" in value;
+
+    return isInstance;
 }
 
 export function MealRecipeUpdateFromJSON(json: any): MealRecipeUpdate {
@@ -78,5 +92,4 @@ export function MealRecipeUpdateToJSON(value?: MealRecipeUpdate | null): any {
         'action': value.action,
     };
 }
-
 

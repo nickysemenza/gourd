@@ -13,20 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    SectionIngredientInput,
+} from './Amount';
+import type { SectionIngredientInput } from './SectionIngredientInput';
+import {
     SectionIngredientInputFromJSON,
     SectionIngredientInputFromJSONTyped,
     SectionIngredientInputToJSON,
-    SectionInstructionInput,
+} from './SectionIngredientInput';
+import type { SectionInstructionInput } from './SectionInstructionInput';
+import {
     SectionInstructionInputFromJSON,
     SectionInstructionInputFromJSONTyped,
     SectionInstructionInputToJSON,
-} from './';
+} from './SectionInstructionInput';
 
 /**
  * A step in the recipe
@@ -52,6 +56,17 @@ export interface RecipeSectionInput {
      * @memberof RecipeSectionInput
      */
     ingredients: Array<SectionIngredientInput>;
+}
+
+/**
+ * Check if a given object implements the RecipeSectionInput interface.
+ */
+export function instanceOfRecipeSectionInput(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "instructions" in value;
+    isInstance = isInstance && "ingredients" in value;
+
+    return isInstance;
 }
 
 export function RecipeSectionInputFromJSON(json: any): RecipeSectionInput {
@@ -84,5 +99,4 @@ export function RecipeSectionInputToJSON(value?: RecipeSectionInput | null): any
         'ingredients': ((value.ingredients as Array<any>).map(SectionIngredientInputToJSON)),
     };
 }
-
 

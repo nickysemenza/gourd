@@ -33,6 +33,17 @@ export interface SectionInstruction {
     instruction: string;
 }
 
+/**
+ * Check if a given object implements the SectionInstruction interface.
+ */
+export function instanceOfSectionInstruction(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "instruction" in value;
+
+    return isInstance;
+}
+
 export function SectionInstructionFromJSON(json: any): SectionInstruction {
     return SectionInstructionFromJSONTyped(json, false);
 }
@@ -61,5 +72,4 @@ export function SectionInstructionToJSON(value?: SectionInstruction | null): any
         'instruction': value.instruction,
     };
 }
-
 

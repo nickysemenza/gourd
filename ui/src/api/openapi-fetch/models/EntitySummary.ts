@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { IngredientKind } from './IngredientKind';
 import {
-    IngredientKind,
     IngredientKindFromJSON,
     IngredientKindFromJSONTyped,
     IngredientKindToJSON,
-} from './';
+} from './IngredientKind';
 
 /**
  * holds name/id and multiplier for a Kind of entity
@@ -50,6 +50,19 @@ export interface EntitySummary {
      * @memberof EntitySummary
      */
     kind: IngredientKind;
+}
+
+/**
+ * Check if a given object implements the EntitySummary interface.
+ */
+export function instanceOfEntitySummary(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "multiplier" in value;
+    isInstance = isInstance && "kind" in value;
+
+    return isInstance;
 }
 
 export function EntitySummaryFromJSON(json: any): EntitySummary {
@@ -84,5 +97,4 @@ export function EntitySummaryToJSON(value?: EntitySummary | null): any {
         'kind': IngredientKindToJSON(value.kind),
     };
 }
-
 

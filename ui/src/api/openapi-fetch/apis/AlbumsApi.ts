@@ -14,10 +14,12 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  ListAllAlbums200Response,
+} from '../models';
 import {
-    InlineResponse200,
-    InlineResponse200FromJSON,
-    InlineResponse200ToJSON,
+    ListAllAlbums200ResponseFromJSON,
+    ListAllAlbums200ResponseToJSON,
 } from '../models';
 
 /**
@@ -29,7 +31,7 @@ export class AlbumsApi extends runtime.BaseAPI {
      * todo
      * List all albums
      */
-    async listAllAlbumsRaw(): Promise<runtime.ApiResponse<InlineResponse200>> {
+    async listAllAlbumsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ListAllAlbums200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -47,17 +49,17 @@ export class AlbumsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse200FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ListAllAlbums200ResponseFromJSON(jsonValue));
     }
 
     /**
      * todo
      * List all albums
      */
-    async listAllAlbums(): Promise<InlineResponse200> {
-        const response = await this.listAllAlbumsRaw();
+    async listAllAlbums(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ListAllAlbums200Response> {
+        const response = await this.listAllAlbumsRaw(initOverrides);
         return await response.value();
     }
 

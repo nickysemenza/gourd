@@ -12,21 +12,23 @@
  * Do not edit the class manually.
  */
 
+
 /**
  * 
  * @export
- * @enum {string}
  */
-export enum FoodNutrientUnit {
-    UG = 'UG',
-    G = 'G',
-    IU = 'IU',
-    K_J = 'kJ',
-    KCAL = 'KCAL',
-    MG = 'MG',
-    MG_ATE = 'MG_ATE',
-    SP_GR = 'SP_GR'
-}
+export const FoodNutrientUnit = {
+    UG: 'UG',
+    G: 'G',
+    IU: 'IU',
+    K_J: 'kJ',
+    KCAL: 'KCAL',
+    MG: 'MG',
+    MG_ATE: 'MG_ATE',
+    SP_GR: 'SP_GR'
+} as const;
+export type FoodNutrientUnit = typeof FoodNutrientUnit[keyof typeof FoodNutrientUnit];
+
 
 export function FoodNutrientUnitFromJSON(json: any): FoodNutrientUnit {
     return FoodNutrientUnitFromJSONTyped(json, false);

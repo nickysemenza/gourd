@@ -12,7 +12,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct IngredientMappingsPayload {
     /// mappings of equivalent units
     #[serde(rename = "ingredient_mappings")]

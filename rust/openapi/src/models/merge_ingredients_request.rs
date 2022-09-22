@@ -11,15 +11,15 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineObject2 {
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct MergeIngredientsRequest {
     #[serde(rename = "ingredient_ids")]
     pub ingredient_ids: Vec<String>,
 }
 
-impl InlineObject2 {
-    pub fn new(ingredient_ids: Vec<String>) -> InlineObject2 {
-        InlineObject2 {
+impl MergeIngredientsRequest {
+    pub fn new(ingredient_ids: Vec<String>) -> MergeIngredientsRequest {
+        MergeIngredientsRequest {
             ingredient_ids,
         }
     }

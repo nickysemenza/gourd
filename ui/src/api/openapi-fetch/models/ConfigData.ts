@@ -33,6 +33,17 @@ export interface ConfigData {
     google_client_id: string;
 }
 
+/**
+ * Check if a given object implements the ConfigData interface.
+ */
+export function instanceOfConfigData(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "google_scopes" in value;
+    isInstance = isInstance && "google_client_id" in value;
+
+    return isInstance;
+}
+
 export function ConfigDataFromJSON(json: any): ConfigData {
     return ConfigDataFromJSONTyped(json, false);
 }
@@ -61,5 +72,4 @@ export function ConfigDataToJSON(value?: ConfigData | null): any {
         'google_client_id': value.google_client_id,
     };
 }
-
 

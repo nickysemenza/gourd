@@ -13,20 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Meal } from './Meal';
 import {
-    Meal,
     MealFromJSON,
     MealFromJSONTyped,
     MealToJSON,
-    Photo,
+} from './Meal';
+import type { Photo } from './Photo';
+import {
     PhotoFromJSON,
     PhotoFromJSONTyped,
     PhotoToJSON,
-    RecipeDetail,
+} from './Photo';
+import type { RecipeDetail } from './RecipeDetail';
+import {
     RecipeDetailFromJSON,
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
-} from './';
+} from './RecipeDetail';
 
 /**
  * A recipe with subcomponents
@@ -58,6 +62,17 @@ export interface RecipeWrapper {
      * @memberof RecipeWrapper
      */
     linked_photos?: Array<Photo>;
+}
+
+/**
+ * Check if a given object implements the RecipeWrapper interface.
+ */
+export function instanceOfRecipeWrapper(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "detail" in value;
+
+    return isInstance;
 }
 
 export function RecipeWrapperFromJSON(json: any): RecipeWrapper {
@@ -92,5 +107,4 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         'linked_photos': value.linked_photos === undefined ? undefined : ((value.linked_photos as Array<any>).map(PhotoToJSON)),
     };
 }
-
 

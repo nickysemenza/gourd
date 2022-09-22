@@ -14,8 +14,10 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  PaginatedPhotos,
+} from '../models';
 import {
-    PaginatedPhotos,
     PaginatedPhotosFromJSON,
     PaginatedPhotosToJSON,
 } from '../models';
@@ -34,7 +36,7 @@ export class PhotosApi extends runtime.BaseAPI {
      * todo
      * List all photos
      */
-    async listPhotosRaw(requestParameters: PhotosApiListPhotosRequest): Promise<runtime.ApiResponse<PaginatedPhotos>> {
+    async listPhotosRaw(requestParameters: PhotosApiListPhotosRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedPhotos>> {
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -60,7 +62,7 @@ export class PhotosApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedPhotosFromJSON(jsonValue));
     }
@@ -69,8 +71,8 @@ export class PhotosApi extends runtime.BaseAPI {
      * todo
      * List all photos
      */
-    async listPhotos(requestParameters: PhotosApiListPhotosRequest): Promise<PaginatedPhotos> {
-        const response = await this.listPhotosRaw(requestParameters);
+    async listPhotos(requestParameters: PhotosApiListPhotosRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedPhotos> {
+        const response = await this.listPhotosRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

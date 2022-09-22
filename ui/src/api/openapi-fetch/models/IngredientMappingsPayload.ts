@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { IngredientMapping } from './IngredientMapping';
 import {
-    IngredientMapping,
     IngredientMappingFromJSON,
     IngredientMappingFromJSONTyped,
     IngredientMappingToJSON,
-} from './';
+} from './IngredientMapping';
 
 /**
  * list of IngredientMapping
@@ -32,6 +32,16 @@ export interface IngredientMappingsPayload {
      * @memberof IngredientMappingsPayload
      */
     ingredient_mappings: Array<IngredientMapping>;
+}
+
+/**
+ * Check if a given object implements the IngredientMappingsPayload interface.
+ */
+export function instanceOfIngredientMappingsPayload(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ingredient_mappings" in value;
+
+    return isInstance;
 }
 
 export function IngredientMappingsPayloadFromJSON(json: any): IngredientMappingsPayload {
@@ -60,5 +70,4 @@ export function IngredientMappingsPayloadToJSON(value?: IngredientMappingsPayloa
         'ingredient_mappings': ((value.ingredient_mappings as Array<any>).map(IngredientMappingToJSON)),
     };
 }
-
 

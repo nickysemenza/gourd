@@ -13,32 +13,41 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { RecipeDependency } from './RecipeDependency';
 import {
-    RecipeDependency,
     RecipeDependencyFromJSON,
     RecipeDependencyFromJSONTyped,
     RecipeDependencyToJSON,
-} from './';
+} from './RecipeDependency';
 
 /**
  * 
  * @export
- * @interface InlineResponse2001
+ * @interface RecipeDependencies200Response
  */
-export interface InlineResponse2001 {
+export interface RecipeDependencies200Response {
     /**
      * all
      * @type {Array<RecipeDependency>}
-     * @memberof InlineResponse2001
+     * @memberof RecipeDependencies200Response
      */
     items?: Array<RecipeDependency>;
 }
 
-export function InlineResponse2001FromJSON(json: any): InlineResponse2001 {
-    return InlineResponse2001FromJSONTyped(json, false);
+/**
+ * Check if a given object implements the RecipeDependencies200Response interface.
+ */
+export function instanceOfRecipeDependencies200Response(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
-export function InlineResponse2001FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse2001 {
+export function RecipeDependencies200ResponseFromJSON(json: any): RecipeDependencies200Response {
+    return RecipeDependencies200ResponseFromJSONTyped(json, false);
+}
+
+export function RecipeDependencies200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): RecipeDependencies200Response {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -48,7 +57,7 @@ export function InlineResponse2001FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function InlineResponse2001ToJSON(value?: InlineResponse2001 | null): any {
+export function RecipeDependencies200ResponseToJSON(value?: RecipeDependencies200Response | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -60,5 +69,4 @@ export function InlineResponse2001ToJSON(value?: InlineResponse2001 | null): any
         'items': value.items === undefined ? undefined : ((value.items as Array<any>).map(RecipeDependencyToJSON)),
     };
 }
-
 

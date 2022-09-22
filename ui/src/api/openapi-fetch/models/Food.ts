@@ -13,32 +13,42 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { BrandedFood } from './BrandedFood';
 import {
-    BrandedFood,
     BrandedFoodFromJSON,
     BrandedFoodFromJSONTyped,
     BrandedFoodToJSON,
-    FoodCategory,
+} from './BrandedFood';
+import type { FoodCategory } from './FoodCategory';
+import {
     FoodCategoryFromJSON,
     FoodCategoryFromJSONTyped,
     FoodCategoryToJSON,
-    FoodDataType,
+} from './FoodCategory';
+import type { FoodDataType } from './FoodDataType';
+import {
     FoodDataTypeFromJSON,
     FoodDataTypeFromJSONTyped,
     FoodDataTypeToJSON,
-    FoodNutrient,
+} from './FoodDataType';
+import type { FoodNutrient } from './FoodNutrient';
+import {
     FoodNutrientFromJSON,
     FoodNutrientFromJSONTyped,
     FoodNutrientToJSON,
-    FoodPortion,
+} from './FoodNutrient';
+import type { FoodPortion } from './FoodPortion';
+import {
     FoodPortionFromJSON,
     FoodPortionFromJSONTyped,
     FoodPortionToJSON,
-    UnitMapping,
+} from './FoodPortion';
+import type { UnitMapping } from './UnitMapping';
+import {
     UnitMappingFromJSON,
     UnitMappingFromJSONTyped,
     UnitMappingToJSON,
-} from './';
+} from './UnitMapping';
 
 /**
  * A top level food
@@ -96,6 +106,20 @@ export interface Food {
     unit_mappings: Array<UnitMapping>;
 }
 
+/**
+ * Check if a given object implements the Food interface.
+ */
+export function instanceOfFood(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "fdc_id" in value;
+    isInstance = isInstance && "description" in value;
+    isInstance = isInstance && "data_type" in value;
+    isInstance = isInstance && "nutrients" in value;
+    isInstance = isInstance && "unit_mappings" in value;
+
+    return isInstance;
+}
+
 export function FoodFromJSON(json: any): Food {
     return FoodFromJSONTyped(json, false);
 }
@@ -136,5 +160,4 @@ export function FoodToJSON(value?: Food | null): any {
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
-
 

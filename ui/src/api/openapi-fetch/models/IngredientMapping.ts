@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { UnitMapping } from './UnitMapping';
 import {
-    UnitMapping,
     UnitMappingFromJSON,
     UnitMappingFromJSONTyped,
     UnitMappingToJSON,
-} from './';
+} from './UnitMapping';
 
 /**
  * details about ingredients
@@ -50,6 +50,18 @@ export interface IngredientMapping {
      * @memberof IngredientMapping
      */
     unit_mappings: Array<UnitMapping>;
+}
+
+/**
+ * Check if a given object implements the IngredientMapping interface.
+ */
+export function instanceOfIngredientMapping(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "aliases" in value;
+    isInstance = isInstance && "unit_mappings" in value;
+
+    return isInstance;
 }
 
 export function IngredientMappingFromJSON(json: any): IngredientMapping {
@@ -84,5 +96,4 @@ export function IngredientMappingToJSON(value?: IngredientMapping | null): any {
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
-
 

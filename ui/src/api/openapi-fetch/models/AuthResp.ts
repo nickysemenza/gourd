@@ -33,6 +33,17 @@ export interface AuthResp {
     jwt: string;
 }
 
+/**
+ * Check if a given object implements the AuthResp interface.
+ */
+export function instanceOfAuthResp(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "user" in value;
+    isInstance = isInstance && "jwt" in value;
+
+    return isInstance;
+}
+
 export function AuthRespFromJSON(json: any): AuthResp {
     return AuthRespFromJSONTyped(json, false);
 }
@@ -61,5 +72,4 @@ export function AuthRespToJSON(value?: AuthResp | null): any {
         'jwt': value.jwt,
     };
 }
-
 

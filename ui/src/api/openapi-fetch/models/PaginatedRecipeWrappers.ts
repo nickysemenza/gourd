@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Items } from './Items';
 import {
-    Items,
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
-    RecipeWrapper,
+} from './Items';
+import type { RecipeWrapper } from './RecipeWrapper';
+import {
     RecipeWrapperFromJSON,
     RecipeWrapperFromJSONTyped,
     RecipeWrapperToJSON,
-} from './';
+} from './RecipeWrapper';
 
 /**
  * pages of Recipe
@@ -42,6 +44,16 @@ export interface PaginatedRecipeWrappers {
      * @memberof PaginatedRecipeWrappers
      */
     meta: Items;
+}
+
+/**
+ * Check if a given object implements the PaginatedRecipeWrappers interface.
+ */
+export function instanceOfPaginatedRecipeWrappers(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "meta" in value;
+
+    return isInstance;
 }
 
 export function PaginatedRecipeWrappersFromJSON(json: any): PaginatedRecipeWrappers {
@@ -72,5 +84,4 @@ export function PaginatedRecipeWrappersToJSON(value?: PaginatedRecipeWrappers | 
         'meta': ItemsToJSON(value.meta),
     };
 }
-
 

@@ -11,16 +11,16 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineResponse2001 {
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct RecipeDependencies200Response {
     /// all
     #[serde(rename = "items", skip_serializing_if = "Option::is_none")]
     pub items: Option<Vec<crate::models::RecipeDependency>>,
 }
 
-impl InlineResponse2001 {
-    pub fn new() -> InlineResponse2001 {
-        InlineResponse2001 {
+impl RecipeDependencies200Response {
+    pub fn new() -> RecipeDependencies200Response {
+        RecipeDependencies200Response {
             items: None,
         }
     }

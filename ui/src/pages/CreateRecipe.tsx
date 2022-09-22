@@ -36,7 +36,7 @@ const CreateRecipe: React.FC = () => {
                 const foo = async () => {
                   const bar = new RecipesApi(getOpenapiFetchConfig());
                   const recipe = await bar.scrapeRecipe({
-                    inlineObject1: { url: ingredientName },
+                    scrapeRecipeRequest: { url: ingredientName },
                   });
 
                   console.log({ recipe });

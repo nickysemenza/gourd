@@ -63,13 +63,30 @@ export interface Photo {
     source: PhotoSourceEnum;
 }
 
+
 /**
-* @export
-* @enum {string}
-*/
-export enum PhotoSourceEnum {
-    GOOGLE = 'google',
-    NOTION = 'notion'
+ * @export
+ */
+export const PhotoSourceEnum = {
+    GOOGLE: 'google',
+    NOTION: 'notion'
+} as const;
+export type PhotoSourceEnum = typeof PhotoSourceEnum[keyof typeof PhotoSourceEnum];
+
+
+/**
+ * Check if a given object implements the Photo interface.
+ */
+export function instanceOfPhoto(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "base_url" in value;
+    isInstance = isInstance && "created" in value;
+    isInstance = isInstance && "width" in value;
+    isInstance = isInstance && "height" in value;
+    isInstance = isInstance && "source" in value;
+
+    return isInstance;
 }
 
 export function PhotoFromJSON(json: any): Photo {
@@ -110,5 +127,4 @@ export function PhotoToJSON(value?: Photo | null): any {
         'source': value.source,
     };
 }
-
 

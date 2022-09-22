@@ -14,29 +14,31 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  Ingredient,
+  IngredientDetail,
+  IngredientMappingsPayload,
+  MergeIngredientsRequest,
+  PaginatedIngredients,
+  RecipeDependencies200Response,
+  RecipeDetail,
+  SearchResult,
+} from '../models';
 import {
-    Ingredient,
     IngredientFromJSON,
     IngredientToJSON,
-    IngredientDetail,
     IngredientDetailFromJSON,
     IngredientDetailToJSON,
-    IngredientMappingsPayload,
     IngredientMappingsPayloadFromJSON,
     IngredientMappingsPayloadToJSON,
-    InlineObject2,
-    InlineObject2FromJSON,
-    InlineObject2ToJSON,
-    InlineResponse2001,
-    InlineResponse2001FromJSON,
-    InlineResponse2001ToJSON,
-    PaginatedIngredients,
+    MergeIngredientsRequestFromJSON,
+    MergeIngredientsRequestToJSON,
     PaginatedIngredientsFromJSON,
     PaginatedIngredientsToJSON,
-    RecipeDetail,
+    RecipeDependencies200ResponseFromJSON,
+    RecipeDependencies200ResponseToJSON,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
-    SearchResult,
     SearchResultFromJSON,
     SearchResultToJSON,
 } from '../models';
@@ -68,9 +70,9 @@ export interface IngredientsApiLoadIngredientMappingsRequest {
     ingredientMappingsPayload: IngredientMappingsPayload;
 }
 
-export interface IngredientsApiMergeIngredientsRequest {
+export interface IngredientsApiMergeIngredientsOperationRequest {
     ingredientId: string;
-    inlineObject2: InlineObject2;
+    mergeIngredientsRequest: MergeIngredientsRequest;
 }
 
 export interface IngredientsApiSearchRequest {
@@ -88,7 +90,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Assosiates a food with a given ingredient
      */
-    async associateFoodWithIngredientRaw(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
+    async associateFoodWithIngredientRaw(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling associateFoodWithIngredient.');
         }
@@ -118,7 +120,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
     }
@@ -127,8 +129,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Assosiates a food with a given ingredient
      */
-    async associateFoodWithIngredient(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest): Promise<RecipeDetail> {
-        const response = await this.associateFoodWithIngredientRaw(requestParameters);
+    async associateFoodWithIngredient(requestParameters: IngredientsApiAssociateFoodWithIngredientRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeDetail> {
+        const response = await this.associateFoodWithIngredientRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -136,7 +138,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it
      */
-    async convertIngredientToRecipeRaw(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<runtime.ApiResponse<RecipeDetail>> {
+    async convertIngredientToRecipeRaw(requestParameters: IngredientsApiConvertIngredientToRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling convertIngredientToRecipe.');
         }
@@ -158,7 +160,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDetailFromJSON(jsonValue));
     }
@@ -167,8 +169,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Converts an ingredient to a recipe, updating all recipes depending on it
      */
-    async convertIngredientToRecipe(requestParameters: IngredientsApiConvertIngredientToRecipeRequest): Promise<RecipeDetail> {
-        const response = await this.convertIngredientToRecipeRaw(requestParameters);
+    async convertIngredientToRecipe(requestParameters: IngredientsApiConvertIngredientToRecipeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeDetail> {
+        const response = await this.convertIngredientToRecipeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -176,7 +178,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Create a ingredient
      */
-    async createIngredientsRaw(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
+    async createIngredientsRaw(requestParameters: IngredientsApiCreateIngredientsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ingredient>> {
         if (requestParameters.ingredient === null || requestParameters.ingredient === undefined) {
             throw new runtime.RequiredError('ingredient','Required parameter requestParameters.ingredient was null or undefined when calling createIngredients.');
         }
@@ -201,7 +203,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             headers: headerParameters,
             query: queryParameters,
             body: IngredientToJSON(requestParameters.ingredient),
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IngredientFromJSON(jsonValue));
     }
@@ -210,8 +212,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Create a ingredient
      */
-    async createIngredients(requestParameters: IngredientsApiCreateIngredientsRequest): Promise<Ingredient> {
-        const response = await this.createIngredientsRaw(requestParameters);
+    async createIngredients(requestParameters: IngredientsApiCreateIngredientsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ingredient> {
+        const response = await this.createIngredientsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -219,7 +221,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Get a specific ingredient
      */
-    async getIngredientByIdRaw(requestParameters: IngredientsApiGetIngredientByIdRequest): Promise<runtime.ApiResponse<IngredientDetail>> {
+    async getIngredientByIdRaw(requestParameters: IngredientsApiGetIngredientByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IngredientDetail>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling getIngredientById.');
         }
@@ -241,7 +243,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IngredientDetailFromJSON(jsonValue));
     }
@@ -250,8 +252,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Get a specific ingredient
      */
-    async getIngredientById(requestParameters: IngredientsApiGetIngredientByIdRequest): Promise<IngredientDetail> {
-        const response = await this.getIngredientByIdRaw(requestParameters);
+    async getIngredientById(requestParameters: IngredientsApiGetIngredientByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IngredientDetail> {
+        const response = await this.getIngredientByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -259,7 +261,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * List all ingredients
      */
-    async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest): Promise<runtime.ApiResponse<PaginatedIngredients>> {
+    async listIngredientsRaw(requestParameters: IngredientsApiListIngredientsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedIngredients>> {
         const queryParameters: any = {};
 
         if (requestParameters.offset !== undefined) {
@@ -289,7 +291,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedIngredientsFromJSON(jsonValue));
     }
@@ -298,8 +300,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * List all ingredients
      */
-    async listIngredients(requestParameters: IngredientsApiListIngredientsRequest): Promise<PaginatedIngredients> {
-        const response = await this.listIngredientsRaw(requestParameters);
+    async listIngredients(requestParameters: IngredientsApiListIngredientsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedIngredients> {
+        const response = await this.listIngredientsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -307,7 +309,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * load mappings
      */
-    async loadIngredientMappingsRaw(requestParameters: IngredientsApiLoadIngredientMappingsRequest): Promise<runtime.ApiResponse<object>> {
+    async loadIngredientMappingsRaw(requestParameters: IngredientsApiLoadIngredientMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
         if (requestParameters.ingredientMappingsPayload === null || requestParameters.ingredientMappingsPayload === undefined) {
             throw new runtime.RequiredError('ingredientMappingsPayload','Required parameter requestParameters.ingredientMappingsPayload was null or undefined when calling loadIngredientMappings.');
         }
@@ -332,7 +334,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             headers: headerParameters,
             query: queryParameters,
             body: IngredientMappingsPayloadToJSON(requestParameters.ingredientMappingsPayload),
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
     }
@@ -341,8 +343,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * load mappings
      */
-    async loadIngredientMappings(requestParameters: IngredientsApiLoadIngredientMappingsRequest): Promise<object> {
-        const response = await this.loadIngredientMappingsRaw(requestParameters);
+    async loadIngredientMappings(requestParameters: IngredientsApiLoadIngredientMappingsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+        const response = await this.loadIngredientMappingsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -350,13 +352,13 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Merges the provide ingredients in the body into the param
      */
-    async mergeIngredientsRaw(requestParameters: IngredientsApiMergeIngredientsRequest): Promise<runtime.ApiResponse<Ingredient>> {
+    async mergeIngredientsRaw(requestParameters: IngredientsApiMergeIngredientsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ingredient>> {
         if (requestParameters.ingredientId === null || requestParameters.ingredientId === undefined) {
             throw new runtime.RequiredError('ingredientId','Required parameter requestParameters.ingredientId was null or undefined when calling mergeIngredients.');
         }
 
-        if (requestParameters.inlineObject2 === null || requestParameters.inlineObject2 === undefined) {
-            throw new runtime.RequiredError('inlineObject2','Required parameter requestParameters.inlineObject2 was null or undefined when calling mergeIngredients.');
+        if (requestParameters.mergeIngredientsRequest === null || requestParameters.mergeIngredientsRequest === undefined) {
+            throw new runtime.RequiredError('mergeIngredientsRequest','Required parameter requestParameters.mergeIngredientsRequest was null or undefined when calling mergeIngredients.');
         }
 
         const queryParameters: any = {};
@@ -378,8 +380,8 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: InlineObject2ToJSON(requestParameters.inlineObject2),
-        });
+            body: MergeIngredientsRequestToJSON(requestParameters.mergeIngredientsRequest),
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IngredientFromJSON(jsonValue));
     }
@@ -388,8 +390,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Merges the provide ingredients in the body into the param
      */
-    async mergeIngredients(requestParameters: IngredientsApiMergeIngredientsRequest): Promise<Ingredient> {
-        const response = await this.mergeIngredientsRaw(requestParameters);
+    async mergeIngredients(requestParameters: IngredientsApiMergeIngredientsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ingredient> {
+        const response = await this.mergeIngredientsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -397,7 +399,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * recipe dependencies
      * Get foods
      */
-    async recipeDependenciesRaw(): Promise<runtime.ApiResponse<InlineResponse2001>> {
+    async recipeDependenciesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RecipeDependencies200Response>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -415,17 +417,17 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => RecipeDependencies200ResponseFromJSON(jsonValue));
     }
 
     /**
      * recipe dependencies
      * Get foods
      */
-    async recipeDependencies(): Promise<InlineResponse2001> {
-        const response = await this.recipeDependenciesRaw();
+    async recipeDependencies(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RecipeDependencies200Response> {
+        const response = await this.recipeDependenciesRaw(initOverrides);
         return await response.value();
     }
 
@@ -433,7 +435,7 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Search recipes and ingredients
      */
-    async searchRaw(requestParameters: IngredientsApiSearchRequest): Promise<runtime.ApiResponse<SearchResult>> {
+    async searchRaw(requestParameters: IngredientsApiSearchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SearchResult>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling search.');
         }
@@ -467,7 +469,7 @@ export class IngredientsApi extends runtime.BaseAPI {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SearchResultFromJSON(jsonValue));
     }
@@ -476,8 +478,8 @@ export class IngredientsApi extends runtime.BaseAPI {
      * todo
      * Search recipes and ingredients
      */
-    async search(requestParameters: IngredientsApiSearchRequest): Promise<SearchResult> {
-        const response = await this.searchRaw(requestParameters);
+    async search(requestParameters: IngredientsApiSearchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SearchResult> {
+        const response = await this.searchRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

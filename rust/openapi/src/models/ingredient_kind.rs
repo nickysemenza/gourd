@@ -28,6 +28,12 @@ impl ToString for IngredientKind {
     }
 }
 
+impl Default for IngredientKind {
+    fn default() -> IngredientKind {
+        Self::Ingredient
+    }
+}
+
 
 
 

@@ -45,6 +45,17 @@ export interface Amount {
     source?: string;
 }
 
+/**
+ * Check if a given object implements the Amount interface.
+ */
+export function instanceOfAmount(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "unit" in value;
+    isInstance = isInstance && "value" in value;
+
+    return isInstance;
+}
+
 export function AmountFromJSON(json: any): Amount {
     return AmountFromJSONTyped(json, false);
 }
@@ -77,5 +88,4 @@ export function AmountToJSON(value?: Amount | null): any {
         'source': value.source,
     };
 }
-
 

@@ -12,7 +12,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct IngredientDetail {
     #[serde(rename = "ingredient")]
     pub ingredient: Box<crate::models::Ingredient>,

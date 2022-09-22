@@ -33,6 +33,16 @@ export interface ModelError {
     trace_id?: string;
 }
 
+/**
+ * Check if a given object implements the ModelError interface.
+ */
+export function instanceOfModelError(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "message" in value;
+
+    return isInstance;
+}
+
 export function ModelErrorFromJSON(json: any): ModelError {
     return ModelErrorFromJSONTyped(json, false);
 }
@@ -61,5 +71,4 @@ export function ModelErrorToJSON(value?: ModelError | null): any {
         'trace_id': value.trace_id,
     };
 }
-
 

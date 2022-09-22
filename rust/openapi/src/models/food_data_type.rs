@@ -46,6 +46,12 @@ impl ToString for FoodDataType {
     }
 }
 
+impl Default for FoodDataType {
+    fn default() -> FoodDataType {
+        Self::FoundationFood
+    }
+}
+
 
 
 

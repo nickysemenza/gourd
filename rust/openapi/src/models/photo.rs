@@ -12,7 +12,7 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Photo {
     /// id
     #[serde(rename = "id")]
@@ -59,5 +59,11 @@ pub enum Source {
     Google,
     #[serde(rename = "notion")]
     Notion,
+}
+
+impl Default for Source {
+    fn default() -> Source {
+        Self::Google
+    }
 }
 

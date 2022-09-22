@@ -45,6 +45,19 @@ export interface GooglePhotosAlbum {
     usecase: string;
 }
 
+/**
+ * Check if a given object implements the GooglePhotosAlbum interface.
+ */
+export function instanceOfGooglePhotosAlbum(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "title" in value;
+    isInstance = isInstance && "product_url" in value;
+    isInstance = isInstance && "usecase" in value;
+
+    return isInstance;
+}
+
 export function GooglePhotosAlbumFromJSON(json: any): GooglePhotosAlbum {
     return GooglePhotosAlbumFromJSONTyped(json, false);
 }
@@ -77,5 +90,4 @@ export function GooglePhotosAlbumToJSON(value?: GooglePhotosAlbum | null): any {
         'usecase': value.usecase,
     };
 }
-
 

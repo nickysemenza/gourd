@@ -52,7 +52,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
       setSumsLoading(true);
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
       let recipeSumResp = await rAPI.sumRecipes({
-        inlineObject: {
+        sumRecipesRequest: {
           inputs: entitiesToDiff.map((id, x) => {
             let foo: EntitySummary = {
               id: id.id,

@@ -51,6 +51,20 @@ export interface Items {
     page_count: number;
 }
 
+/**
+ * Check if a given object implements the Items interface.
+ */
+export function instanceOfItems(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "page_number" in value;
+    isInstance = isInstance && "limit" in value;
+    isInstance = isInstance && "offset" in value;
+    isInstance = isInstance && "total_count" in value;
+    isInstance = isInstance && "page_count" in value;
+
+    return isInstance;
+}
+
 export function ItemsFromJSON(json: any): Items {
     return ItemsFromJSONTyped(json, false);
 }
@@ -85,5 +99,4 @@ export function ItemsToJSON(value?: Items | null): any {
         'page_count': value.page_count,
     };
 }
-
 

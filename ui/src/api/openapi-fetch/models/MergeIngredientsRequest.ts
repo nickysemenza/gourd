@@ -16,22 +16,32 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface InlineObject2
+ * @interface MergeIngredientsRequest
  */
-export interface InlineObject2 {
+export interface MergeIngredientsRequest {
     /**
      * 
      * @type {Array<string>}
-     * @memberof InlineObject2
+     * @memberof MergeIngredientsRequest
      */
     ingredient_ids: Array<string>;
 }
 
-export function InlineObject2FromJSON(json: any): InlineObject2 {
-    return InlineObject2FromJSONTyped(json, false);
+/**
+ * Check if a given object implements the MergeIngredientsRequest interface.
+ */
+export function instanceOfMergeIngredientsRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "ingredient_ids" in value;
+
+    return isInstance;
 }
 
-export function InlineObject2FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject2 {
+export function MergeIngredientsRequestFromJSON(json: any): MergeIngredientsRequest {
+    return MergeIngredientsRequestFromJSONTyped(json, false);
+}
+
+export function MergeIngredientsRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): MergeIngredientsRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -41,7 +51,7 @@ export function InlineObject2FromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function InlineObject2ToJSON(value?: InlineObject2 | null): any {
+export function MergeIngredientsRequestToJSON(value?: MergeIngredientsRequest | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -53,5 +63,4 @@ export function InlineObject2ToJSON(value?: InlineObject2 | null): any {
         'ingredient_ids': value.ingredient_ids,
     };
 }
-
 

@@ -14,8 +14,10 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  AuthResp,
+} from '../models';
 import {
-    AuthResp,
     AuthRespFromJSON,
     AuthRespToJSON,
 } from '../models';
@@ -33,7 +35,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
      * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
      * Google Login callback
      */
-    async authLoginRaw(requestParameters: AuthenticationApiAuthLoginRequest): Promise<runtime.ApiResponse<AuthResp>> {
+    async authLoginRaw(requestParameters: AuthenticationApiAuthLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AuthResp>> {
         if (requestParameters.code === null || requestParameters.code === undefined) {
             throw new runtime.RequiredError('code','Required parameter requestParameters.code was null or undefined when calling authLogin.');
         }
@@ -51,7 +53,7 @@ export class AuthenticationApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-        });
+        }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AuthRespFromJSON(jsonValue));
     }
@@ -60,8 +62,8 @@ export class AuthenticationApi extends runtime.BaseAPI {
      * Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
      * Google Login callback
      */
-    async authLogin(requestParameters: AuthenticationApiAuthLoginRequest): Promise<AuthResp> {
-        const response = await this.authLoginRaw(requestParameters);
+    async authLogin(requestParameters: AuthenticationApiAuthLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AuthResp> {
+        const response = await this.authLoginRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

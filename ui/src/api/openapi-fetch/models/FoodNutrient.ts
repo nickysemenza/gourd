@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Nutrient } from './Nutrient';
 import {
-    Nutrient,
     NutrientFromJSON,
     NutrientFromJSONTyped,
     NutrientToJSON,
-} from './';
+} from './Nutrient';
 
 /**
  * todo
@@ -44,6 +44,18 @@ export interface FoodNutrient {
      * @memberof FoodNutrient
      */
     data_points: number;
+}
+
+/**
+ * Check if a given object implements the FoodNutrient interface.
+ */
+export function instanceOfFoodNutrient(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "nutrient" in value;
+    isInstance = isInstance && "amount" in value;
+    isInstance = isInstance && "data_points" in value;
+
+    return isInstance;
 }
 
 export function FoodNutrientFromJSON(json: any): FoodNutrient {
@@ -76,5 +88,4 @@ export function FoodNutrientToJSON(value?: FoodNutrient | null): any {
         'data_points': value.data_points,
     };
 }
-
 

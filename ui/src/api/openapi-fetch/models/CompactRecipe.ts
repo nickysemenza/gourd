@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { CompactRecipeMeta } from './CompactRecipeMeta';
 import {
-    CompactRecipeMeta,
     CompactRecipeMetaFromJSON,
     CompactRecipeMetaFromJSONTyped,
     CompactRecipeMetaToJSON,
-    CompactRecipeSection,
+} from './CompactRecipeMeta';
+import type { CompactRecipeSection } from './CompactRecipeSection';
+import {
     CompactRecipeSectionFromJSON,
     CompactRecipeSectionFromJSONTyped,
     CompactRecipeSectionToJSON,
-} from './';
+} from './CompactRecipeSection';
 
 /**
  * 
@@ -42,6 +44,17 @@ export interface CompactRecipe {
      * @memberof CompactRecipe
      */
     sections: Array<CompactRecipeSection>;
+}
+
+/**
+ * Check if a given object implements the CompactRecipe interface.
+ */
+export function instanceOfCompactRecipe(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "meta" in value;
+    isInstance = isInstance && "sections" in value;
+
+    return isInstance;
 }
 
 export function CompactRecipeFromJSON(json: any): CompactRecipe {
@@ -72,5 +85,4 @@ export function CompactRecipeToJSON(value?: CompactRecipe | null): any {
         'sections': ((value.sections as Array<any>).map(CompactRecipeSectionToJSON)),
     };
 }
-
 

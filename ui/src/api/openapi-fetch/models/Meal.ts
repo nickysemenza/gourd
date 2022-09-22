@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { MealRecipe } from './MealRecipe';
 import {
-    MealRecipe,
     MealRecipeFromJSON,
     MealRecipeFromJSONTyped,
     MealRecipeToJSON,
-    Photo,
+} from './MealRecipe';
+import type { Photo } from './Photo';
+import {
     PhotoFromJSON,
     PhotoFromJSONTyped,
     PhotoToJSON,
-} from './';
+} from './Photo';
 
 /**
  * A meal, which bridges recipes to photos
@@ -62,6 +64,19 @@ export interface Meal {
     recipes?: Array<MealRecipe>;
 }
 
+/**
+ * Check if a given object implements the Meal interface.
+ */
+export function instanceOfMeal(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "ate_at" in value;
+    isInstance = isInstance && "photos" in value;
+
+    return isInstance;
+}
+
 export function MealFromJSON(json: any): Meal {
     return MealFromJSONTyped(json, false);
 }
@@ -96,5 +111,4 @@ export function MealToJSON(value?: Meal | null): any {
         'recipes': value.recipes === undefined ? undefined : ((value.recipes as Array<any>).map(MealRecipeToJSON)),
     };
 }
-
 

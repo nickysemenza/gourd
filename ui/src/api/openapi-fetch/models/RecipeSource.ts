@@ -45,6 +45,15 @@ export interface RecipeSource {
     image_url?: string;
 }
 
+/**
+ * Check if a given object implements the RecipeSource interface.
+ */
+export function instanceOfRecipeSource(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
+}
+
 export function RecipeSourceFromJSON(json: any): RecipeSource {
     return RecipeSourceFromJSONTyped(json, false);
 }
@@ -77,5 +86,4 @@ export function RecipeSourceToJSON(value?: RecipeSource | null): any {
         'image_url': value.image_url,
     };
 }
-
 

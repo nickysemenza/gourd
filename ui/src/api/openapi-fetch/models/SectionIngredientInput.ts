@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    IngredientKind,
+} from './Amount';
+import type { IngredientKind } from './IngredientKind';
+import {
     IngredientKindFromJSON,
     IngredientKindFromJSONTyped,
     IngredientKindToJSON,
-} from './';
+} from './IngredientKind';
 
 /**
  * Ingredients in a single section
@@ -80,6 +82,17 @@ export interface SectionIngredientInput {
     substitutes?: Array<SectionIngredientInput>;
 }
 
+/**
+ * Check if a given object implements the SectionIngredientInput interface.
+ */
+export function instanceOfSectionIngredientInput(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "kind" in value;
+    isInstance = isInstance && "amounts" in value;
+
+    return isInstance;
+}
+
 export function SectionIngredientInputFromJSON(json: any): SectionIngredientInput {
     return SectionIngredientInputFromJSONTyped(json, false);
 }
@@ -120,5 +133,4 @@ export function SectionIngredientInputToJSON(value?: SectionIngredientInput | nu
         'substitutes': value.substitutes === undefined ? undefined : ((value.substitutes as Array<any>).map(SectionIngredientInputToJSON)),
     };
 }
-
 

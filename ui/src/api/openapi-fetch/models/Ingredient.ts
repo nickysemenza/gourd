@@ -45,6 +45,17 @@ export interface Ingredient {
     fdc_id?: number;
 }
 
+/**
+ * Check if a given object implements the Ingredient interface.
+ */
+export function instanceOfIngredient(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function IngredientFromJSON(json: any): Ingredient {
     return IngredientFromJSONTyped(json, false);
 }
@@ -77,5 +88,4 @@ export function IngredientToJSON(value?: Ingredient | null): any {
         'fdc_id': value.fdc_id,
     };
 }
-
 

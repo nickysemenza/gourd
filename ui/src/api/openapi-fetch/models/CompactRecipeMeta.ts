@@ -39,6 +39,16 @@ export interface CompactRecipeMeta {
     image?: string;
 }
 
+/**
+ * Check if a given object implements the CompactRecipeMeta interface.
+ */
+export function instanceOfCompactRecipeMeta(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "name" in value;
+
+    return isInstance;
+}
+
 export function CompactRecipeMetaFromJSON(json: any): CompactRecipeMeta {
     return CompactRecipeMetaFromJSONTyped(json, false);
 }
@@ -69,5 +79,4 @@ export function CompactRecipeMetaToJSON(value?: CompactRecipeMeta | null): any {
         'image': value.image,
     };
 }
-
 

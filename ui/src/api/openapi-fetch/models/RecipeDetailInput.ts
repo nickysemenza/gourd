@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { RecipeSectionInput } from './RecipeSectionInput';
 import {
-    RecipeSectionInput,
     RecipeSectionInputFromJSON,
     RecipeSectionInputFromJSONTyped,
     RecipeSectionInputToJSON,
-    RecipeSource,
+} from './RecipeSectionInput';
+import type { RecipeSource } from './RecipeSource';
+import {
     RecipeSourceFromJSON,
     RecipeSourceFromJSONTyped,
     RecipeSourceToJSON,
-} from './';
+} from './RecipeSource';
 
 /**
  * A revision of a recipe
@@ -80,6 +82,20 @@ export interface RecipeDetailInput {
     tags: Array<string>;
 }
 
+/**
+ * Check if a given object implements the RecipeDetailInput interface.
+ */
+export function instanceOfRecipeDetailInput(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "sections" in value;
+    isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "quantity" in value;
+    isInstance = isInstance && "unit" in value;
+    isInstance = isInstance && "tags" in value;
+
+    return isInstance;
+}
+
 export function RecipeDetailInputFromJSON(json: any): RecipeDetailInput {
     return RecipeDetailInputFromJSONTyped(json, false);
 }
@@ -120,5 +136,4 @@ export function RecipeDetailInputToJSON(value?: RecipeDetailInput | null): any {
         'tags': value.tags,
     };
 }
-
 

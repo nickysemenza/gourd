@@ -11,15 +11,15 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineObject {
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct SumRecipesRequest {
     #[serde(rename = "inputs")]
     pub inputs: Vec<crate::models::EntitySummary>,
 }
 
-impl InlineObject {
-    pub fn new(inputs: Vec<crate::models::EntitySummary>) -> InlineObject {
-        InlineObject {
+impl SumRecipesRequest {
+    pub fn new(inputs: Vec<crate::models::EntitySummary>) -> SumRecipesRequest {
+        SumRecipesRequest {
             inputs,
         }
     }

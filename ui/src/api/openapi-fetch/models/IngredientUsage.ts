@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Amount } from './Amount';
 import {
-    Amount,
     AmountFromJSON,
     AmountFromJSONTyped,
     AmountToJSON,
-    EntitySummary,
+} from './Amount';
+import type { EntitySummary } from './EntitySummary';
+import {
     EntitySummaryFromJSON,
     EntitySummaryFromJSONTyped,
     EntitySummaryToJSON,
-} from './';
+} from './EntitySummary';
 
 /**
  * todo
@@ -48,6 +50,18 @@ export interface IngredientUsage {
      * @memberof IngredientUsage
      */
     required_by: Array<EntitySummary>;
+}
+
+/**
+ * Check if a given object implements the IngredientUsage interface.
+ */
+export function instanceOfIngredientUsage(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "multiplier" in value;
+    isInstance = isInstance && "amounts" in value;
+    isInstance = isInstance && "required_by" in value;
+
+    return isInstance;
 }
 
 export function IngredientUsageFromJSON(json: any): IngredientUsage {
@@ -80,5 +94,4 @@ export function IngredientUsageToJSON(value?: IngredientUsage | null): any {
         'required_by': ((value.required_by as Array<any>).map(EntitySummaryToJSON)),
     };
 }
-
 

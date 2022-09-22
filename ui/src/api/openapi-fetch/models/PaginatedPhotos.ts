@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Items } from './Items';
 import {
-    Items,
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
-    Photo,
+} from './Items';
+import type { Photo } from './Photo';
+import {
     PhotoFromJSON,
     PhotoFromJSONTyped,
     PhotoToJSON,
-} from './';
+} from './Photo';
 
 /**
  * pages of Photos
@@ -42,6 +44,16 @@ export interface PaginatedPhotos {
      * @memberof PaginatedPhotos
      */
     meta: Items;
+}
+
+/**
+ * Check if a given object implements the PaginatedPhotos interface.
+ */
+export function instanceOfPaginatedPhotos(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "meta" in value;
+
+    return isInstance;
 }
 
 export function PaginatedPhotosFromJSON(json: any): PaginatedPhotos {
@@ -72,5 +84,4 @@ export function PaginatedPhotosToJSON(value?: PaginatedPhotos | null): any {
         'meta': ItemsToJSON(value.meta),
     };
 }
-
 

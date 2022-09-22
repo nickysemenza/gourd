@@ -16,22 +16,32 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface InlineObject1
+ * @interface ScrapeRecipeRequest
  */
-export interface InlineObject1 {
+export interface ScrapeRecipeRequest {
     /**
      * 
      * @type {string}
-     * @memberof InlineObject1
+     * @memberof ScrapeRecipeRequest
      */
     url: string;
 }
 
-export function InlineObject1FromJSON(json: any): InlineObject1 {
-    return InlineObject1FromJSONTyped(json, false);
+/**
+ * Check if a given object implements the ScrapeRecipeRequest interface.
+ */
+export function instanceOfScrapeRecipeRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "url" in value;
+
+    return isInstance;
 }
 
-export function InlineObject1FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject1 {
+export function ScrapeRecipeRequestFromJSON(json: any): ScrapeRecipeRequest {
+    return ScrapeRecipeRequestFromJSONTyped(json, false);
+}
+
+export function ScrapeRecipeRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ScrapeRecipeRequest {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -41,7 +51,7 @@ export function InlineObject1FromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function InlineObject1ToJSON(value?: InlineObject1 | null): any {
+export function ScrapeRecipeRequestToJSON(value?: ScrapeRecipeRequest | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -53,5 +63,4 @@ export function InlineObject1ToJSON(value?: InlineObject1 | null): any {
         'url': value.url,
     };
 }
-
 

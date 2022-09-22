@@ -11,15 +11,15 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineObject1 {
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScrapeRecipeRequest {
     #[serde(rename = "url")]
     pub url: String,
 }
 
-impl InlineObject1 {
-    pub fn new(url: String) -> InlineObject1 {
-        InlineObject1 {
+impl ScrapeRecipeRequest {
+    pub fn new(url: String) -> ScrapeRecipeRequest {
+        ScrapeRecipeRequest {
             url,
         }
     }

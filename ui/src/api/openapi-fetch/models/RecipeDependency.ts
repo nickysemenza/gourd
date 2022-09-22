@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { IngredientKind } from './IngredientKind';
 import {
-    IngredientKind,
     IngredientKindFromJSON,
     IngredientKindFromJSONTyped,
     IngredientKindToJSON,
-} from './';
+} from './IngredientKind';
 
 /**
  * represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
@@ -58,6 +58,20 @@ export interface RecipeDependency {
     ingredient_kind: IngredientKind;
 }
 
+/**
+ * Check if a given object implements the RecipeDependency interface.
+ */
+export function instanceOfRecipeDependency(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "recipe_id" in value;
+    isInstance = isInstance && "recipe_name" in value;
+    isInstance = isInstance && "ingredient_id" in value;
+    isInstance = isInstance && "ingredient_name" in value;
+    isInstance = isInstance && "ingredient_kind" in value;
+
+    return isInstance;
+}
+
 export function RecipeDependencyFromJSON(json: any): RecipeDependency {
     return RecipeDependencyFromJSONTyped(json, false);
 }
@@ -92,5 +106,4 @@ export function RecipeDependencyToJSON(value?: RecipeDependency | null): any {
         'ingredient_kind': IngredientKindToJSON(value.ingredient_kind),
     };
 }
-
 

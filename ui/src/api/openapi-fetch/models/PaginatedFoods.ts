@@ -13,16 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { Food } from './Food';
 import {
-    Food,
     FoodFromJSON,
     FoodFromJSONTyped,
     FoodToJSON,
-    Items,
+} from './Food';
+import type { Items } from './Items';
+import {
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
-} from './';
+} from './Items';
 
 /**
  * pages of Food
@@ -42,6 +44,16 @@ export interface PaginatedFoods {
      * @memberof PaginatedFoods
      */
     meta: Items;
+}
+
+/**
+ * Check if a given object implements the PaginatedFoods interface.
+ */
+export function instanceOfPaginatedFoods(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "meta" in value;
+
+    return isInstance;
 }
 
 export function PaginatedFoodsFromJSON(json: any): PaginatedFoods {
@@ -72,5 +84,4 @@ export function PaginatedFoodsToJSON(value?: PaginatedFoods | null): any {
         'meta': ItemsToJSON(value.meta),
     };
 }
-
 

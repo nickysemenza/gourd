@@ -11,16 +11,16 @@
 
 
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct InlineResponse200 {
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct ListAllAlbums200Response {
     /// The list of albums
     #[serde(rename = "albums", skip_serializing_if = "Option::is_none")]
     pub albums: Option<Vec<crate::models::GooglePhotosAlbum>>,
 }
 
-impl InlineResponse200 {
-    pub fn new() -> InlineResponse200 {
-        InlineResponse200 {
+impl ListAllAlbums200Response {
+    pub fn new() -> ListAllAlbums200Response {
+        ListAllAlbums200Response {
             albums: None,
         }
     }

@@ -12,15 +12,17 @@
  * Do not edit the class manually.
  */
 
+
 /**
  * 
  * @export
- * @enum {string}
  */
-export enum IngredientKind {
-    INGREDIENT = 'ingredient',
-    RECIPE = 'recipe'
-}
+export const IngredientKind = {
+    INGREDIENT: 'ingredient',
+    RECIPE: 'recipe'
+} as const;
+export type IngredientKind = typeof IngredientKind[keyof typeof IngredientKind];
+
 
 export function IngredientKindFromJSON(json: any): IngredientKind {
     return IngredientKindFromJSONTyped(json, false);
