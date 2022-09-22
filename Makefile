@@ -105,9 +105,9 @@ openapi-docs:
 	npx @redocly/openapi-cli preview-docs api/openapi.yaml -p 8081
 
 gen-db:
-	rm -rf models/
-	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml
-	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../models/usdamodels 
+	rm -rf db/models/
+	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./db/models
+	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../db/models/usdamodels 
 
 
 # frontend

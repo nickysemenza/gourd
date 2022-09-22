@@ -10,9 +10,9 @@ import (
 	"github.com/nickysemenza/gourd/clients/notion"
 	"github.com/nickysemenza/gourd/clients/rs_client"
 	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/db/models"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/image"
-	"github.com/nickysemenza/gourd/models"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 )
