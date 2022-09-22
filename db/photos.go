@@ -85,6 +85,9 @@ type NotionImage struct {
 }
 
 func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) error {
+	if len(photos) == 0 {
+		return nil
+	}
 	q := c.psql.Insert("notion_image").Columns("block_id", "page_id", "image_id")
 	for _, photo := range photos {
 		q = q.Values(photo.BlockID, photo.PageID, photo.ImageID)
@@ -197,6 +200,10 @@ func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
 	ctx, span := c.tracer.Start(ctx, "db.SaveImage")
 	defer span.End()
 
+	if len(items) == 0 {
+		return nil
+	}
+
 	q := c.psql.Insert("images").Columns("id", "blur_hash", "source")
 	for _, r := range items {
 		q = q.Values(r.ID, r.BlurHash, r.Source)
@@ -217,6 +224,10 @@ func (c *Client) DoesNotionImageExist(ctx context.Context, blockID string) (exis
 func (c *Client) SaveNotionRecipes(ctx context.Context, items []models.NotionRecipe) (err error) {
 	ctx, span := c.tracer.Start(ctx, "db.SaveNotionRecipes")
 	defer span.End()
+
+	if len(items) == 0 {
+		return nil
+	}
 
 	for _, r := range items {
 		r.LastSeen = time.Now()

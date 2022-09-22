@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"go.mitsakis.org/workerpool"
+
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/clients/notion"
 	"github.com/nickysemenza/gourd/clients/rs_client"
@@ -81,6 +83,58 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 	err = nr.Meta.Marshal(m)
 	return &nr, err
 }
+
+type notionSyncResult struct {
+	nRecipes []models.NotionRecipe
+	nImages  []db.NotionImage
+	images   []db.Image
+}
+
+func (a *API) processNotionRecipe(ctx context.Context, nRecipe notion.Recipe) (res notionSyncResult, err error) {
+	ctx, span := a.tracer.Start(ctx, "processNotionRecipe")
+	defer span.End()
+	dbnr, err := a.notionRecipeToDB(ctx, nRecipe)
+	if err != nil {
+		return notionSyncResult{}, err
+	}
+	res.nRecipes = append(res.nRecipes, *dbnr)
+	for _, nPhoto := range nRecipe.Photos {
+
+		l := log.WithField("block_id", nPhoto.BlockID)
+		// nPhoto.BlockID
+		exists, err := a.db.DoesNotionImageExist(ctx, nPhoto.BlockID)
+		if err != nil {
+			return notionSyncResult{}, err
+		}
+		if exists {
+			l.Println("already exists")
+			continue
+		}
+
+		bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
+		if err != nil {
+			return notionSyncResult{}, err
+		}
+		id := common.ID("notion_image")
+		err = a.ImageStore.SaveImage(ctx, id, image)
+		if err != nil {
+			return notionSyncResult{}, err
+		}
+
+		res.images = append(res.images, db.Image{
+			ID:       id,
+			BlurHash: bh,
+			Source:   "notion",
+		})
+		res.nImages = append(res.nImages, db.NotionImage{
+			PageID:  nRecipe.PageID,
+			BlockID: nPhoto.BlockID,
+			ImageID: id,
+		})
+	}
+	return
+}
+
 func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
 	defer span.End()
@@ -90,69 +144,35 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error 
 	}
 	log.Infof("got %d notion recipes", len(nRecipes))
 
-	var notionRecipes []models.NotionRecipe
-	var notionImages []db.NotionImage
-	var images []db.Image
-	for _, nRecipe := range nRecipes {
-		dbnr, err := a.notionRecipeToDB(ctx, nRecipe)
-		if err != nil {
-			return err
+	p, _ := workerpool.NewPoolWithResults(8, func(job workerpool.Job[notion.Recipe], workerID int) (notionSyncResult, error) {
+		return a.processNotionRecipe(ctx, job.Payload)
+	})
+	go func() {
+		for _, nRecipe := range nRecipes {
+			p.Submit(nRecipe)
 		}
-		notionRecipes = append(notionRecipes, *dbnr)
-		for _, nPhoto := range nRecipe.Photos {
+		p.StopAndWait()
+	}()
 
-			l := log.WithField("block_id", nPhoto.BlockID)
-			// nPhoto.BlockID
-			exists, err := a.db.DoesNotionImageExist(ctx, nPhoto.BlockID)
-			if err != nil {
-				return err
-			}
-			if exists {
-				l.Println("already exists")
-				continue
-			}
+	summary := notionSyncResult{}
 
-			bh, image, err := image.GetBlurHash(ctx, nPhoto.URL)
-			if err != nil {
-				return err
-			}
-			id := common.ID("notion_image")
-			err = a.ImageStore.SaveImage(ctx, id, image)
-			if err != nil {
-				return err
-			}
-
-			images = append(images, db.Image{
-				ID:       id,
-				BlurHash: bh,
-				Source:   "notion",
-			})
-			notionImages = append(notionImages, db.NotionImage{
-				PageID:  nRecipe.PageID,
-				BlockID: nPhoto.BlockID,
-				ImageID: id,
-			})
-		}
+	for result := range p.Results {
+		res := result.Value
+		summary.nRecipes = append(summary.nRecipes, res.nRecipes...)
+		summary.nImages = append(summary.nImages, res.nImages...)
+		summary.images = append(summary.images, res.images...)
 	}
-
-	if len(images) > 0 {
-		err = a.db.SaveImage(ctx, images)
-		if err != nil {
-			return err
-		}
+	err = a.db.SaveImage(ctx, summary.images)
+	if err != nil {
+		return err
 	}
-
-	if len(notionRecipes) > 0 {
-		err = a.db.SaveNotionRecipes(ctx, notionRecipes)
-		if err != nil {
-			return err
-		}
+	err = a.db.SaveNotionRecipes(ctx, summary.nRecipes)
+	if err != nil {
+		return err
 	}
-	if len(notionImages) > 0 {
-		err = a.db.UpsertNotionImages(ctx, notionImages)
-		if err != nil {
-			return err
-		}
+	err = a.db.UpsertNotionImages(ctx, summary.nImages)
+	if err != nil {
+		return err
 	}
 	return nil
 }
