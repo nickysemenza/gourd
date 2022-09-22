@@ -20,7 +20,7 @@ async fn main() -> std::io::Result<()> {
         .version("1.0")
         .arg(
             Arg::with_name("config")
-                .short("c")
+                .short('c')
                 .long("config")
                 .value_name("FILE")
                 .help("Sets a custom config file")
@@ -31,7 +31,7 @@ async fn main() -> std::io::Result<()> {
                 .about("runs the http server")
                 .arg(
                     Arg::with_name("debug")
-                        .short("d")
+                        .short('d')
                         .help("print debug information verbosely"),
                 ),
         )
@@ -40,7 +40,7 @@ async fn main() -> std::io::Result<()> {
                 .about("load unit mappings")
                 .arg(
                     Arg::with_name("MAPPING")
-                        .short("m")
+                        .short('m')
                         .long("mapping")
                         .value_name("FILE")
                         .required(true)
@@ -66,7 +66,7 @@ async fn main() -> std::io::Result<()> {
         let root = span!(tracing::Level::TRACE, "load_mappings",);
         let _enter = root.enter();
     }
-    opentelemetry::global::force_flush_tracer_provider();
+    // opentelemetry::global::force_flush_tracer_provider();
 
     Ok(())
 }
@@ -75,7 +75,7 @@ fn initialize_tracing(s: &str) {
     // global::set_text_map_propagator(opentelemetry_jaeger::Propagator::new());
     // not jaeger, this one: https://github.com/openebs/Mayastor/blob/master/control-plane/rest/service/src/main.rs#L64
     opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
-    let tracer = opentelemetry_jaeger::new_pipeline()
+    let tracer = opentelemetry_jaeger::new_agent_pipeline()
         .with_service_name(s)
         .with_trace_config(trace::config().with_sampler(Sampler::AlwaysOn))
         .install_simple()

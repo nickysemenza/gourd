@@ -142,13 +142,7 @@ mod tests {
 
         // assert_eq!(resp.status(), http::StatusCode::OK);
 
-        let response_body: String = match resp.into_body() {
-            actix_web::body::AnyBody::Bytes(bytes) => {
-                std::str::from_utf8(&bytes).unwrap().to_string()
-            }
-            _ => panic!("Response error"),
-        };
-
+        let response_body = actix_web::body::to_bytes(resp.into_body()).await.unwrap();
         assert_eq!(
             response_body,
             r##"{"name":"flour","kind":"ingredient","amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##

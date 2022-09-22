@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 mod utils;
 
 use gourd_common::{
