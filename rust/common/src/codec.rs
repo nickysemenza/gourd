@@ -312,8 +312,7 @@ mod tests {
             "".to_string(),
             vec![],
         );
-        let raw = "---
-name: cake
+        let raw = "name: cake
 ---
 12 g foo
 14 g / 1.5 cups bar
@@ -332,8 +331,7 @@ name: cake
     }
     #[test]
     fn test_encode_decode() {
-        let r = "---
-name: cookies
+        let r = "name: cookies
 ---
 113 g / 1 stick butter
 ;brown, add to mixer
