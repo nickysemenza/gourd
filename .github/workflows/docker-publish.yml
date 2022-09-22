@@ -9,7 +9,7 @@ on:
   push:
     branches: [main, dev]
     paths:
-      - "Dockerfile.base"
+      - "deploy/Dockerfile.base"
       - "rust/Dockerfile"
       - "Dockerfile"
       - "usda/Dockerfile"
@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - file: "Dockerfile.base"
+          - file: "deploy/Dockerfile.base"
             name: "base"
             context: .
           - file: "rust/Dockerfile"
