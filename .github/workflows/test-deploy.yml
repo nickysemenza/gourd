@@ -6,8 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: "1.19"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2.5.2
+        uses: golangci/golangci-lint-action@v3.2.0
         with:
           version: latest
   test-e2e:
@@ -15,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1.18"]
+        go: ["1.19"]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go
