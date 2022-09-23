@@ -1,5 +1,5 @@
 use anyhow::bail;
-use ingredient::rich_text::Chunk;
+use ingredient::rich_text::{Chunk, Rich};
 use openapi::models::{
     Amount, CompactRecipe, CompactRecipeMeta, CompactRecipeSection, RecipeDetail,
     RecipeDetailInput, RecipeSection, RecipeSectionInput, RecipeSource, SectionIngredient,
@@ -95,7 +95,7 @@ pub fn encode_recipe(r: RecipeDetailInput) -> Result<String, anyhow::Error> {
     let compact = compact_recipe(r);
     to_string(compact)
 }
-pub fn decode_recipe(r: String) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), anyhow::Error> {
+pub fn decode_recipe(r: String) -> Result<(RecipeDetailInput, Vec<Rich>), anyhow::Error> {
     let compact = from_string(r)?;
     expand_recipe(compact)
 }
@@ -114,10 +114,8 @@ pub fn fixup_ingredient_line_item(ing: String) -> String {
         .replace("Egg, (s)", "egg")
 }
 const SEP: &str = "---\n";
-pub fn expand_recipe(
-    r: CompactRecipe,
-) -> Result<(RecipeDetailInput, Vec<Vec<Chunk>>), anyhow::Error> {
-    let mut rtt: Vec<Vec<Chunk>> = vec![];
+pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>), anyhow::Error> {
+    let mut rtt: Vec<Rich> = vec![];
     let sections = r
         .sections
         .into_iter()

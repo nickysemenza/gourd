@@ -26,6 +26,6 @@ RUN which pdflatex
 RUN which magick
 WORKDIR /work
 COPY --from=builder-go /work/bin ./bin
-COPY --from=builder-go /work/db/migrations ./db/migrations
+COPY --from=builder-go /work/internal/db/migrations ./internal/db/migrations
 COPY --from=build-ui /work/ui/build ./ui/build
 ENTRYPOINT ["./bin/gourd","server"]

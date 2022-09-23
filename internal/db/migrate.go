@@ -20,7 +20,7 @@ func AutoMigrate(_ context.Context, dbConn *sql.DB, up bool) error {
 	if err != nil {
 		return err
 	}
-	viper.SetDefault("MIGRATIONS_DIR", "file://./db/migrations")
+	viper.SetDefault("MIGRATIONS_DIR", "file://./internal/db/migrations")
 	viper.AutomaticEnv()
 	dir := viper.GetString("MIGRATIONS_DIR")
 	log.Infof("Migrations dir: %s", dir)

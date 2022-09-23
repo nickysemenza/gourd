@@ -45,7 +45,7 @@ jobs:
       - name: go integration tests
         run: make integration-test-go
         env:
-          MIGRATIONS_DIR: file://../db/migrations
+          MIGRATIONS_DIR: file://../internal/db/migrations
           PDFLATEX_BINARY: /usr/bin/pdflatex
       - uses: codecov/codecov-action@v3
       - name: seed db with testdata

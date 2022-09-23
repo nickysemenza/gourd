@@ -35,12 +35,12 @@ dev-db:
 dev-db-stats:
 	docker logs gourd_db_1 2>&1 | pgbadger - --prefix '%t [%p]:[%l] user=%u, db=%d'
 new-migrate/%: bin/migrate
-	mkdir -p db/migrations
-	./bin/migrate create -dir db/migrations -ext sql $(@F)
+	mkdir -p internal/db/migrations
+	./bin/migrate create -dir internal/db/migrations -ext sql $(@F)
 migrate: bin/migrate
-	./bin/migrate -source file://db/migrations -database $(DSN) up
+	./bin/migrate -source file://internal/db/migrations -database $(DSN) up
 migrate-down: bin/migrate
-	./bin/migrate -source file://db/migrations -database $(DSN) down
+	./bin/migrate -source file://internal/db/migrations -database $(DSN) down
 
 
 # golang

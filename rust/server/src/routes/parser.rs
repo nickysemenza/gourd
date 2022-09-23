@@ -1,7 +1,7 @@
 use actix_web::{web, HttpResponse};
-use gourd_common::{codec::expand_recipe, convert_to, pan, tmp_normalize};
+use gourd_common::{codec::expand_recipe, convert_to, ingredient, pan, tmp_normalize};
 use openapi::models::{Amount, CompactRecipe, RecipeWrapperInput};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tracing::{debug, error, span};
 
 #[derive(Deserialize, Debug)]
@@ -72,21 +72,31 @@ pub async fn pans() -> HttpResponse {
     HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
 }
 
+#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+struct DebugScrapeWrapper {
+    compact_scrape_result: CompactRecipe,
+    instructions_rich: Vec<ingredient::rich_text::Rich>,
+    input: RecipeWrapperInput,
+}
 #[tracing::instrument(name = "route::debug_scrape")]
 pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
     let url = info.url.as_str();
 
-    let sc_result = match crate::scraper::scrape_recipe(url).await {
+    let compact_scrape_result = match crate::scraper::scrape_recipe(url).await {
         Ok(s) => s,
         Err(e) => {
             error!("{:#?}", e);
             return HttpResponse::InternalServerError().json(format!("{:#?}", e));
         }
     };
-    let a = expand_recipe(sc_result.clone()).unwrap();
+    let a = expand_recipe(compact_scrape_result.clone()).unwrap();
     let res = RecipeWrapperInput::new(a.clone().0);
 
-    HttpResponse::Ok().json((sc_result, a.1, res))
+    HttpResponse::Ok().json(DebugScrapeWrapper {
+        compact_scrape_result,
+        instructions_rich: a.1,
+        input: res,
+    })
 }
 
 #[tracing::instrument(name = "route::scrape")]

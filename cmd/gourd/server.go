@@ -66,7 +66,7 @@ func makeServer(ctx context.Context) (*server.Server, error) {
 		log.Fatal(err)
 	}
 
-	// postgres db/migrations
+	// postgres internal/db/migrations
 	if err := db.AutoMigrate(ctx, dbConn, true); err != nil {
 		err := fmt.Errorf("failed to migrate db: %w", err)
 		log.Fatal(err)
