@@ -166,6 +166,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             <TableInput
               width={"full"}
               data-cy="grams-input"
+              placeholder="grams"
               edit={edit}
               softEdit
               value={adjustIngredientValue(
@@ -244,6 +245,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           )}
           <TableInput
             data-cy="amount-input"
+            placeholder="amount (non-grams)"
             width={"full"}
             edit={edit}
             softEdit
@@ -269,6 +271,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           />
           <TableInput
             data-cy="unit-input"
+            placeholder="unit for amount"
             width={"full"}
             edit={edit}
             value={ingIndex === -1 ? "" : ingredient.amounts[ingIndex].unit}
@@ -286,6 +289,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <div className="flex space-x-1">
             <TableInput
               data-cy="adjective-input"
+              placeholder="adjective"
               width={"full"}
               edit={edit}
               value={ingredient.adjective || ""}
@@ -360,6 +364,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         <PillLabel kind="letter" x={x} />
         <TableInput
           width={40}
+          placeholder="time"
           data-cy="time-input"
           edit={edit}
           value={formatTimeRange(w, section.duration)}
@@ -412,6 +417,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             {edit && (
               <TableInput
                 data-cy="instruction-input"
+                placeholder="instruction step"
                 width={72}
                 tall
                 edit={edit}

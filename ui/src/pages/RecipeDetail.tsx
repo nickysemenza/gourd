@@ -407,6 +407,7 @@ const RecipeDetail: React.FC = () => {
                           type="text"
                           className="border-2 w-96"
                           value={source[key]}
+                          placeholder={key}
                           onChange={(e) =>
                             setRecipe(
                               updateRecipeSource(recipe, i, e.target.value, key)

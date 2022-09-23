@@ -1,5 +1,5 @@
 use anyhow::bail;
-use ingredient::rich_text::{Chunk, Rich};
+use ingredient::rich_text::Rich;
 use openapi::models::{
     Amount, CompactRecipe, CompactRecipeMeta, CompactRecipeSection, RecipeDetail,
     RecipeDetailInput, RecipeSection, RecipeSectionInput, RecipeSource, SectionIngredient,

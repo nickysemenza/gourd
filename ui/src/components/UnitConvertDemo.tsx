@@ -43,6 +43,7 @@ export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {
       <Debug data={{ result }} />
       <TableInput
         data-cy="grams-input"
+        placeholder="grams"
         edit={true}
         value={input}
         blur

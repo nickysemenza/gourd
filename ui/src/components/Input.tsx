@@ -18,6 +18,7 @@ export type TableInputProps = {
   softEdit?: boolean;
   value: string | number;
   pValue?: number;
+  placeholder: string;
   width?: number | "full";
   highlight?: boolean;
   onChange: (event: string) => void;
@@ -32,6 +33,7 @@ export const TableInput: React.FC<TableInputProps> = ({
   highlight = false,
   value,
   pValue,
+  placeholder,
   onChange,
   ...props
 }) => {
@@ -74,6 +76,7 @@ export const TableInput: React.FC<TableInputProps> = ({
         onChange={oC}
         className={className}
         rows={3}
+        placeholder={placeholder}
       />
     ) : (
       <input
@@ -83,6 +86,7 @@ export const TableInput: React.FC<TableInputProps> = ({
         onBlur={oB}
         className={className}
         disabled={!edit && (controlledVal === "0" || !!pValue)}
+        placeholder={placeholder}
       />
     )
   ) : (
