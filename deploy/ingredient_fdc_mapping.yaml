@@ -147,7 +147,7 @@
         value: 1
       b:
         unit: grams
-        value: 52
+        value: 50.3
       source: misc
 - name: all purpose flour
   fdc_id: 804415

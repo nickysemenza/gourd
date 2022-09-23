@@ -99,7 +99,7 @@ openapi: validate-openapi internal/api/openapi.yaml bin/oapi-codegen
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher
 
-	go generate ./api
+	go generate ./internal/api
 
 openapi-docs:
 	npx @redocly/openapi-cli preview-docs internal/api/openapi.yaml -p 8081

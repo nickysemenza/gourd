@@ -50,7 +50,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.Use(echo.WrapMiddleware(func(h http.Handler) http.Handler { return servertiming.Middleware(h, nil) }))
 	r.Use(TraceIDHeader)
 
-	skipper := func(c echo.Context) bool {
+	skipAuth := func(c echo.Context) bool {
 		if s.BypassAuth {
 			log.Debugf("bypassing auth for %s", c.Path())
 
@@ -64,7 +64,7 @@ func (s *Server) Run(_ context.Context) error {
 		}
 	}
 	config := middleware.JWTConfig{
-		Skipper:    skipper,
+		Skipper:    skipAuth,
 		Claims:     &auth.Claims{},
 		SigningKey: s.APIManager.Auth.Key,
 	}
