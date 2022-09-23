@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/nickysemenza/gourd/db/models"
+	"github.com/nickysemenza/gourd/internal/db/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"gopkg.in/guregu/null.v4/zero"
 )

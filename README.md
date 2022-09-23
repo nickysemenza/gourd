@@ -18,7 +18,7 @@ Gourd is a recipe database that can be used for meal planning and generating ing
 
 This is comprised mulitple components:
 
-1. **api** OpenAPI 3.0 REST API, defined in `api/openapi.yaml`
+1. **api** OpenAPI 3.0 REST API, defined in `internal/api/openapi.yaml`
 1. **ui** in React + Typescript, using generated openapi clients
 1. **scraper** for saving recipes from websites (nytimes, seriouseats) for later analysis.
    - This currently works on websites using `json+ld` with [the appropriate schema](https://schema.org/Recipe)

@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
-	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/clients/client"
+	"github.com/nickysemenza/gourd/internal/api"
+	"github.com/nickysemenza/gourd/internal/clients/client"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"go.opentelemetry.io/otel"
@@ -28,6 +28,7 @@ var rootCmd = &cobra.Command{
 // nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(
+		importCommand,
 		&cobra.Command{
 			Use: "version",
 			Run: func(cmd *cobra.Command, args []string) {
@@ -152,37 +153,38 @@ func init() {
 				return nil
 			},
 		},
-		&cobra.Command{
-			Use:   "import [file]",
-			Short: "import a recipe",
-			Args:  cobra.MinimumNArgs(1),
-			RunE: func(cmd *cobra.Command, args []string) error {
-				ctx := cmd.Context()
-				s, err := makeServer(ctx)
-				if err != nil {
-					return err
-				}
+	)
+}
 
-				recipes, err := s.APIManager.RecipeFromFile(ctx, strings.Join(args, " "))
-				if err != nil {
-					return err
-				}
+var importCommand = &cobra.Command{
+	Use:   "import [file]",
+	Short: "import a recipe",
+	Args:  cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+		s, err := makeServer(ctx)
+		if err != nil {
+			return err
+		}
 
-				for x := range recipes {
-					out, err := s.APIManager.CreateRecipe(ctx, &api.RecipeWrapperInput{Detail: recipes[x]})
-					if err != nil {
-						return err
-					}
-					res, err := glamour.Render(fmt.Sprintf(`
+		recipes, err := s.APIManager.RecipeFromFile(ctx, strings.Join(args, " "))
+		if err != nil {
+			return err
+		}
+
+		for x := range recipes {
+			out, err := s.APIManager.CreateRecipe(ctx, &api.RecipeWrapperInput{Detail: recipes[x]})
+			if err != nil {
+				return err
+			}
+			res, err := glamour.Render(fmt.Sprintf(`
 # Import Complete
 Imported `+" **%s** as `%s`", out.Detail.Name, out.Detail.Id), "dark")
-					if err != nil {
-						return err
-					}
-					fmt.Print(res)
-				}
-				return nil
-			},
-		},
-	)
+			if err != nil {
+				return err
+			}
+			fmt.Print(res)
+		}
+		return nil
+	},
 }

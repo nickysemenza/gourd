@@ -19,7 +19,7 @@ func main() {
 			log.Error(err)
 		}
 	}()
-	ctx, span := otel.Tracer("client").Start(context.Background(), "main")
+	ctx, span := otel.Tracer("client").Start(context.Background(), "gourd main")
 	defer span.End()
 
 	err := rootCmd.ExecuteContext(ctx)

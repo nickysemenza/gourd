@@ -12,12 +12,12 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/clients/google"
-	"github.com/nickysemenza/gourd/clients/notion"
-	"github.com/nickysemenza/gourd/clients/rs_client"
-	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/internal/api"
 	"github.com/nickysemenza/gourd/internal/auth"
+	"github.com/nickysemenza/gourd/internal/clients/google"
+	"github.com/nickysemenza/gourd/internal/clients/notion"
+	"github.com/nickysemenza/gourd/internal/clients/rs_client"
+	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
 	"github.com/nickysemenza/gourd/internal/server"
 )

@@ -20,9 +20,9 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/nickysemenza/gourd/api"
-	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/internal/api"
 	"github.com/nickysemenza/gourd/internal/auth"
+	"github.com/nickysemenza/gourd/internal/db"
 )
 
 // Server represents a server

@@ -7,7 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/labstack/echo/v4"
-	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/internal/db"
 )
 
 func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) []Photo {

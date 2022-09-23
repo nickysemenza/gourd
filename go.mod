@@ -61,6 +61,7 @@ require (
 
 require (
 	github.com/arran4/golang-ical v0.0.0-20220424140932-da9e1dd56623
+	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.10.0
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
@@ -325,7 +326,6 @@ require (
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	gitlab.com/bosi/decorder v0.2.3 // indirect
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
-	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca // indirect
 	go.mongodb.org/mongo-driver v1.10.1 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.10.0 // indirect
 	go.opentelemetry.io/otel/metric v0.32.0 // indirect

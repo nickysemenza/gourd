@@ -10,9 +10,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
-	"github.com/nickysemenza/gourd/db"
-	"github.com/nickysemenza/gourd/db/models/usdamodels"
 	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/nickysemenza/gourd/internal/db/models/usdamodels"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/exp/slices"

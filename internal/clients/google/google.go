@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/db"
 	"go.opentelemetry.io/otel"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"

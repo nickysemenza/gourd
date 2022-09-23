@@ -3,7 +3,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/nickysemenza/gourd/api"
+	"github.com/nickysemenza/gourd/internal/api"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 

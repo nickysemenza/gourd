@@ -70,7 +70,7 @@
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject",
-    "generate-fetcher": "restful-react import --file ../api/openapi.yaml --output src/api/openapi-hooks/api.tsx",
+    "generate-fetcher": "restful-react import --file ../internal/api/openapi.yaml --output src/api/openapi-hooks/api.tsx",
     "postgenerate-fetcher": "prettier src/api/openapi-hooks/api.tsx --write",
     "coverage:unit": "craco test --watchAll=false --coverage --coverageDirectory=coverage/unit",
     "cy:run": "cypress run",

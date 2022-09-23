@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/nickysemenza/gourd/db"
 	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
 )

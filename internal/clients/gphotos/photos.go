@@ -12,9 +12,9 @@ import (
 
 	gphotos "github.com/gphotosuploader/google-photos-api-client-go/lib-gphotos"
 	"github.com/gphotosuploader/googlemirror/api/photoslibrary/v1"
-	"github.com/nickysemenza/gourd/clients/google"
-	"github.com/nickysemenza/gourd/db"
+	"github.com/nickysemenza/gourd/internal/clients/google"
 	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
