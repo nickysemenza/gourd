@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Highcharts from "highcharts";
+import Highcharts, { Point, PointClickEventObject } from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsNetworkGraph from "highcharts/modules/networkgraph";
 
@@ -51,16 +51,16 @@ const Graph: React.FC = () => {
       type: "networkgraph",
     },
     title: {
-      text: "My chart",
+      text: "ingredients",
     },
     plotOptions: {
       networkgraph: {
         keys: ["from", "to"],
         layoutAlgorithm: {
-          // enableSimulation: true,
+          enableSimulation: true,
           // friction: -0.9,
           integration: "verlet",
-          linkLength: 40,
+          // linkLength: 80,
         },
         marker: {
           radius: 5,
@@ -76,8 +76,8 @@ const Graph: React.FC = () => {
         },
         point: {
           events: {
-            click: function () {
-              var node = this as CustomPoint;
+            click: function (this: Point, _event: PointClickEventObject) {
+              var node = this as unknown as CustomPoint;
               console.log(node);
 
               history(
@@ -110,7 +110,7 @@ const Graph: React.FC = () => {
           highcharts={Highcharts}
           options={options}
           ref={chartComponentRef}
-          height={500}
+          height={900}
         />
       </div>
     </div>
