@@ -110,23 +110,23 @@ func (c *Client) updateRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	return nil
 }
 
-func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) (recipeDetail *RecipeDetail, err error) {
-	if r.CreatedAt.IsZero() {
-		r.CreatedAt = time.Now()
+func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, insert *RecipeDetail) (recipeDetail *RecipeDetail, err error) {
+	if insert.CreatedAt.IsZero() {
+		insert.CreatedAt = time.Now()
 	}
 	// if we have an existing recipe with the same Id or name, this one is a n+1 version of that one
 	version := int64(1)
 	var modifying *RecipeDetail
 	parentID := ""
-	if r.Id != "" {
-		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": r.Id})
+	if insert.Id != "" {
+		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"id": insert.Id})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
 		modifying = res.First()
 	}
 	if modifying == nil {
-		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"name": r.Name})
+		res, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"name": insert.Name})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
 		}
@@ -134,6 +134,7 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 	}
 
 	if modifying != nil {
+
 		latestVersion, err := c.GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": modifying.RecipeId})
 		if err != nil {
 			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
@@ -141,17 +142,26 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 		version = latestVersion.First().Version + 1
 		parentID = latestVersion.First().RecipeId
 
-		if len(r.Sections) == 0 {
+		if len(insert.Sections) == 0 {
 			log.Infof("no sections, modifying, so just returning")
 			return modifying, nil
 		}
+		modifying, err = c.GetRecipeDetailByIdFull(ctx, modifying.Id)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find prior recipe: %w", err)
+		}
+		if modifying.equals(insert) {
+			log.Infof("recipe already exists, so just returning")
+			return modifying, nil
+		}
+
 	}
-	r.Version = version
-	r.Id = common.ID("rd")
+	insert.Version = version
+	insert.Id = common.ID("rd")
 
 	if parentID == "" {
 		parentID = common.ID("r")
-		_, err = c.execTx(ctx, tx, c.psql.Insert(recipesTable).Columns("id", "created_at").Values(parentID, r.CreatedAt))
+		_, err = c.execTx(ctx, tx, c.psql.Insert(recipesTable).Columns("id", "created_at").Values(parentID, insert.CreatedAt))
 		if err != nil {
 			return nil, fmt.Errorf("failed to insert parent recipe: %w", err)
 		}
@@ -166,33 +176,33 @@ func (c *Client) insertRecipe(ctx context.Context, tx *sql.Tx, r *RecipeDetail) 
 			return nil, fmt.Errorf("failed to update other verions to not be latest: %w", err)
 		}
 	}
-	r.RecipeId = parentID
+	insert.RecipeId = parentID
 
-	if r.Id == "" {
+	if insert.Id == "" {
 		// todo? needed?
-		r.Id = common.ID("rd")
+		insert.Id = common.ID("rd")
 	}
-	log.Println("inserting", r.Id, r.Name)
+	log.Println("inserting", insert.Id, insert.Name)
 
 	date := time.Now()
-	if !r.CreatedAt.IsZero() {
-		date = r.CreatedAt
+	if !insert.CreatedAt.IsZero() {
+		date = insert.CreatedAt
 	}
 
 	_, err = c.execTx(ctx, tx, c.psql.
 		Insert(recipeDetailsTable).
 		Columns("id", "recipe_id", "name", "version", "is_latest_version", "source", "created_at", "tags").
-		Values(r.Id, r.RecipeId, r.Name, r.Version, true, r.Source, date, pq.Array(r.Tags)))
+		Values(insert.Id, insert.RecipeId, insert.Name, insert.Version, true, insert.Source, date, pq.Array(insert.Tags)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert new recipe details row: %w", err)
 	}
 
-	err = c.updateRecipe(ctx, tx, r)
+	err = c.updateRecipe(ctx, tx, insert)
 	if err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	return insert, nil
 
 }
 

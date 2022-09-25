@@ -1055,7 +1055,7 @@ dependencies = [
 [[package]]
 name = "ingredient"
 version = "0.2.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#1c18c71b39f879273183151f45c40aa2ee6a148e"
+source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#6e75accb15d31f76114dfc87be99966c060be3d2"
 dependencies = [
  "itertools",
  "nom",
@@ -1805,7 +1805,7 @@ dependencies = [
 [[package]]
 name = "recipe-scraper"
 version = "0.1.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=scraper#d770a6cc8f42b25017e211ce95b8f1d573fcdb30"
+source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#6e75accb15d31f76114dfc87be99966c060be3d2"
 dependencies = [
  "reqwest",
  "reqwest-middleware",

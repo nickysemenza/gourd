@@ -11,14 +11,17 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/dgraph-io/ristretto"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	servertiming "github.com/mitchellh/go-server-timing"
 	"github.com/nickysemenza/gourd/internal/common"
+	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -99,6 +102,42 @@ type RecipeDetail struct {
 	UpdatedAt     time.Time      `db:"updated_at"`
 	DeletedAt     zero.Time      `db:"deleted_at"`
 	Tags          pq.StringArray `db:"tags"`
+}
+
+func (rd *RecipeDetail) equals(y *RecipeDetail) bool {
+	diffCheck := slices.CompareFunc(rd.Sections, y.Sections, func(x, y Section) int {
+		// if x.TimeRange != y.TimeRange {
+		// 	return 1
+		// }
+		if x.Sort.ValueOrZero() < y.Sort.ValueOrZero() {
+			return 1
+		}
+		return slices.CompareFunc(x.Ingredients, y.Ingredients, func(x, y SectionIngredient) int {
+			if x.RecipeId != y.RecipeId {
+				return 1
+			}
+			if x.IngredientId != y.IngredientId {
+				return 1
+			}
+			return slices.CompareFunc(x.Amounts, y.Amounts, func(x, y Amount) int {
+				if x.Unit != y.Unit {
+					return 1
+				}
+				if x.Value != y.Value {
+					return 1
+				}
+				return 0
+			})
+		}) + slices.CompareFunc(x.Instructions, y.Instructions, func(x, y SectionInstruction) int {
+			if x.Instruction != y.Instruction {
+				return 1
+			}
+			return 0
+		})
+	})
+	log.Infof("diffcheck %d", diffCheck)
+	spew.Dump(rd, y)
+	return diffCheck == 0
 }
 
 // Section represents a Section
