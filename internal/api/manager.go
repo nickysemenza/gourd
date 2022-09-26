@@ -8,6 +8,7 @@ import (
 
 	"go.mitsakis.org/workerpool"
 
+	"github.com/ericlagergren/decimal"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/clients/notion"
 	"github.com/nickysemenza/gourd/internal/clients/rs_client"
@@ -17,6 +18,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/types"
 )
 
 func (a *API) DB() *db.Client {
@@ -73,11 +75,18 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 			return nil, err
 		}
 	}
+
 	nr := models.NotionRecipe{
 		PageID:    nRecipe.PageID,
 		PageTitle: nRecipe.Title,
 		AteAt:     null.TimeFromPtr(nRecipe.Time),
 		RecipeID:  null.StringFrom(r.Id),
+	}
+
+	if nRecipe.Scale != nil {
+		d := decimal.WithContext(types.DecimalContext)
+		d.SetFloat64(*nRecipe.Scale)
+		nr.Scale = types.NewNullDecimal(d)
 	}
 	m := db.NotionRecipeMeta{Tags: nRecipe.Tags}
 	err = nr.Meta.Marshal(m)

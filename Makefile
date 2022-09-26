@@ -106,8 +106,8 @@ openapi-docs:
 
 gen-db:
 	rm -rf db/models/
-	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./db/models
-	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../db/models/usdamodels 
+	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models
+	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../internal/db/models/usdamodels 
 
 
 # frontend

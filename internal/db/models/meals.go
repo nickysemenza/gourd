@@ -662,7 +662,7 @@ func (mealL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, sing
 	}
 
 	query := NewQuery(
-		qm.Select("\"notion_recipe\".\"page_id\", \"notion_recipe\".\"page_title\", \"notion_recipe\".\"meta\", \"notion_recipe\".\"last_seen\", \"notion_recipe\".\"recipe_id\", \"notion_recipe\".\"ate_at\", \"a\".\"meal_id\""),
+		qm.Select("\"notion_recipe\".\"page_id\", \"notion_recipe\".\"page_title\", \"notion_recipe\".\"meta\", \"notion_recipe\".\"last_seen\", \"notion_recipe\".\"recipe_id\", \"notion_recipe\".\"ate_at\", \"notion_recipe\".\"scale\", \"a\".\"meal_id\""),
 		qm.From("\"notion_recipe\""),
 		qm.InnerJoin("\"notion_meal\" as \"a\" on \"notion_recipe\".\"page_id\" = \"a\".\"notion_recipe\""),
 		qm.WhereIn("\"a\".\"meal_id\" in ?", args...),
@@ -683,7 +683,7 @@ func (mealL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, sing
 		one := new(NotionRecipe)
 		var localJoinCol string
 
-		err = results.Scan(&one.PageID, &one.PageTitle, &one.Meta, &one.LastSeen, &one.RecipeID, &one.AteAt, &localJoinCol)
+		err = results.Scan(&one.PageID, &one.PageTitle, &one.Meta, &one.LastSeen, &one.RecipeID, &one.AteAt, &one.Scale, &localJoinCol)
 		if err != nil {
 			return errors.Wrap(err, "failed to scan eager loaded results for notion_recipe")
 		}

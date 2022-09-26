@@ -63,6 +63,7 @@ type NotionRecipe struct {
 	Meta      null.JSON   `db:"meta"`
 	LastSeen  time.Time   `db:"last_seen"`
 	Recipe    zero.String `db:"recipe_id"`
+	Scale     zero.Float  `db:"scale"`
 	AteAt     zero.Time   `db:"ate_at"`
 }
 
@@ -231,7 +232,7 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []models.NotionRec
 
 	for _, r := range items {
 		r.LastSeen = time.Now()
-		err := r.Upsert(ctx, c.db, true, []string{"page_id"}, boil.Whitelist("page_title", "recipe_id", "last_seen", "meta"), boil.Infer())
+		err := r.Upsert(ctx, c.db, true, []string{"page_id"}, boil.Whitelist("page_title", "recipe_id", "last_seen", "meta", "scale"), boil.Infer())
 		if err != nil {
 			return err
 		}
@@ -268,7 +269,7 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	q := c.psql.Select("page_id", "ate_at", "recipe_id", "meta").From("notion_recipe").
+	q := c.psql.Select("page_id", "ate_at", "recipe_id", "meta", "scale").From("notion_recipe").
 		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal_id": nil})
 	var missingMeals []NotionRecipe
 	err := c.selectContext(ctx, q, &missingMeals)
@@ -300,7 +301,7 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 		}
 
 		if m.Recipe.Valid {
-			err = c.AddRecipeToMeal(ctx, mealID, m.Recipe.ValueOrZero(), 1)
+			err = c.AddRecipeToMeal(ctx, mealID, m.Recipe.ValueOrZero(), m.Scale.Ptr())
 			if err != nil {
 				return err
 			}
@@ -387,9 +388,14 @@ func (c *Client) GetMealById(ctx context.Context, id string) (*Meal, error) {
 	return &result, err
 }
 
-func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, multiplier float64) error {
+func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, m *float64) error {
 	ctx, span := c.tracer.Start(ctx, "AddRecipeToMeal")
 	defer span.End()
+
+	multiplier := 1.0
+	if m != nil {
+		multiplier = *m
+	}
 
 	c.psql.Insert("meals")
 	q := c.psql.Insert("meal_recipe").Columns("meal_id", "recipe_id", "multiplier").

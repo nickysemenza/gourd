@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "notion_recipe" (
 	"recipe_id" TEXT references recipes(id),
 	-- NOT NULL,
 	"ate_at" timestamp,
+	"scale" numeric(10, 2),
 	-- NOT NULL,
 	PRIMARY KEY ("page_id")
 );

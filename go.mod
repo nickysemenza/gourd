@@ -61,6 +61,7 @@ require (
 
 require (
 	github.com/arran4/golang-ical v0.0.0-20220424140932-da9e1dd56623
+	github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
 	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.10.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.10.0
@@ -136,7 +137,6 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.3 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.7 // indirect
-	github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect

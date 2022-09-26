@@ -19,17 +19,19 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
+	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // NotionRecipe is an object representing the database table.
 type NotionRecipe struct {
-	PageID    string      `boil:"page_id" json:"page_id" toml:"page_id" yaml:"page_id"`
-	PageTitle string      `boil:"page_title" json:"page_title" toml:"page_title" yaml:"page_title"`
-	Meta      null.JSON   `boil:"meta" json:"meta,omitempty" toml:"meta" yaml:"meta,omitempty"`
-	LastSeen  time.Time   `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
-	RecipeID  null.String `boil:"recipe_id" json:"recipe_id,omitempty" toml:"recipe_id" yaml:"recipe_id,omitempty"`
-	AteAt     null.Time   `boil:"ate_at" json:"ate_at,omitempty" toml:"ate_at" yaml:"ate_at,omitempty"`
+	PageID    string            `boil:"page_id" json:"page_id" toml:"page_id" yaml:"page_id"`
+	PageTitle string            `boil:"page_title" json:"page_title" toml:"page_title" yaml:"page_title"`
+	Meta      null.JSON         `boil:"meta" json:"meta,omitempty" toml:"meta" yaml:"meta,omitempty"`
+	LastSeen  time.Time         `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
+	RecipeID  null.String       `boil:"recipe_id" json:"recipe_id,omitempty" toml:"recipe_id" yaml:"recipe_id,omitempty"`
+	AteAt     null.Time         `boil:"ate_at" json:"ate_at,omitempty" toml:"ate_at" yaml:"ate_at,omitempty"`
+	Scale     types.NullDecimal `boil:"scale" json:"scale,omitempty" toml:"scale" yaml:"scale,omitempty"`
 
 	R *notionRecipeR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L notionRecipeL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -42,6 +44,7 @@ var NotionRecipeColumns = struct {
 	LastSeen  string
 	RecipeID  string
 	AteAt     string
+	Scale     string
 }{
 	PageID:    "page_id",
 	PageTitle: "page_title",
@@ -49,6 +52,7 @@ var NotionRecipeColumns = struct {
 	LastSeen:  "last_seen",
 	RecipeID:  "recipe_id",
 	AteAt:     "ate_at",
+	Scale:     "scale",
 }
 
 var NotionRecipeTableColumns = struct {
@@ -58,6 +62,7 @@ var NotionRecipeTableColumns = struct {
 	LastSeen  string
 	RecipeID  string
 	AteAt     string
+	Scale     string
 }{
 	PageID:    "notion_recipe.page_id",
 	PageTitle: "notion_recipe.page_title",
@@ -65,6 +70,7 @@ var NotionRecipeTableColumns = struct {
 	LastSeen:  "notion_recipe.last_seen",
 	RecipeID:  "notion_recipe.recipe_id",
 	AteAt:     "notion_recipe.ate_at",
+	Scale:     "notion_recipe.scale",
 }
 
 // Generated where
@@ -124,6 +130,7 @@ var NotionRecipeWhere = struct {
 	LastSeen  whereHelpertime_Time
 	RecipeID  whereHelpernull_String
 	AteAt     whereHelpernull_Time
+	Scale     whereHelpertypes_NullDecimal
 }{
 	PageID:    whereHelperstring{field: "\"notion_recipe\".\"page_id\""},
 	PageTitle: whereHelperstring{field: "\"notion_recipe\".\"page_title\""},
@@ -131,6 +138,7 @@ var NotionRecipeWhere = struct {
 	LastSeen:  whereHelpertime_Time{field: "\"notion_recipe\".\"last_seen\""},
 	RecipeID:  whereHelpernull_String{field: "\"notion_recipe\".\"recipe_id\""},
 	AteAt:     whereHelpernull_Time{field: "\"notion_recipe\".\"ate_at\""},
+	Scale:     whereHelpertypes_NullDecimal{field: "\"notion_recipe\".\"scale\""},
 }
 
 // NotionRecipeRels is where relationship names are stored.
@@ -160,9 +168,9 @@ func (*notionRecipeR) NewStruct() *notionRecipeR {
 type notionRecipeL struct{}
 
 var (
-	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at"}
+	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at", "scale"}
 	notionRecipeColumnsWithoutDefault = []string{"page_id", "page_title"}
-	notionRecipeColumnsWithDefault    = []string{"meta", "last_seen", "recipe_id", "ate_at"}
+	notionRecipeColumnsWithDefault    = []string{"meta", "last_seen", "recipe_id", "ate_at", "scale"}
 	notionRecipePrimaryKeyColumns     = []string{"page_id"}
 	notionRecipeGeneratedColumns      = []string{}
 )

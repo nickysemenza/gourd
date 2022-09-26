@@ -55,6 +55,7 @@ type Recipe struct {
 	Raw       string     `json:"raw,omitempty"`
 	Children  []Recipe   `json:"children,omitempty"`
 	Debug     []string   `json:"debug,omitempty"`
+	Scale     *float64   `json:"scale,omitempty"`
 }
 
 func (r *Recipe) addDebug(l *log.Entry, format string, args ...interface{}) {
@@ -126,6 +127,12 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		}
 		if url, ok := page.Properties["source"]; ok {
 			r.SourceURL = url.(*notionapi.URLProperty).URL
+		}
+		if num, ok := page.Properties["scale"]; ok && num != nil {
+			raw := num.(*notionapi.NumberProperty).Number
+			if raw != 0 {
+				r.Scale = &raw
+			}
 		}
 
 		// on each page, get all the blocks that are images

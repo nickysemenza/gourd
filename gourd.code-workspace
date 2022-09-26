@@ -31,6 +31,14 @@
     ]
   },
   "settings": {
+    "go.testFlags": [
+      // "-tags",
+      // "integration",
+      "-v",
+      "-cover",
+      "-race",
+      "-coverpkg=all"
+    ],
     "go.lintTool": "golangci-lint",
     "go.lintFlags": ["--fast"],
     "editor.formatOnSave": true,
