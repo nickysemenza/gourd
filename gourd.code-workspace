@@ -32,8 +32,8 @@
   },
   "settings": {
     "go.testFlags": [
-      // "-tags",
-      // "integration",
+      "-tags",
+      "integration",
       "-v",
       "-cover",
       "-race",

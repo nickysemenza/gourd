@@ -223,7 +223,7 @@ func firstAmount(a []Amount, grams bool) *Amount {
 }
 
 func removeCalculatedAmounts(a []Amount) []Amount {
-	var out []Amount
+	out := make([]Amount, 0, len(a))
 	for _, s := range a {
 		if !s.IsMoneyKCal() {
 			out = append(out, s)
