@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "http://example.com/example.json",
+  "title": "Ingredient Mapping",
+  "type": "array",
+  "default": [],
+  "$defs": {
+    "mapping_item": {
+      "title": "one side of the unit and value pair",
+      "type": "object",
+      "required": ["unit", "value"],
+      "properties": {
+        "unit": {
+          "title": "The unit Schema",
+          "type": "string"
+        },
+        "value": {
+          "title": "The value Schema",
+          "type": ["integer", "number"]
+        }
+      }
+    }
+  },
+  "items": {
+    "title": "A n ingredient",
+    "type": "object",
+    "required": ["name"],
+    "properties": {
+      "name": {
+        "title": "ingredient name",
+        "type": "string"
+      },
+      "aliases": {
+        "title": "The other names for the schema",
+        "type": "array",
+        "items": {
+          "title": "A Schema",
+          "type": "string"
+        }
+      },
+      "fdc_id": {
+        "title": "The fdc_id Schema",
+        "type": "integer"
+      },
+      "unit_mappings": {
+        "title": "The unit_mappings Schema",
+        "type": "array",
+        "items": {
+          "title": "A Schema",
+          "type": "object",
+          "required": ["a", "b"],
+          "properties": {
+            "a": { "$ref": "#/$defs/mapping_item" },
+            "b": { "$ref": "#/$defs/mapping_item" },
+            "source": {
+              "title": "The source Schema",
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
