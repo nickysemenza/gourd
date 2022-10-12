@@ -16,6 +16,6 @@ split-debuginfo = "unpacked"
 opt-level = "s"
 
 
-# [patch."https://github.com/nickysemenza/ingredient-parser"]
-# recipe-scraper = { path = "../../ingredient-parser/recipe-scraper" }
-# ingredient = { path = "../../ingredient-parser/ingredient-parser" }
+[patch."https://github.com/nickysemenza/ingredient-parser"]
+recipe_scraper_fetcher = { path = "../../ingredient-parser/recipe_scraper_fetcher" }
+ingredient = { path = "../../ingredient-parser/ingredient-parser" }
