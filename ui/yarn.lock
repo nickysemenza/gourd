@@ -8769,10 +8769,10 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-ibm-openapi-validator@0.95.0:
-  version "0.95.0"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.95.0.tgz#d6b342bc462187f96b9d6d14719adafb55e64b2e"
-  integrity sha512-SqVcg/ZNC9dBhJ3tUdOPsizVvqRtpHHcO/Oz+FtDPl+3q6+ND84Y2gOgM2ZD6ehzJyMgLu1nRGWcxFda5aQNVg==
+ibm-openapi-validator@0.96.0:
+  version "0.96.0"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-0.96.0.tgz#55db29a9c8f853dc02a932548772bff7880736d1"
+  integrity sha512-KS2Z9c6G0H5WGWaf//pMoJI74iLLdgU4Md1ja5vyhLhrQdLN6u8QyaceIz8aU4jmTt734w9aP29B+LII5jzHLg==
   dependencies:
     "@ibm-cloud/openapi-ruleset" "0.44.0"
     "@stoplight/spectral-cli" "^6.4.2"
