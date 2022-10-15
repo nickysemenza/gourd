@@ -30,7 +30,7 @@ console_error_panic_hook = {version = "0.1.7", optional = true}
 # Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
 wee_alloc = {version = "0.4.5", optional = true}
 
-tracing = "0.1.36"
+tracing = "0.1.37"
 tracing-wasm = "0.2.1"
 
 [dev-dependencies]

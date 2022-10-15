@@ -11,47 +11,48 @@ use tracing::{info, span};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 extern crate clap;
-use clap::{App, Arg, SubCommand};
+use clap::{Arg, Command};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env::set_var("RUST_BACKTRACE", "1");
-    let matches = App::new("gourd CLI")
+    let matches = Command::new("gourd CLI")
         .version("1.0")
         .arg(
-            Arg::with_name("config")
+            Arg::new("config")
                 .short('c')
                 .long("config")
                 .value_name("FILE")
                 .help("Sets a custom config file")
-                .takes_value(true),
+                .num_args(1),
         )
         .subcommand(
-            SubCommand::with_name("server")
-                .about("runs the http server")
-                .arg(
-                    Arg::with_name("debug")
-                        .short('d')
-                        .help("print debug information verbosely"),
-                ),
+            Command::new("server").about("runs the http server").arg(
+                Arg::new("debug")
+                    .short('d')
+                    .help("print debug information verbosely"),
+            ),
         )
         .subcommand(
-            SubCommand::with_name("load_mappings")
+            Command::new("load_mappings")
                 .about("load unit mappings")
                 .arg(
-                    Arg::with_name("MAPPING")
+                    Arg::new("MAPPING")
                         .short('m')
                         .long("mapping")
                         .value_name("FILE")
                         .required(true)
                         .help("Sets a custom config file")
-                        .takes_value(true),
+                        .num_args(1),
                 ),
         )
         .get_matches();
 
     // Gets a value for config if supplied by user, or defaults to "default.conf"
-    let _config = matches.value_of("config").unwrap_or("default.conf");
+    let _config = matches
+        .get_one::<String>("config")
+        .map(|s| s.as_str())
+        .unwrap_or("default.conf");
 
     let configuration = get_configuration().expect("Failed to read configuration.");
     info!("confiig: {:?}", configuration);
