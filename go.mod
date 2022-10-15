@@ -13,7 +13,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
-	github.com/getkin/kin-openapi v0.103.0
+	github.com/getkin/kin-openapi v0.105.0
 	github.com/getsentry/sentry-go v0.14.0
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.2
@@ -253,6 +253,7 @@ require (
 	github.com/mgechev/revive v1.2.4 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.21 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/montanaflynn/stats v0.6.6 // indirect
 	github.com/moricho/tparallel v0.2.1 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
