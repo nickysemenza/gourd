@@ -5,7 +5,7 @@ COPY . .
 RUN go mod vendor
 RUN make bin/gourd
 
-FROM rust:1.64 as builder-wasm
+FROM rust:1.65 as builder-wasm
 WORKDIR /work/rust
 RUN cargo install wasm-pack
 COPY rust/ .
