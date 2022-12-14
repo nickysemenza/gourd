@@ -40,7 +40,7 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
 	github.com/volatiletech/null/v8 v8.1.2
-	github.com/volatiletech/sqlboiler/v4 v4.13.0
+	github.com/volatiletech/sqlboiler/v4 v4.14.0
 	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.36.0
@@ -61,7 +61,7 @@ require (
 
 require (
 	github.com/arran4/golang-ical v0.0.0-20220424140932-da9e1dd56623
-	github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
+	github.com/ericlagergren/decimal v0.0.0-20211103172832-aca2edc11f73
 	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.0
@@ -168,7 +168,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocql/gocql v1.2.0 // indirect
 	github.com/gofrs/flock v0.8.1 // indirect
-	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
@@ -359,23 +359,23 @@ require (
 	honnef.co/go/tools v0.3.3 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/b v1.0.2 // indirect
-	modernc.org/cc/v3 v3.36.1 // indirect
-	modernc.org/ccgo/v3 v3.16.8 // indirect
+	modernc.org/cc/v3 v3.36.3 // indirect
+	modernc.org/ccgo/v3 v3.16.9 // indirect
 	modernc.org/db v1.0.4 // indirect
 	modernc.org/file v1.0.3 // indirect
 	modernc.org/fileutil v1.1.0 // indirect
 	modernc.org/golex v1.0.1 // indirect
 	modernc.org/internal v1.0.4 // indirect
-	modernc.org/libc v1.16.19 // indirect
+	modernc.org/libc v1.17.1 // indirect
 	modernc.org/lldb v1.0.4 // indirect
-	modernc.org/mathutil v1.4.1 // indirect
-	modernc.org/memory v1.1.1 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
+	modernc.org/memory v1.2.1 // indirect
 	modernc.org/opt v0.1.3 // indirect
 	modernc.org/ql v1.4.1 // indirect
 	modernc.org/sortutil v1.1.0 // indirect
 	modernc.org/sqlite v1.18.1 // indirect
-	modernc.org/strutil v1.1.2 // indirect
-	modernc.org/token v1.0.0 // indirect
+	modernc.org/strutil v1.1.3 // indirect
+	modernc.org/token v1.0.1 // indirect
 	modernc.org/zappy v1.0.5 // indirect
 	mvdan.cc/gofumpt v0.4.0 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
