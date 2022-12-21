@@ -39,7 +39,7 @@ require (
 	github.com/spf13/cobra v1.6.0
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
-	github.com/volatiletech/null/v8 v8.1.2
+	github.com/volatiletech/null/v9 v9.0.0
 	github.com/volatiletech/sqlboiler/v4 v4.14.0
 	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.24.0
@@ -62,6 +62,7 @@ require (
 require (
 	github.com/arran4/golang-ical v0.0.0-20220424140932-da9e1dd56623
 	github.com/ericlagergren/decimal v0.0.0-20211103172832-aca2edc11f73
+	github.com/volatiletech/null/v8 v8.1.2
 	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.11.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.11.0
