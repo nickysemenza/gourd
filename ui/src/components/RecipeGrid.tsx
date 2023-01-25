@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Photo, RecipeWrapper } from "../api/openapi-hooks/api";
@@ -5,6 +6,8 @@ import { formatTimeRange, getTotalDuration } from "../util";
 import { WasmContext } from "../wasmContext";
 import ProgressiveImage from "./ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 
 export const RecipeGrid: React.FC<{
   recipes: RecipeWrapper[];
@@ -69,7 +72,9 @@ export const RecipeGrid: React.FC<{
                   )}
                   <ul className="list-disc">
                     {(recipe.linked_meals || []).map((m) => (
-                      <li className="text-xs"> {m.name}</li>
+                      <li className="text-xs">
+                        {m.name} ({dayjs(m.ate_at).fromNow()})
+                      </li>
                     ))}
                   </ul>
                 </div>

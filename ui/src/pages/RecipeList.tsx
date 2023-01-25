@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CellProps, Column } from "react-table";
 import Debug from "../components/Debug";
-import { useListRecipes } from "../api/openapi-hooks/api";
+import { RecipeWrapper, useListRecipes } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
@@ -17,6 +17,7 @@ import ProgressiveImage from "../components/ProgressiveImage";
 import { sumIngredients } from "../components/RecipeEditorUtils";
 import dayjs from "dayjs";
 import { RecipeGrid } from "../components/RecipeGrid";
+import { PassThrough } from "stream";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -39,6 +40,21 @@ const RecipeList: React.FC = () => {
   });
 
   const recipes = data?.recipes || [];
+
+  let future = new Set<RecipeWrapper>();
+  let past = new Set<RecipeWrapper>();
+  recipes.forEach((r) => {
+    (r.linked_meals || []).forEach((m) => {
+      const ago = dayjs(m.ate_at);
+      if (ago.isAfter(dayjs())) {
+        future.add(r);
+      }
+      if (ago.isBefore(dayjs())) {
+        past.add(r);
+      }
+    });
+  });
+
   type i = typeof recipes[0];
 
   const columns: Array<Column<i>> = React.useMemo(
@@ -152,7 +168,10 @@ const RecipeList: React.FC = () => {
         />
       </div>
       {grid ? (
-        <RecipeGrid recipes={recipes} />
+        <>
+          <RecipeGrid recipes={Array.from(future)} />
+          <RecipeGrid recipes={Array.from(past)} />
+        </>
       ) : (
         <PaginatedTable
           columns={columns}

@@ -158,8 +158,9 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			gp = append(gp, x.R.Gphoto)
 		}
 		linkedMeals = append(linkedMeals, Meal{
-			Id:   m.R.Meal.ID,
-			Name: m.R.Meal.Name,
+			Id:    m.R.Meal.ID,
+			Name:  m.R.Meal.Name,
+			AteAt: m.R.Meal.AteAt,
 		})
 	}
 	images := a.imagesFromModel(ctx, recipe.R.NotionRecipes, gp)
