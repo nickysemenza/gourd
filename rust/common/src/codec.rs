@@ -182,6 +182,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
             sources: match r.meta.url {
                 Some(u) => Some(vec![RecipeSource {
                     url: Some(u),
+                    image_url: r.meta.image,
                     ..RecipeSource::new()
                 }]),
                 None => None,

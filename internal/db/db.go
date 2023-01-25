@@ -105,6 +105,9 @@ type RecipeDetail struct {
 }
 
 func (rd *RecipeDetail) equals(y *RecipeDetail) bool {
+	if rd.Source.String != y.Source.String || rd.Quantity != y.Quantity {
+		return false
+	}
 	diffCheck := slices.CompareFunc(rd.Sections, y.Sections, func(x, y Section) int {
 		// if x.TimeRange != y.TimeRange {
 		// 	return 1
