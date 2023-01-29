@@ -93,7 +93,13 @@ func makeServer(ctx context.Context) (*server.Server, error) {
 
 	r := rs_client.New(viper.GetString("RS_URI"))
 	n := notion.New(viper.GetString("notion_secret"), viper.GetString("notion_db"))
-	i, err := image.NewLocalImageStore(s.GetBaseURL())
+	//
+	var i image.Store
+	if viper.GetBool("image_s3") {
+		i, err = image.NewS3Store(viper.GetString("s3_endpoint"), viper.GetString("s3_region"), viper.GetString("s3_bucket"), viper.GetString("s3_keyid"), viper.GetString("s3_appkey"))
+	} else {
+		i, err = image.NewLocalImageStore(s.GetBaseURL())
+	}
 	if err != nil {
 		return nil, err
 	}

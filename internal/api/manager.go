@@ -166,10 +166,14 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error 
 	summary := notionSyncResult{}
 
 	for result := range p.Results {
-		res := result.Value
-		summary.nRecipes = append(summary.nRecipes, res.nRecipes...)
-		summary.nImages = append(summary.nImages, res.nImages...)
-		summary.images = append(summary.images, res.images...)
+		if result.Error != nil {
+			log.Error(result.Error)
+		} else {
+			res := result.Value
+			summary.nRecipes = append(summary.nRecipes, res.nRecipes...)
+			summary.nImages = append(summary.nImages, res.nImages...)
+			summary.images = append(summary.images, res.images...)
+		}
 	}
 	err = a.db.SaveImage(ctx, summary.images)
 	if err != nil {

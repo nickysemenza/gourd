@@ -13,7 +13,7 @@ import (
 )
 
 type Store interface {
-	GetImageURL(ctx context.Context, id string) string
+	GetImageURL(ctx context.Context, id string) (string, error)
 	SaveImage(ctx context.Context, id string, data image.Image) error
 	Dir() string
 }
@@ -39,9 +39,9 @@ func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
 	}, nil
 }
 
-func (l *LocalImageStore) GetImageURL(ctx context.Context, id string) string {
+func (l *LocalImageStore) GetImageURL(ctx context.Context, id string) (string, error) {
 	fileName := l.getFileName(id)
-	return l.httpBaseURL + "/images/" + fileName
+	return l.httpBaseURL + "/images/" + fileName, nil
 }
 func (l *LocalImageStore) getFileName(id string) string {
 	return fmt.Sprintf("%s.png", id)

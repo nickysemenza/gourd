@@ -39,7 +39,6 @@ require (
 	github.com/spf13/cobra v1.6.0
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
-	github.com/volatiletech/null/v9 v9.0.0
 	github.com/volatiletech/sqlboiler/v4 v4.14.0
 	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.24.0
@@ -61,6 +60,7 @@ require (
 
 require (
 	github.com/arran4/golang-ical v0.0.0-20220424140932-da9e1dd56623
+	github.com/aws/aws-sdk-go v1.44.189
 	github.com/ericlagergren/decimal v0.0.0-20211103172832-aca2edc11f73
 	github.com/volatiletech/null/v8 v8.1.2
 	go.mitsakis.org/workerpool v0.0.0-20220708032925-ee5b283b69ca
@@ -102,7 +102,6 @@ require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/ashanbrown/forbidigo v1.3.0 // indirect
 	github.com/ashanbrown/makezero v1.1.1 // indirect
-	github.com/aws/aws-sdk-go v1.44.81 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.11 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.4 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.14 // indirect
@@ -310,12 +309,10 @@ require (
 	github.com/stbenjam/no-sprintf-host-port v0.1.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
-	github.com/sylvia7788/contextcheck v1.0.6 // indirect
 	github.com/tdakkota/asciicheck v0.1.1 // indirect
 	github.com/tetafro/godot v1.4.11 // indirect
 	github.com/timakin/bodyclose v0.0.0-20210704033933-f49887972144 // indirect
 	github.com/timonwong/loggercheck v0.9.3 // indirect
-	github.com/timonwong/logrlint v0.1.0 // indirect
 	github.com/tomarrell/wrapcheck/v2 v2.6.2 // indirect
 	github.com/tommy-muehle/go-mnd/v2 v2.5.0 // indirect
 	github.com/ultraware/funlen v0.0.3 // indirect

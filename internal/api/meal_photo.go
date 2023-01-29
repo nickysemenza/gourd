@@ -10,11 +10,14 @@ import (
 	"github.com/nickysemenza/gourd/internal/db"
 )
 
-func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) []Photo {
+func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) ([]Photo, error) {
 	items := []Photo{}
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
-		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		url, err := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		if err != nil {
+			return nil, err
+		}
 		items = append(items, Photo{
 			Id:       aa.BlockID,
 			Created:  aa.LastSeen,
@@ -25,17 +28,20 @@ func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionIma
 			Source:   PhotoSourceNotion,
 		})
 	}
-	return items
+	return items, nil
 }
 
-func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) []Photo {
+func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) ([]Photo, error) {
 	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
 
 	items := []Photo{}
 	for _, aa := range photos {
 		bh := aa.Image.BlurHash
-		url := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		url, err := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		if err != nil {
+			return nil, err
+		}
 		items = append(items, Photo{
 			Id:       aa.PhotoID,
 			Created:  aa.Seen,
@@ -46,7 +52,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) [
 			Source:   PhotoSourceGoogle,
 		})
 	}
-	return items
+	return items, nil
 }
 func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	ctx := c.Request().Context()
@@ -54,7 +60,10 @@ func (a *API) ListPhotos(c echo.Context, params ListPhotosParams) error {
 	if err != nil {
 		return handleErr(c, err)
 	}
-	items := a.googlePhotosFromDBPhoto(ctx, photos)
+	items, err := a.googlePhotosFromDBPhoto(ctx, photos)
+	if err != nil {
+		return handleErr(c, err)
+	}
 
 	resp := PaginatedPhotos{
 		Photos: &items,
@@ -101,13 +110,20 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 			return nil, err
 		}
 
-		googlePhotos := a.googlePhotosFromDBPhoto(ctx, googlePhotosDB)
+		googlePhotos, err := a.googlePhotosFromDBPhoto(ctx, googlePhotosDB)
+		if err != nil {
+			return nil, err
+		}
 
 		notionPhotosDB, err := a.DB().GetNotionPhotosForMeal(ctx, m.ID)
 		if err != nil {
 			return nil, err
 		}
-		notionPhotos := a.notionPhotosFromDBPhoto(ctx, notionPhotosDB)
+		notionPhotos, err := a.notionPhotosFromDBPhoto(ctx, notionPhotosDB)
+		if err != nil {
+			return nil, err
+		}
+
 		googlePhotos = append(googlePhotos, notionPhotos...)
 		meal.Photos = googlePhotos
 		items = append(items, meal)

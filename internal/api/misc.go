@@ -21,11 +21,14 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 	}
 	return &i
 }
-func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, gp models.GphotosPhotoSlice) []Photo {
+func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, gp models.GphotosPhotoSlice) ([]Photo, error) {
 	items := []Photo{}
 	for _, notionRecipe := range nr {
 		for _, notionImage := range notionRecipe.R.PageNotionImages {
-			url := a.ImageStore.GetImageURL(ctx, notionImage.ImageID)
+			url, err := a.ImageStore.GetImageURL(ctx, notionImage.ImageID)
+			if err != nil {
+				return nil, err
+			}
 			items = append(items, Photo{
 				Id:       notionImage.BlockID,
 				Created:  notionImage.LastSeen,
@@ -39,7 +42,10 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, 
 	}
 
 	for _, gPhoto := range gp {
-		url := a.ImageStore.GetImageURL(ctx, gPhoto.R.Image.ID)
+		url, err := a.ImageStore.GetImageURL(ctx, gPhoto.R.Image.ID)
+		if err != nil {
+			return nil, err
+		}
 		items = append(items, Photo{
 			Id:       gPhoto.ImageID,
 			Created:  gPhoto.LastSeen,
@@ -51,7 +57,7 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, 
 		})
 	}
 
-	return items
+	return items, nil
 }
 func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
 	if recipe == nil || len(recipe.R.RecipeDetails) == 0 {
@@ -163,7 +169,10 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			AteAt: m.R.Meal.AteAt,
 		})
 	}
-	images := a.imagesFromModel(ctx, recipe.R.NotionRecipes, gp)
+	images, err := a.imagesFromModel(ctx, recipe.R.NotionRecipes, gp)
+	if err != nil {
+		return nil, err
+	}
 	rw.LinkedPhotos = &images
 
 	rw.LinkedMeals = &linkedMeals
@@ -251,7 +260,7 @@ func (a *API) imagesFromRecipeDetailId(ctx context.Context, id string) ([]Photo,
 
 	}
 
-	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes, gp), nil
+	return a.imagesFromModel(ctx, rd.R.Recipe.R.NotionRecipes, gp)
 
 }
 

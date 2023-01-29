@@ -71,7 +71,9 @@ func (s *Server) Run(_ context.Context) error {
 	jwtMiddleware := middleware.JWTWithConfig(config)
 
 	// r.Add("/images", echo.WrapHandler(s.APIManager.ImageStore.Handler))
-	r.Static("/images", s.APIManager.ImageStore.Dir())
+	if dir := s.APIManager.ImageStore.Dir(); dir != "" {
+		r.Static("/images", dir)
+	}
 	// http routes
 	r.GET("/scrape", echo.WrapHandler(http.HandlerFunc(s.Scrape)))
 
