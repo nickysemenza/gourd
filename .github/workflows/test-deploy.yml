@@ -88,11 +88,11 @@ jobs:
       - name: cargo test
         run: cargo test --verbose
         working-directory: rust
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          args: -t 120 --manifest-path rust/Cargo.toml --output-dir rust/.cov --avoid-cfg-tarpaulin --out Xml -- --test-threads 1
-          version: "latest"
+      # - name: Run cargo-tarpaulin
+      #   uses: actions-rs/tarpaulin@v0.1
+      #   with:
+      #     args: -t 120 --manifest-path rust/Cargo.toml --output-dir rust/.cov --avoid-cfg-tarpaulin --out Xml -- --test-threads 1
+      #     version: "latest"
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v3.1.0

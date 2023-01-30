@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	servertiming "github.com/mitchellh/go-server-timing"
 
+	echojwt "github.com/labstack/echo-jwt/v4"
 	mw2 "github.com/neko-neko/echo-logrus/v2"
 	log2 "github.com/neko-neko/echo-logrus/v2/log"
 	log "github.com/sirupsen/logrus"
@@ -21,7 +22,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/nickysemenza/gourd/internal/api"
-	"github.com/nickysemenza/gourd/internal/auth"
 	"github.com/nickysemenza/gourd/internal/db"
 )
 
@@ -63,12 +63,11 @@ func (s *Server) Run(_ context.Context) error {
 			return false
 		}
 	}
-	config := middleware.JWTConfig{
+	config := echojwt.Config{
 		Skipper:    skipAuth,
-		Claims:     &auth.Claims{},
 		SigningKey: s.APIManager.Auth.Key,
 	}
-	jwtMiddleware := middleware.JWTWithConfig(config)
+	jwtMiddleware := echojwt.WithConfig(config)
 
 	// r.Add("/images", echo.WrapHandler(s.APIManager.ImageStore.Handler))
 	if dir := s.APIManager.ImageStore.Dir(); dir != "" {

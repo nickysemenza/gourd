@@ -55,7 +55,7 @@ func (s *S3Store) SaveImage(ctx context.Context, id string, data image.Image) er
 	}
 
 	// Upload a new object "testfile.txt" with the string "S3 Compatible API"
-	_, err = s.s3Client.PutObject(&s3.PutObjectInput{
+	_, err = s.s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   bytes.NewReader(buf.Bytes()),
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(s.prefix + "/" + id),
@@ -68,7 +68,6 @@ func (s *S3Store) SaveImage(ctx context.Context, id string, data image.Image) er
 
 }
 func (s *S3Store) GetImageURL(ctx context.Context, id string) (string, error) {
-
 	req, _ := s.s3Client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
 		Key:    aws.String(s.prefix + "/" + getFileName(id)),

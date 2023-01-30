@@ -62,6 +62,7 @@ require (
 	github.com/arran4/golang-ical v0.0.0-20221122102835-109346913e54
 	github.com/aws/aws-sdk-go v1.44.189
 	github.com/ericlagergren/decimal v0.0.0-20221120152707-495c53812d05
+	github.com/labstack/echo-jwt/v4 v4.1.0
 	github.com/volatiletech/null/v8 v8.1.2
 	go.mitsakis.org/workerpool v0.0.0-20221016122625-07d45f730b5b
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.12.0
