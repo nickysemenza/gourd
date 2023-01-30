@@ -40,16 +40,16 @@ func NewLocalImageStore(httpBaseURL string) (*LocalImageStore, error) {
 }
 
 func (l *LocalImageStore) GetImageURL(ctx context.Context, id string) (string, error) {
-	fileName := l.getFileName(id)
+	fileName := getFileName(id)
 	return l.httpBaseURL + "/images/" + fileName, nil
 }
-func (l *LocalImageStore) getFileName(id string) string {
+func getFileName(id string) string {
 	return fmt.Sprintf("%s.png", id)
 }
 func (l *LocalImageStore) SaveImage(ctx context.Context, id string, data image.Image) error {
 	_, span := l.tracer.Start(ctx, "SaveImage")
 	defer span.End()
-	fileName := l.getFileName(id)
+	fileName := getFileName(id)
 	fileName = l.dir + "/" + fileName
 	outputFile, err := os.Create(fileName)
 	if err != nil {

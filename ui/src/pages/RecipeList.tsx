@@ -43,16 +43,23 @@ const RecipeList: React.FC = () => {
 
   let future = new Set<RecipeWrapper>();
   let past = new Set<RecipeWrapper>();
+  let other = new Set<RecipeWrapper>();
   recipes.forEach((r) => {
+    let added = false;
     (r.linked_meals || []).forEach((m) => {
       const ago = dayjs(m.ate_at);
       if (ago.isAfter(dayjs())) {
         future.add(r);
+        added = true;
       }
       if (ago.isBefore(dayjs())) {
         past.add(r);
+        added = true;
       }
     });
+    if (!added) {
+      other.add(r);
+    }
   });
 
   type i = typeof recipes[0];
@@ -171,6 +178,7 @@ const RecipeList: React.FC = () => {
         <>
           <RecipeGrid recipes={Array.from(future)} />
           <RecipeGrid recipes={Array.from(past)} />
+          <RecipeGrid recipes={Array.from(other)} />
         </>
       ) : (
         <PaginatedTable

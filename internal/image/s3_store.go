@@ -17,27 +17,31 @@ import (
 )
 
 type S3Store struct {
-	tracer   trace.Tracer
-	s3Client *s3.S3
-	bucket   string
+	tracer         trace.Tracer
+	s3Client       *s3.S3
+	bucket, prefix string
 }
 
 var _ Store = &S3Store{}
 
-func NewS3Store(endpoint, region, bucket, keyID, appKey string) (*S3Store, error) {
+func NewS3Store(endpoint, region, bucket, keyID, appKey, prefix string) (*S3Store, error) {
 	s3Config := &aws.Config{
 		Credentials:      credentials.NewStaticCredentials(keyID, appKey, ""),
 		Endpoint:         aws.String(endpoint),
 		Region:           aws.String(region),
 		S3ForcePathStyle: aws.Bool(true),
 	}
-	newSession := session.New(s3Config)
+	newSession, err := session.NewSession(s3Config)
+	if err != nil {
+		return nil, err
+	}
 	s3Client := s3.New(newSession)
 
 	return &S3Store{
 		otel.Tracer("s3"),
 		s3Client,
 		bucket,
+		prefix,
 	}, nil
 }
 func (s *S3Store) SaveImage(ctx context.Context, id string, data image.Image) error {
@@ -54,7 +58,7 @@ func (s *S3Store) SaveImage(ctx context.Context, id string, data image.Image) er
 	_, err = s.s3Client.PutObject(&s3.PutObjectInput{
 		Body:   bytes.NewReader(buf.Bytes()),
 		Bucket: aws.String(s.bucket),
-		Key:    aws.String(id),
+		Key:    aws.String(s.prefix + "/" + id),
 	})
 	if err != nil {
 		span.RecordError(err)
@@ -67,7 +71,7 @@ func (s *S3Store) GetImageURL(ctx context.Context, id string) (string, error) {
 
 	req, _ := s.s3Client.GetObjectRequest(&s3.GetObjectInput{
 		Bucket: aws.String(s.bucket),
-		Key:    aws.String(id),
+		Key:    aws.String(s.prefix + "/" + getFileName(id)),
 	})
 
 	url, err := req.Presign(15 * time.Minute) // Set link expiration time

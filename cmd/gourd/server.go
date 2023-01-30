@@ -96,7 +96,7 @@ func makeServer(ctx context.Context) (*server.Server, error) {
 	//
 	var i image.Store
 	if viper.GetBool("image_s3") {
-		i, err = image.NewS3Store(viper.GetString("s3_endpoint"), viper.GetString("s3_region"), viper.GetString("s3_bucket"), viper.GetString("s3_keyid"), viper.GetString("s3_appkey"))
+		i, err = image.NewS3Store(viper.GetString("s3_endpoint"), viper.GetString("s3_region"), viper.GetString("s3_bucket"), viper.GetString("s3_keyid"), viper.GetString("s3_appkey"), viper.GetString("s3_prefix"))
 	} else {
 		i, err = image.NewLocalImageStore(s.GetBaseURL())
 	}
