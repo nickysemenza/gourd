@@ -35,5 +35,5 @@ recipe_scraper_fetcher = {git = "https://github.com/nickysemenza/ingredient-pars
 
 
 [dev-dependencies]
-actix-rt = "2.7.0"
+actix-rt = "2.8.0"
 
