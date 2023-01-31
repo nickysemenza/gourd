@@ -51,7 +51,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.12.0
 	golang.org/x/oauth2 v0.4.0
 	golang.org/x/tools v0.5.0
-	google.golang.org/api v0.108.0
+	google.golang.org/api v0.109.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
