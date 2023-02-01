@@ -11,7 +11,7 @@ name = "gourd"
 path = "src/main.rs"
 
 [dependencies]
-actix-http = "3.2"
+actix-http = "3.3"
 actix-router = "0.5.1"
 actix-web = "4.3"
 actix-web-opentelemetry = "0.13.0"
