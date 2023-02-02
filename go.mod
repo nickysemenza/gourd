@@ -17,7 +17,7 @@ require (
 	github.com/getsentry/sentry-go v0.17.0
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.2
-	github.com/golangci/golangci-lint v1.50.1
+	github.com/golangci/golangci-lint v1.51.0
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
 	github.com/gphotosuploader/googlemirror v0.5.0
@@ -72,6 +72,7 @@ require (
 )
 
 require (
+	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect
 	4d63.com/gochecknoglobals v0.2.1 // indirect
 	cloud.google.com/go v0.109.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
@@ -232,6 +233,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/julz/importas v0.1.0 // indirect
+	github.com/junk1tm/musttag v0.4.3 // indirect
 	github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kisielk/errcheck v1.6.3 // indirect
@@ -277,6 +279,7 @@ require (
 	github.com/neo4j/neo4j-go-driver v1.8.3 // indirect
 	github.com/nishanths/exhaustive v0.9.5 // indirect
 	github.com/nishanths/predeclared v0.2.2 // indirect
+	github.com/nunnatsa/ginkgolinter v0.7.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/ory/viper v1.7.5 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect
@@ -364,7 +367,7 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	honnef.co/go/tools v0.3.3 // indirect
+	honnef.co/go/tools v0.4.0-0.dev.0.20221209223220-58c4d7e4b720 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/b v1.0.4 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
