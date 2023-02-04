@@ -134,6 +134,7 @@ func (a *API) processNotionRecipe(ctx context.Context, nRecipe notion.Recipe) (r
 			ID:       id,
 			BlurHash: bh,
 			Source:   "notion",
+			TakenAt:  null.TimeFromPtr(nRecipe.Time),
 		})
 		res.nImages = append(res.nImages, db.NotionImage{
 			PageID:  nRecipe.PageID,
@@ -175,7 +176,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error 
 			summary.images = append(summary.images, res.images...)
 		}
 	}
-	err = a.db.SaveImage(ctx, summary.images)
+	err = a.db.SaveImage(ctx, summary.images...)
 	if err != nil {
 		return err
 	}

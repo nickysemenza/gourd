@@ -17,6 +17,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
+	"github.com/volatiletech/null/v8"
 	"go.mitsakis.org/workerpool"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
@@ -182,6 +183,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 			ID:       id,
 			BlurHash: bh,
 			Source:   "google",
+			TakenAt:  null.TimeFrom(t),
 		}
 		return &PhotoSync{
 			Image: i,
@@ -212,6 +214,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 			return err
 		}
 	}
+	log.Infof("will process %d photos", len(jobs))
 
 	go func() {
 		for _, job := range jobs {
@@ -219,28 +222,22 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		}
 		pool.StopAndWait()
 	}()
-	var photos []db.GPhoto
-	var img []db.Image
 
 	for result := range pool.Results {
 		if result.Error != nil {
 			log.Error(result.Error)
 		} else {
-			photos = append(photos, result.Value.GPhoto)
-			img = append(img, result.Value.Image)
+			err = p.db.SaveImage(ctx, result.Value.Image)
+			if err != nil {
+				return err
+			}
+			err = p.db.UpsertGPhotos(ctx, result.Value.GPhoto)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	err = p.db.SaveImage(ctx, img)
-	if err != nil {
-		return err
-	}
-	err = p.db.UpsertPhotos(ctx, photos)
-	if err != nil {
-		return err
-	}
-	log.Infof(
-		"synced %d photos",
-		len(photos))
+
 	return nil
 }
 

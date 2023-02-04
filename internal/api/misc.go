@@ -31,7 +31,7 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, 
 			}
 			items = append(items, Photo{
 				Id:       notionImage.BlockID,
-				Created:  notionImage.LastSeen,
+				TakenAt:  notionImage.R.Image.TakenAt.Ptr(),
 				BlurHash: &notionImage.R.Image.BlurHash,
 				Width:    300,
 				Height:   400,
@@ -48,7 +48,7 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, 
 		}
 		items = append(items, Photo{
 			Id:       gPhoto.ImageID,
-			Created:  gPhoto.LastSeen,
+			TakenAt:  gPhoto.R.Image.TakenAt.Ptr(),
 			BlurHash: &gPhoto.R.Image.BlurHash,
 			Width:    300,
 			Height:   400,

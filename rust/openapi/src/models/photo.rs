@@ -24,8 +24,8 @@ pub struct Photo {
     #[serde(rename = "blur_hash", skip_serializing_if = "Option::is_none")]
     pub blur_hash: Option<String>,
     /// when it was taken
-    #[serde(rename = "created")]
-    pub created: String,
+    #[serde(rename = "taken_at", skip_serializing_if = "Option::is_none")]
+    pub taken_at: Option<String>,
     /// width px
     #[serde(rename = "width")]
     pub width: i64,
@@ -39,12 +39,12 @@ pub struct Photo {
 
 impl Photo {
     /// A photo
-    pub fn new(id: String, base_url: String, created: String, width: i64, height: i64, source: Source) -> Photo {
+    pub fn new(id: String, base_url: String, width: i64, height: i64, source: Source) -> Photo {
         Photo {
             id,
             base_url,
             blur_hash: None,
-            created,
+            taken_at: None,
             width,
             height,
             source,

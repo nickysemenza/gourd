@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -23,9 +24,10 @@ import (
 
 // Image is an object representing the database table.
 type Image struct {
-	ID       string `boil:"id" json:"id" toml:"id" yaml:"id"`
-	BlurHash string `boil:"blur_hash" json:"blur_hash" toml:"blur_hash" yaml:"blur_hash"`
-	Source   string `boil:"source" json:"source" toml:"source" yaml:"source"`
+	ID       string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	BlurHash string    `boil:"blur_hash" json:"blur_hash" toml:"blur_hash" yaml:"blur_hash"`
+	Source   string    `boil:"source" json:"source" toml:"source" yaml:"source"`
+	TakenAt  null.Time `boil:"taken_at" json:"taken_at,omitempty" toml:"taken_at" yaml:"taken_at,omitempty"`
 
 	R *imageR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L imageL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -35,32 +37,62 @@ var ImageColumns = struct {
 	ID       string
 	BlurHash string
 	Source   string
+	TakenAt  string
 }{
 	ID:       "id",
 	BlurHash: "blur_hash",
 	Source:   "source",
+	TakenAt:  "taken_at",
 }
 
 var ImageTableColumns = struct {
 	ID       string
 	BlurHash string
 	Source   string
+	TakenAt  string
 }{
 	ID:       "images.id",
 	BlurHash: "images.blur_hash",
 	Source:   "images.source",
+	TakenAt:  "images.taken_at",
 }
 
 // Generated where
+
+type whereHelpernull_Time struct{ field string }
+
+func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var ImageWhere = struct {
 	ID       whereHelperstring
 	BlurHash whereHelperstring
 	Source   whereHelperstring
+	TakenAt  whereHelpernull_Time
 }{
 	ID:       whereHelperstring{field: "\"images\".\"id\""},
 	BlurHash: whereHelperstring{field: "\"images\".\"blur_hash\""},
 	Source:   whereHelperstring{field: "\"images\".\"source\""},
+	TakenAt:  whereHelpernull_Time{field: "\"images\".\"taken_at\""},
 }
 
 // ImageRels is where relationship names are stored.
@@ -87,9 +119,9 @@ func (*imageR) NewStruct() *imageR {
 type imageL struct{}
 
 var (
-	imageAllColumns            = []string{"id", "blur_hash", "source"}
+	imageAllColumns            = []string{"id", "blur_hash", "source", "taken_at"}
 	imageColumnsWithoutDefault = []string{"id", "blur_hash", "source"}
-	imageColumnsWithDefault    = []string{}
+	imageColumnsWithDefault    = []string{"taken_at"}
 	imagePrimaryKeyColumns     = []string{"id"}
 	imageGeneratedColumns      = []string{}
 )

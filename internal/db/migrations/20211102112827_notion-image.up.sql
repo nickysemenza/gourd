@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS "images" (
 	"id" text NOT NULL,
 	"blur_hash" text NOT NULL,
 	"source" text NOT NULL,
+	"taken_at" timestamp,
 	PRIMARY KEY ("id")
 );
 ALTER TABLE "gphotos_photos"
@@ -31,4 +32,3 @@ CREATE TABLE IF NOT EXISTS "notion_meal" (
 	"notion_recipe" TEXT references notion_recipe(page_id) NOT NULL,
 	primary key (meal_id, notion_recipe)
 );
---

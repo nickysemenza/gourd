@@ -42,7 +42,7 @@ export interface Photo {
      * @type {Date}
      * @memberof Photo
      */
-    created: Date;
+    taken_at?: Date;
     /**
      * width px
      * @type {number}
@@ -81,7 +81,6 @@ export function instanceOfPhoto(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "base_url" in value;
-    isInstance = isInstance && "created" in value;
     isInstance = isInstance && "width" in value;
     isInstance = isInstance && "height" in value;
     isInstance = isInstance && "source" in value;
@@ -102,7 +101,7 @@ export function PhotoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pho
         'id': json['id'],
         'base_url': json['base_url'],
         'blur_hash': !exists(json, 'blur_hash') ? undefined : json['blur_hash'],
-        'created': (new Date(json['created'])),
+        'taken_at': !exists(json, 'taken_at') ? undefined : (new Date(json['taken_at'])),
         'width': json['width'],
         'height': json['height'],
         'source': json['source'],
@@ -121,7 +120,7 @@ export function PhotoToJSON(value?: Photo | null): any {
         'id': value.id,
         'base_url': value.base_url,
         'blur_hash': value.blur_hash,
-        'created': (value.created.toISOString()),
+        'taken_at': value.taken_at === undefined ? undefined : (value.taken_at.toISOString()),
         'width': value.width,
         'height': value.height,
         'source': value.source,

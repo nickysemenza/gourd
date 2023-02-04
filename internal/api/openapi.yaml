@@ -1235,7 +1235,7 @@ components:
         blur_hash:
           description: blur hash
           type: string
-        created:
+        taken_at:
           description: when it was taken
           type: string
           format: date-time

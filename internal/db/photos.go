@@ -52,9 +52,10 @@ type GPhoto struct {
 }
 
 type Image struct {
-	ID       string `db:"id"`
-	BlurHash string `db:"blur_hash"`
-	Source   string `db:"source"`
+	ID       string    `db:"id"`
+	BlurHash string    `db:"blur_hash"`
+	Source   string    `db:"source"`
+	TakenAt  null.Time `db:"taken_at"`
 }
 
 type NotionRecipe struct {
@@ -67,7 +68,7 @@ type NotionRecipe struct {
 	AteAt     zero.Time   `db:"ate_at"`
 }
 
-func (c *Client) UpsertPhotos(ctx context.Context, photos []GPhoto) error {
+func (c *Client) UpsertGPhotos(ctx context.Context, photos ...GPhoto) error {
 	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "image_id")
 	for _, photo := range photos {
 		q = q.Values(photo.PhotoID, photo.AlbumID, photo.Created, photo.ImageID)
@@ -116,7 +117,7 @@ func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) 
 	}
 
 	images := []Image{}
-	q = c.psql.Select("id", "blur_hash", "source").From("images").Where(sq.Eq{"id": ids})
+	q = c.psql.Select("id", "blur_hash", "source", "taken_at").From("images").Where(sq.Eq{"id": ids})
 	err = c.selectContext(ctx, q, &images)
 	if err != nil {
 		return nil, err
@@ -197,7 +198,7 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, pq.FormatTimestamp(t))
 	return
 }
 
-func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
+func (c *Client) SaveImage(ctx context.Context, items ...Image) (err error) {
 	ctx, span := c.tracer.Start(ctx, "db.SaveImage")
 	defer span.End()
 
@@ -205,9 +206,9 @@ func (c *Client) SaveImage(ctx context.Context, items []Image) (err error) {
 		return nil
 	}
 
-	q := c.psql.Insert("images").Columns("id", "blur_hash", "source")
+	q := c.psql.Insert("images").Columns("id", "blur_hash", "source", "taken_at")
 	for _, r := range items {
-		q = q.Values(r.ID, r.BlurHash, r.Source)
+		q = q.Values(r.ID, r.BlurHash, r.Source, r.TakenAt)
 	}
 	_, err = c.execContext(ctx, q)
 

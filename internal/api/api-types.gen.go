@@ -409,9 +409,6 @@ type Photo struct {
 	// blur hash
 	BlurHash *string `json:"blur_hash,omitempty"`
 
-	// when it was taken
-	Created time.Time `json:"created"`
-
 	// height px
 	Height int64 `json:"height"`
 
@@ -420,6 +417,9 @@ type Photo struct {
 
 	// where the photo came from
 	Source PhotoSource `json:"source"`
+
+	// when it was taken
+	TakenAt *time.Time `json:"taken_at,omitempty"`
 
 	// width px
 	Width int64 `json:"width"`

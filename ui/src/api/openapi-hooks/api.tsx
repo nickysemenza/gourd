@@ -416,7 +416,7 @@ export interface Photo {
   /**
    * when it was taken
    */
-  created: string;
+  taken_at?: string;
   /**
    * width px
    */

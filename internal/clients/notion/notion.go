@@ -220,7 +220,6 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 		}
 
 		for _, block := range children.Results {
-			spew.Dump(block)
 			blockID := block.GetID().String()
 			span.AddEvent("block", trace.WithAttributes(attribute.String("block", spew.Sdump(block))))
 			l := log.WithField("page_id", pageID).
@@ -247,7 +246,6 @@ func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID,
 					}
 				} else {
 					r.addDebug(l, "found code block with no text")
-					spew.Dump(i)
 				}
 			case notionapi.BlockTypeChildPage:
 				// treat as top level page?

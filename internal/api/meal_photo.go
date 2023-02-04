@@ -20,7 +20,7 @@ func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionIma
 		}
 		items = append(items, Photo{
 			Id:       aa.BlockID,
-			Created:  aa.LastSeen,
+			TakenAt:  aa.Image.TakenAt.Ptr(),
 			BlurHash: &bh,
 			Width:    300,
 			Height:   400,
@@ -44,7 +44,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) (
 		}
 		items = append(items, Photo{
 			Id:       aa.PhotoID,
-			Created:  aa.Seen,
+			TakenAt:  aa.Image.TakenAt.Ptr(),
 			BlurHash: &bh,
 			Width:    300,
 			Height:   400,

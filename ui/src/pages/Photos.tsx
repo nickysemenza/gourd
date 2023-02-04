@@ -27,13 +27,19 @@ const Photos: React.FC = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: "Created",
-        accessor: "created",
+        Header: "Taken",
+        accessor: "Taken",
         Cell: (cell: CellProps<any>) => {
-          const { created } = cell.row.original;
-          const ago = dayjs(created);
+          const { taken_at } = cell.row.original;
+          const ago = dayjs(taken_at);
 
-          return <div>{ago.format("dddd, MMMM D, YYYY h:mm A")}</div>;
+          return (
+            <div>
+              {ago.format("dddd, MMMM D, YYYY h:mm A")}
+              <br />
+              {ago.fromNow()}
+            </div>
+          );
         },
       },
       {
