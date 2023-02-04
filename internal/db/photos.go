@@ -242,8 +242,10 @@ func (c *Client) SaveNotionRecipes(ctx context.Context, items []models.NotionRec
 }
 
 func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
-	q := c.psql.Select("id", "album_id", "creation_time").From("gphotos_photos").
-		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").Where(sq.Eq{"meal_id": nil})
+	q := c.psql.Select("gphotos_photos.id as id", "album_id", "creation_time").From("gphotos_photos").
+		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").
+		LeftJoin("gphotos_albums on gphotos_photos.album_id = gphotos_albums.id").
+		Where(sq.Eq{"meal_id": nil}).Where(sq.Eq{"usecase": "food"})
 	var missingMeals []GPhoto
 	err := c.selectContext(ctx, q, &missingMeals)
 	if err != nil {

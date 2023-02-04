@@ -58,7 +58,7 @@ func (s *S3Store) SaveImage(ctx context.Context, id string, data image.Image) er
 	_, err = s.s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   bytes.NewReader(buf.Bytes()),
 		Bucket: aws.String(s.bucket),
-		Key:    aws.String(s.prefix + "/" + id),
+		Key:    aws.String(s.prefix + "/" + getFileName(id)),
 	})
 	if err != nil {
 		span.RecordError(err)
@@ -73,7 +73,7 @@ func (s *S3Store) GetImageURL(ctx context.Context, id string) (string, error) {
 		Key:    aws.String(s.prefix + "/" + getFileName(id)),
 	})
 
-	url, err := req.Presign(15 * time.Minute) // Set link expiration time
+	url, err := req.Presign(90 * time.Minute) // Set link expiration time
 	if err != nil {
 		return "", err
 	}

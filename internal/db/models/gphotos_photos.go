@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -24,12 +23,11 @@ import (
 
 // GphotosPhoto is an object representing the database table.
 type GphotosPhoto struct {
-	ID           string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	AlbumID      string      `boil:"album_id" json:"album_id" toml:"album_id" yaml:"album_id"`
-	CreationTime time.Time   `boil:"creation_time" json:"creation_time" toml:"creation_time" yaml:"creation_time"`
-	LastSeen     time.Time   `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
-	BlurHash     null.String `boil:"blur_hash" json:"blur_hash,omitempty" toml:"blur_hash" yaml:"blur_hash,omitempty"`
-	ImageID      string      `boil:"image_id" json:"image_id" toml:"image_id" yaml:"image_id"`
+	ID           string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	AlbumID      string    `boil:"album_id" json:"album_id" toml:"album_id" yaml:"album_id"`
+	CreationTime time.Time `boil:"creation_time" json:"creation_time" toml:"creation_time" yaml:"creation_time"`
+	LastSeen     time.Time `boil:"last_seen" json:"last_seen" toml:"last_seen" yaml:"last_seen"`
+	ImageID      string    `boil:"image_id" json:"image_id" toml:"image_id" yaml:"image_id"`
 
 	R *gphotosPhotoR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L gphotosPhotoL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -40,14 +38,12 @@ var GphotosPhotoColumns = struct {
 	AlbumID      string
 	CreationTime string
 	LastSeen     string
-	BlurHash     string
 	ImageID      string
 }{
 	ID:           "id",
 	AlbumID:      "album_id",
 	CreationTime: "creation_time",
 	LastSeen:     "last_seen",
-	BlurHash:     "blur_hash",
 	ImageID:      "image_id",
 }
 
@@ -56,14 +52,12 @@ var GphotosPhotoTableColumns = struct {
 	AlbumID      string
 	CreationTime string
 	LastSeen     string
-	BlurHash     string
 	ImageID      string
 }{
 	ID:           "gphotos_photos.id",
 	AlbumID:      "gphotos_photos.album_id",
 	CreationTime: "gphotos_photos.creation_time",
 	LastSeen:     "gphotos_photos.last_seen",
-	BlurHash:     "gphotos_photos.blur_hash",
 	ImageID:      "gphotos_photos.image_id",
 }
 
@@ -90,43 +84,17 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var GphotosPhotoWhere = struct {
 	ID           whereHelperstring
 	AlbumID      whereHelperstring
 	CreationTime whereHelpertime_Time
 	LastSeen     whereHelpertime_Time
-	BlurHash     whereHelpernull_String
 	ImageID      whereHelperstring
 }{
 	ID:           whereHelperstring{field: "\"gphotos_photos\".\"id\""},
 	AlbumID:      whereHelperstring{field: "\"gphotos_photos\".\"album_id\""},
 	CreationTime: whereHelpertime_Time{field: "\"gphotos_photos\".\"creation_time\""},
 	LastSeen:     whereHelpertime_Time{field: "\"gphotos_photos\".\"last_seen\""},
-	BlurHash:     whereHelpernull_String{field: "\"gphotos_photos\".\"blur_hash\""},
 	ImageID:      whereHelperstring{field: "\"gphotos_photos\".\"image_id\""},
 }
 
@@ -157,9 +125,9 @@ func (*gphotosPhotoR) NewStruct() *gphotosPhotoR {
 type gphotosPhotoL struct{}
 
 var (
-	gphotosPhotoAllColumns            = []string{"id", "album_id", "creation_time", "last_seen", "blur_hash", "image_id"}
+	gphotosPhotoAllColumns            = []string{"id", "album_id", "creation_time", "last_seen", "image_id"}
 	gphotosPhotoColumnsWithoutDefault = []string{"id", "album_id", "creation_time", "image_id"}
-	gphotosPhotoColumnsWithDefault    = []string{"last_seen", "blur_hash"}
+	gphotosPhotoColumnsWithDefault    = []string{"last_seen"}
 	gphotosPhotoPrimaryKeyColumns     = []string{"id"}
 	gphotosPhotoGeneratedColumns      = []string{}
 )

@@ -148,4 +148,4 @@ devdata: seed-testdata sync
 sync:
 	./bin/gourd sync
 insert-album: 	
-	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food');"
+	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food'), ('AIbigFobaVQFOEyoZk2TKEkCNS-ffzesGu7n-OZy6-YXnKLgrYE4ALSW-LknhcbttNNifPPCm7sY','plants');"

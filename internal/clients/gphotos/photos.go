@@ -17,6 +17,8 @@ import (
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
+	"go.mitsakis.org/workerpool"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -41,6 +43,7 @@ func (p *Photos) getPhotosClient(ctx context.Context) (*gphotos.Client, error) {
 	}
 	tc := p.g.GetOauth().Client(ctx, token)
 
+	tc = &http.Client{Transport: otelhttp.NewTransport(tc.Transport)}
 	return gphotos.NewClient(tc)
 }
 func (p *Photos) batchGet(ctx context.Context, ids []string) ([]photoslibrary.MediaItem, error) {
@@ -134,6 +137,15 @@ func (p *Photos) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album,
 	return albums, err
 }
 
+type PhotoSync struct {
+	db.Image
+	db.GPhoto
+}
+type PhotoSyncJob struct {
+	album db.GAlbum
+	*photoslibrary.MediaItem
+}
+
 func (p *Photos) SyncAlbums(ctx context.Context) error {
 	ctx, span := otel.Tracer("google").Start(ctx, "google.SyncAlbums")
 	defer span.End()
@@ -148,64 +160,87 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		return err
 	}
 	log.Infof("syncing %d album(s)", len(albums))
-	numBlurHashCalculated := 0
+
+	pool, _ := workerpool.NewPoolWithResults(20, func(job workerpool.Job[PhotoSyncJob], workerID int) (*PhotoSync, error) {
+		m := job.Payload
+		log.Infof("processing photo %s", m.MediaItem.Id)
+		t, err := time.Parse(time.RFC3339, m.MediaMetadata.CreationTime)
+		if err != nil {
+			return nil, err
+		}
+
+		bh, rimage, err := image.GetBlurHash(ctx, m.BaseUrl)
+		if err != nil {
+			return nil, err
+		}
+		id := common.ID("google_image")
+		err = p.ImageStore.SaveImage(ctx, id, rimage)
+		if err != nil {
+			return nil, err
+		}
+		i := db.Image{
+			ID:       id,
+			BlurHash: bh,
+			Source:   "google",
+		}
+		return &PhotoSync{
+			Image: i,
+			GPhoto: db.GPhoto{
+				AlbumID: m.album.ID,
+				PhotoID: m.Id,
+				Created: t,
+				ImageID: id,
+				// BlurHash: zero.StringFrom(bh),
+			},
+		}, nil
+
+	})
+
+	jobs := []PhotoSyncJob{}
+
 	for _, album := range albums {
-		var photos []db.GPhoto
-		var img []db.Image
 		err = client.MediaItems.Search(&photoslibrary.SearchMediaItemsRequest{
 			AlbumId:  album.ID,
 			PageSize: maxPhotoBatchGet,
 		}).Pages(ctx, func(r *photoslibrary.SearchMediaItemsResponse) error {
 			for _, m := range r.MediaItems {
-				t, err := time.Parse(time.RFC3339, m.MediaMetadata.CreationTime)
-				if err != nil {
-					return err
-				}
-
-				bh, rimage, err := image.GetBlurHash(ctx, m.BaseUrl)
-				if err != nil {
-					return err
-				}
-				numBlurHashCalculated++
-				// }
-				id := common.ID("google_image")
-				err = p.ImageStore.SaveImage(ctx, id, rimage)
-				if err != nil {
-					return err
-				}
-				i := db.Image{
-					ID:       id,
-					BlurHash: bh,
-					Source:   "google",
-				}
-				img = append(img, i)
-
-				//nolint:scopelint
-				photos = append(photos, db.GPhoto{
-					AlbumID: album.ID,
-					PhotoID: m.Id,
-					Created: t,
-					ImageID: id,
-					// BlurHash: zero.StringFrom(bh),
-				})
+				jobs = append(jobs, PhotoSyncJob{album: album, MediaItem: m})
 			}
 			return nil
 		})
 		if err != nil {
 			return err
 		}
-		err = p.db.SaveImage(ctx, img)
-		if err != nil {
-			return err
-		}
-		err = p.db.UpsertPhotos(ctx, photos)
-		if err != nil {
-			return err
-		}
-		log.Infof(
-			"synced %d photos from album %s. Calculated %d blur hashes",
-			len(photos), album, numBlurHashCalculated)
 	}
+
+	go func() {
+		for _, job := range jobs {
+			pool.Submit(job)
+		}
+		pool.StopAndWait()
+	}()
+	var photos []db.GPhoto
+	var img []db.Image
+
+	for result := range pool.Results {
+		if result.Error != nil {
+			log.Error(result.Error)
+		} else {
+			photos = append(photos, result.Value.GPhoto)
+			img = append(img, result.Value.Image)
+		}
+	}
+	err = p.db.SaveImage(ctx, img)
+	if err != nil {
+		return err
+	}
+	err = p.db.UpsertPhotos(ctx, photos)
+	if err != nil {
+		return err
+	}
+	log.Infof(
+		"synced %d photos",
+		len(photos))
 	return nil
 }
 
