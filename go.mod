@@ -14,7 +14,7 @@ require (
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
 	github.com/getkin/kin-openapi v0.114.0
-	github.com/getsentry/sentry-go v0.17.0
+	github.com/getsentry/sentry-go v0.18.0
 	github.com/go-openapi/swag v0.22.3 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/golangci/golangci-lint v1.51.0
