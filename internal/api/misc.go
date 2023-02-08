@@ -21,40 +21,46 @@ func (a *API) ingredientFromModel(_ context.Context, ingredient *models.Ingredie
 	}
 	return &i
 }
+
+func (a *API) imageFromModel(ctx context.Context, p *models.Image) (*Photo, error) {
+	if p == nil {
+		return nil, nil
+	}
+	url, err := a.ImageStore.GetImageURL(ctx, p.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &Photo{
+		Id:       p.ID,
+		TakenAt:  p.TakenAt.Ptr(),
+		BlurHash: &p.BlurHash,
+		Width:    300,
+		Height:   400,
+		BaseUrl:  url,
+		Source:   PhotoSource(p.Source),
+	}, nil
+
+}
+
 func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, gp models.GphotosPhotoSlice) ([]Photo, error) {
 	items := []Photo{}
 	for _, notionRecipe := range nr {
 		for _, notionImage := range notionRecipe.R.PageNotionImages {
-			url, err := a.ImageStore.GetImageURL(ctx, notionImage.ImageID)
+			photo, err := a.imageFromModel(ctx, notionImage.R.Image)
 			if err != nil {
 				return nil, err
 			}
-			items = append(items, Photo{
-				Id:       notionImage.BlockID,
-				TakenAt:  notionImage.R.Image.TakenAt.Ptr(),
-				BlurHash: &notionImage.R.Image.BlurHash,
-				Width:    300,
-				Height:   400,
-				BaseUrl:  url,
-				Source:   PhotoSourceNotion,
-			})
+			items = append(items, *photo)
 		}
 	}
 
 	for _, gPhoto := range gp {
-		url, err := a.ImageStore.GetImageURL(ctx, gPhoto.R.Image.ID)
+
+		image, err := a.imageFromModel(ctx, gPhoto.R.Image)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, Photo{
-			Id:       gPhoto.ImageID,
-			TakenAt:  gPhoto.R.Image.TakenAt.Ptr(),
-			BlurHash: &gPhoto.R.Image.BlurHash,
-			Width:    300,
-			Height:   400,
-			BaseUrl:  url,
-			Source:   PhotoSourceGoogle,
-		})
+		items = append(items, *image)
 	}
 
 	return items, nil

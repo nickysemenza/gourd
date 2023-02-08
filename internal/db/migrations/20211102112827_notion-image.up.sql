@@ -13,10 +13,9 @@ CREATE TABLE IF NOT EXISTS "notion_recipe" (
 	"meta" json,
 	"last_seen" timestamp NOT NULL DEFAULT now(),
 	"recipe_id" TEXT references recipes(id),
-	-- NOT NULL,
 	"ate_at" timestamp,
 	"scale" numeric(10, 2),
-	-- NOT NULL,
+	"deleted_at" timestamp,
 	PRIMARY KEY ("page_id")
 );
 CREATE TABLE IF NOT EXISTS "notion_image" (

@@ -18,6 +18,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/types"
 )
 
@@ -145,10 +146,10 @@ func (a *API) processNotionRecipe(ctx context.Context, nRecipe notion.Recipe) (r
 	return
 }
 
-func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error {
+func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) error {
 	ctx, span := a.tracer.Start(ctx, "syncRecipeFromNotion")
 	defer span.End()
-	nRecipes, err := a.Notion.GetAll(ctx, lookbackDays, "")
+	nRecipes, err := a.Notion.GetAll(ctx, lookback, "")
 	if err != nil {
 		return err
 	}
@@ -188,6 +189,16 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookbackDays int) error 
 	if err != nil {
 		return err
 	}
+
+	res, err := models.NotionRecipes(
+		qm.Where("ate_at > ?", time.Now().Add(-lookback)),
+		qm.Where("last_seen < ?", time.Now().Add(-time.Hour*12)),
+	).DeleteAll(ctx, a.db.DB(), false)
+	if err != nil {
+		return err
+	}
+	log.Warnf("deleted %d stale recipes", res)
+
 	return nil
 }
 
@@ -204,7 +215,7 @@ func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	ctx, span := a.tracer.Start(ctx, "DoSync")
 	defer span.End()
 
-	if err := a.syncRecipeFromNotion(ctx, lookbackDays); err != nil {
+	if err := a.syncRecipeFromNotion(ctx, time.Hour*24*time.Duration(lookbackDays)); err != nil {
 		return fmt.Errorf("notion: %w", err)
 	}
 	log.Infof("synced recipes from notion")

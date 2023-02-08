@@ -8,6 +8,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/uptrace/opentelemetry-go-extra/otellogrus"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc/credentials"
 
@@ -104,6 +105,14 @@ func setupMisc() error {
 	}
 	log.SetLevel(level)
 	log.SetReportCaller(true)
+
+	// Instrument log.
+	log.AddHook(otellogrus.NewHook(otellogrus.WithLevels(
+		log.PanicLevel,
+		log.FatalLevel,
+		log.ErrorLevel,
+		log.WarnLevel,
+	)))
 
 	// tracing
 	if err := initTracer(viper.GetString("JAEGER_ENDPOINT"), viper.GetString("HONEYCOMB_KEY"), "gourd", "dev"); err != nil {

@@ -466,6 +466,7 @@ func (recipeSectionL) LoadRecipeDetail(ctx context.Context, e boil.ContextExecut
 	query := NewQuery(
 		qm.From(`recipe_details`),
 		qm.WhereIn(`recipe_details.id in ?`, args...),
+		qmhelper.WhereIsNull(`recipe_details.deleted_at`),
 	)
 	if mods != nil {
 		mods.Apply(query)

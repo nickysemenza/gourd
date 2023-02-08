@@ -157,14 +157,14 @@ func (c *Client) PageByID(ctx context.Context, id notionapi.PageID) (*Recipe, er
 }
 
 // GetAll looks back the specified number of days. shortcut to filter by a single page id
-func (c *Client) GetAll(ctx context.Context, lookbackDays int, pageID string) ([]Recipe, error) {
+func (c *Client) GetAll(ctx context.Context, lookback time.Duration, pageID string) ([]Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "GetAll")
 	defer span.End()
 
 	var cursor notionapi.Cursor
 	recipes := []Recipe{}
 
-	daysAgo := notionapi.Date(time.Now().AddDate(0, 0, -lookbackDays))
+	daysAgo := notionapi.Date(time.Now().Add(lookback))
 
 	filter := notionapi.AndCompoundFilter{
 		notionapi.PropertyFilter{

@@ -549,6 +549,7 @@ func (notionImageL) LoadPage(ctx context.Context, e boil.ContextExecutor, singul
 	query := NewQuery(
 		qm.From(`notion_recipe`),
 		qm.WhereIn(`notion_recipe.page_id in ?`, args...),
+		qmhelper.WhereIsNull(`notion_recipe.deleted_at`),
 	)
 	if mods != nil {
 		mods.Apply(query)

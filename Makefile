@@ -106,7 +106,7 @@ openapi-docs:
 
 gen-db:
 	rm -rf db/models/
-	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models
+	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models --add-soft-deletes
 	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../internal/db/models/usdamodels 
 
 

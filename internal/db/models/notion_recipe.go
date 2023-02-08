@@ -32,6 +32,7 @@ type NotionRecipe struct {
 	RecipeID  null.String       `boil:"recipe_id" json:"recipe_id,omitempty" toml:"recipe_id" yaml:"recipe_id,omitempty"`
 	AteAt     null.Time         `boil:"ate_at" json:"ate_at,omitempty" toml:"ate_at" yaml:"ate_at,omitempty"`
 	Scale     types.NullDecimal `boil:"scale" json:"scale,omitempty" toml:"scale" yaml:"scale,omitempty"`
+	DeletedAt null.Time         `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *notionRecipeR `boil:"rel" json:"rel" toml:"rel" yaml:"rel"`
 	L notionRecipeL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -45,6 +46,7 @@ var NotionRecipeColumns = struct {
 	RecipeID  string
 	AteAt     string
 	Scale     string
+	DeletedAt string
 }{
 	PageID:    "page_id",
 	PageTitle: "page_title",
@@ -53,6 +55,7 @@ var NotionRecipeColumns = struct {
 	RecipeID:  "recipe_id",
 	AteAt:     "ate_at",
 	Scale:     "scale",
+	DeletedAt: "deleted_at",
 }
 
 var NotionRecipeTableColumns = struct {
@@ -63,6 +66,7 @@ var NotionRecipeTableColumns = struct {
 	RecipeID  string
 	AteAt     string
 	Scale     string
+	DeletedAt string
 }{
 	PageID:    "notion_recipe.page_id",
 	PageTitle: "notion_recipe.page_title",
@@ -71,6 +75,7 @@ var NotionRecipeTableColumns = struct {
 	RecipeID:  "notion_recipe.recipe_id",
 	AteAt:     "notion_recipe.ate_at",
 	Scale:     "notion_recipe.scale",
+	DeletedAt: "notion_recipe.deleted_at",
 }
 
 // Generated where
@@ -107,6 +112,7 @@ var NotionRecipeWhere = struct {
 	RecipeID  whereHelpernull_String
 	AteAt     whereHelpernull_Time
 	Scale     whereHelpertypes_NullDecimal
+	DeletedAt whereHelpernull_Time
 }{
 	PageID:    whereHelperstring{field: "\"notion_recipe\".\"page_id\""},
 	PageTitle: whereHelperstring{field: "\"notion_recipe\".\"page_title\""},
@@ -115,6 +121,7 @@ var NotionRecipeWhere = struct {
 	RecipeID:  whereHelpernull_String{field: "\"notion_recipe\".\"recipe_id\""},
 	AteAt:     whereHelpernull_Time{field: "\"notion_recipe\".\"ate_at\""},
 	Scale:     whereHelpertypes_NullDecimal{field: "\"notion_recipe\".\"scale\""},
+	DeletedAt: whereHelpernull_Time{field: "\"notion_recipe\".\"deleted_at\""},
 }
 
 // NotionRecipeRels is where relationship names are stored.
@@ -144,9 +151,9 @@ func (*notionRecipeR) NewStruct() *notionRecipeR {
 type notionRecipeL struct{}
 
 var (
-	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at", "scale"}
+	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at", "scale", "deleted_at"}
 	notionRecipeColumnsWithoutDefault = []string{"page_id", "page_title"}
-	notionRecipeColumnsWithDefault    = []string{"meta", "last_seen", "recipe_id", "ate_at", "scale"}
+	notionRecipeColumnsWithDefault    = []string{"meta", "last_seen", "recipe_id", "ate_at", "scale", "deleted_at"}
 	notionRecipePrimaryKeyColumns     = []string{"page_id"}
 	notionRecipeGeneratedColumns      = []string{}
 )
@@ -1070,7 +1077,7 @@ func removeMealsFromNotionRecipesSlice(o *NotionRecipe, related []*Meal) {
 
 // NotionRecipes retrieves all the records using an executor.
 func NotionRecipes(mods ...qm.QueryMod) notionRecipeQuery {
-	mods = append(mods, qm.From("\"notion_recipe\""))
+	mods = append(mods, qm.From("\"notion_recipe\""), qmhelper.WhereIsNull("\"notion_recipe\".\"deleted_at\""))
 	q := NewQuery(mods...)
 	if len(queries.GetSelect(q)) == 0 {
 		queries.SetSelect(q, []string{"\"notion_recipe\".*"})
@@ -1089,7 +1096,7 @@ func FindNotionRecipe(ctx context.Context, exec boil.ContextExecutor, pageID str
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"notion_recipe\" where \"page_id\"=$1", sel,
+		"select %s from \"notion_recipe\" where \"page_id\"=$1 and \"deleted_at\" is null", sel,
 	)
 
 	q := queries.Raw(query, pageID)
@@ -1434,7 +1441,7 @@ func (o *NotionRecipe) Upsert(ctx context.Context, exec boil.ContextExecutor, up
 
 // Delete deletes a single NotionRecipe record with an executor.
 // Delete will match against the primary key column to find the record to delete.
-func (o *NotionRecipe) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o *NotionRecipe) Delete(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no NotionRecipe provided for delete")
 	}
@@ -1443,8 +1450,26 @@ func (o *NotionRecipe) Delete(ctx context.Context, exec boil.ContextExecutor) (i
 		return 0, err
 	}
 
-	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), notionRecipePrimaryKeyMapping)
-	sql := "DELETE FROM \"notion_recipe\" WHERE \"page_id\"=$1"
+	var (
+		sql  string
+		args []interface{}
+	)
+	if hardDelete {
+		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), notionRecipePrimaryKeyMapping)
+		sql = "DELETE FROM \"notion_recipe\" WHERE \"page_id\"=$1"
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		o.DeletedAt = null.TimeFrom(currTime)
+		wl := []string{"deleted_at"}
+		sql = fmt.Sprintf("UPDATE \"notion_recipe\" SET %s WHERE \"page_id\"=$2",
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+		)
+		valueMapping, err := queries.BindMapping(notionRecipeType, notionRecipeMapping, append(wl, notionRecipePrimaryKeyColumns...))
+		if err != nil {
+			return 0, err
+		}
+		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), valueMapping)
+	}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1469,12 +1494,17 @@ func (o *NotionRecipe) Delete(ctx context.Context, exec boil.ContextExecutor) (i
 }
 
 // DeleteAll deletes all matching rows.
-func (q notionRecipeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (q notionRecipeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if q.Query == nil {
 		return 0, errors.New("models: no notionRecipeQuery provided for delete all")
 	}
 
-	queries.SetDelete(q.Query)
+	if hardDelete {
+		queries.SetDelete(q.Query)
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		queries.SetUpdate(q.Query, M{"deleted_at": currTime})
+	}
 
 	result, err := q.Query.ExecContext(ctx, exec)
 	if err != nil {
@@ -1490,7 +1520,7 @@ func (q notionRecipeQuery) DeleteAll(ctx context.Context, exec boil.ContextExecu
 }
 
 // DeleteAll deletes all rows in the slice, using an executor.
-func (o NotionRecipeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
+func (o NotionRecipeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor, hardDelete bool) (int64, error) {
 	if len(o) == 0 {
 		return 0, nil
 	}
@@ -1503,14 +1533,31 @@ func (o NotionRecipeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecu
 		}
 	}
 
-	var args []interface{}
-	for _, obj := range o {
-		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), notionRecipePrimaryKeyMapping)
-		args = append(args, pkeyArgs...)
+	var (
+		sql  string
+		args []interface{}
+	)
+	if hardDelete {
+		for _, obj := range o {
+			pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), notionRecipePrimaryKeyMapping)
+			args = append(args, pkeyArgs...)
+		}
+		sql = "DELETE FROM \"notion_recipe\" WHERE " +
+			strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, notionRecipePrimaryKeyColumns, len(o))
+	} else {
+		currTime := time.Now().In(boil.GetLocation())
+		for _, obj := range o {
+			pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), notionRecipePrimaryKeyMapping)
+			args = append(args, pkeyArgs...)
+			obj.DeletedAt = null.TimeFrom(currTime)
+		}
+		wl := []string{"deleted_at"}
+		sql = fmt.Sprintf("UPDATE \"notion_recipe\" SET %s WHERE "+
+			strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 2, notionRecipePrimaryKeyColumns, len(o)),
+			strmangle.SetParamNames("\"", "\"", 1, wl),
+		)
+		args = append([]interface{}{currTime}, args...)
 	}
-
-	sql := "DELETE FROM \"notion_recipe\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, notionRecipePrimaryKeyColumns, len(o))
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -1565,7 +1612,8 @@ func (o *NotionRecipeSlice) ReloadAll(ctx context.Context, exec boil.ContextExec
 	}
 
 	sql := "SELECT \"notion_recipe\".* FROM \"notion_recipe\" WHERE " +
-		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, notionRecipePrimaryKeyColumns, len(*o))
+		strmangle.WhereClauseRepeated(string(dialect.LQ), string(dialect.RQ), 1, notionRecipePrimaryKeyColumns, len(*o)) +
+		"and \"deleted_at\" is null"
 
 	q := queries.Raw(sql, args...)
 
@@ -1582,7 +1630,7 @@ func (o *NotionRecipeSlice) ReloadAll(ctx context.Context, exec boil.ContextExec
 // NotionRecipeExists checks if the NotionRecipe row exists.
 func NotionRecipeExists(ctx context.Context, exec boil.ContextExecutor, pageID string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"notion_recipe\" where \"page_id\"=$1 limit 1)"
+	sql := "select exists(select 1 from \"notion_recipe\" where \"page_id\"=$1 and \"deleted_at\" is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)

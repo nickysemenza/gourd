@@ -7,6 +7,7 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/auth"
@@ -145,7 +146,7 @@ func (a *API) NotionTest(c echo.Context) error {
 		}
 	}
 
-	res, err := a.Notion.GetAll(ctx, daysSince, c.QueryParam("page_id"))
+	res, err := a.Notion.GetAll(ctx, time.Hour*24*time.Duration(daysSince), c.QueryParam("page_id"))
 	if err != nil {
 		return handleErr(c, err)
 	}

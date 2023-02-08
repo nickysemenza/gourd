@@ -682,6 +682,7 @@ func (recipeL) LoadNotionRecipes(ctx context.Context, e boil.ContextExecutor, si
 	query := NewQuery(
 		qm.From(`notion_recipe`),
 		qm.WhereIn(`notion_recipe.recipe_id in ?`, args...),
+		qmhelper.WhereIsNull(`notion_recipe.deleted_at`),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -780,6 +781,7 @@ func (recipeL) LoadRecipeDetails(ctx context.Context, e boil.ContextExecutor, si
 	query := NewQuery(
 		qm.From(`recipe_details`),
 		qm.WhereIn(`recipe_details.recipe_id in ?`, args...),
+		qmhelper.WhereIsNull(`recipe_details.deleted_at`),
 	)
 	if mods != nil {
 		mods.Apply(query)
