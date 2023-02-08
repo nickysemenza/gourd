@@ -1982,6 +1982,8 @@ go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.39.0/go.mod h1:
 go.opentelemetry.io/contrib/propagators/b3 v1.13.0 h1:f17PBmZK60RoHvOpJVqEka8oS2EXjpjHquESD/8zZ50=
 go.opentelemetry.io/contrib/propagators/jaeger v1.13.0 h1:+tVlvpiQMOCzi4EYCaBjblibpyKfqoph0fcITmtXMws=
 go.opentelemetry.io/contrib/propagators/jaeger v1.13.0/go.mod h1:Qf7eVCLYawiNIB+A81kk8aFDFwYqXSqmt0N2RcvkLLI=
+go.opentelemetry.io/contrib/propagators/jaeger v1.14.0 h1:j6Xah53xRDrR+K1c4Y1uVHA0ESo69xDOblw+3OrVoF4=
+go.opentelemetry.io/contrib/propagators/jaeger v1.14.0/go.mod h1:viOfwr1OqHmCF6G3KvKnnmpSJUX/rLzXztU18FC9ymU=
 go.opentelemetry.io/otel v0.20.0/go.mod h1:Y3ugLH2oa81t5QO+Lty+zXf8zC9L26ax4Nzoxm/dooo=
 go.opentelemetry.io/otel v1.3.0/go.mod h1:PWIKzi6JCp7sM0k9yZ43VX+T345uNbAkDKwHVjb2PTs=
 go.opentelemetry.io/otel v1.12.0 h1:IgfC7kqQrRccIKuB7Cl+SRUmsKbEwSGPr0Eu+/ht1SQ=
