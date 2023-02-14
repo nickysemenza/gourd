@@ -3,7 +3,7 @@ version: "3.1"
 
 services:
   db:
-    image: postgres:15.1
+    image: postgres:15.2
     restart: always
     ports:
       - "5555:5432"
@@ -22,7 +22,7 @@ services:
         "log_line_prefix=%t [%p]:[%l] user=%u, db=%d "
       ]
   usda_db:
-    image: postgres:15.1
+    image: postgres:15.2
     volumes:
       - ./usda/migrate-up.sql:/docker-entrypoint-initdb.d/migrate.sql
     restart: always
