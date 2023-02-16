@@ -26,7 +26,6 @@ require (
 	github.com/jomei/notionapi v1.11.0
 	github.com/labstack/echo/v4 v4.10.0
 	github.com/lib/pq v1.10.7
-	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -66,7 +65,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.1
 	github.com/ericlagergren/decimal v0.0.0-20221120152707-495c53812d05
 	github.com/labstack/echo-jwt/v4 v4.1.0
-	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.1.20
+	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.1.21
+	github.com/uptrace/opentelemetry-go-extra/otelsql v0.1.21
 	github.com/volatiletech/null/v8 v8.1.2
 	go.mitsakis.org/workerpool v0.0.0-20221016122625-07d45f730b5b
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.13.0
@@ -336,7 +336,7 @@ require (
 	github.com/tommy-muehle/go-mnd/v2 v2.5.1 // indirect
 	github.com/ultraware/funlen v0.0.3 // indirect
 	github.com/ultraware/whitespace v0.0.5 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.20 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.21 // indirect
 	github.com/uudashr/gocognit v1.0.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect

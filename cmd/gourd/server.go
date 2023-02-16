@@ -6,9 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
-	"github.com/luna-duclos/instrumentedsql"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
@@ -20,23 +18,20 @@ import (
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
 	"github.com/nickysemenza/gourd/internal/server"
+	"github.com/uptrace/opentelemetry-go-extra/otelsql"
+	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
-	driver := "instrumented-postgres-" + string(kind)
-	sql.Register(driver, instrumentedsql.WrapDriver(&pq.Driver{},
-		instrumentedsql.WithLogger(instrumentedsql.LoggerFunc(func(ctx context.Context, msg string, keyvals ...interface{}) {
-			log.WithContext(ctx).WithFields(log.Fields{"client": "db", "kind": string(kind)}).Debugf("%s %v", msg, keyvals)
-		})),
-		instrumentedsql.WithTracer(NewTracer(true)),
-		instrumentedsql.WithOpsExcluded(instrumentedsql.OpSQLRowsNext),
-	))
 
 	if !strings.Contains(dsn, "sslmode=disable") {
 		dsn += "?sslmode=disable"
 	}
 	log.Info("connecting to db: ", dsn)
-	dbConn, err := sql.Open(driver, dsn)
+	dbConn, err := otelsql.Open("postgres", dsn,
+		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
+		otelsql.WithDBName(string(kind)))
+
 	return dbConn, err
 }
 func makeServer(ctx context.Context) (*server.Server, error) {
