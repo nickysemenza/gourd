@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.6.0
-	github.com/cosmtrek/air v1.41.0
+	github.com/cosmtrek/air v1.42.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/dgraph-io/ristretto v0.1.1
