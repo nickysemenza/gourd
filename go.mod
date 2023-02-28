@@ -24,7 +24,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/jomei/notionapi v1.11.0
-	github.com/labstack/echo/v4 v4.10.0
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/lib/pq v1.10.7
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
@@ -41,7 +41,7 @@ require (
 	github.com/volatiletech/sqlboiler/v4 v4.14.0
 	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.24.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.39.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/contrib/propagators/jaeger v1.14.0
 	go.opentelemetry.io/otel v1.14.0
@@ -360,10 +360,10 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20230129154200-a960b3787bd2 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
