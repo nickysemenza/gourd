@@ -35,7 +35,7 @@ services:
   jaeger:
     container_name: food-jaeger
     environment:
-      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+      - 'COLLECTOR_ZIPKIN_HOST_PORT=:9411'
     ports:
       - "5775:5775/udp"
       - "6831:6831/udp"
@@ -44,7 +44,7 @@ services:
       - 16686:16686 # UI
       - 14268:14268
       - 9411:9411
-    image: "jaegertracing/all-in-one:latest"
+    image: "jaegertracing/all-in-one:1.42"
   # Collector
   collector:
     image: otel/opentelemetry-collector:0.75.0
@@ -82,7 +82,7 @@ services:
     environment:
       DATABASE_URL: postgres://gourd:gourd@db:5432/food
       DATABASE_URL_USDA: postgres://gourd:gourd@usda_db:5432/usda
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      TRACE_ADDRESS: http://jaeger:9411/api/v2/spans
       RS_URI: http://rs:8080/
       BYPASS_AUTH: "true"
       JWT_KEY: "foo"

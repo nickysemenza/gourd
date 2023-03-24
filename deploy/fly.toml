@@ -8,7 +8,7 @@ kill_timeout = 5
 image = "ghcr.io/nickysemenza/gourd-api-go:dev"
 
 [env]
-JAEGER_ENDPOINT = "http://tracing.internal:14268/api/traces"
+TRACE_ADDRESS = "http://tracing.internal:9411/api/v2/spans"
 
 [[services]]
 internal_port = 4242

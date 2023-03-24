@@ -30,7 +30,7 @@ func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
 	log.Info("connecting to db: ", dsn)
 	dbConn, err := otelsql.Open("postgres", dsn,
 		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
-		otelsql.WithDBName(string(kind)))
+		otelsql.WithDBName(fmt.Sprintf("%s_db", kind)))
 
 	return dbConn, err
 }
