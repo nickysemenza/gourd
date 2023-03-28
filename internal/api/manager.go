@@ -40,11 +40,7 @@ func (a *API) ProcessGoogleAuth(ctx context.Context, code string) (jwt string, r
 	jwt, err = a.Auth.GetJWT(user)
 	return
 }
-
-func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*models.NotionRecipe, error) {
-	ctx, span := a.tracer.Start(ctx, "notionRecipeToDB")
-	defer span.End()
-
+func (a *API) notionRecipeToInput(ctx context.Context, nRecipe notion.Recipe) (*RecipeDetailInput, error) {
 	output := RecipeDetailInput{}
 	if nRecipe.Raw != "" {
 		err := a.R.Call(ctx, nRecipe.Raw, rs_client.RecipeDecode, &output)
@@ -63,8 +59,18 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 	output.Date = nRecipe.Time
 	nRecipe.Tags = append(nRecipe.Tags, "notion")
 	output.Tags = nRecipe.Tags
+	return &output, nil
+}
+func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*models.NotionRecipe, error) {
+	ctx, span := a.tracer.Start(ctx, "notionRecipeToDB")
+	defer span.End()
 
-	r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: output})
+	output, err := a.notionRecipeToInput(ctx, nRecipe)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: *output})
 	if err != nil {
 		return nil, err
 	}

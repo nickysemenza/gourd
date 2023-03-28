@@ -150,7 +150,24 @@ func (a *API) NotionTest(c echo.Context) error {
 	if err != nil {
 		return handleErr(c, err)
 	}
-	return c.JSON(http.StatusOK, res)
+
+	type Res struct {
+		Notion  notion.Recipe
+		Details *RecipeDetailInput
+	}
+	var res2 []Res
+	for _, r := range res {
+		i, err := a.notionRecipeToInput(ctx, r)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		res2 = append(res2, Res{
+			Notion:  r,
+			Details: i,
+		})
+	}
+
+	return c.JSON(http.StatusOK, res2)
 }
 
 func (a *API) GetConfig(c echo.Context) error {

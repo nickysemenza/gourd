@@ -164,7 +164,7 @@ func (c *Client) GetAll(ctx context.Context, lookback time.Duration, pageID stri
 	var cursor notionapi.Cursor
 	recipes := []Recipe{}
 
-	daysAgo := notionapi.Date(time.Now().Add(lookback))
+	daysAgo := notionapi.Date(time.Now().Add(-lookback))
 
 	filter := notionapi.AndCompoundFilter{
 		notionapi.PropertyFilter{
@@ -178,14 +178,19 @@ func (c *Client) GetAll(ctx context.Context, lookback time.Duration, pageID stri
 	}
 
 	for {
-		resp, err := c.db.Query(ctx, c.dbID, &notionapi.DatabaseQueryRequest{
+		req := &notionapi.DatabaseQueryRequest{
 			Filter:      &filter,
 			PageSize:    100,
 			StartCursor: cursor,
-		})
+		}
+		resp, err := c.db.Query(ctx, c.dbID, req)
 		if err != nil {
 			return nil, err
 		}
+		span.AddEvent("data", trace.WithAttributes(
+			attribute.String("data", spew.Sdump(resp)),
+			attribute.String("req", spew.Sdump(req)),
+		))
 
 		for _, page := range resp.Results {
 			span.AddEvent("page", trace.WithAttributes(attribute.String("page", spew.Sdump(page))))
