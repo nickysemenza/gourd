@@ -10,8 +10,6 @@
 
 /// Amount : amount and unit
 
-
-
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Amount {
     /// unit
@@ -39,5 +37,3 @@ impl Amount {
         }
     }
 }
-
-

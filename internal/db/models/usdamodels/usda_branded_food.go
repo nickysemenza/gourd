@@ -31,7 +31,7 @@ type UsdaBrandedFood struct {
 	NotASignificantSourceOf  null.String  `boil:"not_a_significant_source_of" json:"not_a_significant_source_of,omitempty" toml:"not_a_significant_source_of" yaml:"not_a_significant_source_of,omitempty"`
 	GtinUpc                  null.String  `boil:"gtin_upc" json:"gtin_upc,omitempty" toml:"gtin_upc" yaml:"gtin_upc,omitempty"`
 	Ingredients              null.String  `boil:"ingredients" json:"ingredients,omitempty" toml:"ingredients" yaml:"ingredients,omitempty"`
-	ServingSize              null.Float32 `boil:"serving_size" json:"serving_size,omitempty" toml:"serving_size" yaml:"serving_size,omitempty"`
+	ServingSize              null.Float64 `boil:"serving_size" json:"serving_size,omitempty" toml:"serving_size" yaml:"serving_size,omitempty"`
 	ServingSizeUnit          null.String  `boil:"serving_size_unit" json:"serving_size_unit,omitempty" toml:"serving_size_unit" yaml:"serving_size_unit,omitempty"`
 	HouseholdServingFulltext null.String  `boil:"household_serving_fulltext" json:"household_serving_fulltext,omitempty" toml:"household_serving_fulltext" yaml:"household_serving_fulltext,omitempty"`
 	BrandedFoodCategory      null.String  `boil:"branded_food_category" json:"branded_food_category,omitempty" toml:"branded_food_category" yaml:"branded_food_category,omitempty"`
@@ -124,29 +124,29 @@ var UsdaBrandedFoodTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Float32 struct{ field string }
+type whereHelpernull_Float64 struct{ field string }
 
-func (w whereHelpernull_Float32) EQ(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) EQ(x null.Float64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, false, x)
 }
-func (w whereHelpernull_Float32) NEQ(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) NEQ(x null.Float64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, true, x)
 }
-func (w whereHelpernull_Float32) LT(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) LT(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpernull_Float32) LTE(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) LTE(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpernull_Float32) GT(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) GT(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpernull_Float32) GTE(x null.Float32) qm.QueryMod {
+func (w whereHelpernull_Float64) GTE(x null.Float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-func (w whereHelpernull_Float32) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Float32) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Float64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var UsdaBrandedFoodWhere = struct {
 	FDCID                    whereHelperint
@@ -156,7 +156,7 @@ var UsdaBrandedFoodWhere = struct {
 	NotASignificantSourceOf  whereHelpernull_String
 	GtinUpc                  whereHelpernull_String
 	Ingredients              whereHelpernull_String
-	ServingSize              whereHelpernull_Float32
+	ServingSize              whereHelpernull_Float64
 	ServingSizeUnit          whereHelpernull_String
 	HouseholdServingFulltext whereHelpernull_String
 	BrandedFoodCategory      whereHelpernull_String
@@ -174,7 +174,7 @@ var UsdaBrandedFoodWhere = struct {
 	NotASignificantSourceOf:  whereHelpernull_String{field: "\"usda_branded_food\".\"not_a_significant_source_of\""},
 	GtinUpc:                  whereHelpernull_String{field: "\"usda_branded_food\".\"gtin_upc\""},
 	Ingredients:              whereHelpernull_String{field: "\"usda_branded_food\".\"ingredients\""},
-	ServingSize:              whereHelpernull_Float32{field: "\"usda_branded_food\".\"serving_size\""},
+	ServingSize:              whereHelpernull_Float64{field: "\"usda_branded_food\".\"serving_size\""},
 	ServingSizeUnit:          whereHelpernull_String{field: "\"usda_branded_food\".\"serving_size_unit\""},
 	HouseholdServingFulltext: whereHelpernull_String{field: "\"usda_branded_food\".\"household_serving_fulltext\""},
 	BrandedFoodCategory:      whereHelpernull_String{field: "\"usda_branded_food\".\"branded_food_category\""},

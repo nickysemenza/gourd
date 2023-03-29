@@ -1,4 +1,4 @@
-openapi: "3.0.0"
+openapi: 3.0.0
 info:
   contact:
     email: n@nickysemenza.com
@@ -7,7 +7,6 @@ info:
   title: Gourd Recipe Database
   license:
     name: MIT
-    # identifier: MIT
 tags:
   - name: recipes
     description: Recipe operations
@@ -23,7 +22,6 @@ tags:
     description: ingredients operations
   - name: foods
     description: food operations
-
 servers:
   - description: test
     url: http://localhost:4242/api
@@ -33,7 +31,9 @@ paths:
   /auth:
     post:
       summary: Google Login callback
-      description: Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
+      description: >-
+        Second step of
+        https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
       security: []
       operationId: auth_login
       tags:
@@ -46,18 +46,18 @@ paths:
             type: string
           description: Google code
       responses:
-        "200":
+        '200':
           description: Auth response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthResp"
+                $ref: '#/components/schemas/AuthResp'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /config:
     get:
       summary: Get app config
@@ -66,18 +66,18 @@ paths:
       tags:
         - system
       responses:
-        "200":
+        '200':
           description: Config data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConfigData"
+                $ref: '#/components/schemas/ConfigData'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /sync:
     get:
       summary: perform sync
@@ -93,7 +93,7 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        '200':
           description: Config data
           content:
             application/json:
@@ -104,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /photos:
     get:
       summary: List all photos
@@ -113,21 +113,21 @@ paths:
       tags:
         - photos
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
-        "200":
+        '200':
           description: A page of photos
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedPhotos"
+                $ref: '#/components/schemas/PaginatedPhotos'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /albums:
     get:
       summary: List all albums
@@ -136,7 +136,7 @@ paths:
       tags:
         - albums
       responses:
-        "200":
+        '200':
           description: All available albums from google
           content:
             application/json:
@@ -146,14 +146,14 @@ paths:
                   albums:
                     type: array
                     items:
-                      $ref: "#/components/schemas/GooglePhotosAlbum"
+                      $ref: '#/components/schemas/GooglePhotosAlbum'
                     description: The list of albums
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /search:
     get:
       summary: Search recipes and ingredients
@@ -163,22 +163,22 @@ paths:
         - ingredients
         - recipes
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/nameParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/nameParam'
       responses:
-        "200":
+        '200':
           description: Search results
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SearchResult"
+                $ref: '#/components/schemas/SearchResult'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /meals:
     get:
       summary: List all meals
@@ -187,21 +187,21 @@ paths:
       tags:
         - meals
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
-        "200":
+        '200':
           description: A page of meals
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedMeals"
+                $ref: '#/components/schemas/PaginatedMeals'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /meals/{meal_id}:
     get:
       summary: Info for a specific meal
@@ -217,18 +217,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Meal"
+                $ref: '#/components/schemas/Meal'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /meals/{meal_id}/recipes:
     patch:
       summary: Update the recipes associated with a given meal
@@ -249,20 +249,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MealRecipeUpdate"
+              $ref: '#/components/schemas/MealRecipeUpdate'
       responses:
-        "200":
+        '200':
           description: Newly updated meal
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Meal"
+                $ref: '#/components/schemas/Meal'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /ingredients:
     get:
       summary: List all ingredients
@@ -271,8 +271,8 @@ paths:
       tags:
         - ingredients
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
         - name: ingredient_id
           in: query
           required: false
@@ -282,7 +282,7 @@ paths:
             items:
               type: string
       responses:
-        "200":
+        '200':
           description: A page of ingredient results
           headers:
             x-next:
@@ -292,13 +292,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedIngredients"
+                $ref: '#/components/schemas/PaginatedIngredients'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a ingredient
       description: todo
@@ -311,20 +311,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Ingredient"
+              $ref: '#/components/schemas/Ingredient'
       responses:
-        "201":
+        '201':
           description: Newly created ingredient
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Ingredient"
+                $ref: '#/components/schemas/Ingredient'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /meta/load_ingredient_mappings:
     post:
       summary: load mappings
@@ -338,10 +338,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/IngredientMappingsPayload"
+              $ref: '#/components/schemas/IngredientMappingsPayload'
       responses:
-        "200":
-          description: "success"
+        '200':
+          description: success
           content:
             application/json:
               schema:
@@ -354,10 +354,10 @@ paths:
       tags:
         - recipes
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
       responses:
-        "200":
+        '200':
           description: A paged array of recipes
           headers:
             x-next:
@@ -367,13 +367,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedRecipeWrappers"
+                $ref: '#/components/schemas/PaginatedRecipeWrappers'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a recipe
       description: todo
@@ -386,20 +386,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecipeWrapperInput"
+              $ref: '#/components/schemas/RecipeWrapperInput'
       responses:
-        "201":
+        '201':
           description: Newly created recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeWrapper"
+                $ref: '#/components/schemas/RecipeWrapper'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /recipes/{recipe_id}/latex:
     get:
       summary: recipe as latex
@@ -415,7 +415,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: PDF
           content:
             application/pdf:
@@ -427,7 +427,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /recipes/{recipe_id}:
     get:
       summary: Info for a specific recipe
@@ -443,18 +443,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeWrapper"
+                $ref: '#/components/schemas/RecipeWrapper'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /recipes/bulk:
     get:
       summary: Get recipes
@@ -472,12 +472,12 @@ paths:
             items:
               type: string
       responses:
-        "200":
+        '200':
           description: bulk results
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedRecipeWrappers"
+                $ref: '#/components/schemas/PaginatedRecipeWrappers'
   /recipes/sum:
     post:
       summary: sum up recipes
@@ -498,20 +498,20 @@ paths:
                 inputs:
                   type: array
                   items:
-                    $ref: "#/components/schemas/EntitySummary"
+                    $ref: '#/components/schemas/EntitySummary'
       responses:
-        "200":
+        '200':
           description: Newly converted recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SumsResponse"
+                $ref: '#/components/schemas/SumsResponse'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /recipes/scrape:
     post:
       summary: scrape a recipe by URL
@@ -532,18 +532,18 @@ paths:
                 url:
                   type: string
       responses:
-        "201":
+        '201':
           description: Newly created recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeWrapper"
+                $ref: '#/components/schemas/RecipeWrapper'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /ingredients/{ingredient_id}/convert_to_recipe:
     post:
       summary: Converts an ingredient to a recipe, updating all recipes depending on it
@@ -560,18 +560,18 @@ paths:
           schema:
             type: string
       responses:
-        "201":
+        '201':
           description: Newly converted recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: '#/components/schemas/RecipeDetail'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /ingredients/{ingredient_id}/associate_food:
     post:
       summary: Assosiates a food with a given ingredient
@@ -595,18 +595,18 @@ paths:
             minimum: 1
           description: The FDC id of the food to link to the ingredient
       responses:
-        "201":
+        '201':
           description: Newly converted recipe
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RecipeDetail"
+                $ref: '#/components/schemas/RecipeDetail'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /ingredients/{ingredient_id}/merge:
     post:
       summary: Merges the provide ingredients in the body into the param
@@ -638,18 +638,18 @@ paths:
                   minItems: 1
                   maxItems: 50
       responses:
-        "201":
+        '201':
           description: The ingredient everything was merged into
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Ingredient"
+                $ref: '#/components/schemas/Ingredient'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /foods/{fdc_id}:
     get:
       summary: get a FDC entry by id
@@ -665,18 +665,18 @@ paths:
           schema:
             type: integer
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Food"
+                $ref: '#/components/schemas/FoodInfo'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /ingredients/{ingredient_id}:
     get:
       summary: Get a specific ingredient
@@ -692,18 +692,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: An ingredient
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IngredientDetail"
+                $ref: '#/components/schemas/IngredientDetail'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /foods/search:
     get:
       summary: Search foods
@@ -712,9 +712,9 @@ paths:
       tags:
         - foods
       parameters:
-        - $ref: "#/components/parameters/offsetParam"
-        - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/nameParam"
+        - $ref: '#/components/parameters/offsetParam'
+        - $ref: '#/components/parameters/limitParam'
+        - $ref: '#/components/parameters/nameParam'
         - name: data_types
           in: query
           required: false
@@ -722,20 +722,20 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/FoodDataType"
+              $ref: '#/components/schemas/FoodDataType'
       responses:
-        "200":
+        '200':
           description: Search results
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedFoods"
+                $ref: '#/components/schemas/FoodSearchResult'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /foods/bulk:
     get:
       summary: Get foods
@@ -753,12 +753,12 @@ paths:
             items:
               type: integer
       responses:
-        "200":
+        '200':
           description: Search results
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PaginatedFoods"
+                $ref: '#/components/schemas/PaginatedFoods'
   /data/recipe_dependencies:
     get:
       summary: Get foods
@@ -768,7 +768,7 @@ paths:
         - recipes
         - ingredients
       responses:
-        "200":
+        '200':
           description: All dependencies
           content:
             application/json:
@@ -778,17 +778,16 @@ paths:
                   items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/RecipeDependency"
+                      $ref: '#/components/schemas/RecipeDependency'
                     description: all
 security:
-  - bearerAuth: [] # use the same name as above
+  - bearerAuth: []
 components:
   securitySchemes:
-    bearerAuth: # arbitrary name for the security scheme
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT # optional, arbitrary value for documentation purposes
-
+      bearerFormat: JWT
   schemas:
     SectionIngredient:
       description: Ingredients in a single section
@@ -803,16 +802,16 @@ components:
           type: string
         kind:
           description: what kind of ingredient
-          $ref: "#/components/schemas/IngredientKind"
+          $ref: '#/components/schemas/IngredientKind'
         recipe:
-          $ref: "#/components/schemas/RecipeDetail"
+          $ref: '#/components/schemas/RecipeDetail'
         ingredient:
-          $ref: "#/components/schemas/IngredientDetail"
+          $ref: '#/components/schemas/IngredientDetail'
         amounts:
           description: the various measures
           type: array
           items:
-            $ref: "#/components/schemas/Amount"
+            $ref: '#/components/schemas/Amount'
         adjective:
           description: adjective
           type: string
@@ -826,7 +825,7 @@ components:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionIngredient"
+            $ref: '#/components/schemas/SectionIngredient'
     SectionIngredientInput:
       description: Ingredients in a single section
       type: object
@@ -842,12 +841,12 @@ components:
           type: string
         kind:
           description: what kind of ingredient, for target_id or name
-          $ref: "#/components/schemas/IngredientKind"
+          $ref: '#/components/schemas/IngredientKind'
         amounts:
           description: the various measures
           type: array
           items:
-            $ref: "#/components/schemas/Amount"
+            $ref: '#/components/schemas/Amount'
         adjective:
           description: adjective
           type: string
@@ -861,7 +860,7 @@ components:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionIngredientInput"
+            $ref: '#/components/schemas/SectionIngredientInput'
     SectionInstruction:
       description: Instructions in a single section
       type: object
@@ -896,17 +895,17 @@ components:
           description: id
           type: string
         duration:
-          $ref: "#/components/schemas/Amount"
+          $ref: '#/components/schemas/Amount'
         instructions:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionInstruction"
+            $ref: '#/components/schemas/SectionInstruction'
         ingredients:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionIngredient"
+            $ref: '#/components/schemas/SectionIngredient'
     RecipeSectionInput:
       description: A step in the recipe
       type: object
@@ -915,17 +914,17 @@ components:
         - ingredients
       properties:
         duration:
-          $ref: "#/components/schemas/Amount"
+          $ref: '#/components/schemas/Amount'
         instructions:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionInstructionInput"
+            $ref: '#/components/schemas/SectionInstructionInput'
         ingredients:
           description: x
           type: array
           items:
-            $ref: "#/components/schemas/SectionIngredientInput"
+            $ref: '#/components/schemas/SectionIngredientInput'
     RecipeWrapper:
       description: A recipe with subcomponents
       type: object
@@ -937,15 +936,15 @@ components:
           description: id
           type: string
         detail:
-          $ref: "#/components/schemas/RecipeDetail"
+          $ref: '#/components/schemas/RecipeDetail'
         linked_meals:
           type: array
           items:
-            $ref: "#/components/schemas/Meal"
+            $ref: '#/components/schemas/Meal'
         linked_photos:
           type: array
           items:
-            $ref: "#/components/schemas/Photo"
+            $ref: '#/components/schemas/Photo'
     RecipeWrapperInput:
       description: A recipe with subcomponents
       type: object
@@ -956,7 +955,7 @@ components:
           description: id
           type: string
         detail:
-          $ref: "#/components/schemas/RecipeDetailInput"
+          $ref: '#/components/schemas/RecipeDetailInput'
     RecipeDetail:
       description: A revision of a recipe
       type: object
@@ -979,7 +978,7 @@ components:
           description: sections of the recipe
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSection"
+            $ref: '#/components/schemas/RecipeSection'
         name:
           description: recipe name
           type: string
@@ -987,7 +986,7 @@ components:
           description: book or websites
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSource"
+            $ref: '#/components/schemas/RecipeSource'
         servings:
           description: num servings
           type: integer
@@ -1014,7 +1013,7 @@ components:
           description: Other versions
           type: array
           items:
-            $ref: "#/components/schemas/RecipeDetail"
+            $ref: '#/components/schemas/RecipeDetail'
         tags:
           description: tags
           type: array
@@ -1034,7 +1033,7 @@ components:
           description: sections of the recipe
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSectionInput"
+            $ref: '#/components/schemas/RecipeSectionInput'
         name:
           description: recipe name
           type: string
@@ -1042,7 +1041,7 @@ components:
           description: book or websites
           type: array
           items:
-            $ref: "#/components/schemas/RecipeSource"
+            $ref: '#/components/schemas/RecipeSource'
         servings:
           description: num servings
           type: integer
@@ -1064,7 +1063,7 @@ components:
           items:
             type: string
     Ingredient:
-      description: "An Ingredient"
+      description: An Ingredient
       type: object
       required:
         - id
@@ -1084,33 +1083,32 @@ components:
           type: integer
           format: int64
     IngredientDetail:
-      description: "An Ingredient"
+      description: An Ingredient
       type: object
       required:
         - ingredient
         - recipes
-        # - children
         - unit_mappings
       properties:
         ingredient:
-          $ref: "#/components/schemas/Ingredient"
+          $ref: '#/components/schemas/Ingredient'
         recipes:
           description: Recipes referencing this ingredient
           type: array
           items:
-            $ref: "#/components/schemas/RecipeDetail"
+            $ref: '#/components/schemas/RecipeDetail'
         children:
           description: Ingredients that are equivalent
           type: array
           items:
-            $ref: "#/components/schemas/IngredientDetail"
+            $ref: '#/components/schemas/IngredientDetail'
         food:
-          $ref: "#/components/schemas/Food"
+          $ref: '#/components/schemas/FoodInfo'
         unit_mappings:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/UnitMapping"
+            $ref: '#/components/schemas/UnitMapping'
     UnitMapping:
       description: mappings
       type: object
@@ -1119,9 +1117,9 @@ components:
         - b
       properties:
         a:
-          $ref: "#/components/schemas/Amount"
+          $ref: '#/components/schemas/Amount'
         b:
-          $ref: "#/components/schemas/Amount"
+          $ref: '#/components/schemas/Amount'
         source:
           description: source of the mapping
           type: string
@@ -1135,7 +1133,7 @@ components:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/IngredientMapping"
+            $ref: '#/components/schemas/IngredientMapping'
     IngredientMapping:
       description: details about ingredients
       type: object
@@ -1156,7 +1154,7 @@ components:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/UnitMapping"
+            $ref: '#/components/schemas/UnitMapping'
     Amount:
       description: amount and unit
       type: object
@@ -1170,11 +1168,11 @@ components:
         value:
           description: value
           type: number
-          format: double # float64
+          format: double
         upper_value:
           description: value
           type: number
-          format: double # float64
+          format: double
         source:
           description: if it was explicit, inferred, etc
           type: string
@@ -1250,7 +1248,9 @@ components:
         source:
           description: where the photo came from
           type: string
-          enum: [google, notion]
+          enum:
+            - google
+            - notion
     Meal:
       description: A meal, which bridges recipes to photos
       type: object
@@ -1273,11 +1273,11 @@ components:
         photos:
           type: array
           items:
-            $ref: "#/components/schemas/Photo"
+            $ref: '#/components/schemas/Photo'
         recipes:
           type: array
           items:
-            $ref: "#/components/schemas/MealRecipe"
+            $ref: '#/components/schemas/MealRecipe'
     MealRecipe:
       description: A recipe that's part of a meal (a recipe at a specific amount)
       type: object
@@ -1288,9 +1288,9 @@ components:
         multiplier:
           description: when it was taken
           type: number
-          format: double # float64
+          format: double
         recipe:
-          $ref: "#/components/schemas/RecipeDetail"
+          $ref: '#/components/schemas/RecipeDetail'
     SearchResult:
       description: A search result wrapper, which contains ingredients and recipes
       type: object
@@ -1299,25 +1299,26 @@ components:
           description: The ingredients
           type: array
           items:
-            $ref: "#/components/schemas/Ingredient"
+            $ref: '#/components/schemas/Ingredient'
         recipes:
           description: The recipes
           type: array
           items:
-            $ref: "#/components/schemas/RecipeWrapper"
+            $ref: '#/components/schemas/RecipeWrapper'
         meta:
-          $ref: "#/components/schemas/Items"
+          $ref: '#/components/schemas/Items'
     Error:
       type: object
       description: A generic error message
-      required: ["message"]
+      required:
+        - message
       properties:
         message:
           type: string
         trace_id:
           type: string
       example:
-        message: "Something went wrong"
+        message: Something went wrong
     ConfigData:
       type: object
       description: config data
@@ -1374,9 +1375,9 @@ components:
         recipes:
           type: array
           items:
-            $ref: "#/components/schemas/RecipeWrapper"
+            $ref: '#/components/schemas/RecipeWrapper'
         meta:
-          $ref: "#/components/schemas/Items"
+          $ref: '#/components/schemas/Items'
     PaginatedIngredients:
       type: object
       description: pages of IngredientDetail
@@ -1386,9 +1387,9 @@ components:
         ingredients:
           type: array
           items:
-            $ref: "#/components/schemas/IngredientDetail"
+            $ref: '#/components/schemas/IngredientDetail'
         meta:
-          $ref: "#/components/schemas/Items"
+          $ref: '#/components/schemas/Items'
     PaginatedPhotos:
       type: object
       description: pages of Photos
@@ -1398,9 +1399,9 @@ components:
         photos:
           type: array
           items:
-            $ref: "#/components/schemas/Photo"
+            $ref: '#/components/schemas/Photo'
         meta:
-          $ref: "#/components/schemas/Items"
+          $ref: '#/components/schemas/Items'
     PaginatedMeals:
       type: object
       description: pages of Meal
@@ -1410,9 +1411,9 @@ components:
         meals:
           type: array
           items:
-            $ref: "#/components/schemas/Meal"
+            $ref: '#/components/schemas/Meal'
         meta:
-          $ref: "#/components/schemas/Items"
+          $ref: '#/components/schemas/Items'
     PaginatedFoods:
       type: object
       description: pages of Food
@@ -1422,41 +1423,9 @@ components:
         foods:
           type: array
           items:
-            $ref: "#/components/schemas/Food"
+            $ref: '#/components/schemas/FoodInfo'
         meta:
-          $ref: "#/components/schemas/Items"
-    Nutrient:
-      type: object
-      description: todo
-      required:
-        - id
-        - name
-        - unit_name
-      properties:
-        id:
-          description: todo
-          type: integer
-        name:
-          description: todo
-          type: string
-        unit_name:
-          description: todo
-          $ref: "#/components/schemas/FoodNutrientUnit"
-    FoodNutrient:
-      type: object
-      description: todo
-      required:
-        - nutrient
-        - amount
-        - data_points
-      properties:
-        nutrient:
-          $ref: "#/components/schemas/Nutrient"
-        amount:
-          type: number
-          format: double # float64
-        data_points:
-          type: integer
+          $ref: '#/components/schemas/Items'
     FoodCategory:
       type: object
       description: food category, set for some
@@ -1483,7 +1452,7 @@ components:
           type: string
         serving_size:
           type: number
-          format: double # float64
+          format: double
         serving_size_unit:
           type: string
         household_serving:
@@ -1504,15 +1473,15 @@ components:
           type: integer
         amount:
           type: number
-          format: double # float64
+          format: double
         portion_description:
           type: string
         modifier:
           type: string
         gram_weight:
           type: number
-          format: double # float64
-    Food:
+          format: double
+    FoodWrapper:
       type: object
       description: A top level food
       required:
@@ -1520,7 +1489,6 @@ components:
         - description
         - data_type
         - nutrients
-        - unit_mappings
       properties:
         fdc_id:
           description: FDC Id
@@ -1530,26 +1498,35 @@ components:
           type: string
         data_type:
           description: todo
-          $ref: "#/components/schemas/FoodDataType"
+          $ref: '#/components/schemas/FoodDataType'
         category:
-          $ref: "#/components/schemas/FoodCategory"
+          $ref: '#/components/schemas/FoodCategory'
         nutrients:
           description: todo
           type: array
           items:
-            $ref: "#/components/schemas/FoodNutrient"
+            $ref: '#/components/schemas/FoodNutrient'
         portions:
           description: portion datapoints
           type: array
           items:
-            $ref: "#/components/schemas/FoodPortion"
+            $ref: '#/components/schemas/FoodPortion'
         branded_info:
-          $ref: "#/components/schemas/BrandedFood"
+          $ref: '#/components/schemas/BrandedFood'
+    FoodInfo:
+      type: object
+      description: A top level food?
+      required:
+        - wrapper
+        - unit_mappings
+      properties:
+        wrapper:
+          $ref: '#/components/schemas/FoodWrapper'
         unit_mappings:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/UnitMapping"
+            $ref: '#/components/schemas/UnitMapping'
     MealRecipeUpdate:
       type: object
       description: an update to the recipes on a mea
@@ -1564,33 +1541,34 @@ components:
         multiplier:
           description: multiplier
           type: number
-          format: double # float64
+          format: double
           minimum: 0
         action:
           description: todo
           type: string
-          enum: [add, remove]
+          enum:
+            - add
+            - remove
     FoodDataType:
       type: string
       enum:
-        [
-          foundation_food,
-          sample_food,
-          market_acquisition,
-          survey_fndds_food,
-          sub_sample_food,
-          agricultural_acquisition,
-          sr_legacy_food,
-          branded_food,
-        ]
-    FoodNutrientUnit:
-      type: string
-      enum: [UG, G, IU, kJ, KCAL, MG, MG_ATE, SP_GR]
+        - foundation_food
+        - sample_food
+        - market_acquisition
+        - survey_fndds_food
+        - sub_sample_food
+        - agricultural_acquisition
+        - sr_legacy_food
+        - branded_food
     IngredientKind:
       type: string
-      enum: [ingredient, recipe]
+      enum:
+        - ingredient
+        - recipe
     RecipeDependency:
-      description: represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
+      description: >-
+        represents a relationship between recipe and ingredient, the latter of
+        which can also be a recipe.
       type: object
       required:
         - recipe_id
@@ -1613,7 +1591,7 @@ components:
           type: string
         ingredient_kind:
           description: what kind of ingredient
-          $ref: "#/components/schemas/IngredientKind"
+          $ref: '#/components/schemas/IngredientKind'
     EntitySummary:
       description: holds name/id and multiplier for a Kind of entity
       type: object
@@ -1632,10 +1610,10 @@ components:
         multiplier:
           description: multiplier
           type: number
-          format: double # float64
+          format: double
         kind:
           description: what kind of entity
-          $ref: "#/components/schemas/IngredientKind"
+          $ref: '#/components/schemas/IngredientKind'
     IngredientUsage:
       description: todo
       type: object
@@ -1647,17 +1625,17 @@ components:
         multiplier:
           description: multiplier
           type: number
-          format: double # float64
+          format: double
         amounts:
           description: multiple amounts to try
           type: array
           items:
-            $ref: "#/components/schemas/Amount"
+            $ref: '#/components/schemas/Amount'
         required_by:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/EntitySummary"
+            $ref: '#/components/schemas/EntitySummary'
     UsageValue:
       type: object
       description: holds information
@@ -1670,15 +1648,15 @@ components:
           description: multiplier
           type: array
           items:
-            $ref: "#/components/schemas/IngredientUsage"
+            $ref: '#/components/schemas/IngredientUsage'
         sum:
           description: amounts
           type: array
           items:
-            $ref: "#/components/schemas/Amount"
+            $ref: '#/components/schemas/Amount'
         meta:
           description: detail about it
-          $ref: "#/components/schemas/EntitySummary"
+          $ref: '#/components/schemas/EntitySummary'
     UnitConversionRequest:
       type: object
       required:
@@ -1687,17 +1665,22 @@ components:
       properties:
         target:
           type: string
-          enum: [weight, volume, money, calories, other]
+          enum:
+            - weight
+            - volume
+            - money
+            - calories
+            - other
         input:
           description: multiple amounts to try
           type: array
           items:
-            $ref: "#/components/schemas/Amount"
+            $ref: '#/components/schemas/Amount'
         unit_mappings:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/UnitMapping"
+            $ref: '#/components/schemas/UnitMapping'
     SumsResponse:
       type: object
       required:
@@ -1708,13 +1691,13 @@ components:
           description: mappings of equivalent units
           type: array
           items:
-            $ref: "#/components/schemas/UsageValue"
+            $ref: '#/components/schemas/UsageValue'
         by_recipe:
           type: object
           additionalProperties:
             type: array
             items:
-              $ref: "#/components/schemas/UsageValue"
+              $ref: '#/components/schemas/UsageValue'
     CompactRecipeSection:
       type: object
       required:
@@ -1747,11 +1730,763 @@ components:
         - sections
       properties:
         meta:
-          $ref: "#/components/schemas/CompactRecipeMeta"
+          $ref: '#/components/schemas/CompactRecipeMeta'
         sections:
           type: array
           items:
-            $ref: "#/components/schemas/CompactRecipeSection"
+            $ref: '#/components/schemas/CompactRecipeSection'
+    FoodSearchResult:
+      description: A meal, which bridges recipes to photos
+      type: object
+      required:
+        - foods
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodInfo'
+        results:
+          $ref: '#/components/schemas/FoodResultByItem'
+    FoodResultByItem:
+      description: A meal, which bridges recipes to photos
+      type: object
+      required:
+        - branded_food
+        - foundation_food
+        - legacy_food
+        - survey_food
+        - info
+      properties:
+        branded_food:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandedFoodItem'
+        foundation_food:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoundationFoodItem'
+        legacy_food:
+          type: array
+          items:
+            $ref: '#/components/schemas/SRLegacyFoodItem'
+        survey_food:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurveyFoodItem'
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodInfo'
+    Nutrient:
+      description: a food nutrient
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1005
+        number:
+          type: string
+          example: '305'
+        name:
+          type: string
+          example: Carbohydrate, by difference
+        rank:
+          type: integer
+          format: int
+          example: 1110
+        unitName:
+          type: string
+          example: g
+    FoodNutrientSource:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 9
+        code:
+          type: string
+          example: '12'
+        description:
+          type: string
+          example: Manufacturer's analytical; partial documentation
+    FoodNutrientDerivation:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 75
+        code:
+          type: string
+          example: LCCD
+        description:
+          type: string
+          example: Calculated from a daily value percentage per serving size measure
+        foodNutrientSource:
+          $ref: '#/components/schemas/FoodNutrientSource'
+    NutrientAcquisitionDetails:
+      type: object
+      properties:
+        sampleUnitId:
+          type: integer
+          example: 321632
+        purchaseDate:
+          type: string
+          example: 12/2/2005
+        storeCity:
+          type: string
+          example: TRUSSVILLE
+        storeState:
+          type: string
+          example: AL
+    NutrientAnalysisDetails:
+      properties:
+        subSampleId:
+          type: integer
+          example: 343866
+        amount:
+          type: number
+          format: double
+          example: 0
+        nutrientId:
+          type: integer
+          example: 1005
+        labMethodDescription:
+          type: string
+          example: 10.2135/cropsci2017.04.0244
+        labMethodOriginalDescription:
+          type: string
+        labMethodLink:
+          type: string
+          format: url
+          example: https://doi.org/10.2135/cropsci2017.04.0244
+        labMethodTechnique:
+          type: string
+          example: DOI for Beans
+        nutrientAcquisitionDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/NutrientAcquisitionDetails'
+    FoodNutrient:
+      required:
+        - id
+        - nutrientNumber
+        - unit
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 167514
+        amount:
+          type: number
+          format: double
+          example: 0
+        dataPoints:
+          type: integer
+          format: int64
+          example: 49
+        min:
+          type: number
+          format: double
+          example: 73.73
+        max:
+          type: number
+          format: double
+          example: 91.8
+        median:
+          type: number
+          format: double
+          example: 90.3
+        type:
+          type: string
+          example: FoodNutrient
+        nutrient:
+          $ref: '#/components/schemas/Nutrient'
+        foodNutrientDerivation:
+          $ref: '#/components/schemas/FoodNutrientDerivation'
+        nutrientAnalysisDetails:
+          $ref: '#/components/schemas/NutrientAnalysisDetails'
+    FoodAttribute:
+      properties:
+        id:
+          type: integer
+          example: 25117
+        sequenceNumber:
+          type: integer
+          example: 1
+        value:
+          type: string
+          example: 'Moisture change: -5.0%'
+        FoodAttributeType:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1002
+            name:
+              type: string
+              example: Adjustments
+            description:
+              type: string
+              example: Adjustments made to foods, including moisture and fat changes.
+    FoodUpdateLog:
+      properties:
+        fdcId:
+          type: integer
+          example: 534358
+        availableDate:
+          type: string
+          example: 8/18/2018
+        brandOwner:
+          type: string
+          example: Kar Nut Products Company
+        dataSource:
+          type: string
+          example: LI
+        dataType:
+          type: string
+          example: Branded
+        description:
+          type: string
+          example: NUT 'N BERRY MIX
+        foodClass:
+          type: string
+          example: Branded
+        gtinUpc:
+          type: string
+          example: '077034085228'
+        householdServingFullText:
+          type: string
+          example: 1 ONZ
+        ingredients:
+          type: string
+          example: >-
+            PEANUTS (PEANUTS, PEANUT AND/OR SUNFLOWER OIL). RAISINS. DRIED
+            CRANBERRIES (CRANBERRIES, SUGAR, SUNFLOWER OIL). SUNFLOWER KERNELS
+            AND ALMONDS (SUNFLOWER KERNELS AND ALMONDS, PEANUT AND/OR SUNFLOWER
+            OIL).
+        modifiedDate:
+          type: string
+          example: 8/18/2018
+        publicationDate:
+          type: string
+          example: 4/1/2019
+        servingSize:
+          type: number
+          format: double
+          example: 28
+        servingSizeUnit:
+          type: string
+          example: g
+        brandedFoodCategory:
+          type: string
+          example: Popcorn, Peanuts, Seeds & Related Snacks
+        changes:
+          type: string
+          example: Nutrient Added, Nutrient Updated
+        foodAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodAttribute'
+    BrandedFoodItem:
+      type: object
+      required:
+        - fdcId
+        - dataType
+        - description
+      properties:
+        fdcId:
+          type: integer
+          example: 534358
+        availableDate:
+          type: string
+          example: 8/18/2018
+        brandOwner:
+          type: string
+          example: Kar Nut Products Company
+        dataSource:
+          type: string
+          example: LI
+        dataType:
+          type: string
+          example: Branded
+        description:
+          type: string
+          example: NUT 'N BERRY MIX
+        foodClass:
+          type: string
+          example: Branded
+        gtinUpc:
+          type: string
+          example: '077034085228'
+        householdServingFullText:
+          type: string
+          example: 1 ONZ
+        ingredients:
+          type: string
+          example: >-
+            PEANUTS (PEANUTS, PEANUT AND/OR SUNFLOWER OIL). RAISINS. DRIED
+            CRANBERRIES (CRANBERRIES, SUGAR, SUNFLOWER OIL). SUNFLOWER KERNELS
+            AND ALMONDS (SUNFLOWER KERNELS AND ALMONDS, PEANUT AND/OR SUNFLOWER
+            OIL).
+        modifiedDate:
+          type: string
+          example: 8/18/2018
+        publicationDate:
+          type: string
+          example: 4/1/2019
+        servingSize:
+          type: number
+          format: double
+          example: 28
+        servingSizeUnit:
+          type: string
+          example: g
+        preparationStateCode:
+          type: string
+          example: UNPREPARED
+        brandedFoodCategory:
+          type: string
+          example: Popcorn, Peanuts, Seeds & Related Snacks
+        tradeChannel:
+          type: array
+          items:
+            type: string
+          example:
+            - CHILD_NUTRITION_FOOD_PROGRAMS
+            - GROCERY
+        gpcClassCode:
+          type: integer
+          example: 50161800
+        foodNutrients:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodNutrient'
+        foodUpdateLog:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodUpdateLog'
+        labelNutrients:
+          type: object
+          properties:
+            fat:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 8.9992
+            saturatedFat:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 0.9996
+            transFat:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 0
+            cholesterol:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 0
+            sodium:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 0
+            carbohydrates:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 12.0008
+            fiber:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 1.988
+            sugars:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 7.9996
+            protein:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 4.0012
+            calcium:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 19.88
+            iron:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 0.7196
+            potassium:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 159.88
+            calories:
+              type: object
+              properties:
+                value:
+                  type: number
+                  format: double
+                  example: 140
+    schemas-FoodCategory:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 11
+        code:
+          type: string
+          example: '1100'
+        description:
+          type: string
+          example: Vegetables and Vegetable Products
+    FoodComponent:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 59929
+        name:
+          type: string
+          example: External fat
+        dataPoints:
+          type: integer
+          example: 24
+        gramWeight:
+          type: number
+          example: 2.1
+        isRefuse:
+          type: boolean
+          example: true
+        minYearAcquired:
+          type: integer
+          example: 2011
+        percentWeight:
+          type: number
+          example: 0.5
+    MeasureUnit:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 999
+        abbreviation:
+          type: string
+          example: undetermined
+        name:
+          type: string
+          example: undetermined
+    schemas-FoodPortion:
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 135806
+        amount:
+          type: number
+          format: double
+          example: 1
+        dataPoints:
+          type: integer
+          format: int32
+          example: 9
+        gramWeight:
+          type: number
+          format: double
+          example: 91
+        minYearAcquired:
+          type: integer
+          example: 2011
+        modifier:
+          type: string
+          example: '10205'
+        portionDescription:
+          type: string
+          example: 1 cup
+        sequenceNumber:
+          type: integer
+          example: 1
+        measureUnit:
+          $ref: '#/components/schemas/MeasureUnit'
+    SampleFoodItem:
+      required:
+        - fdcId
+        - dataType
+        - description
+      properties:
+        fdcId:
+          type: integer
+          example: 45551
+        datatype:
+          type: string
+          example: Sample
+        description:
+          type: string
+          example: Beef, Tenderloin Roast, select, roasted, comp5, lean (34BLTR)
+        foodClass:
+          type: string
+          example: Composite
+        publicationDate:
+          type: string
+          example: 4/1/2019
+        foodAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-FoodCategory'
+    InputFoodFoundation:
+      description: applies to Foundation foods. Not all inputFoods will have all fields.
+      properties:
+        id:
+          type: integer
+          example: 45551
+        foodDescription:
+          type: string
+          example: Beef, Tenderloin Roast, select, roasted, comp5, lean (34BLTR)
+        inputFood:
+          $ref: '#/components/schemas/SampleFoodItem'
+    NutrientConversionFactors:
+      properties:
+        type:
+          type: string
+          example: .ProteinConversionFactor
+        value:
+          type: number
+          format: double
+          example: 6.25
+    FoundationFoodItem:
+      required:
+        - fdcId
+        - dataType
+        - description
+      properties:
+        fdcId:
+          type: integer
+          example: 747448
+        dataType:
+          type: string
+          example: Foundation
+        description:
+          type: string
+          example: Strawberries, raw
+        foodClass:
+          type: string
+          example: FinalFood
+        footNote:
+          type: string
+          example: >-
+            Source number reflects the actual number of samples analyzed for a
+            nutrient. Repeat nutrient analyses may have been done on the same
+            sample with the values shown.
+        isHistoricalReference:
+          type: boolean
+          example: false
+        ndbNumber:
+          type: integer
+          example: 9316
+        publicationDate:
+          type: string
+          example: 12/16/2019
+        scientificName:
+          type: string
+          example: Fragaria X ananassa
+        foodCategory:
+          $ref: '#/components/schemas/schemas-FoodCategory'
+        foodComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodComponent'
+        foodNutrients:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodNutrient'
+        foodPortions:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-FoodPortion'
+        inputFoods:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputFoodFoundation'
+        nutrientConversionFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/NutrientConversionFactors'
+    SRLegacyFoodItem:
+      required:
+        - fdcId
+        - dataType
+        - description
+      properties:
+        fdcId:
+          type: integer
+          example: 170379
+        dataType:
+          type: string
+          example: SR Legacy
+        description:
+          type: string
+          example: Broccoli, raw
+        foodClass:
+          type: string
+          example: FinalFood
+        isHistoricalReference:
+          type: boolean
+          example: true
+        ndbNumber:
+          type: integer
+          example: 11090
+        publicationDate:
+          type: string
+          example: 4/1/2019
+        scientificName:
+          type: string
+          example: Brassica oleracea var. italica
+        foodCategory:
+          $ref: '#/components/schemas/schemas-FoodCategory'
+        foodNutrients:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodNutrient'
+        nutrientConversionFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/NutrientConversionFactors'
+    SurveyFoodItem:
+      required:
+        - fdcId
+        - dataType
+        - description
+      properties:
+        fdcId:
+          type: integer
+          example: 337985
+        datatype:
+          type: string
+          example: Survey (FNDDS)
+        description:
+          type: string
+          example: Beef curry
+        endDate:
+          type: string
+          example: 12/31/2014
+        foodClass:
+          type: string
+          example: Survey
+        foodCode:
+          type: string
+          example: '27116100'
+        publicationDate:
+          type: string
+          example: 4/1/2019
+        startDate:
+          type: string
+          example: 1/1/2013
+        foodAttributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FoodAttribute'
+        foodPortions:
+          type: array
+          items:
+            $ref: '#/components/schemas/schemas-FoodPortion'
+        inputFoods:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputFoodSurvey'
+        wweiaFoodCategory:
+          $ref: '#/components/schemas/WweiaFoodCategory'
+    RetentionFactor:
+      properties:
+        id:
+          type: integer
+          example: 235
+        code:
+          type: integer
+          example: 3460
+        description:
+          type: string
+          example: VEG, ROOTS, ETC, SAUTEED
+    InputFoodSurvey:
+      description: applies to Survey (FNDDS). Not all inputFoods will have all fields.
+      properties:
+        id:
+          type: integer
+          example: 18146
+        amount:
+          type: number
+          format: double
+          example: 1.5
+        foodDescription:
+          type: string
+          example: Spices, curry powder
+        ingredientCode:
+          type: integer
+          example: 2015
+        ingredientDescription:
+          type: string
+          example: Spices, curry powder
+        ingredientWeight:
+          type: number
+          format: double
+          example: 9.45
+        portionCode:
+          type: string
+          example: '21000'
+        portionDescription:
+          type: string
+          example: 1 tablespoon
+        sequenceNumber:
+          type: integer
+          example: 6
+        surveyFlag:
+          type: integer
+          example: 0
+        unit:
+          type: string
+          example: TB
+        inputFood:
+          $ref: '#/components/schemas/SurveyFoodItem'
+        retentionFactor:
+          $ref: '#/components/schemas/RetentionFactor'
+    WweiaFoodCategory:
+      properties:
+        wweiaFoodCategoryCode:
+          type: integer
+          example: 3002
+        wweiaFoodCategoryDescription:
+          type: string
+          example: Meat mixed dishes
   parameters:
     offsetParam:
       in: query

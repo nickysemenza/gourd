@@ -39,7 +39,7 @@ const IngredientList: React.FC = () => {
     onlyMissingFDC ? !i.food : true
   );
 
-  type i = typeof ingredients[0];
+  type i = (typeof ingredients)[0];
 
   const columns: Array<Column<i>> = React.useMemo(() => {
     const iApi = new IngredientsApi(getOpenapiFetchConfig());
@@ -162,7 +162,7 @@ const IngredientList: React.FC = () => {
               <FoodSearch
                 enableSearch={onlyMissingFDC}
                 name={original.ingredient.name}
-                highlightId={original.food?.fdc_id}
+                highlightId={original.food?.wrapper.fdc_id}
                 onLink={(fdcId: number) => {
                   linkFoodToIngredient(original.ingredient.id, fdcId);
                 }}

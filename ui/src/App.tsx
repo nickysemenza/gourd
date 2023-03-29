@@ -16,6 +16,7 @@ import CreateRecipe from "./pages/CreateRecipe";
 import Food from "./pages/Food";
 import Playground from "./pages/Playground";
 import RecipeDiff from "./pages/RecipeDiff";
+import Search from "./pages/Search";
 
 import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
@@ -81,6 +82,7 @@ function App() {
                   <Route path="playground" element={<Playground />} />
                   <Route path="diff" element={<RecipeDiff />} />
                   <Route path="graph" element={<Graph />} />
+                  <Route path="search" element={<Search />} />
                   <Route
                     path="photos"
                     element={

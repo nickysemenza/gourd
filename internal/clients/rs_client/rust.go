@@ -61,27 +61,35 @@ func (c *Client) ConvertUnit(ctx context.Context, body, target interface{}) erro
 	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
 	defer span.End()
 
-	return c.Post(ctx, "convert", body, target)
+	return c.Send(ctx, "convert", body, target)
 }
 
-func (c *Client) Post(ctx context.Context, route string, body, target interface{}) error {
+func (c *Client) Send(ctx context.Context, route string, body, target interface{}) error {
 
 	route = c.baseurl + route
 
-	ctx, span := otel.Tracer("rs_client").Start(ctx, "post")
+	ctx, span := otel.Tracer("rs_client").Start(ctx, "send")
 	defer span.End()
-	payloadBuf := new(bytes.Buffer)
-	err := json.NewEncoder(payloadBuf).Encode(body)
-	if err != nil {
-		return err
-	}
 
 	span.AddEvent("sending", trace.WithAttributes(attribute.String("body", spew.Sdump(body))))
 	defer func() {
 		span.AddEvent("got", trace.WithAttributes(attribute.String("target", spew.Sdump(target))))
 	}()
-
-	req, _ := http.NewRequestWithContext(ctx, "POST", route, payloadBuf)
+	var req *http.Request
+	var err error
+	if body == nil {
+		req, err = http.NewRequestWithContext(ctx, "GET", route, nil)
+	} else {
+		payloadBuf := new(bytes.Buffer)
+		err = json.NewEncoder(payloadBuf).Encode(body)
+		if err != nil {
+			return err
+		}
+		req, err = http.NewRequestWithContext(ctx, "POST", route, payloadBuf)
+	}
+	if err != nil {
+		return err
+	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "gourd")
 

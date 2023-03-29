@@ -59,6 +59,30 @@ var UsdaFoodCalorieConversionFactorTableColumns = struct {
 
 // Generated where
 
+type whereHelpernull_Float32 struct{ field string }
+
+func (w whereHelpernull_Float32) EQ(x null.Float32) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Float32) NEQ(x null.Float32) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Float32) LT(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Float32) LTE(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Float32) GT(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Float32) GTE(x null.Float32) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Float32) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Float32) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var UsdaFoodCalorieConversionFactorWhere = struct {
 	FoodNutrientConversionFactorID whereHelperint
 	ProteinValue                   whereHelpernull_Float32

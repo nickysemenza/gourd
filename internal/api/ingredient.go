@@ -110,14 +110,24 @@ func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *Ingredien
 	}
 
 	detail.Food = food
-	span.SetAttributes(attribute.Int("fdc_id", food.FdcId))
+	span.SetAttributes(attribute.Int("fdc_id", food.Wrapper.FdcId))
 
 	detail.UnitMappings = append(detail.UnitMappings, food.UnitMappings...)
 	return
 }
-func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMapping, error) {
+func (a *API) UnitMappingsFromFood(ctx context.Context, food *FoodWrapper) ([]UnitMapping, error) {
+	ctx, span := a.tracer.Start(ctx, "UnitMappingsFromFood")
+	defer span.End()
+
 	// todo: store these in DB instead of inline parsing ?
 	m := []UnitMapping{}
+
+	err := a.R.Send(ctx, "unit_mappings_from_food", food, &m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
+
 	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
 		var res []Amount
 		err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.ParseAmount, &res)
@@ -160,9 +170,9 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *Food) ([]UnitMappi
 		}
 	}
 	for _, n := range food.Nutrients {
-		if n.Nutrient.UnitName == FoodNutrientUnitKCAL {
+		if *n.Nutrient.UnitName == "KCAL" {
 			m = append(m, UnitMapping{
-				Amount{Unit: "kcal", Value: n.Amount},
+				Amount{Unit: "kcal", Value: *n.Amount},
 				Amount{Unit: "grams", Value: 100},
 				zero.StringFrom("fdc n").Ptr()})
 		}

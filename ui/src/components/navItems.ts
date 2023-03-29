@@ -9,6 +9,7 @@ export const navItems: {
   // { title: "playground", path: "playground" },
   { title: "graph", path: "graph" },
   { title: "photos", path: "photos" },
-  { title: "meals", path: "meals" },
-  { title: "albums", path: "albums" },
+  { title: "n meals", path: "meals" },
+  { title: "g albums", path: "albums" },
+  { title: "search", path: "search" },
 ];

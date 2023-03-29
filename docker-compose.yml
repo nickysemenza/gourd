@@ -113,3 +113,11 @@ services:
     environment:
       DB_DSN: postgresql://gourd:gourd@usda_db:5432/usda
       CI: "true"
+  meilisearch:
+    ports:
+      - '7700:7700'
+    environment:
+      - MEILI_MASTER_KEY=FOO
+    volumes:
+      - './meili_data:/meili_data'
+    image: 'getmeili/meilisearch:v1.0'

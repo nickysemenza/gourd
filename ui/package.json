@@ -5,6 +5,7 @@
   "dependencies": {
     "@craco/craco": "7.1.0",
     "@headlessui/react": "1.7.8",
+    "@meilisearch/instant-meilisearch": "^0.11.1",
     "@opentelemetry/api": "1.4.0",
     "@opentelemetry/auto-instrumentations-web": "0.31.2",
     "@opentelemetry/context-zone": "1.11.0",
@@ -49,6 +50,7 @@
     "react-google-login": "5.2.2",
     "react-helmet": "6.1.0",
     "react-hotkeys-hook": "4.3.4",
+    "react-instantsearch-hooks-web": "^6.42.0",
     "react-json-view": "1.21.3",
     "react-router-dom": "6.10.0",
     "react-scripts": "5.0.1",

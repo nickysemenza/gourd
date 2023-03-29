@@ -32,25 +32,6 @@ const (
 	FoodDataTypeSurveyFnddsFood FoodDataType = "survey_fndds_food"
 )
 
-// Defines values for FoodNutrientUnit.
-const (
-	FoodNutrientUnitG FoodNutrientUnit = "G"
-
-	FoodNutrientUnitIU FoodNutrientUnit = "IU"
-
-	FoodNutrientUnitKCAL FoodNutrientUnit = "KCAL"
-
-	FoodNutrientUnitKJ FoodNutrientUnit = "kJ"
-
-	FoodNutrientUnitMG FoodNutrientUnit = "MG"
-
-	FoodNutrientUnitMGATE FoodNutrientUnit = "MG_ATE"
-
-	FoodNutrientUnitSPGR FoodNutrientUnit = "SP_GR"
-
-	FoodNutrientUnitUG FoodNutrientUnit = "UG"
-)
-
 // Defines values for IngredientKind.
 const (
 	IngredientKindIngredient IngredientKind = "ingredient"
@@ -116,6 +97,71 @@ type BrandedFood struct {
 	ServingSizeUnit     string  `json:"serving_size_unit"`
 }
 
+// BrandedFoodItem defines model for BrandedFoodItem.
+type BrandedFoodItem struct {
+	AvailableDate            *string          `json:"availableDate,omitempty"`
+	BrandOwner               *string          `json:"brandOwner,omitempty"`
+	BrandedFoodCategory      *string          `json:"brandedFoodCategory,omitempty"`
+	DataSource               *string          `json:"dataSource,omitempty"`
+	DataType                 string           `json:"dataType"`
+	Description              string           `json:"description"`
+	FdcId                    int              `json:"fdcId"`
+	FoodClass                *string          `json:"foodClass,omitempty"`
+	FoodNutrients            *[]FoodNutrient  `json:"foodNutrients,omitempty"`
+	FoodUpdateLog            *[]FoodUpdateLog `json:"foodUpdateLog,omitempty"`
+	GpcClassCode             *int             `json:"gpcClassCode,omitempty"`
+	GtinUpc                  *string          `json:"gtinUpc,omitempty"`
+	HouseholdServingFullText *string          `json:"householdServingFullText,omitempty"`
+	Ingredients              *string          `json:"ingredients,omitempty"`
+	LabelNutrients           *struct {
+		Calcium *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"calcium,omitempty"`
+		Calories *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"calories,omitempty"`
+		Carbohydrates *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"carbohydrates,omitempty"`
+		Cholesterol *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"cholesterol,omitempty"`
+		Fat *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"fat,omitempty"`
+		Fiber *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"fiber,omitempty"`
+		Iron *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"iron,omitempty"`
+		Potassium *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"potassium,omitempty"`
+		Protein *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"protein,omitempty"`
+		SaturatedFat *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"saturatedFat,omitempty"`
+		Sodium *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"sodium,omitempty"`
+		Sugars *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"sugars,omitempty"`
+		TransFat *struct {
+			Value *float64 `json:"value,omitempty"`
+		} `json:"transFat,omitempty"`
+	} `json:"labelNutrients,omitempty"`
+	ModifiedDate         *string   `json:"modifiedDate,omitempty"`
+	PreparationStateCode *string   `json:"preparationStateCode,omitempty"`
+	PublicationDate      *string   `json:"publicationDate,omitempty"`
+	ServingSize          *float64  `json:"servingSize,omitempty"`
+	ServingSizeUnit      *string   `json:"servingSizeUnit,omitempty"`
+	TradeChannel         *[]string `json:"tradeChannel,omitempty"`
+}
+
 // CompactRecipe defines model for CompactRecipe.
 type CompactRecipe struct {
 	Meta     CompactRecipeMeta      `json:"meta"`
@@ -160,8 +206,130 @@ type Error struct {
 	TraceId *string `json:"trace_id,omitempty"`
 }
 
+// FoodAttribute defines model for FoodAttribute.
+type FoodAttribute struct {
+	FoodAttributeType *struct {
+		Description *string `json:"description,omitempty"`
+		Id          *int    `json:"id,omitempty"`
+		Name        *string `json:"name,omitempty"`
+	} `json:"FoodAttributeType,omitempty"`
+	Id             *int    `json:"id,omitempty"`
+	SequenceNumber *int    `json:"sequenceNumber,omitempty"`
+	Value          *string `json:"value,omitempty"`
+}
+
+// food category, set for some
+type FoodCategory struct {
+	// Food description
+	Code string `json:"code"`
+
+	// Food description
+	Description string `json:"description"`
+}
+
+// FoodComponent defines model for FoodComponent.
+type FoodComponent struct {
+	DataPoints      *int     `json:"dataPoints,omitempty"`
+	GramWeight      *float32 `json:"gramWeight,omitempty"`
+	Id              *int32   `json:"id,omitempty"`
+	IsRefuse        *bool    `json:"isRefuse,omitempty"`
+	MinYearAcquired *int     `json:"minYearAcquired,omitempty"`
+	Name            *string  `json:"name,omitempty"`
+	PercentWeight   *float32 `json:"percentWeight,omitempty"`
+}
+
+// FoodDataType defines model for FoodDataType.
+type FoodDataType string
+
+// A top level food?
+type FoodInfo struct {
+	// mappings of equivalent units
+	UnitMappings []UnitMapping `json:"unit_mappings"`
+
+	// A top level food
+	Wrapper FoodWrapper `json:"wrapper"`
+}
+
+// FoodNutrient defines model for FoodNutrient.
+type FoodNutrient struct {
+	Amount                 *float64                `json:"amount,omitempty"`
+	DataPoints             *int64                  `json:"dataPoints,omitempty"`
+	FoodNutrientDerivation *FoodNutrientDerivation `json:"foodNutrientDerivation,omitempty"`
+	Id                     int                     `json:"id"`
+	Max                    *float64                `json:"max,omitempty"`
+	Median                 *float64                `json:"median,omitempty"`
+	Min                    *float64                `json:"min,omitempty"`
+
+	// a food nutrient
+	Nutrient                *Nutrient                `json:"nutrient,omitempty"`
+	NutrientAnalysisDetails *NutrientAnalysisDetails `json:"nutrientAnalysisDetails,omitempty"`
+	Type                    *string                  `json:"type,omitempty"`
+}
+
+// FoodNutrientDerivation defines model for FoodNutrientDerivation.
+type FoodNutrientDerivation struct {
+	Code               *string             `json:"code,omitempty"`
+	Description        *string             `json:"description,omitempty"`
+	FoodNutrientSource *FoodNutrientSource `json:"foodNutrientSource,omitempty"`
+	Id                 *int32              `json:"id,omitempty"`
+}
+
+// FoodNutrientSource defines model for FoodNutrientSource.
+type FoodNutrientSource struct {
+	Code        *string `json:"code,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Id          *int32  `json:"id,omitempty"`
+}
+
+// food_portion
+type FoodPortion struct {
+	Amount             float64 `json:"amount"`
+	GramWeight         float64 `json:"gram_weight"`
+	Id                 int     `json:"id"`
+	Modifier           string  `json:"modifier"`
+	PortionDescription string  `json:"portion_description"`
+}
+
+// A meal, which bridges recipes to photos
+type FoodResultByItem struct {
+	BrandedFood    []BrandedFoodItem    `json:"branded_food"`
+	FoundationFood []FoundationFoodItem `json:"foundation_food"`
+	Info           []FoodInfo           `json:"info"`
+	LegacyFood     []SRLegacyFoodItem   `json:"legacy_food"`
+	SurveyFood     []SurveyFoodItem     `json:"survey_food"`
+}
+
+// A meal, which bridges recipes to photos
+type FoodSearchResult struct {
+	Foods []FoodInfo `json:"foods"`
+
+	// A meal, which bridges recipes to photos
+	Results *FoodResultByItem `json:"results,omitempty"`
+}
+
+// FoodUpdateLog defines model for FoodUpdateLog.
+type FoodUpdateLog struct {
+	AvailableDate            *string          `json:"availableDate,omitempty"`
+	BrandOwner               *string          `json:"brandOwner,omitempty"`
+	BrandedFoodCategory      *string          `json:"brandedFoodCategory,omitempty"`
+	Changes                  *string          `json:"changes,omitempty"`
+	DataSource               *string          `json:"dataSource,omitempty"`
+	DataType                 *string          `json:"dataType,omitempty"`
+	Description              *string          `json:"description,omitempty"`
+	FdcId                    *int             `json:"fdcId,omitempty"`
+	FoodAttributes           *[]FoodAttribute `json:"foodAttributes,omitempty"`
+	FoodClass                *string          `json:"foodClass,omitempty"`
+	GtinUpc                  *string          `json:"gtinUpc,omitempty"`
+	HouseholdServingFullText *string          `json:"householdServingFullText,omitempty"`
+	Ingredients              *string          `json:"ingredients,omitempty"`
+	ModifiedDate             *string          `json:"modifiedDate,omitempty"`
+	PublicationDate          *string          `json:"publicationDate,omitempty"`
+	ServingSize              *float64         `json:"servingSize,omitempty"`
+	ServingSizeUnit          *string          `json:"servingSizeUnit,omitempty"`
+}
+
 // A top level food
-type Food struct {
+type FoodWrapper struct {
 	// branded_food
 	BrandedInfo *BrandedFood `json:"branded_info,omitempty"`
 
@@ -180,42 +348,25 @@ type Food struct {
 
 	// portion datapoints
 	Portions *[]FoodPortion `json:"portions,omitempty"`
-
-	// mappings of equivalent units
-	UnitMappings []UnitMapping `json:"unit_mappings"`
 }
 
-// food category, set for some
-type FoodCategory struct {
-	// Food description
-	Code string `json:"code"`
-
-	// Food description
-	Description string `json:"description"`
-}
-
-// FoodDataType defines model for FoodDataType.
-type FoodDataType string
-
-// todo
-type FoodNutrient struct {
-	Amount     float64 `json:"amount"`
-	DataPoints int     `json:"data_points"`
-
-	// todo
-	Nutrient Nutrient `json:"nutrient"`
-}
-
-// FoodNutrientUnit defines model for FoodNutrientUnit.
-type FoodNutrientUnit string
-
-// food_portion
-type FoodPortion struct {
-	Amount             float64 `json:"amount"`
-	GramWeight         float64 `json:"gram_weight"`
-	Id                 int     `json:"id"`
-	Modifier           string  `json:"modifier"`
-	PortionDescription string  `json:"portion_description"`
+// FoundationFoodItem defines model for FoundationFoodItem.
+type FoundationFoodItem struct {
+	DataType                  string                       `json:"dataType"`
+	Description               string                       `json:"description"`
+	FdcId                     int                          `json:"fdcId"`
+	FoodCategory              *SchemasFoodCategory         `json:"foodCategory,omitempty"`
+	FoodClass                 *string                      `json:"foodClass,omitempty"`
+	FoodComponents            *[]FoodComponent             `json:"foodComponents,omitempty"`
+	FoodNutrients             *[]FoodNutrient              `json:"foodNutrients,omitempty"`
+	FoodPortions              *[]SchemasFoodPortion        `json:"foodPortions,omitempty"`
+	FootNote                  *string                      `json:"footNote,omitempty"`
+	InputFoods                *[]InputFoodFoundation       `json:"inputFoods,omitempty"`
+	IsHistoricalReference     *bool                        `json:"isHistoricalReference,omitempty"`
+	NdbNumber                 *int                         `json:"ndbNumber,omitempty"`
+	NutrientConversionFactors *[]NutrientConversionFactors `json:"nutrientConversionFactors,omitempty"`
+	PublicationDate           *string                      `json:"publicationDate,omitempty"`
+	ScientificName            *string                      `json:"scientificName,omitempty"`
 }
 
 // an album containing `Photo`
@@ -253,8 +404,8 @@ type IngredientDetail struct {
 	// Ingredients that are equivalent
 	Children *[]IngredientDetail `json:"children,omitempty"`
 
-	// A top level food
-	Food *Food `json:"food,omitempty"`
+	// A top level food?
+	Food *FoodInfo `json:"food,omitempty"`
 
 	// An Ingredient
 	Ingredient Ingredient `json:"ingredient"`
@@ -295,6 +446,30 @@ type IngredientUsage struct {
 
 	// mappings of equivalent units
 	RequiredBy []EntitySummary `json:"required_by"`
+}
+
+// applies to Foundation foods. Not all inputFoods will have all fields.
+type InputFoodFoundation struct {
+	FoodDescription *string         `json:"foodDescription,omitempty"`
+	Id              *int            `json:"id,omitempty"`
+	InputFood       *SampleFoodItem `json:"inputFood,omitempty"`
+}
+
+// applies to Survey (FNDDS). Not all inputFoods will have all fields.
+type InputFoodSurvey struct {
+	Amount                *float64         `json:"amount,omitempty"`
+	FoodDescription       *string          `json:"foodDescription,omitempty"`
+	Id                    *int             `json:"id,omitempty"`
+	IngredientCode        *int             `json:"ingredientCode,omitempty"`
+	IngredientDescription *string          `json:"ingredientDescription,omitempty"`
+	IngredientWeight      *float64         `json:"ingredientWeight,omitempty"`
+	InputFood             *SurveyFoodItem  `json:"inputFood,omitempty"`
+	PortionCode           *string          `json:"portionCode,omitempty"`
+	PortionDescription    *string          `json:"portionDescription,omitempty"`
+	RetentionFactor       *RetentionFactor `json:"retentionFactor,omitempty"`
+	SequenceNumber        *int             `json:"sequenceNumber,omitempty"`
+	SurveyFlag            *int             `json:"surveyFlag,omitempty"`
+	Unit                  *string          `json:"unit,omitempty"`
 }
 
 // A generic list (for pagination use)
@@ -353,19 +528,51 @@ type MealRecipeUpdate struct {
 // todo
 type MealRecipeUpdateAction string
 
-// todo
-type Nutrient struct {
-	// todo
-	Id int `json:"id"`
+// MeasureUnit defines model for MeasureUnit.
+type MeasureUnit struct {
+	Abbreviation *string `json:"abbreviation,omitempty"`
+	Id           *int32  `json:"id,omitempty"`
+	Name         *string `json:"name,omitempty"`
+}
 
-	// todo
-	Name     string           `json:"name"`
-	UnitName FoodNutrientUnit `json:"unit_name"`
+// a food nutrient
+type Nutrient struct {
+	Id       *int    `json:"id,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Number   *string `json:"number,omitempty"`
+	Rank     *int    `json:"rank,omitempty"`
+	UnitName *string `json:"unitName,omitempty"`
+}
+
+// NutrientAcquisitionDetails defines model for NutrientAcquisitionDetails.
+type NutrientAcquisitionDetails struct {
+	PurchaseDate *string `json:"purchaseDate,omitempty"`
+	SampleUnitId *int    `json:"sampleUnitId,omitempty"`
+	StoreCity    *string `json:"storeCity,omitempty"`
+	StoreState   *string `json:"storeState,omitempty"`
+}
+
+// NutrientAnalysisDetails defines model for NutrientAnalysisDetails.
+type NutrientAnalysisDetails struct {
+	Amount                       *float64                      `json:"amount,omitempty"`
+	LabMethodDescription         *string                       `json:"labMethodDescription,omitempty"`
+	LabMethodLink                *string                       `json:"labMethodLink,omitempty"`
+	LabMethodOriginalDescription *string                       `json:"labMethodOriginalDescription,omitempty"`
+	LabMethodTechnique           *string                       `json:"labMethodTechnique,omitempty"`
+	NutrientAcquisitionDetails   *[]NutrientAcquisitionDetails `json:"nutrientAcquisitionDetails,omitempty"`
+	NutrientId                   *int                          `json:"nutrientId,omitempty"`
+	SubSampleId                  *int                          `json:"subSampleId,omitempty"`
+}
+
+// NutrientConversionFactors defines model for NutrientConversionFactors.
+type NutrientConversionFactors struct {
+	Type  *string  `json:"type,omitempty"`
+	Value *float64 `json:"value,omitempty"`
 }
 
 // pages of Food
 type PaginatedFoods struct {
-	Foods *[]Food `json:"foods,omitempty"`
+	Foods *[]FoodInfo `json:"foods,omitempty"`
 
 	// A generic list (for pagination use)
 	Meta Items `json:"meta"`
@@ -572,6 +779,38 @@ type RecipeWrapperInput struct {
 	Id *string `json:"id,omitempty"`
 }
 
+// RetentionFactor defines model for RetentionFactor.
+type RetentionFactor struct {
+	Code        *int    `json:"code,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Id          *int    `json:"id,omitempty"`
+}
+
+// SRLegacyFoodItem defines model for SRLegacyFoodItem.
+type SRLegacyFoodItem struct {
+	DataType                  string                       `json:"dataType"`
+	Description               string                       `json:"description"`
+	FdcId                     int                          `json:"fdcId"`
+	FoodCategory              *SchemasFoodCategory         `json:"foodCategory,omitempty"`
+	FoodClass                 *string                      `json:"foodClass,omitempty"`
+	FoodNutrients             *[]FoodNutrient              `json:"foodNutrients,omitempty"`
+	IsHistoricalReference     *bool                        `json:"isHistoricalReference,omitempty"`
+	NdbNumber                 *int                         `json:"ndbNumber,omitempty"`
+	NutrientConversionFactors *[]NutrientConversionFactors `json:"nutrientConversionFactors,omitempty"`
+	PublicationDate           *string                      `json:"publicationDate,omitempty"`
+	ScientificName            *string                      `json:"scientificName,omitempty"`
+}
+
+// SampleFoodItem defines model for SampleFoodItem.
+type SampleFoodItem struct {
+	Datatype        *string                `json:"datatype,omitempty"`
+	Description     string                 `json:"description"`
+	FdcId           int                    `json:"fdcId"`
+	FoodAttributes  *[]SchemasFoodCategory `json:"foodAttributes,omitempty"`
+	FoodClass       *string                `json:"foodClass,omitempty"`
+	PublicationDate *string                `json:"publicationDate,omitempty"`
+}
+
 // A search result wrapper, which contains ingredients and recipes
 type SearchResult struct {
 	// The ingredients
@@ -665,6 +904,22 @@ type SumsResponse_ByRecipe struct {
 	AdditionalProperties map[string][]UsageValue `json:"-"`
 }
 
+// SurveyFoodItem defines model for SurveyFoodItem.
+type SurveyFoodItem struct {
+	Datatype          *string               `json:"datatype,omitempty"`
+	Description       string                `json:"description"`
+	EndDate           *string               `json:"endDate,omitempty"`
+	FdcId             int                   `json:"fdcId"`
+	FoodAttributes    *[]FoodAttribute      `json:"foodAttributes,omitempty"`
+	FoodClass         *string               `json:"foodClass,omitempty"`
+	FoodCode          *string               `json:"foodCode,omitempty"`
+	FoodPortions      *[]SchemasFoodPortion `json:"foodPortions,omitempty"`
+	InputFoods        *[]InputFoodSurvey    `json:"inputFoods,omitempty"`
+	PublicationDate   *string               `json:"publicationDate,omitempty"`
+	StartDate         *string               `json:"startDate,omitempty"`
+	WweiaFoodCategory *WweiaFoodCategory    `json:"wweiaFoodCategory,omitempty"`
+}
+
 // UnitConversionRequest defines model for UnitConversionRequest.
 type UnitConversionRequest struct {
 	// multiple amounts to try
@@ -700,6 +955,32 @@ type UsageValue struct {
 
 	// amounts
 	Sum []Amount `json:"sum"`
+}
+
+// WweiaFoodCategory defines model for WweiaFoodCategory.
+type WweiaFoodCategory struct {
+	WweiaFoodCategoryCode        *int    `json:"wweiaFoodCategoryCode,omitempty"`
+	WweiaFoodCategoryDescription *string `json:"wweiaFoodCategoryDescription,omitempty"`
+}
+
+// SchemasFoodCategory defines model for schemas-FoodCategory.
+type SchemasFoodCategory struct {
+	Code        *string `json:"code,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Id          *int32  `json:"id,omitempty"`
+}
+
+// SchemasFoodPortion defines model for schemas-FoodPortion.
+type SchemasFoodPortion struct {
+	Amount             *float64     `json:"amount,omitempty"`
+	DataPoints         *int32       `json:"dataPoints,omitempty"`
+	GramWeight         *float64     `json:"gramWeight,omitempty"`
+	Id                 *int32       `json:"id,omitempty"`
+	MeasureUnit        *MeasureUnit `json:"measureUnit,omitempty"`
+	MinYearAcquired    *int         `json:"minYearAcquired,omitempty"`
+	Modifier           *string      `json:"modifier,omitempty"`
+	PortionDescription *string      `json:"portionDescription,omitempty"`
+	SequenceNumber     *int         `json:"sequenceNumber,omitempty"`
 }
 
 // LimitParam defines model for limitParam.

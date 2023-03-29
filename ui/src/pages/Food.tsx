@@ -29,8 +29,8 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
     description,
     data_type,
     nutrients,
-    unit_mappings,
-  } = data;
+  } = data.wrapper;
+  const { unit_mappings } = data;
   return (
     <div>
       <h2 className="font-bold text-l">{description}</h2>
@@ -45,12 +45,12 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
 
       <table>
         {nutrients
-          .filter((n) => n.amount > 0.1)
+          .filter((n) => n.amount && n.amount > 0.1)
           .map((n, x) => (
             <tr key={x}>
-              <td>{scaledRound(n.amount)} </td>
-              <td>{n.nutrient.unit_name} </td>
-              <td>{n.nutrient.name} </td>
+              <td>{n.amount && scaledRound(n.amount)} </td>
+              <td>{n.nutrient && n.nutrient.unitName} </td>
+              <td>{n.nutrient && n.nutrient.name} </td>
             </tr>
           ))}
       </table>

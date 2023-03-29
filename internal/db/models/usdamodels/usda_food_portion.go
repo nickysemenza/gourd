@@ -27,11 +27,11 @@ type UsdaFoodPortion struct {
 	ID                 int          `boil:"id" json:"id" toml:"id" yaml:"id"`
 	FDCID              null.Int     `boil:"fdc_id" json:"fdc_id,omitempty" toml:"fdc_id" yaml:"fdc_id,omitempty"`
 	SeqNum             null.Int     `boil:"seq_num" json:"seq_num,omitempty" toml:"seq_num" yaml:"seq_num,omitempty"`
-	Amount             null.Float32 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
+	Amount             null.Float64 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
 	MeasureUnitID      null.Int     `boil:"measure_unit_id" json:"measure_unit_id,omitempty" toml:"measure_unit_id" yaml:"measure_unit_id,omitempty"`
 	PortionDescription null.String  `boil:"portion_description" json:"portion_description,omitempty" toml:"portion_description" yaml:"portion_description,omitempty"`
 	Modifier           null.String  `boil:"modifier" json:"modifier,omitempty" toml:"modifier" yaml:"modifier,omitempty"`
-	GramWeight         null.Float32 `boil:"gram_weight" json:"gram_weight,omitempty" toml:"gram_weight" yaml:"gram_weight,omitempty"`
+	GramWeight         null.Float64 `boil:"gram_weight" json:"gram_weight,omitempty" toml:"gram_weight" yaml:"gram_weight,omitempty"`
 	DataPoints         null.Int     `boil:"data_points" json:"data_points,omitempty" toml:"data_points" yaml:"data_points,omitempty"`
 	Footnote           null.String  `boil:"footnote" json:"footnote,omitempty" toml:"footnote" yaml:"footnote,omitempty"`
 	MinYearAcquired    null.String  `boil:"min_year_acquired" json:"min_year_acquired,omitempty" toml:"min_year_acquired" yaml:"min_year_acquired,omitempty"`
@@ -98,11 +98,11 @@ var UsdaFoodPortionWhere = struct {
 	ID                 whereHelperint
 	FDCID              whereHelpernull_Int
 	SeqNum             whereHelpernull_Int
-	Amount             whereHelpernull_Float32
+	Amount             whereHelpernull_Float64
 	MeasureUnitID      whereHelpernull_Int
 	PortionDescription whereHelpernull_String
 	Modifier           whereHelpernull_String
-	GramWeight         whereHelpernull_Float32
+	GramWeight         whereHelpernull_Float64
 	DataPoints         whereHelpernull_Int
 	Footnote           whereHelpernull_String
 	MinYearAcquired    whereHelpernull_String
@@ -110,11 +110,11 @@ var UsdaFoodPortionWhere = struct {
 	ID:                 whereHelperint{field: "\"usda_food_portion\".\"id\""},
 	FDCID:              whereHelpernull_Int{field: "\"usda_food_portion\".\"fdc_id\""},
 	SeqNum:             whereHelpernull_Int{field: "\"usda_food_portion\".\"seq_num\""},
-	Amount:             whereHelpernull_Float32{field: "\"usda_food_portion\".\"amount\""},
+	Amount:             whereHelpernull_Float64{field: "\"usda_food_portion\".\"amount\""},
 	MeasureUnitID:      whereHelpernull_Int{field: "\"usda_food_portion\".\"measure_unit_id\""},
 	PortionDescription: whereHelpernull_String{field: "\"usda_food_portion\".\"portion_description\""},
 	Modifier:           whereHelpernull_String{field: "\"usda_food_portion\".\"modifier\""},
-	GramWeight:         whereHelpernull_Float32{field: "\"usda_food_portion\".\"gram_weight\""},
+	GramWeight:         whereHelpernull_Float64{field: "\"usda_food_portion\".\"gram_weight\""},
 	DataPoints:         whereHelpernull_Int{field: "\"usda_food_portion\".\"data_points\""},
 	Footnote:           whereHelpernull_String{field: "\"usda_food_portion\".\"footnote\""},
 	MinYearAcquired:    whereHelpernull_String{field: "\"usda_food_portion\".\"min_year_acquired\""},

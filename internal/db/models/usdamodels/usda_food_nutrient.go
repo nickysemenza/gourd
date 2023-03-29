@@ -27,13 +27,13 @@ type UsdaFoodNutrient struct {
 	ID              int          `boil:"id" json:"id" toml:"id" yaml:"id"`
 	FDCID           null.Int     `boil:"fdc_id" json:"fdc_id,omitempty" toml:"fdc_id" yaml:"fdc_id,omitempty"`
 	NutrientID      null.Int     `boil:"nutrient_id" json:"nutrient_id,omitempty" toml:"nutrient_id" yaml:"nutrient_id,omitempty"`
-	Amount          null.Float32 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
-	DataPoints      null.Int     `boil:"data_points" json:"data_points,omitempty" toml:"data_points" yaml:"data_points,omitempty"`
+	Amount          null.Float64 `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
+	DataPoints      null.Int64   `boil:"data_points" json:"data_points,omitempty" toml:"data_points" yaml:"data_points,omitempty"`
 	DerivationID    null.Int     `boil:"derivation_id" json:"derivation_id,omitempty" toml:"derivation_id" yaml:"derivation_id,omitempty"`
-	Min             null.Float32 `boil:"min" json:"min,omitempty" toml:"min" yaml:"min,omitempty"`
-	Max             null.Float32 `boil:"max" json:"max,omitempty" toml:"max" yaml:"max,omitempty"`
-	Median          null.Float32 `boil:"median" json:"median,omitempty" toml:"median" yaml:"median,omitempty"`
-	Loq             null.Float32 `boil:"loq" json:"loq,omitempty" toml:"loq" yaml:"loq,omitempty"`
+	Min             null.Float64 `boil:"min" json:"min,omitempty" toml:"min" yaml:"min,omitempty"`
+	Max             null.Float64 `boil:"max" json:"max,omitempty" toml:"max" yaml:"max,omitempty"`
+	Median          null.Float64 `boil:"median" json:"median,omitempty" toml:"median" yaml:"median,omitempty"`
+	Loq             null.Float64 `boil:"loq" json:"loq,omitempty" toml:"loq" yaml:"loq,omitempty"`
 	Footnote        null.String  `boil:"footnote" json:"footnote,omitempty" toml:"footnote" yaml:"footnote,omitempty"`
 	MinYearAcquired null.String  `boil:"min_year_acquired" json:"min_year_acquired,omitempty" toml:"min_year_acquired" yaml:"min_year_acquired,omitempty"`
 
@@ -99,30 +99,54 @@ var UsdaFoodNutrientTableColumns = struct {
 
 // Generated where
 
+type whereHelpernull_Int64 struct{ field string }
+
+func (w whereHelpernull_Int64) EQ(x null.Int64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_Int64) NEQ(x null.Int64) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_Int64) LT(x null.Int64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_Int64) LTE(x null.Int64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_Int64) GT(x null.Int64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_Int64) GTE(x null.Int64) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+func (w whereHelpernull_Int64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Int64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+
 var UsdaFoodNutrientWhere = struct {
 	ID              whereHelperint
 	FDCID           whereHelpernull_Int
 	NutrientID      whereHelpernull_Int
-	Amount          whereHelpernull_Float32
-	DataPoints      whereHelpernull_Int
+	Amount          whereHelpernull_Float64
+	DataPoints      whereHelpernull_Int64
 	DerivationID    whereHelpernull_Int
-	Min             whereHelpernull_Float32
-	Max             whereHelpernull_Float32
-	Median          whereHelpernull_Float32
-	Loq             whereHelpernull_Float32
+	Min             whereHelpernull_Float64
+	Max             whereHelpernull_Float64
+	Median          whereHelpernull_Float64
+	Loq             whereHelpernull_Float64
 	Footnote        whereHelpernull_String
 	MinYearAcquired whereHelpernull_String
 }{
 	ID:              whereHelperint{field: "\"usda_food_nutrient\".\"id\""},
 	FDCID:           whereHelpernull_Int{field: "\"usda_food_nutrient\".\"fdc_id\""},
 	NutrientID:      whereHelpernull_Int{field: "\"usda_food_nutrient\".\"nutrient_id\""},
-	Amount:          whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"amount\""},
-	DataPoints:      whereHelpernull_Int{field: "\"usda_food_nutrient\".\"data_points\""},
+	Amount:          whereHelpernull_Float64{field: "\"usda_food_nutrient\".\"amount\""},
+	DataPoints:      whereHelpernull_Int64{field: "\"usda_food_nutrient\".\"data_points\""},
 	DerivationID:    whereHelpernull_Int{field: "\"usda_food_nutrient\".\"derivation_id\""},
-	Min:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"min\""},
-	Max:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"max\""},
-	Median:          whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"median\""},
-	Loq:             whereHelpernull_Float32{field: "\"usda_food_nutrient\".\"loq\""},
+	Min:             whereHelpernull_Float64{field: "\"usda_food_nutrient\".\"min\""},
+	Max:             whereHelpernull_Float64{field: "\"usda_food_nutrient\".\"max\""},
+	Median:          whereHelpernull_Float64{field: "\"usda_food_nutrient\".\"median\""},
+	Loq:             whereHelpernull_Float64{field: "\"usda_food_nutrient\".\"loq\""},
 	Footnote:        whereHelpernull_String{field: "\"usda_food_nutrient\".\"footnote\""},
 	MinYearAcquired: whereHelpernull_String{field: "\"usda_food_nutrient\".\"min_year_acquired\""},
 }

@@ -289,7 +289,7 @@ export interface IngredientDetail {
    * Ingredients that are equivalent
    */
   children?: IngredientDetail[];
-  food?: Food;
+  food?: FoodInfo;
   /**
    * mappings of equivalent units
    */
@@ -563,32 +563,8 @@ export interface PaginatedMeals {
  * pages of Food
  */
 export interface PaginatedFoods {
-  foods?: Food[];
+  foods?: FoodInfo[];
   meta: Items;
-}
-
-/**
- * todo
- */
-export interface Nutrient {
-  /**
-   * todo
-   */
-  id: number;
-  /**
-   * todo
-   */
-  name: string;
-  unit_name: FoodNutrientUnit;
-}
-
-/**
- * todo
- */
-export interface FoodNutrient {
-  nutrient: Nutrient;
-  amount: number;
-  data_points: number;
 }
 
 /**
@@ -631,7 +607,7 @@ export interface FoodPortion {
 /**
  * A top level food
  */
-export interface Food {
+export interface FoodWrapper {
   /**
    * FDC Id
    */
@@ -651,6 +627,13 @@ export interface Food {
    */
   portions?: FoodPortion[];
   branded_info?: BrandedFood;
+}
+
+/**
+ * A top level food?
+ */
+export interface FoodInfo {
+  wrapper: FoodWrapper;
   /**
    * mappings of equivalent units
    */
@@ -684,16 +667,6 @@ export type FoodDataType =
   | "agricultural_acquisition"
   | "sr_legacy_food"
   | "branded_food";
-
-export type FoodNutrientUnit =
-  | "UG"
-  | "G"
-  | "IU"
-  | "kJ"
-  | "KCAL"
-  | "MG"
-  | "MG_ATE"
-  | "SP_GR";
 
 export type IngredientKind = "ingredient" | "recipe";
 
@@ -808,6 +781,309 @@ export interface CompactRecipeMeta {
 export interface CompactRecipe {
   meta: CompactRecipeMeta;
   sections: CompactRecipeSection[];
+}
+
+/**
+ * A meal, which bridges recipes to photos
+ */
+export interface FoodSearchResult {
+  foods: FoodInfo[];
+  results?: FoodResultByItem;
+}
+
+/**
+ * A meal, which bridges recipes to photos
+ */
+export interface FoodResultByItem {
+  branded_food: BrandedFoodItem[];
+  foundation_food: FoundationFoodItem[];
+  legacy_food: SRLegacyFoodItem[];
+  survey_food: SurveyFoodItem[];
+  info: FoodInfo[];
+}
+
+/**
+ * a food nutrient
+ */
+export interface Nutrient {
+  id?: number;
+  number?: string;
+  name?: string;
+  rank?: number;
+  unitName?: string;
+}
+
+export interface FoodNutrientSource {
+  id?: number;
+  code?: string;
+  description?: string;
+}
+
+export interface FoodNutrientDerivation {
+  id?: number;
+  code?: string;
+  description?: string;
+  foodNutrientSource?: FoodNutrientSource;
+}
+
+export interface NutrientAcquisitionDetails {
+  sampleUnitId?: number;
+  purchaseDate?: string;
+  storeCity?: string;
+  storeState?: string;
+}
+
+export interface NutrientAnalysisDetails {
+  subSampleId?: number;
+  amount?: number;
+  nutrientId?: number;
+  labMethodDescription?: string;
+  labMethodOriginalDescription?: string;
+  labMethodLink?: string;
+  labMethodTechnique?: string;
+  nutrientAcquisitionDetails?: NutrientAcquisitionDetails[];
+}
+
+export interface FoodNutrient {
+  id: number;
+  amount?: number;
+  dataPoints?: number;
+  min?: number;
+  max?: number;
+  median?: number;
+  type?: string;
+  nutrient?: Nutrient;
+  foodNutrientDerivation?: FoodNutrientDerivation;
+  nutrientAnalysisDetails?: NutrientAnalysisDetails;
+}
+
+export interface FoodAttribute {
+  id?: number;
+  sequenceNumber?: number;
+  value?: string;
+  FoodAttributeType?: {
+    id?: number;
+    name?: string;
+    description?: string;
+  };
+}
+
+export interface FoodUpdateLog {
+  fdcId?: number;
+  availableDate?: string;
+  brandOwner?: string;
+  dataSource?: string;
+  dataType?: string;
+  description?: string;
+  foodClass?: string;
+  gtinUpc?: string;
+  householdServingFullText?: string;
+  ingredients?: string;
+  modifiedDate?: string;
+  publicationDate?: string;
+  servingSize?: number;
+  servingSizeUnit?: string;
+  brandedFoodCategory?: string;
+  changes?: string;
+  foodAttributes?: FoodAttribute[];
+}
+
+export interface BrandedFoodItem {
+  fdcId: number;
+  availableDate?: string;
+  brandOwner?: string;
+  dataSource?: string;
+  dataType: string;
+  description: string;
+  foodClass?: string;
+  gtinUpc?: string;
+  householdServingFullText?: string;
+  ingredients?: string;
+  modifiedDate?: string;
+  publicationDate?: string;
+  servingSize?: number;
+  servingSizeUnit?: string;
+  preparationStateCode?: string;
+  brandedFoodCategory?: string;
+  tradeChannel?: string[];
+  gpcClassCode?: number;
+  foodNutrients?: FoodNutrient[];
+  foodUpdateLog?: FoodUpdateLog[];
+  labelNutrients?: {
+    fat?: {
+      value?: number;
+    };
+    saturatedFat?: {
+      value?: number;
+    };
+    transFat?: {
+      value?: number;
+    };
+    cholesterol?: {
+      value?: number;
+    };
+    sodium?: {
+      value?: number;
+    };
+    carbohydrates?: {
+      value?: number;
+    };
+    fiber?: {
+      value?: number;
+    };
+    sugars?: {
+      value?: number;
+    };
+    protein?: {
+      value?: number;
+    };
+    calcium?: {
+      value?: number;
+    };
+    iron?: {
+      value?: number;
+    };
+    potassium?: {
+      value?: number;
+    };
+    calories?: {
+      value?: number;
+    };
+  };
+}
+
+export interface SchemasFoodCategory {
+  id?: number;
+  code?: string;
+  description?: string;
+}
+
+export interface FoodComponent {
+  id?: number;
+  name?: string;
+  dataPoints?: number;
+  gramWeight?: number;
+  isRefuse?: boolean;
+  minYearAcquired?: number;
+  percentWeight?: number;
+}
+
+export interface MeasureUnit {
+  id?: number;
+  abbreviation?: string;
+  name?: string;
+}
+
+export interface SchemasFoodPortion {
+  id?: number;
+  amount?: number;
+  dataPoints?: number;
+  gramWeight?: number;
+  minYearAcquired?: number;
+  modifier?: string;
+  portionDescription?: string;
+  sequenceNumber?: number;
+  measureUnit?: MeasureUnit;
+}
+
+export interface SampleFoodItem {
+  fdcId: number;
+  datatype?: string;
+  description: string;
+  foodClass?: string;
+  publicationDate?: string;
+  foodAttributes?: SchemasFoodCategory[];
+}
+
+/**
+ * applies to Foundation foods. Not all inputFoods will have all fields.
+ */
+export interface InputFoodFoundation {
+  id?: number;
+  foodDescription?: string;
+  inputFood?: SampleFoodItem;
+}
+
+export interface NutrientConversionFactors {
+  type?: string;
+  value?: number;
+}
+
+export interface FoundationFoodItem {
+  fdcId: number;
+  dataType: string;
+  description: string;
+  foodClass?: string;
+  footNote?: string;
+  isHistoricalReference?: boolean;
+  ndbNumber?: number;
+  publicationDate?: string;
+  scientificName?: string;
+  foodCategory?: SchemasFoodCategory;
+  foodComponents?: FoodComponent[];
+  foodNutrients?: FoodNutrient[];
+  foodPortions?: SchemasFoodPortion[];
+  inputFoods?: InputFoodFoundation[];
+  nutrientConversionFactors?: NutrientConversionFactors[];
+}
+
+export interface SRLegacyFoodItem {
+  fdcId: number;
+  dataType: string;
+  description: string;
+  foodClass?: string;
+  isHistoricalReference?: boolean;
+  ndbNumber?: number;
+  publicationDate?: string;
+  scientificName?: string;
+  foodCategory?: SchemasFoodCategory;
+  foodNutrients?: FoodNutrient[];
+  nutrientConversionFactors?: NutrientConversionFactors[];
+}
+
+export interface SurveyFoodItem {
+  fdcId: number;
+  datatype?: string;
+  description: string;
+  endDate?: string;
+  foodClass?: string;
+  foodCode?: string;
+  publicationDate?: string;
+  startDate?: string;
+  foodAttributes?: FoodAttribute[];
+  foodPortions?: SchemasFoodPortion[];
+  inputFoods?: InputFoodSurvey[];
+  wweiaFoodCategory?: WweiaFoodCategory;
+}
+
+export interface RetentionFactor {
+  id?: number;
+  code?: number;
+  description?: string;
+}
+
+/**
+ * applies to Survey (FNDDS). Not all inputFoods will have all fields.
+ */
+export interface InputFoodSurvey {
+  id?: number;
+  amount?: number;
+  foodDescription?: string;
+  ingredientCode?: number;
+  ingredientDescription?: string;
+  ingredientWeight?: number;
+  portionCode?: string;
+  portionDescription?: string;
+  sequenceNumber?: number;
+  surveyFlag?: number;
+  unit?: string;
+  inputFood?: SurveyFoodItem;
+  retentionFactor?: RetentionFactor;
+}
+
+export interface WweiaFoodCategory {
+  wweiaFoodCategoryCode?: number;
+  wweiaFoodCategoryDescription?: string;
 }
 
 export interface AuthLoginQueryParams {
@@ -1871,7 +2147,7 @@ export interface GetFoodByIdPathParams {
 }
 
 export type GetFoodByIdProps = Omit<
-  GetProps<Food, Error, void, GetFoodByIdPathParams>,
+  GetProps<FoodInfo, Error, void, GetFoodByIdPathParams>,
   "path"
 > &
   GetFoodByIdPathParams;
@@ -1882,14 +2158,14 @@ export type GetFoodByIdProps = Omit<
  * todo
  */
 export const GetFoodById = ({ fdc_id, ...props }: GetFoodByIdProps) => (
-  <Get<Food, Error, void, GetFoodByIdPathParams>
+  <Get<FoodInfo, Error, void, GetFoodByIdPathParams>
     path={`/foods/${fdc_id}`}
     {...props}
   />
 );
 
 export type UseGetFoodByIdProps = Omit<
-  UseGetProps<Food, Error, void, GetFoodByIdPathParams>,
+  UseGetProps<FoodInfo, Error, void, GetFoodByIdPathParams>,
   "path"
 > &
   GetFoodByIdPathParams;
@@ -1900,7 +2176,7 @@ export type UseGetFoodByIdProps = Omit<
  * todo
  */
 export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
-  useGet<Food, Error, void, GetFoodByIdPathParams>(
+  useGet<FoodInfo, Error, void, GetFoodByIdPathParams>(
     (paramsInPath: GetFoodByIdPathParams) => `/foods/${paramsInPath.fdc_id}`,
     { pathParams: { fdc_id }, ...props }
   );
@@ -1974,7 +2250,7 @@ export interface SearchFoodsQueryParams {
 }
 
 export type SearchFoodsProps = Omit<
-  GetProps<PaginatedFoods, Error, SearchFoodsQueryParams, void>,
+  GetProps<FoodSearchResult, Error, SearchFoodsQueryParams, void>,
   "path"
 >;
 
@@ -1984,14 +2260,14 @@ export type SearchFoodsProps = Omit<
  * todo
  */
 export const SearchFoods = (props: SearchFoodsProps) => (
-  <Get<PaginatedFoods, Error, SearchFoodsQueryParams, void>
+  <Get<FoodSearchResult, Error, SearchFoodsQueryParams, void>
     path={`/foods/search`}
     {...props}
   />
 );
 
 export type UseSearchFoodsProps = Omit<
-  UseGetProps<PaginatedFoods, Error, SearchFoodsQueryParams, void>,
+  UseGetProps<FoodSearchResult, Error, SearchFoodsQueryParams, void>,
   "path"
 >;
 
@@ -2001,7 +2277,7 @@ export type UseSearchFoodsProps = Omit<
  * todo
  */
 export const useSearchFoods = (props: UseSearchFoodsProps) =>
-  useGet<PaginatedFoods, Error, SearchFoodsQueryParams, void>(
+  useGet<FoodSearchResult, Error, SearchFoodsQueryParams, void>(
     `/foods/search`,
     props
   );

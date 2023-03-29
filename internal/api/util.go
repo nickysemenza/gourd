@@ -134,7 +134,7 @@ func (a *API) RecipeFromText(ctx context.Context, text string) (*RecipeDetailInp
 }
 func (a *API) RecipeFromCompact(ctx context.Context, cr CompactRecipe) (*RecipeWrapperInput, error) {
 	output := RecipeWrapperInput{}
-	err := a.R.Post(ctx, "codec/expand", cr, &output)
+	err := a.R.Send(ctx, "codec/expand", cr, &output)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode recipe: %w", err)
 	}
@@ -142,7 +142,7 @@ func (a *API) RecipeFromCompact(ctx context.Context, cr CompactRecipe) (*RecipeW
 }
 func (a *API) NormalizeAmount(ctx context.Context, amt Amount) (*Amount, error) {
 	output := Amount{}
-	err := a.R.Post(ctx, "normalize_amount", amt, &output)
+	err := a.R.Send(ctx, "normalize_amount", amt, &output)
 	if err != nil {
 		return nil, fmt.Errorf("failed to normalize recipe: %w", err)
 	}
@@ -244,7 +244,7 @@ func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId
 }
 
 // Coalesce returns the first non-zero provided
-func Coalesce[T string | int | float64](i ...T) T {
+func Coalesce[T string | int | float32 | float64](i ...T) T {
 	var zeroVal T
 	for _, s := range i {
 		if s != zeroVal {

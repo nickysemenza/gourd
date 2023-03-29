@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS usda_branded_food (
   "not_a_significant_source_of" TEXT,
   "gtin_upc" TEXT,
   "ingredients" TEXT,
-  "serving_size" REAL,
+  "serving_size" double precision,
   "serving_size_unit" TEXT CHECK(serving_size_unit IN ('g', 'ml')),
   "household_serving_fulltext" TEXT,
   "branded_food_category" TEXT,
@@ -77,18 +77,18 @@ CREATE INDEX IF NOT EXISTS idx_food_nutrient_conversion_factor_fdc_id ON usda_fo
 CREATE TABLE IF NOT EXISTS usda_food_calorie_conversion_factor (
   "food_nutrient_conversion_factor_id" INT NOT NULL PRIMARY KEY,
   -- REFERENCES -0 usda_food_nutrient_conversion_factor(id),
-  "protein_value" REAL,
-  "fat_value" REAL,
-  "carbohydrate_value" REAL
+  "protein_value" double precision,
+  "fat_value" double precision,
+  "carbohydrate_value" double precision
 );
 CREATE TABLE IF NOT EXISTS usda_food_component (
   "id" INT NOT NULL PRIMARY KEY,
   "fdc_id" INT REFERENCES usda_food(fdc_id),
   "name" TEXT,
-  "pct_weight" REAL,
+  "pct_weight" double precision,
   "is_refuse" TEXT CHECK(is_refuse IN ('Y', 'N')),
-  "gram_weight" REAL,
-  "data_points" INT,
+  "gram_weight" double precision,
+  "data_points" BIGINT,
   "min_year_acquired" TEXT
 );
 -- XXX Field Descriptions describes "food_fat_conversion_factor" but there is no table for it.
@@ -119,14 +119,14 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient_raw (
   -- todo fk
   "nutrient_id" INT,
   -- todo fk
-  "amount" REAL,
+  "amount" double precision,
   "data_points" INT,
   "derivation_id" INT,
   -- XXX Missing standard_error from Field Descriptions
-  "min" REAL,
-  "max" REAL,
-  "median" REAL,
-  "loq" REAL,
+  "min" double precision,
+  "max" double precision,
+  "median" double precision,
+  "loq" double precision,
   "footnote" TEXT,
   "min_year_acquired" TEXT
 );
@@ -134,14 +134,14 @@ CREATE TABLE IF NOT EXISTS usda_food_nutrient (
   "id" INT NOT NULL PRIMARY KEY,
   "fdc_id" INT REFERENCES usda_food(fdc_id),
   "nutrient_id" INT REFERENCES usda_nutrient(id),
-  "amount" REAL,
+  "amount" double precision,
   "data_points" INT,
   "derivation_id" INT REFERENCES usda_food_nutrient_derivation(id),
   -- XXX Missing standard_error from Field Descriptions
-  "min" REAL,
-  "max" REAL,
-  "median" REAL,
-  "loq" REAL,
+  "min" double precision,
+  "max" double precision,
+  "median" double precision,
+  "loq" double precision,
   "footnote" TEXT,
   "min_year_acquired" TEXT
 );
@@ -157,11 +157,11 @@ CREATE TABLE IF NOT EXISTS usda_food_portion (
   "id" INT NOT NULL PRIMARY KEY,
   "fdc_id" INT REFERENCES usda_food(fdc_id),
   "seq_num" INT,
-  "amount" REAL,
+  "amount" double precision,
   "measure_unit_id" INT REFERENCES usda_measure_unit(id),
   "portion_description" TEXT,
   "modifier" TEXT,
-  "gram_weight" REAL,
+  "gram_weight" double precision,
   "data_points" INT,
   "footnote" TEXT,
   "min_year_acquired" TEXT
@@ -171,7 +171,7 @@ CREATE INDEX IF NOT EXISTS idx_food_portion_fcd_id ON usda_food_portion (fdc_id)
 -- new
 CREATE TABLE IF NOT EXISTS usda_food_protein_conversion_factor (
   "food_nutrient_conversion_factor_id" INT NOT NULL PRIMARY KEY REFERENCES usda_food_nutrient_conversion_factor(id),
-  "value" REAL
+  "value" double precision
 );
 CREATE TABLE IF NOT EXISTS usda_foundation_food (
   "fdc_id" INT NOT NULL PRIMARY KEY REFERENCES usda_food(fdc_id),
@@ -184,7 +184,7 @@ CREATE TABLE IF NOT EXISTS usda_input_food (
   "fdc_id" INT REFERENCES usda_food(fdc_id),
   "fdc_id_of_input_food" INT REFERENCES usda_food(fdc_id),
   "seq_num" INT,
-  "amount" REAL,
+  "amount" double precision,
   "sr_code" INT,
   -- NDB code of SR food XXX but not a FK
   "sr_description" TEXT,
@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS usda_input_food (
   "portion_code" INT,
   -- Code for portion description XXX FK?
   "portion_description" TEXT,
-  "gram_weight" REAL,
+  "gram_weight" double precision,
   "retention_code" INT,
   "survey_flag" INT
 );
@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS usda_market_acquisition (
   "fdc_id" INT NOT NULL PRIMARY KEY REFERENCES usda_food(fdc_id),
   "brand_description" TEXT,
   "expiration_date" TEXT,
-  "label_weight" REAL,
+  "label_weight" double precision,
   "location" TEXT,
   "acquisition_date" TEXT,
   "sales_type" TEXT,
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS usda_sub_sample_food (
 CREATE INDEX IF NOT EXISTS idx_sub_sample_food_fdc_id_of_sample_food ON usda_sub_sample_food (fdc_id_of_sample_food);
 CREATE TABLE IF NOT EXISTS usda_sub_sample_result (
   "food_nutrient_id" INT NOT NULL PRIMARY KEY REFERENCES usda_food_nutrient(id),
-  "adjusted_amount" REAL,
+  "adjusted_amount" double precision,
   "lab_method_id" INT REFERENCES usda_lab_method(id),
   -- XXX cannot use this because of broken refs: REFERENCES usda_lab_method(id),
   "nutrient_name" TEXT

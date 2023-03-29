@@ -23,7 +23,7 @@ pub struct IngredientDetail {
     #[serde(rename = "children", skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<crate::models::IngredientDetail>>,
     #[serde(rename = "food", skip_serializing_if = "Option::is_none")]
-    pub food: Option<Box<crate::models::Food>>,
+    pub food: Option<Box<crate::models::FoodInfo>>,
     /// mappings of equivalent units
     #[serde(rename = "unit_mappings")]
     pub unit_mappings: Vec<crate::models::UnitMapping>,

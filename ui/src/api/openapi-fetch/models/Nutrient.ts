@@ -13,37 +13,42 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { FoodNutrientUnit } from './FoodNutrientUnit';
-import {
-    FoodNutrientUnitFromJSON,
-    FoodNutrientUnitFromJSONTyped,
-    FoodNutrientUnitToJSON,
-} from './FoodNutrientUnit';
-
 /**
- * todo
+ * a food nutrient
  * @export
  * @interface Nutrient
  */
 export interface Nutrient {
     /**
-     * todo
+     * 
      * @type {number}
      * @memberof Nutrient
      */
-    id: number;
+    id?: number;
     /**
-     * todo
+     * 
      * @type {string}
      * @memberof Nutrient
      */
-    name: string;
+    number?: string;
     /**
      * 
-     * @type {FoodNutrientUnit}
+     * @type {string}
      * @memberof Nutrient
      */
-    unit_name: FoodNutrientUnit;
+    name?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Nutrient
+     */
+    rank?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Nutrient
+     */
+    unit_name?: string;
 }
 
 /**
@@ -51,9 +56,6 @@ export interface Nutrient {
  */
 export function instanceOfNutrient(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "unit_name" in value;
 
     return isInstance;
 }
@@ -68,9 +70,11 @@ export function NutrientFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
-        'id': json['id'],
-        'name': json['name'],
-        'unit_name': FoodNutrientUnitFromJSON(json['unit_name']),
+        'id': !exists(json, 'id') ? undefined : json['id'],
+        'number': !exists(json, 'number') ? undefined : json['number'],
+        'name': !exists(json, 'name') ? undefined : json['name'],
+        'rank': !exists(json, 'rank') ? undefined : json['rank'],
+        'unit_name': !exists(json, 'unitName') ? undefined : json['unitName'],
     };
 }
 
@@ -84,8 +88,10 @@ export function NutrientToJSON(value?: Nutrient | null): any {
     return {
         
         'id': value.id,
+        'number': value.number,
         'name': value.name,
-        'unit_name': FoodNutrientUnitToJSON(value.unit_name),
+        'rank': value.rank,
+        'unitName': value.unit_name,
     };
 }
 

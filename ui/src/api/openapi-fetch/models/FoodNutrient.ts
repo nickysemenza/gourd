@@ -13,37 +13,91 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { FoodNutrientDerivation } from './FoodNutrientDerivation';
+import {
+    FoodNutrientDerivationFromJSON,
+    FoodNutrientDerivationFromJSONTyped,
+    FoodNutrientDerivationToJSON,
+} from './FoodNutrientDerivation';
 import type { Nutrient } from './Nutrient';
 import {
     NutrientFromJSON,
     NutrientFromJSONTyped,
     NutrientToJSON,
 } from './Nutrient';
+import type { NutrientAnalysisDetails } from './NutrientAnalysisDetails';
+import {
+    NutrientAnalysisDetailsFromJSON,
+    NutrientAnalysisDetailsFromJSONTyped,
+    NutrientAnalysisDetailsToJSON,
+} from './NutrientAnalysisDetails';
 
 /**
- * todo
+ * 
  * @export
  * @interface FoodNutrient
  */
 export interface FoodNutrient {
     /**
      * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    id: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    amount?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    data_points?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    min?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    max?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodNutrient
+     */
+    median?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof FoodNutrient
+     */
+    type?: string;
+    /**
+     * 
      * @type {Nutrient}
      * @memberof FoodNutrient
      */
-    nutrient: Nutrient;
+    nutrient?: Nutrient;
     /**
      * 
-     * @type {number}
+     * @type {FoodNutrientDerivation}
      * @memberof FoodNutrient
      */
-    amount: number;
+    food_nutrient_derivation?: FoodNutrientDerivation;
     /**
      * 
-     * @type {number}
+     * @type {NutrientAnalysisDetails}
      * @memberof FoodNutrient
      */
-    data_points: number;
+    nutrient_analysis_details?: NutrientAnalysisDetails;
 }
 
 /**
@@ -51,9 +105,7 @@ export interface FoodNutrient {
  */
 export function instanceOfFoodNutrient(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "nutrient" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "data_points" in value;
+    isInstance = isInstance && "id" in value;
 
     return isInstance;
 }
@@ -68,9 +120,16 @@ export function FoodNutrientFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'nutrient': NutrientFromJSON(json['nutrient']),
-        'amount': json['amount'],
-        'data_points': json['data_points'],
+        'id': json['id'],
+        'amount': !exists(json, 'amount') ? undefined : json['amount'],
+        'data_points': !exists(json, 'dataPoints') ? undefined : json['dataPoints'],
+        'min': !exists(json, 'min') ? undefined : json['min'],
+        'max': !exists(json, 'max') ? undefined : json['max'],
+        'median': !exists(json, 'median') ? undefined : json['median'],
+        'type': !exists(json, 'type') ? undefined : json['type'],
+        'nutrient': !exists(json, 'nutrient') ? undefined : NutrientFromJSON(json['nutrient']),
+        'food_nutrient_derivation': !exists(json, 'foodNutrientDerivation') ? undefined : FoodNutrientDerivationFromJSON(json['foodNutrientDerivation']),
+        'nutrient_analysis_details': !exists(json, 'nutrientAnalysisDetails') ? undefined : NutrientAnalysisDetailsFromJSON(json['nutrientAnalysisDetails']),
     };
 }
 
@@ -83,9 +142,16 @@ export function FoodNutrientToJSON(value?: FoodNutrient | null): any {
     }
     return {
         
-        'nutrient': NutrientToJSON(value.nutrient),
+        'id': value.id,
         'amount': value.amount,
-        'data_points': value.data_points,
+        'dataPoints': value.data_points,
+        'min': value.min,
+        'max': value.max,
+        'median': value.median,
+        'type': value.type,
+        'nutrient': NutrientToJSON(value.nutrient),
+        'foodNutrientDerivation': FoodNutrientDerivationToJSON(value.food_nutrient_derivation),
+        'nutrientAnalysisDetails': NutrientAnalysisDetailsToJSON(value.nutrient_analysis_details),
     };
 }
 

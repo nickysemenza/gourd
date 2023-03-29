@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { Food } from './Food';
+import type { FoodInfo } from './FoodInfo';
 import {
-    FoodFromJSON,
-    FoodFromJSONTyped,
-    FoodToJSON,
-} from './Food';
+    FoodInfoFromJSON,
+    FoodInfoFromJSONTyped,
+    FoodInfoToJSON,
+} from './FoodInfo';
 import type { Items } from './Items';
 import {
     ItemsFromJSON,
@@ -34,10 +34,10 @@ import {
 export interface PaginatedFoods {
     /**
      * 
-     * @type {Array<Food>}
+     * @type {Array<FoodInfo>}
      * @memberof PaginatedFoods
      */
-    foods?: Array<Food>;
+    foods?: Array<FoodInfo>;
     /**
      * 
      * @type {Items}
@@ -66,7 +66,7 @@ export function PaginatedFoodsFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'foods': !exists(json, 'foods') ? undefined : ((json['foods'] as Array<any>).map(FoodFromJSON)),
+        'foods': !exists(json, 'foods') ? undefined : ((json['foods'] as Array<any>).map(FoodInfoFromJSON)),
         'meta': ItemsFromJSON(json['meta']),
     };
 }
@@ -80,7 +80,7 @@ export function PaginatedFoodsToJSON(value?: PaginatedFoods | null): any {
     }
     return {
         
-        'foods': value.foods === undefined ? undefined : ((value.foods as Array<any>).map(FoodToJSON)),
+        'foods': value.foods === undefined ? undefined : ((value.foods as Array<any>).map(FoodInfoToJSON)),
         'meta': ItemsToJSON(value.meta),
     };
 }

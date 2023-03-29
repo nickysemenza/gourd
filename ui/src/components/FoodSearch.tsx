@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { Food, useSearchFoods } from "../api/openapi-hooks/api";
+import { FoodInfo, useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
 import { UnitMappingList } from "./Misc";
@@ -10,7 +10,7 @@ const FoodSearch: React.FC<{
   highlightId?: number;
   limit?: number;
   enableSearch?: boolean;
-  addon?: Food;
+  addon?: FoodInfo;
   onLink?: (fdc_id: number) => void;
 }> = ({
   name,
@@ -43,19 +43,23 @@ const FoodSearch: React.FC<{
     },
   });
 
-  const placeholder: Food = {
-    fdc_id: 0,
-    description: "loading...",
-    data_type: "branded_food",
+  const placeholder: FoodInfo = {
+    wrapper: {
+      fdc_id: 0,
+      description: "loading...",
+      data_type: "branded_food",
+      nutrients: [],
+      branded_info: undefined,
+    },
     unit_mappings: [],
-    nutrients: [],
-    branded_info: undefined,
   };
   const results = foods?.foods || [];
   const reallyLoading = loading && results.length === 0;
-  const items = [
+  const items: FoodInfo[] = [
     ...(reallyLoading ? Array(5).fill(placeholder) : []),
-    ...(addon && results.filter((f) => f.fdc_id === addon.fdc_id).length === 0
+    ...(addon &&
+    results.filter((f) => f.wrapper.fdc_id === addon.wrapper.fdc_id).length ===
+      0
       ? [addon]
       : []),
     ...results,
@@ -76,10 +80,10 @@ const FoodSearch: React.FC<{
         />
       )}
       {items.map((r, x) => {
-        const isHighlighted = highlightId === r.fdc_id;
+        const isHighlighted = highlightId === r.wrapper.fdc_id;
         return (
           <FoodRow
-            food={r}
+            info={r}
             isHighlighted={isHighlighted}
             onLink={onLink}
             x={x}
@@ -92,14 +96,15 @@ const FoodSearch: React.FC<{
   );
 };
 export const FoodRow: React.FC<{
-  food: Food;
+  info: FoodInfo;
   isHighlighted?: boolean;
   x?: number;
   onLink?: (fdc_id: number) => void;
   loading: boolean;
-}> = ({ food, isHighlighted = false, x = 0, onLink, loading }) => {
+}> = ({ info, isHighlighted = false, x = 0, onLink, loading }) => {
   const loadingClass =
     (loading && "h-2 bg-gray-400 rounded animate-pulse") || "";
+  const food = info.wrapper;
   return (
     <div
       style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
@@ -140,7 +145,7 @@ export const FoodRow: React.FC<{
           <p className="font-mono text-xs">{food.data_type}</p>
           <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
         </div>
-        <UnitMappingList unit_mappings={food.unit_mappings} />
+        <UnitMappingList unit_mappings={info.unit_mappings} />
         {(food.branded_info || loading) && (
           <div className={`flex flex-col w-80 ${loadingClass}`}>
             {food.branded_info?.brand_owner} <br />

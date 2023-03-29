@@ -1,0 +1,1800 @@
+openapi: "3.0.0"
+info:
+  contact:
+    email: n@nickysemenza.com
+  description: API for https://github.com/nickysemenza/gourd
+  version: 1.0.0
+  title: Gourd Recipe Database
+  license:
+    name: MIT
+    # identifier: MIT
+tags:
+  - name: recipes
+    description: Recipe operations
+  - name: authentication
+    description: authentication operations
+  - name: photos
+    description: photos operations
+  - name: albums
+    description: albums operations
+  - name: meals
+    description: meals operations
+  - name: ingredients
+    description: ingredients operations
+  - name: foods
+    description: food operations
+
+servers:
+  - description: test
+    url: http://localhost:4242/api
+  - description: prod
+    url: https://food.nickysemenza.com/api
+paths:
+  /auth:
+    post:
+      summary: Google Login callback
+      description: Second step of https://developers.google.com/identity/sign-in/web/backend-auth#send-the-id-token-to-your-server
+      security: []
+      operationId: auth_login
+      tags:
+        - authentication
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: Google code
+      responses:
+        "200":
+          description: Auth response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResp"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /config:
+    get:
+      summary: Get app config
+      description: todo
+      operationId: get_config
+      tags:
+        - system
+      responses:
+        "200":
+          description: Config data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigData"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /sync:
+    get:
+      summary: perform sync
+      description: todo
+      operationId: do_sync
+      tags:
+        - system
+      parameters:
+        - name: lookback_days
+          in: query
+          required: true
+          description: how many days to lookback
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Config data
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /photos:
+    get:
+      summary: List all photos
+      description: todo
+      operationId: list_photos
+      tags:
+        - photos
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A page of photos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPhotos"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /albums:
+    get:
+      summary: List all albums
+      description: todo
+      operationId: list_all_albums
+      tags:
+        - albums
+      responses:
+        "200":
+          description: All available albums from google
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  albums:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GooglePhotosAlbum"
+                    description: The list of albums
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /search:
+    get:
+      summary: Search recipes and ingredients
+      description: todo
+      operationId: search
+      tags:
+        - ingredients
+        - recipes
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/nameParam"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResult"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /meals:
+    get:
+      summary: List all meals
+      description: todo
+      operationId: list_meals
+      tags:
+        - meals
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A page of meals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedMeals"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /meals/{meal_id}:
+    get:
+      summary: Info for a specific meal
+      description: todo
+      operationId: get_meal_by_id
+      tags:
+        - meals
+      parameters:
+        - name: meal_id
+          in: path
+          required: true
+          description: The id of the meal to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /meals/{meal_id}/recipes:
+    patch:
+      summary: Update the recipes associated with a given meal
+      description: todo
+      operationId: update_recipes_for_meal
+      tags:
+        - meals
+      parameters:
+        - name: meal_id
+          in: path
+          required: true
+          description: The id of the meal to retrieve
+          schema:
+            type: string
+      requestBody:
+        description: Creates a ingredient by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealRecipeUpdate"
+      responses:
+        "200":
+          description: Newly updated meal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ingredients:
+    get:
+      summary: List all ingredients
+      description: todo
+      operationId: list_ingredients
+      tags:
+        - ingredients
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+        - name: ingredient_id
+          in: query
+          required: false
+          description: ids
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: A page of ingredient results
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedIngredients"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a ingredient
+      description: todo
+      operationId: create_ingredients
+      tags:
+        - ingredients
+      requestBody:
+        description: Creates a ingredient by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ingredient"
+      responses:
+        "201":
+          description: Newly created ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /meta/load_ingredient_mappings:
+    post:
+      summary: load mappings
+      description: todo
+      operationId: load_ingredient_mappings
+      tags:
+        - ingredients
+      requestBody:
+        description: Creates a ingredient by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngredientMappingsPayload"
+      responses:
+        "200":
+          description: "success"
+          content:
+            application/json:
+              schema:
+                type: object
+  /recipes:
+    get:
+      summary: List all recipes
+      description: todo
+      operationId: list_recipes
+      tags:
+        - recipes
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+      responses:
+        "200":
+          description: A paged array of recipes
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRecipeWrappers"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a recipe
+      description: todo
+      operationId: create_recipes
+      tags:
+        - recipes
+      requestBody:
+        description: Creates a recipe by payload. If the id/name exists, it errors
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecipeWrapperInput"
+      responses:
+        "201":
+          description: Newly created recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeWrapper"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /recipes/{recipe_id}/latex:
+    get:
+      summary: recipe as latex
+      description: todo
+      operationId: get_latex_by_recipe_id
+      tags:
+        - recipes
+      parameters:
+        - name: recipe_id
+          in: path
+          required: true
+          description: The id of the recipe to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /recipes/{recipe_id}:
+    get:
+      summary: Info for a specific recipe
+      description: todo
+      operationId: get_recipe_by_id
+      tags:
+        - recipes
+      parameters:
+        - name: recipe_id
+          in: path
+          required: true
+          description: The id of the recipe to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeWrapper"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /recipes/bulk:
+    get:
+      summary: Get recipes
+      description: get recipes by ids
+      operationId: get_recipes_by_ids
+      tags:
+        - recipes
+      parameters:
+        - name: recipe_id
+          in: query
+          required: true
+          description: detail ids
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: bulk results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRecipeWrappers"
+  /recipes/sum:
+    post:
+      summary: sum up recipes
+      description: sums up the given recipes
+      operationId: sum_recipes
+      tags:
+        - recipes
+      requestBody:
+        description: sum stuff
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inputs
+              properties:
+                inputs:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/EntitySummary"
+      responses:
+        "200":
+          description: Newly converted recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SumsResponse"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /recipes/scrape:
+    post:
+      summary: scrape a recipe by URL
+      description: todo
+      operationId: scrape_recipe
+      tags:
+        - recipes
+      requestBody:
+        description: sum stuff
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+      responses:
+        "201":
+          description: Newly created recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeWrapper"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/convert_to_recipe:
+    post:
+      summary: Converts an ingredient to a recipe, updating all recipes depending on it
+      description: todo
+      operationId: convert_ingredient_to_recipe
+      tags:
+        - recipes
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Newly converted recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/associate_food:
+    post:
+      summary: Assosiates a food with a given ingredient
+      description: todo
+      operationId: associate_food_with_ingredient
+      tags:
+        - foods
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient
+          schema:
+            type: string
+        - name: fdc_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The FDC id of the food to link to the ingredient
+      responses:
+        "201":
+          description: Newly converted recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipeDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}/merge:
+    post:
+      summary: Merges the provide ingredients in the body into the param
+      description: todo
+      operationId: merge_ingredients
+      tags:
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient to merge into
+          schema:
+            type: string
+      requestBody:
+        description: The ingredient ids to be merged
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ingredient_ids
+              properties:
+                ingredient_ids:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 1
+                  maxItems: 50
+      responses:
+        "201":
+          description: The ingredient everything was merged into
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ingredient"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /foods/{fdc_id}:
+    get:
+      summary: get a FDC entry by id
+      description: todo
+      operationId: get_food_by_id
+      tags:
+        - foods
+      parameters:
+        - name: fdc_id
+          in: path
+          required: true
+          description: The fdc id
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodInfo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /ingredients/{ingredient_id}:
+    get:
+      summary: Get a specific ingredient
+      description: todo
+      operationId: get_ingredient_by_id
+      tags:
+        - ingredients
+      parameters:
+        - name: ingredient_id
+          in: path
+          required: true
+          description: The id of the ingredient to get into
+          schema:
+            type: string
+      responses:
+        "200":
+          description: An ingredient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngredientDetail"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /foods/search:
+    get:
+      summary: Search foods
+      description: todo
+      operationId: search_foods
+      tags:
+        - foods
+      parameters:
+        - $ref: "#/components/parameters/offsetParam"
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/nameParam"
+        - name: data_types
+          in: query
+          required: false
+          description: The data types
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/FoodDataType"
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodSearchResult"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /foods/bulk:
+    get:
+      summary: Get foods
+      description: get foods by ids
+      operationId: get_foods_by_ids
+      tags:
+        - foods
+      parameters:
+        - name: fdc_id
+          in: query
+          required: true
+          description: ids
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFoods"
+  /data/recipe_dependencies:
+    get:
+      summary: Get foods
+      description: recipe dependencies
+      operationId: recipe_dependencies
+      tags:
+        - recipes
+        - ingredients
+      responses:
+        "200":
+          description: All dependencies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RecipeDependency"
+                    description: all
+security:
+  - bearerAuth: [] # use the same name as above
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # optional, arbitrary value for documentation purposes
+
+  schemas:
+    SectionIngredient:
+      description: Ingredients in a single section
+      type: object
+      required:
+        - id
+        - amounts
+        - kind
+      properties:
+        id:
+          description: id
+          type: string
+        kind:
+          description: what kind of ingredient
+          $ref: "#/components/schemas/IngredientKind"
+        recipe:
+          $ref: "#/components/schemas/RecipeDetail"
+        ingredient:
+          $ref: "#/components/schemas/IngredientDetail"
+        amounts:
+          description: the various measures
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        adjective:
+          description: adjective
+          type: string
+        optional:
+          description: optional
+          type: boolean
+        original:
+          description: raw line item (pre-import/scrape)
+          type: string
+        substitutes:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredient"
+    SectionIngredientInput:
+      description: Ingredients in a single section
+      type: object
+      required:
+        - amounts
+        - kind
+      properties:
+        target_id:
+          description: recipe/ingredient id
+          type: string
+        name:
+          description: recipe/ingredient name
+          type: string
+        kind:
+          description: what kind of ingredient, for target_id or name
+          $ref: "#/components/schemas/IngredientKind"
+        amounts:
+          description: the various measures
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        adjective:
+          description: adjective
+          type: string
+        optional:
+          description: optional
+          type: boolean
+        original:
+          description: raw line item (pre-import/scrape)
+          type: string
+        substitutes:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredientInput"
+    SectionInstruction:
+      description: Instructions in a single section
+      type: object
+      required:
+        - id
+        - instruction
+      properties:
+        id:
+          description: id
+          type: string
+        instruction:
+          description: instruction
+          type: string
+    SectionInstructionInput:
+      description: Instructions in a single section
+      type: object
+      required:
+        - instruction
+      properties:
+        instruction:
+          description: instruction
+          type: string
+    RecipeSection:
+      description: A step in the recipe
+      type: object
+      required:
+        - id
+        - instructions
+        - ingredients
+      properties:
+        id:
+          description: id
+          type: string
+        duration:
+          $ref: "#/components/schemas/Amount"
+        instructions:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionInstruction"
+        ingredients:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredient"
+    RecipeSectionInput:
+      description: A step in the recipe
+      type: object
+      required:
+        - instructions
+        - ingredients
+      properties:
+        duration:
+          $ref: "#/components/schemas/Amount"
+        instructions:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionInstructionInput"
+        ingredients:
+          description: x
+          type: array
+          items:
+            $ref: "#/components/schemas/SectionIngredientInput"
+    RecipeWrapper:
+      description: A recipe with subcomponents
+      type: object
+      required:
+        - detail
+        - id
+      properties:
+        id:
+          description: id
+          type: string
+        detail:
+          $ref: "#/components/schemas/RecipeDetail"
+        linked_meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+        linked_photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
+    RecipeWrapperInput:
+      description: A recipe with subcomponents
+      type: object
+      required:
+        - detail
+      properties:
+        id:
+          description: id
+          type: string
+        detail:
+          $ref: "#/components/schemas/RecipeDetailInput"
+    RecipeDetail:
+      description: A revision of a recipe
+      type: object
+      required:
+        - id
+        - name
+        - sources
+        - quantity
+        - unit
+        - sections
+        - version
+        - is_latest_version
+        - created_at
+        - tags
+      properties:
+        id:
+          description: id
+          type: string
+        sections:
+          description: sections of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSection"
+        name:
+          description: recipe name
+          type: string
+        sources:
+          description: book or websites
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSource"
+        servings:
+          description: num servings
+          type: integer
+          format: int64
+        quantity:
+          description: serving quantity
+          type: integer
+          format: int64
+        unit:
+          description: serving unit
+          type: string
+        version:
+          description: version of the recipe
+          type: integer
+          format: int64
+        is_latest_version:
+          description: whether or not it is the most recent version
+          type: boolean
+        created_at:
+          description: when the version was created
+          type: string
+          format: date-time
+        other_versions:
+          description: Other versions
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeDetail"
+        tags:
+          description: tags
+          type: array
+          items:
+            type: string
+    RecipeDetailInput:
+      description: A revision of a recipe
+      type: object
+      required:
+        - name
+        - quantity
+        - unit
+        - sections
+        - tags
+      properties:
+        sections:
+          description: sections of the recipe
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSectionInput"
+        name:
+          description: recipe name
+          type: string
+        sources:
+          description: book or websites
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeSource"
+        servings:
+          description: num servings
+          type: integer
+          format: int64
+        quantity:
+          description: serving quantity
+          type: integer
+          format: int64
+        unit:
+          description: serving unit
+          type: string
+        date:
+          description: when it created / updated
+          type: string
+          format: date-time
+        tags:
+          description: tags
+          type: array
+          items:
+            type: string
+    Ingredient:
+      description: "An Ingredient"
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          description: id
+          type: string
+        name:
+          description: Ingredient name
+          type: string
+        parent:
+          description: ingredient ID for a similar (likely a different spelling)
+          type: string
+        fdc_id:
+          description: FDC id equivalent to this ingredient
+          type: integer
+          format: int64
+    IngredientDetail:
+      description: "An Ingredient"
+      type: object
+      required:
+        - ingredient
+        - recipes
+        # - children
+        - unit_mappings
+      properties:
+        ingredient:
+          $ref: "#/components/schemas/Ingredient"
+        recipes:
+          description: Recipes referencing this ingredient
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeDetail"
+        children:
+          description: Ingredients that are equivalent
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientDetail"
+        food:
+          $ref: "#/components/schemas/FoodInfo"
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
+    UnitMapping:
+      description: mappings
+      type: object
+      required:
+        - a
+        - b
+      properties:
+        a:
+          $ref: "#/components/schemas/Amount"
+        b:
+          $ref: "#/components/schemas/Amount"
+        source:
+          description: source of the mapping
+          type: string
+    IngredientMappingsPayload:
+      description: list of IngredientMapping
+      type: object
+      required:
+        - ingredient_mappings
+      properties:
+        ingredient_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientMapping"
+    IngredientMapping:
+      description: details about ingredients
+      type: object
+      required:
+        - name
+        - aliases
+        - unit_mappings
+      properties:
+        name:
+          type: string
+        fdc_id:
+          type: integer
+        aliases:
+          type: array
+          items:
+            type: string
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
+    Amount:
+      description: amount and unit
+      type: object
+      required:
+        - unit
+        - value
+      properties:
+        unit:
+          description: unit
+          type: string
+        value:
+          description: value
+          type: number
+          format: double
+        upper_value:
+          description: value
+          type: number
+          format: double
+        source:
+          description: if it was explicit, inferred, etc
+          type: string
+    RecipeSource:
+      description: where the recipe came from (i.e. book/website)
+      type: object
+      properties:
+        url:
+          description: url
+          type: string
+        title:
+          description: title (if book)
+          type: string
+        page:
+          description: page number/section (if book)
+          type: string
+        image_url:
+          description: image url
+          type: string
+    GooglePhotosAlbum:
+      description: an album containing `Photo`
+      type: object
+      required:
+        - id
+        - title
+        - product_url
+        - usecase
+      properties:
+        id:
+          description: id
+          type: string
+        title:
+          description: title
+          type: string
+        product_url:
+          description: product_url
+          type: string
+        usecase:
+          description: usecase
+          type: string
+    Photo:
+      description: A photo
+      type: object
+      required:
+        - id
+        - base_url
+        - created
+        - width
+        - height
+        - source
+      properties:
+        id:
+          description: id
+          type: string
+        base_url:
+          description: public image
+          type: string
+        blur_hash:
+          description: blur hash
+          type: string
+        taken_at:
+          description: when it was taken
+          type: string
+          format: date-time
+        width:
+          description: width px
+          type: integer
+          format: int64
+        height:
+          description: height px
+          type: integer
+          format: int64
+        source:
+          description: where the photo came from
+          type: string
+          enum: [google, notion]
+    Meal:
+      description: A meal, which bridges recipes to photos
+      type: object
+      required:
+        - id
+        - name
+        - ate_at
+        - photos
+      properties:
+        id:
+          description: id
+          type: string
+        name:
+          description: public image
+          type: string
+        ate_at:
+          description: when it was taken
+          type: string
+          format: date-time
+        photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealRecipe"
+    MealRecipe:
+      description: A recipe that's part of a meal (a recipe at a specific amount)
+      type: object
+      required:
+        - multiplier
+        - recipe
+      properties:
+        multiplier:
+          description: when it was taken
+          type: number
+          format: double
+        recipe:
+          $ref: "#/components/schemas/RecipeDetail"
+    SearchResult:
+      description: A search result wrapper, which contains ingredients and recipes
+      type: object
+      properties:
+        ingredients:
+          description: The ingredients
+          type: array
+          items:
+            $ref: "#/components/schemas/Ingredient"
+        recipes:
+          description: The recipes
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeWrapper"
+        meta:
+          $ref: "#/components/schemas/Items"
+    Error:
+      type: object
+      description: A generic error message
+      required: ["message"]
+      properties:
+        message:
+          type: string
+        trace_id:
+          type: string
+      example:
+        message: "Something went wrong"
+    ConfigData:
+      type: object
+      description: config data
+      required:
+        - google_scopes
+        - google_client_id
+      properties:
+        google_scopes:
+          type: string
+        google_client_id:
+          type: string
+    AuthResp:
+      type: object
+      description: todo
+      required:
+        - user
+        - jwt
+      properties:
+        user:
+          type: object
+        jwt:
+          type: string
+    Items:
+      type: object
+      description: A generic list (for pagination use)
+      required:
+        - page_number
+        - limit
+        - total_count
+        - offset
+        - page_count
+      properties:
+        page_number:
+          description: What number page this is
+          type: integer
+        limit:
+          description: How many items were requested for this page
+          type: integer
+        offset:
+          description: todo
+          type: integer
+        total_count:
+          description: Total number of items across all pages
+          type: integer
+        page_count:
+          description: Total number of pages available
+          type: integer
+    PaginatedRecipeWrappers:
+      type: object
+      description: pages of Recipe
+      required:
+        - meta
+      properties:
+        recipes:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecipeWrapper"
+        meta:
+          $ref: "#/components/schemas/Items"
+    PaginatedIngredients:
+      type: object
+      description: pages of IngredientDetail
+      required:
+        - meta
+      properties:
+        ingredients:
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientDetail"
+        meta:
+          $ref: "#/components/schemas/Items"
+    PaginatedPhotos:
+      type: object
+      description: pages of Photos
+      required:
+        - meta
+      properties:
+        photos:
+          type: array
+          items:
+            $ref: "#/components/schemas/Photo"
+        meta:
+          $ref: "#/components/schemas/Items"
+    PaginatedMeals:
+      type: object
+      description: pages of Meal
+      required:
+        - meta
+      properties:
+        meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+        meta:
+          $ref: "#/components/schemas/Items"
+    PaginatedFoods:
+      type: object
+      description: pages of Food
+      required:
+        - meta
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodInfo"
+        meta:
+          $ref: "#/components/schemas/Items"
+    FoodCategory:
+      type: object
+      description: food category, set for some
+      required:
+        - code
+        - description
+      properties:
+        code:
+          description: Food description
+          type: string
+        description:
+          description: Food description
+          type: string
+    BrandedFood:
+      type: object
+      description: branded_food
+      required:
+        - serving_size
+        - serving_size_unit
+      properties:
+        brand_owner:
+          type: string
+        ingredients:
+          type: string
+        serving_size:
+          type: number
+          format: double
+        serving_size_unit:
+          type: string
+        household_serving:
+          type: string
+        branded_food_category:
+          type: string
+    FoodPortion:
+      type: object
+      description: food_portion
+      required:
+        - id
+        - amount
+        - portion_description
+        - modifier
+        - gram_weight
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+          format: double
+        portion_description:
+          type: string
+        modifier:
+          type: string
+        gram_weight:
+          type: number
+          format: double
+    FoodWrapper:
+      type: object
+      description: A top level food
+      required:
+        - fdc_id
+        - description
+        - data_type
+        - nutrients
+      properties:
+        fdc_id:
+          description: FDC Id
+          type: integer
+        description:
+          description: Food description
+          type: string
+        data_type:
+          description: todo
+          $ref: "#/components/schemas/FoodDataType"
+        category:
+          $ref: "#/components/schemas/FoodCategory"
+        nutrients:
+          description: todo
+          type: array
+          items:
+            $ref: "./usda.yaml#/components/schemas/FoodNutrient"
+        portions:
+          description: portion datapoints
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodPortion"
+        branded_info:
+          $ref: "#/components/schemas/BrandedFood"
+
+    FoodInfo:
+      type: object
+      description: A top level food?
+      required:
+        - wrapper
+        - unit_mappings
+      properties:
+        wrapper:
+          $ref: "#/components/schemas/FoodWrapper"
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
+    MealRecipeUpdate:
+      type: object
+      description: an update to the recipes on a mea
+      required:
+        - recipe_id
+        - multiplier
+        - action
+      properties:
+        recipe_id:
+          description: Recipe Id
+          type: string
+        multiplier:
+          description: multiplier
+          type: number
+          format: double
+          minimum: 0
+        action:
+          description: todo
+          type: string
+          enum: [add, remove]
+    FoodDataType:
+      type: string
+      enum:
+        [
+          foundation_food,
+          sample_food,
+          market_acquisition,
+          survey_fndds_food,
+          sub_sample_food,
+          agricultural_acquisition,
+          sr_legacy_food,
+          branded_food,
+        ]
+    # FoodNutrientUnit:
+    #   type: string
+    #   enum: [UG, G, IU, kJ, KCAL, MG, MG_ATE, SP_GR]
+    IngredientKind:
+      type: string
+      enum: [ingredient, recipe]
+    RecipeDependency:
+      description: represents a relationship between recipe and ingredient, the latter of which can also be a recipe.
+      type: object
+      required:
+        - recipe_id
+        - recipe_name
+        - ingredient_id
+        - ingredient_name
+        - ingredient_kind
+      properties:
+        recipe_id:
+          description: recipe_id
+          type: string
+        recipe_name:
+          description: id
+          type: string
+        ingredient_id:
+          description: id
+          type: string
+        ingredient_name:
+          description: id
+          type: string
+        ingredient_kind:
+          description: what kind of ingredient
+          $ref: "#/components/schemas/IngredientKind"
+    EntitySummary:
+      description: holds name/id and multiplier for a Kind of entity
+      type: object
+      required:
+        - id
+        - name
+        - multiplier
+        - kind
+      properties:
+        id:
+          description: recipe_detail or ingredient id
+          type: string
+        name:
+          description: recipe or ingredient name
+          type: string
+        multiplier:
+          description: multiplier
+          type: number
+          format: double
+        kind:
+          description: what kind of entity
+          $ref: "#/components/schemas/IngredientKind"
+    IngredientUsage:
+      description: todo
+      type: object
+      required:
+        - amounts
+        - required_by
+        - multiplier
+      properties:
+        multiplier:
+          description: multiplier
+          type: number
+          format: double
+        amounts:
+          description: multiple amounts to try
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        required_by:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/EntitySummary"
+    UsageValue:
+      type: object
+      description: holds information
+      required:
+        - ings
+        - sum
+        - meta
+      properties:
+        ings:
+          description: multiplier
+          type: array
+          items:
+            $ref: "#/components/schemas/IngredientUsage"
+        sum:
+          description: amounts
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        meta:
+          description: detail about it
+          $ref: "#/components/schemas/EntitySummary"
+    UnitConversionRequest:
+      type: object
+      required:
+        - input
+        - unit_mappings
+      properties:
+        target:
+          type: string
+          enum: [weight, volume, money, calories, other]
+        input:
+          description: multiple amounts to try
+          type: array
+          items:
+            $ref: "#/components/schemas/Amount"
+        unit_mappings:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UnitMapping"
+    SumsResponse:
+      type: object
+      required:
+        - sums
+        - by_recipe
+      properties:
+        sums:
+          description: mappings of equivalent units
+          type: array
+          items:
+            $ref: "#/components/schemas/UsageValue"
+        by_recipe:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/UsageValue"
+    CompactRecipeSection:
+      type: object
+      required:
+        - ingredients
+        - instructions
+      properties:
+        ingredients:
+          type: array
+          items:
+            type: string
+        instructions:
+          type: array
+          items:
+            type: string
+    CompactRecipeMeta:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        image:
+          type: string
+    CompactRecipe:
+      type: object
+      required:
+        - meta
+        - sections
+      properties:
+        meta:
+          $ref: "#/components/schemas/CompactRecipeMeta"
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompactRecipeSection"
+    FoodSearchResult:
+      description: A meal, which bridges recipes to photos
+      type: object
+      required:
+        - foods
+      properties:
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodInfo"
+        results:
+          $ref: "#/components/schemas/FoodResultByItem"
+    FoodResultByItem:
+      description: A meal, which bridges recipes to photos
+      type: object
+      required:
+        - branded_food
+        - foundation_food
+        - legacy_food
+        - survey_food
+        - info
+      properties:
+        branded_food:
+          type: array
+          items:
+            $ref: "./usda.yaml#/components/schemas/BrandedFoodItem"
+        foundation_food:
+          type: array
+          items:
+            $ref: "./usda.yaml#/components/schemas/FoundationFoodItem"
+        legacy_food:
+          type: array
+          items:
+            $ref: "./usda.yaml#/components/schemas/SRLegacyFoodItem"
+        survey_food:
+          type: array
+          items:
+            $ref: "./usda.yaml#/components/schemas/SurveyFoodItem"
+        info:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodInfo"
+
+  parameters:
+    offsetParam:
+      in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+      description: The number of items to skip before starting to collect the result set.
+    limitParam:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 50
+        default: 20
+      description: The numbers of items to return.
+    nameParam:
+      in: query
+      name: name
+      required: true
+      schema:
+        type: string
+      description: The search query (name).

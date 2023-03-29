@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { Food } from './Food';
+import type { FoodInfo } from './FoodInfo';
 import {
-    FoodFromJSON,
-    FoodFromJSONTyped,
-    FoodToJSON,
-} from './Food';
+    FoodInfoFromJSON,
+    FoodInfoFromJSONTyped,
+    FoodInfoToJSON,
+} from './FoodInfo';
 import type { Ingredient } from './Ingredient';
 import {
     IngredientFromJSON,
@@ -64,10 +64,10 @@ export interface IngredientDetail {
     children?: Array<IngredientDetail>;
     /**
      * 
-     * @type {Food}
+     * @type {FoodInfo}
      * @memberof IngredientDetail
      */
-    food?: Food;
+    food?: FoodInfo;
     /**
      * mappings of equivalent units
      * @type {Array<UnitMapping>}
@@ -101,7 +101,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
         'ingredient': IngredientFromJSON(json['ingredient']),
         'recipes': ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
-        'food': !exists(json, 'food') ? undefined : FoodFromJSON(json['food']),
+        'food': !exists(json, 'food') ? undefined : FoodInfoFromJSON(json['food']),
         'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
@@ -118,7 +118,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         'ingredient': IngredientToJSON(value.ingredient),
         'recipes': ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
-        'food': FoodToJSON(value.food),
+        'food': FoodInfoToJSON(value.food),
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }

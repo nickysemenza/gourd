@@ -43,7 +43,7 @@ const IngredientDetail: React.FC = () => {
             name={ingredient.name}
             limit={20}
             enableSearch
-            highlightId={food?.fdc_id}
+            highlightId={food?.wrapper.fdc_id}
             onLink={(fdcId: number) => {
               linkFoodToIngredient(ingredient.id, fdcId);
             }}

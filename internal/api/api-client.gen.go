@@ -2090,7 +2090,7 @@ func (r GetFoodsByIdsResponse) StatusCode() int {
 type SearchFoodsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *PaginatedFoods
+	JSON200      *FoodSearchResult
 	JSONDefault  *Error
 }
 
@@ -2113,7 +2113,7 @@ func (r SearchFoodsResponse) StatusCode() int {
 type GetFoodByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *Food
+	JSON200      *FoodInfo
 	JSONDefault  *Error
 }
 
@@ -3061,7 +3061,7 @@ func ParseSearchFoodsResponse(rsp *http.Response) (*SearchFoodsResponse, error) 
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest PaginatedFoods
+		var dest FoodSearchResult
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3094,7 +3094,7 @@ func ParseGetFoodByIdResponse(rsp *http.Response) (*GetFoodByIdResponse, error) 
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Food
+		var dest FoodInfo
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

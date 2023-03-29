@@ -1,5 +1,5 @@
 import {
-  Food,
+  FoodWrapper,
   Ingredient,
   IngredientDetail,
   Meal,
@@ -31,7 +31,7 @@ export type IngredientAttr = "grams" | "amount";
 export type IngredientKind = SectionIngredient["kind"];
 
 export type FoodsById = {
-  [key: number]: Food;
+  [key: number]: FoodWrapper;
 };
 export type IngDetailsById = {
   [key: string]: IngredientDetail;
@@ -460,8 +460,8 @@ export const sumIngredients = (sections?: RecipeSection[]) => {
   return { recipes, ingredients };
 };
 
-export const getCalories = (food: Food) => {
-  const first = food.nutrients.find((n) => n.nutrient.unit_name === "KCAL");
+export const getCalories = (food: FoodWrapper) => {
+  const first = food.nutrients.find((n) => n.nutrient?.unitName === "KCAL");
   return (!!first && first.amount) || 0;
 };
 
@@ -492,8 +492,9 @@ export const calCalc = (
             const cal = getCalories(hint) * scalingFactor;
             const ingNutrients = new Map<string, number>();
             hint.nutrients.forEach((n) => {
-              const { name, unit_name } = n.nutrient;
-              const label = `${name} (${unit_name})`;
+              if (n.nutrient === undefined || n.amount === undefined) return;
+              const { name, unitName } = n.nutrient;
+              const label = `${name} (${unitName})`;
               if (n.amount <= 0) return;
               totalNutrients.set(
                 label,

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -51,12 +52,12 @@ var catmap = map[int]FoodCategory{
 	28: {Code: "1410", Description: " Alcoholic Beverages"},
 }
 
-func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*Food, error) {
+func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*FoodInfo, error) {
 	if foodRec == nil {
 		return nil, nil
 	}
 
-	f := Food{
+	f := FoodWrapper{
 		FdcId:       foodRec.FDCID,
 		Description: foodRec.Description.String,
 		DataType:    FoodDataType(foodRec.DataType.String),
@@ -75,12 +76,12 @@ func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*F
 			continue
 		}
 		nutrients = append(nutrients, FoodNutrient{
-			Amount:     float64(fn.Amount.Float32),
-			DataPoints: fn.DataPoints.Int,
-			Nutrient: Nutrient{
-				Id:       n.ID,
-				Name:     n.Name.String,
-				UnitName: FoodNutrientUnit(n.UnitName.String),
+			Amount:     fn.Amount.Ptr(),
+			DataPoints: fn.DataPoints.Ptr(),
+			Nutrient: &Nutrient{
+				Id:       &n.ID,
+				Name:     &n.Name.String,
+				UnitName: &n.UnitName.String,
 			},
 		})
 
@@ -94,7 +95,7 @@ func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*F
 			BrandedFoodCategory: brandInfo.BrandedFoodCategory.Ptr(),
 			HouseholdServing:    brandInfo.HouseholdServingFulltext.Ptr(),
 			Ingredients:         brandInfo.Ingredients.Ptr(),
-			ServingSize:         float64(brandInfo.ServingSize.Float32),
+			ServingSize:         brandInfo.ServingSize.Float64,
 			ServingSizeUnit:     brandInfo.ServingSizeUnit.String,
 		}
 	}
@@ -102,8 +103,8 @@ func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*F
 	portions := []FoodPortion{}
 	for _, p := range foodRec.R.FDCUsdaFoodPortions {
 		portions = append(portions, FoodPortion{
-			Amount:             float64(p.Amount.Float32),
-			GramWeight:         float64(p.GramWeight.Float32),
+			Amount:             p.Amount.Float64,
+			GramWeight:         p.GramWeight.Float64,
 			Id:                 p.ID,
 			Modifier:           p.Modifier.String,
 			PortionDescription: p.PortionDescription.String,
@@ -115,8 +116,10 @@ func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*F
 	if err != nil {
 		return nil, err
 	}
-	f.UnitMappings = m
-	return &f, nil
+	return &FoodInfo{
+		Wrapper:      f,
+		UnitMappings: m,
+	}, nil
 }
 func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
@@ -146,7 +149,7 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	if err != nil {
 		return handleErr(c, err)
 	}
-	items := []Food{}
+	items := []FoodInfo{}
 	for _, foodRec := range foodRecs {
 		f, err := a.foodFromRec(ctx, foodRec)
 		if err != nil {
@@ -178,26 +181,36 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 			}
 		}
 	}
-	foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
-	if err != nil {
-		return handleErr(c, err)
-	}
-	listMeta.setTotalCount(count)
 
-	items, err := a.buildPaginatedFood(ctx, foods)
+	var byItem FoodResultByItem
+	err := a.R.Send(ctx, "debug/search_usda?name="+url.QueryEscape(string(params.Name)), nil, &byItem)
 	if err != nil {
 		return handleErr(c, err)
 	}
-	resp := PaginatedFoods{
-		Foods: &items,
-		Meta:  listMeta,
+	resp := FoodSearchResult{
+		Foods:   byItem.Info,
+		Results: &byItem,
+	}
+
+	if false {
+		foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		listMeta.setTotalCount(count)
+
+		items, err := a.buildPaginatedFood(ctx, foods)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		resp.Foods = items
 	}
 
 	return c.JSON(http.StatusOK, resp)
 
 }
 
-func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
+func (a *API) getFoodById(ctx context.Context, fdcId int) (*FoodInfo, error) {
 	ctx, span := a.tracer.Start(ctx, "getFoodById")
 	defer span.End()
 
@@ -221,7 +234,7 @@ func (a *API) getFoodById(ctx context.Context, fdcId int) (*Food, error) {
 	return f, nil
 }
 
-func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, error) {
+func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]FoodInfo, error) {
 	ctx, span := a.tracer.Start(ctx, "buildPaginatedFood")
 	defer span.End()
 
@@ -239,7 +252,7 @@ func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]Food, 
 	if err != nil {
 		return nil, err
 	}
-	items := []Food{}
+	items := []FoodInfo{}
 	for _, foodRec := range foodRecs {
 		f, err := a.foodFromRec(ctx, foodRec)
 		if err != nil {

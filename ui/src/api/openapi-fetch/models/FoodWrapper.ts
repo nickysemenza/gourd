@@ -43,88 +43,75 @@ import {
     FoodPortionFromJSONTyped,
     FoodPortionToJSON,
 } from './FoodPortion';
-import type { UnitMapping } from './UnitMapping';
-import {
-    UnitMappingFromJSON,
-    UnitMappingFromJSONTyped,
-    UnitMappingToJSON,
-} from './UnitMapping';
 
 /**
  * A top level food
  * @export
- * @interface Food
+ * @interface FoodWrapper
  */
-export interface Food {
+export interface FoodWrapper {
     /**
      * FDC Id
      * @type {number}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     fdc_id: number;
     /**
      * Food description
      * @type {string}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     description: string;
     /**
      * 
      * @type {FoodDataType}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     data_type: FoodDataType;
     /**
      * 
      * @type {FoodCategory}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     category?: FoodCategory;
     /**
      * todo
      * @type {Array<FoodNutrient>}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     nutrients: Array<FoodNutrient>;
     /**
      * portion datapoints
      * @type {Array<FoodPortion>}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     portions?: Array<FoodPortion>;
     /**
      * 
      * @type {BrandedFood}
-     * @memberof Food
+     * @memberof FoodWrapper
      */
     branded_info?: BrandedFood;
-    /**
-     * mappings of equivalent units
-     * @type {Array<UnitMapping>}
-     * @memberof Food
-     */
-    unit_mappings: Array<UnitMapping>;
 }
 
 /**
- * Check if a given object implements the Food interface.
+ * Check if a given object implements the FoodWrapper interface.
  */
-export function instanceOfFood(value: object): boolean {
+export function instanceOfFoodWrapper(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "fdc_id" in value;
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "data_type" in value;
     isInstance = isInstance && "nutrients" in value;
-    isInstance = isInstance && "unit_mappings" in value;
 
     return isInstance;
 }
 
-export function FoodFromJSON(json: any): Food {
-    return FoodFromJSONTyped(json, false);
+export function FoodWrapperFromJSON(json: any): FoodWrapper {
+    return FoodWrapperFromJSONTyped(json, false);
 }
 
-export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food {
+export function FoodWrapperFromJSONTyped(json: any, ignoreDiscriminator: boolean): FoodWrapper {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -137,11 +124,10 @@ export function FoodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Food
         'nutrients': ((json['nutrients'] as Array<any>).map(FoodNutrientFromJSON)),
         'portions': !exists(json, 'portions') ? undefined : ((json['portions'] as Array<any>).map(FoodPortionFromJSON)),
         'branded_info': !exists(json, 'branded_info') ? undefined : BrandedFoodFromJSON(json['branded_info']),
-        'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
 
-export function FoodToJSON(value?: Food | null): any {
+export function FoodWrapperToJSON(value?: FoodWrapper | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -157,7 +143,6 @@ export function FoodToJSON(value?: Food | null): any {
         'nutrients': ((value.nutrients as Array<any>).map(FoodNutrientToJSON)),
         'portions': value.portions === undefined ? undefined : ((value.portions as Array<any>).map(FoodPortionToJSON)),
         'branded_info': BrandedFoodToJSON(value.branded_info),
-        'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }
 

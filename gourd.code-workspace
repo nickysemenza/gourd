@@ -77,6 +77,10 @@
     "go.testTimeout": "60s",
     "files.exclude": {
       "ui/build/": true
+    },
+    "search.exclude": {
+      "**/openapi-fetch/**": true,
+      "**/openapi-hooks/**": true
     }
   }
 }

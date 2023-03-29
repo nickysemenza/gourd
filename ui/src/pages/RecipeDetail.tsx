@@ -174,7 +174,7 @@ const RecipeDetail: React.FC = () => {
   //https://stackoverflow.com/a/26265095
   const hints: FoodsById = Object.assign(
     {},
-    ...(foods?.foods || []).map((s) => ({ [s.fdc_id]: s }))
+    ...(foods?.foods || []).map((s) => ({ [s.wrapper.fdc_id]: s }))
   );
   const ing_hints: IngDetailsById = Object.assign(
     {},

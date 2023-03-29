@@ -89,13 +89,14 @@ docker-push: docker-build
 validate-openapi: internal/api/openapi.yaml
 	# ./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js internal/api/openapi.yaml -c api/.validaterc -v
 
-openapi: validate-openapi internal/api/openapi.yaml bin/oapi-codegen
+openapi: 
+	npx @redocly/openapi-cli bundle openapi.yaml --output internal/api/openapi.yaml 
 	rm -rf ui/src/api/openapi-fetch
 	rm -rf ui/src/api/openapi-hooks
 	rm -rf rust/openapi/src/models
 	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
 	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml -o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
-
+	
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher
 

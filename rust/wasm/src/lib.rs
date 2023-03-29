@@ -2,12 +2,12 @@
 mod utils;
 
 use gourd_common::{
-    convert_to,
+    convert_to, food_info_from_branded_food_item,
     ingredient::Amount,
     parse_unit_mappings, sum_ingredients,
     unit::{add_time_amounts, make_graph, print_graph},
 };
-use openapi::models::{RecipeDetail, RecipeDetailInput, UnitConversionRequest};
+use openapi::models::{BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest};
 use tracing::{error, info};
 use wasm_bindgen::prelude::*;
 
@@ -193,4 +193,11 @@ pub fn sum_time_amounts(amount: &IAmounts) -> IAmount {
     let sum = add_time_amounts(r);
     info!("sum {}", sum);
     JsValue::from_serde(&sum).unwrap().into()
+}
+
+#[wasm_bindgen]
+pub fn bfi_to_info(x: &JsValue) -> JsValue {
+    let bfi: BrandedFoodItem = x.into_serde().unwrap();
+    let fw = food_info_from_branded_food_item(bfi);
+    JsValue::from_serde(&fw).unwrap()
 }

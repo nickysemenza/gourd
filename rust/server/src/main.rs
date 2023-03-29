@@ -1,7 +1,7 @@
 use std::env;
 
-use gourd::configuration::get_configuration;
 use gourd::startup::Application;
+use gourd::{configuration::get_configuration, usda_loader};
 use opentelemetry::sdk::{
     propagation::TraceContextPropagator,
     trace::{self, Sampler},
@@ -46,6 +46,7 @@ async fn main() -> std::io::Result<()> {
                         .num_args(1),
                 ),
         )
+        .subcommand(Command::new("load_usda").about("load usda"))
         .get_matches();
 
     // Gets a value for config if supplied by user, or defaults to "default.conf"
@@ -66,6 +67,11 @@ async fn main() -> std::io::Result<()> {
     if let Some(_m) = matches.subcommand_matches("load_mappings") {
         let root = span!(tracing::Level::TRACE, "load_mappings",);
         let _enter = root.enter();
+    }
+    if let Some(_m) = matches.subcommand_matches("load_usda") {
+        let root = span!(tracing::Level::TRACE, "load_mappings",);
+        let _enter = root.enter();
+        usda_loader::load_json_into_search().await;
     }
     // opentelemetry::global::force_flush_tracer_provider();
 
@@ -90,10 +96,10 @@ fn initialize_tracing(s: &str) {
     // https://github.com/ex-howiebbq/sisi-spss/blob/f3ea31df2620a3ae0a152160539b516b2c670193/stargate/src/telemetry.rs
     let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
-    let console_layer = console_subscriber::spawn();
+    // let console_layer = console_subscriber::spawn();
 
     tracing_subscriber::registry()
-        .with(console_layer)
+        // .with(console_layer)
         .with(tracing_subscriber::fmt::layer())
         .with(EnvFilter::from_default_env())
         .with(opentelemetry)
