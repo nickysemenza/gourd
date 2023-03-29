@@ -120,7 +120,7 @@ cy:
 
 
 dev-rs:
-	cd rust && RUST_BACKTRACE=1  RUST_LOG=html5ever=info,selectors=info,debug cargo watch -x 'run server'
+	cd rust && RUST_BACKTRACE=1 RUST_LOG=html5ever=info,selectors=info,debug cargo watch -x 'run server'
 generate-wasm:
 	cd rust && wasm-pack build wasm
 wasm-dev: generate-wasm

@@ -5,6 +5,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -133,6 +134,30 @@ func (a *API) RecipeDependencies(c echo.Context) error {
 	}{res})
 }
 
+type Res struct {
+	Notion  notion.Recipe
+	Details *RecipeDetailInput
+}
+
+func (a *API) getEnhancedNotion(ctx context.Context, lookback time.Duration, pageID string) ([]Res, error) {
+	res, err := a.Notion.GetAll(ctx, lookback, pageID)
+	if err != nil {
+		return nil, err
+	}
+
+	var res2 []Res
+	for _, r := range res {
+		i, err := a.notionRecipeToInput(ctx, r)
+		if err != nil {
+			return nil, err
+		}
+		res2 = append(res2, Res{
+			Notion:  r,
+			Details: i,
+		})
+	}
+	return res2, nil
+}
 func (a *API) NotionTest(c echo.Context) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "Notion")
 	defer span.End()
@@ -145,26 +170,9 @@ func (a *API) NotionTest(c echo.Context) error {
 			return handleErr(c, err)
 		}
 	}
-
-	res, err := a.Notion.GetAll(ctx, time.Hour*24*time.Duration(daysSince), c.QueryParam("page_id"))
+	res2, err := a.getEnhancedNotion(ctx, time.Hour*24*time.Duration(daysSince), c.QueryParam("page_id"))
 	if err != nil {
 		return handleErr(c, err)
-	}
-
-	type Res struct {
-		Notion  notion.Recipe
-		Details *RecipeDetailInput
-	}
-	var res2 []Res
-	for _, r := range res {
-		i, err := a.notionRecipeToInput(ctx, r)
-		if err != nil {
-			return handleErr(c, err)
-		}
-		res2 = append(res2, Res{
-			Notion:  r,
-			Details: i,
-		})
 	}
 
 	return c.JSON(http.StatusOK, res2)

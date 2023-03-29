@@ -13,7 +13,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilte
 extern crate clap;
 use clap::{Arg, Command};
 
-#[actix_web::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
     env::set_var("RUST_BACKTRACE", "1");
     let matches = Command::new("gourd CLI")
@@ -90,9 +90,12 @@ fn initialize_tracing(s: &str) {
     // https://github.com/ex-howiebbq/sisi-spss/blob/f3ea31df2620a3ae0a152160539b516b2c670193/stargate/src/telemetry.rs
     let opentelemetry = tracing_opentelemetry::layer().with_tracer(tracer);
 
+    let console_layer = console_subscriber::spawn();
+
     tracing_subscriber::registry()
-        .with(EnvFilter::from_default_env())
+        .with(console_layer)
         .with(tracing_subscriber::fmt::layer())
+        .with(EnvFilter::from_default_env())
         .with(opentelemetry)
         .try_init()
         .expect("unable to initialize the tokio tracer");
