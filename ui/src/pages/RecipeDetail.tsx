@@ -350,7 +350,7 @@ const RecipeDetail: React.FC = () => {
     kcal: totalKCal,
   } = countTotals(recipe.detail.sections, w, ing_hints);
 
-  const newerVersion = recipe.detail.other_versions
+  const newerVersion = recipe.other_versions
     ?.filter((r) => r.is_latest_version)
     .pop();
 
@@ -569,7 +569,7 @@ const RecipeDetail: React.FC = () => {
         <div className="w-4/12">
           <h3>other versions</h3>
           <ul>
-            {recipe.detail.other_versions?.map((v) => (
+            {recipe.other_versions?.map((v) => (
               <li key={`${v.id}@`}>
                 <RecipeLink recipe={v} />
               </li>

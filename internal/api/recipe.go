@@ -162,7 +162,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 	return c.JSON(http.StatusOK, result)
 }
 
-func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) (*RecipeDetail, error) {
+func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeOtherVersions bool) (*RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "transformRecipe")
 	defer span.End()
 	sections, err := a.transformRecipeSections(ctx, dbr.Sections)
@@ -187,6 +187,10 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 			return nil, err
 		}
 	}
+	w := RecipeWrapper{
+		Id:     dbr.RecipeId,
+		Detail: rd,
+	}
 	if includeOtherVersions {
 		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe_id": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
 		if err != nil {
@@ -196,15 +200,18 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		if err != nil {
 			return nil, err
 		}
-		rd.OtherVersions = &details
+		// w.OtherVersions = &details
+		for _, d := range details {
+			w.OtherVersions = append(w.OtherVersions, d.Detail)
+		}
 	}
 
-	return &rd, nil
+	return &w, nil
 }
-func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) ([]RecipeDetail, error) {
+func (a *API) transformRecipes(ctx context.Context, dbr db.RecipeDetails, includeOtherVersions bool) ([]RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "transformRecipes")
 	defer span.End()
-	r := make([]RecipeDetail, len(dbr))
+	r := make([]RecipeWrapper, len(dbr))
 	for x, d := range dbr {
 		each, err := a.transformRecipe(ctx, d, includeOtherVersions)
 		if err != nil {
@@ -221,10 +228,7 @@ func (a *API) transformRecipeFull(ctx context.Context, dbr *db.RecipeDetail) (*R
 		return nil, err
 	}
 
-	return &RecipeWrapper{
-		Id:     dbr.RecipeId,
-		Detail: *d,
-	}, nil
+	return d, nil
 }
 func transformIngredient(dbr db.Ingredient) Ingredient {
 	return Ingredient{
@@ -402,7 +406,7 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 				if err != nil {
 					return nil, err
 				}
-				si.Recipe = r
+				si.Recipe = &r.Detail
 			} else {
 				si.Kind = "ingredient"
 				foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})

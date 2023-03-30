@@ -65,6 +65,10 @@ fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
                 "/unit_mappings_from_food",
                 web::post().to(crate::usda_mappings::unit_mappings_from_food),
             )
+            .route(
+                "/index_recipe_detail",
+                web::post().to(crate::search::index_recipe_detail),
+            )
     })
     .listen(listener)?
     .run();

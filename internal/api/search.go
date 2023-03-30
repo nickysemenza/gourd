@@ -33,7 +33,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 		if err != nil {
 			return handleErr(c, err)
 		}
-		resRecipes = append(resRecipes, RecipeWrapper{Detail: *r, Id: x.RecipeId})
+		resRecipes = append(resRecipes, RecipeWrapper{Detail: r.Detail, Id: x.RecipeId})
 	}
 	for _, x := range ingredients {
 		i := transformIngredient(x)

@@ -505,7 +505,7 @@ type MealRecipe struct {
 	// when it was taken
 	Multiplier float64 `json:"multiplier"`
 
-	// A revision of a recipe
+	// A revision of a recipe. does not include any "generated" fields. everything directly from db
 	Recipe RecipeDetail `json:"recipe"`
 }
 
@@ -647,7 +647,7 @@ type RecipeDependency struct {
 	RecipeName string `json:"recipe_name"`
 }
 
-// A revision of a recipe
+// A revision of a recipe. does not include any "generated" fields. everything directly from db
 type RecipeDetail struct {
 	// when the version was created
 	CreatedAt time.Time `json:"created_at"`
@@ -660,9 +660,6 @@ type RecipeDetail struct {
 
 	// recipe name
 	Name string `json:"name"`
-
-	// Other versions
-	OtherVersions *[]RecipeDetail `json:"other_versions,omitempty"`
 
 	// serving quantity
 	Quantity int64 `json:"quantity"`
@@ -755,15 +752,18 @@ type RecipeSource struct {
 	Url *string `json:"url,omitempty"`
 }
 
-// A recipe with subcomponents
+// A recipe with subcomponents, including some "generated" fields to enhance data
 type RecipeWrapper struct {
-	// A revision of a recipe
+	// A revision of a recipe. does not include any "generated" fields. everything directly from db
 	Detail RecipeDetail `json:"detail"`
 
 	// id
 	Id           string   `json:"id"`
 	LinkedMeals  *[]Meal  `json:"linked_meals,omitempty"`
 	LinkedPhotos *[]Photo `json:"linked_photos,omitempty"`
+
+	// Other versions
+	OtherVersions []RecipeDetail `json:"other_versions"`
 }
 
 // A recipe with subcomponents
@@ -840,7 +840,7 @@ type SectionIngredient struct {
 	// raw line item (pre-import/scrape)
 	Original *string `json:"original,omitempty"`
 
-	// A revision of a recipe
+	// A revision of a recipe. does not include any "generated" fields. everything directly from db
 	Recipe *RecipeDetail `json:"recipe,omitempty"`
 
 	// x

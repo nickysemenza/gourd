@@ -8,14 +8,15 @@ import {
 } from "react-instantsearch-hooks-web";
 
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
-import { BrandedFoodItem } from "../api/openapi-hooks/api";
+import { BrandedFoodItem, RecipeDetail } from "../api/openapi-hooks/api";
 import { WasmContext } from "../wasmContext";
 import { FoodRow } from "../components/FoodSearch";
 import { FoodInfo } from "../api/openapi-fetch";
+import { RecipeGridCell } from "../components/RecipeGrid";
 
 const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
 
-function Hit(props: { hit: any }) {
+function BrandedHit(props: { hit: any }) {
   let hit = props.hit as BrandedFoodItem;
   const w = useContext(WasmContext);
   let f: FoodInfo | undefined = w?.bfi_to_info(hit);
@@ -37,39 +38,79 @@ function Hit(props: { hit: any }) {
   );
 }
 
-const Hits: React.FC = () => {
+function RecipeDetailHit(props: { hit: any }) {
+  let hit = props.hit as RecipeDetail;
+  return (
+    <div className="border-1">
+      <RecipeGridCell detail={hit} />
+    </div>
+  );
+}
+
+const BrandedHits: React.FC = () => {
   const { hits } = useHits();
   return (
     <div>
       {hits.map((hit) => (
-        <Hit key={(hit as unknown as BrandedFoodItem).fdcId} hit={hit} />
+        <BrandedHit key={(hit as unknown as BrandedFoodItem).fdcId} hit={hit} />
       ))}
     </div>
   );
 };
 
+const RecipeDetailsHits: React.FC = () => {
+  const { hits } = useHits();
+  return (
+    <div className="grid gap-5 row-gap-5 mb-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2">
+      {hits.map((hit) => (
+        <RecipeDetailHit key={(hit as unknown as RecipeDetail).id} hit={hit} />
+      ))}
+    </div>
+  );
+};
+const searchClassNames = {
+  root: "p-3 shadow-sm",
+  form: "relative",
+  input:
+    "block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 rounded-md focus:ring-1",
+  // submitIcon: "absolute top-0 left-0 bottom-0 w-6",
+};
 const Search: React.FC = () => (
+  <div>
+    <BrandedSearch />
+    <hr />
+    <RecipeDetailsSearch />
+  </div>
+);
+const BrandedSearch: React.FC = () => (
   <InstantSearch indexName="BrandedFoods" searchClient={searchClient}>
     <div>
-      <SearchBox
-        classNames={{
-          root: "p-3 shadow-sm",
-          form: "relative",
-          input:
-            "block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 rounded-md focus:ring-1",
-          // submitIcon: "absolute top-0 left-0 bottom-0 w-6",
-        }}
-      />
+      <SearchBox classNames={searchClassNames} />
       <div className="flex">
         <div>
           <RefinementList attribute="brandOwner" showMore={true} />
           <RefinementList attribute="brandedFoodCategory" />
           <RefinementList attribute="servingSizeUnit" />
         </div>
-        <Hits />
+        <BrandedHits />
       </div>
     </div>
-    {/* <Hits hitComponent={Hit as unknown as Foo} /> */}
+  </InstantSearch>
+);
+
+const RecipeDetailsSearch: React.FC = () => (
+  <InstantSearch indexName="RecipeDetails" searchClient={searchClient}>
+    <div>
+      <SearchBox classNames={searchClassNames} />
+      <div className="flex">
+        <div>
+          {/* <RefinementList attribute="brandOwner" showMore={true} /> */}
+          <RefinementList attribute="tags" />
+          {/* <RefinementList attribute="servingSizeUnit" /> */}
+        </div>
+        <RecipeDetailsHits />
+      </div>
+    </div>
   </InstantSearch>
 );
 

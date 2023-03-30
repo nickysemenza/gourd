@@ -139,7 +139,7 @@ export interface RecipeSectionInput {
 }
 
 /**
- * A recipe with subcomponents
+ * A recipe with subcomponents, including some "generated" fields to enhance data
  */
 export interface RecipeWrapper {
   /**
@@ -149,6 +149,10 @@ export interface RecipeWrapper {
   detail: RecipeDetail;
   linked_meals?: Meal[];
   linked_photos?: Photo[];
+  /**
+   * Other versions
+   */
+  other_versions: RecipeDetail[];
 }
 
 /**
@@ -163,7 +167,7 @@ export interface RecipeWrapperInput {
 }
 
 /**
- * A revision of a recipe
+ * A revision of a recipe. does not include any "generated" fields. everything directly from db
  */
 export interface RecipeDetail {
   /**
@@ -206,10 +210,6 @@ export interface RecipeDetail {
    * when the version was created
    */
   created_at: string;
-  /**
-   * Other versions
-   */
-  other_versions?: RecipeDetail[];
   /**
    * tags
    */

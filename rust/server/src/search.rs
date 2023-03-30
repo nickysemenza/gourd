@@ -1,5 +1,7 @@
 use std::fmt;
 
+use actix_web::{web, HttpResponse};
+use openapi::models::RecipeDetail;
 use serde::{de::DeserializeOwned, Serialize};
 use tracing::info;
 
@@ -16,6 +18,7 @@ pub enum Index {
     SurveyFoods,
     SRLegacyFoods,
     ScrapedRecipes,
+    RecipeDetails,
 }
 impl Index {
     pub fn get_top_level(&self) -> String {
@@ -24,7 +27,9 @@ impl Index {
             | Index::FoundationFoods
             | Index::SurveyFoods
             | Index::SRLegacyFoods => self.to_string(),
-            Index::ScrapedRecipes => panic!("ScrapedRecipes is not a top level index"),
+            Index::ScrapedRecipes | Index::RecipeDetails => {
+                panic!("ScrapedRecipes is not a top level index")
+            }
         }
     }
     pub fn get_searchable_attributes(&self) -> Option<Vec<&str>> {
@@ -40,6 +45,7 @@ impl Index {
             Index::SurveyFoods => None,
             Index::SRLegacyFoods => None,
             Index::ScrapedRecipes => None,
+            Index::RecipeDetails => None,
         }
     }
     pub fn get_filterable_attributes(&self) -> Option<Vec<&str>> {
@@ -54,6 +60,7 @@ impl Index {
             Index::SurveyFoods => None,
             Index::SRLegacyFoods => None,
             Index::ScrapedRecipes => Some(vec!["name", "url", "sections"]),
+            Index::RecipeDetails => Some(vec!["unit", "is_latest_version", "tags"]),
         }
     }
 }
@@ -71,6 +78,7 @@ impl fmt::Display for Index {
             Index::SurveyFoods => write!(f, "SurveyFoods"),
             Index::SRLegacyFoods => write!(f, "SRLegacyFoods"),
             Index::ScrapedRecipes => write!(f, "ScrapedRecipes"),
+            Index::RecipeDetails => write!(f, "RecipeDetails"),
         }
     }
 }
@@ -93,6 +101,13 @@ pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
             tokio::spawn(async move { client.index(i).add_documents(&x, None).await.unwrap() })
         })
         .collect();
-    futures::future::join_all(tasks).await;
-    info!("finished loading")
+    let res = futures::future::join_all(tasks).await;
+    info!("finished loading {:#?}", res);
+}
+
+#[tracing::instrument(name = "route::index_recipe_detail")]
+pub async fn index_recipe_detail(cr: web::Json<RecipeDetail>) -> HttpResponse {
+    load(&vec![cr.0.clone()], Index::RecipeDetails).await;
+
+    HttpResponse::Ok().json(())
 }

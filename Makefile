@@ -86,7 +86,7 @@ generate: wasm-dev openapi # gen-db
 
 .PHONY: openapi
 openapi: internal/api/openapi.yaml
-internal/api/openpi.yaml: openapi.yaml usda.yaml
+internal/api/openapi.yaml: openapi.yaml usda.yaml
 	# generate merged bundle
 	npx @redocly/openapi-cli bundle openapi.yaml --output internal/api/openapi.yaml 
 	

@@ -17,5 +17,5 @@ opt-level = "s"
 
 
 [patch."https://github.com/nickysemenza/ingredient-parser"]
-recipe_scraper_fetcher = { path = "../../ingredient-parser/recipe_scraper_fetcher" }
-ingredient = { path = "../../ingredient-parser/ingredient-parser" }
+# recipe_scraper_fetcher = { path = "../../ingredient-parser/recipe_scraper_fetcher" }
+# ingredient = { path = "../../ingredient-parser/ingredient-parser" }

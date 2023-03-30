@@ -101,6 +101,9 @@ func (c *Client) Send(ctx context.Context, route string, body, target interface{
 	}
 
 	defer res.Body.Close()
+	if target == nil {
+		return nil
+	}
 	return json.NewDecoder(res.Body).Decode(target)
 
 }

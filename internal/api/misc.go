@@ -66,6 +66,8 @@ func (a *API) imagesFromModel(ctx context.Context, nr models.NotionRecipeSlice, 
 	return items, nil
 }
 func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
+	ctx, span := a.tracer.Start(ctx, "recipeFromModel")
+	defer span.End()
 	if recipe == nil || len(recipe.R.RecipeDetails) == 0 {
 		return nil, nil
 	}
@@ -161,7 +163,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			other = append(other, rd)
 		}
 	}
-	rw.Detail.OtherVersions = &other
+	rw.OtherVersions = other
 
 	gp := models.GphotosPhotoSlice{}
 	linkedMeals := []Meal{}
@@ -182,9 +184,17 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 	rw.LinkedPhotos = &images
 
 	rw.LinkedMeals = &linkedMeals
+
+	// temporary: bump index. this should happen after save not lazy load
+	if err := a.R.Send(ctx, "index_recipe_detail", rw.Detail, nil); err != nil {
+		return nil, err
+	}
+
 	return &rw, nil
 }
 func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeWrapper, error) {
+	ctx, span := a.tracer.Start(ctx, "RecipeListV2")
+	defer span.End()
 	recipes, err := models.Recipes(
 		// Load(models.RecipeRels.RecipeDetails, Where("recipe_details.is_latest_version = ?", true)),
 		// has many sections, has many ingredients, which can be ingredients or recipes

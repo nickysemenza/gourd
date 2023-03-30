@@ -926,11 +926,14 @@ components:
           items:
             $ref: '#/components/schemas/SectionIngredientInput'
     RecipeWrapper:
-      description: A recipe with subcomponents
+      description: >-
+        A recipe with subcomponents, including some "generated" fields to
+        enhance data
       type: object
       required:
         - detail
         - id
+        - other_versions
       properties:
         id:
           description: id
@@ -945,6 +948,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Photo'
+        other_versions:
+          description: Other versions
+          type: array
+          items:
+            $ref: '#/components/schemas/RecipeDetail'
     RecipeWrapperInput:
       description: A recipe with subcomponents
       type: object
@@ -957,7 +965,9 @@ components:
         detail:
           $ref: '#/components/schemas/RecipeDetailInput'
     RecipeDetail:
-      description: A revision of a recipe
+      description: >-
+        A revision of a recipe. does not include any "generated" fields.
+        everything directly from db
       type: object
       required:
         - id
@@ -1009,11 +1019,6 @@ components:
           description: when the version was created
           type: string
           format: date-time
-        other_versions:
-          description: Other versions
-          type: array
-          items:
-            $ref: '#/components/schemas/RecipeDetail'
         tags:
           description: tags
           type: array

@@ -7,9 +7,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
-	"github.com/nickysemenza/gourd/internal/clients/rs_client"
 	"github.com/nickysemenza/gourd/internal/db"
-	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
@@ -128,56 +126,56 @@ func (a *API) UnitMappingsFromFood(ctx context.Context, food *FoodWrapper) ([]Un
 	}
 	return m, nil
 
-	if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
-		var res []Amount
-		err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.ParseAmount, &res)
-		if err != nil {
-			return nil, err
-		}
-		if len(res) > 0 {
-			m = append(m, UnitMapping{
-				Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
-				res[0],
-				zero.StringFrom("fdc hs").Ptr()})
-		}
-	}
-	if food.Portions != nil {
-		for _, p := range *food.Portions {
+	// if food.BrandedInfo != nil && food.BrandedInfo.HouseholdServing != nil {
+	// 	var res []Amount
+	// 	err := a.R.Call(ctx, *food.BrandedInfo.HouseholdServing, rs_client.ParseAmount, &res)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	if len(res) > 0 {
+	// 		m = append(m, UnitMapping{
+	// 			Amount{Unit: food.BrandedInfo.ServingSizeUnit, Value: food.BrandedInfo.ServingSize},
+	// 			res[0],
+	// 			zero.StringFrom("fdc hs").Ptr()})
+	// 	}
+	// }
+	// if food.Portions != nil {
+	// 	for _, p := range *food.Portions {
 
-			if p.PortionDescription != "" {
-				var res []Amount
-				err := a.R.Call(ctx, p.PortionDescription, rs_client.ParseAmount, &res)
-				if err != nil {
-					err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
-					log.Error(err)
-					continue
-					// return nil, err
-				}
-				if len(res) == 0 {
-					continue
-				}
-				m = append(m, UnitMapping{
-					res[0],
-					Amount{Unit: "grams", Value: p.GramWeight},
-					zero.StringFrom("fdc p1").Ptr()})
-			} else {
-				m = append(m, UnitMapping{
-					Amount{Unit: p.Modifier, Value: p.Amount},
-					Amount{Unit: "grams", Value: p.GramWeight},
-					zero.StringFrom("fdc p2").Ptr()})
-			}
+	// 		if p.PortionDescription != "" {
+	// 			var res []Amount
+	// 			err := a.R.Call(ctx, p.PortionDescription, rs_client.ParseAmount, &res)
+	// 			if err != nil {
+	// 				err := fmt.Errorf("failed to parse '%s' :%w", p.PortionDescription, err)
+	// 				log.Error(err)
+	// 				continue
+	// 				// return nil, err
+	// 			}
+	// 			if len(res) == 0 {
+	// 				continue
+	// 			}
+	// 			m = append(m, UnitMapping{
+	// 				res[0],
+	// 				Amount{Unit: "grams", Value: p.GramWeight},
+	// 				zero.StringFrom("fdc p1").Ptr()})
+	// 		} else {
+	// 			m = append(m, UnitMapping{
+	// 				Amount{Unit: p.Modifier, Value: p.Amount},
+	// 				Amount{Unit: "grams", Value: p.GramWeight},
+	// 				zero.StringFrom("fdc p2").Ptr()})
+	// 		}
 
-		}
-	}
-	for _, n := range food.Nutrients {
-		if *n.Nutrient.UnitName == "KCAL" {
-			m = append(m, UnitMapping{
-				Amount{Unit: "kcal", Value: *n.Amount},
-				Amount{Unit: "grams", Value: 100},
-				zero.StringFrom("fdc n").Ptr()})
-		}
-	}
-	return m, nil
+	// 	}
+	// }
+	// for _, n := range food.Nutrients {
+	// 	if *n.Nutrient.UnitName == "KCAL" {
+	// 		m = append(m, UnitMapping{
+	// 			Amount{Unit: "kcal", Value: *n.Amount},
+	// 			Amount{Unit: "grams", Value: 100},
+	// 			zero.StringFrom("fdc n").Ptr()})
+	// 	}
+	// }
+	// return m, nil
 
 }
 func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) error {
@@ -233,7 +231,7 @@ func (a *API) makeDetail(ctx context.Context, i db.Ingredient, bulkParent db.Ing
 		if err != nil {
 			return nil, err
 		}
-		recipes = append(recipes, *tr)
+		recipes = append(recipes, tr.Detail)
 	}
 
 	detail := IngredientDetail{

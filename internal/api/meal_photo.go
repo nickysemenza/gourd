@@ -101,7 +101,7 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 				return nil, err
 			}
 
-			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: test[0]})
+			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: test[0].Detail})
 		}
 		meal.Recipes = &mrs
 

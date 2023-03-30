@@ -69,7 +69,7 @@ const RecipeList: React.FC = () => {
         Header: "Name",
         // accessor: "name",
         Cell: ({ row: { original } }: CellProps<i>) => {
-          const olderVersions = original.detail.other_versions || [];
+          const olderVersions = original.other_versions || [];
           const versions = [
             original.detail,
             ...(showOlder ? olderVersions : []),
