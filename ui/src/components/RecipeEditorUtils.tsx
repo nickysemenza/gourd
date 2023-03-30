@@ -9,6 +9,7 @@ import {
   RecipeWrapper,
   SectionIngredient,
   Amount as Amount2,
+  FoodInfo,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 import { wasm } from "../wasmContext";
@@ -31,7 +32,7 @@ export type IngredientAttr = "grams" | "amount";
 export type IngredientKind = SectionIngredient["kind"];
 
 export type FoodsById = {
-  [key: number]: FoodWrapper;
+  [key: number]: FoodInfo;
 };
 export type IngDetailsById = {
   [key: string]: IngredientDetail;
@@ -461,6 +462,7 @@ export const sumIngredients = (sections?: RecipeSection[]) => {
 };
 
 export const getCalories = (food: FoodWrapper) => {
+  console.log({ food });
   const first = food.nutrients.find((n) => n.nutrient?.unitName === "KCAL");
   return (!!first && first.amount) || 0;
 };
@@ -471,6 +473,7 @@ export const calCalc = (
   multiplier: number
 ) => {
   console.group("nutrients");
+  console.log({ sections, hints, multiplier });
   const ingredientsSum = sumIngredients(sections);
   const uniqIng = ingredientsSum.ingredients;
   let totalCal = 0;
@@ -489,9 +492,9 @@ export const calCalc = (
           const hint = hints[fdc_id];
           if (hint !== undefined) {
             const scalingFactor = (getGramsFromSI(si) / 100) * multiplier;
-            const cal = getCalories(hint) * scalingFactor;
+            const cal = getCalories(hint.wrapper) * scalingFactor;
             const ingNutrients = new Map<string, number>();
-            hint.nutrients.forEach((n) => {
+            hint.wrapper.nutrients.forEach((n) => {
               if (n.nutrient === undefined || n.amount === undefined) return;
               const { name, unitName } = n.nutrient;
               const label = `${name} (${unitName})`;
@@ -510,7 +513,7 @@ export const calCalc = (
             console.log(
               `${si.ingredient.ingredient.name}: ${getGramsFromSI(
                 si
-              )}g = ${scalingFactor}x of ${hint.description}`,
+              )}g = ${scalingFactor}x of ${hint.wrapper.description}`,
               cal
             );
           }

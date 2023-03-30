@@ -101,7 +101,17 @@ export const FoodRow: React.FC<{
   x?: number;
   onLink?: (fdc_id: number) => void;
   loading: boolean;
-}> = ({ info, isHighlighted = false, x = 0, onLink, loading }) => {
+  descriptionComponent?: JSX.Element;
+  brandOwnerComponent?: JSX.Element;
+}> = ({
+  info,
+  isHighlighted = false,
+  x = 0,
+  onLink,
+  loading,
+  descriptionComponent,
+  brandOwnerComponent,
+}) => {
   const loadingClass =
     (loading && "h-2 bg-gray-400 rounded animate-pulse") || "";
   const food = info.wrapper;
@@ -140,7 +150,9 @@ export const FoodRow: React.FC<{
         )}
       </div>
       <div className="flex flex-col p-1">
-        <div className="flex whitespace-normal">{food.description}</div>
+        <div className="flex whitespace-normal">
+          {descriptionComponent || food.description}
+        </div>
         <div className="flex flex-row">
           <p className="font-mono text-xs">{food.data_type}</p>
           <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
@@ -148,7 +160,7 @@ export const FoodRow: React.FC<{
         <UnitMappingList unit_mappings={info.unit_mappings} />
         {(food.branded_info || loading) && (
           <div className={`flex flex-col w-80 ${loadingClass}`}>
-            {food.branded_info?.brand_owner} <br />
+            {brandOwnerComponent || food.branded_info?.brand_owner} <br />
             <p className={`text-sm italic ${loadingClass}`}>
               {food.branded_info?.branded_food_category}
             </p>

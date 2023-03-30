@@ -21,10 +21,18 @@ function Hit(props: { hit: any }) {
   let f: FoodInfo | undefined = w?.bfi_to_info(hit);
   return (
     <div className="border-1">
-      {f && <FoodRow info={f} loading={false} />}
-      {/* <Debug data={props.hit.name} /> */}
-      <Highlight attribute="brandOwner" hit={props.hit} />
-      <Highlight attribute="description" hit={props.hit} />
+      {f && (
+        <FoodRow
+          info={f}
+          loading={false}
+          descriptionComponent={
+            <Highlight attribute="description" hit={props.hit} />
+          }
+          brandOwnerComponent={
+            <Highlight attribute="brandOwner" hit={props.hit} />
+          }
+        />
+      )}
     </div>
   );
 }
