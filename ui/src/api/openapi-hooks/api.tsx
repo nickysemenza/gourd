@@ -772,14 +772,11 @@ export interface CompactRecipeSection {
   instructions: string[];
 }
 
-export interface CompactRecipeMeta {
+export interface CompactRecipe {
+  id: string;
   name: string;
   url?: string;
   image?: string;
-}
-
-export interface CompactRecipe {
-  meta: CompactRecipeMeta;
   sections: CompactRecipeSection[];
 }
 

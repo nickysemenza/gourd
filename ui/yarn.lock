@@ -9235,7 +9235,7 @@ inquirer@^7.0.3:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
-instantsearch.js@4.53.0, instantsearch.js@^4.53.0:
+instantsearch.js@4.53.0:
   version "4.53.0"
   resolved "https://registry.yarnpkg.com/instantsearch.js/-/instantsearch.js-4.53.0.tgz#8dffe121681f514363762a4c70bc4c4344b9775d"
   integrity sha512-YsKZo8yF/2/lc1FHwyP73k8IoIMPesP+8R4VSmWDf/No8EgELgpC7qgZOlQl/vLIoAAaDrKD/BfstposfMF8KQ==

@@ -17,7 +17,6 @@ import ProgressiveImage from "../components/ProgressiveImage";
 import { sumIngredients } from "../components/RecipeEditorUtils";
 import dayjs from "dayjs";
 import { RecipeGrid } from "../components/RecipeGrid";
-import { PassThrough } from "stream";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -62,7 +61,7 @@ const RecipeList: React.FC = () => {
     }
   });
 
-  type i = typeof recipes[0];
+  type i = (typeof recipes)[0];
 
   const columns: Array<Column<i>> = React.useMemo(
     () => [

@@ -15,6 +15,7 @@ pub enum Index {
     FoundationFoods,
     SurveyFoods,
     SRLegacyFoods,
+    ScrapedRecipes,
 }
 impl Index {
     pub fn get_top_level(&self) -> String {
@@ -23,6 +24,7 @@ impl Index {
             | Index::FoundationFoods
             | Index::SurveyFoods
             | Index::SRLegacyFoods => self.to_string(),
+            Index::ScrapedRecipes => panic!("ScrapedRecipes is not a top level index"),
         }
     }
     pub fn get_searchable_attributes(&self) -> Option<Vec<&str>> {
@@ -37,6 +39,7 @@ impl Index {
             Index::FoundationFoods => None,
             Index::SurveyFoods => None,
             Index::SRLegacyFoods => None,
+            Index::ScrapedRecipes => None,
         }
     }
     pub fn get_filterable_attributes(&self) -> Option<Vec<&str>> {
@@ -50,6 +53,7 @@ impl Index {
             Index::FoundationFoods => None,
             Index::SurveyFoods => None,
             Index::SRLegacyFoods => None,
+            Index::ScrapedRecipes => Some(vec!["name", "url", "sections"]),
         }
     }
 }
@@ -66,6 +70,7 @@ impl fmt::Display for Index {
             Index::FoundationFoods => write!(f, "FoundationFoods"),
             Index::SurveyFoods => write!(f, "SurveyFoods"),
             Index::SRLegacyFoods => write!(f, "SRLegacyFoods"),
+            Index::ScrapedRecipes => write!(f, "ScrapedRecipes"),
         }
     }
 }

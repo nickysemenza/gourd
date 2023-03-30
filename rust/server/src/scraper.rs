@@ -1,41 +1,33 @@
 use anyhow::Result;
-use openapi::models::{CompactRecipe, CompactRecipeMeta, CompactRecipeSection};
+use openapi::models::{CompactRecipe, CompactRecipeSection};
+use url::Url;
 
-use crate::search::get_client;
+use crate::search::load;
 
 #[tracing::instrument(name = "route::scrape_recipe")]
 pub async fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
     let s = recipe_scraper_fetcher::Fetcher::new();
     let res = s.scrape_url(url).await?;
 
-    let client = get_client();
-    let mut res2 = res.clone();
-    res2.url = res2.url.replace(|c: char| !c.is_alphanumeric(), "");
-    client
-        .index("scraped_recipes")
-        .add_documents(&vec![res2], Some("url"))
-        .await
-        .unwrap();
+    let parsed_url = Url::parse(url).unwrap();
+    let compact = CompactRecipe {
+        id: format!(
+            "{}-{}",
+            parsed_url.host_str().unwrap(),
+            parsed_url.path().replace("/", "-")
+        )
+        .replace(|c: char| !c.is_alphanumeric() && c != '-' && c != '_', ""),
 
-    let meta = CompactRecipeMeta {
         name: res.name,
         image: res.image,
         url: Some(url.to_string()),
-    };
-
-    let compact = CompactRecipe {
         sections: vec![CompactRecipeSection {
             ingredients: res.ingredients,
             instructions: res.instructions,
         }],
-        meta: Box::new(meta),
     };
 
-    // client
-    //     .index("recipes")
-    //     .add_documents(&vec![compact.clone()], Some("url"))
-    //     .await
-    //     .unwrap();
+    load(&vec![compact.clone()], crate::search::Index::ScrapedRecipes).await;
 
     Ok(compact)
 }

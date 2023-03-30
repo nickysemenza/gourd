@@ -46,7 +46,6 @@ Class | Method | HTTP request | Description
  - [BrandedFoodItemLabelNutrientsSugars](docs/BrandedFoodItemLabelNutrientsSugars.md)
  - [BrandedFoodItemLabelNutrientsTransFat](docs/BrandedFoodItemLabelNutrientsTransFat.md)
  - [CompactRecipe](docs/CompactRecipe.md)
- - [CompactRecipeMeta](docs/CompactRecipeMeta.md)
  - [CompactRecipeSection](docs/CompactRecipeSection.md)
  - [ConfigData](docs/ConfigData.md)
  - [EntitySummary](docs/EntitySummary.md)

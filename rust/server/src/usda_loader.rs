@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse};
+use anyhow::Result;
 use futures::future::join4;
 use gourd_common::food_info_from_branded_food_item;
 use meilisearch_sdk::task_info::TaskInfo;
@@ -29,19 +30,13 @@ pub fn read_file(filepath: &str) -> String {
 }
 
 #[tracing::instrument]
-async fn read_and_load<T: Document>(
-    filename: &str,
-    index: Index,
-) -> Result<Vec<T>, Box<dyn std::error::Error + Send + Sync>> {
+async fn read_and_load<T: Document>(filename: &str, index: Index) -> Result<Vec<T>> {
     let data: Vec<T> = read_from_file(filename, &index.get_top_level()).unwrap();
     load(&data, index).await;
     Ok(data)
 }
 #[tracing::instrument]
-fn read_from_file<T: Document>(
-    filename: &str,
-    toplevel: &str,
-) -> Result<Vec<T>, Box<dyn std::error::Error + Send + Sync>> {
+fn read_from_file<T: Document>(filename: &str, toplevel: &str) -> Result<Vec<T>> {
     // Open the file
     info!("loading {}", filename);
     let start = Instant::now();

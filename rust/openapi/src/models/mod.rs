@@ -32,8 +32,6 @@ pub mod branded_food_item_label_nutrients_trans_fat;
 pub use self::branded_food_item_label_nutrients_trans_fat::BrandedFoodItemLabelNutrientsTransFat;
 pub mod compact_recipe;
 pub use self::compact_recipe::CompactRecipe;
-pub mod compact_recipe_meta;
-pub use self::compact_recipe_meta::CompactRecipeMeta;
 pub mod compact_recipe_section;
 pub use self::compact_recipe_section::CompactRecipeSection;
 pub mod config_data;

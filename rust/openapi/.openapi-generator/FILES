@@ -23,7 +23,6 @@ src/models/branded_food_item_label_nutrients_saturated_fat.rs
 src/models/branded_food_item_label_nutrients_sugars.rs
 src/models/branded_food_item_label_nutrients_trans_fat.rs
 src/models/compact_recipe.rs
-src/models/compact_recipe_meta.rs
 src/models/compact_recipe_section.rs
 src/models/config_data.rs
 src/models/entity_summary.rs

@@ -17,7 +17,6 @@ export * from './BrandedFoodItemLabelNutrientsSaturatedFat';
 export * from './BrandedFoodItemLabelNutrientsSugars';
 export * from './BrandedFoodItemLabelNutrientsTransFat';
 export * from './CompactRecipe';
-export * from './CompactRecipeMeta';
 export * from './CompactRecipeSection';
 export * from './ConfigData';
 export * from './EntitySummary';

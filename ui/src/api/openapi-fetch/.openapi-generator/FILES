@@ -26,7 +26,6 @@ models/BrandedFoodItemLabelNutrientsSaturatedFat.ts
 models/BrandedFoodItemLabelNutrientsSugars.ts
 models/BrandedFoodItemLabelNutrientsTransFat.ts
 models/CompactRecipe.ts
-models/CompactRecipeMeta.ts
 models/CompactRecipeSection.ts
 models/ConfigData.ts
 models/EntitySummary.ts

@@ -2,21 +2,7 @@ VERSION          := $(shell git describe --tags --always --dirty="-dev")a
 DATE             := $(shell date '+%Y-%m-%d-%H%M UTC')
 VERSION_FLAGS    := -ldflags='-X "main.Version=$(VERSION)" -X "main.BuildTime=$(DATE)"'
 
-GCP_PROJECT := cloudrun1-278204
-GCR_IMAGE := gcr.io/$(GCP_PROJECT)/gourd-backend:$(VERSION)
-
-IMAGE := nicky/gourd-backend
-
 DSN := postgres://gourd:gourd@localhost:5555/food?sslmode=disable
-
-deploy: deploy-image deploy-run
-deploy-image:
-	echo "building $(GCR_IMAGE)"
-	gcloud builds submit --tag $(GCR_IMAGE)
-deploy-run:
-	echo "deploying $(GCR_IMAGE)"
-	terraform apply -var-file="prod.tfvars" -var="image_name=$(GCR_IMAGE)" -var="project_id=$(GCP_PROJECT)"
-
 
 .PHONY: all
 all: bin/gourd
@@ -28,8 +14,27 @@ dev-env:
 	docker-compose up -d db usda collector
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c dev/air.conf
-# db
 
+install-deps:
+	go mod tidy
+	go mod vendor
+	go mod tidy
+	cd ui && yarn
+
+# frontend dev
+dev-ui:
+	cd ui && yarn run start
+cy:
+	cd ui && yarn run cy:open
+
+# rust dev
+dev-rs:
+	cd rust && RUST_BACKTRACE=1 RUST_LOG=html5ever=info,selectors=info,debug cargo watch -x 'run server'
+
+test-rs:
+	cd rust && cargo test
+
+# db
 dev-db:
 	pgcli $(DSN)
 dev-db-stats:
@@ -47,9 +52,6 @@ migrate-down: bin/migrate
 bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 	@mkdir -p $(dir $@)
 	go build $(VERSION_FLAGS) -o $@ ./cmd/$(@F)
-
-# dev: bin/gourd
-# 	./bin/gourd server
 
 bin/air:
 	@mkdir -p $(dir $@)
@@ -77,60 +79,56 @@ unit-cover-go: bin/go-acc
 lint-go: bin/golangci-lint
 	bin/golangci-lint run || (echo "lint failed"; exit 1)	
 
-docker-build:
-	docker build -t $(IMAGE) .
 
-docker-push: docker-build
-	docker push $(IMAGE):latest
+generate: wasm-dev openapi # gen-db
 
 
-# openAPI
 
-validate-openapi: internal/api/openapi.yaml
-	# ./ui/node_modules/ibm-openapi-validator/src/cli-validator/index.js internal/api/openapi.yaml -c api/.validaterc -v
-
-openapi: 
+.PHONY: openapi
+openapi: internal/api/openapi.yaml
+internal/api/openpi.yaml: openapi.yaml usda.yaml
+	# generate merged bundle
 	npx @redocly/openapi-cli bundle openapi.yaml --output internal/api/openapi.yaml 
-	rm -rf ui/src/api/openapi-fetch
-	rm -rf ui/src/api/openapi-hooks
-	rm -rf rust/openapi/src/models
-	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml -o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
-	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml -o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
 	
+	# ui hooks 1
+	rm -rf ui/src/api/openapi-hooks
 	mkdir -p ui/src/api/openapi-hooks/
 	cd ui && yarn run generate-fetcher
 
+	# ui hooks 2
+	rm -rf ui/src/api/openapi-fetch
+	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml \
+		-o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
+	
+	# rust
+	rm -rf rust/openapi/src/models
+	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml \
+		-o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
+
+	# go
 	go generate ./internal/api
 
 openapi-docs:
 	npx @redocly/openapi-cli preview-docs internal/api/openapi.yaml -p 8081
 
+# WASM generation
+.PHONY: generate-wasm
+generate-wasm: rust/wasm/pkg
+
+rust/wasm/pkg: $(shell find rust/ -type f -name '*.rs')
+	cd rust && wasm-pack build wasm
+
+ui/src/wasm/package.json: rust/wasm/pkg/package.json
+	cp -r rust/wasm/pkg/ ui/src/wasm/
+wasm-dev: generate-wasm ui/src/wasm/package.json
+	
+
+# GO SQL GENERATION
 gen-db:
 	rm -rf db/models/
 	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models --add-soft-deletes
 	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../internal/db/models/usdamodels 
 
-
-# frontend
-dev-ui:
-	cd ui && yarn run start
-
-cy:
-	cd ui && yarn run cy:open
-
-
-
-dev-rs:
-	cd rust && RUST_BACKTRACE=1 RUST_LOG=html5ever=info,selectors=info,debug cargo watch -x 'run server'
-generate-wasm:
-	cd rust && wasm-pack build wasm
-wasm-dev: generate-wasm
-	cp -r rust/wasm/pkg/ ui/src/wasm/
-
-test-rs:
-	cd rust && cargo test
-
-generate: wasm-dev openapi gen-db
 
 
 # misc dev
@@ -146,7 +144,24 @@ seed-testdata: bin/gourd
 
 devdata: seed-testdata sync
 	./usda/import.sh ~/Downloads/FoodData_Central_csv_2021-10-28/
-sync:
+sync: bin/gourd
 	./bin/gourd sync
 insert-album: 	
 	PGPASSWORD=gourd psql -Atx "$(DSN)" -h localhost -U gourd -d food -p 5555 -c "INSERT INTO "public"."gphotos_albums" ("id", "usecase") VALUES ('AIbigFomDsn4esVUopzvXsZ5GDjY3EDb7L_A8sf1Wf7-IWHxykoMjVy-KeCTHW7nVIaTkJ8CAV8i', 'food'), ('AIbigFobaVQFOEyoZk2TKEkCNS-ffzesGu7n-OZy6-YXnKLgrYE4ALSW-LknhcbttNNifPPCm7sY','plants');"
+
+
+# GCP_PROJECT := cloudrun1-278204
+# GCR_IMAGE := gcr.io/$(GCP_PROJECT)/gourd-backend:$(VERSION)
+# IMAGE := nicky/gourd-backend
+# deploy: deploy-image deploy-run
+# deploy-image:
+# 	echo "building $(GCR_IMAGE)"
+# 	gcloud builds submit --tag $(GCR_IMAGE)
+# deploy-run:
+# 	echo "deploying $(GCR_IMAGE)"
+# 	terraform apply -var-file="prod.tfvars" -var="image_name=$(GCR_IMAGE)" -var="project_id=$(GCP_PROJECT)"
+# docker-build:
+# 	docker build -t $(IMAGE) .
+
+# docker-push: docker-build
+# 	docker push $(IMAGE):latest	

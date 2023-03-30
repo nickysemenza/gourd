@@ -31,7 +31,7 @@ func MustInsert(t *testing.T, a *API, cr CompactRecipe) string {
 // NewCompact builds a compact recipe
 func NewCompact(name string, ingredients, instructions []string) CompactRecipe {
 	return CompactRecipe{
-		Meta: CompactRecipeMeta{Name: name},
+		Name: name,
 		Sections: []CompactRecipeSection{{
 			Ingredients:  ingredients,
 			Instructions: instructions,

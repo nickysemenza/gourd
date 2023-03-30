@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { CompactRecipeMeta } from './CompactRecipeMeta';
-import {
-    CompactRecipeMetaFromJSON,
-    CompactRecipeMetaFromJSONTyped,
-    CompactRecipeMetaToJSON,
-} from './CompactRecipeMeta';
 import type { CompactRecipeSection } from './CompactRecipeSection';
 import {
     CompactRecipeSectionFromJSON,
@@ -34,10 +28,28 @@ import {
 export interface CompactRecipe {
     /**
      * 
-     * @type {CompactRecipeMeta}
+     * @type {string}
      * @memberof CompactRecipe
      */
-    meta: CompactRecipeMeta;
+    id: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompactRecipe
+     */
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompactRecipe
+     */
+    url?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompactRecipe
+     */
+    image?: string;
     /**
      * 
      * @type {Array<CompactRecipeSection>}
@@ -51,7 +63,8 @@ export interface CompactRecipe {
  */
 export function instanceOfCompactRecipe(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "meta" in value;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "name" in value;
     isInstance = isInstance && "sections" in value;
 
     return isInstance;
@@ -67,7 +80,10 @@ export function CompactRecipeFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'meta': CompactRecipeMetaFromJSON(json['meta']),
+        'id': json['id'],
+        'name': json['name'],
+        'url': !exists(json, 'url') ? undefined : json['url'],
+        'image': !exists(json, 'image') ? undefined : json['image'],
         'sections': ((json['sections'] as Array<any>).map(CompactRecipeSectionFromJSON)),
     };
 }
@@ -81,7 +97,10 @@ export function CompactRecipeToJSON(value?: CompactRecipe | null): any {
     }
     return {
         
-        'meta': CompactRecipeMetaToJSON(value.meta),
+        'id': value.id,
+        'name': value.name,
+        'url': value.url,
+        'image': value.image,
         'sections': ((value.sections as Array<any>).map(CompactRecipeSectionToJSON)),
     };
 }

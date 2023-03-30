@@ -1089,7 +1089,6 @@ components:
       required:
         - ingredient
         - recipes
-        # - children
         - unit_mappings
       properties:
         ingredient:
@@ -1706,25 +1705,22 @@ components:
           type: array
           items:
             type: string
-    CompactRecipeMeta:
+    CompactRecipe:
       type: object
       required:
+        - id
         - name
+        - meta
+        - sections
       properties:
+        id:
+          type: string
         name:
           type: string
         url:
           type: string
         image:
           type: string
-    CompactRecipe:
-      type: object
-      required:
-        - meta
-        - sections
-      properties:
-        meta:
-          $ref: "#/components/schemas/CompactRecipeMeta"
         sections:
           type: array
           items:

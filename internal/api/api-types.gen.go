@@ -164,15 +164,11 @@ type BrandedFoodItem struct {
 
 // CompactRecipe defines model for CompactRecipe.
 type CompactRecipe struct {
-	Meta     CompactRecipeMeta      `json:"meta"`
+	Id       string                 `json:"id"`
+	Image    *string                `json:"image,omitempty"`
+	Name     string                 `json:"name"`
 	Sections []CompactRecipeSection `json:"sections"`
-}
-
-// CompactRecipeMeta defines model for CompactRecipeMeta.
-type CompactRecipeMeta struct {
-	Image *string `json:"image,omitempty"`
-	Name  string  `json:"name"`
-	Url   *string `json:"url,omitempty"`
+	Url      *string                `json:"url,omitempty"`
 }
 
 // CompactRecipeSection defines model for CompactRecipeSection.

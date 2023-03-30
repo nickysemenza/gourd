@@ -1,11 +1,12 @@
 use anyhow::bail;
 use ingredient::rich_text::Rich;
 use openapi::models::{
-    Amount, CompactRecipe, CompactRecipeMeta, CompactRecipeSection, RecipeDetail,
-    RecipeDetailInput, RecipeSection, RecipeSectionInput, RecipeSource, SectionIngredient,
-    SectionIngredientInput, SectionInstruction, SectionInstructionInput,
+    Amount, CompactRecipe, CompactRecipeSection, RecipeDetail, RecipeDetailInput, RecipeSection,
+    RecipeSectionInput, RecipeSource, SectionIngredient, SectionIngredientInput,
+    SectionInstruction, SectionInstructionInput,
 };
 use tracing::trace;
+use uuid::Uuid;
 
 use crate::{
     amount_to_measure2, new_ingredient_parser, section_ingredient_from_parsed, si_to_ingredient,
@@ -15,7 +16,7 @@ use crate::{
 pub fn to_string(cr: CompactRecipe) -> Result<String, anyhow::Error> {
     let mut res = String::new();
 
-    let section1 = serde_yaml::to_string(&cr.meta)?;
+    let section1 = format!("name: {}\n", cr.name);
     res.push_str(&section1);
     res.push_str(SEP);
     dbg!(res.clone());
@@ -38,8 +39,18 @@ pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
     if parts.len() != 2 {
         bail!("expected 2 parts: {:#?}", parts);
     }
+    let name = parts[0]
+        .to_string()
+        .strip_prefix("name: ")
+        .unwrap()
+        .trim_end()
+        .to_string();
+    // let mut compact: CompactRecipe = serde_yaml::from_str(parts[0])?;
     let compact = CompactRecipe {
-        meta: serde_yaml::from_str(parts[0])?,
+        name,
+        url: None,
+        image: None,
+        id: Uuid::new_v4().to_string(),
         sections: parts[1]
             .split("\n\n")
             .collect::<Vec<&str>>()
@@ -81,11 +92,10 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
         sections.push(sec);
     }
     return CompactRecipe {
-        meta: Box::new(CompactRecipeMeta {
-            name: r.name,
-            url: None,
-            image: None,
-        }),
+        id: Uuid::new_v4().to_string(),
+        name: r.name,
+        url: None,
+        image: None,
         sections,
     };
 }
@@ -179,15 +189,15 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
 
     Ok((
         RecipeDetailInput {
-            sources: match r.meta.url {
+            sources: match r.url {
                 Some(u) => Some(vec![RecipeSource {
                     url: Some(u),
-                    image_url: r.meta.image,
+                    image_url: r.image,
                     ..RecipeSource::new()
                 }]),
                 None => None,
             },
-            ..RecipeDetailInput::new(sections, r.meta.name, 0, "".to_string(), vec![])
+            ..RecipeDetailInput::new(sections, r.name, 0, "".to_string(), vec![])
         },
         rtt,
     ))

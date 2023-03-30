@@ -13,16 +13,25 @@
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct CompactRecipe {
-    #[serde(rename = "meta")]
-    pub meta: Box<crate::models::CompactRecipeMeta>,
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "url", skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+    #[serde(rename = "image", skip_serializing_if = "Option::is_none")]
+    pub image: Option<String>,
     #[serde(rename = "sections")]
     pub sections: Vec<crate::models::CompactRecipeSection>,
 }
 
 impl CompactRecipe {
-    pub fn new(meta: crate::models::CompactRecipeMeta, sections: Vec<crate::models::CompactRecipeSection>) -> CompactRecipe {
+    pub fn new(id: String, name: String, sections: Vec<crate::models::CompactRecipeSection>) -> CompactRecipe {
         CompactRecipe {
-            meta: Box::new(meta),
+            id,
+            name,
+            url: None,
+            image: None,
             sections,
         }
     }
