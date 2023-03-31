@@ -140,7 +140,7 @@ get-detail/%:
 	rm tmp1
 
 seed-testdata: bin/gourd
-	./testdata/seed.sh
+	./dev/testdata/seed.sh
 
 devdata: seed-testdata sync
 	./usda/import.sh ~/Downloads/FoodData_Central_csv_2021-10-28/
