@@ -51,7 +51,7 @@ migrate-down: bin/migrate
 # golang
 bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 	@mkdir -p $(dir $@)
-	go build $(VERSION_FLAGS) -o $@ ./cmd/$(@F)
+	go build $(VERSION_FLAGS) -o $@ ./internal/cmd/$(@F)
 
 bin/air:
 	@mkdir -p $(dir $@)
@@ -86,9 +86,9 @@ generate: wasm-dev openapi # gen-db
 
 .PHONY: openapi
 openapi: internal/api/openapi.yaml
-internal/api/openapi.yaml: openapi.yaml usda.yaml
+internal/api/openapi.yaml: schemas/gourd.yaml schemas/usda.yaml
 	# generate merged bundle
-	npx @redocly/openapi-cli bundle openapi.yaml --output internal/api/openapi.yaml 
+	npx @redocly/openapi-cli bundle schemas/gourd.yaml --output internal/api/openapi.yaml 
 	
 	# ui hooks 1
 	rm -rf ui/src/api/openapi-hooks

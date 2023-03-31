@@ -1,15 +1,15 @@
 {
   "folders": [
     {
+      // https://code.visualstudio.com/docs/editor/multi-root-workspaces
+      "name": "go",
+      "path": "."
+    },
+    {
       "path": "ui"
     },
     {
       "path": "rust"
-    },
-    {
-      // https://code.visualstudio.com/docs/editor/multi-root-workspaces
-      "name": "go",
-      "path": "."
     }
   ],
   "extensions": {
