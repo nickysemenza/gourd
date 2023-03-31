@@ -41,9 +41,10 @@ function BrandedHit(props: { hit: any }) {
 function RecipeDetailHit(props: { hit: any }) {
   let hit = props.hit as RecipeDetail;
   return (
-    <div className="border-1">
-      <RecipeGridCell detail={hit} />
-    </div>
+    <RecipeGridCell
+      detail={hit}
+      nameComponent={<Highlight attribute="name" hit={props.hit} />}
+    />
   );
 }
 

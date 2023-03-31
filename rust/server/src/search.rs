@@ -1,6 +1,7 @@
 use std::fmt;
 
 use actix_web::{web, HttpResponse};
+use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::RecipeDetail;
 use serde::{de::DeserializeOwned, Serialize};
 use tracing::info;
@@ -90,7 +91,12 @@ impl<T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static> Document f
 pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
     // let chunks: Vec<&[FoundationFoodItem]> = legacy.chunks(10).collect();
     let chunks: Vec<Vec<T>> = data.chunks(2000).map(|x| x.to_vec()).collect();
-    info!("going to load {} chunks into index {}", chunks.len(), index);
+    info!(
+        "going to load {} items in {} chunks into index {}",
+        data.len(),
+        chunks.len(),
+        index
+    );
 
     let tasks: Vec<_> = chunks
         .iter()
@@ -105,8 +111,36 @@ pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
     info!("finished loading {:#?}", res);
 }
 
-#[tracing::instrument(name = "route::index_recipe_detail")]
+#[tracing::instrument(name = "route::index_recipe_detail", skip(cr))]
 pub async fn index_recipe_detail(cr: web::Json<Vec<RecipeDetail>>) -> HttpResponse {
     load(&cr.0, Index::RecipeDetails).await;
     HttpResponse::Ok().json(())
+}
+
+#[tracing::instrument]
+pub async fn init_indexes() {
+    let client = get_client();
+
+    for x in [
+        Index::BrandedFoods,
+        Index::ScrapedRecipes,
+        Index::RecipeDetails,
+    ] {
+        if let Some(attr) = x.get_searchable_attributes() {
+            let task: TaskInfo = client
+                .index(x)
+                .set_searchable_attributes(attr)
+                .await
+                .unwrap();
+            info!("configured searchable attributes for {}: {:?}", x, task);
+        }
+        if let Some(attr) = x.get_filterable_attributes() {
+            let task: TaskInfo = client
+                .index(x)
+                .set_filterable_attributes(attr)
+                .await
+                .unwrap();
+            info!("configured filterable attributes for {}: {:?}", x, task);
+        }
+    }
 }

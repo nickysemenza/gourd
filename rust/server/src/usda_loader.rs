@@ -2,7 +2,6 @@ use actix_web::{web, HttpResponse};
 use anyhow::Result;
 use futures::future::join4;
 use gourd_common::usda::food_info_from_branded_food_item;
-use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::FoodResultByItem;
 use openapi::models::{BrandedFoodItem, FoundationFoodItem, SrLegacyFoodItem, SurveyFoodItem};
 use serde::Deserialize;
@@ -15,7 +14,7 @@ use std::{
 };
 use tracing::info;
 
-use crate::search::{get_client, load, Document, Index};
+use crate::search::{get_client, init_indexes, load, Document, Index};
 
 #[tracing::instrument]
 pub fn read_file(filepath: &str) -> String {
@@ -132,27 +131,4 @@ pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {
     };
 
     HttpResponse::Ok().json(res)
-}
-
-pub async fn init_indexes() {
-    let client = get_client();
-
-    for x in [Index::BrandedFoods] {
-        if let Some(attr) = x.get_searchable_attributes() {
-            let task: TaskInfo = client
-                .index(x)
-                .set_searchable_attributes(attr)
-                .await
-                .unwrap();
-            info!("task {:?}", task);
-        }
-        if let Some(attr) = x.get_filterable_attributes() {
-            let task: TaskInfo = client
-                .index(x)
-                .set_filterable_attributes(attr)
-                .await
-                .unwrap();
-            info!("task {:?}", task);
-        }
-    }
 }

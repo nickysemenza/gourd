@@ -95,7 +95,12 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 		return nil, fmt.Errorf("failed to create recipe with name %s", r.Detail.Name)
 	}
 
-	return a.transformRecipeFull(ctx, r2)
+	w, err := a.transformRecipeFull(ctx, r2)
+	if err != nil {
+		return nil, err
+	}
+	a.indexRecipeDetails(ctx, append(w.OtherVersions, w.Detail)...)
+	return w, nil
 }
 
 func (a *API) recipeById(ctx context.Context, recipeId string) (*RecipeWrapper, error) {
@@ -374,6 +379,8 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 }
 
 func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]RecipeSection, error) {
+	ctx, span := a.tracer.Start(ctx, "transformRecipeSections")
+	defer span.End()
 	s := []RecipeSection{}
 	for _, d := range dbs {
 		ing := []SectionIngredient{}
@@ -459,10 +466,7 @@ func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, ite
 		UnitMappings: item.Ingredient.UnitMappings,
 	}
 	var res Amount
-	err := a.R.ConvertUnit(
-		ctx, req, &res,
-	)
-	if err != nil {
+	if err := a.R.Send(ctx, "convert", req, &res); err != nil {
 		return fmt.Errorf("enhance: %w", err)
 	}
 	if res.Value != 0 {

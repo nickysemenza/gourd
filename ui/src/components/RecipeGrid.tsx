@@ -25,9 +25,6 @@ export const RecipeGrid: React.FC<{
   return (
     <div className="grid gap-5 row-gap-5 mb-8 lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2">
       {recipes.map((recipe) => {
-        const ing = Object.keys(
-          sumIngredients(recipe.detail.sections).ingredients
-        );
         const rec = Object.keys(sumIngredients(recipe.detail.sections).recipes);
 
         const totalDuration = getTotalDuration(w, recipe.detail.sections);
@@ -39,7 +36,6 @@ export const RecipeGrid: React.FC<{
             key={`recipegrid-${recipe.detail.id}`}
             totalDuration={totalDuration}
             linked_meals={recipe.linked_meals}
-            ing={ing}
             rec={rec}
           />
         );
@@ -52,11 +48,18 @@ export const RecipeGridCell: React.FC<{
   detail: RecipeDetail;
   photo?: Photo;
   totalDuration?: Amount;
-  ing?: string[];
   rec?: string[];
   linked_meals?: Meal[];
   linked_photos?: Photo[];
-}> = ({ detail, linked_photos, totalDuration, ing, rec, linked_meals }) => {
+  nameComponent?: JSX.Element;
+}> = ({
+  detail,
+  linked_photos,
+  totalDuration,
+  rec,
+  linked_meals,
+  nameComponent,
+}) => {
   const w = useContext(WasmContext);
 
   let rs = (detail.sources || []).filter((s) => s.image_url !== undefined);
@@ -66,7 +69,7 @@ export const RecipeGridCell: React.FC<{
       : rs.length > 0
       ? ({ base_url: rs[0].image_url || "" } as Photo)
       : undefined;
-
+  const ing = Object.keys(sumIngredients(detail.sections).ingredients);
   return (
     <Link
       to={`/recipe/${detail.id}`}
@@ -88,13 +91,11 @@ export const RecipeGridCell: React.FC<{
           <div className="p-5 flex flex-col justify-between h-full">
             <div>
               <h1 className="mb-2 font-semibold leading-5 text-m">
-                {detail.name}
+                {nameComponent || detail.name}
               </h1>
-              {ing && rec && (
-                <p className="text-sm text-gray-900">
-                  {ing.length} ingredients | {rec.length} recipes
-                </p>
-              )}
+              <p className="text-sm text-gray-900">
+                {ing.length} ingredients {rec && `| ${rec.length} recipes`}
+              </p>
             </div>
             {totalDuration && totalDuration.value > 0 && (
               <div className="text-xs text-gray-700 ">

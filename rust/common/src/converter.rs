@@ -12,6 +12,7 @@ use ingredient::unit::kind::MeasureKind;
 use crate::parser::parse_unit_mappings;
 use crate::unit;
 
+#[tracing::instrument]
 pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     let equivalencies = parse_unit_mappings(req.unit_mappings);
     let target = match req.target.unwrap_or(Target::Other) {
@@ -132,4 +133,51 @@ pub fn sum_ingredients(
         }
     });
     (recipes, ing)
+}
+
+#[cfg(test)]
+mod tests {
+    use openapi::models::{
+        unit_conversion_request::Target, Amount, UnitConversionRequest, UnitMapping,
+    };
+
+    use crate::convert_to;
+
+    #[test]
+    fn test_conversion_request() {
+        let unit_mappings = vec![
+            UnitMapping::new(
+                Amount::new("piece".to_string(), 1.0),
+                Amount::new("grams".to_string(), 100.0),
+            ),
+            UnitMapping::new(
+                Amount::new("cents".to_string(), 1.0),
+                Amount::new("grams".to_string(), 1.0),
+            ),
+        ];
+        assert_eq!(
+            convert_to(UnitConversionRequest {
+                target: Some(Target::Weight),
+                input: vec![Amount::new("piece".to_string(), 0.5)],
+                unit_mappings: unit_mappings.clone(),
+            }),
+            Some(Amount::new("g".to_string(), 50.0)),
+        );
+        assert_eq!(
+            convert_to(UnitConversionRequest {
+                target: Some(Target::Money),
+                input: vec![Amount::new("piece".to_string(), 0.5)],
+                unit_mappings: unit_mappings.clone(),
+            }),
+            Some(Amount::new("$".to_string(), 0.5)),
+        );
+        assert_eq!(
+            convert_to(UnitConversionRequest {
+                target: Some(Target::Calories),
+                input: vec![Amount::new("piece".to_string(), 0.5)],
+                unit_mappings: unit_mappings.clone(),
+            }),
+            None,
+        );
+    }
 }

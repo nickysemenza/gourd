@@ -57,13 +57,6 @@ func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target
 
 }
 
-func (c *Client) ConvertUnit(ctx context.Context, body, target interface{}) error {
-	ctx, span := otel.Tracer("rs_client").Start(ctx, "Convert")
-	defer span.End()
-
-	return c.Send(ctx, "convert", body, target)
-}
-
 func (c *Client) Send(ctx context.Context, route string, body, target interface{}) error {
 
 	route = c.baseurl + route
