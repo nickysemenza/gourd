@@ -172,15 +172,15 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "SearchFoods")
 	defer span.End()
 
-	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	dataTypes := []string{}
-	if params.DataTypes != nil {
-		for _, x := range *params.DataTypes {
-			if x != "" {
-				dataTypes = append(dataTypes, string(x))
-			}
-		}
-	}
+	// paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
+	// dataTypes := []string{}
+	// if params.DataTypes != nil {
+	// 	for _, x := range *params.DataTypes {
+	// 		if x != "" {
+	// 			dataTypes = append(dataTypes, string(x))
+	// 		}
+	// 	}
+	// }
 
 	var byItem FoodResultByItem
 	err := a.R.Send(ctx, "debug/search_usda?name="+url.QueryEscape(string(params.Name)), nil, &byItem)
@@ -192,19 +192,19 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 		Results: &byItem,
 	}
 
-	if false {
-		foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
-		if err != nil {
-			return handleErr(c, err)
-		}
-		listMeta.setTotalCount(count)
+	// if false {
+	// 	foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
+	// 	if err != nil {
+	// 		return handleErr(c, err)
+	// 	}
+	// 	listMeta.setTotalCount(count)
 
-		items, err := a.buildPaginatedFood(ctx, foods)
-		if err != nil {
-			return handleErr(c, err)
-		}
-		resp.Foods = items
-	}
+	// 	items, err := a.buildPaginatedFood(ctx, foods)
+	// 	if err != nil {
+	// 		return handleErr(c, err)
+	// 	}
+	// 	resp.Foods = items
+	// }
 
 	return c.JSON(http.StatusOK, resp)
 
@@ -234,35 +234,35 @@ func (a *API) getFoodById(ctx context.Context, fdcId int) (*FoodInfo, error) {
 	return f, nil
 }
 
-func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]FoodInfo, error) {
-	ctx, span := a.tracer.Start(ctx, "buildPaginatedFood")
-	defer span.End()
+// func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]FoodInfo, error) {
+// 	ctx, span := a.tracer.Start(ctx, "buildPaginatedFood")
+// 	defer span.End()
 
-	ids := []int{}
-	for _, food := range foods {
-		ids = append(ids, food.FdcID)
-	}
-	foodRecs, err := usdamodels.UsdaFoods(
-		qm.Where("fdc_id = any(?)", pq.Array(ids)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
-			usdamodels.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).All(ctx, a.usdaDb.DB())
-	if err != nil {
-		return nil, err
-	}
-	items := []FoodInfo{}
-	for _, foodRec := range foodRecs {
-		f, err := a.foodFromRec(ctx, foodRec)
-		if err != nil {
-			return nil, err
-		}
-		items = append(items, *f)
-	}
-	return items, nil
+// 	ids := []int{}
+// 	for _, food := range foods {
+// 		ids = append(ids, food.FdcID)
+// 	}
+// 	foodRecs, err := usdamodels.UsdaFoods(
+// 		qm.Where("fdc_id = any(?)", pq.Array(ids)),
+// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
+// 			usdamodels.UsdaFoodNutrientRels.Nutrient)),
+// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
+// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
+// 	).All(ctx, a.usdaDb.DB())
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	items := []FoodInfo{}
+// 	for _, foodRec := range foodRecs {
+// 		f, err := a.foodFromRec(ctx, foodRec)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		items = append(items, *f)
+// 	}
+// 	return items, nil
 
-}
+// }
 
 func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, params AssociateFoodWithIngredientParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "AssociateFoodWithIngredient")

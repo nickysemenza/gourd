@@ -86,27 +86,28 @@ func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, c
 
 	return res, count, nil
 }
-func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
-	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
-	defer span.End()
-	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
-		w := `description ILIKE '%' || $1 || '%'`
 
-		q = q.Where(w, searchQuery)
-		q = newSearchQuery(opts...).apply(q)
+// func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
+// 	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")
+// 	defer span.End()
+// 	return c.getFoods(ctx, func(q sq.SelectBuilder, count bool) sq.SelectBuilder {
+// 		w := `description ILIKE '%' || $1 || '%'`
 
-		if foodCategoryID != nil {
-			q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
-		}
-		if len(dataType) > 0 {
-			q = q.Where(sq.Eq{"data_type": dataType})
-		}
-		if !count {
-			q = q.OrderBy("length(description) ASC", "fdc_id DESC")
-		}
-		return q
-	})
-}
+// 		q = q.Where(w, searchQuery)
+// 		q = newSearchQuery(opts...).apply(q)
+
+// 		if foodCategoryID != nil {
+// 			q = q.Where(sq.Eq{"food_category_id": &foodCategoryID})
+// 		}
+// 		if len(dataType) > 0 {
+// 			q = q.Where(sq.Eq{"data_type": dataType})
+// 		}
+// 		if !count {
+// 			q = q.OrderBy("length(description) ASC", "fdc_id DESC")
+// 		}
+// 		return q
+// 	})
+// }
 
 func (c *Client) AssociateFoodWithIngredient(ctx context.Context, ingredient string, fdcId int) error {
 	ctx, span := c.tracer.Start(ctx, "AssociateFoodWithIngredient")

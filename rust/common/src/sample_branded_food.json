@@ -1,0 +1,399 @@
+{
+	"description": "TRADER JOE'S, JOE-JOE'S, CHOCOLATE VANILLA CREME COOKIES",
+	"ingredients": "CANE SUGAR, GRAIN BLEND (CORN FLOUR, SOY FLOUR, RICE FLOUR, CORNSTARCH, POTATO FLOUR, TAPIOCA STARCH, POTATO STARCH, XANTHAN GUM, ARABIC GUM, CARRAGEENAN), PALM OIL, COCOA POWDER (PROCESSED WITH ALKALI), EXPELLER PRESSED CANOLA OIL, INVERT SYRUP, COCOA POWDER, EGG WHITE POWDER, SEA SALT, BAKING SODA, VANILLA BEAN SEEDS, SOY LECITHIN (AN EMULSIFIER), NATURAL FLAVORS, AMMONIUM BICARBONATE. ",
+	"brandOwner": "Hi-Tech Accessories, Inc.",
+	"fdcId": 2082103,
+	"brandedFoodCategory": "Cookies & Biscuits",
+	"availableDate": "7/21/2018",
+	"dataSource": "LI",
+	"dataType": "Branded",
+	"foodClass": "Branded",
+	"gtinUpc": "00827560",
+	"modifiedDate": "7/21/2018",
+	"publicationDate": "10/28/2021",
+	"servingSize": 26,
+	"servingSizeUnit": "g",
+	"foodNutrients": [
+	  {
+		"id": 25913999,
+		"amount": 3.85,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1003,
+		  "number": "203",
+		  "name": "Protein",
+		  "rank": 600,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914000,
+		"amount": 23.1,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1004,
+		  "number": "204",
+		  "name": "Total lipid (fat)",
+		  "rank": 800,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914001,
+		"amount": 69.2,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1005,
+		  "number": "205",
+		  "name": "Carbohydrate, by difference",
+		  "rank": 1110,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914002,
+		"amount": 500,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1008,
+		  "number": "208",
+		  "name": "Energy",
+		  "rank": 300,
+		  "unitName": "kcal"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914003,
+		"amount": 42.3,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 2000,
+		  "number": "269",
+		  "name": "Sugars, Total",
+		  "rank": 1510,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914004,
+		"amount": 3.8,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1079,
+		  "number": "291",
+		  "name": "Fiber, total dietary",
+		  "rank": 1200,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCSL",
+		  "description": "Calculated from a less than value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914005,
+		"amount": 0,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1087,
+		  "number": "301",
+		  "name": "Calcium, Ca",
+		  "rank": 5300,
+		  "unitName": "mg"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCD",
+		  "description": "Calculated from a daily value percentage per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914006,
+		"amount": 2.77,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1089,
+		  "number": "303",
+		  "name": "Iron, Fe",
+		  "rank": 5400,
+		  "unitName": "mg"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCD",
+		  "description": "Calculated from a daily value percentage per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914007,
+		"amount": 250,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1093,
+		  "number": "307",
+		  "name": "Sodium, Na",
+		  "rank": 5800,
+		  "unitName": "mg"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914008,
+		"amount": 0,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1104,
+		  "number": "318",
+		  "name": "Vitamin A, IU",
+		  "rank": 7500,
+		  "unitName": "IU"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCD",
+		  "description": "Calculated from a daily value percentage per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914009,
+		"amount": 0,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1162,
+		  "number": "401",
+		  "name": "Vitamin C, total ascorbic acid",
+		  "rank": 6300,
+		  "unitName": "mg"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCD",
+		  "description": "Calculated from a daily value percentage per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914010,
+		"amount": 0,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1253,
+		  "number": "601",
+		  "name": "Cholesterol",
+		  "rank": 15700,
+		  "unitName": "mg"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCD",
+		  "description": "Calculated from a daily value percentage per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914011,
+		"amount": 0,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1257,
+		  "number": "605",
+		  "name": "Fatty acids, total trans",
+		  "rank": 15400,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  },
+	  {
+		"id": 25914012,
+		"amount": 9.62,
+		"type": "FoodNutrient",
+		"nutrient": {
+		  "id": 1258,
+		  "number": "606",
+		  "name": "Fatty acids, total saturated",
+		  "rank": 9700,
+		  "unitName": "g"
+		},
+		"foodNutrientDerivation": {
+		  "code": "LCCS",
+		  "description": "Calculated from value per serving size measure",
+		  "foodNutrientSource": {
+			"id": 9,
+			"code": "12",
+			"description": "Manufacturer's analytical; partial documentation"
+		  }
+		}
+	  }
+	],
+	"foodUpdateLog": [
+	  {
+		"fdcId": 2082103,
+		"dataType": "Branded",
+		"description": "TRADER JOE'S, JOE-JOE'S, CHOCOLATE VANILLA CREME COOKIES",
+		"foodClass": "Branded",
+		"publicationDate": "10/28/2021",
+		"foodAttributes": [
+		  {
+			"id": 2284163,
+			"value": "9"
+		  }
+		]
+	  },
+	  {
+		"fdcId": 1584041,
+		"dataType": "Branded",
+		"description": "TRADER JOE'S, JOE-JOE'S, CHOCOLATE VANILLA CREME COOKIES",
+		"foodClass": "Branded",
+		"publicationDate": "3/19/2021",
+		"foodAttributes": [
+		  {
+			"id": 1606282,
+			"value": "10"
+		  }
+		]
+	  },
+	  {
+		"fdcId": 1291934,
+		"dataType": "Branded",
+		"description": "TRADER JOE'S, JOE-JOE'S, CHOCOLATE VANILLA CREME COOKIES",
+		"foodClass": "Branded",
+		"publicationDate": "2/26/2021",
+		"foodAttributes": [
+		  {
+			"id": 1239391,
+			"value": "10"
+		  }
+		]
+	  },
+	  {
+		"fdcId": 493675,
+		"dataType": "Branded",
+		"description": "TRADER JOE'S, JOE-JOE'S, CHOCOLATE VANILLA CREME COOKIES",
+		"foodClass": "Branded",
+		"publicationDate": "4/1/2019",
+		"foodAttributes": []
+	  }
+	],
+	"labelNutrients": {
+	  "fat": {
+		"value": 6.01
+	  },
+	  "saturatedFat": {
+		"value": 2.5
+	  },
+	  "transFat": {
+		"value": 0
+	  },
+	  "cholesterol": {
+		"value": 0
+	  },
+	  "sodium": {
+		"value": 65
+	  },
+	  "carbohydrates": {
+		"value": 18
+	  },
+	  "fiber": {
+		"value": 0.988
+	  },
+	  "sugars": {
+		"value": 11
+	  },
+	  "protein": {
+		"value": 1
+	  },
+	  "calcium": {
+		"value": 0
+	  },
+	  "iron": {
+		"value": 0.72
+	  },
+	  "calories": {
+		"value": 130
+	  }
+	}
+  }

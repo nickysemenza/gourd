@@ -1143,6 +1143,7 @@ dependencies = [
  "petgraph",
  "pretty_assertions",
  "serde",
+ "serde_json",
  "serde_yaml",
  "tracing",
  "uuid",

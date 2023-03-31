@@ -7,7 +7,7 @@ pub fn food_info_from_branded_food_item(x: BrandedFoodItem) -> FoodInfo {
     let x = FoodWrapper {
         fdc_id: x.fdc_id,
         description: x.description,
-        data_type: openapi::models::FoodDataType::FoundationFood,
+        data_type: openapi::models::FoodDataType::FoundationFood, // todo
         category: None,
         nutrients: x.food_nutrients.unwrap_or_default(),
         portions: None,
@@ -87,13 +87,12 @@ pub fn make_unit_mappings(food: FoodWrapper) -> Vec<UnitMapping> {
     for n in food.nutrients {
         if let Some(nutrient) = n.nutrient {
             if let Some(unit) = nutrient.unit_name {
-                if unit == "KCAL" {
-                    let mapping = UnitMapping {
-                        a: Box::new(Amount::new("kcal".to_string(), n.amount.unwrap())),
-                        b: Box::new(Amount::new("grams".to_string(), 100.0)),
-                        source: Some("fdc p".to_string()),
-                    };
-                    mappings.push(mapping);
+                if unit.to_ascii_lowercase() == "kcal" {
+                    mappings.push(UnitMapping::new_with_source(
+                        Amount::new("kcal".to_string(), n.amount.unwrap()),
+                        Amount::new("grams".to_string(), 100.0),
+                        "fdc p",
+                    ));
                 }
             }
         }
@@ -102,4 +101,23 @@ pub fn make_unit_mappings(food: FoodWrapper) -> Vec<UnitMapping> {
     info!("found {} mappings", mappings.len());
 
     mappings
+}
+
+#[cfg(test)]
+mod tests {
+    use openapi::models::BrandedFoodItem;
+
+    use super::food_info_from_branded_food_item;
+
+    #[test]
+    fn test_branded_item_conversion() {
+        let res: BrandedFoodItem =
+            serde_json::from_str(include_str!("sample_branded_food.json")).unwrap();
+        assert_eq!(res.fdc_id, 2082103);
+
+        let converted = food_info_from_branded_food_item(res.clone());
+        assert_eq!(res.fdc_id, converted.wrapper.fdc_id);
+        assert_eq!(1, converted.unit_mappings.len());
+        assert_eq!(500.0, converted.unit_mappings[0].a.value);
+    }
 }
