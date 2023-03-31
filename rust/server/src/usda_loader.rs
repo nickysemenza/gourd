@@ -1,7 +1,7 @@
 use actix_web::{web, HttpResponse};
 use anyhow::Result;
 use futures::future::join4;
-use gourd_common::food_info_from_branded_food_item;
+use gourd_common::usda::food_info_from_branded_food_item;
 use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::FoodResultByItem;
 use openapi::models::{BrandedFoodItem, FoundationFoodItem, SrLegacyFoodItem, SurveyFoodItem};
@@ -41,7 +41,7 @@ fn read_from_file<T: Document>(filename: &str, toplevel: &str) -> Result<Vec<T>>
     info!("loading {}", filename);
     let start = Instant::now();
     // let root: Value = serde_json::from_str(data.as_str()).unwrap();
-    let file = File::open(Path::new("/Users/nicky/dev/gourd/data/").join(filename))
+    let file = File::open(Path::new("/Users/nicky/dev/gourd/tmp/usda_json/").join(filename))
         .expect("could not open file");
     let reader = BufReader::new(file);
     let root: Value = serde_json::from_reader(reader)?;

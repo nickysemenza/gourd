@@ -9,8 +9,9 @@ use tracing::trace;
 use uuid::Uuid;
 
 use crate::{
-    amount_to_measure2, new_ingredient_parser, section_ingredient_from_parsed, si_to_ingredient,
-    unit::unit,
+    converter::{amount_to_measure2, si_to_ingredient},
+    parser::{new_ingredient_parser, section_ingredient_from_parsed},
+    unit::measure,
 };
 
 pub fn to_string(cr: CompactRecipe) -> Result<String, anyhow::Error> {
@@ -132,7 +133,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
         .map(|s| {
             let mut instructions = vec![];
             let mut ingredients = vec![];
-            let mut total_time = unit::Measure::parse(ingredient::Amount::new("second", 0.0));
+            let mut total_time = measure::Measure::parse(ingredient::Amount::new("second", 0.0));
 
             for ing in s.ingredients.into_iter() {
                 ingredients.push(section_ingredient_from_parsed(
@@ -259,8 +260,8 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use crate::{
-        bare_detail,
         codec::{decode_recipe, encode_recipe, recipe_to_input},
+        converter::bare_detail,
     };
 
     #[test]

@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use gourd_common::make_unit_mappings;
+use gourd_common::usda::make_unit_mappings;
 use openapi::models::FoodWrapper;
 
 #[tracing::instrument(name = "route::unit_mappings_from_food")]

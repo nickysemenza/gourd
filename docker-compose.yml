@@ -119,5 +119,5 @@ services:
     environment:
       - MEILI_MASTER_KEY=FOO
     volumes:
-      - './meili_data:/meili_data'
+      - './tmp/meili_data:/meili_data'
     image: 'getmeili/meilisearch:v1.0'

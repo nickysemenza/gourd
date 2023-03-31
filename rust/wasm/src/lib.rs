@@ -2,10 +2,11 @@
 mod utils;
 
 use gourd_common::{
-    convert_to, food_info_from_branded_food_item,
+    convert_to,
     ingredient::Amount,
     parse_unit_mappings, sum_ingredients,
     unit::{add_time_amounts, make_graph, print_graph},
+    usda::food_info_from_branded_food_item,
 };
 use openapi::models::{BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest};
 use tracing::{error, info};

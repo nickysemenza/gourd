@@ -11,6 +11,3 @@ coverage*
 
 ui/target
 tmp_images/
-
-data/FoodData_*
-meili_data

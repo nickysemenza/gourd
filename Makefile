@@ -11,7 +11,7 @@ all: bin/gourd
 test: unit-test-go lint-go test-rs
 
 dev-env:
-	docker-compose up -d db usda collector
+	docker-compose up -d db usda collector meilisearch
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c dev/air.conf
 

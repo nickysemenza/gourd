@@ -6,7 +6,8 @@ use petgraph::Graph;
 use serde::{Deserialize, Serialize};
 use tracing::{debug, info};
 
-use crate::new_ingredient_parser;
+use crate::parser::new_ingredient_parser;
+
 type MeasureGraph = Graph<Unit, f64>;
 
 pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> MeasureGraph {
@@ -28,49 +29,6 @@ pub fn make_graph(mappings: Vec<(Measure, Measure)>) -> MeasureGraph {
 }
 pub fn print_graph(g: MeasureGraph) -> String {
     return format!("{}", petgraph::dot::Dot::new(&g));
-}
-
-#[tracing::instrument(name = "unit::convert")]
-pub fn convert(
-    m: Measure,
-    target: MeasureKind,
-    mappings: Vec<(Measure, Measure)>,
-) -> Option<Measure> {
-    let g = make_graph(mappings);
-
-    let unit_a = m.unit.clone();
-    let unit_b = target.unit();
-
-    let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
-    let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
-
-    debug!("calculating {:?} to {:?}", n_a, n_b);
-    if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
-        debug!("convert failed for {:?}", m);
-        return None;
-    };
-
-    let steps = petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
-        .unwrap()
-        .1;
-    let mut factor: f64 = 1.0;
-    for x in 0..steps.len() - 1 {
-        let edge = g
-            .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
-            .unwrap();
-        factor *= g.edge_weight(edge).unwrap();
-    }
-
-    let result = Measure::new(
-        unit_b,
-        (m.value * factor * 100.0).round() / 100.0,
-        match m.upper_value {
-            Some(x) => Some((x * factor * 100.0).round() / 100.0),
-            None => None,
-        },
-    );
-    debug!("{:?} -> {:?} ({} hops)", m, result, steps.len());
-    return Some(result);
 }
 
 pub fn add_time_amounts(a: Vec<Amount>) -> Amount {
@@ -280,6 +238,50 @@ impl Measure {
             },
         });
     }
+
+    #[tracing::instrument]
+    pub fn convert_measure_via_mappings(
+        &self,
+        target: MeasureKind,
+        mappings: Vec<(Measure, Measure)>,
+    ) -> Option<Measure> {
+        let g = make_graph(mappings);
+
+        let unit_a = self.unit.clone();
+        let unit_b = target.unit();
+
+        let n_a = g.node_indices().find(|i| g[*i] == unit_a)?;
+        let n_b = g.node_indices().find(|i| g[*i] == unit_b)?;
+
+        debug!("calculating {:?} to {:?}", n_a, n_b);
+        if !petgraph::algo::has_path_connecting(&g, n_a, n_b, None) {
+            debug!("convert failed for {:?}", self);
+            return None;
+        };
+
+        let steps =
+            petgraph::algo::astar(&g, n_a, |finish| finish == n_b, |e| *e.weight(), |_| 0.0)
+                .unwrap()
+                .1;
+        let mut factor: f64 = 1.0;
+        for x in 0..steps.len() - 1 {
+            let edge = g
+                .find_edge(*steps.get(x).unwrap(), *steps.get(x + 1).unwrap())
+                .unwrap();
+            factor *= g.edge_weight(edge).unwrap();
+        }
+
+        let result = Measure::new(
+            unit_b,
+            (self.value * factor * 100.0).round() / 100.0,
+            match self.upper_value {
+                Some(x) => Some((x * factor * 100.0).round() / 100.0),
+                None => None,
+            },
+        );
+        debug!("{:?} -> {:?} ({} hops)", self, result, steps.len());
+        return Some(result);
+    }
 }
 
 #[cfg(test)]
@@ -311,118 +313,109 @@ mod tests {
         let tbsp_dollars = (Measure::from_str("2 tbsp"), Measure::from_str("4 dollars"));
         assert_eq!(
             Measure::from_str("2 dollars"),
-            convert(m.clone(), MeasureKind::Money, vec![tbsp_dollars.clone()]).unwrap()
+            m.convert_measure_via_mappings(MeasureKind::Money, vec![tbsp_dollars.clone()])
+                .unwrap()
         );
 
-        assert!(convert(m, MeasureKind::Volume, vec![tbsp_dollars.clone()]).is_none());
+        assert!(m
+            .convert_measure_via_mappings(MeasureKind::Volume, vec![tbsp_dollars.clone()])
+            .is_none());
     }
     #[test]
     fn test_convert_lb() {
         let grams_dollars = (Measure::from_str("1 gram"), Measure::from_str("1 dollar"));
         assert_eq!(
             Measure::from_str("2 dollars"),
-            convert(
-                Measure::from_str("2 grams"),
-                MeasureKind::Money,
-                vec![grams_dollars.clone()]
-            )
-            .unwrap()
+            Measure::from_str("2 grams")
+                .convert_measure_via_mappings(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
         );
         assert_eq!(
             Measure::from_str("56.699 dollars"),
-            convert(
-                Measure::from_str("2 oz"),
-                MeasureKind::Money,
-                vec![grams_dollars.clone()]
-            )
-            .unwrap()
+            Measure::from_str("2 oz")
+                .convert_measure_via_mappings(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
         );
         assert_eq!(
             Measure::from_str("226.796 dollars"),
-            convert(
-                Measure::from_str(".5 lb"),
-                MeasureKind::Money,
-                vec![grams_dollars.clone()]
-            )
-            .unwrap()
+            Measure::from_str(".5 lb")
+                .convert_measure_via_mappings(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
         );
         assert_eq!(
             Measure::from_str("453.592 dollars"),
-            convert(
-                Measure::from_str("1 lb"),
-                MeasureKind::Money,
-                vec![grams_dollars.clone()]
-            )
-            .unwrap()
+            Measure::from_str("1 lb")
+                .convert_measure_via_mappings(MeasureKind::Money, vec![grams_dollars.clone()])
+                .unwrap()
         );
     }
     #[test]
     fn test_convert_other() {
         assert_eq!(
             Measure::from_str("10.0 cents"),
-            convert(
-                Measure::from_str("1 whole"),
-                MeasureKind::Money,
-                vec![(
-                    Measure::from_str("12 whole"),
-                    Measure::from_str("1.20 dollar"),
-                )]
-            )
-            .unwrap()
+            Measure::from_str("1 whole")
+                .convert_measure_via_mappings(
+                    MeasureKind::Money,
+                    vec![(
+                        Measure::from_str("12 whole"),
+                        Measure::from_str("1.20 dollar"),
+                    )]
+                )
+                .unwrap()
         );
     }
     #[test]
     fn test_convert_range() {
         assert_eq!(
             Measure::from_str("5-10 dollars"),
-            convert(
-                Measure::from_str("1-2 whole"),
-                MeasureKind::Money,
-                vec![(Measure::from_str("4 whole"), Measure::from_str("20 dollar"))]
-            )
-            .unwrap()
+            Measure::from_str("1-2 whole")
+                .convert_measure_via_mappings(
+                    MeasureKind::Money,
+                    vec![(Measure::from_str("4 whole"), Measure::from_str("20 dollar"))]
+                )
+                .unwrap()
         );
     }
     #[test]
     fn test_convert_transitive() {
         assert_eq!(
             Measure::from_str("1 cent"),
-            convert(
-                Measure::from_str("1 grams"),
-                MeasureKind::Money,
-                vec![
-                    (Measure::from_str("1 cent"), Measure::from_str("1 tsp"),),
-                    (Measure::from_str("1 grams"), Measure::from_str("1 tsp"),),
-                ]
-            )
-            .unwrap()
+            Measure::from_str("1 grams")
+                .convert_measure_via_mappings(
+                    MeasureKind::Money,
+                    vec![
+                        (Measure::from_str("1 cent"), Measure::from_str("1 tsp"),),
+                        (Measure::from_str("1 grams"), Measure::from_str("1 tsp"),),
+                    ]
+                )
+                .unwrap()
         );
         assert_eq!(
             Measure::from_str("1 dollar"),
-            convert(
-                Measure::from_str("1 grams"),
-                MeasureKind::Money,
-                vec![
-                    (Measure::from_str("1 dollar"), Measure::from_str("1 cup"),),
-                    (Measure::from_str("1 grams"), Measure::from_str("1 cup"),),
-                ]
-            )
-            .unwrap()
+            Measure::from_str("1 grams")
+                .convert_measure_via_mappings(
+                    MeasureKind::Money,
+                    vec![
+                        (Measure::from_str("1 dollar"), Measure::from_str("1 cup"),),
+                        (Measure::from_str("1 grams"), Measure::from_str("1 cup"),),
+                    ]
+                )
+                .unwrap()
         );
     }
     #[test]
     fn test_convert_kcal() {
         assert_eq!(
             Measure::from_str("200 kcal"),
-            convert(
-                Measure::from_str("100 g"),
-                MeasureKind::Calories,
-                vec![
-                    (Measure::from_str("20 cups"), Measure::from_str("40 grams"),),
-                    (Measure::from_str("20 grams"), Measure::from_str("40 kcal"),)
-                ]
-            )
-            .unwrap()
+            Measure::from_str("100 g")
+                .convert_measure_via_mappings(
+                    MeasureKind::Calories,
+                    vec![
+                        (Measure::from_str("20 cups"), Measure::from_str("40 grams"),),
+                        (Measure::from_str("20 grams"), Measure::from_str("40 kcal"),)
+                    ]
+                )
+                .unwrap()
         );
     }
     #[test]

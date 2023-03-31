@@ -108,6 +108,5 @@ pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
 #[tracing::instrument(name = "route::index_recipe_detail")]
 pub async fn index_recipe_detail(cr: web::Json<Vec<RecipeDetail>>) -> HttpResponse {
     load(&cr.0, Index::RecipeDetails).await;
-
     HttpResponse::Ok().json(())
 }

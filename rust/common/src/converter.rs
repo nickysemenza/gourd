@@ -1,0 +1,135 @@
+use std::collections::{hash_map::Entry, HashMap};
+
+use openapi::models::{
+    unit_conversion_request::Target, Amount, Ingredient, IngredientDetail, IngredientKind,
+    RecipeDetail, SectionIngredient, SectionIngredientInput, UnitConversionRequest,
+};
+
+use tracing::info;
+
+use ingredient::unit::kind::MeasureKind;
+
+use crate::parser::parse_unit_mappings;
+use crate::unit;
+
+pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
+    let equivalencies = parse_unit_mappings(req.unit_mappings);
+    let target = match req.target.unwrap_or(Target::Other) {
+        Target::Weight => MeasureKind::Weight,
+        Target::Volume => MeasureKind::Volume,
+        Target::Money => MeasureKind::Money,
+        Target::Calories => MeasureKind::Calories,
+        Target::Other => MeasureKind::Other,
+    };
+    if req.input.len() == 0 {
+        return None;
+    }
+    return match amount_to_measure(req.input[0].clone())
+        .convert_measure_via_mappings(target.clone(), equivalencies.clone())
+    {
+        Some(a) => Some(measure_to_amount(a).unwrap()),
+        None => {
+            if target == MeasureKind::Weight {
+                // try again to convert to ml, and then use that as grams
+                return match amount_to_measure(req.input[0].clone())
+                    .convert_measure_via_mappings(MeasureKind::Volume, equivalencies)
+                {
+                    Some(a) => {
+                        let mut a = measure_to_amount(a).unwrap();
+                        a.unit = "gram".to_string();
+                        info!("no grams for {:#?} using volume with density 1", req.input);
+                        return Some(a);
+                    }
+                    None => None,
+                };
+            }
+            return None;
+        }
+    };
+}
+pub fn tmp_normalize(a: Amount) -> Amount {
+    let m = amount_to_measure(a.clone()).as_raw();
+    return Amount {
+        unit: m.unit,
+        value: m.value,
+        upper_value: m.upper_value,
+        source: a.source.clone(),
+    };
+}
+pub fn amount_to_measure(a: Amount) -> unit::Measure {
+    unit::Measure::parse(ingredient::Amount {
+        unit: a.unit,
+        value: a.value,
+        upper_value: a.upper_value,
+    })
+}
+pub fn amount_to_measure2(a: ingredient::Amount) -> unit::Measure {
+    unit::Measure::parse(ingredient::Amount {
+        unit: a.unit,
+        value: a.value,
+        upper_value: a.upper_value,
+    })
+}
+pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
+    let m1 = m.as_bare()?;
+    Ok(Amount::new(m1.unit, m1.value.into()))
+}
+pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
+    let mut amounts = vec![];
+    for a in s.amounts.iter() {
+        amounts.push(ingredient::Amount {
+            unit: a.unit.clone(),
+            value: a.value,
+            upper_value: a.upper_value,
+        });
+    }
+
+    return ingredient::Ingredient {
+        name: s.name.unwrap_or_default(),
+        modifier: s.adjective,
+        amounts,
+    };
+}
+#[allow(dead_code)]
+pub fn bare_detail(name: String) -> IngredientDetail {
+    IngredientDetail::new(
+        Ingredient::new("".to_string(), name.to_string()),
+        vec![],
+        vec![],
+    )
+}
+
+pub fn sum_ingredients(
+    r: RecipeDetail,
+) -> (
+    HashMap<String, Vec<SectionIngredient>>,
+    HashMap<String, Vec<SectionIngredient>>,
+) {
+    let mut recipes = HashMap::new();
+    let mut ing = HashMap::new();
+
+    let flat_ingredients: Vec<SectionIngredient> = r
+        .sections
+        .iter()
+        .flat_map(|section| section.ingredients.clone())
+        .collect();
+
+    flat_ingredients.iter().for_each(|i| {
+        let (k, m) = match i.kind {
+            IngredientKind::Recipe => (i.recipe.as_ref().unwrap().id.clone(), &mut recipes),
+            IngredientKind::Ingredient => (
+                i.ingredient.as_ref().unwrap().ingredient.id.clone(),
+                &mut ing,
+            ),
+        };
+        match m.entry(k) {
+            Entry::Vacant(e) => {
+                e.insert(vec![i.clone()]);
+            }
+            Entry::Occupied(mut e) => {
+                e.get_mut().push(i.clone());
+            }
+        }
+    });
+    (recipes, ing)
+}
