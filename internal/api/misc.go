@@ -185,11 +185,6 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 
 	rw.LinkedMeals = &linkedMeals
 
-	// temporary: bump index. this should happen after save not lazy load
-	if err := a.R.Send(ctx, "index_recipe_detail", rw.Detail, nil); err != nil {
-		return nil, err
-	}
-
 	return &rw, nil
 }
 func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeWrapper, error) {
@@ -235,6 +230,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 	}
 	// spew.Dump(recipes)
 	items := []RecipeWrapper{}
+	details := []RecipeDetail{}
 	for _, recipe := range recipes {
 		rw, err := a.recipeFromModel(ctx, recipe)
 		if err != nil {
@@ -242,7 +238,12 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 		}
 		if rw != nil {
 			items = append(items, *rw)
+			details = append(details, rw.Detail)
 		}
+	}
+	// temporary: bump index. this should happen after save not lazy load
+	if err := a.R.Send(ctx, "index_recipe_detail", details, nil); err != nil {
+		return nil, err
 	}
 	return items, nil
 }
