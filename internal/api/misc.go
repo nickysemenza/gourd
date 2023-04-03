@@ -164,7 +164,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*Reci
 			other = append(other, rd)
 		}
 	}
-	rw.OtherVersions = other
+	rw.OtherVersions = &other
 
 	gp := models.GphotosPhotoSlice{}
 	linkedMeals := []Meal{}
@@ -229,9 +229,7 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 	if err != nil {
 		return nil, err
 	}
-	// spew.Dump(recipes)
 	items := []RecipeWrapper{}
-	details := []RecipeDetail{}
 	for _, recipe := range recipes {
 		rw, err := a.recipeFromModel(ctx, recipe)
 		if err != nil {
@@ -239,7 +237,6 @@ func (a *API) RecipeListV2(ctx context.Context, limit, offset uint64) ([]RecipeW
 		}
 		if rw != nil {
 			items = append(items, *rw)
-			details = append(details, rw.Detail)
 		}
 	}
 

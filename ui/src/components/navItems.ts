@@ -11,5 +11,5 @@ export const navItems: {
   { title: "photos", path: "photos" },
   { title: "n meals", path: "meals" },
   { title: "g albums", path: "albums" },
-  { title: "search", path: "search" },
+  // { title: "search", path: "search" },
 ];

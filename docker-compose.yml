@@ -121,3 +121,9 @@ services:
     volumes:
       - './tmp/meili_data:/meili_data'
     image: 'getmeili/meilisearch:v1.0'
+  meilisearch-ui:
+    restart: always
+    container_name: meilisearch-ui
+    ports:
+      - '24900:24900'
+    image: 'riccoxie/meilisearch-ui:latest'

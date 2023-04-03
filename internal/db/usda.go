@@ -2,9 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"strings"
-	"sync"
 
 	sq "github.com/Masterminds/squirrel"
 	"gopkg.in/guregu/null.v4/zero"
@@ -17,75 +14,75 @@ type Food struct {
 	CategoryID  zero.Int `db:"food_category_id"`
 }
 
-func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, count bool) sq.SelectBuilder) ([]Food, uint64, error) {
+// func (c *Client) getFoods(ctx context.Context, addons func(q sq.SelectBuilder, count bool) sq.SelectBuilder) ([]Food, uint64, error) {
 
-	favoriteBrands := []string{
-		// brands
-		"Guittard Chocolate Co.",
-		"Bob's Red Mill Natural Foods, Inc.",
-		"The King Arthur Flour Company, Inc.",
+// 	favoriteBrands := []string{
+// 		// brands
+// 		"Guittard Chocolate Co.",
+// 		"Bob's Red Mill Natural Foods, Inc.",
+// 		"The King Arthur Flour Company, Inc.",
 
-		// stores
-		"'Whole Foods Market, Inc.",
-		"WHOLE FOODS MARKET",
-		"TRADER JOE'S",
-		"Target Stores",
-		"Kikkoman Sales USA, Inc.",
-	}
-	for x := range favoriteBrands {
-		// escape single quote
-		favoriteBrands[x] = strings.ReplaceAll(favoriteBrands[x], "'", "''")
-	}
+// 		// stores
+// 		"'Whole Foods Market, Inc.",
+// 		"WHOLE FOODS MARKET",
+// 		"TRADER JOE'S",
+// 		"Target Stores",
+// 		"Kikkoman Sales USA, Inc.",
+// 	}
+// 	for x := range favoriteBrands {
+// 		// escape single quote
+// 		favoriteBrands[x] = strings.ReplaceAll(favoriteBrands[x], "'", "''")
+// 	}
 
-	ctx, span := c.tracer.Start(ctx, "getFoods")
-	defer span.End()
+// 	ctx, span := c.tracer.Start(ctx, "getFoods")
+// 	defer span.End()
 
-	q := c.psql.Select(
-		"food_category_id",
-		"data_type",
-		"description",
-		"usda_food.fdc_id as fdc_id",
-	).From("usda_food").
-		LeftJoin("usda_branded_food	on usda_food.fdc_id = usda_branded_food.fdc_id").
-		OrderBy(fmt.Sprintf(`array_position(array['%s'], brand_owner)`, strings.Join(favoriteBrands, "','"))).
-		OrderBy("length(ingredients) asc") // shorter ingredient list = more likely to be 'pure'
+// 	q := c.psql.Select(
+// 		"food_category_id",
+// 		"data_type",
+// 		"description",
+// 		"usda_food.fdc_id as fdc_id",
+// 	).From("usda_food").
+// 		LeftJoin("usda_branded_food	on usda_food.fdc_id = usda_branded_food.fdc_id").
+// 		OrderBy(fmt.Sprintf(`array_position(array['%s'], brand_owner)`, strings.Join(favoriteBrands, "','"))).
+// 		OrderBy("length(ingredients) asc") // shorter ingredient list = more likely to be 'pure'
 
-	cq := c.psql.Select("count(*)").From("usda_food")
+// 	cq := c.psql.Select("count(*)").From("usda_food")
 
-	q = addons(q, false)
-	cq = addons(cq, true)
+// 	q = addons(q, false)
+// 	cq = addons(cq, true)
 
-	cq = cq.RemoveLimit().RemoveOffset()
+// 	cq = cq.RemoveLimit().RemoveOffset()
 
-	res := []Food{}
-	var count uint64
+// 	res := []Food{}
+// 	var count uint64
 
-	numQueries := 2
-	var wg sync.WaitGroup
-	wg.Add(numQueries)
-	errs := make(chan error, numQueries)
+// 	numQueries := 2
+// 	var wg sync.WaitGroup
+// 	wg.Add(numQueries)
+// 	errs := make(chan error, numQueries)
 
-	go func() {
-		if err := c.selectContext(ctx, q, &res); err != nil {
-			errs <- err
-		}
-		wg.Done()
-	}()
-	go func() {
-		if err := c.getContext(ctx, cq, &count); err != nil {
-			errs <- err
-		}
-		wg.Done()
-	}()
+// 	go func() {
+// 		if err := c.selectContext(ctx, q, &res); err != nil {
+// 			errs <- err
+// 		}
+// 		wg.Done()
+// 	}()
+// 	go func() {
+// 		if err := c.getContext(ctx, cq, &count); err != nil {
+// 			errs <- err
+// 		}
+// 		wg.Done()
+// 	}()
 
-	wg.Wait()
-	close(errs)
-	if len(errs) > 0 {
-		return nil, 0, <-errs
-	}
+// 	wg.Wait()
+// 	close(errs)
+// 	if len(errs) > 0 {
+// 		return nil, 0, <-errs
+// 	}
 
-	return res, count, nil
-}
+// 	return res, count, nil
+// }
 
 // func (c *Client) SearchFoods(ctx context.Context, searchQuery string, dataType []string, foodCategoryID *int, opts ...SearchOption) ([]Food, uint64, error) {
 // 	ctx, span := c.tracer.Start(ctx, "GetIngrientsParent")

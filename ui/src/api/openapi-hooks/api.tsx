@@ -152,7 +152,7 @@ export interface RecipeWrapper {
   /**
    * Other versions
    */
-  other_versions: RecipeDetail[];
+  other_versions?: RecipeDetail[];
 }
 
 /**

@@ -763,7 +763,7 @@ type RecipeWrapper struct {
 	LinkedPhotos *[]Photo `json:"linked_photos,omitempty"`
 
 	// Other versions
-	OtherVersions []RecipeDetail `json:"other_versions"`
+	OtherVersions *[]RecipeDetail `json:"other_versions,omitempty"`
 }
 
 // A recipe with subcomponents

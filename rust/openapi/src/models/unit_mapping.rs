@@ -10,6 +10,8 @@
 
 /// UnitMapping : mappings
 
+
+
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct UnitMapping {
     #[serde(rename = "a")]
@@ -30,15 +32,6 @@ impl UnitMapping {
             source: None,
         }
     }
-    pub fn new_with_source(
-        a: crate::models::Amount,
-        b: crate::models::Amount,
-        source: &str,
-    ) -> UnitMapping {
-        UnitMapping {
-            a: Box::new(a),
-            b: Box::new(b),
-            source: Some(source.to_string()),
-        }
-    }
 }
+
+

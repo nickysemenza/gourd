@@ -88,11 +88,13 @@ pub fn make_unit_mappings(food: FoodWrapper) -> Vec<UnitMapping> {
         if let Some(nutrient) = n.nutrient {
             if let Some(unit) = nutrient.unit_name {
                 if unit.to_ascii_lowercase() == "kcal" {
-                    mappings.push(UnitMapping::new_with_source(
-                        Amount::new("kcal".to_string(), n.amount.unwrap()),
-                        Amount::new("grams".to_string(), 100.0),
-                        "fdc p",
-                    ));
+                    mappings.push(UnitMapping {
+                        source: Some("fdc p".to_string()),
+                        ..UnitMapping::new(
+                            Amount::new("kcal".to_string(), n.amount.unwrap()),
+                            Amount::new("grams".to_string(), 100.0),
+                        )
+                    });
                 }
             }
         }

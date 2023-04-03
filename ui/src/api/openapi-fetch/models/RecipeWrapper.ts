@@ -67,7 +67,7 @@ export interface RecipeWrapper {
      * @type {Array<RecipeDetail>}
      * @memberof RecipeWrapper
      */
-    other_versions: Array<RecipeDetail>;
+    other_versions?: Array<RecipeDetail>;
 }
 
 /**
@@ -77,7 +77,6 @@ export function instanceOfRecipeWrapper(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "detail" in value;
-    isInstance = isInstance && "other_versions" in value;
 
     return isInstance;
 }
@@ -96,7 +95,7 @@ export function RecipeWrapperFromJSONTyped(json: any, ignoreDiscriminator: boole
         'detail': RecipeDetailFromJSON(json['detail']),
         'linked_meals': !exists(json, 'linked_meals') ? undefined : ((json['linked_meals'] as Array<any>).map(MealFromJSON)),
         'linked_photos': !exists(json, 'linked_photos') ? undefined : ((json['linked_photos'] as Array<any>).map(PhotoFromJSON)),
-        'other_versions': ((json['other_versions'] as Array<any>).map(RecipeDetailFromJSON)),
+        'other_versions': !exists(json, 'other_versions') ? undefined : ((json['other_versions'] as Array<any>).map(RecipeDetailFromJSON)),
     };
 }
 
@@ -113,7 +112,7 @@ export function RecipeWrapperToJSON(value?: RecipeWrapper | null): any {
         'detail': RecipeDetailToJSON(value.detail),
         'linked_meals': value.linked_meals === undefined ? undefined : ((value.linked_meals as Array<any>).map(MealToJSON)),
         'linked_photos': value.linked_photos === undefined ? undefined : ((value.linked_photos as Array<any>).map(PhotoToJSON)),
-        'other_versions': ((value.other_versions as Array<any>).map(RecipeDetailToJSON)),
+        'other_versions': value.other_versions === undefined ? undefined : ((value.other_versions as Array<any>).map(RecipeDetailToJSON)),
     };
 }
 

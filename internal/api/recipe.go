@@ -99,7 +99,11 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 	if err != nil {
 		return nil, err
 	}
-	a.indexRecipeDetails(ctx, append(w.OtherVersions, w.Detail)...)
+	toIndex := []RecipeDetail{w.Detail}
+	if w.OtherVersions != nil {
+		toIndex = append(toIndex, *w.OtherVersions...)
+	}
+	a.indexRecipeDetails(ctx, toIndex...)
 	return w, nil
 }
 
@@ -197,6 +201,7 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		Detail: rd,
 	}
 	if includeOtherVersions {
+		var other []RecipeDetail
 		recipes, err := a.DB().GetRecipeDetailWhere(ctx, sq.And{sq.Eq{"recipe_id": dbr.RecipeId}, sq.NotEq{"id": dbr.Id}})
 		if err != nil {
 			return nil, err
@@ -207,8 +212,9 @@ func (a *API) transformRecipe(ctx context.Context, dbr db.RecipeDetail, includeO
 		}
 		// w.OtherVersions = &details
 		for _, d := range details {
-			w.OtherVersions = append(w.OtherVersions, d.Detail)
+			other = append(other, d.Detail)
 		}
+		w.OtherVersions = &other
 	}
 
 	return &w, nil
@@ -377,7 +383,55 @@ func (a *API) recipeWrappertoDB(ctx context.Context, r *RecipeWrapperInput) (*db
 	return &dbr, nil
 
 }
+func (a *API) transformRecipeSectionIngredient(ctx context.Context, i db.SectionIngredient) (SectionIngredient, error) {
+	ctx, span := a.tracer.Start(ctx, "transformRecipeSectionIngredient")
+	defer span.End()
+	si := SectionIngredient{
+		Id:        i.Id,
+		Adjective: i.Adjective.Ptr(),
+		Original:  i.Original.Ptr(),
+		Optional:  i.Optional.Ptr(),
+		Amounts:   []Amount{},
+	}
+	for _, amt := range i.Amounts {
+		si.Amounts = append(si.Amounts, Amount{
+			Unit:   amt.Unit,
+			Value:  amt.Value,
+			Source: zero.StringFrom("db").Ptr(),
+		})
 
+	}
+
+	if i.RawRecipe != nil {
+		si.Kind = "recipe"
+		r, err := a.transformRecipe(ctx, *i.RawRecipe, false)
+		if err != nil {
+			return si, err
+		}
+		si.Recipe = &r.Detail
+	} else {
+		si.Kind = "ingredient"
+		foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})
+		if err != nil {
+			return si, err
+		}
+		// i := transformIngredient(*i.RawIngredient)
+		si.Ingredient = &foo[0]
+
+		targets := []UnitConversionRequestTarget{UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney, UnitConversionRequestTargetVolume}
+		if !hasGrams(si.Amounts) {
+			targets = append(targets, UnitConversionRequestTargetWeight)
+		}
+		for _, t := range targets {
+			err = a.enhance(ctx, t, &si)
+			if err != nil {
+				return si, err
+			}
+		}
+	}
+	return si, nil
+
+}
 func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]RecipeSection, error) {
 	ctx, span := a.tracer.Start(ctx, "transformRecipeSections")
 	defer span.End()
@@ -391,48 +445,9 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 			ins = append(ins, SectionInstruction{Id: i.Id, Instruction: i.Instruction})
 		}
 		for _, i := range d.Ingredients {
-			si := SectionIngredient{
-				Id:        i.Id,
-				Adjective: i.Adjective.Ptr(),
-				Original:  i.Original.Ptr(),
-				Optional:  i.Optional.Ptr(),
-				Amounts:   []Amount{},
-			}
-			for _, amt := range i.Amounts {
-				si.Amounts = append(si.Amounts, Amount{
-					Unit:   amt.Unit,
-					Value:  amt.Value,
-					Source: zero.StringFrom("db").Ptr(),
-				})
-
-			}
-
-			if i.RawRecipe != nil {
-				si.Kind = "recipe"
-				r, err := a.transformRecipe(ctx, *i.RawRecipe, false)
-				if err != nil {
-					return nil, err
-				}
-				si.Recipe = &r.Detail
-			} else {
-				si.Kind = "ingredient"
-				foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*i.RawIngredient})
-				if err != nil {
-					return nil, err
-				}
-				// i := transformIngredient(*i.RawIngredient)
-				si.Ingredient = &foo[0]
-
-				targets := []UnitConversionRequestTarget{UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney, UnitConversionRequestTargetVolume}
-				if !hasGrams(si.Amounts) {
-					targets = append(targets, UnitConversionRequestTargetWeight)
-				}
-				for _, t := range targets {
-					err = a.enhance(ctx, t, &si)
-					if err != nil {
-						return nil, err
-					}
-				}
+			si, err := a.transformRecipeSectionIngredient(ctx, i)
+			if err != nil {
+				return nil, err
 			}
 			if i.SubsFor.Valid {
 				ingSubs[i.SubsFor.String] = append(ingSubs[i.SubsFor.String], si)

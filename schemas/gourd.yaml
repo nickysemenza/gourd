@@ -932,7 +932,6 @@ components:
       required:
         - detail
         - id
-        - other_versions
       properties:
         id:
           description: id

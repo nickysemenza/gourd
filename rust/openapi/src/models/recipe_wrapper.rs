@@ -24,19 +24,19 @@ pub struct RecipeWrapper {
     #[serde(rename = "linked_photos", skip_serializing_if = "Option::is_none")]
     pub linked_photos: Option<Vec<crate::models::Photo>>,
     /// Other versions
-    #[serde(rename = "other_versions")]
-    pub other_versions: Vec<crate::models::RecipeDetail>,
+    #[serde(rename = "other_versions", skip_serializing_if = "Option::is_none")]
+    pub other_versions: Option<Vec<crate::models::RecipeDetail>>,
 }
 
 impl RecipeWrapper {
     /// A recipe with subcomponents, including some \"generated\" fields to enhance data
-    pub fn new(id: String, detail: crate::models::RecipeDetail, other_versions: Vec<crate::models::RecipeDetail>) -> RecipeWrapper {
+    pub fn new(id: String, detail: crate::models::RecipeDetail) -> RecipeWrapper {
         RecipeWrapper {
             id,
             detail: Box::new(detail),
             linked_meals: None,
             linked_photos: None,
-            other_versions,
+            other_versions: None,
         }
     }
 }
