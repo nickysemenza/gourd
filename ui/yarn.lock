@@ -2653,13 +2653,13 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.4.0.tgz#2c91791a9ba6ca0a0f4aaac5e45d58df13639ac8"
   integrity sha512-IgMK9i3sFGNUqPMbjABm0G26g0QCKCUBfglhQ7rQq6WcxbKfEHRcmwsoER4hZcuYqJgkYn2OeuoJIv7Jsftp7g==
 
-"@opentelemetry/auto-instrumentations-web@0.31.2":
-  version "0.31.2"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/auto-instrumentations-web/-/auto-instrumentations-web-0.31.2.tgz#94023c6adfd2441062875d0cfa87eaf93c3670bd"
-  integrity sha512-00r9ykv42qUyo0JtaCYT1da/2SlgNEkXkzMmIOreg632QS5F4kD1bb90hrkByEwAPl0wcRElzfh0XReZ+m0gtQ==
+"@opentelemetry/auto-instrumentations-web@0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/auto-instrumentations-web/-/auto-instrumentations-web-0.32.0.tgz#5363e3bda021b6cf3bf29e7c6e8a95576ee37a8a"
+  integrity sha512-fGGzs8p70mZLjLd8UoKocGvEtmOoqPHQfuGsaMnsBRjxcusChL2pujIr56nJqQCaf3Dzz1Lxdz13T9bOGqHnsQ==
   dependencies:
     "@opentelemetry/instrumentation" "^0.35.1"
-    "@opentelemetry/instrumentation-document-load" "^0.31.2"
+    "@opentelemetry/instrumentation-document-load" "^0.32.0"
     "@opentelemetry/instrumentation-fetch" "^0.35.1"
     "@opentelemetry/instrumentation-user-interaction" "^0.32.1"
     "@opentelemetry/instrumentation-xml-http-request" "^0.35.1"
@@ -2724,10 +2724,10 @@
     "@opentelemetry/sdk-metrics-base" "0.25.0"
     "@opentelemetry/sdk-trace-base" "0.25.0"
 
-"@opentelemetry/instrumentation-document-load@^0.31.2":
-  version "0.31.2"
-  resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-document-load/-/instrumentation-document-load-0.31.2.tgz#0efa54159db8a592bb46936149a0a34d30781e39"
-  integrity sha512-u8a+noo5FCky9q7yDWqfEVbLCYj8HpwL4x7NANmfUog/xyJsantSRKuKOjJUmn36UHxKN+Yc0gQqbTZUPp5Q8A==
+"@opentelemetry/instrumentation-document-load@^0.32.0":
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/@opentelemetry/instrumentation-document-load/-/instrumentation-document-load-0.32.0.tgz#1b6b6482a2bfff5cf0000a16a4495fb9b505750d"
+  integrity sha512-5mq1W0y1KsiNtO9bYlzuUnRi3u5clBkvkKN67POr6wZiP+2cyP+ZtVkznY1sodcnWppYIAi6hCOzaFZ2wYedfQ==
   dependencies:
     "@opentelemetry/core" "^1.8.0"
     "@opentelemetry/instrumentation" "^0.35.1"
