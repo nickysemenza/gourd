@@ -120,7 +120,7 @@ services:
       - MEILI_MASTER_KEY=FOO
     volumes:
       - './tmp/meili_data:/meili_data'
-    image: 'getmeili/meilisearch:v1.0'
+    image: 'getmeili/meilisearch:v1.1'
   meilisearch-ui:
     restart: always
     container_name: meilisearch-ui
