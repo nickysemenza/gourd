@@ -5,7 +5,7 @@
   "dependencies": {
     "@craco/craco": "7.1.0",
     "@headlessui/react": "1.7.8",
-    "@meilisearch/instant-meilisearch": "^0.11.1",
+    "@meilisearch/instant-meilisearch": "^0.12.0",
     "@opentelemetry/api": "1.4.0",
     "@opentelemetry/auto-instrumentations-web": "0.32.0",
     "@opentelemetry/context-zone": "1.11.0",
