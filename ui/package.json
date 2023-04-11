@@ -105,7 +105,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "3.10.0",
     "@cypress/instrument-cra": "1.4.0",
-    "@openapitools/openapi-generator-cli": "2.5.2",
+    "@openapitools/openapi-generator-cli": "2.6.0",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@testing-library/user-event": "14.4.3",
