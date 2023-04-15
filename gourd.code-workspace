@@ -5,7 +5,7 @@
       "name": "go",
       "path": ".",
       "files.exclude": {
-        "ui/": true
+        "ui/*": true
       }
     },
     {

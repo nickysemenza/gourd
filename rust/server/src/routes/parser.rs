@@ -86,7 +86,7 @@ pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
         Ok(s) => s,
         Err(e) => {
             error!("{:#?}", e);
-            return HttpResponse::InternalServerError().json(format!("{:#?}", e));
+            return HttpResponse::InternalServerError().json(format!("{}", e));
         }
     };
     let a = expand_recipe(compact_scrape_result.clone()).unwrap();

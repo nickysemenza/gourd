@@ -34,9 +34,10 @@ const IngredientList: React.FC = () => {
   });
 
   const [onlyMissingFDC, setOnlyMissingFDC] = useState(false);
+  const [justLinked, setJustLinked] = useState<string[]>([]);
 
   const ingredients = (data?.ingredients || []).filter((i) =>
-    onlyMissingFDC ? !i.food : true
+    onlyMissingFDC ? !i.food && !justLinked.includes(i.ingredient.id) : true
   );
 
   type i = (typeof ingredients)[0];
@@ -165,6 +166,7 @@ const IngredientList: React.FC = () => {
                 highlightId={original.food?.wrapper.fdc_id}
                 onLink={(fdcId: number) => {
                   linkFoodToIngredient(original.ingredient.id, fdcId);
+                  setJustLinked([...justLinked, original.ingredient.id]);
                 }}
                 addon={original.food}
               />

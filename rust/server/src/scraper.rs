@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use openapi::models::{CompactRecipe, CompactRecipeSection};
 use url::Url;
 
@@ -7,7 +7,10 @@ use crate::search::load;
 #[tracing::instrument(name = "route::scrape_recipe")]
 pub async fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
     let s = recipe_scraper_fetcher::Fetcher::new();
-    let res = s.scrape_url(url).await?;
+    let res = s
+        .scrape_url(url)
+        .await
+        .with_context(|| format!("Failed to scrape {}", url))?;
 
     let parsed_url = Url::parse(url).unwrap();
     let compact = CompactRecipe {

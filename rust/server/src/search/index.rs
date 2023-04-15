@@ -42,6 +42,7 @@ impl Index {
             Index::BrandedFoods => Some(vec![
                 "brandOwner",
                 "brandedFoodCategory",
+                "servingSizeUnit",
                 "ingredients",
                 "description",
             ]),

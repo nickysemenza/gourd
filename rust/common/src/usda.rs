@@ -12,8 +12,8 @@ pub fn food_info_from_branded_food_item(x: BrandedFoodItem) -> FoodInfo {
         nutrients: x.food_nutrients.unwrap_or_default(),
         portions: None,
         branded_info: Some(Box::new(BrandedFood {
-            serving_size: x.serving_size.unwrap(),
-            serving_size_unit: x.serving_size_unit.unwrap(),
+            serving_size: x.serving_size.unwrap_or_default(),
+            serving_size_unit: x.serving_size_unit.unwrap_or_default(),
             brand_owner: x.brand_owner,
             ingredients: x.ingredients,
             // fdcId:  2317162 as None as the text which messes up the wasm
