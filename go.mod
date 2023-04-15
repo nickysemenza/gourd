@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.6.0
-	github.com/cosmtrek/air v1.42.0
+	github.com/cosmtrek/air v1.43.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/dgraph-io/ristretto v0.1.1
@@ -341,7 +341,7 @@ require (
 	github.com/yagipy/maintidx v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.2.0 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
-	github.com/yuin/goldmark v1.5.3 // indirect
+	github.com/yuin/goldmark v1.5.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	gitlab.com/bosi/decorder v0.2.3 // indirect
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
@@ -399,8 +399,15 @@ require (
 
 require (
 	go.opentelemetry.io/otel/exporters/zipkin v1.14.0
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
+	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326
 	google.golang.org/grpc v1.54.0
 )
 
-require github.com/google/s2a-go v0.1.0 // indirect
+require (
+	github.com/bep/godartsass v0.16.0 // indirect
+	github.com/bep/golibsass v1.1.0 // indirect
+	github.com/cli/safeexec v1.0.0 // indirect
+	github.com/gohugoio/hugo v0.111.3 // indirect
+	github.com/google/s2a-go v0.1.0 // indirect
+	github.com/tdewolff/parse/v2 v2.6.5 // indirect
+)
