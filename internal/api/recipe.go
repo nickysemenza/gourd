@@ -484,7 +484,7 @@ func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, ite
 	if err := a.R.Send(ctx, "convert", req, &res); err != nil {
 		return fmt.Errorf("enhance: %w", err)
 	}
-	if res.Value != 0 {
+	if true { // todo: if success
 		res.Value = math.Round(res.Value*100) / 100
 		res.Source = zero.StringFrom("calculated").Ptr()
 		item.Amounts = append(item.Amounts, res)

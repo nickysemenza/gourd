@@ -16,7 +16,11 @@ const IngredientPopover: React.FC<{ detail: IngredientDetail }> = ({
         {({ open }) => (
           <>
             <Popover.Button>
-              <AlertCircle className="w-6 h-6 p-1 text-blue-700" />
+              <AlertCircle
+                className={`w-6 h-6 p-1 ${
+                  unit_mappings.length > 0 ? "text-blue-700" : "text-red-700"
+                } `}
+              />
             </Popover.Button>
             <Transition
               show={open}

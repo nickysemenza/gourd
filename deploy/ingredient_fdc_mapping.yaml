@@ -309,6 +309,25 @@
 - name: onion
   fdc_id: 790646
   aliases: ["white onion", "yellow onion"]
+  unit_mappings:
+    - a:
+        unit: whole
+        value: 1
+      b:
+        unit: edible
+        value: 1
+    - a:
+        unit: large
+        value: 1
+      b:
+        unit: edible
+        value: 1
+    - a:
+        unit: large
+        value: 1
+      b:
+        unit: dollar
+        value: .8
 - name: red onion
   fdc_id: 790577
 - name: soy sauce

@@ -210,6 +210,8 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 
 func (a *API) DoSync(c echo.Context, params DoSyncParams) error {
 	ctx := c.Request().Context()
+	ctx, span := a.tracer.Start(ctx, "DoSync")
+	defer span.End()
 	err := a.Sync(ctx, params.LookbackDays)
 	if err != nil {
 		return handleErr(c, err)
@@ -218,7 +220,7 @@ func (a *API) DoSync(c echo.Context, params DoSyncParams) error {
 }
 func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	now := time.Now()
-	ctx, span := a.tracer.Start(ctx, "DoSync")
+	ctx, span := a.tracer.Start(ctx, "Sync")
 	defer span.End()
 
 	if err := a.syncRecipeFromNotion(ctx, time.Hour*24*time.Duration(lookbackDays)); err != nil {

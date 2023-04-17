@@ -2,6 +2,8 @@ module github.com/nickysemenza/gourd
 
 go 1.19
 
+replace github.com/ericlagergren/decimal => github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
+
 require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/buckket/go-blurhash v1.1.0
@@ -141,7 +143,7 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.3 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.9.1 // indirect
-	github.com/ericlagergren/decimal v0.0.0-20221120152707-495c53812d05
+	github.com/ericlagergren/decimal v0.0.0-20211103172832-aca2edc11f73
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.15.0 // indirect

@@ -1,6 +1,7 @@
 mod index;
 
 use actix_web::{web, HttpResponse};
+use indicatif::ProgressIterator;
 use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::RecipeDetail;
 use serde::{de::DeserializeOwned, Serialize};
@@ -25,6 +26,7 @@ pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
 
     let tasks: Vec<_> = chunks
         .iter()
+        .progress()
         .map(|v| {
             let client = get_client();
             let x = v.clone();
@@ -32,15 +34,13 @@ pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
             tokio::spawn(async move { client.index(i).add_documents(&x, None).await.unwrap() })
         })
         .collect();
-    let res = futures::future::join_all(tasks).await;
-    // info!("finished loading {:?}", res);
+    let _res = futures::future::join_all(tasks).await;
 
     info!(
-        "going load {} items in {} chunks into index {}: {:?}",
+        "loaded {} items in {} chunks into index {}",
         data.len(),
         chunks.len(),
         index,
-        res
     );
 }
 
@@ -54,7 +54,7 @@ pub async fn index_recipe_detail(cr: web::Json<Vec<RecipeDetail>>) -> HttpRespon
 pub async fn init_indexes() {
     let client = get_client();
 
-    for x in Index::iter() {
+    for x in Index::iter().progress() {
         if let Some(attr) = x.get_searchable_attributes() {
             let task: TaskInfo = client
                 .index(x)

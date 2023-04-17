@@ -238,7 +238,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
               ) : (
                 <div className="flex justify-between pr-1">
                   <p>{ingredient.ingredient?.ingredient.name}</p>
-                  {hint && <IngredientPopover detail={hint} />}
+                  {hint ? <IngredientPopover detail={hint} /> : "none"}
                 </div>
               )}
             </div>
@@ -310,8 +310,8 @@ const RecipeDetailTable: React.FC<TableProps> = ({
           <div>
             {showKcalDollars && (
               <div>
-                {kcal ? scaledRound(kcal) : "n/a"}
-                kcal ${dollars ? scaledRound(dollars) : "n/a"}
+                {kcal !== undefined ? scaledRound(kcal) : "n/a"}
+                kcal ${dollars !== undefined ? scaledRound(dollars) : "n/a"}
               </div>
             )}
 

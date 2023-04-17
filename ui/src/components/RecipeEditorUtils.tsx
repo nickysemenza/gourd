@@ -413,6 +413,7 @@ export const getStats = (
       total.grams && grams ? (grams / total.grams) * multiplier : 1
     );
   }
+  console.log({ si });
 
   return {
     grams,
