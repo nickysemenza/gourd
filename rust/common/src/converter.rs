@@ -7,10 +7,9 @@ use openapi::models::{
 
 use tracing::info;
 
-use ingredient::unit::kind::MeasureKind;
+use ingredient::unit::{kind::MeasureKind, Measure};
 
 use crate::parser::parse_unit_mappings;
-use crate::unit;
 
 #[tracing::instrument]
 pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
@@ -57,21 +56,21 @@ pub fn tmp_normalize(a: Amount) -> Amount {
         source: a.source.clone(),
     };
 }
-pub fn amount_to_measure(a: Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount {
+pub fn amount_to_measure(a: Amount) -> Measure {
+    Measure::parse(ingredient::Amount {
         unit: a.unit,
         value: a.value,
         upper_value: a.upper_value,
     })
 }
-pub fn amount_to_measure2(a: ingredient::Amount) -> unit::Measure {
-    unit::Measure::parse(ingredient::Amount {
+pub fn amount_to_measure2(a: ingredient::Amount) -> Measure {
+    Measure::parse(ingredient::Amount {
         unit: a.unit,
         value: a.value,
         upper_value: a.upper_value,
     })
 }
-pub fn measure_to_amount(m: unit::Measure) -> anyhow::Result<Amount> {
+pub fn measure_to_amount(m: Measure) -> anyhow::Result<Amount> {
     let m1 = m.as_bare()?;
     Ok(Amount::new(m1.unit, m1.value.into()))
 }

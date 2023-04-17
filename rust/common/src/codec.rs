@@ -1,5 +1,5 @@
 use anyhow::bail;
-use ingredient::rich_text::Rich;
+use ingredient::{rich_text::Rich, unit::Measure};
 use openapi::models::{
     Amount, CompactRecipe, CompactRecipeSection, RecipeDetail, RecipeDetailInput, RecipeSection,
     RecipeSectionInput, RecipeSource, SectionIngredient, SectionIngredientInput,
@@ -11,7 +11,6 @@ use uuid::Uuid;
 use crate::{
     converter::{amount_to_measure2, si_to_ingredient},
     parser::{new_ingredient_parser, section_ingredient_from_parsed},
-    unit::measure,
 };
 
 pub fn to_string(cr: CompactRecipe) -> Result<String, anyhow::Error> {
@@ -133,7 +132,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
         .map(|s| {
             let mut instructions = vec![];
             let mut ingredients = vec![];
-            let mut total_time = measure::Measure::parse(ingredient::Amount::new("second", 0.0));
+            let mut total_time = Measure::parse(ingredient::Amount::new("second", 0.0));
 
             for ing in s.ingredients.into_iter() {
                 ingredients.push(section_ingredient_from_parsed(

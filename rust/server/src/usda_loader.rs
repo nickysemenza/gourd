@@ -1,6 +1,5 @@
 use actix_web::{web, HttpResponse};
 use anyhow::{Context, Result};
-use futures::future::join4;
 use gourd_common::usda::food_info_from_branded_food_item;
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use itertools::Itertools;

@@ -5,7 +5,6 @@ pub mod codec;
 mod converter;
 pub mod pan;
 mod parser;
-pub mod unit;
 pub mod usda;
 pub use ingredient;
 

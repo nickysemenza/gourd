@@ -1409,10 +1409,11 @@ dependencies = [
 [[package]]
 name = "ingredient"
 version = "0.2.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#b94a89a9fba98dd7a412bdba64e09a589c14093e"
 dependencies = [
+ "anyhow",
  "itertools",
  "nom 7.1.3",
+ "petgraph",
  "serde",
  "tracing",
 ]
@@ -2422,7 +2423,6 @@ dependencies = [
 [[package]]
 name = "recipe-scraper"
 version = "0.1.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#b94a89a9fba98dd7a412bdba64e09a589c14093e"
 dependencies = [
  "ingredient",
  "scraper",
@@ -2435,7 +2435,6 @@ dependencies = [
 [[package]]
 name = "recipe_scraper_fetcher"
 version = "0.1.0"
-source = "git+https://github.com/nickysemenza/ingredient-parser?branch=main#b94a89a9fba98dd7a412bdba64e09a589c14093e"
 dependencies = [
  "recipe-scraper",
  "reqwest",

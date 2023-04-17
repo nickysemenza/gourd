@@ -1,10 +1,9 @@
 use openapi::models::{Amount, IngredientKind, SectionIngredientInput, UnitMapping};
 use tracing::info;
 
-use ingredient::IngredientParser;
+use ingredient::{unit::Measure, IngredientParser};
 
 use crate::converter::amount_to_measure;
-use crate::unit;
 
 pub(crate) fn section_ingredient_from_parsed(
     i: ingredient::Ingredient,
@@ -124,7 +123,7 @@ pub fn amount_from_ingredient(e: &ingredient::Amount) -> Amount {
     }
 }
 
-pub fn parse_unit_mappings(um: Vec<UnitMapping>) -> Vec<(unit::Measure, unit::Measure)> {
+pub fn parse_unit_mappings(um: Vec<UnitMapping>) -> Vec<(Measure, Measure)> {
     um.iter()
         .map(|u| {
             return (
