@@ -9,7 +9,7 @@ use tracing::trace;
 use uuid::Uuid;
 
 use crate::{
-    converter::{amount_to_measure2, si_to_ingredient},
+    converter::{measure_to_amount, si_to_ingredient},
     parser::{new_ingredient_parser, section_ingredient_from_parsed},
 };
 
@@ -132,7 +132,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
         .map(|s| {
             let mut instructions = vec![];
             let mut ingredients = vec![];
-            let mut total_time = Measure::parse(ingredient::Amount::new("second", 0.0));
+            let mut total_time = Measure::parse_new("second", 0.0);
 
             for ing in s.ingredients.into_iter() {
                 ingredients.push(section_ingredient_from_parsed(
@@ -154,9 +154,8 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
 
                 for token in rich_text_tokens.into_iter() {
                     match token {
-                        ingredient::rich_text::Chunk::Amount(amt) => {
-                            for a in amt.into_iter() {
-                                let m = amount_to_measure2(a.clone());
+                        ingredient::rich_text::Chunk::Measure(amt) => {
+                            for m in amt.into_iter() {
                                 if m.kind().unwrap() == ingredient::unit::kind::MeasureKind::Time {
                                     total_time = total_time.add(m).unwrap();
                                 }
@@ -171,15 +170,13 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
                         .to_string(),
                 ))
             }
-            let total_time_seconds = total_time.as_raw();
             RecipeSectionInput {
-                duration: match total_time_seconds.value == 0.0 {
+                duration: match total_time.values().0 == 0.0 {
                     true => None,
                     false => Some(Box::new(Amount {
-                        unit: total_time_seconds.unit,
-                        value: total_time_seconds.value,
-                        upper_value: total_time_seconds.upper_value,
                         source: Some("parsed sum".to_string()),
+
+                        ..measure_to_amount(total_time)
                     })),
                 },
                 ..RecipeSectionInput::new(instructions, ingredients)

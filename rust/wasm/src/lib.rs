@@ -3,10 +3,7 @@ mod utils;
 
 use gourd_common::{
     convert_to,
-    ingredient::{
-        unit::{add_time_amounts, make_graph, print_graph},
-        Amount,
-    },
+    ingredient::unit::{add_time_amounts, make_graph, print_graph, Measure},
     parse_unit_mappings, sum_ingredients,
     usda::food_info_from_branded_food_item,
 };
@@ -43,12 +40,12 @@ pub fn parse(input: &str) -> String {
 #[wasm_bindgen(typescript_custom_section)]
 const ITEXT_STYLE: &'static str = r#"
 interface Ingredient {
-    amounts: Amount[];
+    amounts: Measure[];
     modifier?: string;
     name: string;
   }
   
-interface Amount {
+interface Measure {
   unit: string;
   value: number;
   upper_value?: number;
@@ -61,18 +58,18 @@ interface CompactR {
 export type RichItem =
   | { kind: "Text"; value: string }
   | { kind: "Ing"; value: string }
-  | { kind: "Amount"; value: Amount[] }
+  | { kind: "Measure"; value: Measure[] }
 "#;
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(typescript_type = "Ingredient")]
     pub type IIngredient;
-    #[wasm_bindgen(typescript_type = "Amount")]
+    #[wasm_bindgen(typescript_type = "Measure")]
     #[derive(Debug)]
-    pub type IAmount;
-    #[wasm_bindgen(typescript_type = "Amount[]")]
-    pub type IAmounts;
+    pub type IMeasure;
+    #[wasm_bindgen(typescript_type = "Measure[]")]
+    pub type IMeasures;
     #[wasm_bindgen(typescript_type = "CompactR[][]")]
     pub type ICompactR;
     #[wasm_bindgen(typescript_type = "RichItem[]")]
@@ -111,7 +108,7 @@ pub fn sum_ingr(recipe_detail: &JsValue) -> JsValue {
 }
 
 #[wasm_bindgen]
-pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
+pub fn dolla(conversion_request: &JsValue) -> Result<IMeasure, JsValue> {
     utils::set_panic_hook();
     let req: UnitConversionRequest = conversion_request.into_serde().unwrap();
     return match convert_to(req) {
@@ -121,7 +118,7 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IAmount, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn parse_amount(input: &str) -> Result<IAmounts, JsValue> {
+pub fn parse_amount(input: &str) -> Result<IMeasures, JsValue> {
     utils::set_panic_hook();
     let ip = gourd_common::new_ingredient_parser(false);
     let i = ip.parse_amount(input);
@@ -177,9 +174,9 @@ pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn format_amount(amount: &IAmount) -> String {
+pub fn format_amount(amount: &IMeasure) -> String {
     utils::set_panic_hook();
-    let a1: Result<Amount, _> = amount.into_serde();
+    let a1: Result<Measure, _> = amount.into_serde();
     match a1 {
         Ok(a) => format!("{}", a),
         Err(e) => {
@@ -190,9 +187,9 @@ pub fn format_amount(amount: &IAmount) -> String {
 }
 
 #[wasm_bindgen]
-pub fn sum_time_amounts(amount: &IAmounts) -> IAmount {
+pub fn sum_time_amounts(amount: &IMeasures) -> IMeasure {
     utils::set_panic_hook();
-    let r: Vec<Amount> = amount.into_serde().unwrap();
+    let r: Vec<Measure> = amount.into_serde().unwrap();
     let sum = add_time_amounts(r);
     info!("sum {}", sum);
     JsValue::from_serde(&sum).unwrap().into()

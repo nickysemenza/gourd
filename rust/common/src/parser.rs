@@ -1,7 +1,10 @@
 use openapi::models::{Amount, IngredientKind, SectionIngredientInput, UnitMapping};
 use tracing::info;
 
-use ingredient::{unit::Measure, IngredientParser};
+use ingredient::{
+    unit::{self, Measure, Unit},
+    IngredientParser,
+};
 
 use crate::converter::amount_to_measure;
 
@@ -17,18 +20,20 @@ pub(crate) fn section_ingredient_from_parsed(
     let mut kind = IngredientKind::Ingredient;
 
     let mut amounts: Vec<Amount> = Vec::new();
-    for x in i.amounts.iter() {
-        if is_gram(&x.unit) {
-            grams = x.value.into();
+    for y in i.amounts.iter() {
+        let measure_unit = y.unit();
+        let (value, upper_value) = y.values();
+        if measure_unit == Unit::Gram {
+            grams = value;
             amount = Some(grams);
             unit = Some("g".to_string());
-        } else if is_oz(x) {
-            oz = x.value.into();
-        } else if is_ml(x) {
-            ml = x.value.into();
+        } else if measure_unit == Unit::Ounce {
+            oz = value;
+        } else if measure_unit == Unit::Milliliter {
+            ml = value;
         } else {
-            unit = Some(x.unit.clone());
-            amount = Some(x.value as f64);
+            unit = Some(measure_unit.to_str());
+            amount = Some(value);
         }
         if amount.is_some() && unit.is_some() {
             let unitstr = unit.clone().unwrap_or("unknown".to_string());
@@ -37,9 +42,7 @@ pub(crate) fn section_ingredient_from_parsed(
                 kind = IngredientKind::Recipe;
             }
             let mut a = Amount::new(unitstr, amount.unwrap_or(0.0));
-            if x.upper_value.is_some() {
-                a.upper_value = Some(x.upper_value.unwrap().into());
-            }
+            a.upper_value = upper_value;
             amounts.push(a);
         }
     }
@@ -77,7 +80,7 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     let i = dbg!(ingredient::from_str(s2.as_str()));
     Ok(section_ingredient_from_parsed(i, s))
 }
-pub fn parse_amount(s: &str) -> Vec<ingredient::Amount> {
+pub fn parse_amount(s: &str) -> Vec<unit::Measure> {
     let i = new_ingredient_parser(false).parse_amount(s);
     info!("parsed {} into {:?}", s, i.clone());
     return i;
@@ -87,38 +90,12 @@ pub fn new_ingredient_parser(is_rich_text: bool) -> IngredientParser {
     IngredientParser::new(is_rich_text)
 }
 
-// fn get_grams_si(si: SectionIngredient) -> f64 {
-//     for x in si.amounts.iter() {
-//         if is_gram(&x.unit) {
-//             return x.value;
-//         }
-//     }
-//     return 0.0;
-// }
-// pub fn get_grams(r: RecipeDetail) -> f64 {
-//     r.sections.iter().fold(0.0, |acc, s| {
-//         acc + s
-//             .ingredients
-//             .iter()
-//             .fold(0.0, |acc, i| acc + get_grams_si(i.clone()))
-//     })
-// }
-
-fn is_gram(unit: &String) -> bool {
-    unit == "g" || unit == "gram" || unit == "grams"
-}
-fn is_oz(a: &ingredient::Amount) -> bool {
-    a.unit == "oz" || a.unit == "ounce" || a.unit == "ounces"
-}
-fn is_ml(a: &ingredient::Amount) -> bool {
-    a.unit == "ml" || a.unit == "mL"
-}
-
-pub fn amount_from_ingredient(e: &ingredient::Amount) -> Amount {
+pub fn amount_from_ingredient(e1: &unit::Measure) -> Amount {
+    let (value, upper_value) = e1.values();
     Amount {
-        unit: e.unit.clone(),
-        value: e.value,
-        upper_value: e.upper_value,
+        unit: e1.unit().to_str(),
+        value,
+        upper_value,
         source: None,
     }
 }

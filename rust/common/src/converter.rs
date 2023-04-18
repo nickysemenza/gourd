@@ -9,7 +9,7 @@ use tracing::info;
 
 use ingredient::unit::{kind::MeasureKind, Measure};
 
-use crate::parser::parse_unit_mappings;
+use crate::{amount_from_ingredient, parser::parse_unit_mappings};
 
 #[tracing::instrument]
 pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
@@ -27,7 +27,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     return match amount_to_measure(req.input[0].clone())
         .convert_measure_via_mappings(target.clone(), equivalencies.clone())
     {
-        Some(a) => Some(measure_to_amount(a).unwrap()),
+        Some(a) => Some(measure_to_amount(a)),
         None => {
             if target == MeasureKind::Weight {
                 // try again to convert to ml, and then use that as grams
@@ -35,7 +35,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
                     .convert_measure_via_mappings(MeasureKind::Volume, equivalencies)
                 {
                     Some(a) => {
-                        let mut a = measure_to_amount(a).unwrap();
+                        let mut a = measure_to_amount(a);
                         a.unit = "gram".to_string();
                         info!("no grams for {:#?} using volume with density 1", req.input);
                         return Some(a);
@@ -48,7 +48,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
     };
 }
 pub fn tmp_normalize(a: Amount) -> Amount {
-    let m = amount_to_measure(a.clone()).as_raw();
+    let m = measure_to_amount(amount_to_measure(a.clone()));
     return Amount {
         unit: m.unit,
         value: m.value,
@@ -57,31 +57,16 @@ pub fn tmp_normalize(a: Amount) -> Amount {
     };
 }
 pub fn amount_to_measure(a: Amount) -> Measure {
-    Measure::parse(ingredient::Amount {
-        unit: a.unit,
-        value: a.value,
-        upper_value: a.upper_value,
-    })
+    Measure::from_parts(a.unit.as_ref(), a.value, a.upper_value)
 }
-pub fn amount_to_measure2(a: ingredient::Amount) -> Measure {
-    Measure::parse(ingredient::Amount {
-        unit: a.unit,
-        value: a.value,
-        upper_value: a.upper_value,
-    })
-}
-pub fn measure_to_amount(m: Measure) -> anyhow::Result<Amount> {
-    let m1 = m.as_bare()?;
-    Ok(Amount::new(m1.unit, m1.value.into()))
+
+pub fn measure_to_amount(m: Measure) -> Amount {
+    amount_from_ingredient(&m)
 }
 pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     let mut amounts = vec![];
     for a in s.amounts.iter() {
-        amounts.push(ingredient::Amount {
-            unit: a.unit.clone(),
-            value: a.value,
-            upper_value: a.upper_value,
-        });
+        amounts.push(Measure::from_parts(a.unit.as_ref(), a.value, a.upper_value));
     }
 
     return ingredient::Ingredient {
