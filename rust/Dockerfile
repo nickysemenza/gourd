@@ -1,4 +1,4 @@
-FROM rust:1.68 as builder
+FROM rust:1.69 as builder
 WORKDIR /work/rust
 RUN apt-get update
 COPY rust/ .
