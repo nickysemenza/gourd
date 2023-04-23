@@ -356,7 +356,7 @@ mod tests {
 
 100 g / 0.5 recipe CS Pecan Brittle
 100 g / 1 cup oats
-173 g / 1.3 cup flour
+173 g / 1.3 cups flour
 6 g / 2 tsp salt
 6 g / 1 tsp baking soda
 ;food processor until combined

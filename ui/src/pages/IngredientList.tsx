@@ -175,7 +175,7 @@ const IngredientList: React.FC = () => {
         },
       },
     ];
-  }, [onlyMissingFDC, showIDs]);
+  }, [onlyMissingFDC, showIDs, justLinked]);
 
   return (
     <>

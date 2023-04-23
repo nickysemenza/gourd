@@ -153,7 +153,7 @@ mod tests {
                 input: vec![Amount::new("piece".to_string(), 0.5)],
                 unit_mappings: unit_mappings.clone(),
             }),
-            Some(Amount::new("$".to_string(), 0.5)),
+            Some(Amount::new("cent".to_string(), 50.0)),
         );
         assert_eq!(
             convert_to(UnitConversionRequest {

@@ -6,7 +6,7 @@ use ingredient::{
     IngredientParser,
 };
 
-use crate::converter::amount_to_measure;
+pub use crate::converter::amount_to_measure;
 
 pub(crate) fn section_ingredient_from_parsed(
     i: ingredient::Ingredient,
@@ -22,17 +22,17 @@ pub(crate) fn section_ingredient_from_parsed(
     let mut amounts: Vec<Amount> = Vec::new();
     for y in i.amounts.iter() {
         let measure_unit = y.unit();
-        let (value, upper_value) = y.values();
+        let (value, upper_value, foo1) = y.values();
         if measure_unit == Unit::Gram {
             grams = value;
             amount = Some(grams);
-            unit = Some("g".to_string());
+            unit = Some(foo1);
         } else if measure_unit == Unit::Ounce {
             oz = value;
         } else if measure_unit == Unit::Milliliter {
             ml = value;
         } else {
-            unit = Some(measure_unit.to_str());
+            unit = Some(foo1);
             amount = Some(value);
         }
         if amount.is_some() && unit.is_some() {
@@ -91,9 +91,9 @@ pub fn new_ingredient_parser(is_rich_text: bool) -> IngredientParser {
 }
 
 pub fn amount_from_ingredient(e1: &unit::Measure) -> Amount {
-    let (value, upper_value) = e1.values();
+    let (value, upper_value, unit) = e1.normalize().values();
     Amount {
-        unit: e1.unit().to_str(),
+        unit,
         value,
         upper_value,
         source: None,
@@ -134,7 +134,7 @@ mod tests {
                     IngredientKind::Ingredient,
                     vec![
                         Amount::new("g".to_string(), 118.0),
-                        Amount::new("cups".to_string(), 0.5),
+                        Amount::new("cup".to_string(), 0.5),
                     ]
                 )
             }
@@ -151,7 +151,7 @@ mod tests {
                 ..SectionIngredientInput::new(
                     IngredientKind::Ingredient,
                     vec![
-                        Amount::new("cups".to_string(), 0.5),
+                        Amount::new("cup".to_string(), 0.5),
                         Amount::new("g".to_string(), 118.0),
                     ]
                 )

@@ -4,7 +4,7 @@ extern crate serde;
 pub mod codec;
 mod converter;
 pub mod pan;
-mod parser;
+pub mod parser;
 pub mod usda;
 pub use ingredient;
 

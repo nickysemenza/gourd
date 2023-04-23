@@ -4,10 +4,14 @@ mod utils;
 use gourd_common::{
     convert_to,
     ingredient::unit::{add_time_amounts, make_graph, print_graph, Measure},
-    parse_unit_mappings, sum_ingredients,
+    parse_unit_mappings,
+    parser::amount_to_measure,
+    sum_ingredients,
     usda::food_info_from_branded_food_item,
 };
-use openapi::models::{BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest};
+use openapi::models::{
+    Amount, BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest,
+};
 use tracing::{error, info};
 use wasm_bindgen::prelude::*;
 
@@ -51,6 +55,12 @@ interface Measure {
   upper_value?: number;
 }
 
+interface Amount {
+    unit: string;
+    value: number;
+    upper_value?: number;
+}
+
 interface CompactR {
   Ing?: Ingredient;
   Ins?: string;
@@ -69,6 +79,8 @@ extern "C" {
     #[derive(Debug)]
     pub type IMeasure;
     #[wasm_bindgen(typescript_type = "Measure[]")]
+    pub type IAmount;
+    #[wasm_bindgen(typescript_type = "Amount[]")]
     pub type IMeasures;
     #[wasm_bindgen(typescript_type = "CompactR[][]")]
     pub type ICompactR;
@@ -187,10 +199,12 @@ pub fn format_amount(amount: &IMeasure) -> String {
 }
 
 #[wasm_bindgen]
-pub fn sum_time_amounts(amount: &IMeasures) -> IMeasure {
+pub fn sum_time_amounts(amount: &IAmount) -> IMeasure {
     utils::set_panic_hook();
-    let r: Vec<Measure> = amount.into_serde().unwrap();
-    let sum = add_time_amounts(r);
+    let r: Vec<Amount> = amount.into_serde().unwrap();
+
+    let m = r.into_iter().map(|a| amount_to_measure(a)).collect();
+    let sum = add_time_amounts(m);
     info!("sum {}", sum);
     JsValue::from_serde(&sum).unwrap().into()
 }
