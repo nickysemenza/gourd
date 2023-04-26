@@ -30,8 +30,7 @@ jobs:
       - run: go mod vendor
       - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - run: make wasm-dev
-      - run: docker-compose pull
-      - run: docker-compose build --parallel
+      - run: docker-compose build
       - name: start postgres db
         run: docker-compose up -d db usda_db
       - name: migrate db

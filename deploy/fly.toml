@@ -5,7 +5,7 @@ kill_timeout = 5
 
 
 [build]
-image = "ghcr.io/nickysemenza/gourd-api-go:dev"
+image = "ghcr.io/nickysemenza/gourd-api:dev"
 
 [env]
 TRACE_ADDRESS = "http://tracing.internal:9411/api/v2/spans"

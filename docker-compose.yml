@@ -71,7 +71,6 @@ services:
     ports:
       - "9090:9090"
   gourd:
-    platform: linux/amd64
     build:
       context: .
     depends_on:
@@ -91,8 +90,8 @@ services:
 
   rs:
     build:
-      dockerfile: rust/Dockerfile
       context: .
+    entrypoint: [ "./bin/gourd-rs", "server" ]
     depends_on:
       - db
       - jaeger
