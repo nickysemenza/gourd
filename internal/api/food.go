@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
@@ -161,6 +162,13 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 		}
 
 		if m.FdcId != nil {
+			food, err := a.grabFood(ctx, *m.FdcId)
+			if err != nil {
+				return err
+			}
+			if food == nil {
+				logrus.Warnf("food %d not found,", *m.FdcId)
+			}
 			err = a.DB().AssociateFoodWithIngredient(ctx, ing.Id, *m.FdcId)
 			if err != nil {
 				return err

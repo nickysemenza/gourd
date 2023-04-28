@@ -1,10 +1,9 @@
-use openapi::models::{Amount, IngredientKind, SectionIngredientInput, UnitMapping};
-use tracing::info;
-
+use anyhow::Result;
 use ingredient::{
     unit::{self, Measure, Unit},
     IngredientParser,
 };
+use openapi::models::{Amount, IngredientKind, SectionIngredientInput, UnitMapping};
 
 pub use crate::converter::amount_to_measure;
 
@@ -80,10 +79,8 @@ pub fn parse_ingredient(s: &str) -> Result<SectionIngredientInput, String> {
     let i = dbg!(ingredient::from_str(s2.as_str()));
     Ok(section_ingredient_from_parsed(i, s))
 }
-pub fn parse_amount(s: &str) -> Vec<unit::Measure> {
-    let i = new_ingredient_parser(false).parse_amount(s);
-    info!("parsed {} into {:?}", s, i.clone());
-    return i;
+pub fn parse_amount(s: &str) -> Result<Vec<unit::Measure>> {
+    new_ingredient_parser(false).parse_amount(s)
 }
 
 pub fn new_ingredient_parser(is_rich_text: bool) -> IngredientParser {

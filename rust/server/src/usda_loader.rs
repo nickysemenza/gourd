@@ -1,9 +1,6 @@
 use actix_web::{web, HttpResponse};
 use anyhow::{Context, Result};
-use gourd_common::usda::{
-    branded_food_into_wrapper, foundation_food_into_wrapper, sr_legacy_food_into_wrapper,
-    survey_food_into_wrapper,
-};
+use gourd_common::usda::IntoFoodWrapper;
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use itertools::Itertools;
 use openapi::models::TempFood;
@@ -14,7 +11,7 @@ use std::fmt::Write;
 use std::{fs::File, io::BufReader, path::Path, time::Instant};
 use tracing::info;
 
-use crate::search::{get_client, init_indexes, load, Document, Index};
+use crate::search::{Document, Index, Searcher};
 
 #[tracing::instrument]
 async fn read_and_load_stream<T: Document>(filename: &str, index: Index) -> Result<()> {
@@ -22,7 +19,7 @@ async fn read_and_load_stream<T: Document>(filename: &str, index: Index) -> Resu
         .expect(format!("could not open file {}", filename).as_str());
     let pb = ProgressBar::new(file.metadata()?.len());
     pb.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")
-    .unwrap()
+    ?
     .with_key("eta", |state: &ProgressState, w: &mut dyn Write| write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap())
     .progress_chars("#>-"));
 
@@ -36,11 +33,12 @@ async fn read_and_load_stream<T: Document>(filename: &str, index: Index) -> Resu
         // res.
         let start = Instant::now();
         let res: Vec<T> = value.map(|x| x.unwrap()).collect();
-        load(&res, index).await;
-        // let v = value.unwrap();
+        let s = Searcher::new();
+        s.load(&res, index).await;
+        // let v = value?;
         // data.push(v);
 
-        // println!("{:?}", value.unwrap());
+        // println!("{:?}", value?);
 
         info!(
             "[stream] loaded {} from {} in {:?}",
@@ -50,7 +48,7 @@ async fn read_and_load_stream<T: Document>(filename: &str, index: Index) -> Resu
         );
     }
 
-    // let data: Vec<T> = read_from_file(filename, &index.get_top_level()).unwrap();
+    // let data: Vec<T> = read_from_file(filename, &index.get_top_level())?;
     // load(&data, index).await;
     Ok(())
 }
@@ -59,12 +57,12 @@ fn read_from_file<T: Document>(filename: &str, toplevel: &str) -> Result<Vec<T>>
     // Open the file
     info!("loading {}", filename);
     let start = Instant::now();
-    // let root: Value = serde_json::from_str(data.as_str()).unwrap();
+    // let root: Value = serde_json::from_str(data.as_str())?;
     let file = File::open(Path::new("/Users/nicky/dev/gourd/tmp/usda_json/").join(filename))
         .with_context(|| format!("could not open file {}", filename))?;
     let pb = ProgressBar::new(file.metadata()?.len());
     pb.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")
-    .unwrap()
+    ?
     .with_key("eta", |state: &ProgressState, w: &mut dyn Write| write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap())
     .progress_chars("#>-"));
 
@@ -87,170 +85,137 @@ fn read_from_file<T: Document>(filename: &str, toplevel: &str) -> Result<Vec<T>>
 
 #[tracing::instrument]
 async fn read_and_load<T: Document>(filename: &str, index: Index) -> Result<Vec<T>> {
-    let data: Vec<T> = read_from_file(filename, &index.get_top_level()).unwrap();
-    load(&data, index).await;
+    let data: Vec<T> = read_from_file(filename, &index.get_top_level_json_key())?;
+    Searcher::new().load(&data, index).await;
     Ok(data)
 }
 
-pub async fn load_json_into_search() {
-    // let root: Value = serde_json::from_reader(reader)?;
-
-    init_indexes().await;
-
+pub async fn load_json_into_search() -> Result<()> {
+    Searcher::new().init_indexes().await;
     // return;
     if false {
-        read_and_load_stream::<SrLegacyFoodItem>(
-            // "FoodData_Central_sr_legacy_food_json_2021-10-28.json",
-            "srlegacyfoods.ndjson",
-            Index::SRLegacyFoods,
-        )
-        .await
-        .unwrap();
-        read_and_load_stream::<BrandedFoodItem>(
-            // "FoodData_Central_branded_food_json_2022-10-28.json",
-            "brandedfoods.ndjson",
-            Index::BrandedFoods,
-        )
-        .await
-        .unwrap();
-        read_and_load_stream::<SurveyFoodItem>(
-            // "FoodData_Central_survey_food_json_2022-10-28.json",
-            "surveyfoods.ndjson",
-            Index::SurveyFoods,
-        )
-        .await
-        .unwrap();
+        read_and_load_stream::<SrLegacyFoodItem>("srlegacyfoods.ndjson", Index::SRLegacyFoods)
+            .await?;
+        read_and_load_stream::<BrandedFoodItem>("brandedfoods.ndjson", Index::BrandedFoods).await?;
+        read_and_load_stream::<SurveyFoodItem>("surveyfoods.ndjson", Index::SurveyFoods).await?;
         read_and_load_stream::<FoundationFoodItem>(
-            // "FoodData_Central_foundation_food_json_2022-10-28.json",
             "foundationfoods.ndjson",
             Index::FoundationFoods,
         )
-        .await
-        .unwrap();
+        .await?;
     } else {
         read_and_load::<SrLegacyFoodItem>(
             "FoodData_Central_sr_legacy_food_json_2021-10-28.json",
             Index::SRLegacyFoods,
         )
-        .await
-        .unwrap();
+        .await?;
         read_and_load::<BrandedFoodItem>(
             "FoodData_Central_branded_food_json_2022-04-28.json",
             Index::BrandedFoods,
         )
-        .await
-        .unwrap();
+        .await?;
         read_and_load::<SurveyFoodItem>(
             "FoodData_Central_survey_food_json_2022-10-28.json",
             Index::SurveyFoods,
         )
-        .await
-        .unwrap();
+        .await?;
         read_and_load::<FoundationFoodItem>(
             "FoodData_Central_foundation_food_json_2022-04-28.json",
             Index::FoundationFoods,
         )
-        .await
-        .unwrap();
+        .await?;
     }
+    Ok(())
 }
 
 #[derive(Deserialize, Debug)]
 pub struct URLInput {
     name: String,
 }
+async fn get_usda_by_id(id: &str) -> Result<Option<Result<TempFood>>> {
+    let s = Searcher::new();
 
-#[tracing::instrument]
-async fn search<T: Document>(
-    client: &meilisearch_sdk::Client,
-    index: Index,
-    limit: usize,
-    name: &str,
-) -> Vec<T> {
-    let results = client
-        .index(index)
-        .search()
-        .with_query(name)
-        .with_limit(limit)
-        .execute::<T>()
-        .await
-        .unwrap();
-    info!("searched in {}ms", results.processing_time_ms);
-    results.hits.into_iter().map(|x| x.result).collect()
+    let item = s
+        .get_document::<BrandedFoodItem>(Index::BrandedFoods, id)
+        .await?
+        .map(|x| x.into_wrapper());
+    if item.is_some() {
+        return Ok(item);
+    }
+    let item = s
+        .get_document::<SrLegacyFoodItem>(Index::SRLegacyFoods, id)
+        .await?
+        .map(|x| x.into_wrapper());
+    if item.is_some() {
+        return Ok(item);
+    }
+    let item = s
+        .get_document::<SurveyFoodItem>(Index::SurveyFoods, id)
+        .await?
+        .map(|x| x.into_wrapper());
+    if item.is_some() {
+        return Ok(item);
+    }
+    let item = s
+        .get_document::<FoundationFoodItem>(Index::FoundationFoods, id)
+        .await?
+        .map(|x| x.into_wrapper());
+    if item.is_some() {
+        return Ok(item);
+    }
+    Ok(None)
 }
 
-async fn get_document<T: Document>(
-    client: &meilisearch_sdk::Client,
-    index: Index,
-    name: &str,
-) -> Result<Option<T>> {
-    match client.index(index).get_document::<T>(name).await {
-        Ok(d) => Ok(Some(d)),
-        Err(e) => match e {
-            meilisearch_sdk::errors::Error::Meilisearch(m) => match m.error_code {
-                meilisearch_sdk::errors::ErrorCode::DocumentNotFound => Ok(None),
-                _ => Err(m.into()),
-            },
+pub async fn get_usda(info: web::Query<URLInput>) -> HttpResponse {
+    let id = info.name.as_str();
 
-            _ => Err(e.into()),
+    match get_usda_by_id(id).await.unwrap() {
+        Some(item) => match item {
+            Ok(item) => HttpResponse::Ok().json(item),
+            Err(e) => HttpResponse::InternalServerError().json(e.to_string()),
         },
+        None => HttpResponse::NotFound().json(format!("{} not found", id).to_string()),
     }
 }
 
-#[tracing::instrument(name = "route::search_usda")]
-pub async fn get_usda(info: web::Query<URLInput>) -> HttpResponse {
-    let id = info.name.as_str();
-    let item = get_document::<BrandedFoodItem>(&get_client(), Index::BrandedFoods, id)
-        .await
-        .unwrap();
-    if let Some(item) = item {
-        return HttpResponse::Ok().json(branded_food_into_wrapper(item));
-    };
+async fn search_usda_by_name(name: &str) -> Result<Vec<TempFood>> {
+    let s = Searcher::new();
 
-    let item = get_document::<SrLegacyFoodItem>(&get_client(), Index::SRLegacyFoods, id)
+    let mut a: Vec<TempFood> = s
+        .search::<BrandedFoodItem>(Index::BrandedFoods, 5, name)
         .await
-        .unwrap();
-    if let Some(item) = item {
-        return HttpResponse::Ok().json(sr_legacy_food_into_wrapper(item));
-    };
-
-    let item = get_document::<SurveyFoodItem>(&get_client(), Index::SurveyFoods, id)
-        .await
-        .unwrap();
-    if let Some(item) = item {
-        return HttpResponse::Ok().json(survey_food_into_wrapper(item));
-    };
-
-    let item = get_document::<FoundationFoodItem>(&get_client(), Index::FoundationFoods, id)
-        .await
-        .unwrap();
-    if let Some(item) = item {
-        return HttpResponse::Ok().json(foundation_food_into_wrapper(item));
-    };
-
-    HttpResponse::NotFound().json(format!("{} not found", id).to_string())
+        .context("branded food")?
+        .into_iter()
+        .map(|x| x.into_wrapper())
+        .collect::<Result<Vec<TempFood>>>()
+        .context("branded food")?;
+    let mut b = s
+        .search::<SrLegacyFoodItem>(Index::SRLegacyFoods, 5, name)
+        .await?
+        .into_iter()
+        .map(|x| x.into_wrapper())
+        .collect::<Result<Vec<TempFood>>>()?;
+    let mut c = s
+        .search::<SurveyFoodItem>(Index::SurveyFoods, 5, name)
+        .await?
+        .into_iter()
+        .map(|x| x.into_wrapper())
+        .collect::<Result<Vec<TempFood>>>()?;
+    let mut d = s
+        .search::<FoundationFoodItem>(Index::FoundationFoods, 5, name)
+        .await?
+        .into_iter()
+        .map(|x| x.into_wrapper())
+        .collect::<Result<Vec<TempFood>>>()?;
+    a.append(&mut b);
+    a.append(&mut c);
+    a.append(&mut d);
+    Ok(a)
 }
-
 #[tracing::instrument(name = "route::search_usda")]
 pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {
-    let name = info.name.as_str();
-    let branded_food: Vec<BrandedFoodItem> =
-        search(&get_client(), Index::BrandedFoods, 5, name).await;
-    let legacy_food: Vec<SrLegacyFoodItem> =
-        search(&get_client(), Index::SRLegacyFoods, 5, name).await;
-
-    let mut a: Vec<TempFood> = branded_food
-        .into_iter()
-        .map(branded_food_into_wrapper)
-        .collect();
-    let mut b = legacy_food
-        .into_iter()
-        .map(sr_legacy_food_into_wrapper)
-        .collect();
-    a.append(&mut b);
-
-    HttpResponse::Ok().json(a)
+    match search_usda_by_name(info.name.as_str()).await {
+        Ok(item) => HttpResponse::Ok().json(item),
+        Err(e) => HttpResponse::InternalServerError().json(format!("{:?}", e).to_string()),
+    }
 }
-
-// #[tracing::instrument(name = "route::search_usda")]
-// pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {

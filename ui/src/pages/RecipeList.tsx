@@ -28,6 +28,7 @@ const RecipeList: React.FC = () => {
 
   const [params, setParams] = useState(initialParams);
   const [showOlder, setShowOlder] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(false);
   const [grid, setGrid] = useState(true);
 
   const fetchData = React.useCallback((params: PaginationParameters) => {
@@ -38,7 +39,9 @@ const RecipeList: React.FC = () => {
     queryParams: params,
   });
 
-  const recipes = data?.recipes || [];
+  const recipes = (data?.recipes || []).filter(
+    (r) => showEmpty || r.detail.sections.length > 0
+  );
 
   let future = new Set<RecipeWrapper>();
   let past = new Set<RecipeWrapper>();
@@ -198,7 +201,14 @@ const RecipeList: React.FC = () => {
               onClick: () => {
                 setShowOlder(!showOlder);
               },
-              text: "toggle older",
+              text: showOlder ? "hide older" : "show older",
+              IconLeft: PlusCircle,
+            },
+            {
+              onClick: () => {
+                setShowEmpty(!showEmpty);
+              },
+              text: showEmpty ? "hide empty" : "show empty",
               IconLeft: PlusCircle,
             },
           ]}

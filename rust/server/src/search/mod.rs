@@ -1,6 +1,7 @@
 mod index;
 
 use actix_web::{web, HttpResponse};
+use anyhow::{Context, Result};
 use indicatif::ProgressIterator;
 use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::RecipeDetail;
@@ -10,66 +11,112 @@ use tracing::info;
 
 pub use self::index::Index;
 
-pub fn get_client() -> meilisearch_sdk::Client {
+fn get_client() -> meilisearch_sdk::Client {
     let meilisearch_url = option_env!("MEILISEARCH_URL").unwrap_or("http://localhost:7700");
     let meilisearch_api_key = option_env!("MEILISEARCH_API_KEY").unwrap_or("FOO");
     meilisearch_sdk::Client::new(meilisearch_url, meilisearch_api_key)
 }
 
+#[derive(Debug)]
+
+pub struct Searcher {
+    client: meilisearch_sdk::Client,
+}
+impl Searcher {
+    pub fn new() -> Self {
+        Self {
+            client: get_client(),
+        }
+    }
+
+    #[tracing::instrument]
+    pub async fn search<T: Document>(
+        &self,
+        index: Index,
+        limit: usize,
+        name: &str,
+    ) -> Result<Vec<T>> {
+        let results = self
+            .client
+            .index(index)
+            .search()
+            .with_query(name)
+            .with_limit(limit)
+            .execute::<T>()
+            .await
+            .context(format!("search {} for {}", index, name))?;
+        info!("searched in {}ms", results.processing_time_ms);
+        Ok(results.hits.into_iter().map(|x| x.result).collect())
+    }
+
+    pub async fn get_document<T: Document>(&self, index: Index, name: &str) -> Result<Option<T>> {
+        match self.client.index(index).get_document::<T>(name).await {
+            Ok(d) => Ok(Some(d)),
+            Err(e) => match e {
+                meilisearch_sdk::errors::Error::Meilisearch(m) => match m.error_code {
+                    meilisearch_sdk::errors::ErrorCode::DocumentNotFound => Ok(None),
+                    _ => Err(m.into()),
+                },
+
+                _ => Err(e.into()),
+            },
+        }
+    }
+
+    #[tracing::instrument(skip(data))]
+    pub async fn load<T: Document>(self, data: &Vec<T>, index: Index) {
+        let chunks: Vec<Vec<T>> = data.chunks(2000).map(|x| x.to_vec()).collect();
+
+        let tasks: Vec<_> = chunks
+            .iter()
+            .progress()
+            .map(|v| {
+                let client = self.client.clone();
+                let x = v.clone();
+                let i = index.clone();
+                tokio::spawn(async move { client.index(i).add_documents(&x, None).await.unwrap() })
+            })
+            .collect();
+        let _res = futures::future::join_all(tasks).await;
+
+        info!(
+            "loaded {} items in {} chunks into index {}",
+            data.len(),
+            chunks.len(),
+            index,
+        );
+    }
+
+    #[tracing::instrument]
+    pub async fn init_indexes(self) {
+        for x in Index::iter().progress() {
+            if let Some(attr) = x.get_searchable_attributes() {
+                let task: TaskInfo = self
+                    .client
+                    .index(x)
+                    .set_searchable_attributes(attr)
+                    .await
+                    .unwrap();
+                info!("configured searchable attributes for {}: {:?}", x, task);
+            }
+            if let Some(attr) = x.get_filterable_attributes() {
+                let task: TaskInfo = self
+                    .client
+                    .index(x)
+                    .set_filterable_attributes(attr)
+                    .await
+                    .unwrap();
+                info!("configured filterable attributes for {}: {:?}", x, task);
+            }
+        }
+    }
+}
+
 pub trait Document: Clone + Serialize + DeserializeOwned + Send + Sync + 'static {}
 impl<T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static> Document for T {}
 
-#[tracing::instrument(skip(data))]
-pub async fn load<T: Document>(data: &Vec<T>, index: Index) {
-    // let chunks: Vec<&[FoundationFoodItem]> = legacy.chunks(10).collect();
-    let chunks: Vec<Vec<T>> = data.chunks(2000).map(|x| x.to_vec()).collect();
-
-    let tasks: Vec<_> = chunks
-        .iter()
-        .progress()
-        .map(|v| {
-            let client = get_client();
-            let x = v.clone();
-            let i = index.clone();
-            tokio::spawn(async move { client.index(i).add_documents(&x, None).await.unwrap() })
-        })
-        .collect();
-    let _res = futures::future::join_all(tasks).await;
-
-    info!(
-        "loaded {} items in {} chunks into index {}",
-        data.len(),
-        chunks.len(),
-        index,
-    );
-}
-
 #[tracing::instrument(name = "route::index_recipe_detail", skip(cr))]
 pub async fn index_recipe_detail(cr: web::Json<Vec<RecipeDetail>>) -> HttpResponse {
-    load(&cr.0, Index::RecipeDetails).await;
+    Searcher::new().load(&cr.0, Index::RecipeDetails).await;
     HttpResponse::Ok().json(())
-}
-
-#[tracing::instrument]
-pub async fn init_indexes() {
-    let client = get_client();
-
-    for x in Index::iter().progress() {
-        if let Some(attr) = x.get_searchable_attributes() {
-            let task: TaskInfo = client
-                .index(x)
-                .set_searchable_attributes(attr)
-                .await
-                .unwrap();
-            info!("configured searchable attributes for {}: {:?}", x, task);
-        }
-        if let Some(attr) = x.get_filterable_attributes() {
-            let task: TaskInfo = client
-                .index(x)
-                .set_filterable_attributes(attr)
-                .await
-                .unwrap();
-            info!("configured filterable attributes for {}: {:?}", x, task);
-        }
-    }
 }

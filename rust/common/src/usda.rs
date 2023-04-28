@@ -1,10 +1,10 @@
+use crate::{amount_from_ingredient, parse_amount};
+use anyhow::{Context, Result};
 use openapi::models::{
     Amount, BrandedFoodItem, FoundationFoodItem, SrLegacyFoodItem, SurveyFoodItem, TempFood,
     TempFoodWrapper, UnitMapping,
 };
 use tracing::info;
-
-use crate::{amount_from_ingredient, parse_amount};
 
 pub fn kcal_from_nutrients(nutrients: Vec<openapi::models::FoodNutrient>) -> Option<UnitMapping> {
     for n in nutrients {
@@ -32,75 +32,87 @@ pub fn kcal_from_nutrients(nutrients: Vec<openapi::models::FoodNutrient>) -> Opt
     None
 }
 
-pub fn foo(nutrients: Option<Vec<openapi::models::FoodNutrient>>) -> Vec<UnitMapping> {
+pub fn get_cal_mappings(nutrients: Option<Vec<openapi::models::FoodNutrient>>) -> Vec<UnitMapping> {
     if let Some(m) = kcal_from_nutrients(nutrients.unwrap_or_default()) {
         return vec![m];
     }
     return vec![];
 }
 
-pub fn branded_food_into_wrapper(x: BrandedFoodItem) -> TempFood {
-    let mut mappings = foo(x.food_nutrients.clone());
+pub trait IntoFoodWrapper {
+    fn into_wrapper(self) -> Result<TempFood>;
+}
+impl IntoFoodWrapper for BrandedFoodItem {
+    fn into_wrapper(self) -> Result<TempFood> {
+        let mut mappings = get_cal_mappings(self.food_nutrients.clone());
 
-    if let Some(serving) = x.household_serving_full_text.clone() {
-        info!("going to parse {} for {}", serving, x.fdc_id);
-        let res = parse_amount(&serving);
-        if let Some(b) = res.first() {
-            info!("found {} servings: {:?}", res.len(), res);
-            let mapping = UnitMapping {
-                a: Box::new(Amount {
-                    unit: x.serving_size_unit.clone().unwrap(),
-                    value: x.serving_size.unwrap(),
-                    upper_value: None,
-                    source: None,
-                }),
-                b: Box::new(amount_from_ingredient(b)),
-                source: Some("fdc hs".to_string()),
-            };
-            mappings.push(mapping);
+        if let Some(serving) = self.household_serving_full_text.clone() {
+            if serving != "" {
+                // catch 614264
+                info!("going to parse {} for {}", serving, self.fdc_id);
+                let res = parse_amount(&serving).context("failed to parse serving size")?;
+                if let Some(b) = res.first() {
+                    info!("found {} servings: {:?}", res.len(), res);
+                    let mapping = UnitMapping {
+                        a: Box::new(Amount {
+                            unit: self.serving_size_unit.clone().unwrap(),
+                            value: self.serving_size.unwrap(),
+                            upper_value: None,
+                            source: None,
+                        }),
+                        b: Box::new(amount_from_ingredient(b)),
+                        source: Some("fdc hs".to_string()),
+                    };
+                    mappings.push(mapping);
+                }
+            }
         }
-    }
 
-    TempFood {
-        branded_food: Some(Box::new(x.clone())),
-        food_nutrients: x.food_nutrients,
-        ..TempFood::new(
-            TempFoodWrapper::new(x.fdc_id, x.data_type, x.description),
-            mappings,
-        )
+        Ok(TempFood {
+            branded_food: Some(Box::new(self.clone())),
+            food_nutrients: self.food_nutrients,
+            ..TempFood::new(
+                TempFoodWrapper::new(self.fdc_id, self.data_type, self.description),
+                mappings,
+            )
+        })
     }
 }
-pub fn sr_legacy_food_into_wrapper(x: SrLegacyFoodItem) -> TempFood {
-    TempFood {
-        legacy_food: Some(Box::new(x.clone())),
-        food_nutrients: x.food_nutrients.clone(),
-        ..TempFood::new(
-            TempFoodWrapper::new(x.fdc_id, x.data_type, x.description),
-            foo(x.food_nutrients),
-        )
+impl IntoFoodWrapper for SrLegacyFoodItem {
+    fn into_wrapper(self) -> Result<TempFood> {
+        Ok(TempFood {
+            legacy_food: Some(Box::new(self.clone())),
+            food_nutrients: self.food_nutrients.clone(),
+            ..TempFood::new(
+                TempFoodWrapper::new(self.fdc_id, self.data_type, self.description),
+                get_cal_mappings(self.food_nutrients),
+            )
+        })
     }
 }
-
-pub fn foundation_food_into_wrapper(x: FoundationFoodItem) -> TempFood {
-    TempFood {
-        foundation_food: Some(Box::new(x.clone())),
-        food_nutrients: x.food_nutrients.clone(),
-        ..TempFood::new(
-            TempFoodWrapper::new(x.fdc_id, x.data_type, x.description),
-            foo(x.food_nutrients),
-        )
+impl IntoFoodWrapper for FoundationFoodItem {
+    fn into_wrapper(self) -> Result<TempFood> {
+        Ok(TempFood {
+            foundation_food: Some(Box::new(self.clone())),
+            food_nutrients: self.food_nutrients.clone(),
+            ..TempFood::new(
+                TempFoodWrapper::new(self.fdc_id, self.data_type, self.description),
+                get_cal_mappings(self.food_nutrients),
+            )
+        })
     }
 }
-pub fn survey_food_into_wrapper(x: SurveyFoodItem) -> TempFood {
-    TempFood {
-        survey_food: Some(Box::new(x.clone())),
-        ..TempFood::new(
-            TempFoodWrapper::new(x.fdc_id, x.data_type, x.description),
-            vec![],
-        )
+impl IntoFoodWrapper for SurveyFoodItem {
+    fn into_wrapper(self) -> Result<TempFood> {
+        Ok(TempFood {
+            survey_food: Some(Box::new(self.clone())),
+            ..TempFood::new(
+                TempFoodWrapper::new(self.fdc_id, self.data_type, self.description),
+                vec![],
+            )
+        })
     }
 }
-
 #[cfg(test)]
 mod tests {
     use openapi::models::{Amount, BrandedFoodItem, UnitMapping};

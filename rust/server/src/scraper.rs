@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use openapi::models::{CompactRecipe, CompactRecipeSection};
 use url::Url;
 
-use crate::search::load;
+use crate::search::Searcher;
 
 #[tracing::instrument(name = "route::scrape_recipe")]
 pub async fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
@@ -30,7 +30,9 @@ pub async fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
         }],
     };
 
-    load(&vec![compact.clone()], crate::search::Index::ScrapedRecipes).await;
+    Searcher::new()
+        .load(&vec![compact.clone()], crate::search::Index::ScrapedRecipes)
+        .await;
 
     Ok(compact)
 }

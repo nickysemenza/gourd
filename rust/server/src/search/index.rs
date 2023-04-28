@@ -10,14 +10,14 @@ pub enum Index {
     RecipeDetails,
 }
 impl Index {
-    pub fn get_top_level(&self) -> String {
+    pub fn get_top_level_json_key(&self) -> String {
         match self {
-            Index::BrandedFoods
-            | Index::FoundationFoods
-            | Index::SurveyFoods
-            | Index::SRLegacyFoods => self.to_string(),
+            Index::BrandedFoods => "BrandedFoods".to_string(),
+            Index::FoundationFoods => "FoundationFoods".to_string(),
+            Index::SurveyFoods => "SurveyFoods".to_string(),
+            Index::SRLegacyFoods => "SRLegacyFoods".to_string(),
             Index::ScrapedRecipes | Index::RecipeDetails => {
-                panic!("ScrapedRecipes is not a top level index")
+                panic!("{} is not a top level index", self)
             }
         }
     }

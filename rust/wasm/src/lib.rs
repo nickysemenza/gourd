@@ -1,13 +1,13 @@
 #![allow(deprecated)]
 mod utils;
 
+use gourd_common::usda::IntoFoodWrapper;
 use gourd_common::{
     convert_to,
     ingredient::unit::{add_time_amounts, make_graph, print_graph, Measure},
     parse_unit_mappings,
     parser::amount_to_measure,
     sum_ingredients,
-    usda::branded_food_into_wrapper,
 };
 use openapi::models::{
     Amount, BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest,
@@ -133,7 +133,7 @@ pub fn dolla(conversion_request: &JsValue) -> Result<IMeasure, JsValue> {
 pub fn parse_amount(input: &str) -> Result<IMeasures, JsValue> {
     utils::set_panic_hook();
     let ip = gourd_common::new_ingredient_parser(false);
-    let i = ip.parse_amount(input);
+    let i = ip.parse_amount(input).expect("wasm parse amount");
     Ok(JsValue::from_serde(&i).unwrap().into())
 }
 
@@ -214,6 +214,6 @@ pub fn sum_time_amounts(amount: &IAmount) -> IMeasure {
 #[wasm_bindgen]
 pub fn bfi_to_info(x: &JsValue) -> JsValue {
     let bfi: BrandedFoodItem = x.into_serde().unwrap();
-    let fw = branded_food_into_wrapper(bfi);
+    let fw = bfi.into_wrapper().unwrap();
     JsValue::from_serde(&fw).unwrap()
 }

@@ -30,16 +30,6 @@ const FoodSearch: React.FC<{
     queryParams: {
       name: ingredientName,
       limit,
-      data_types: [
-        "foundation_food",
-        "sample_food",
-        "market_acquisition",
-        "survey_fndds_food",
-        "sub_sample_food",
-        "agricultural_acquisition",
-        "sr_legacy_food",
-        "branded_food",
-      ],
     },
   });
 
@@ -58,7 +48,7 @@ const FoodSearch: React.FC<{
   const items: TempFood[] = [
     ...(reallyLoading ? Array(5).fill(placeholder) : []),
     ...(addon &&
-    results.filter((f) => f.wrapper.fdc_id === addon.wrapper.fdcId).length === 0
+    results.filter((f) => f.wrapper.fdcId === addon.wrapper.fdcId).length === 0
       ? [addon]
       : []),
     ...results,

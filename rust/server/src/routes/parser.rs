@@ -50,7 +50,13 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     );
     let _enter = root.enter();
 
-    let i = gourd_common::parse_amount(&info.text);
+    let i = match gourd_common::parse_amount(&info.text) {
+        Ok(a) => a,
+        Err(e) => {
+            error!("error parsing amount: {:?}", e);
+            return HttpResponse::BadRequest().json("error parsing amount");
+        }
+    };
 
     let foo = web::Json(i);
 

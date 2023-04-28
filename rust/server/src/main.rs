@@ -71,9 +71,8 @@ async fn main() -> std::io::Result<()> {
     if let Some(_m) = matches.subcommand_matches("load_usda") {
         let root = span!(tracing::Level::TRACE, "load_mappings",);
         let _enter = root.enter();
-        usda_loader::load_json_into_search().await;
+        usda_loader::load_json_into_search().await.unwrap();
     }
-    // opentelemetry::global::force_flush_tracer_provider();
 
     Ok(())
 }
