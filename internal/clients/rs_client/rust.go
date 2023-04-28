@@ -33,7 +33,7 @@ func New(baseurl string) *Client {
 	return &Client{baseurl}
 }
 func (c *Client) Call(ctx context.Context, text string, kind parseMethod, target interface{}) error {
-	ctx, span := otel.Tracer("rs_client").Start(ctx, "Parse")
+	ctx, span := otel.Tracer("rs_client").Start(ctx, "Call")
 	defer span.End()
 	url := fmt.Sprintf("%s%s?text=%s", c.baseurl, kind, url.QueryEscape(text))
 

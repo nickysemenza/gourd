@@ -1,0 +1,7 @@
+{
+  // https://github.com/microsoft/vscode/issues/82145#issuecomment-829347865
+  "files.exclude": {
+    "ui": true,
+    "rust": true
+  }
+}

@@ -3,10 +3,7 @@
     {
       // https://code.visualstudio.com/docs/editor/multi-root-workspaces
       "name": "go",
-      "path": ".",
-      "files.exclude": {
-        "ui/*": true
-      }
+      "path": "."
     },
     {
       "path": "ui"
@@ -75,7 +72,7 @@
     ],
     "yaml.schemas": {
       "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json": "openapi.yaml",
-      "../deploy/mapping_schema.json": "ingredient_fdc_mapping.yaml"
+      "data/mapping_schema.json": "ingredient_fdc_mapping.yaml"
     },
     "go.testTimeout": "60s",
     "files.exclude": {
