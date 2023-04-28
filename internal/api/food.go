@@ -2,130 +2,35 @@ package api
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
-	"github.com/nickysemenza/gourd/internal/db/models/usdamodels"
 	log "github.com/sirupsen/logrus"
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-// from usda_food_category
-var catmap = map[int]FoodCategory{
-	1:  {Code: "0100", Description: " Dairy and Egg Products"},
-	2:  {Code: "0200", Description: " Spices and Herbs"},
-	3:  {Code: "0300", Description: " Baby Foods"},
-	4:  {Code: "0400", Description: " Fats and Oils"},
-	5:  {Code: "0500", Description: " Poultry Products"},
-	6:  {Code: "0600", Description: " Soups, Sauces, and Gravies"},
-	7:  {Code: "0700", Description: " Sausages and Luncheon Meats"},
-	8:  {Code: "0800", Description: " Breakfast Cereals"},
-	9:  {Code: "0900", Description: " Fruits and Fruit Juices"},
-	10: {Code: "1000", Description: " Pork Products"},
-	11: {Code: "1100", Description: " Vegetables and Vegetable Products"},
-	12: {Code: "1200", Description: " Nut and Seed Products"},
-	13: {Code: "1300", Description: " Beef Products"},
-	14: {Code: "1400", Description: " Beverages"},
-	15: {Code: "1500", Description: " Finfish and Shellfish Products"},
-	16: {Code: "1600", Description: " Legumes and Legume Products"},
-	17: {Code: "1700", Description: " Lamb, Veal, and Game Products"},
-	18: {Code: "1800", Description: " Baked Products"},
-	19: {Code: "1900", Description: " Sweets"},
-	20: {Code: "2000", Description: " Cereal Grains and Pasta"},
-	21: {Code: "2100", Description: " Fast Foods"},
-	22: {Code: "2200", Description: " Meals, Entrees, and Side Dishes"},
-	23: {Code: "2500", Description: " Snacks"},
-	24: {Code: "3500", Description: " American Indian/Alaska Native Foods"},
-	25: {Code: "3600", Description: " Restaurant Foods"},
-	26: {Code: "4500", Description: " Branded Food Products Database"},
-	27: {Code: "2600", Description: " Quality Control Materials"},
-	28: {Code: "1410", Description: " Alcoholic Beverages"},
-}
-
-func (a *API) foodFromRec(ctx context.Context, foodRec *usdamodels.UsdaFood) (*FoodInfo, error) {
-	if foodRec == nil {
-		return nil, nil
-	}
-
-	f := FoodWrapper{
-		FdcId:       foodRec.FDCID,
-		Description: foodRec.Description.String,
-		DataType:    FoodDataType(foodRec.DataType.String),
-	}
-	if foodRec.FoodCategoryID.Valid {
-		cat, ok := catmap[foodRec.FoodCategoryID.Int]
-		if ok {
-			f.Category = &cat
-		}
-	}
-
-	nutrients := []FoodNutrient{}
-	for _, fn := range foodRec.R.FDCUsdaFoodNutrients {
-		n := fn.R.Nutrient
-		if n == nil {
-			continue
-		}
-		nutrients = append(nutrients, FoodNutrient{
-			Amount:     fn.Amount.Ptr(),
-			DataPoints: fn.DataPoints.Ptr(),
-			Nutrient: &Nutrient{
-				Id:       &n.ID,
-				Name:     &n.Name.String,
-				UnitName: &n.UnitName.String,
-			},
-		})
-
-	}
-	f.Nutrients = nutrients
-
-	if foodRec.R.FDCUsdaBrandedFood != nil {
-		brandInfo := foodRec.R.FDCUsdaBrandedFood
-		f.BrandedInfo = &BrandedFood{
-			BrandOwner:          brandInfo.BrandOwner.Ptr(),
-			BrandedFoodCategory: brandInfo.BrandedFoodCategory.Ptr(),
-			HouseholdServing:    brandInfo.HouseholdServingFulltext.Ptr(),
-			Ingredients:         brandInfo.Ingredients.Ptr(),
-			ServingSize:         brandInfo.ServingSize.Float64,
-			ServingSizeUnit:     brandInfo.ServingSizeUnit.String,
-		}
-	}
-
-	portions := []FoodPortion{}
-	for _, p := range foodRec.R.FDCUsdaFoodPortions {
-		portions = append(portions, FoodPortion{
-			Amount:             p.Amount.Float64,
-			GramWeight:         p.GramWeight.Float64,
-			Id:                 p.ID,
-			Modifier:           p.Modifier.String,
-			PortionDescription: p.PortionDescription.String,
-		})
-	}
-	f.Portions = &portions
-
-	m, err := a.UnitMappingsFromFood(ctx, &f)
+func (a *API) grabFood(ctx context.Context, id int) (*TempFood, error) {
+	ctx, span := a.tracer.Start(ctx, "RecipeFromText")
+	defer span.End()
+	var result *TempFood
+	err := a.R.Send(ctx, "debug/get_usda?name="+url.QueryEscape(fmt.Sprintf("%d", id)), nil, &result)
 	if err != nil {
 		return nil, err
 	}
-	return &FoodInfo{
-		Wrapper:      f,
-		UnitMappings: m,
-	}, nil
+	return result, nil
 }
+
 func (a *API) GetFoodById(c echo.Context, fdcId int) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodById")
 	defer span.End()
 
-	f, err := a.getFoodById(ctx, fdcId)
+	f, err := a.grabFood(ctx, fdcId)
 	if err != nil {
 		return handleErr(c, err)
 	}
@@ -139,23 +44,15 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetFoodsByIds")
 	defer span.End()
 
-	foodRecs, err := usdamodels.UsdaFoods(
-		qm.Where("fdc_id = any(?)", pq.Array(params.FdcId)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
-			usdamodels.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).All(ctx, a.usdaDb.DB())
-	if err != nil {
-		return handleErr(c, err)
-	}
-	items := []FoodInfo{}
-	for _, foodRec := range foodRecs {
-		f, err := a.foodFromRec(ctx, foodRec)
+	items := []TempFood{}
+	for _, id := range params.FdcId {
+		res, err := a.grabFood(ctx, id)
 		if err != nil {
 			return handleErr(c, err)
 		}
-		items = append(items, *f)
+		if res != nil {
+			items = append(items, *res)
+		}
 	}
 
 	listMeta := Items{PageCount: 1}
@@ -182,14 +79,13 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	// 	}
 	// }
 
-	var byItem FoodResultByItem
+	var byItem []TempFood
 	err := a.R.Send(ctx, "debug/search_usda?name="+url.QueryEscape(string(params.Name)), nil, &byItem)
 	if err != nil {
 		return handleErr(c, err)
 	}
 	resp := FoodSearchResult{
-		Foods:   byItem.Info,
-		Results: &byItem,
+		Foods: byItem,
 	}
 
 	// if false {
@@ -209,60 +105,6 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	return c.JSON(http.StatusOK, resp)
 
 }
-
-func (a *API) getFoodById(ctx context.Context, fdcId int) (*FoodInfo, error) {
-	ctx, span := a.tracer.Start(ctx, "getFoodById")
-	defer span.End()
-
-	foodRec, err := usdamodels.UsdaFoods(
-		qm.Where("fdc_id = ?", fdcId),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
-			usdamodels.UsdaFoodNutrientRels.Nutrient)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
-		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
-	).One(ctx, a.usdaDb.DB())
-
-	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, fmt.Errorf("failed to get food with id %d: %w", fdcId, err)
-	}
-
-	f, err := a.foodFromRec(ctx, foodRec)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
-}
-
-// func (a *API) buildPaginatedFood(ctx context.Context, foods []db.Food) ([]FoodInfo, error) {
-// 	ctx, span := a.tracer.Start(ctx, "buildPaginatedFood")
-// 	defer span.End()
-
-// 	ids := []int{}
-// 	for _, food := range foods {
-// 		ids = append(ids, food.FdcID)
-// 	}
-// 	foodRecs, err := usdamodels.UsdaFoods(
-// 		qm.Where("fdc_id = any(?)", pq.Array(ids)),
-// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodNutrients,
-// 			usdamodels.UsdaFoodNutrientRels.Nutrient)),
-// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaBrandedFood)),
-// 		qm.Load(qm.Rels(usdamodels.UsdaFoodRels.FDCUsdaFoodPortions)),
-// 	).All(ctx, a.usdaDb.DB())
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	items := []FoodInfo{}
-// 	for _, foodRec := range foodRecs {
-// 		f, err := a.foodFromRec(ctx, foodRec)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		items = append(items, *f)
-// 	}
-// 	return items, nil
-
-// }
 
 func (a *API) AssociateFoodWithIngredient(c echo.Context, ingredientId string, params AssociateFoodWithIngredientParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "AssociateFoodWithIngredient")

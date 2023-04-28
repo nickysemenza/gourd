@@ -1,5 +1,5 @@
 import {
-  FoodWrapper,
+  TempFood,
   Ingredient,
   IngredientDetail,
   Meal,
@@ -9,7 +9,6 @@ import {
   RecipeWrapper,
   SectionIngredient,
   Amount as Amount2,
-  FoodInfo,
 } from "../api/openapi-hooks/api";
 import update from "immutability-helper";
 import { wasm } from "../wasmContext";
@@ -32,7 +31,7 @@ export type IngredientAttr = "grams" | "amount";
 export type IngredientKind = SectionIngredient["kind"];
 
 export type FoodsById = {
-  [key: number]: FoodInfo;
+  [key: number]: TempFood;
 };
 export type IngDetailsById = {
   [key: string]: IngredientDetail;
@@ -383,18 +382,18 @@ export const flatIngredients = (
 
 export type Stats = {
   grams?: number;
-  dollars?: number;
+  cents?: number;
   kcal?: number;
 };
 const sumStats = (a: Stats, b: Stats) => {
   a.grams = (a.grams || 0) + (b.grams || 0);
-  a.dollars = (a.dollars || 0) + (b.dollars || 0);
+  a.cents = (a.cents || 0) + (b.cents || 0);
   a.kcal = (a.kcal || 0) + (b.kcal || 0);
   return a;
 };
 const scaleStats = (a: Stats, amount: number) => {
   a.grams = (a.grams || 0) * amount;
-  a.dollars = (a.dollars || 0) * amount;
+  a.cents = (a.cents || 0) * amount;
   a.kcal = (a.kcal || 0) * amount;
   return a;
 };
@@ -417,7 +416,7 @@ export const getStats = (
 
   return {
     grams,
-    dollars: si.amounts.filter((a) => isMoney(a)).pop()?.value,
+    cents: si.amounts.filter((a) => isMoney(a)).pop()?.value,
     kcal: si.amounts.filter((a) => isCal(a)).pop()?.value,
   };
 };
@@ -435,7 +434,7 @@ export const countTotals = (
         1 //todo
       )
     )
-    .reduce((a, b) => sumStats(a, b), { grams: 0, dollars: 0 });
+    .reduce((a, b) => sumStats(a, b), { grams: 0, cents: 0 });
 
 export const sumIngredients = (sections?: RecipeSection[]) => {
   let recipes: Record<string, SectionIngredient[]> = {};
@@ -462,9 +461,11 @@ export const sumIngredients = (sections?: RecipeSection[]) => {
   return { recipes, ingredients };
 };
 
-export const getCalories = (food: FoodWrapper) => {
+export const getCalories = (food: TempFood) => {
   console.log({ food });
-  const first = food.nutrients.find((n) => n.nutrient?.unitName === "KCAL");
+  const first = (food.foodNutrients || []).find(
+    (n) => n.nutrient?.unitName === "kcal"
+  );
   return (!!first && first.amount) || 0;
 };
 
@@ -493,9 +494,9 @@ export const calCalc = (
           const hint = hints[fdc_id];
           if (hint !== undefined) {
             const scalingFactor = (getGramsFromSI(si) / 100) * multiplier;
-            const cal = getCalories(hint.wrapper) * scalingFactor;
+            const cal = getCalories(hint) * scalingFactor;
             const ingNutrients = new Map<string, number>();
-            hint.wrapper.nutrients.forEach((n) => {
+            (hint.foodNutrients || []).forEach((n) => {
               if (n.nutrient === undefined || n.amount === undefined) return;
               const { name, unitName } = n.nutrient;
               const label = `${name} (${unitName})`;
@@ -577,7 +578,7 @@ export const extractIngredientID = (
 };
 
 export const isCal = (a: Amount) => a.unit === "kcal";
-export const isMoney = (a: Amount) => a.unit === "$";
+export const isMoney = (a: Amount) => a.unit === "cent";
 export const isVolume = (a: Amount) => !isGram(a) && !isMoney(a) && !isCal(a);
 export const isGram = (a: Amount) =>
   a.unit === "grams" || a.unit === "gram" || a.unit === "g";

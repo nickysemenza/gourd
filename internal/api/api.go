@@ -23,7 +23,7 @@ import (
 )
 
 type API struct {
-	db, usdaDb *db.Client
+	db         *db.Client
 	Google     *google.Client
 	GPhotos    *gphotos.Photos
 	Auth       *auth.Auth
@@ -33,12 +33,11 @@ type API struct {
 	tracer     trace.Tracer
 }
 
-func New(db, usdaDb *db.Client, g *google.Client, auth *auth.Auth,
+func New(db *db.Client, g *google.Client, auth *auth.Auth,
 	r *rs_client.Client, notion *notion.Client,
 	imageStore image.Store) *API {
 	a := API{
 		db:         db,
-		usdaDb:     usdaDb,
 		Google:     g,
 		Auth:       auth,
 		R:          r,

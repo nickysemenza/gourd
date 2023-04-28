@@ -289,7 +289,7 @@ export interface IngredientDetail {
    * Ingredients that are equivalent
    */
   children?: IngredientDetail[];
-  food?: FoodInfo;
+  food?: TempFood;
   /**
    * mappings of equivalent units
    */
@@ -563,81 +563,8 @@ export interface PaginatedMeals {
  * pages of Food
  */
 export interface PaginatedFoods {
-  foods?: FoodInfo[];
+  foods?: TempFood[];
   meta: Items;
-}
-
-/**
- * food category, set for some
- */
-export interface FoodCategory {
-  /**
-   * Food description
-   */
-  code: string;
-  /**
-   * Food description
-   */
-  description: string;
-}
-
-/**
- * branded_food
- */
-export interface BrandedFood {
-  brand_owner?: string;
-  ingredients?: string;
-  serving_size: number;
-  serving_size_unit: string;
-  household_serving?: string;
-  branded_food_category?: string;
-}
-
-/**
- * food_portion
- */
-export interface FoodPortion {
-  id: number;
-  amount: number;
-  portion_description: string;
-  modifier: string;
-  gram_weight: number;
-}
-
-/**
- * A top level food
- */
-export interface FoodWrapper {
-  /**
-   * FDC Id
-   */
-  fdc_id: number;
-  /**
-   * Food description
-   */
-  description: string;
-  data_type: FoodDataType;
-  category?: FoodCategory;
-  /**
-   * todo
-   */
-  nutrients: FoodNutrient[];
-  /**
-   * portion datapoints
-   */
-  portions?: FoodPortion[];
-  branded_info?: BrandedFood;
-}
-
-/**
- * A top level food?
- */
-export interface FoodInfo {
-  wrapper: FoodWrapper;
-  /**
-   * mappings of equivalent units
-   */
-  unit_mappings: UnitMapping[];
 }
 
 /**
@@ -657,16 +584,6 @@ export interface MealRecipeUpdate {
    */
   action: "add" | "remove";
 }
-
-export type FoodDataType =
-  | "foundation_food"
-  | "sample_food"
-  | "market_acquisition"
-  | "survey_fndds_food"
-  | "sub_sample_food"
-  | "agricultural_acquisition"
-  | "sr_legacy_food"
-  | "branded_food";
 
 export type IngredientKind = "ingredient" | "recipe";
 
@@ -784,19 +701,24 @@ export interface CompactRecipe {
  * A meal, which bridges recipes to photos
  */
 export interface FoodSearchResult {
-  foods: FoodInfo[];
-  results?: FoodResultByItem;
+  foods: TempFood[];
 }
 
-/**
- * A meal, which bridges recipes to photos
- */
-export interface FoodResultByItem {
-  branded_food: BrandedFoodItem[];
-  foundation_food: FoundationFoodItem[];
-  legacy_food: SRLegacyFoodItem[];
-  survey_food: SurveyFoodItem[];
-  info: FoodInfo[];
+export interface TempFood {
+  wrapper:
+    | BrandedFoodItem
+    | FoundationFoodItem
+    | SRLegacyFoodItem
+    | SurveyFoodItem;
+  branded_food?: BrandedFoodItem;
+  foundation_food?: FoundationFoodItem;
+  legacy_food?: SRLegacyFoodItem;
+  survey_food?: SurveyFoodItem;
+  /**
+   * mappings of equivalent units
+   */
+  unit_mappings: UnitMapping[];
+  foodNutrients?: FoodNutrient[];
 }
 
 /**
@@ -949,7 +871,7 @@ export interface BrandedFoodItem {
   };
 }
 
-export interface SchemasFoodCategory {
+export interface FoodCategory {
   id?: number;
   code?: string;
   description?: string;
@@ -971,7 +893,7 @@ export interface MeasureUnit {
   name?: string;
 }
 
-export interface SchemasFoodPortion {
+export interface FoodPortion {
   id?: number;
   amount?: number;
   dataPoints?: number;
@@ -989,7 +911,7 @@ export interface SampleFoodItem {
   description: string;
   foodClass?: string;
   publicationDate?: string;
-  foodAttributes?: SchemasFoodCategory[];
+  foodAttributes?: FoodCategory[];
 }
 
 /**
@@ -1016,10 +938,10 @@ export interface FoundationFoodItem {
   ndbNumber?: number;
   publicationDate?: string;
   scientificName?: string;
-  foodCategory?: SchemasFoodCategory;
+  foodCategory?: FoodCategory;
   foodComponents?: FoodComponent[];
   foodNutrients?: FoodNutrient[];
-  foodPortions?: SchemasFoodPortion[];
+  foodPortions?: FoodPortion[];
   inputFoods?: InputFoodFoundation[];
   nutrientConversionFactors?: NutrientConversionFactors[];
 }
@@ -1033,14 +955,14 @@ export interface SRLegacyFoodItem {
   ndbNumber?: number;
   publicationDate?: string;
   scientificName?: string;
-  foodCategory?: SchemasFoodCategory;
+  foodCategory?: FoodCategory;
   foodNutrients?: FoodNutrient[];
   nutrientConversionFactors?: NutrientConversionFactors[];
 }
 
 export interface SurveyFoodItem {
   fdcId: number;
-  datatype?: string;
+  dataType: string;
   description: string;
   endDate?: string;
   foodClass?: string;
@@ -1048,7 +970,7 @@ export interface SurveyFoodItem {
   publicationDate?: string;
   startDate?: string;
   foodAttributes?: FoodAttribute[];
-  foodPortions?: SchemasFoodPortion[];
+  foodPortions?: FoodPortion[];
   inputFoods?: InputFoodSurvey[];
   wweiaFoodCategory?: WweiaFoodCategory;
 }
@@ -2144,7 +2066,7 @@ export interface GetFoodByIdPathParams {
 }
 
 export type GetFoodByIdProps = Omit<
-  GetProps<FoodInfo, Error, void, GetFoodByIdPathParams>,
+  GetProps<TempFood, Error, void, GetFoodByIdPathParams>,
   "path"
 > &
   GetFoodByIdPathParams;
@@ -2155,14 +2077,14 @@ export type GetFoodByIdProps = Omit<
  * todo
  */
 export const GetFoodById = ({ fdc_id, ...props }: GetFoodByIdProps) => (
-  <Get<FoodInfo, Error, void, GetFoodByIdPathParams>
+  <Get<TempFood, Error, void, GetFoodByIdPathParams>
     path={`/foods/${fdc_id}`}
     {...props}
   />
 );
 
 export type UseGetFoodByIdProps = Omit<
-  UseGetProps<FoodInfo, Error, void, GetFoodByIdPathParams>,
+  UseGetProps<TempFood, Error, void, GetFoodByIdPathParams>,
   "path"
 > &
   GetFoodByIdPathParams;
@@ -2173,7 +2095,7 @@ export type UseGetFoodByIdProps = Omit<
  * todo
  */
 export const useGetFoodById = ({ fdc_id, ...props }: UseGetFoodByIdProps) =>
-  useGet<FoodInfo, Error, void, GetFoodByIdPathParams>(
+  useGet<TempFood, Error, void, GetFoodByIdPathParams>(
     (paramsInPath: GetFoodByIdPathParams) => `/foods/${paramsInPath.fdc_id}`,
     { pathParams: { fdc_id }, ...props }
   );
@@ -2240,10 +2162,6 @@ export interface SearchFoodsQueryParams {
    * The search query (name).
    */
   name: string;
-  /**
-   * The data types
-   */
-  data_types?: FoodDataType[];
 }
 
 export type SearchFoodsProps = Omit<

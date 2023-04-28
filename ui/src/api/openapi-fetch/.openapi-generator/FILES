@@ -11,7 +11,6 @@ apis/index.ts
 index.ts
 models/Amount.ts
 models/AuthResp.ts
-models/BrandedFood.ts
 models/BrandedFoodItem.ts
 models/BrandedFoodItemLabelNutrients.ts
 models/BrandedFoodItemLabelNutrientsCalcium.ts
@@ -33,16 +32,12 @@ models/FoodAttribute.ts
 models/FoodAttributeFoodAttributeType.ts
 models/FoodCategory.ts
 models/FoodComponent.ts
-models/FoodDataType.ts
-models/FoodInfo.ts
 models/FoodNutrient.ts
 models/FoodNutrientDerivation.ts
 models/FoodNutrientSource.ts
 models/FoodPortion.ts
-models/FoodResultByItem.ts
 models/FoodSearchResult.ts
 models/FoodUpdateLog.ts
-models/FoodWrapper.ts
 models/FoundationFoodItem.ts
 models/GooglePhotosAlbum.ts
 models/Ingredient.ts
@@ -83,8 +78,6 @@ models/RecipeWrapperInput.ts
 models/RetentionFactor.ts
 models/SRLegacyFoodItem.ts
 models/SampleFoodItem.ts
-models/SchemasFoodCategory.ts
-models/SchemasFoodPortion.ts
 models/ScrapeRecipeRequest.ts
 models/SearchResult.ts
 models/SectionIngredient.ts
@@ -94,6 +87,8 @@ models/SectionInstructionInput.ts
 models/SumRecipesRequest.ts
 models/SumsResponse.ts
 models/SurveyFoodItem.ts
+models/TempFood.ts
+models/TempFoodWrapper.ts
 models/UnitConversionRequest.ts
 models/UnitMapping.ts
 models/UsageValue.ts

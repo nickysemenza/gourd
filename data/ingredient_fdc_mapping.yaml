@@ -216,7 +216,7 @@
         value: 2
       source: tjs
 - name: milk
-  fdc_id: 726156
+  fdc_id: 746782
   aliases: ["whole milk"]
   unit_mappings:
     - a:

@@ -14,23 +14,29 @@
 
 import { exists, mapValues } from '../runtime';
 /**
- * food category, set for some
+ * 
  * @export
  * @interface FoodCategory
  */
 export interface FoodCategory {
     /**
-     * Food description
-     * @type {string}
+     * 
+     * @type {number}
      * @memberof FoodCategory
      */
-    code: string;
+    id?: number;
     /**
-     * Food description
+     * 
      * @type {string}
      * @memberof FoodCategory
      */
-    description: string;
+    code?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FoodCategory
+     */
+    description?: string;
 }
 
 /**
@@ -38,8 +44,6 @@ export interface FoodCategory {
  */
 export function instanceOfFoodCategory(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "code" in value;
-    isInstance = isInstance && "description" in value;
 
     return isInstance;
 }
@@ -54,8 +58,9 @@ export function FoodCategoryFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'code': json['code'],
-        'description': json['description'],
+        'id': !exists(json, 'id') ? undefined : json['id'],
+        'code': !exists(json, 'code') ? undefined : json['code'],
+        'description': !exists(json, 'description') ? undefined : json['description'],
     };
 }
 
@@ -68,6 +73,7 @@ export function FoodCategoryToJSON(value?: FoodCategory | null): any {
     }
     return {
         
+        'id': value.id,
         'code': value.code,
         'description': value.description,
     };

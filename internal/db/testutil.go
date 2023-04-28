@@ -14,29 +14,22 @@ import (
 )
 
 // NewTestDB makes a test DB.
-func NewTestDB(t *testing.T, kind Kind) *Client {
+func NewTestDB(t *testing.T) *Client {
 	viper.SetDefault("DATABASE_URL", "postgres://gourd:gourd@localhost:5555/food")
 	viper.SetDefault("DATABASE_URL_USDA", "postgres://gourd:gourd@localhost:5556/usda")
 	viper.AutomaticEnv()
 
-	var dsn string
-	if kind == USDA {
-		dsn = viper.GetString("DATABASE_URL_USDA") + "?sslmode=disable"
-	} else {
-		dsn = viper.GetString("DATABASE_URL") + "?sslmode=disable"
-	}
+	dsn := viper.GetString("DATABASE_URL") + "?sslmode=disable"
 	dbConn, err := sql.Open("postgres", dsn)
 	require.NoError(t, err)
 
 	ctx := context.Background()
-	if kind == Gourd {
-		err = AutoMigrate(ctx, dbConn, false)
-		require.NoError(t, err)
-		err = AutoMigrate(ctx, dbConn, true)
-		require.NoError(t, err)
-	}
+	err = AutoMigrate(ctx, dbConn, false)
+	require.NoError(t, err)
+	err = AutoMigrate(ctx, dbConn, true)
+	require.NoError(t, err)
 
-	d, err := New(dbConn, kind)
+	d, err := New(dbConn)
 	require.NoError(t, err)
 	return d
 }

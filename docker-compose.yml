@@ -21,17 +21,6 @@ services:
         "-c",
         "log_line_prefix=%t [%p]:[%l] user=%u, db=%d "
       ]
-  usda_db:
-    image: postgres:15.2
-    volumes:
-      - ./usda/migrate-up.sql:/docker-entrypoint-initdb.d/migrate.sql
-    restart: always
-    ports:
-      - "5556:5432"
-    environment:
-      POSTGRES_USER: gourd
-      POSTGRES_PASSWORD: gourd
-      POSTGRES_DB: usda
   jaeger:
     container_name: food-jaeger
     environment:

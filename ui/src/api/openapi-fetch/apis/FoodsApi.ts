@@ -15,23 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
-  FoodDataType,
-  FoodInfo,
   FoodSearchResult,
   PaginatedFoods,
   RecipeDetail,
+  TempFood,
 } from '../models';
 import {
-    FoodDataTypeFromJSON,
-    FoodDataTypeToJSON,
-    FoodInfoFromJSON,
-    FoodInfoToJSON,
     FoodSearchResultFromJSON,
     FoodSearchResultToJSON,
     PaginatedFoodsFromJSON,
     PaginatedFoodsToJSON,
     RecipeDetailFromJSON,
     RecipeDetailToJSON,
+    TempFoodFromJSON,
+    TempFoodToJSON,
 } from '../models';
 
 export interface FoodsApiAssociateFoodWithIngredientRequest {
@@ -51,7 +48,6 @@ export interface FoodsApiSearchFoodsRequest {
     name: string;
     offset?: number;
     limit?: number;
-    dataTypes?: Array<FoodDataType>;
 }
 
 /**
@@ -111,7 +107,7 @@ export class FoodsApi extends runtime.BaseAPI {
      * todo
      * get a FDC entry by id
      */
-    async getFoodByIdRaw(requestParameters: FoodsApiGetFoodByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FoodInfo>> {
+    async getFoodByIdRaw(requestParameters: FoodsApiGetFoodByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TempFood>> {
         if (requestParameters.fdcId === null || requestParameters.fdcId === undefined) {
             throw new runtime.RequiredError('fdcId','Required parameter requestParameters.fdcId was null or undefined when calling getFoodById.');
         }
@@ -135,14 +131,14 @@ export class FoodsApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => FoodInfoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => TempFoodFromJSON(jsonValue));
     }
 
     /**
      * todo
      * get a FDC entry by id
      */
-    async getFoodById(requestParameters: FoodsApiGetFoodByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FoodInfo> {
+    async getFoodById(requestParameters: FoodsApiGetFoodByIdRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TempFood> {
         const response = await this.getFoodByIdRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -212,10 +208,6 @@ export class FoodsApi extends runtime.BaseAPI {
 
         if (requestParameters.name !== undefined) {
             queryParameters['name'] = requestParameters.name;
-        }
-
-        if (requestParameters.dataTypes) {
-            queryParameters['data_types'] = requestParameters.dataTypes;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

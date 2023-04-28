@@ -22,40 +22,27 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
-func getDBConn(dsn string, kind db.Kind) (*sql.DB, error) {
+func getDBConn(dsn string) (*sql.DB, error) {
 
 	if !strings.Contains(dsn, "sslmode=disable") {
 		dsn += "?sslmode=disable"
 	}
 	log.Info("connecting to db: ", dsn)
 	dbConn, err := otelsql.Open("postgres", dsn,
-		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
-		otelsql.WithDBName(fmt.Sprintf("%s_db", kind)))
+		otelsql.WithAttributes(semconv.DBSystemPostgreSQL))
 
 	return dbConn, err
 }
 func makeServer(ctx context.Context) (*server.Server, error) {
 
 	// postgres database
-	dbConn, err := getDBConn(viper.GetString("DATABASE_URL"), db.Gourd)
+	dbConn, err := getDBConn(viper.GetString("DATABASE_URL"))
 	if err != nil {
 		err := fmt.Errorf("failed to init db conn: %w", err)
 		log.Fatal(err)
 	}
 
-	dbConnUSDA, err := getDBConn(viper.GetString("DATABASE_URL_USDA"), db.USDA)
-	if err != nil {
-		err := fmt.Errorf("failed to init db conn: %w", err)
-		log.Fatal(err)
-	}
-
-	dbClient, err := db.New(dbConn, db.Gourd)
-	if err != nil {
-		err := fmt.Errorf("failed to init db: %w", err)
-		log.Fatal(err)
-	}
-
-	dbClientUSDA, err := db.New(dbConnUSDA, db.USDA)
+	dbClient, err := db.New(dbConn)
 	if err != nil {
 		err := fmt.Errorf("failed to init db: %w", err)
 		log.Fatal(err)
@@ -98,7 +85,7 @@ func makeServer(ctx context.Context) (*server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	m := api.New(dbClient, dbClientUSDA, gClient, auth, r, n, i)
+	m := api.New(dbClient, gClient, auth, r, n, i)
 	s.APIManager = m
 
 	// server

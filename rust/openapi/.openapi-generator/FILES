@@ -8,7 +8,6 @@ src/apis/mod.rs
 src/lib.rs
 src/models/amount.rs
 src/models/auth_resp.rs
-src/models/branded_food.rs
 src/models/branded_food_item.rs
 src/models/branded_food_item_label_nutrients.rs
 src/models/branded_food_item_label_nutrients_calcium.rs
@@ -31,16 +30,12 @@ src/models/food_attribute.rs
 src/models/food_attribute_food_attribute_type.rs
 src/models/food_category.rs
 src/models/food_component.rs
-src/models/food_data_type.rs
-src/models/food_info.rs
 src/models/food_nutrient.rs
 src/models/food_nutrient_derivation.rs
 src/models/food_nutrient_source.rs
 src/models/food_portion.rs
-src/models/food_result_by_item.rs
 src/models/food_search_result.rs
 src/models/food_update_log.rs
-src/models/food_wrapper.rs
 src/models/foundation_food_item.rs
 src/models/google_photos_album.rs
 src/models/ingredient.rs
@@ -80,8 +75,6 @@ src/models/recipe_wrapper.rs
 src/models/recipe_wrapper_input.rs
 src/models/retention_factor.rs
 src/models/sample_food_item.rs
-src/models/schemas_food_category.rs
-src/models/schemas_food_portion.rs
 src/models/scrape_recipe_request.rs
 src/models/search_result.rs
 src/models/section_ingredient.rs
@@ -92,6 +85,8 @@ src/models/sr_legacy_food_item.rs
 src/models/sum_recipes_request.rs
 src/models/sums_response.rs
 src/models/survey_food_item.rs
+src/models/temp_food.rs
+src/models/temp_food_wrapper.rs
 src/models/unit_conversion_request.rs
 src/models/unit_mapping.rs
 src/models/usage_value.rs

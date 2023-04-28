@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -34,20 +33,12 @@ const (
 	ingredientsTable   = "ingredients"
 )
 
-type Kind string
-
-const (
-	Gourd Kind = "gourd"
-	USDA  Kind = "usda"
-)
-
 // Client is a database client
 type Client struct {
 	db     *sqlx.DB
 	psql   sq.StatementBuilderType
 	cache  *ristretto.Cache
 	tracer trace.Tracer
-	kind   Kind
 }
 
 func (c *Client) DB() *sqlx.DB {
@@ -208,7 +199,7 @@ type IngredientUnitMapping struct {
 }
 
 // New creates a new Client.
-func New(dbConn *sql.DB, kind Kind) (*Client, error) {
+func New(dbConn *sql.DB) (*Client, error) {
 	dbx := sqlx.NewDb(dbConn, "postgres")
 	if err := dbx.Ping(); err != nil {
 		return nil, err
@@ -229,7 +220,6 @@ func New(dbConn *sql.DB, kind Kind) (*Client, error) {
 		psql:   sq.StatementBuilder.PlaceholderFormat(sq.Dollar),
 		cache:  cache,
 		tracer: otel.Tracer("db"),
-		kind:   kind,
 	}, nil
 }
 
@@ -260,12 +250,7 @@ func (c *Client) AssignIds(ctx context.Context, r *RecipeDetail) error {
 	return nil
 }
 func (c *Client) lintQuery(query string) error {
-	hasUSDA := strings.Contains(query, "usda_")
-	if hasUSDA && c.kind != USDA {
-		return fmt.Errorf("tried to query usda on wrong db: %s", c.kind)
-	} else if !hasUSDA && c.kind == USDA {
-		return fmt.Errorf("tried to query non-usda on wrong usda: %s", c.kind)
-	}
+
 	return nil
 }
 func (c *Client) getContext(ctx context.Context, q sq.SelectBuilder, dest interface{}) error {

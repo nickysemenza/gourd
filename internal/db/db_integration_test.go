@@ -13,11 +13,11 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-//nolint: funlen
+// nolint: funlen
 func TestInsertGet(t *testing.T) {
 	ctx := context.Background()
 	require := require.New(t)
-	db := NewTestDB(t, Gourd)
+	db := NewTestDB(t)
 
 	all1, _, err := db.GetRecipesDetails(ctx, "")
 	require.NoError(err)

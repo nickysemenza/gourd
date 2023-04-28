@@ -13,18 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { FoodInfo } from './FoodInfo';
+import type { TempFood } from './TempFood';
 import {
-    FoodInfoFromJSON,
-    FoodInfoFromJSONTyped,
-    FoodInfoToJSON,
-} from './FoodInfo';
-import type { FoodResultByItem } from './FoodResultByItem';
-import {
-    FoodResultByItemFromJSON,
-    FoodResultByItemFromJSONTyped,
-    FoodResultByItemToJSON,
-} from './FoodResultByItem';
+    TempFoodFromJSON,
+    TempFoodFromJSONTyped,
+    TempFoodToJSON,
+} from './TempFood';
 
 /**
  * A meal, which bridges recipes to photos
@@ -34,16 +28,10 @@ import {
 export interface FoodSearchResult {
     /**
      * 
-     * @type {Array<FoodInfo>}
+     * @type {Array<TempFood>}
      * @memberof FoodSearchResult
      */
-    foods: Array<FoodInfo>;
-    /**
-     * 
-     * @type {FoodResultByItem}
-     * @memberof FoodSearchResult
-     */
-    results?: FoodResultByItem;
+    foods: Array<TempFood>;
 }
 
 /**
@@ -66,8 +54,7 @@ export function FoodSearchResultFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'foods': ((json['foods'] as Array<any>).map(FoodInfoFromJSON)),
-        'results': !exists(json, 'results') ? undefined : FoodResultByItemFromJSON(json['results']),
+        'foods': ((json['foods'] as Array<any>).map(TempFoodFromJSON)),
     };
 }
 
@@ -80,8 +67,7 @@ export function FoodSearchResultToJSON(value?: FoodSearchResult | null): any {
     }
     return {
         
-        'foods': ((value.foods as Array<any>).map(FoodInfoToJSON)),
-        'results': FoodResultByItemToJSON(value.results),
+        'foods': ((value.foods as Array<any>).map(TempFoodToJSON)),
     };
 }
 

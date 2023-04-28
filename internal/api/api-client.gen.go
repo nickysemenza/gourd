@@ -826,22 +826,6 @@ func NewSearchFoodsRequest(server string, params *SearchFoodsParams) (*http.Requ
 		}
 	}
 
-	if params.DataTypes != nil {
-
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "data_types", runtime.ParamLocationQuery, *params.DataTypes); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
-				}
-			}
-		}
-
-	}
-
 	queryURL.RawQuery = queryValues.Encode()
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -2113,7 +2097,7 @@ func (r SearchFoodsResponse) StatusCode() int {
 type GetFoodByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *FoodInfo
+	JSON200      *TempFood
 	JSONDefault  *Error
 }
 
@@ -3094,7 +3078,7 @@ func ParseGetFoodByIdResponse(rsp *http.Response) (*GetFoodByIdResponse, error) 
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest FoodInfo
+		var dest TempFood
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

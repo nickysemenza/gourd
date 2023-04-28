@@ -9,10 +9,13 @@ import {
 } from "react-instantsearch-hooks-web";
 
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
-import { BrandedFoodItem, RecipeDetail } from "../api/openapi-hooks/api";
+import {
+  BrandedFoodItem,
+  RecipeDetail,
+  TempFood,
+} from "../api/openapi-hooks/api";
 import { WasmContext } from "../wasmContext";
 import { FoodRow } from "../components/FoodSearch";
-import { FoodInfo } from "../api/openapi-fetch";
 import { RecipeGridCell } from "../components/RecipeGrid";
 
 const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
@@ -20,7 +23,7 @@ const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
 function BrandedHit(props: { hit: any }) {
   let hit = props.hit as BrandedFoodItem;
   const w = useContext(WasmContext);
-  let f: FoodInfo | undefined = w?.bfi_to_info(hit);
+  let f: TempFood | undefined = w?.bfi_to_info(hit);
   return (
     <div className="border-1">
       {f && (

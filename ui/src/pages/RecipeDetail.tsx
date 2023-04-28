@@ -174,7 +174,7 @@ const RecipeDetail: React.FC = () => {
   //https://stackoverflow.com/a/26265095
   const hints: FoodsById = Object.assign(
     {},
-    ...(foods?.foods || []).map((s) => ({ [s.wrapper.fdc_id]: s }))
+    ...(foods?.foods || []).map((s) => ({ [s.wrapper.fdcId]: s }))
   );
   const ing_hints: IngDetailsById = Object.assign(
     {},
@@ -346,7 +346,7 @@ const RecipeDetail: React.FC = () => {
   );
   const {
     grams: totalGrams,
-    dollars: totalDollars,
+    cents: totalCents,
     kcal: totalKCal,
   } = countTotals(recipe.detail.sections, w, ing_hints);
 
@@ -525,12 +525,10 @@ const RecipeDetail: React.FC = () => {
               ` (${scaledRound(totalKCal / quantity)} per ${singular(unit)})`}
           </div>
           <div>
-            dollars: {totalDollars}
-            {totalDollars &&
+            cents: {totalCents}
+            {totalCents &&
               quantity > 0 &&
-              ` (${scaledRound(totalDollars / quantity)} per ${singular(
-                unit
-              )})`}
+              ` (${scaledRound(totalCents / quantity)} per ${singular(unit)})`}
           </div>
           <div>
             grams: {totalGrams}

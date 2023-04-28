@@ -1,9 +1,12 @@
 use actix_web::{web, HttpResponse};
 use anyhow::{Context, Result};
-use gourd_common::usda::food_info_from_branded_food_item;
+use gourd_common::usda::{
+    branded_food_into_wrapper, foundation_food_into_wrapper, sr_legacy_food_into_wrapper,
+    survey_food_into_wrapper,
+};
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use itertools::Itertools;
-use openapi::models::FoodResultByItem;
+use openapi::models::TempFood;
 use openapi::models::{BrandedFoodItem, FoundationFoodItem, SrLegacyFoodItem, SurveyFoodItem};
 use serde::Deserialize;
 use serde_json::{Deserializer, Value};
@@ -176,24 +179,78 @@ async fn search<T: Document>(
     results.hits.into_iter().map(|x| x.result).collect()
 }
 
+async fn get_document<T: Document>(
+    client: &meilisearch_sdk::Client,
+    index: Index,
+    name: &str,
+) -> Result<Option<T>> {
+    match client.index(index).get_document::<T>(name).await {
+        Ok(d) => Ok(Some(d)),
+        Err(e) => match e {
+            meilisearch_sdk::errors::Error::Meilisearch(m) => match m.error_code {
+                meilisearch_sdk::errors::ErrorCode::DocumentNotFound => Ok(None),
+                _ => Err(m.into()),
+            },
+
+            _ => Err(e.into()),
+        },
+    }
+}
+
+#[tracing::instrument(name = "route::search_usda")]
+pub async fn get_usda(info: web::Query<URLInput>) -> HttpResponse {
+    let id = info.name.as_str();
+    let item = get_document::<BrandedFoodItem>(&get_client(), Index::BrandedFoods, id)
+        .await
+        .unwrap();
+    if let Some(item) = item {
+        return HttpResponse::Ok().json(branded_food_into_wrapper(item));
+    };
+
+    let item = get_document::<SrLegacyFoodItem>(&get_client(), Index::SRLegacyFoods, id)
+        .await
+        .unwrap();
+    if let Some(item) = item {
+        return HttpResponse::Ok().json(sr_legacy_food_into_wrapper(item));
+    };
+
+    let item = get_document::<SurveyFoodItem>(&get_client(), Index::SurveyFoods, id)
+        .await
+        .unwrap();
+    if let Some(item) = item {
+        return HttpResponse::Ok().json(survey_food_into_wrapper(item));
+    };
+
+    let item = get_document::<FoundationFoodItem>(&get_client(), Index::FoundationFoods, id)
+        .await
+        .unwrap();
+    if let Some(item) = item {
+        return HttpResponse::Ok().json(foundation_food_into_wrapper(item));
+    };
+
+    HttpResponse::NotFound().json(format!("{} not found", id).to_string())
+}
+
 #[tracing::instrument(name = "route::search_usda")]
 pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {
     let name = info.name.as_str();
     let branded_food: Vec<BrandedFoodItem> =
         search(&get_client(), Index::BrandedFoods, 5, name).await;
+    let legacy_food: Vec<SrLegacyFoodItem> =
+        search(&get_client(), Index::SRLegacyFoods, 5, name).await;
 
-    let wrapped_into_parent = branded_food
-        .clone()
+    let mut a: Vec<TempFood> = branded_food
         .into_iter()
-        .map(food_info_from_branded_food_item)
+        .map(branded_food_into_wrapper)
         .collect();
-    let res = FoodResultByItem {
-        branded_food,
-        foundation_food: vec![],
-        survey_food: vec![],
-        legacy_food: vec![],
-        info: wrapped_into_parent,
-    };
+    let mut b = legacy_food
+        .into_iter()
+        .map(sr_legacy_food_into_wrapper)
+        .collect();
+    a.append(&mut b);
 
-    HttpResponse::Ok().json(res)
+    HttpResponse::Ok().json(a)
 }
+
+// #[tracing::instrument(name = "route::search_usda")]
+// pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {

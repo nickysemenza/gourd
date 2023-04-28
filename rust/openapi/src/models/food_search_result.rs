@@ -15,17 +15,14 @@
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct FoodSearchResult {
     #[serde(rename = "foods")]
-    pub foods: Vec<crate::models::FoodInfo>,
-    #[serde(rename = "results", skip_serializing_if = "Option::is_none")]
-    pub results: Option<Box<crate::models::FoodResultByItem>>,
+    pub foods: Vec<crate::models::TempFood>,
 }
 
 impl FoodSearchResult {
     /// A meal, which bridges recipes to photos
-    pub fn new(foods: Vec<crate::models::FoodInfo>) -> FoodSearchResult {
+    pub fn new(foods: Vec<crate::models::TempFood>) -> FoodSearchResult {
         FoodSearchResult {
             foods,
-            results: None,
         }
     }
 }

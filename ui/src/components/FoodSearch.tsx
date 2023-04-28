@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { FoodInfo, useSearchFoods } from "../api/openapi-hooks/api";
+import { TempFood, useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
 import { UnitMappingList } from "./Misc";
@@ -10,8 +10,8 @@ const FoodSearch: React.FC<{
   highlightId?: number;
   limit?: number;
   enableSearch?: boolean;
-  addon?: FoodInfo;
-  onLink?: (fdc_id: number) => void;
+  addon?: TempFood;
+  onLink?: (fdcId: number) => void;
 }> = ({
   name,
   highlightId,
@@ -43,23 +43,22 @@ const FoodSearch: React.FC<{
     },
   });
 
-  const placeholder: FoodInfo = {
+  const placeholder: TempFood = {
     wrapper: {
-      fdc_id: 0,
+      fdcId: 0,
       description: "loading...",
-      data_type: "branded_food",
-      nutrients: [],
-      branded_info: undefined,
+      dataType: "branded_food",
+      //   nutrients: [],
+      //   branded_info: undefined,
     },
     unit_mappings: [],
   };
   const results = foods?.foods || [];
   const reallyLoading = loading && results.length === 0;
-  const items: FoodInfo[] = [
+  const items: TempFood[] = [
     ...(reallyLoading ? Array(5).fill(placeholder) : []),
     ...(addon &&
-    results.filter((f) => f.wrapper.fdc_id === addon.wrapper.fdc_id).length ===
-      0
+    results.filter((f) => f.wrapper.fdc_id === addon.wrapper.fdcId).length === 0
       ? [addon]
       : []),
     ...results,
@@ -80,7 +79,7 @@ const FoodSearch: React.FC<{
         />
       )}
       {items.map((r, x) => {
-        const isHighlighted = highlightId === r.wrapper.fdc_id;
+        const isHighlighted = highlightId === r.wrapper.fdcId;
         return (
           <FoodRow
             info={r}
@@ -96,10 +95,10 @@ const FoodSearch: React.FC<{
   );
 };
 export const FoodRow: React.FC<{
-  info: FoodInfo;
+  info: TempFood;
   isHighlighted?: boolean;
   x?: number;
-  onLink?: (fdc_id: number) => void;
+  onLink?: (fdcId: number) => void;
   loading: boolean;
   wide?: boolean;
   descriptionComponent?: JSX.Element;
@@ -117,18 +116,19 @@ export const FoodRow: React.FC<{
   const loadingClass =
     (loading && "h-2 bg-gray-400 rounded animate-pulse") || "";
   const food = info.wrapper;
+  const brand = info.branded_food;
   return (
     <div
       style={{ gridTemplateColumns: "1fr 3fr " }}
       className={`border ${
         isHighlighted ? "border-red-600 " : "border-indigo-600"
       } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
-      key={`${food.fdc_id}@${x}`}
+      key={`${food.fdcId}@${x}`}
     >
       <div className="flex flex-col p-1">
-        <Code>{food.fdc_id}</Code>
+        <Code>{food.fdcId}</Code>
         <a
-          href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdc_id}/nutrients`}
+          href={`https://fdc.nal.usda.gov/fdc-app.html#/food-details/${food.fdcId}/nutrients`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm pr-1 underline text-blue-800"
@@ -141,7 +141,7 @@ export const FoodRow: React.FC<{
             buttons={[
               {
                 onClick: () => {
-                  onLink(food.fdc_id);
+                  onLink(food.fdcId);
                 },
                 text: "link",
                 disabled: isHighlighted,
@@ -157,28 +157,30 @@ export const FoodRow: React.FC<{
             {descriptionComponent || food.description}
           </div>
           <div className="flex flex-row">
-            <p className="font-mono text-xs">{food.data_type}</p>
-            <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
+            <p className="font-mono text-xs">{food?.dataType}</p>
+            <p className="pl-1 text-xs">
+              {info.foodNutrients?.length} nutrients
+            </p>
           </div>
           <UnitMappingList unit_mappings={info.unit_mappings} />
         </div>
 
-        {(food.branded_info || loading) && (
+        {(brand || loading) && (
           <div
             className={`flex ${
               wide ? "flex-row" : "flex-col w-80"
             }  ${loadingClass}`}
           >
             <div>
-              {brandOwnerComponent || food.branded_info?.brand_owner} <br />
+              {brandOwnerComponent || brand?.brandOwner} <br />
               <p className={`text-sm italic ${loadingClass}`}>
-                {food.branded_info?.branded_food_category}
+                {brand?.brandedFoodCategory}
               </p>
             </div>
             <div
               className={`text-xs text-gray-500 whitespace-normal ${loadingClass}`}
             >
-              {food.branded_info?.ingredients}
+              {brand?.ingredients}
             </div>
           </div>
         )}

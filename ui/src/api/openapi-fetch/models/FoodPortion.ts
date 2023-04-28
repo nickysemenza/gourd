@@ -13,8 +13,15 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { MeasureUnit } from './MeasureUnit';
+import {
+    MeasureUnitFromJSON,
+    MeasureUnitFromJSONTyped,
+    MeasureUnitToJSON,
+} from './MeasureUnit';
+
 /**
- * food_portion
+ * 
  * @export
  * @interface FoodPortion
  */
@@ -24,31 +31,55 @@ export interface FoodPortion {
      * @type {number}
      * @memberof FoodPortion
      */
-    id: number;
+    id?: number;
     /**
      * 
      * @type {number}
      * @memberof FoodPortion
      */
-    amount: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof FoodPortion
-     */
-    portion_description: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FoodPortion
-     */
-    modifier: string;
+    amount?: number;
     /**
      * 
      * @type {number}
      * @memberof FoodPortion
      */
-    gram_weight: number;
+    data_points?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodPortion
+     */
+    gram_weight?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodPortion
+     */
+    min_year_acquired?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof FoodPortion
+     */
+    modifier?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FoodPortion
+     */
+    portion_description?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FoodPortion
+     */
+    sequence_number?: number;
+    /**
+     * 
+     * @type {MeasureUnit}
+     * @memberof FoodPortion
+     */
+    measure_unit?: MeasureUnit;
 }
 
 /**
@@ -56,11 +87,6 @@ export interface FoodPortion {
  */
 export function instanceOfFoodPortion(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "id" in value;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "portion_description" in value;
-    isInstance = isInstance && "modifier" in value;
-    isInstance = isInstance && "gram_weight" in value;
 
     return isInstance;
 }
@@ -75,11 +101,15 @@ export function FoodPortionFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'id': json['id'],
-        'amount': json['amount'],
-        'portion_description': json['portion_description'],
-        'modifier': json['modifier'],
-        'gram_weight': json['gram_weight'],
+        'id': !exists(json, 'id') ? undefined : json['id'],
+        'amount': !exists(json, 'amount') ? undefined : json['amount'],
+        'data_points': !exists(json, 'dataPoints') ? undefined : json['dataPoints'],
+        'gram_weight': !exists(json, 'gramWeight') ? undefined : json['gramWeight'],
+        'min_year_acquired': !exists(json, 'minYearAcquired') ? undefined : json['minYearAcquired'],
+        'modifier': !exists(json, 'modifier') ? undefined : json['modifier'],
+        'portion_description': !exists(json, 'portionDescription') ? undefined : json['portionDescription'],
+        'sequence_number': !exists(json, 'sequenceNumber') ? undefined : json['sequenceNumber'],
+        'measure_unit': !exists(json, 'measureUnit') ? undefined : MeasureUnitFromJSON(json['measureUnit']),
     };
 }
 
@@ -94,9 +124,13 @@ export function FoodPortionToJSON(value?: FoodPortion | null): any {
         
         'id': value.id,
         'amount': value.amount,
-        'portion_description': value.portion_description,
+        'dataPoints': value.data_points,
+        'gramWeight': value.gram_weight,
+        'minYearAcquired': value.min_year_acquired,
         'modifier': value.modifier,
-        'gram_weight': value.gram_weight,
+        'portionDescription': value.portion_description,
+        'sequenceNumber': value.sequence_number,
+        'measureUnit': MeasureUnitToJSON(value.measure_unit),
     };
 }
 

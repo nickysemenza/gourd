@@ -24,7 +24,7 @@ pub struct SampleFoodItem {
     #[serde(rename = "publicationDate", skip_serializing_if = "Option::is_none")]
     pub publication_date: Option<String>,
     #[serde(rename = "foodAttributes", skip_serializing_if = "Option::is_none")]
-    pub food_attributes: Option<Vec<crate::models::SchemasFoodCategory>>,
+    pub food_attributes: Option<Vec<crate::models::FoodCategory>>,
 }
 
 impl SampleFoodItem {

@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { SchemasFoodCategory } from './SchemasFoodCategory';
+import type { FoodCategory } from './FoodCategory';
 import {
-    SchemasFoodCategoryFromJSON,
-    SchemasFoodCategoryFromJSONTyped,
-    SchemasFoodCategoryToJSON,
-} from './SchemasFoodCategory';
+    FoodCategoryFromJSON,
+    FoodCategoryFromJSONTyped,
+    FoodCategoryToJSON,
+} from './FoodCategory';
 
 /**
  * 
@@ -58,10 +58,10 @@ export interface SampleFoodItem {
     publication_date?: string;
     /**
      * 
-     * @type {Array<SchemasFoodCategory>}
+     * @type {Array<FoodCategory>}
      * @memberof SampleFoodItem
      */
-    food_attributes?: Array<SchemasFoodCategory>;
+    food_attributes?: Array<FoodCategory>;
 }
 
 /**
@@ -90,7 +90,7 @@ export function SampleFoodItemFromJSONTyped(json: any, ignoreDiscriminator: bool
         'description': json['description'],
         'food_class': !exists(json, 'foodClass') ? undefined : json['foodClass'],
         'publication_date': !exists(json, 'publicationDate') ? undefined : json['publicationDate'],
-        'food_attributes': !exists(json, 'foodAttributes') ? undefined : ((json['foodAttributes'] as Array<any>).map(SchemasFoodCategoryFromJSON)),
+        'food_attributes': !exists(json, 'foodAttributes') ? undefined : ((json['foodAttributes'] as Array<any>).map(FoodCategoryFromJSON)),
     };
 }
 
@@ -108,7 +108,7 @@ export function SampleFoodItemToJSON(value?: SampleFoodItem | null): any {
         'description': value.description,
         'foodClass': value.food_class,
         'publicationDate': value.publication_date,
-        'foodAttributes': value.food_attributes === undefined ? undefined : ((value.food_attributes as Array<any>).map(SchemasFoodCategoryToJSON)),
+        'foodAttributes': value.food_attributes === undefined ? undefined : ((value.food_attributes as Array<any>).map(FoodCategoryToJSON)),
     };
 }
 

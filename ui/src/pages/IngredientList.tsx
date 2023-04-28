@@ -163,7 +163,7 @@ const IngredientList: React.FC = () => {
               <FoodSearch
                 enableSearch={onlyMissingFDC}
                 name={original.ingredient.name}
-                highlightId={original.food?.wrapper.fdc_id}
+                highlightId={original.food?.wrapper.fdcId}
                 onLink={(fdcId: number) => {
                   linkFoodToIngredient(original.ingredient.id, fdcId);
                   setJustLinked([...justLinked, original.ingredient.id]);

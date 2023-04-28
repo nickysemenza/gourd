@@ -415,7 +415,6 @@ func (a *API) transformRecipeSectionIngredient(ctx context.Context, i db.Section
 		if err != nil {
 			return si, err
 		}
-		// i := transformIngredient(*i.RawIngredient)
 		si.Ingredient = &foo[0]
 
 		targets := []UnitConversionRequestTarget{UnitConversionRequestTargetCalories, UnitConversionRequestTargetMoney, UnitConversionRequestTargetVolume}
@@ -475,6 +474,8 @@ func (a *API) transformRecipeSections(ctx context.Context, dbs []db.Section) ([]
 }
 
 func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, item *SectionIngredient) error {
+	ctx, span := a.tracer.Start(ctx, "enhance")
+	defer span.End()
 	req := UnitConversionRequest{
 		Input:        item.Amounts,
 		Target:       &with,
@@ -484,7 +485,7 @@ func (a *API) enhance(ctx context.Context, with UnitConversionRequestTarget, ite
 	if err := a.R.Send(ctx, "convert", req, &res); err != nil {
 		return fmt.Errorf("enhance: %w", err)
 	}
-	if true { // todo: if success
+	if res.Value > 0 { // todo: if success
 		res.Value = math.Round(res.Value*100) / 100
 		res.Source = zero.StringFrom("calculated").Ptr()
 		item.Amounts = append(item.Amounts, res)

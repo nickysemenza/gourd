@@ -696,7 +696,7 @@ components:
         fdcId:
           type: integer
           example: 337985
-        datatype:
+        dataType:
           type: string
           example: "Survey (FNDDS)"
         description:

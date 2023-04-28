@@ -13,18 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { FoodInfo } from './FoodInfo';
-import {
-    FoodInfoFromJSON,
-    FoodInfoFromJSONTyped,
-    FoodInfoToJSON,
-} from './FoodInfo';
 import type { Items } from './Items';
 import {
     ItemsFromJSON,
     ItemsFromJSONTyped,
     ItemsToJSON,
 } from './Items';
+import type { TempFood } from './TempFood';
+import {
+    TempFoodFromJSON,
+    TempFoodFromJSONTyped,
+    TempFoodToJSON,
+} from './TempFood';
 
 /**
  * pages of Food
@@ -34,10 +34,10 @@ import {
 export interface PaginatedFoods {
     /**
      * 
-     * @type {Array<FoodInfo>}
+     * @type {Array<TempFood>}
      * @memberof PaginatedFoods
      */
-    foods?: Array<FoodInfo>;
+    foods?: Array<TempFood>;
     /**
      * 
      * @type {Items}
@@ -66,7 +66,7 @@ export function PaginatedFoodsFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'foods': !exists(json, 'foods') ? undefined : ((json['foods'] as Array<any>).map(FoodInfoFromJSON)),
+        'foods': !exists(json, 'foods') ? undefined : ((json['foods'] as Array<any>).map(TempFoodFromJSON)),
         'meta': ItemsFromJSON(json['meta']),
     };
 }
@@ -80,7 +80,7 @@ export function PaginatedFoodsToJSON(value?: PaginatedFoods | null): any {
     }
     return {
         
-        'foods': value.foods === undefined ? undefined : ((value.foods as Array<any>).map(FoodInfoToJSON)),
+        'foods': value.foods === undefined ? undefined : ((value.foods as Array<any>).map(TempFoodToJSON)),
         'meta': ItemsToJSON(value.meta),
     };
 }

@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { FoodCategory } from './FoodCategory';
+import {
+    FoodCategoryFromJSON,
+    FoodCategoryFromJSONTyped,
+    FoodCategoryToJSON,
+} from './FoodCategory';
 import type { FoodComponent } from './FoodComponent';
 import {
     FoodComponentFromJSON,
@@ -25,6 +31,12 @@ import {
     FoodNutrientFromJSONTyped,
     FoodNutrientToJSON,
 } from './FoodNutrient';
+import type { FoodPortion } from './FoodPortion';
+import {
+    FoodPortionFromJSON,
+    FoodPortionFromJSONTyped,
+    FoodPortionToJSON,
+} from './FoodPortion';
 import type { InputFoodFoundation } from './InputFoodFoundation';
 import {
     InputFoodFoundationFromJSON,
@@ -37,18 +49,6 @@ import {
     NutrientConversionFactorsFromJSONTyped,
     NutrientConversionFactorsToJSON,
 } from './NutrientConversionFactors';
-import type { SchemasFoodCategory } from './SchemasFoodCategory';
-import {
-    SchemasFoodCategoryFromJSON,
-    SchemasFoodCategoryFromJSONTyped,
-    SchemasFoodCategoryToJSON,
-} from './SchemasFoodCategory';
-import type { SchemasFoodPortion } from './SchemasFoodPortion';
-import {
-    SchemasFoodPortionFromJSON,
-    SchemasFoodPortionFromJSONTyped,
-    SchemasFoodPortionToJSON,
-} from './SchemasFoodPortion';
 
 /**
  * 
@@ -112,10 +112,10 @@ export interface FoundationFoodItem {
     scientific_name?: string;
     /**
      * 
-     * @type {SchemasFoodCategory}
+     * @type {FoodCategory}
      * @memberof FoundationFoodItem
      */
-    food_category?: SchemasFoodCategory;
+    food_category?: FoodCategory;
     /**
      * 
      * @type {Array<FoodComponent>}
@@ -130,10 +130,10 @@ export interface FoundationFoodItem {
     food_nutrients?: Array<FoodNutrient>;
     /**
      * 
-     * @type {Array<SchemasFoodPortion>}
+     * @type {Array<FoodPortion>}
      * @memberof FoundationFoodItem
      */
-    food_portions?: Array<SchemasFoodPortion>;
+    food_portions?: Array<FoodPortion>;
     /**
      * 
      * @type {Array<InputFoodFoundation>}
@@ -179,10 +179,10 @@ export function FoundationFoodItemFromJSONTyped(json: any, ignoreDiscriminator: 
         'ndb_number': !exists(json, 'ndbNumber') ? undefined : json['ndbNumber'],
         'publication_date': !exists(json, 'publicationDate') ? undefined : json['publicationDate'],
         'scientific_name': !exists(json, 'scientificName') ? undefined : json['scientificName'],
-        'food_category': !exists(json, 'foodCategory') ? undefined : SchemasFoodCategoryFromJSON(json['foodCategory']),
+        'food_category': !exists(json, 'foodCategory') ? undefined : FoodCategoryFromJSON(json['foodCategory']),
         'food_components': !exists(json, 'foodComponents') ? undefined : ((json['foodComponents'] as Array<any>).map(FoodComponentFromJSON)),
         'food_nutrients': !exists(json, 'foodNutrients') ? undefined : ((json['foodNutrients'] as Array<any>).map(FoodNutrientFromJSON)),
-        'food_portions': !exists(json, 'foodPortions') ? undefined : ((json['foodPortions'] as Array<any>).map(SchemasFoodPortionFromJSON)),
+        'food_portions': !exists(json, 'foodPortions') ? undefined : ((json['foodPortions'] as Array<any>).map(FoodPortionFromJSON)),
         'input_foods': !exists(json, 'inputFoods') ? undefined : ((json['inputFoods'] as Array<any>).map(InputFoodFoundationFromJSON)),
         'nutrient_conversion_factors': !exists(json, 'nutrientConversionFactors') ? undefined : ((json['nutrientConversionFactors'] as Array<any>).map(NutrientConversionFactorsFromJSON)),
     };
@@ -206,10 +206,10 @@ export function FoundationFoodItemToJSON(value?: FoundationFoodItem | null): any
         'ndbNumber': value.ndb_number,
         'publicationDate': value.publication_date,
         'scientificName': value.scientific_name,
-        'foodCategory': SchemasFoodCategoryToJSON(value.food_category),
+        'foodCategory': FoodCategoryToJSON(value.food_category),
         'foodComponents': value.food_components === undefined ? undefined : ((value.food_components as Array<any>).map(FoodComponentToJSON)),
         'foodNutrients': value.food_nutrients === undefined ? undefined : ((value.food_nutrients as Array<any>).map(FoodNutrientToJSON)),
-        'foodPortions': value.food_portions === undefined ? undefined : ((value.food_portions as Array<any>).map(SchemasFoodPortionToJSON)),
+        'foodPortions': value.food_portions === undefined ? undefined : ((value.food_portions as Array<any>).map(FoodPortionToJSON)),
         'inputFoods': value.input_foods === undefined ? undefined : ((value.input_foods as Array<any>).map(InputFoodFoundationToJSON)),
         'nutrientConversionFactors': value.nutrient_conversion_factors === undefined ? undefined : ((value.nutrient_conversion_factors as Array<any>).map(NutrientConversionFactorsToJSON)),
     };

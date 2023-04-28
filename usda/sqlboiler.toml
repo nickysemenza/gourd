@@ -1,9 +1,0 @@
-no-tests = true
-[psql]
-  dbname = "usda"
-  host   = "localhost"
-  port   = 5556
-  user   = "gourd"
-  pass   = "gourd"
-  sslmode = "disable"
-  blacklist = ["migrations"]

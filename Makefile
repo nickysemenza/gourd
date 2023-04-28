@@ -11,7 +11,7 @@ all: bin/gourd
 test: unit-test-go lint-go test-rs
 
 dev-env:
-	docker-compose up -d db usda collector meilisearch meilisearch-ui
+	docker-compose up -d db  collector meilisearch meilisearch-ui
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c dev/air.conf
 
@@ -127,10 +127,6 @@ wasm-dev: generate-wasm ui/src/wasm/package.json
 gen-db:
 	rm -rf db/models/
 	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models --add-soft-deletes
-	cd usda && sqlboiler psql --relation-tag rel --config ../usda/sqlboiler.toml --pkgname usdamodels --output ../internal/db/models/usdamodels 
-
-
-
 # misc dev
 
 # https://jqplay.org/s/c1T3lLCJwH
@@ -142,8 +138,8 @@ get-detail/%:
 seed-testdata: bin/gourd
 	./dev/testdata/seed.sh
 
+# todo import usda
 devdata: seed-testdata sync
-	./usda/import.sh ~/Downloads/FoodData_Central_csv_2021-10-28/
 sync: bin/gourd
 	./bin/gourd sync
 insert-album: 	

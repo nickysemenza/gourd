@@ -54,16 +54,16 @@ fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
                 web::get().to(crate::usda_loader::search_usda),
             )
             .route(
+                "/debug/get_usda",
+                web::get().to(crate::usda_loader::get_usda),
+            )
+            .route(
                 "/codec/expand",
                 web::post().to(parser::expand_compact_to_input),
             )
             .route(
                 "/normalize_amount",
                 web::post().to(parser::normalize_amount),
-            )
-            .route(
-                "/unit_mappings_from_food",
-                web::post().to(crate::usda_mappings::unit_mappings_from_food),
             )
             .route(
                 "/index_recipe_detail",

@@ -32,13 +32,13 @@ pub struct FoundationFoodItem {
     #[serde(rename = "scientificName", skip_serializing_if = "Option::is_none")]
     pub scientific_name: Option<String>,
     #[serde(rename = "foodCategory", skip_serializing_if = "Option::is_none")]
-    pub food_category: Option<Box<crate::models::SchemasFoodCategory>>,
+    pub food_category: Option<Box<crate::models::FoodCategory>>,
     #[serde(rename = "foodComponents", skip_serializing_if = "Option::is_none")]
     pub food_components: Option<Vec<crate::models::FoodComponent>>,
     #[serde(rename = "foodNutrients", skip_serializing_if = "Option::is_none")]
     pub food_nutrients: Option<Vec<crate::models::FoodNutrient>>,
     #[serde(rename = "foodPortions", skip_serializing_if = "Option::is_none")]
-    pub food_portions: Option<Vec<crate::models::SchemasFoodPortion>>,
+    pub food_portions: Option<Vec<crate::models::FoodPortion>>,
     #[serde(rename = "inputFoods", skip_serializing_if = "Option::is_none")]
     pub input_foods: Option<Vec<crate::models::InputFoodFoundation>>,
     #[serde(rename = "nutrientConversionFactors", skip_serializing_if = "Option::is_none")]

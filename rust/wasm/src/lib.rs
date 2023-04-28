@@ -7,7 +7,7 @@ use gourd_common::{
     parse_unit_mappings,
     parser::amount_to_measure,
     sum_ingredients,
-    usda::food_info_from_branded_food_item,
+    usda::branded_food_into_wrapper,
 };
 use openapi::models::{
     Amount, BrandedFoodItem, RecipeDetail, RecipeDetailInput, UnitConversionRequest,
@@ -174,7 +174,9 @@ pub fn make_dag(conversion_request: &JsValue) -> String {
 pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     utils::set_panic_hook();
     let ings2: Vec<String> = ings.into_serde().unwrap();
-    info!("rich2: {:?}", ings2);
+    if ings2.len() > 0 {
+        info!("rich2: {:?}", ings2);
+    }
     let rtp = gourd_common::ingredient::rich_text::RichParser {
         ingredient_names: ings2,
         ip: gourd_common::new_ingredient_parser(true),
@@ -212,6 +214,6 @@ pub fn sum_time_amounts(amount: &IAmount) -> IMeasure {
 #[wasm_bindgen]
 pub fn bfi_to_info(x: &JsValue) -> JsValue {
     let bfi: BrandedFoodItem = x.into_serde().unwrap();
-    let fw = food_info_from_branded_food_item(bfi);
+    let fw = branded_food_into_wrapper(bfi);
     JsValue::from_serde(&fw).unwrap()
 }

@@ -5,6 +5,5 @@ rust/pkg/*
 rust/**/target/*
 openapi/
 .terraform/*
-usda/*
 ui/build
 tmp_images/

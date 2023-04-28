@@ -15,8 +15,8 @@
 pub struct SurveyFoodItem {
     #[serde(rename = "fdcId")]
     pub fdc_id: i32,
-    #[serde(rename = "datatype", skip_serializing_if = "Option::is_none")]
-    pub datatype: Option<String>,
+    #[serde(rename = "dataType")]
+    pub data_type: String,
     #[serde(rename = "description")]
     pub description: String,
     #[serde(rename = "endDate", skip_serializing_if = "Option::is_none")]
@@ -32,7 +32,7 @@ pub struct SurveyFoodItem {
     #[serde(rename = "foodAttributes", skip_serializing_if = "Option::is_none")]
     pub food_attributes: Option<Vec<crate::models::FoodAttribute>>,
     #[serde(rename = "foodPortions", skip_serializing_if = "Option::is_none")]
-    pub food_portions: Option<Vec<crate::models::SchemasFoodPortion>>,
+    pub food_portions: Option<Vec<crate::models::FoodPortion>>,
     #[serde(rename = "inputFoods", skip_serializing_if = "Option::is_none")]
     pub input_foods: Option<Vec<crate::models::InputFoodSurvey>>,
     #[serde(rename = "wweiaFoodCategory", skip_serializing_if = "Option::is_none")]
@@ -40,10 +40,10 @@ pub struct SurveyFoodItem {
 }
 
 impl SurveyFoodItem {
-    pub fn new(fdc_id: i32, description: String) -> SurveyFoodItem {
+    pub fn new(fdc_id: i32, data_type: String, description: String) -> SurveyFoodItem {
         SurveyFoodItem {
             fdc_id,
-            datatype: None,
+            data_type,
             description,
             end_date: None,
             food_class: None,

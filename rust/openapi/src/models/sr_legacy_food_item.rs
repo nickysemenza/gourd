@@ -30,7 +30,7 @@ pub struct SrLegacyFoodItem {
     #[serde(rename = "scientificName", skip_serializing_if = "Option::is_none")]
     pub scientific_name: Option<String>,
     #[serde(rename = "foodCategory", skip_serializing_if = "Option::is_none")]
-    pub food_category: Option<Box<crate::models::SchemasFoodCategory>>,
+    pub food_category: Option<Box<crate::models::FoodCategory>>,
     #[serde(rename = "foodNutrients", skip_serializing_if = "Option::is_none")]
     pub food_nutrients: Option<Vec<crate::models::FoodNutrient>>,
     #[serde(rename = "nutrientConversionFactors", skip_serializing_if = "Option::is_none")]

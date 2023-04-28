@@ -19,18 +19,18 @@ import {
     FoodAttributeFromJSONTyped,
     FoodAttributeToJSON,
 } from './FoodAttribute';
+import type { FoodPortion } from './FoodPortion';
+import {
+    FoodPortionFromJSON,
+    FoodPortionFromJSONTyped,
+    FoodPortionToJSON,
+} from './FoodPortion';
 import type { InputFoodSurvey } from './InputFoodSurvey';
 import {
     InputFoodSurveyFromJSON,
     InputFoodSurveyFromJSONTyped,
     InputFoodSurveyToJSON,
 } from './InputFoodSurvey';
-import type { SchemasFoodPortion } from './SchemasFoodPortion';
-import {
-    SchemasFoodPortionFromJSON,
-    SchemasFoodPortionFromJSONTyped,
-    SchemasFoodPortionToJSON,
-} from './SchemasFoodPortion';
 import type { WweiaFoodCategory } from './WweiaFoodCategory';
 import {
     WweiaFoodCategoryFromJSON,
@@ -55,7 +55,7 @@ export interface SurveyFoodItem {
      * @type {string}
      * @memberof SurveyFoodItem
      */
-    datatype?: string;
+    data_type: string;
     /**
      * 
      * @type {string}
@@ -100,10 +100,10 @@ export interface SurveyFoodItem {
     food_attributes?: Array<FoodAttribute>;
     /**
      * 
-     * @type {Array<SchemasFoodPortion>}
+     * @type {Array<FoodPortion>}
      * @memberof SurveyFoodItem
      */
-    food_portions?: Array<SchemasFoodPortion>;
+    food_portions?: Array<FoodPortion>;
     /**
      * 
      * @type {Array<InputFoodSurvey>}
@@ -124,6 +124,7 @@ export interface SurveyFoodItem {
 export function instanceOfSurveyFoodItem(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "fdc_id" in value;
+    isInstance = isInstance && "data_type" in value;
     isInstance = isInstance && "description" in value;
 
     return isInstance;
@@ -140,7 +141,7 @@ export function SurveyFoodItemFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'fdc_id': json['fdcId'],
-        'datatype': !exists(json, 'datatype') ? undefined : json['datatype'],
+        'data_type': json['dataType'],
         'description': json['description'],
         'end_date': !exists(json, 'endDate') ? undefined : json['endDate'],
         'food_class': !exists(json, 'foodClass') ? undefined : json['foodClass'],
@@ -148,7 +149,7 @@ export function SurveyFoodItemFromJSONTyped(json: any, ignoreDiscriminator: bool
         'publication_date': !exists(json, 'publicationDate') ? undefined : json['publicationDate'],
         'start_date': !exists(json, 'startDate') ? undefined : json['startDate'],
         'food_attributes': !exists(json, 'foodAttributes') ? undefined : ((json['foodAttributes'] as Array<any>).map(FoodAttributeFromJSON)),
-        'food_portions': !exists(json, 'foodPortions') ? undefined : ((json['foodPortions'] as Array<any>).map(SchemasFoodPortionFromJSON)),
+        'food_portions': !exists(json, 'foodPortions') ? undefined : ((json['foodPortions'] as Array<any>).map(FoodPortionFromJSON)),
         'input_foods': !exists(json, 'inputFoods') ? undefined : ((json['inputFoods'] as Array<any>).map(InputFoodSurveyFromJSON)),
         'wweia_food_category': !exists(json, 'wweiaFoodCategory') ? undefined : WweiaFoodCategoryFromJSON(json['wweiaFoodCategory']),
     };
@@ -164,7 +165,7 @@ export function SurveyFoodItemToJSON(value?: SurveyFoodItem | null): any {
     return {
         
         'fdcId': value.fdc_id,
-        'datatype': value.datatype,
+        'dataType': value.data_type,
         'description': value.description,
         'endDate': value.end_date,
         'foodClass': value.food_class,
@@ -172,7 +173,7 @@ export function SurveyFoodItemToJSON(value?: SurveyFoodItem | null): any {
         'publicationDate': value.publication_date,
         'startDate': value.start_date,
         'foodAttributes': value.food_attributes === undefined ? undefined : ((value.food_attributes as Array<any>).map(FoodAttributeToJSON)),
-        'foodPortions': value.food_portions === undefined ? undefined : ((value.food_portions as Array<any>).map(SchemasFoodPortionToJSON)),
+        'foodPortions': value.food_portions === undefined ? undefined : ((value.food_portions as Array<any>).map(FoodPortionToJSON)),
         'inputFoods': value.input_foods === undefined ? undefined : ((value.input_foods as Array<any>).map(InputFoodSurveyToJSON)),
         'wweiaFoodCategory': WweiaFoodCategoryToJSON(value.wweia_food_category),
     };

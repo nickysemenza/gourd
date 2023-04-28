@@ -670,7 +670,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodInfo'
+                $ref: '#/components/schemas/TempFood'
         default:
           description: unexpected error
           content:
@@ -715,14 +715,6 @@ paths:
         - $ref: '#/components/parameters/offsetParam'
         - $ref: '#/components/parameters/limitParam'
         - $ref: '#/components/parameters/nameParam'
-        - name: data_types
-          in: query
-          required: false
-          description: The data types
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/FoodDataType'
       responses:
         '200':
           description: Search results
@@ -1107,7 +1099,7 @@ components:
           items:
             $ref: '#/components/schemas/IngredientDetail'
         food:
-          $ref: '#/components/schemas/FoodInfo'
+          $ref: '#/components/schemas/TempFood'
         unit_mappings:
           description: mappings of equivalent units
           type: array
@@ -1427,110 +1419,9 @@ components:
         foods:
           type: array
           items:
-            $ref: '#/components/schemas/FoodInfo'
+            $ref: '#/components/schemas/TempFood'
         meta:
           $ref: '#/components/schemas/Items'
-    FoodCategory:
-      type: object
-      description: food category, set for some
-      required:
-        - code
-        - description
-      properties:
-        code:
-          description: Food description
-          type: string
-        description:
-          description: Food description
-          type: string
-    BrandedFood:
-      type: object
-      description: branded_food
-      required:
-        - serving_size
-        - serving_size_unit
-      properties:
-        brand_owner:
-          type: string
-        ingredients:
-          type: string
-        serving_size:
-          type: number
-          format: double
-        serving_size_unit:
-          type: string
-        household_serving:
-          type: string
-        branded_food_category:
-          type: string
-    FoodPortion:
-      type: object
-      description: food_portion
-      required:
-        - id
-        - amount
-        - portion_description
-        - modifier
-        - gram_weight
-      properties:
-        id:
-          type: integer
-        amount:
-          type: number
-          format: double
-        portion_description:
-          type: string
-        modifier:
-          type: string
-        gram_weight:
-          type: number
-          format: double
-    FoodWrapper:
-      type: object
-      description: A top level food
-      required:
-        - fdc_id
-        - description
-        - data_type
-        - nutrients
-      properties:
-        fdc_id:
-          description: FDC Id
-          type: integer
-        description:
-          description: Food description
-          type: string
-        data_type:
-          description: todo
-          $ref: '#/components/schemas/FoodDataType'
-        category:
-          $ref: '#/components/schemas/FoodCategory'
-        nutrients:
-          description: todo
-          type: array
-          items:
-            $ref: '#/components/schemas/FoodNutrient'
-        portions:
-          description: portion datapoints
-          type: array
-          items:
-            $ref: '#/components/schemas/FoodPortion'
-        branded_info:
-          $ref: '#/components/schemas/BrandedFood'
-    FoodInfo:
-      type: object
-      description: A top level food?
-      required:
-        - wrapper
-        - unit_mappings
-      properties:
-        wrapper:
-          $ref: '#/components/schemas/FoodWrapper'
-        unit_mappings:
-          description: mappings of equivalent units
-          type: array
-          items:
-            $ref: '#/components/schemas/UnitMapping'
     MealRecipeUpdate:
       type: object
       description: an update to the recipes on a mea
@@ -1553,17 +1444,6 @@ components:
           enum:
             - add
             - remove
-    FoodDataType:
-      type: string
-      enum:
-        - foundation_food
-        - sample_food
-        - market_acquisition
-        - survey_fndds_food
-        - sub_sample_food
-        - agricultural_acquisition
-        - sr_legacy_food
-        - branded_food
     IngredientKind:
       type: string
       enum:
@@ -1745,39 +1625,36 @@ components:
         foods:
           type: array
           items:
-            $ref: '#/components/schemas/FoodInfo'
-        results:
-          $ref: '#/components/schemas/FoodResultByItem'
-    FoodResultByItem:
-      description: A meal, which bridges recipes to photos
+            $ref: '#/components/schemas/TempFood'
+    TempFood:
       type: object
       required:
-        - branded_food
-        - foundation_food
-        - legacy_food
-        - survey_food
-        - info
+        - unit_mappings
+        - wrapper
       properties:
+        wrapper:
+          oneOf:
+            - $ref: '#/components/schemas/BrandedFoodItem'
+            - $ref: '#/components/schemas/FoundationFoodItem'
+            - $ref: '#/components/schemas/SRLegacyFoodItem'
+            - $ref: '#/components/schemas/SurveyFoodItem'
         branded_food:
-          type: array
-          items:
-            $ref: '#/components/schemas/BrandedFoodItem'
+          $ref: '#/components/schemas/BrandedFoodItem'
         foundation_food:
-          type: array
-          items:
-            $ref: '#/components/schemas/FoundationFoodItem'
+          $ref: '#/components/schemas/FoundationFoodItem'
         legacy_food:
-          type: array
-          items:
-            $ref: '#/components/schemas/SRLegacyFoodItem'
+          $ref: '#/components/schemas/SRLegacyFoodItem'
         survey_food:
+          $ref: '#/components/schemas/SurveyFoodItem'
+        unit_mappings:
+          description: mappings of equivalent units
           type: array
           items:
-            $ref: '#/components/schemas/SurveyFoodItem'
-        info:
+            $ref: '#/components/schemas/UnitMapping'
+        foodNutrients:
           type: array
           items:
-            $ref: '#/components/schemas/FoodInfo'
+            $ref: '#/components/schemas/FoodNutrient'
     Nutrient:
       description: a food nutrient
       properties:
@@ -2160,7 +2037,7 @@ components:
                   type: number
                   format: double
                   example: 140
-    schemas-FoodCategory:
+    FoodCategory:
       properties:
         id:
           type: integer
@@ -2208,7 +2085,7 @@ components:
         name:
           type: string
           example: undetermined
-    schemas-FoodPortion:
+    FoodPortion:
       properties:
         id:
           type: integer
@@ -2264,7 +2141,7 @@ components:
         foodAttributes:
           type: array
           items:
-            $ref: '#/components/schemas/schemas-FoodCategory'
+            $ref: '#/components/schemas/FoodCategory'
     InputFoodFoundation:
       description: applies to Foundation foods. Not all inputFoods will have all fields.
       properties:
@@ -2322,7 +2199,7 @@ components:
           type: string
           example: Fragaria X ananassa
         foodCategory:
-          $ref: '#/components/schemas/schemas-FoodCategory'
+          $ref: '#/components/schemas/FoodCategory'
         foodComponents:
           type: array
           items:
@@ -2334,7 +2211,7 @@ components:
         foodPortions:
           type: array
           items:
-            $ref: '#/components/schemas/schemas-FoodPortion'
+            $ref: '#/components/schemas/FoodPortion'
         inputFoods:
           type: array
           items:
@@ -2374,7 +2251,7 @@ components:
           type: string
           example: Brassica oleracea var. italica
         foodCategory:
-          $ref: '#/components/schemas/schemas-FoodCategory'
+          $ref: '#/components/schemas/FoodCategory'
         foodNutrients:
           type: array
           items:
@@ -2392,7 +2269,7 @@ components:
         fdcId:
           type: integer
           example: 337985
-        datatype:
+        dataType:
           type: string
           example: Survey (FNDDS)
         description:
@@ -2420,7 +2297,7 @@ components:
         foodPortions:
           type: array
           items:
-            $ref: '#/components/schemas/schemas-FoodPortion'
+            $ref: '#/components/schemas/FoodPortion'
         inputFoods:
           type: array
           items:

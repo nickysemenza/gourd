@@ -11,7 +11,6 @@ on:
     paths:
       - "deploy/Dockerfile.base"
       - "Dockerfile"
-      - "usda/Dockerfile"
 jobs:
   build:
     env:
@@ -29,9 +28,6 @@ jobs:
           - file: "Dockerfile"
             name: "api"
             context: .
-          - file: "usda/Dockerfile"
-            name: "usda"
-            context: "usda"
     permissions:
       contents: read
       packages: write

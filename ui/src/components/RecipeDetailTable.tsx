@@ -132,12 +132,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
     if (!w) return <div>loading...</div>;
 
-    const { kcal, dollars } = getStats(
+    // console.log({ hint });
+    const { kcal, cents } = getStats(
       w,
       ingredient,
       ing_hints,
       tweaks.multiplier
     );
+    console.log({ hint, kcal, cents });
 
     let ingIndex = -1;
     let gramIndex = -1;
@@ -311,7 +313,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             {showKcalDollars && (
               <div>
                 {kcal !== undefined ? scaledRound(kcal) : "n/a"}
-                kcal ${dollars !== undefined ? scaledRound(dollars) : "n/a"}
+                kcal {cents !== undefined ? scaledRound(cents) : "n/a"}¢
               </div>
             )}
 

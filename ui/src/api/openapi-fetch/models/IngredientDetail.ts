@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { FoodInfo } from './FoodInfo';
-import {
-    FoodInfoFromJSON,
-    FoodInfoFromJSONTyped,
-    FoodInfoToJSON,
-} from './FoodInfo';
 import type { Ingredient } from './Ingredient';
 import {
     IngredientFromJSON,
@@ -31,6 +25,12 @@ import {
     RecipeDetailFromJSONTyped,
     RecipeDetailToJSON,
 } from './RecipeDetail';
+import type { TempFood } from './TempFood';
+import {
+    TempFoodFromJSON,
+    TempFoodFromJSONTyped,
+    TempFoodToJSON,
+} from './TempFood';
 import type { UnitMapping } from './UnitMapping';
 import {
     UnitMappingFromJSON,
@@ -64,10 +64,10 @@ export interface IngredientDetail {
     children?: Array<IngredientDetail>;
     /**
      * 
-     * @type {FoodInfo}
+     * @type {TempFood}
      * @memberof IngredientDetail
      */
-    food?: FoodInfo;
+    food?: TempFood;
     /**
      * mappings of equivalent units
      * @type {Array<UnitMapping>}
@@ -101,7 +101,7 @@ export function IngredientDetailFromJSONTyped(json: any, ignoreDiscriminator: bo
         'ingredient': IngredientFromJSON(json['ingredient']),
         'recipes': ((json['recipes'] as Array<any>).map(RecipeDetailFromJSON)),
         'children': !exists(json, 'children') ? undefined : ((json['children'] as Array<any>).map(IngredientDetailFromJSON)),
-        'food': !exists(json, 'food') ? undefined : FoodInfoFromJSON(json['food']),
+        'food': !exists(json, 'food') ? undefined : TempFoodFromJSON(json['food']),
         'unit_mappings': ((json['unit_mappings'] as Array<any>).map(UnitMappingFromJSON)),
     };
 }
@@ -118,7 +118,7 @@ export function IngredientDetailToJSON(value?: IngredientDetail | null): any {
         'ingredient': IngredientToJSON(value.ingredient),
         'recipes': ((value.recipes as Array<any>).map(RecipeDetailToJSON)),
         'children': value.children === undefined ? undefined : ((value.children as Array<any>).map(IngredientDetailToJSON)),
-        'food': FoodInfoToJSON(value.food),
+        'food': TempFoodToJSON(value.food),
         'unit_mappings': ((value.unit_mappings as Array<any>).map(UnitMappingToJSON)),
     };
 }

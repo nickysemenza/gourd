@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { FoodCategory } from './FoodCategory';
+import {
+    FoodCategoryFromJSON,
+    FoodCategoryFromJSONTyped,
+    FoodCategoryToJSON,
+} from './FoodCategory';
 import type { FoodNutrient } from './FoodNutrient';
 import {
     FoodNutrientFromJSON,
@@ -25,12 +31,6 @@ import {
     NutrientConversionFactorsFromJSONTyped,
     NutrientConversionFactorsToJSON,
 } from './NutrientConversionFactors';
-import type { SchemasFoodCategory } from './SchemasFoodCategory';
-import {
-    SchemasFoodCategoryFromJSON,
-    SchemasFoodCategoryFromJSONTyped,
-    SchemasFoodCategoryToJSON,
-} from './SchemasFoodCategory';
 
 /**
  * 
@@ -88,10 +88,10 @@ export interface SRLegacyFoodItem {
     scientific_name?: string;
     /**
      * 
-     * @type {SchemasFoodCategory}
+     * @type {FoodCategory}
      * @memberof SRLegacyFoodItem
      */
-    food_category?: SchemasFoodCategory;
+    food_category?: FoodCategory;
     /**
      * 
      * @type {Array<FoodNutrient>}
@@ -136,7 +136,7 @@ export function SRLegacyFoodItemFromJSONTyped(json: any, ignoreDiscriminator: bo
         'ndb_number': !exists(json, 'ndbNumber') ? undefined : json['ndbNumber'],
         'publication_date': !exists(json, 'publicationDate') ? undefined : json['publicationDate'],
         'scientific_name': !exists(json, 'scientificName') ? undefined : json['scientificName'],
-        'food_category': !exists(json, 'foodCategory') ? undefined : SchemasFoodCategoryFromJSON(json['foodCategory']),
+        'food_category': !exists(json, 'foodCategory') ? undefined : FoodCategoryFromJSON(json['foodCategory']),
         'food_nutrients': !exists(json, 'foodNutrients') ? undefined : ((json['foodNutrients'] as Array<any>).map(FoodNutrientFromJSON)),
         'nutrient_conversion_factors': !exists(json, 'nutrientConversionFactors') ? undefined : ((json['nutrientConversionFactors'] as Array<any>).map(NutrientConversionFactorsFromJSON)),
     };
@@ -159,7 +159,7 @@ export function SRLegacyFoodItemToJSON(value?: SRLegacyFoodItem | null): any {
         'ndbNumber': value.ndb_number,
         'publicationDate': value.publication_date,
         'scientificName': value.scientific_name,
-        'foodCategory': SchemasFoodCategoryToJSON(value.food_category),
+        'foodCategory': FoodCategoryToJSON(value.food_category),
         'foodNutrients': value.food_nutrients === undefined ? undefined : ((value.food_nutrients as Array<any>).map(FoodNutrientToJSON)),
         'nutrientConversionFactors': value.nutrient_conversion_factors === undefined ? undefined : ((value.nutrient_conversion_factors as Array<any>).map(NutrientConversionFactorsToJSON)),
     };
