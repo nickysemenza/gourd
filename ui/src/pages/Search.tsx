@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import {
   Highlight,
+  HitsPerPage,
   InstantSearch,
   RefinementList,
   SearchBox,
@@ -26,6 +27,7 @@ function BrandedHit(props: { hit: any }) {
         <FoodRow
           info={f}
           loading={false}
+          wide
           descriptionComponent={
             <Highlight attribute="description" hit={props.hit} />
           }
@@ -76,6 +78,10 @@ const searchClassNames = {
     "block w-full pl-9 pr-3 py-2 bg-white border border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 rounded-md focus:ring-1",
   // submitIcon: "absolute top-0 left-0 bottom-0 w-6",
 };
+const refinementClassNames = {
+  label: "flex space-x-1",
+  count: "text-sm font-bold",
+};
 const Search: React.FC = () => (
   <div>
     <BrandedSearch />
@@ -89,9 +95,25 @@ const BrandedSearch: React.FC = () => (
       <SearchBox classNames={searchClassNames} />
       <div className="flex">
         <div>
-          <RefinementList attribute="brandOwner" showMore={true} />
-          <RefinementList attribute="brandedFoodCategory" />
-          <RefinementList attribute="servingSizeUnit" />
+          <RefinementList
+            classNames={refinementClassNames}
+            attribute="brandOwner"
+            showMore={true}
+          />
+          <RefinementList
+            classNames={refinementClassNames}
+            attribute="brandedFoodCategory"
+          />
+          <RefinementList
+            classNames={refinementClassNames}
+            attribute="servingSizeUnit"
+          />
+          <HitsPerPage
+            items={[
+              { label: "8 hits per page", value: 8, default: true },
+              { label: "16 hits per page", value: 16 },
+            ]}
+          />
         </div>
         <BrandedHits />
       </div>
@@ -106,7 +128,7 @@ const RecipeDetailsSearch: React.FC = () => (
       <div className="flex">
         <div>
           {/* <RefinementList attribute="brandOwner" showMore={true} /> */}
-          <RefinementList attribute="tags" />
+          <RefinementList classNames={refinementClassNames} attribute="tags" />
           {/* <RefinementList attribute="servingSizeUnit" /> */}
         </div>
         <RecipeDetailsHits />

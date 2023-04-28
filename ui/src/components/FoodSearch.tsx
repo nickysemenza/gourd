@@ -101,6 +101,7 @@ export const FoodRow: React.FC<{
   x?: number;
   onLink?: (fdc_id: number) => void;
   loading: boolean;
+  wide?: boolean;
   descriptionComponent?: JSX.Element;
   brandOwnerComponent?: JSX.Element;
 }> = ({
@@ -109,6 +110,7 @@ export const FoodRow: React.FC<{
   x = 0,
   onLink,
   loading,
+  wide = false,
   descriptionComponent,
   brandOwnerComponent,
 }) => {
@@ -117,7 +119,7 @@ export const FoodRow: React.FC<{
   const food = info.wrapper;
   return (
     <div
-      style={{ gridTemplateColumns: "1fr 3fr 4fr" }}
+      style={{ gridTemplateColumns: "1fr 3fr " }}
       className={`border ${
         isHighlighted ? "border-red-600 " : "border-indigo-600"
       } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
@@ -149,21 +151,30 @@ export const FoodRow: React.FC<{
           />
         )}
       </div>
-      <div className="flex flex-col p-1">
-        <div className="flex whitespace-normal">
-          {descriptionComponent || food.description}
+      <div className={`flex ${wide ? "flex-row" : "flex-col"} p-1`}>
+        <div>
+          <div className="flex whitespace-normal">
+            {descriptionComponent || food.description}
+          </div>
+          <div className="flex flex-row">
+            <p className="font-mono text-xs">{food.data_type}</p>
+            <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
+          </div>
+          <UnitMappingList unit_mappings={info.unit_mappings} />
         </div>
-        <div className="flex flex-row">
-          <p className="font-mono text-xs">{food.data_type}</p>
-          <p className="pl-1 text-xs">{food.nutrients?.length} nutrients</p>
-        </div>
-        <UnitMappingList unit_mappings={info.unit_mappings} />
+
         {(food.branded_info || loading) && (
-          <div className={`flex flex-col w-80 ${loadingClass}`}>
-            {brandOwnerComponent || food.branded_info?.brand_owner} <br />
-            <p className={`text-sm italic ${loadingClass}`}>
-              {food.branded_info?.branded_food_category}
-            </p>
+          <div
+            className={`flex ${
+              wide ? "flex-row" : "flex-col w-80"
+            }  ${loadingClass}`}
+          >
+            <div>
+              {brandOwnerComponent || food.branded_info?.brand_owner} <br />
+              <p className={`text-sm italic ${loadingClass}`}>
+                {food.branded_info?.branded_food_category}
+              </p>
+            </div>
             <div
               className={`text-xs text-gray-500 whitespace-normal ${loadingClass}`}
             >
