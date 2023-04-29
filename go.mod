@@ -46,9 +46,9 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.40.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
 	go.opentelemetry.io/contrib/propagators/jaeger v1.15.0
-	go.opentelemetry.io/otel v1.14.0
-	go.opentelemetry.io/otel/sdk v1.14.0
-	go.opentelemetry.io/otel/trace v1.14.0
+	go.opentelemetry.io/otel v1.15.0
+	go.opentelemetry.io/otel/sdk v1.15.0
+	go.opentelemetry.io/otel/trace v1.15.0
 	golang.org/x/oauth2 v0.7.0
 	golang.org/x/tools v0.8.0
 	google.golang.org/api v0.120.0
@@ -123,7 +123,7 @@ require (
 	github.com/breml/bidichk v0.2.4 // indirect
 	github.com/breml/errchkjson v0.3.1 // indirect
 	github.com/butuzov/ireturn v0.1.1 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/charithe/durationcheck v0.0.10 // indirect
@@ -155,7 +155,7 @@ require (
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.1 // indirect
 	github.com/go-critic/go-critic v0.7.0 // indirect
-	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
@@ -349,9 +349,9 @@ require (
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mitsakis.org/workerpool v0.0.0-20221016122625-07d45f730b5b
 	go.mongodb.org/mongo-driver v1.11.1 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.14.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.14.0
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.14.0
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.15.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.15.0
 	go.opentelemetry.io/otel/metric v0.37.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
@@ -400,7 +400,7 @@ require (
 )
 
 require (
-	go.opentelemetry.io/otel/exporters/zipkin v1.14.0
+	go.opentelemetry.io/otel/exporters/zipkin v1.15.0
 	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326
 	google.golang.org/grpc v1.54.0
 )
