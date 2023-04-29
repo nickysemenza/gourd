@@ -60,8 +60,7 @@ async fn main() -> std::io::Result<()> {
 
     if let Some(_) = matches.subcommand_matches("server") {
         initialize_tracing("gourd-rs");
-        let application = Application::build(configuration.clone()).await?;
-        application.run_until_stopped().await?;
+        Application::run2(configuration).await.unwrap();
     }
     initialize_tracing("gourd-cli");
     if let Some(_m) = matches.subcommand_matches("load_mappings") {

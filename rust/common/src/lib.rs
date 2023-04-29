@@ -1,9 +1,5 @@
-#[macro_use]
-extern crate serde;
-
 pub mod codec;
 mod converter;
-pub mod pan;
 pub mod parser;
 pub mod usda;
 pub use ingredient;

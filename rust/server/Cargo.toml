@@ -11,10 +11,9 @@ name = "gourd"
 path = "src/main.rs"
 
 [dependencies]
-actix-http = "3.3"
-actix-router = "0.5.1"
-actix-web = "4.3"
-actix-web-opentelemetry = "0.13.0"
+tower-http = { version = "0.4.0", features = ["trace"] }
+axum = {versio  = "0.6.17", features= ["tracing"] }
+axum-tracing-opentelemetry = "0.10.0"
 anyhow = "1.0"
 clap = "4"
 config = {version = "0.13.2", default-features = false, features = ["yaml"]}
@@ -45,7 +44,3 @@ features = [
     "v4",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG
 ]
-
-[dev-dependencies]
-actix-rt = "2.8.0"
-

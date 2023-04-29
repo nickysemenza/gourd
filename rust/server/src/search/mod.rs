@@ -1,7 +1,7 @@
 mod index;
 
-use actix_web::{web, HttpResponse};
 use anyhow::{Context, Result};
+use axum::{extract, response::IntoResponse, Json};
 use indicatif::ProgressIterator;
 use meilisearch_sdk::task_info::TaskInfo;
 use openapi::models::RecipeDetail;
@@ -116,7 +116,9 @@ pub trait Document: Clone + Serialize + DeserializeOwned + Send + Sync + 'static
 impl<T: Clone + Serialize + DeserializeOwned + Send + Sync + 'static> Document for T {}
 
 #[tracing::instrument(name = "route::index_recipe_detail", skip(cr))]
-pub async fn index_recipe_detail(cr: web::Json<Vec<RecipeDetail>>) -> HttpResponse {
-    Searcher::new().load(&cr.0, Index::RecipeDetails).await;
-    HttpResponse::Ok().json(())
+pub async fn index_recipe_detail(
+    extract::Json(cr): extract::Json<Vec<RecipeDetail>>,
+) -> impl IntoResponse {
+    Searcher::new().load(&cr, Index::RecipeDetails).await;
+    Json(())
 }

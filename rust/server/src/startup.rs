@@ -1,76 +1,46 @@
 use crate::configuration::Settings;
-// use crate::email_clhealth_checkient::EmailClient;
 use crate::routes::parser;
-use actix_web::middleware::Logger;
-use actix_web::{dev::Server, web};
-use actix_web::{App, HttpServer};
-use actix_web_opentelemetry::RequestTracing;
-use std::net::TcpListener;
-use tracing::info;
+use anyhow::Result;
+use axum::{
+    routing::{get, post},
+    Router,
+};
+use axum_tracing_opentelemetry::{opentelemetry_tracing_layer, response_with_trace_layer};
+use std::net::SocketAddr;
 
 pub struct Application {
     port: u16,
-    server: Server,
 }
 
 impl Application {
-    pub async fn build(configuration: Settings) -> Result<Self, std::io::Error> {
-        let address = format!(
-            "{}:{}",
-            configuration.application.host, configuration.application.port
-        );
-        let listener = TcpListener::bind(&address)?;
-        let port = listener.local_addr().unwrap().port();
-        let server = run(listener)?;
+    pub async fn run2(configuration: Settings) -> Result<()> {
+        let app = Router::new()
+            .route("/parse_amount", get(parser::amount_parser))
+            .route("/decode_recipe", get(parser::decode_recipe))
+            .route("/convert", post(parser::convert))
+            .route("/scrape", get(parser::scrape))
+            .route("/debug/scrape", get(parser::debug_scrape))
+            .route("/debug/search_usda", get(crate::usda_loader::search_usda))
+            .route("/debug/get_usda", get(crate::usda_loader::get_usda))
+            .route("/codec/expand", post(parser::expand_compact_to_input))
+            .route("/normalize_amount", post(parser::normalize_amount))
+            .route(
+                "/index_recipe_detail",
+                post(crate::search::index_recipe_detail),
+            )
+            .layer(opentelemetry_tracing_layer())
+            .layer(response_with_trace_layer());
 
-        println!("running on http://{}", address);
-        Ok(Self { port, server })
+        let port = configuration.application.port;
+        let addr = SocketAddr::from(([127, 0, 0, 1], port));
+        tracing::debug!("listening on {}", addr);
+        axum::Server::bind(&addr)
+            .serve(app.into_make_service())
+            .await
+            .unwrap();
+        Ok(())
     }
-
     pub fn port(&self) -> u16 {
         self.port
     }
-
-    pub async fn run_until_stopped(self) -> Result<(), std::io::Error> {
-        self.server.await
-    }
-}
-
-fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
-    info!("starting up");
-    let server = HttpServer::new(move || {
-        App::new()
-            .wrap(Logger::default())
-            .wrap(RequestTracing::new())
-            .route("/parse", web::get().to(parser))
-            .route("/parse_amount", web::get().to(parser::amount_parser))
-            .route("/decode_recipe", web::get().to(parser::decode_recipe))
-            .route("/convert", web::post().to(parser::convert))
-            .route("/scrape", web::get().to(parser::scrape))
-            .route("/pans", web::get().to(parser::pans))
-            .route("/debug/scrape", web::get().to(parser::debug_scrape))
-            .route(
-                "/debug/search_usda",
-                web::get().to(crate::usda_loader::search_usda),
-            )
-            .route(
-                "/debug/get_usda",
-                web::get().to(crate::usda_loader::get_usda),
-            )
-            .route(
-                "/codec/expand",
-                web::post().to(parser::expand_compact_to_input),
-            )
-            .route(
-                "/normalize_amount",
-                web::post().to(parser::normalize_amount),
-            )
-            .route(
-                "/index_recipe_detail",
-                web::post().to(crate::search::index_recipe_detail),
-            )
-    })
-    .listen(listener)?
-    .run();
-    Ok(server)
 }

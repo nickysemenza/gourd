@@ -1,8 +1,19 @@
-use actix_web::{web, HttpResponse};
-use gourd_common::{codec::expand_recipe, convert_to, ingredient, pan, tmp_normalize};
+use axum::{
+    extract::{self, Query},
+    response::IntoResponse,
+    Json,
+};
+use gourd_common::{
+    codec::expand_recipe,
+    convert_to,
+    ingredient::{self, unit::Measure},
+    tmp_normalize,
+};
 use openapi::models::{Amount, CompactRecipe, RecipeWrapperInput};
 use serde::{Deserialize, Serialize};
-use tracing::{debug, error, span};
+use tracing::{debug, span};
+
+use crate::error::AppError;
 
 #[derive(Deserialize, Debug)]
 pub struct Info {
@@ -14,23 +25,7 @@ pub struct URLInput {
     url: String,
 }
 
-pub async fn parser(info: web::Query<Info>) -> HttpResponse {
-    let root = span!(
-        tracing::Level::TRACE,
-        "parser",
-        ingredient = info.text.to_string().as_str()
-    );
-    let _enter = root.enter();
-
-    let i = gourd_common::parse_ingredient(&info.text);
-    if i.is_err() {
-        return HttpResponse::BadRequest().finish();
-    }
-    let foo = web::Json(i.unwrap());
-
-    HttpResponse::Ok().json(actix_web::web::Json(foo.0)) // <- send response
-}
-pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
+pub async fn decode_recipe(info: Query<Info>) -> impl IntoResponse {
     let root = span!(tracing::Level::TRACE, "decode_recipe",);
     let _enter = root.enter();
 
@@ -38,11 +33,13 @@ pub async fn decode_recipe(info: web::Query<Info>) -> HttpResponse {
         .unwrap()
         .0;
 
-    let foo = web::Json(detail);
+    Json(detail)
 
-    HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
+    // let foo = Json(detail);
+
+    // HttpResponse::Ok().json(Json(foo.0)) // <- send response
 }
-pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
+pub async fn amount_parser(info: Query<Info>) -> Result<Json<Vec<Measure>>, AppError> {
     let root = span!(
         tracing::Level::TRACE,
         "amount_parser",
@@ -50,118 +47,60 @@ pub async fn amount_parser(info: web::Query<Info>) -> HttpResponse {
     );
     let _enter = root.enter();
 
-    let i = match gourd_common::parse_amount(&info.text) {
-        Ok(a) => a,
-        Err(e) => {
-            error!("error parsing amount: {:?}", e);
-            return HttpResponse::BadRequest().json("error parsing amount");
-        }
-    };
+    let i = gourd_common::parse_amount(&info.text)?;
 
-    let foo = web::Json(i);
-
-    HttpResponse::Ok().json(web::Json(foo.0)) // <- send response
+    Ok(Json(i))
 }
-pub async fn convert(r: web::Json<openapi::models::UnitConversionRequest>) -> HttpResponse {
+pub async fn convert(r: Json<openapi::models::UnitConversionRequest>) -> impl IntoResponse {
     let root = span!(
         tracing::Level::TRACE,
         "convert",
         item = format!("{:#?}", r.0).to_string().as_str()
     );
     let _enter = root.enter();
-    HttpResponse::Ok().json(convert_to(r.0))
-}
-
-pub async fn pans() -> HttpResponse {
-    let p = pan::inventory();
-
-    HttpResponse::Ok().json(actix_web::web::Json(p)) // <- send response
+    Json(convert_to(r.0))
 }
 
 #[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
-struct DebugScrapeWrapper {
+pub struct DebugScrapeWrapper {
     compact_scrape_result: CompactRecipe,
     instructions_rich: Vec<ingredient::rich_text::Rich>,
     input: RecipeWrapperInput,
 }
 #[tracing::instrument(name = "route::debug_scrape")]
-pub async fn debug_scrape(info: web::Query<URLInput>) -> HttpResponse {
+pub async fn debug_scrape(info: Query<URLInput>) -> Result<Json<DebugScrapeWrapper>, AppError> {
     let url = info.url.as_str();
 
-    let compact_scrape_result = match crate::scraper::scrape_recipe(url).await {
-        Ok(s) => s,
-        Err(e) => {
-            error!("{:#?}", e);
-            return HttpResponse::InternalServerError().json(format!("{}", e));
-        }
-    };
+    let compact_scrape_result = crate::scraper::scrape_recipe(url).await?;
     let a = expand_recipe(compact_scrape_result.clone()).unwrap();
     let res = RecipeWrapperInput::new(a.clone().0);
 
-    HttpResponse::Ok().json(DebugScrapeWrapper {
+    Ok(Json(DebugScrapeWrapper {
         compact_scrape_result,
         instructions_rich: a.1,
         input: res,
-    })
+    }))
 }
 
 #[tracing::instrument(name = "route::scrape")]
-pub async fn scrape(info: web::Query<Info>) -> HttpResponse {
+pub async fn scrape(info: Query<Info>) -> Result<Json<RecipeWrapperInput>, AppError> {
     let url = info.text.as_str();
-    let sc_result = match crate::scraper::scrape_recipe(url).await {
-        Ok(s) => s,
-        Err(e) => {
-            error!("{:#?}", e);
-            return HttpResponse::InternalServerError().json(format!("{:#?}", e));
-        }
-    };
+    let sc_result = crate::scraper::scrape_recipe(url).await?;
 
     let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap().0);
 
     debug!("scraped {}", url.clone());
-    HttpResponse::Ok().json(actix_web::web::Json(res)) // <- send response
+    Ok(Json(res))
 }
 
 #[tracing::instrument(name = "route::expand_compact_to_input")]
-pub async fn expand_compact_to_input(cr: web::Json<CompactRecipe>) -> HttpResponse {
+pub async fn expand_compact_to_input(
+    extract::Json(cr): extract::Json<CompactRecipe>,
+) -> impl IntoResponse {
     let res = RecipeWrapperInput::new(expand_recipe(cr.clone()).unwrap().0);
-    HttpResponse::Ok().json(res)
+    Json(res)
 }
 #[tracing::instrument(name = "route::normalize_amount")]
-pub async fn normalize_amount(cr: web::Json<Amount>) -> HttpResponse {
-    HttpResponse::Ok().json(tmp_normalize(cr.clone()))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use actix_web::Error;
-    use actix_web::{test, web, App};
-
-    #[actix_web::test]
-    async fn test_parse() -> Result<(), Error> {
-        let mut app = test::init_service(
-            App::new().service(web::resource("/parse").route(web::get().to(parser))),
-        )
-        .await;
-
-        let req = test::TestRequest::get()
-            .uri("/parse?text=1%20cup%20(120%20grams)%20flour,%20lightly%20sifted")
-            .param("text", "1 cup flour")
-            .to_request();
-        // let resp = app.call(req).await.unwrap();
-
-        let resp = test::call_service(&mut app, req).await;
-        assert!(resp.status().is_success());
-
-        // assert_eq!(resp.status(), http::StatusCode::OK);
-
-        let response_body = actix_web::body::to_bytes(resp.into_body()).await.unwrap();
-        assert_eq!(
-            response_body,
-            r##"{"name":"flour","kind":"ingredient","amounts":[{"unit":"cup","value":1.0},{"unit":"g","value":120.0}],"adjective":"lightly sifted","original":"1 cup (120 grams) flour, lightly sifted"}"##
-        );
-
-        Ok(())
-    }
+pub async fn normalize_amount(extract::Json(cr): extract::Json<Amount>) -> impl IntoResponse {
+    Json(tmp_normalize(cr.clone()))
 }

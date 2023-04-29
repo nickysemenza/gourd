@@ -19,7 +19,6 @@ import (
 type parseMethod string
 
 const (
-	// ParseIngredient parseMethod = "parse"
 	Scrape       parseMethod = "scrape"
 	ParseAmount  parseMethod = "parse_amount"
 	RecipeDecode parseMethod = "decode_recipe"

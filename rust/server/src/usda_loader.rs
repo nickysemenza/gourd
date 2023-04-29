@@ -1,5 +1,8 @@
-use actix_web::{web, HttpResponse};
 use anyhow::{Context, Result};
+use axum::extract::Query;
+use axum::http::StatusCode;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use gourd_common::usda::IntoFoodWrapper;
 use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use itertools::Itertools;
@@ -11,6 +14,7 @@ use std::fmt::Write;
 use std::{fs::File, io::BufReader, path::Path, time::Instant};
 use tracing::info;
 
+use crate::error::AppError;
 use crate::search::{Document, Index, Searcher};
 
 #[tracing::instrument]
@@ -166,15 +170,15 @@ async fn get_usda_by_id(id: &str) -> Result<Option<Result<TempFood>>> {
     Ok(None)
 }
 
-pub async fn get_usda(info: web::Query<URLInput>) -> HttpResponse {
+pub async fn get_usda(info: Query<URLInput>) -> Response {
     let id = info.name.as_str();
 
     match get_usda_by_id(id).await.unwrap() {
         Some(item) => match item {
-            Ok(item) => HttpResponse::Ok().json(item),
-            Err(e) => HttpResponse::InternalServerError().json(e.to_string()),
+            Ok(item) => Json(item).into_response(),
+            Err(e) => AppError::from(e).into_response(),
         },
-        None => HttpResponse::NotFound().json(format!("{} not found", id).to_string()),
+        None => (StatusCode::NOT_FOUND, "Not found").into_response(),
     }
 }
 
@@ -213,9 +217,6 @@ async fn search_usda_by_name(name: &str) -> Result<Vec<TempFood>> {
     Ok(a)
 }
 #[tracing::instrument(name = "route::search_usda")]
-pub async fn search_usda(info: web::Query<URLInput>) -> HttpResponse {
-    match search_usda_by_name(info.name.as_str()).await {
-        Ok(item) => HttpResponse::Ok().json(item),
-        Err(e) => HttpResponse::InternalServerError().json(format!("{:?}", e).to_string()),
-    }
+pub async fn search_usda(info: Query<URLInput>) -> Result<Json<Vec<TempFood>>, AppError> {
+    Ok(Json(search_usda_by_name(info.name.as_str()).await?))
 }

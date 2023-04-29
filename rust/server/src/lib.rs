@@ -1,4 +1,5 @@
 pub mod configuration;
+mod error;
 pub mod routes;
 pub mod scraper;
 mod search;
