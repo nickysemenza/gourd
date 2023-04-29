@@ -5,7 +5,7 @@ kill_timeout = 5
 processes = []
 
 [build]
-image = "ghcr.io/nickysemenza/gourd-api:dev"
+image = "ghcr.io/nickysemenza/gourd-api-rust:dev"
 
 [env]
 

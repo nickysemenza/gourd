@@ -149,7 +149,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
                 ip: new_ingredient_parser(true),
             };
             for i in s.instructions.into_iter() {
-                let rich_text_tokens = dbg!(rtp.clone().parse(&i).unwrap_or_default());
+                let rich_text_tokens = rtp.clone().parse(&i).unwrap_or_default();
                 rtt.push(rich_text_tokens.clone());
 
                 for token in rich_text_tokens.into_iter() {

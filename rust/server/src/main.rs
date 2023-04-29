@@ -1,13 +1,12 @@
 use std::env;
 
-use gourd::startup::Application;
+use gourd::server::Application;
 use gourd::{configuration::get_configuration, usda_loader};
 use opentelemetry::sdk::{
     propagation::TraceContextPropagator,
     trace::{self, Sampler},
 };
 use tracing::{info, span};
-// use tracing_subscriber::subscribe::CollectExt;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 extern crate clap;
@@ -60,7 +59,7 @@ async fn main() -> std::io::Result<()> {
 
     if let Some(_) = matches.subcommand_matches("server") {
         initialize_tracing("gourd-rs");
-        Application::run2(configuration).await.unwrap();
+        Application::run(configuration).await.unwrap();
     }
     initialize_tracing("gourd-cli");
     if let Some(_m) = matches.subcommand_matches("load_mappings") {

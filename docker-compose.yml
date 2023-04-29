@@ -69,7 +69,6 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgres://gourd:gourd@db:5432/food
-      DATABASE_URL_USDA: postgres://gourd:gourd@usda_db:5432/usda
       TRACE_ADDRESS: http://jaeger:9411/api/v2/spans
       RS_URI: http://rs:8080/
       BYPASS_AUTH: "true"
@@ -79,8 +78,8 @@ services:
 
   rs:
     build:
+      dockerfile: rust/Dockerfile
       context: .
-    entrypoint: [ "./bin/gourd-rs", "server" ]
     depends_on:
       - db
       - jaeger
@@ -90,17 +89,6 @@ services:
     ports:
       - "8080:8080"
 
-  usda:
-    # doesn't change much so can just use most recent image
-    image: ghcr.io/nickysemenza/gourd-usda:dev
-    # build:
-    # context: usda
-    depends_on:
-      # - gourd
-      - usda_db
-    environment:
-      DB_DSN: postgresql://gourd:gourd@usda_db:5432/usda
-      CI: "true"
   meilisearch:
     ports:
       - '7700:7700'

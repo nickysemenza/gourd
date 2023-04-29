@@ -13,7 +13,7 @@ pub struct Application {
 }
 
 impl Application {
-    pub async fn run2(configuration: Settings) -> Result<()> {
+    pub async fn run(configuration: Settings) -> Result<()> {
         let app = Router::new()
             .route("/parse_amount", get(parser::amount_parser))
             .route("/decode_recipe", get(parser::decode_recipe))

@@ -12,7 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 tower-http = { version = "0.4.0", features = ["trace"] }
-axum = {versio  = "0.6.17", features= ["tracing"] }
+axum = {version = "0.6", features= ["tracing"] }
 axum-tracing-opentelemetry = "0.10.0"
 anyhow = "1.0"
 clap = "4"

@@ -32,7 +32,7 @@ jobs:
       - run: make wasm-dev
       - run: docker-compose build
       - name: start postgres db
-        run: docker-compose up -d db usda_db
+        run: docker-compose up -d db
       - name: migrate db
         run: sleep 5 && make migrate
       - name: start rust + go servers
@@ -50,7 +50,6 @@ jobs:
       - name: seed db with testdata
         env:
           DATABASE_URL: postgres://gourd:gourd@localhost:5555/food
-          DATABASE_URL_USDA: postgres://gourd:gourd@localhost:5556/usda
         run: make seed-testdata
       - name: Cypress run
         uses: cypress-io/github-action@v4
