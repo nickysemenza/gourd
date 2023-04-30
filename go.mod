@@ -45,7 +45,7 @@ require (
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.41.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
-	go.opentelemetry.io/contrib/propagators/jaeger v1.15.0
+	go.opentelemetry.io/contrib/propagators/jaeger v1.16.0
 	go.opentelemetry.io/otel v1.15.0
 	go.opentelemetry.io/otel/sdk v1.15.0
 	go.opentelemetry.io/otel/trace v1.15.0
