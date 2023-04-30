@@ -550,7 +550,10 @@ const RecipeDetail: React.FC = () => {
 
           <HideShowHOC>
             <Nutrition
-              items={ingredientsWithNutrients}
+              items={[
+                ...ingredientsWithNutrients,
+                ...[{ ingredient: "total", nutrients: totalNutrients }],
+              ]}
               h={[...totalNutrients.keys()]}
             />
           </HideShowHOC>

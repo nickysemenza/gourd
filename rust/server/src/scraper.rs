@@ -10,14 +10,14 @@ pub async fn scrape_recipe(url: &str) -> Result<CompactRecipe> {
     let res = s
         .scrape_url(url)
         .await
-        .with_context(|| format!("Failed to scrape {}", url))?;
+        .with_context(|| format!("Failed to scrape {url}"))?;
 
     let parsed_url = Url::parse(url).unwrap();
     let compact = CompactRecipe {
         id: format!(
             "{}-{}",
             parsed_url.host_str().unwrap(),
-            parsed_url.path().replace("/", "-")
+            parsed_url.path().replace('/', "-")
         )
         .replace(|c: char| !c.is_alphanumeric() && c != '-' && c != '_', ""),
 

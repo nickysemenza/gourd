@@ -469,6 +469,7 @@ export const getCalories = (food: TempFood) => {
   return (!!first && first.amount) || 0;
 };
 
+export type NutrientLabel = string;
 export const calCalc = (
   sections: RecipeSection[],
   hints: FoodsById,
@@ -482,9 +483,9 @@ export const calCalc = (
 
   let ingredientsWithNutrients: Array<{
     ingredient: string;
-    nutrients: Map<string, number>;
+    nutrients: Map<NutrientLabel, number>;
   }> = [];
-  const totalNutrients = new Map<string, number>();
+  const totalNutrients = new Map<NutrientLabel, number>();
   // const foo = [];
   Object.keys(uniqIng).forEach((k) => {
     uniqIng[k].forEach((si) => {
@@ -495,11 +496,11 @@ export const calCalc = (
           if (hint !== undefined) {
             const scalingFactor = (getGramsFromSI(si) / 100) * multiplier;
             const cal = getCalories(hint) * scalingFactor;
-            const ingNutrients = new Map<string, number>();
+            const ingNutrients = new Map<NutrientLabel, number>();
             (hint.foodNutrients || []).forEach((n) => {
               if (n.nutrient === undefined || n.amount === undefined) return;
               const { name, unitName } = n.nutrient;
-              const label = `${name} (${unitName})`;
+              const label: NutrientLabel = `${name} (${unitName})`;
               if (n.amount <= 0) return;
               totalNutrients.set(
                 label,

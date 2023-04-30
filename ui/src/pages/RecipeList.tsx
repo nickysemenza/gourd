@@ -40,7 +40,10 @@ const RecipeList: React.FC = () => {
   });
 
   const recipes = (data?.recipes || []).filter(
-    (r) => showEmpty || r.detail.sections.length > 0
+    (r) =>
+      showEmpty ||
+      r.detail.sections.length > 0 ||
+      r.detail.name.startsWith("cy-")
   );
 
   let future = new Set<RecipeWrapper>();
@@ -63,6 +66,9 @@ const RecipeList: React.FC = () => {
       other.add(r);
     }
   });
+  console.log(
+    `future: ${future.size}, past: ${past.size}, other: ${other.size} (total ${recipes.length})`
+  );
 
   type i = (typeof recipes)[0];
 

@@ -55,8 +55,8 @@ impl Index {
     }
 }
 
-impl Into<String> for Index {
-    fn into(self) -> String {
-        self.to_string()
+impl From<Index> for String {
+    fn from(val: Index) -> Self {
+        val.to_string()
     }
 }

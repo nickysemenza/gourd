@@ -55,7 +55,7 @@ pub async fn convert(r: Json<openapi::models::UnitConversionRequest>) -> impl In
     let root = span!(
         tracing::Level::TRACE,
         "convert",
-        item = format!("{:#?}", r.0).to_string().as_str()
+        item = format!("{:#?}", r.0).as_str()
     );
     let _enter = root.enter();
     Json(convert_to(r.0))
@@ -87,9 +87,9 @@ pub async fn scrape(info: Query<Info>) -> Result<Json<RecipeWrapperInput>, AppEr
     let url = info.text.as_str();
     let sc_result = crate::scraper::scrape_recipe(url).await?;
 
-    let res = RecipeWrapperInput::new(expand_recipe(sc_result.clone()).unwrap().0);
+    let res = RecipeWrapperInput::new(expand_recipe(sc_result).unwrap().0);
 
-    debug!("scraped {}", url.clone());
+    debug!("scraped {}", url);
     Ok(Json(res))
 }
 

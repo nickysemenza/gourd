@@ -44,7 +44,7 @@ impl Searcher {
             .with_limit(limit)
             .execute::<T>()
             .await
-            .context(format!("search {} for {}", index, name))?;
+            .context(format!("search {index} for {name}"))?;
         info!("searched in {}ms", results.processing_time_ms);
         Ok(results.hits.into_iter().map(|x| x.result).collect())
     }
@@ -73,7 +73,7 @@ impl Searcher {
             .map(|v| {
                 let client = self.client.clone();
                 let x = v.clone();
-                let i = index.clone();
+                let i = index;
                 tokio::spawn(async move { client.index(i).add_documents(&x, None).await.unwrap() })
             })
             .collect();

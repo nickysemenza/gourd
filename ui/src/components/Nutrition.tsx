@@ -10,7 +10,7 @@ const Nutrient: React.FC<{
     nutrients: Map<string, number>;
   }>;
 }> = ({ items, h }) => {
-  type i = typeof items[0];
+  type i = (typeof items)[0];
 
   const foo = h.map((n) => {
     const res: Column<i> = {

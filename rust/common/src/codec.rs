@@ -26,7 +26,7 @@ pub fn to_string(cr: CompactRecipe) -> Result<String, anyhow::Error> {
             res.push('\n');
         }
         for i in s.instructions.into_iter() {
-            res.push_str(format!(";{}", i).as_str());
+            res.push_str(format!(";{i}").as_str());
             res.push('\n');
         }
         res.push('\n');
@@ -60,8 +60,8 @@ pub fn from_string(r: String) -> Result<CompactRecipe, anyhow::Error> {
                     ingredients: vec![],
                     instructions: vec![],
                 };
-                section_text_chunk.split("\n").into_iter().for_each(|l| {
-                    match l.strip_prefix(";") {
+                section_text_chunk.split('\n').into_iter().for_each(|l| {
+                    match l.strip_prefix(';') {
                         Some(i) => section.instructions.push(i.to_string()),
                         None => section.ingredients.push(l.to_string()),
                     }
@@ -91,13 +91,13 @@ pub fn compact_recipe(r: RecipeDetailInput) -> CompactRecipe {
         }
         sections.push(sec);
     }
-    return CompactRecipe {
+    CompactRecipe {
         id: Uuid::new_v4().to_string(),
         name: r.name,
         url: None,
         image: None,
         sections,
-    };
+    }
 }
 
 // turn the recipe into a text block
@@ -141,11 +141,7 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
                 ))
             }
             let rtp = ingredient::rich_text::RichParser {
-                ingredient_names: ingredients
-                    .iter()
-                    .map(|i| i.name.clone())
-                    .filter_map(|x| x)
-                    .collect(),
+                ingredient_names: ingredients.iter().filter_map(|i| i.name.clone()).collect(),
                 ip: new_ingredient_parser(true),
             };
             for i in s.instructions.into_iter() {
@@ -153,19 +149,16 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
                 rtt.push(rich_text_tokens.clone());
 
                 for token in rich_text_tokens.into_iter() {
-                    match token {
-                        ingredient::rich_text::Chunk::Measure(amt) => {
-                            for m in amt.into_iter() {
-                                if m.kind().unwrap() == ingredient::unit::kind::MeasureKind::Time {
-                                    total_time = total_time.add(m).unwrap();
-                                }
+                    if let ingredient::rich_text::Chunk::Measure(amt) = token {
+                        for m in amt.into_iter() {
+                            if m.kind().unwrap() == ingredient::unit::kind::MeasureKind::Time {
+                                total_time = total_time.add(m).unwrap();
                             }
                         }
-                        _ => {}
                     }
                 }
                 instructions.push(SectionInstructionInput::new(
-                    i.strip_prefix(" ")
+                    i.strip_prefix(' ')
                         .unwrap_or(&i) // trim leading space if exsists to support `;` or `; `
                         .to_string(),
                 ))
@@ -205,11 +198,11 @@ pub fn section_to_input(s: &RecipeSection) -> RecipeSectionInput {
     RecipeSectionInput::new(
         s.instructions
             .iter()
-            .map(|i| section_instruction_to_input(i))
+            .map(section_instruction_to_input)
             .collect(),
         s.ingredients
             .iter()
-            .map(|i| section_ingredient_to_input(i))
+            .map(section_ingredient_to_input)
             .collect(),
     )
 }
@@ -298,7 +291,7 @@ mod tests {
                 RecipeSection::new(
                     "".to_string(),
                     vec![SectionInstruction::new("".to_string(), "inst1".to_string())],
-                    vec![si_1.clone(), si_2.clone(), si_3.clone()],
+                    vec![si_1, si_2, si_3.clone()],
                 ),
                 RecipeSection::new(
                     "".to_string(),
@@ -306,7 +299,7 @@ mod tests {
                         SectionInstruction::new("".to_string(), "inst2".to_string()),
                         SectionInstruction::new("".to_string(), "inst3".to_string()),
                     ],
-                    vec![si_3.clone()],
+                    vec![si_3],
                 ),
             ],
             "cake".to_string(),

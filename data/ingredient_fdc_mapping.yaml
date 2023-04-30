@@ -47,6 +47,14 @@
         unit: dollars
         value: 4
       source: estimate
+    - &dry_pinch
+      a:
+        unit: pinch
+        value: 16
+      b:
+        unit: tsp
+        value: 1
+      source: estimate
 - name: sugar
   fdc_id: 746784
   aliases: ["granulated sugar", "white sugar"]
@@ -69,7 +77,7 @@
 - name: delicata squash
   fdc_id: 170489
 - name: butter
-  fdc_id: 719780
+  fdc_id: 440079
   aliases: ["unsalted butter"]
   unit_mappings:
     - a:
@@ -150,7 +158,7 @@
         value: 50.3
       source: misc
 - name: all purpose flour
-  fdc_id: 804415
+  fdc_id: 1971433
   aliases: ["flour", "all-purpose flour", "AP flour"]
   unit_mappings:
     - a:
@@ -160,8 +168,16 @@
         unit: dollars
         value: 6
       source: wf
+    - &flour_weight
+      a:
+        unit: cup
+        value: 1
+      b:
+        unit: grams
+        value: 120
+      source: estimate
 - name: kosher salt
-  fdc_id: 705264
+  fdc_id: 2125970
   aliases:
     [
       "salt",
@@ -178,6 +194,13 @@
         unit: dollars
         value: 5
       source: wf
+    - a:
+        unit: grams
+        value: 3
+      b:
+        unit: tsp
+        value: 1
+      source: diamon
 - name: vanilla extract
   fdc_id: 173471
   aliases: ["vanilla"]
@@ -249,6 +272,8 @@
       source: amazon
 - name: pastry flour
   fdc_id: 532183
+  unit_mappings:
+    - *flour_weight
 - name: dark brown sugar
   aliases: ["brown sugar", "light or dark brown sugar"]
   fdc_id: 577990
@@ -320,7 +345,7 @@
         unit: large
         value: 1
       b:
-        unit: edible
+        unit: onion
         value: 1
     - a:
         unit: large
@@ -343,6 +368,7 @@
         unit: dollars
         value: 6
       source: wf
+    - *flour_weight
 - name: whole wheat flour
   fdc_id: 790085
   unit_mappings:
@@ -353,6 +379,7 @@
         unit: dollars
         value: 6
       source: wf
+    - *flour_weight
 - name: cornmeal
   fdc_id: 519412
 - name: blueberries
@@ -426,7 +453,7 @@
     - *density_liquid
 - name: black peppercorns
   aliases: ["black pepper"]
-  fdc_id: 451342
+  fdc_id: 1854028
   unit_mappings:
     - a:
         unit: oz
@@ -435,6 +462,7 @@
         unit: dollars
         value: 4.99
       source: wf brand
+    - *density_spices
 - name: basil
   fdc_id: 172232
   unit_mappings:
@@ -601,14 +629,18 @@
   unit_mappings:
     - *density_spices
     - *cost_spices
+    - *dry_pinch
 - name: ground ginger
   unit_mappings:
     - *density_spices
     - *cost_spices
-- name: freshly grated nutmeg
+    - *dry_pinch
+- name: nutmeg
+  fdc_id: 1135512
   unit_mappings:
     - *density_spices
     - *cost_spices
+    - *dry_pinch
 - name: coconut milk
   fdc_id: 938090
   aliases: ["unsweetened coconut milk"]
@@ -656,3 +688,11 @@
       b:
         unit: ounce
         value: 1
+- name: chickpea flour
+  fdc_id: 1972600
+  unit_mappings:
+    - *flour_weight
+- name: rosemary
+  aliases:
+    - fresh rosemary
+  fdc_id: 1967454

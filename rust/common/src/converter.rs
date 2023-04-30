@@ -21,7 +21,7 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
         Target::Calories => MeasureKind::Calories,
         Target::Other => MeasureKind::Other,
     };
-    if req.input.len() == 0 {
+    if req.input.is_empty() {
         return None;
     }
     return match amount_to_measure(req.input[0].clone())
@@ -49,12 +49,12 @@ pub fn convert_to(req: UnitConversionRequest) -> Option<Amount> {
 }
 pub fn tmp_normalize(a: Amount) -> Amount {
     let m = measure_to_amount(amount_to_measure(a.clone()));
-    return Amount {
+    Amount {
         unit: m.unit,
         value: m.value,
         upper_value: m.upper_value,
-        source: a.source.clone(),
-    };
+        source: a.source,
+    }
 }
 pub fn amount_to_measure(a: Amount) -> Measure {
     Measure::from_parts(a.unit.as_ref(), a.value, a.upper_value)
@@ -69,19 +69,15 @@ pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
         amounts.push(Measure::from_parts(a.unit.as_ref(), a.value, a.upper_value));
     }
 
-    return ingredient::Ingredient {
+    ingredient::Ingredient {
         name: s.name.unwrap_or_default(),
         modifier: s.adjective,
         amounts,
-    };
+    }
 }
 #[allow(dead_code)]
 pub fn bare_detail(name: String) -> IngredientDetail {
-    IngredientDetail::new(
-        Ingredient::new("".to_string(), name.to_string()),
-        vec![],
-        vec![],
-    )
+    IngredientDetail::new(Ingredient::new("".to_string(), name), vec![], vec![])
 }
 
 pub fn sum_ingredients(
@@ -159,7 +155,7 @@ mod tests {
             convert_to(UnitConversionRequest {
                 target: Some(Target::Calories),
                 input: vec![Amount::new("piece".to_string(), 0.5)],
-                unit_mappings: unit_mappings.clone(),
+                unit_mappings,
             }),
             None,
         );

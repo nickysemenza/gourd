@@ -109,7 +109,7 @@ pub fn parse4(input: &str) -> JsValue {
 #[wasm_bindgen]
 pub fn format_ingredient(val: &IIngredient) -> String {
     let i: gourd_common::ingredient::Ingredient = val.into_serde().unwrap();
-    return i.to_string();
+    i.to_string()
 }
 
 #[wasm_bindgen]
@@ -123,10 +123,10 @@ pub fn sum_ingr(recipe_detail: &JsValue) -> JsValue {
 pub fn dolla(conversion_request: &JsValue) -> Result<IMeasure, JsValue> {
     utils::set_panic_hook();
     let req: UnitConversionRequest = conversion_request.into_serde().unwrap();
-    return match convert_to(req) {
+    match convert_to(req) {
         Some(a) => Ok(JsValue::from_serde(&a).unwrap().into()),
         None => Err(JsValue::from_str("no parse result")),
-    };
+    }
 }
 
 #[wasm_bindgen]
@@ -167,14 +167,14 @@ pub fn make_dag(conversion_request: &JsValue) -> String {
 
     let equivalencies = parse_unit_mappings(req.unit_mappings);
     let g = make_graph(equivalencies);
-    return print_graph(g);
+    print_graph(g)
 }
 
 #[wasm_bindgen]
 pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     utils::set_panic_hook();
     let ings2: Vec<String> = ings.into_serde().unwrap();
-    if ings2.len() > 0 {
+    if !ings2.is_empty() {
         info!("rich2: {:?}", ings2);
     }
     let rtp = gourd_common::ingredient::rich_text::RichParser {
@@ -183,7 +183,7 @@ pub fn rich(r: String, ings: &JsValue) -> Result<RichItems, JsValue> {
     };
     match rtp.parse(r.as_str()) {
         Ok(r) => Ok(JsValue::from_serde(&r).unwrap().into()),
-        Err(e) => Err(JsValue::from_str(&e.to_string())),
+        Err(e) => Err(JsValue::from_str(&e)),
     }
 }
 
@@ -192,10 +192,10 @@ pub fn format_amount(amount: &IMeasure) -> String {
     utils::set_panic_hook();
     let a1: Result<Measure, _> = amount.into_serde();
     match a1 {
-        Ok(a) => format!("{}", a),
+        Ok(a) => format!("{a}"),
         Err(e) => {
             error!("failed to format {:#?}: {:?}", amount, e);
-            format!("{}", e)
+            format!("{e}")
         }
     }
 }
@@ -205,7 +205,7 @@ pub fn sum_time_amounts(amount: &IAmount) -> IMeasure {
     utils::set_panic_hook();
     let r: Vec<Amount> = amount.into_serde().unwrap();
 
-    let m = r.into_iter().map(|a| amount_to_measure(a)).collect();
+    let m = r.into_iter().map(amount_to_measure).collect();
     let sum = add_time_amounts(m);
     info!("sum {}", sum);
     JsValue::from_serde(&sum).unwrap().into()

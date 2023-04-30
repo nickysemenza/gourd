@@ -36,7 +36,7 @@ pub fn get_cal_mappings(nutrients: Option<Vec<openapi::models::FoodNutrient>>) -
     if let Some(m) = kcal_from_nutrients(nutrients.unwrap_or_default()) {
         return vec![m];
     }
-    return vec![];
+    vec![]
 }
 
 pub trait IntoFoodWrapper {
@@ -47,7 +47,7 @@ impl IntoFoodWrapper for BrandedFoodItem {
         let mut mappings = get_cal_mappings(self.food_nutrients.clone());
 
         if let Some(serving) = self.household_serving_full_text.clone() {
-            if serving != "" {
+            if !serving.is_empty() {
                 // catch 614264
                 info!("going to parse {} for {}", serving, self.fdc_id);
                 let res = parse_amount(&serving).context("failed to parse serving size")?;
@@ -92,12 +92,30 @@ impl IntoFoodWrapper for SrLegacyFoodItem {
 }
 impl IntoFoodWrapper for FoundationFoodItem {
     fn into_wrapper(self) -> Result<TempFood> {
+        let mut mappings = get_cal_mappings(self.food_nutrients.clone());
+
+        if let Some(p) = self.food_portions.clone() {
+            for portion in p {
+                if let Some(gw) = portion.gram_weight {
+                    if let Some(mu) = portion.measure_unit {
+                        if let Some(n) = mu.name {
+                            let mapping = UnitMapping {
+                                a: Box::new(Amount::new("grams".to_string(), gw)),
+                                b: Box::new(Amount::new(n, 1.0)),
+                                source: Some("fdc hs".to_string()),
+                            };
+                            mappings.push(mapping);
+                        }
+                    }
+                }
+            }
+        }
         Ok(TempFood {
             foundation_food: Some(Box::new(self.clone())),
             food_nutrients: self.food_nutrients.clone(),
             ..TempFood::new(
                 TempFoodWrapper::new(self.fdc_id, self.data_type, self.description),
-                get_cal_mappings(self.food_nutrients),
+                mappings,
             )
         })
     }

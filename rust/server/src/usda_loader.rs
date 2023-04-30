@@ -20,7 +20,7 @@ use crate::search::{Document, Index, Searcher};
 #[tracing::instrument]
 async fn read_and_load_stream<T: Document>(filename: &str, index: Index) -> Result<()> {
     let file = File::open(Path::new("/Users/nicky/dev/gourd/tmp/usda_json/").join(filename))
-        .expect(format!("could not open file {}", filename).as_str());
+        .unwrap_or_else(|_| panic!("{}", "could not open file {filename}"));
     let pb = ProgressBar::new(file.metadata()?.len());
     pb.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")
     ?
@@ -63,7 +63,7 @@ fn read_from_file<T: Document>(filename: &str, toplevel: &str) -> Result<Vec<T>>
     let start = Instant::now();
     // let root: Value = serde_json::from_str(data.as_str())?;
     let file = File::open(Path::new("/Users/nicky/dev/gourd/tmp/usda_json/").join(filename))
-        .with_context(|| format!("could not open file {}", filename))?;
+        .with_context(|| format!("could not open file {filename}"))?;
     let pb = ProgressBar::new(file.metadata()?.len());
     pb.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})")
     ?

@@ -48,7 +48,7 @@ pub(crate) fn section_ingredient_from_parsed(
     if grams == 0.0 {
         // if grams are absent, try converting oz
         if grams == 0.0 && oz != 0.0 {
-            grams = ((oz * 28.35) as f64).round();
+            grams = (oz * 28.35).round();
         }
 
         // // if grams are absent, try using mL
@@ -60,12 +60,12 @@ pub(crate) fn section_ingredient_from_parsed(
         }
     }
 
-    return SectionIngredientInput {
+    SectionIngredientInput {
         adjective: i.modifier,
         name: Some(i.name),
         original: Some(original.to_string()),
         ..SectionIngredientInput::new(kind, amounts)
-    };
+    }
 }
 
 //todo: put this in ing parser project
@@ -100,10 +100,10 @@ pub fn amount_from_ingredient(e1: &unit::Measure) -> Amount {
 pub fn parse_unit_mappings(um: Vec<UnitMapping>) -> Vec<(Measure, Measure)> {
     um.iter()
         .map(|u| {
-            return (
+            (
                 amount_to_measure(*u.a.clone()),
                 amount_to_measure(*u.b.clone()),
-            );
+            )
         })
         .collect()
 }
@@ -228,8 +228,8 @@ mod tests {
             vec![],
         );
         let expected: HashMap<String, Vec<SectionIngredient>> = [
-            ("a".to_string(), vec![si_1.clone()]),
-            ("b".to_string(), vec![si_2.clone(), si_3.clone()]),
+            ("a".to_string(), vec![si_1]),
+            ("b".to_string(), vec![si_2, si_3]),
         ]
         .iter()
         .cloned()

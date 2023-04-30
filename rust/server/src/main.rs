@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
     let configuration = get_configuration().expect("Failed to read configuration.");
     info!("confiig: {:?}", configuration);
 
-    if let Some(_) = matches.subcommand_matches("server") {
+    if matches.subcommand_matches("server").is_some() {
         initialize_tracing("gourd-rs");
         Application::run(configuration).await.unwrap();
     }
