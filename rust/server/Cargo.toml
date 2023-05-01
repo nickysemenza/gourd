@@ -33,7 +33,7 @@ console-subscriber = "0.1.8"
 tokio = { version = "1", features = ["full","tracing"] }
 url = "2.3"
 recipe_scraper_fetcher = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
-meilisearch-sdk = "0.22.1"
+meilisearch-sdk = "0.23.1"
 strum = "0.24"
 strum_macros = "0.24"
 itertools = "0.10.5"
