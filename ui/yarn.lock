@@ -2567,10 +2567,10 @@
   resolved "https://registry.yarnpkg.com/@lukeed/csprng/-/csprng-1.1.0.tgz#1e3e4bd05c1cc7a0b2ddbd8a03f39f6e4b5e6cfe"
   integrity sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==
 
-"@meilisearch/instant-meilisearch@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@meilisearch/instant-meilisearch/-/instant-meilisearch-0.12.0.tgz#5a8cdfd0d0f3b9ebc578dffb5e061bae051f4c10"
-  integrity sha512-DmiqrJvW5onR8pDxXWvg71p10rFx+4sLioZrteT3I033iOVyJbuOTglNMNUetHbRBiCaqJ4kNFx0Yj/fkGzzfg==
+"@meilisearch/instant-meilisearch@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@meilisearch/instant-meilisearch/-/instant-meilisearch-0.13.0.tgz#fced6d29b8f96800d251bb56d80b053fab827ca5"
+  integrity sha512-8xWHqqUDlvJd/Y6ctdWM1uBwW74PMUidFBp6L9+/KTOkH/ghNgJK3ECdyuxXNCpDiLiszEDD46ZePZwauKuEyA==
   dependencies:
     meilisearch "^0.32.1"
 
