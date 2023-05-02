@@ -1,7 +1,7 @@
 ---
 - name: vegetable oil
   aliases: ["neutral oil", "oil", "canola oil"]
-  fdc_id: 748278
+  fdc_id: 1123984
   unit_mappings:
     - a:
         unit: oz
@@ -10,6 +10,13 @@
         unit: dollars
         value: 3
       source: wf
+    - &density_oil
+      a:
+        unit: cup
+        value: 1
+      b:
+        unit: gram
+        value: 225
 - name: buttermilk
   fdc_id: 454974
   unit_mappings:
@@ -251,7 +258,7 @@
       source: wf
 - name: active dry yeast
   aliases: ["yeast"]
-  fdc_id: 368813
+  fdc_id: 2014721
   unit_mappings:
     - a:
         unit: lb
@@ -260,6 +267,14 @@
         unit: dollars
         value: 7
       source: amazon
+    - &yeast_weight
+      a:
+        unit: tsp
+        value: 1
+      b:
+        unit: grams
+        value: 2.8
+      source: google
 - name: instant yeast
   fdc_id: 1601203
   unit_mappings:
@@ -270,6 +285,7 @@
         unit: dollars
         value: 7
       source: amazon
+    - *yeast_weight
 - name: pastry flour
   fdc_id: 532183
   unit_mappings:

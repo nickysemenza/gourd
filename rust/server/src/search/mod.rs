@@ -14,7 +14,7 @@ pub use self::index::Index;
 fn get_client() -> meilisearch_sdk::Client {
     let meilisearch_url = option_env!("MEILISEARCH_URL").unwrap_or("http://localhost:7700");
     let meilisearch_api_key = option_env!("MEILISEARCH_API_KEY").unwrap_or("FOO");
-    meilisearch_sdk::Client::new(meilisearch_url, meilisearch_api_key)
+    meilisearch_sdk::Client::new(meilisearch_url, Some(meilisearch_api_key))
 }
 
 #[derive(Debug)]

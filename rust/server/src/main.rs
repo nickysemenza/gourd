@@ -2,12 +2,13 @@ use std::env;
 
 use gourd::server::Application;
 use gourd::{configuration::get_configuration, usda_loader};
-use opentelemetry::sdk::{
-    propagation::TraceContextPropagator,
-    trace::{self, Sampler},
-};
+use opentelemetry::sdk;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::sdk::trace::Sampler;
+
 use tracing::{info, span};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{layer::SubscriberExt, EnvFilter};
 
 extern crate clap;
 use clap::{Arg, Command};
@@ -81,7 +82,7 @@ fn initialize_tracing(s: &str) {
     opentelemetry::global::set_text_map_propagator(TraceContextPropagator::new());
     let tracer = opentelemetry_jaeger::new_agent_pipeline()
         .with_service_name(s)
-        .with_trace_config(trace::config().with_sampler(Sampler::AlwaysOn))
+        .with_trace_config(sdk::trace::config().with_sampler(Sampler::AlwaysOn))
         .install_simple()
         .expect("pipeline install error");
 
