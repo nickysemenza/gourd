@@ -1,11 +1,11 @@
 import React from "react";
-import { ActionMeta, Styles, ValueType } from "react-select";
+import { ActionMeta, GroupBase, SingleValue, StylesConfig } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../config";
-import { blankRecipeWrapperInput, blankIngredient } from "../util";
 import { Pill2 } from "./Button";
 import { IngredientKind } from "./RecipeEditorUtils";
+import { blankIngredient, blankRecipeWrapperInput } from "../util";
 
 type Option = {
   label: string;
@@ -32,10 +32,7 @@ export const EntitySelector: React.FC<{
 }) => {
   const iApi = new IngredientsApi(getOpenapiFetchConfig());
   const rApi = new RecipesApi(getOpenapiFetchConfig());
-  const loadOptions = async (
-    inputValue: string,
-    callback: (options: Option[]) => void
-  ) => {
+  const loadOptions = async (inputValue: string) => {
     const res = await iApi.search({ name: inputValue });
     const recipeOptions: Option[] = (res.recipes || [])
       .filter((r) => r.detail.is_latest_version)
@@ -56,13 +53,14 @@ export const EntitySelector: React.FC<{
         fdc_id: i.fdc_id,
       };
     });
-    callback([
+    return [
       ...(showKind.includes("ingredient") ? ingredientOptions : []),
       ...(showKind.includes("recipe") ? recipeOptions : []),
-    ]);
+    ];
   };
+
   const onSelectChange = async (
-    val: ValueType<Option, false>,
+    val: SingleValue<Option>,
     action: ActionMeta<Option>
   ) => {
     console.log({ val, action });
@@ -101,25 +99,12 @@ export const EntitySelector: React.FC<{
   };
 
   const height = tall ? 40 : 24;
-  const customStyles: Partial<Styles<Option, false>> = {
-    // option: (provided, state) => ({
-    //   ...provided,
-    //   // borderBottom: "1px dotted pink",
-    //   // color: state.isSelected ? "red" : "blue",
-    //   padding: 20,
-    //   width: "100%",
-    // }),
+  const customStyles: StylesConfig<Option, false, GroupBase<Option>> = {
     control: (base) => ({
       ...base,
       height: height,
       minHeight: height,
     }),
-    // singleValue: (provided, state) => {
-    //   const opacity = state.isDisabled ? 0.5 : 1;
-    //   const transition = "opacity 300ms";
-
-    //   return { ...provided, opacity, transition };
-    // },
     valueContainer: (provided, state) => {
       return { ...provided, height: height, padding: "2px" };
     },
@@ -137,7 +122,6 @@ export const EntitySelector: React.FC<{
 
   return (
     <div data-cy="name-input">
-      {/* @ts-ignore */}
       <AsyncCreatableSelect
         styles={customStyles}
         placeholder={placeholder || `pick a ${showKind.join(" or ")}`}
@@ -150,6 +134,7 @@ export const EntitySelector: React.FC<{
             {option.kind && <Pill2 color="green">{option.kind}</Pill2>}
           </div>
         )}
+        onChange={onSelectChange}
         formatCreateLabel={(val) => (
           <div className="flex flex-row">
             <div className="text-green-600 font-bold pr-1">
@@ -158,10 +143,6 @@ export const EntitySelector: React.FC<{
             <div> {val}</div>
           </div>
         )}
-        // handleInputChange={(...a: any) => {
-        //   console.log({ handle: a });
-        // }}
-        onChange={onSelectChange}
       />
     </div>
   );

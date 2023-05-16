@@ -44,7 +44,7 @@ require (
 	github.com/volatiletech/strmangle v0.0.4
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.41.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.40.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.41.1
 	go.opentelemetry.io/contrib/propagators/jaeger v1.16.0
 	go.opentelemetry.io/otel v1.15.1
 	go.opentelemetry.io/otel/sdk v1.15.1
@@ -328,7 +328,7 @@ require (
 	github.com/ultraware/funlen v0.0.3 // indirect
 	github.com/ultraware/whitespace v0.0.5 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.2.0
-	github.com/uptrace/opentelemetry-go-extra/otelsql v0.1.21
+	github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.0
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.0 // indirect
 	github.com/uudashr/gocognit v1.0.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -352,7 +352,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.15.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.15.0
-	go.opentelemetry.io/otel/metric v0.37.0 // indirect
+	go.opentelemetry.io/otel/metric v0.38.1 // indirect
 	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect

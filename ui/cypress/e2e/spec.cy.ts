@@ -43,7 +43,7 @@ context("Basic Create, List, Edit test", () => {
     cy.intercept("/api/search?name=" + newIngredient).as("ingredientDropdown");
     let foo = cy.get("div[data-cy=name-input]");
     foo
-      .find(".react-select__single-value")
+      .find(".react-select__input-container")
       .click()
       // foo.find("input").first().
       .type(`${newIngredient}`);
