@@ -21,7 +21,7 @@ futures = "0.3"
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
 opentelemetry = "0.18.0"
-opentelemetry-jaeger = "0.17"
+opentelemetry-jaeger = "0.18"
 serde = {version = "1.0", features = ["derive"]}
 serde-aux = "4.2.0"
 serde_derive = "^1.0"
