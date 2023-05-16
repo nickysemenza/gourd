@@ -1891,6 +1891,8 @@ github.com/uptrace/opentelemetry-go-extra/otellogrus v0.2.0 h1:Ql5rfcDmcG2x9+9wZ
 github.com/uptrace/opentelemetry-go-extra/otellogrus v0.2.0/go.mod h1:aAqVF54M+869bIHiUuXlCK6Da/6JouOcGVn6grs9OTE=
 github.com/uptrace/opentelemetry-go-extra/otelsql v0.1.21 h1:iHkIlTU2P3xbSbVJbAiHL9IT+ekYV5empheF+652yeQ=
 github.com/uptrace/opentelemetry-go-extra/otelsql v0.1.21/go.mod h1:hiCFa1UeZITKXi8lhu2qwOD5LHXjdGMCUIQHbybxoF0=
+github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.0 h1:7srBbziwY2NM8xtco+JMqsRu1FSvI1ZJn/eRtgcHtmg=
+github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.0/go.mod h1:OsbPyR3wEfyJVdlEaMLXBrBpIWkyxEb9iwDQcxkMkTI=
 github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.21 h1:HCqo51kNF8wxDMDhxcN5S6DlfZXigMtptRpkvjBCeVc=
 github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.21/go.mod h1:2MNqrUmDrt5E0glMuoJI/9FyGVpBKo1FqjSH60UOZFg=
 github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.0 h1:Y0fGBHZ66s0sl0aweB8Q3atCSpXLEYRBYf4fRi8IePY=
@@ -2042,6 +2044,8 @@ go.opentelemetry.io/otel/exporters/zipkin v1.15.0/go.mod h1:S4F8L8oqVdegb7BO8fl9
 go.opentelemetry.io/otel/metric v0.20.0/go.mod h1:598I5tYlH1vzBjn+BTuhzTCSb/9debfNp6R3s7Pr1eU=
 go.opentelemetry.io/otel/metric v0.37.0 h1:pHDQuLQOZwYD+Km0eb657A25NaRzy0a+eLyKfDXedEs=
 go.opentelemetry.io/otel/metric v0.37.0/go.mod h1:DmdaHfGt54iV6UKxsV9slj2bBRJcKC1B1uvDLIioc1s=
+go.opentelemetry.io/otel/metric v0.38.1 h1:2MM7m6wPw9B8Qv8iHygoAgkbejed59uUR6ezR5T3X2s=
+go.opentelemetry.io/otel/metric v0.38.1/go.mod h1:FwqNHD3I/5iX9pfrRGZIlYICrJv0rHEUl2Ln5vdIVnQ=
 go.opentelemetry.io/otel/oteltest v0.20.0/go.mod h1:L7bgKf9ZB7qCwT9Up7i9/pn0PWIa9FqQ2IQ8LoxiGnw=
 go.opentelemetry.io/otel/sdk v0.20.0/go.mod h1:g/IcepuwNsoiX5Byy2nNV0ySUF1em498m7hBWC279Yc=
 go.opentelemetry.io/otel/sdk v1.3.0/go.mod h1:rIo4suHNhQwBIPg9axF8V9CA72Wz2mKF1teNrup8yzs=
