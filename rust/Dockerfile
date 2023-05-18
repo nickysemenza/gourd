@@ -1,12 +1,25 @@
-FROM rust:1.69 as builder
-WORKDIR /work/rust
-RUN apt-get update
+FROM lukemathwalker/cargo-chef:latest-rust-bullseye AS chef
+WORKDIR /app
+
+FROM chef AS planner
 COPY rust/ .
-WORKDIR /work/rust/s
-RUN pwd && ls
-RUN cargo build --release
-RUN ls
+RUN cargo chef prepare --recipe-path recipe.json
+
+FROM chef AS builder 
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies - this is the caching Docker layer!
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY rust/ .
+RUN cargo build --release --bin gourd
+
+# We do not need the Rust toolchain to run the binary!
+FROM debian:bullseye-slim AS runtime
+WORKDIR /app
+COPY --from=builder /app/target/release/gourd /usr/local/bin
+
 ENV RUST_BACKTRACE 1
 ENV RUST_LOG debug
+ENTRYPOINT ["/usr/local/bin/gourd","server"]
 
-ENTRYPOINT ["/work/rust/target/release/gourd","server"]
+

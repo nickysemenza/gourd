@@ -1,5 +1,0 @@
-FROM ghcr.io/nickysemenza/docker-magick:main
-RUN apt-get update
-RUN apt-get install -y unzip postgresql
-RUN which pdflatex
-RUN which magick

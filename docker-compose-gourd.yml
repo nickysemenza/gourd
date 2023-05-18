@@ -1,0 +1,33 @@
+version: "3.1"
+
+services:
+  gourd:
+    image: ghcr.io/nickysemenza/gourd-api-go:${DOCKER_TAG}
+    # build:
+    #   context: .
+    depends_on:
+      - db
+      - jaeger
+      - rs
+    restart: always
+    environment:
+      DATABASE_URL: postgres://gourd:gourd@db:5432/food
+      TRACE_ADDRESS: http://jaeger:9411/api/v2/spans
+      RS_URI: http://rs:8080/
+      BYPASS_AUTH: "true"
+      JWT_KEY: "foo"
+    ports:
+      - "4242:4242"
+  rs:
+    image: ghcr.io/nickysemenza/gourd-api-rust:${DOCKER_TAG}
+    # build:
+    #   dockerfile: rust/Dockerfile
+    #   context: .
+    depends_on:
+      - db
+      - jaeger
+    restart: always
+    environment:
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    ports:
+      - "8080:8080"

@@ -71,6 +71,9 @@
     "search.exclude": {
       "**/openapi-fetch/**": true,
       "**/openapi-hooks/**": true
+    },
+    "files.associations": {
+      "docker-compose*.yml": "dockercompose"
     }
   }
 }
