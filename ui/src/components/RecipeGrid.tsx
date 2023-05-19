@@ -74,9 +74,9 @@ export const RecipeGridCell: React.FC<{
     <Link
       to={`/recipe/${detail.id}`}
       aria-label="View Item"
-      className={`inline-block overflow-hidden duration-300 transform ${
-        !ing || ing.length > 0 ? "bg-white" : "bg-red-200"
-      } dark:bg-stone-400 shadow hover:-translate-y-2`}
+      className={`inline-block overflow-hidden duration-300 transform rounded-[10px] ${
+        !ing || ing.length > 0 ? "bg-white" : "bg-orange-200"
+      } dark:bg-stone-400 hover:-translate-y-2 border  dark:border-stone-400 shadow-md`}
     >
       <div className="flex flex-col h-full">
         {photo !== undefined ? (
@@ -85,9 +85,9 @@ export const RecipeGridCell: React.FC<{
             className="object-cover w-full h-40"
           />
         ) : (
-          <div className="object-cover w-full h-40 bg-gradient-to-r from-green-300 to-blue-300 dark:from-violet-800 dark:to-fuchsia-400" />
+          <div className="object-cover w-full h-40 bg-gradient-to-tr from-indigo-200 to-purple-500 dark:from-violet-800 dark:to-fuchsia-400" />
         )}
-        <div className="flex-grow border dark:border-stone-400 border-t-0">
+        <div className="h-1/3 ">
           <div className="p-5 flex flex-col justify-between h-full">
             <div>
               <h1 className="mb-2 font-semibold leading-5 text-m">

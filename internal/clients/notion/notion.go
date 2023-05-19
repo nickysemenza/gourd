@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
@@ -52,6 +53,7 @@ type Recipe struct {
 	PageID    string     `json:"page_id,omitempty"`
 	NotionURL string     `json:"notion_url,omitempty"`
 	SourceURL string     `json:"source_url,omitempty"`
+	UID       string     `json:"unique_id,omitempty"`
 	Raw       string     `json:"raw,omitempty"`
 	Children  []Recipe   `json:"children,omitempty"`
 	Debug     []string   `json:"debug,omitempty"`
@@ -112,19 +114,28 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		r.addDebug(l, "processing page %s (%s)", r.PageID, page.Object)
 		l.Info(r.Title)
 
-		if dateProp, ok := page.Properties["Date"]; ok {
-			date := dateProp.(*notionapi.DateProperty).Date.Start
-			if date != nil {
-				utcTime := time.Time(*date)
-				dinnerTime := utcTime.Add(time.Hour * (3 + 24))
-				r.Time = zero.TimeFrom(dinnerTime).Ptr()
-			}
-		}
 		if tags, ok := page.Properties["Tags"]; ok {
 			for _, ms := range tags.(*notionapi.MultiSelectProperty).MultiSelect {
 				r.Tags = append(r.Tags, ms.Name)
 			}
 		}
+
+		if dateProp, ok := page.Properties["Date"]; ok {
+			date := dateProp.(*notionapi.DateProperty).Date.Start
+			if date != nil {
+				utcTime := time.Time(*date)
+				dinnerTime := utcTime.Add(time.Hour * 26) // 7pm
+				r.Time = zero.TimeFrom(dinnerTime).Ptr()
+				if slices.Contains(r.Tags, "lunch") {
+					lunchTime := utcTime.Add(time.Hour * 19) // noon
+					r.Time = zero.TimeFrom(lunchTime).Ptr()
+				}
+			}
+		}
+		if id, ok := page.Properties["ID"]; ok {
+			r.UID = id.(*notionapi.UniqueIDProperty).UniqueID.String()
+		}
+
 		if url, ok := page.Properties["source"]; ok {
 			r.SourceURL = url.(*notionapi.URLProperty).URL
 		}

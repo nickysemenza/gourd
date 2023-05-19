@@ -8,6 +8,7 @@ import {
   Route,
   Navigate,
   Routes,
+  useLocation,
 } from "react-router-dom";
 import RecipeDetail from "./pages/RecipeDetail";
 import NavBar from "./components/NavBar";
@@ -33,6 +34,7 @@ import Graph from "./pages/Graph";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { isLoggedIn } from "./auth";
 import { registerTracing } from "./tracing";
+import ErrorPage from "./components/ErrorPage";
 
 registerTracing(getTracingURL(), true);
 
@@ -107,6 +109,7 @@ function App() {
                       </RequireAuth>
                     }
                   />
+                  <Route path="*" element={<NoMatch />} />
                 </Routes>
               </ErrorBoundary>
             </div>
@@ -120,3 +123,18 @@ function App() {
 }
 
 export default App;
+
+function NoMatch() {
+  let location = useLocation();
+
+  return (
+    <ErrorPage
+      title="not found"
+      message={
+        <>
+          no match for<code>{location.pathname}</code>
+        </>
+      }
+    />
+  );
+}

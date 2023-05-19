@@ -4,6 +4,9 @@ go 1.19
 
 replace github.com/ericlagergren/decimal => github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
 
+// https://github.com/jomei/notionapi/pull/135
+replace github.com/jomei/notionapi v1.12.0 => github.com/nickysemenza/notionapi v1.8.1-0.20230519233347-d1d425557a9c
+
 require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/buckket/go-blurhash v1.1.0

@@ -16,7 +16,7 @@ const NavBar: React.FC = () => {
   return (
     <Disclosure
       as="nav"
-      className="bg-white dark:bg-gray-800 mb-2 w-100 border-b border-gray-500"
+      className="bg-white/95 dark:bg-gray-800 mb-2 w-100 border-b border-slate-900/10 backdrop-blur"
     >
       {({ open }) => (
         <>
@@ -37,10 +37,16 @@ const NavBar: React.FC = () => {
                       <Link
                         key={item.path}
                         to={item.path}
-                        className={`text-gray-400 dark:hover:text-white px-3 py-2  text-sm font-medium ${
-                          location.pathname.includes(item.path) &&
-                          "dark:bg-gray-900 text-gray-800 dark:text-white"
-                        }`}
+                        // className={`text-gray-400 dark:hover:text-white px-3 py-2  text-sm font-medium ${
+                        //   location.pathname.includes(item.path) &&
+                        //   "dark:bg-gray-900 text-gray-800 dark:text-white"
+                        // }`}
+                        className={classNames(
+                          location.pathname.includes(item.path)
+                            ? "bg-gray-500 text-white"
+                            : "text-gray-700 hover:bg-gray-300 hover:text-white",
+                          "rounded-md px-3 py-2 text-sm font-medium"
+                        )}
                       >
                         {item.title}
                       </Link>
