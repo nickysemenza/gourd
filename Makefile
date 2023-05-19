@@ -72,7 +72,7 @@ bin/oapi-codegen:
 unit-test-go: 
 	go test -v -race -cover ./...
 integration-test-go: bin/go-acc 
-	./bin/go-acc -o coverage-integration.txt ./... -- -race -tags integration
+	./bin/go-acc -o coverage-integration.txt ./... -- -race -tags integration -v
 unit-cover-go: bin/go-acc
 	./bin/go-acc -o coverage-full.txt ./... -- -race
 	

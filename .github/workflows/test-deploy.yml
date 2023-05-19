@@ -1,22 +1,28 @@
 name: test
 on: push
 jobs:
-  build-and-push-images:
-    name: images
+  rust-image:
     uses: ./.github/workflows/docker-builder.yml
     with:
-      file: ${{ matrix.file}}
-      name: ${{ matrix.name }}
-      context: ${{ matrix.context }}
-    strategy:
-      matrix:
-        include:
-          - file: "rust/Dockerfile"
-            name: "api-rust"
-            context: .
-          - file: "Dockerfile"
-            name: "api-go"
-            context: .
+      file: "dockerfiles/rust.Dockerfile"
+      name: "api-rust"
+  go-builder-image:
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      file: "dockerfiles/go.Dockerfile"
+      name: "go-builder"
+  ui-builder-image:
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      file: "dockerfiles/ui.Dockerfile"
+      name: "ui-builder"
+  build-main-docker:
+    needs: [go-builder-image, ui-builder-image]
+    name: main docker
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      file: "dockerfiles/main.Dockerfile"
+      name: "api-go"
   golangci:
     name: go lint
     runs-on: ubuntu-latest
@@ -30,8 +36,8 @@ jobs:
         with:
           version: latest
   test-e2e:
-    needs: [build-and-push-images]
-    name: cy + integration
+    needs: [build-main-docker]
+    name: cypress
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -43,33 +49,24 @@ jobs:
         shell: bash
         run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
         id: extract_branch
-      - run: go mod vendor
-      - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      - run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml pull
-      # - run: make wasm-dev
-      - run: |
-          docker create --name=temp ghcr.io/nickysemenza/gourd-api-go:${{steps.extract_branch.outputs.branch}}
-          docker cp temp:/wasm-pkg ui/src/wasm
+      # - run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml pull
+      - name: extract wasm for UI
+        run: |
+          docker create --name=temp ghcr.io/nickysemenza/gourd-ui-builder:${{steps.extract_branch.outputs.branch}}
+          docker cp temp:/work/ui/src/wasm ui/src/wasm
       - name: start postgres db
         run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d db
+      - run: go mod vendor
       - name: migrate db
-        run: sleep 5 && make migrate
+        run: make migrate
       - name: start rust + go servers
         run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d rs gourd
       - name: smoke test rust server
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup
           curl -v http://localhost:8080/debug/scrape?url=https://thewoksoflife.com/ma-po-tofu-real-deal/
-      - name: go integration tests
-        run: make integration-test-go
-        env:
-          MIGRATIONS_DIR: file://../../internal/db/migrations
-          PDFLATEX_BINARY: /usr/bin/pdflatex
       - uses: codecov/codecov-action@v3
-      # - name: seed db with testdata
-      #   env:
-      #     DATABASE_URL: postgres://gourd:gourd@localhost:5555/food
-      #   run: make seed-testdata
+      # - run: ./bin/gourd import dev/testdata/cookies_2.txt
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:
@@ -92,6 +89,33 @@ jobs:
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
+  test-integration:
+    needs: [rust-image]
+    name: integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "stable"
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
+        id: extract_branch
+      - run: go mod vendor
+      - name: start postgres db + rust server
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d db rs
+      - name: smoke test rust server
+        run: |
+          curl -v http://localhost:8080/parse?text=1%20cup
+          curl -v http://localhost:8080/debug/scrape?url=https://thewoksoflife.com/ma-po-tofu-real-deal/
+      - name: go integration tests
+        run: make integration-test-go
+        env:
+          MIGRATIONS_DIR: file://../../internal/db/migrations
+          PDFLATEX_BINARY: /usr/bin/pdflatex
+      - uses: codecov/codecov-action@v3
   test-rust:
     name: rs test
     runs-on: ubuntu-latest
@@ -110,7 +134,7 @@ jobs:
           fail_ci_if_error: true
           working-directory: rust
   deploy:
-    needs: ["test-e2e", "test-rust", "golangci"]
+    needs: ["test-e2e", "test-integration", "test-rust", "golangci"]
     if: github.ref == 'refs/heads/main'
     name: Deploy
     runs-on: ubuntu-latest
