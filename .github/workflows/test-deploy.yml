@@ -2,12 +2,12 @@ name: test
 on: push
 jobs:
   build-and-push-images:
-    env:
-      # Use docker.io for Docker Hub if empty
-      REGISTRY: ghcr.io
-      # github.repository as <account>/<repo>
-      IMAGE_NAME: ${{ github.repository }}-${{ matrix.name }}
-    runs-on: ubuntu-latest
+    name: images
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      file: ${{ matrix.file}}
+      name: ${{ matrix.name }}
+      context: ${{ matrix.context }}
     strategy:
       matrix:
         include:
@@ -17,64 +17,8 @@ jobs:
           - file: "Dockerfile"
             name: "api-go"
             context: .
-    permissions:
-      contents: read
-      packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Get specific changed files
-        id: changed_files
-        uses: tj-actions/changed-files@v35
-        with:
-          files: ${{ matrix.file }}
-      - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=tag
-            type=ref,event=pr
-            type=sha,format=long
-
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v4
-        with:
-          context: ${{ matrix.context }}
-          file: ${{ matrix.file }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max          
   golangci:
-    name: golang lint
+    name: go lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -149,34 +93,22 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v2
   test-rust:
-    name: rust test
+    name: rs test
     runs-on: ubuntu-latest
-    env:
-      CARGO_TERM_COLOR: always
+    # https://github.com/xd009642/tarpaulin#github-actions
+    container:
+      image: xd009642/tarpaulin:develop-nightly
+      options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/checkout@v3
-      - name: cargo build
-        run: cargo build --verbose
+      - uses: actions/checkout@v2
+      - run: |
+          cargo +nightly tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
         working-directory: rust
-      - name: cargo test
-        run: cargo test --verbose
-        working-directory: rust
-      # - name: Run cargo-tarpaulin
-      #   uses: actions-rs/tarpaulin@v0.1
-      #   with:
-      #     args: -t 120 --manifest-path rust/Cargo.toml --output-dir rust/.cov --avoid-cfg-tarpaulin --out Xml -- --test-threads 1
-      #     version: "latest"
-
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3.1.0
+        uses: codecov/codecov-action@v2
         with:
-          directory: rust/.cov
-          # path_to_write_report: rust/.cov/codecov_report.txt
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-report-
-          path: rust/.cov
+          fail_ci_if_error: true
+          working-directory: rust
   deploy:
     needs: ["test-e2e", "test-rust", "golangci"]
     if: github.ref == 'refs/heads/main'
