@@ -25,6 +25,7 @@ import (
 
 // NotionRecipe is an object representing the database table.
 type NotionRecipe struct {
+	NotionID  string            `boil:"notion_id" json:"notion_id" toml:"notion_id" yaml:"notion_id"`
 	PageID    string            `boil:"page_id" json:"page_id" toml:"page_id" yaml:"page_id"`
 	PageTitle string            `boil:"page_title" json:"page_title" toml:"page_title" yaml:"page_title"`
 	Meta      null.JSON         `boil:"meta" json:"meta,omitempty" toml:"meta" yaml:"meta,omitempty"`
@@ -39,6 +40,7 @@ type NotionRecipe struct {
 }
 
 var NotionRecipeColumns = struct {
+	NotionID  string
 	PageID    string
 	PageTitle string
 	Meta      string
@@ -48,6 +50,7 @@ var NotionRecipeColumns = struct {
 	Scale     string
 	DeletedAt string
 }{
+	NotionID:  "notion_id",
 	PageID:    "page_id",
 	PageTitle: "page_title",
 	Meta:      "meta",
@@ -59,6 +62,7 @@ var NotionRecipeColumns = struct {
 }
 
 var NotionRecipeTableColumns = struct {
+	NotionID  string
 	PageID    string
 	PageTitle string
 	Meta      string
@@ -68,6 +72,7 @@ var NotionRecipeTableColumns = struct {
 	Scale     string
 	DeletedAt string
 }{
+	NotionID:  "notion_recipe.notion_id",
 	PageID:    "notion_recipe.page_id",
 	PageTitle: "notion_recipe.page_title",
 	Meta:      "notion_recipe.meta",
@@ -105,6 +110,7 @@ func (w whereHelpernull_JSON) IsNull() qm.QueryMod    { return qmhelper.WhereIsN
 func (w whereHelpernull_JSON) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
 var NotionRecipeWhere = struct {
+	NotionID  whereHelperstring
 	PageID    whereHelperstring
 	PageTitle whereHelperstring
 	Meta      whereHelpernull_JSON
@@ -114,6 +120,7 @@ var NotionRecipeWhere = struct {
 	Scale     whereHelpertypes_NullDecimal
 	DeletedAt whereHelpernull_Time
 }{
+	NotionID:  whereHelperstring{field: "\"notion_recipe\".\"notion_id\""},
 	PageID:    whereHelperstring{field: "\"notion_recipe\".\"page_id\""},
 	PageTitle: whereHelperstring{field: "\"notion_recipe\".\"page_title\""},
 	Meta:      whereHelpernull_JSON{field: "\"notion_recipe\".\"meta\""},
@@ -151,10 +158,10 @@ func (*notionRecipeR) NewStruct() *notionRecipeR {
 type notionRecipeL struct{}
 
 var (
-	notionRecipeAllColumns            = []string{"page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at", "scale", "deleted_at"}
-	notionRecipeColumnsWithoutDefault = []string{"page_id", "page_title"}
+	notionRecipeAllColumns            = []string{"notion_id", "page_id", "page_title", "meta", "last_seen", "recipe_id", "ate_at", "scale", "deleted_at"}
+	notionRecipeColumnsWithoutDefault = []string{"notion_id", "page_id", "page_title"}
 	notionRecipeColumnsWithDefault    = []string{"meta", "last_seen", "recipe_id", "ate_at", "scale", "deleted_at"}
-	notionRecipePrimaryKeyColumns     = []string{"page_id"}
+	notionRecipePrimaryKeyColumns     = []string{"notion_id"}
 	notionRecipeGeneratedColumns      = []string{}
 )
 
@@ -470,7 +477,7 @@ func (o *NotionRecipe) Meals(mods ...qm.QueryMod) mealQuery {
 
 	queryMods = append(queryMods,
 		qm.InnerJoin("\"notion_meal\" on \"meals\".\"id\" = \"notion_meal\".\"meal_id\""),
-		qm.Where("\"notion_meal\".\"notion_recipe\"=?", o.PageID),
+		qm.Where("\"notion_meal\".\"notion_id\"=?", o.NotionID),
 	)
 
 	return Meals(queryMods...)
@@ -699,7 +706,7 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 		if object.R == nil {
 			object.R = &notionRecipeR{}
 		}
-		args = append(args, object.PageID)
+		args = append(args, object.NotionID)
 	} else {
 	Outer:
 		for _, obj := range slice {
@@ -708,12 +715,12 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 			}
 
 			for _, a := range args {
-				if a == obj.PageID {
+				if a == obj.NotionID {
 					continue Outer
 				}
 			}
 
-			args = append(args, obj.PageID)
+			args = append(args, obj.NotionID)
 		}
 	}
 
@@ -722,10 +729,10 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 	}
 
 	query := NewQuery(
-		qm.Select("\"meals\".\"id\", \"meals\".\"name\", \"meals\".\"notion_link\", \"meals\".\"ate_at\", \"a\".\"notion_recipe\""),
+		qm.Select("\"meals\".\"id\", \"meals\".\"name\", \"meals\".\"notion_link\", \"meals\".\"ate_at\", \"a\".\"notion_id\""),
 		qm.From("\"meals\""),
 		qm.InnerJoin("\"notion_meal\" as \"a\" on \"meals\".\"id\" = \"a\".\"meal_id\""),
-		qm.WhereIn("\"a\".\"notion_recipe\" in ?", args...),
+		qm.WhereIn("\"a\".\"notion_id\" in ?", args...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -775,7 +782,7 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 			if foreign.R == nil {
 				foreign.R = &mealR{}
 			}
-			foreign.R.NotionRecipes = append(foreign.R.NotionRecipes, object)
+			foreign.R.NotionNotionRecipes = append(foreign.R.NotionNotionRecipes, object)
 		}
 		return nil
 	}
@@ -783,12 +790,12 @@ func (notionRecipeL) LoadMeals(ctx context.Context, e boil.ContextExecutor, sing
 	for i, foreign := range resultSlice {
 		localJoinCol := localJoinCols[i]
 		for _, local := range slice {
-			if local.PageID == localJoinCol {
+			if local.NotionID == localJoinCol {
 				local.R.Meals = append(local.R.Meals, foreign)
 				if foreign.R == nil {
 					foreign.R = &mealR{}
 				}
-				foreign.R.NotionRecipes = append(foreign.R.NotionRecipes, local)
+				foreign.R.NotionNotionRecipes = append(foreign.R.NotionNotionRecipes, local)
 				break
 			}
 		}
@@ -813,7 +820,7 @@ func (o *NotionRecipe) SetRecipe(ctx context.Context, exec boil.ContextExecutor,
 		strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 		strmangle.WhereClause("\"", "\"", 2, notionRecipePrimaryKeyColumns),
 	)
-	values := []interface{}{related.ID, o.PageID}
+	values := []interface{}{related.ID, o.NotionID}
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
@@ -933,7 +940,7 @@ func (o *NotionRecipe) AddPageNotionImages(ctx context.Context, exec boil.Contex
 // AddMeals adds the given related objects to the existing relationships
 // of the notion_recipe, optionally inserting them as new records.
 // Appends related to o.R.Meals.
-// Sets related.R.NotionRecipes appropriately.
+// Sets related.R.NotionNotionRecipes appropriately.
 func (o *NotionRecipe) AddMeals(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Meal) error {
 	var err error
 	for _, rel := range related {
@@ -945,8 +952,8 @@ func (o *NotionRecipe) AddMeals(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	for _, rel := range related {
-		query := "insert into \"notion_meal\" (\"notion_recipe\", \"meal_id\") values ($1, $2)"
-		values := []interface{}{o.PageID, rel.ID}
+		query := "insert into \"notion_meal\" (\"notion_id\", \"meal_id\") values ($1, $2)"
+		values := []interface{}{o.NotionID, rel.ID}
 
 		if boil.IsDebug(ctx) {
 			writer := boil.DebugWriterFrom(ctx)
@@ -969,10 +976,10 @@ func (o *NotionRecipe) AddMeals(ctx context.Context, exec boil.ContextExecutor, 
 	for _, rel := range related {
 		if rel.R == nil {
 			rel.R = &mealR{
-				NotionRecipes: NotionRecipeSlice{o},
+				NotionNotionRecipes: NotionRecipeSlice{o},
 			}
 		} else {
-			rel.R.NotionRecipes = append(rel.R.NotionRecipes, o)
+			rel.R.NotionNotionRecipes = append(rel.R.NotionNotionRecipes, o)
 		}
 	}
 	return nil
@@ -981,12 +988,12 @@ func (o *NotionRecipe) AddMeals(ctx context.Context, exec boil.ContextExecutor, 
 // SetMeals removes all previously related items of the
 // notion_recipe replacing them completely with the passed
 // in related items, optionally inserting them as new records.
-// Sets o.R.NotionRecipes's Meals accordingly.
+// Sets o.R.NotionNotionRecipes's Meals accordingly.
 // Replaces o.R.Meals with related.
-// Sets related.R.NotionRecipes's Meals accordingly.
+// Sets related.R.NotionNotionRecipes's Meals accordingly.
 func (o *NotionRecipe) SetMeals(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Meal) error {
-	query := "delete from \"notion_meal\" where \"notion_recipe\" = $1"
-	values := []interface{}{o.PageID}
+	query := "delete from \"notion_meal\" where \"notion_id\" = $1"
+	values := []interface{}{o.NotionID}
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, query)
@@ -997,7 +1004,7 @@ func (o *NotionRecipe) SetMeals(ctx context.Context, exec boil.ContextExecutor, 
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
 
-	removeMealsFromNotionRecipesSlice(o, related)
+	removeMealsFromNotionNotionRecipesSlice(o, related)
 	if o.R != nil {
 		o.R.Meals = nil
 	}
@@ -1007,7 +1014,7 @@ func (o *NotionRecipe) SetMeals(ctx context.Context, exec boil.ContextExecutor, 
 
 // RemoveMeals relationships from objects passed in.
 // Removes related items from R.Meals (uses pointer comparison, removal does not keep order)
-// Sets related.R.NotionRecipes.
+// Sets related.R.NotionNotionRecipes.
 func (o *NotionRecipe) RemoveMeals(ctx context.Context, exec boil.ContextExecutor, related ...*Meal) error {
 	if len(related) == 0 {
 		return nil
@@ -1015,10 +1022,10 @@ func (o *NotionRecipe) RemoveMeals(ctx context.Context, exec boil.ContextExecuto
 
 	var err error
 	query := fmt.Sprintf(
-		"delete from \"notion_meal\" where \"notion_recipe\" = $1 and \"meal_id\" in (%s)",
+		"delete from \"notion_meal\" where \"notion_id\" = $1 and \"meal_id\" in (%s)",
 		strmangle.Placeholders(dialect.UseIndexPlaceholders, len(related), 2, 1),
 	)
-	values := []interface{}{o.PageID}
+	values := []interface{}{o.NotionID}
 	for _, rel := range related {
 		values = append(values, rel.ID)
 	}
@@ -1032,7 +1039,7 @@ func (o *NotionRecipe) RemoveMeals(ctx context.Context, exec boil.ContextExecuto
 	if err != nil {
 		return errors.Wrap(err, "failed to remove relationships before set")
 	}
-	removeMealsFromNotionRecipesSlice(o, related)
+	removeMealsFromNotionNotionRecipesSlice(o, related)
 	if o.R == nil {
 		return nil
 	}
@@ -1055,21 +1062,21 @@ func (o *NotionRecipe) RemoveMeals(ctx context.Context, exec boil.ContextExecuto
 	return nil
 }
 
-func removeMealsFromNotionRecipesSlice(o *NotionRecipe, related []*Meal) {
+func removeMealsFromNotionNotionRecipesSlice(o *NotionRecipe, related []*Meal) {
 	for _, rel := range related {
 		if rel.R == nil {
 			continue
 		}
-		for i, ri := range rel.R.NotionRecipes {
-			if o.PageID != ri.PageID {
+		for i, ri := range rel.R.NotionNotionRecipes {
+			if o.NotionID != ri.NotionID {
 				continue
 			}
 
-			ln := len(rel.R.NotionRecipes)
+			ln := len(rel.R.NotionNotionRecipes)
 			if ln > 1 && i < ln-1 {
-				rel.R.NotionRecipes[i] = rel.R.NotionRecipes[ln-1]
+				rel.R.NotionNotionRecipes[i] = rel.R.NotionNotionRecipes[ln-1]
 			}
-			rel.R.NotionRecipes = rel.R.NotionRecipes[:ln-1]
+			rel.R.NotionNotionRecipes = rel.R.NotionNotionRecipes[:ln-1]
 			break
 		}
 	}
@@ -1088,7 +1095,7 @@ func NotionRecipes(mods ...qm.QueryMod) notionRecipeQuery {
 
 // FindNotionRecipe retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindNotionRecipe(ctx context.Context, exec boil.ContextExecutor, pageID string, selectCols ...string) (*NotionRecipe, error) {
+func FindNotionRecipe(ctx context.Context, exec boil.ContextExecutor, notionID string, selectCols ...string) (*NotionRecipe, error) {
 	notionRecipeObj := &NotionRecipe{}
 
 	sel := "*"
@@ -1096,10 +1103,10 @@ func FindNotionRecipe(ctx context.Context, exec boil.ContextExecutor, pageID str
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"notion_recipe\" where \"page_id\"=$1 and \"deleted_at\" is null", sel,
+		"select %s from \"notion_recipe\" where \"notion_id\"=$1 and \"deleted_at\" is null", sel,
 	)
 
-	q := queries.Raw(query, pageID)
+	q := queries.Raw(query, notionID)
 
 	err := q.Bind(ctx, exec, notionRecipeObj)
 	if err != nil {
@@ -1456,12 +1463,12 @@ func (o *NotionRecipe) Delete(ctx context.Context, exec boil.ContextExecutor, ha
 	)
 	if hardDelete {
 		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), notionRecipePrimaryKeyMapping)
-		sql = "DELETE FROM \"notion_recipe\" WHERE \"page_id\"=$1"
+		sql = "DELETE FROM \"notion_recipe\" WHERE \"notion_id\"=$1"
 	} else {
 		currTime := time.Now().In(boil.GetLocation())
 		o.DeletedAt = null.TimeFrom(currTime)
 		wl := []string{"deleted_at"}
-		sql = fmt.Sprintf("UPDATE \"notion_recipe\" SET %s WHERE \"page_id\"=$2",
+		sql = fmt.Sprintf("UPDATE \"notion_recipe\" SET %s WHERE \"notion_id\"=$2",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
 		)
 		valueMapping, err := queries.BindMapping(notionRecipeType, notionRecipeMapping, append(wl, notionRecipePrimaryKeyColumns...))
@@ -1588,7 +1595,7 @@ func (o NotionRecipeSlice) DeleteAll(ctx context.Context, exec boil.ContextExecu
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *NotionRecipe) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindNotionRecipe(ctx, exec, o.PageID)
+	ret, err := FindNotionRecipe(ctx, exec, o.NotionID)
 	if err != nil {
 		return err
 	}
@@ -1628,16 +1635,16 @@ func (o *NotionRecipeSlice) ReloadAll(ctx context.Context, exec boil.ContextExec
 }
 
 // NotionRecipeExists checks if the NotionRecipe row exists.
-func NotionRecipeExists(ctx context.Context, exec boil.ContextExecutor, pageID string) (bool, error) {
+func NotionRecipeExists(ctx context.Context, exec boil.ContextExecutor, notionID string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"notion_recipe\" where \"page_id\"=$1 and \"deleted_at\" is null limit 1)"
+	sql := "select exists(select 1 from \"notion_recipe\" where \"notion_id\"=$1 and \"deleted_at\" is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, pageID)
+		fmt.Fprintln(writer, notionID)
 	}
-	row := exec.QueryRowContext(ctx, sql, pageID)
+	row := exec.QueryRowContext(ctx, sql, notionID)
 
 	err := row.Scan(&exists)
 	if err != nil {

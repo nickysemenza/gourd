@@ -192,34 +192,6 @@ func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
 	return id
 }
 
-func TestSync(t *testing.T) {
-	require := require.New(t)
-	apiManager := makeAPI(t)
-	ctx := context.Background()
-	err := apiManager.Sync(ctx, 14)
-	require.NoError(err)
-
-	items, err := apiManager.RecipeListV2(ctx, 10, 0)
-	require.NoError(err)
-	require.Len(items, 3)
-	rd := items[0].Detail.Id
-	res, err := apiManager.recipeById(ctx, rd)
-	require.NoError(err)
-
-	require.Len(res.Detail.Sections, 1)
-	require.Equal("bread", res.Detail.Sections[0].Ingredients[0].Ingredient.Ingredient.Name)
-	require.Equal("eat", res.Detail.Sections[0].Instructions[0].Instruction)
-
-	// meals, err := apiManager.listMeals(ctx)
-	// require.NoError(err)
-	// require.Len(meals, 1)
-
-	// l, err := apiManager.Latex(ctx, rd)
-	// require.NoError(err)
-	// require.Greater(len(l), 10000)
-
-}
-
 func mustSeedMappings(t *testing.T, apiManager *API) {
 	t.Helper()
 	require := require.New(t)

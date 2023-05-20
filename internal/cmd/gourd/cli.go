@@ -20,6 +20,21 @@ func newClient() (*client.Client, error) {
 var rootCmd = &cobra.Command{
 	Use:   "gourd",
 	Short: "Go Universal Recipe Database",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		mode := "client"
+		if cmd.Name() == "server" {
+			mode = "server"
+		}
+
+		if err := setupMisc(mode); err != nil {
+			return err
+		}
+		ctx, span := otel.Tracer(mode).Start(cmd.Context(), cmd.Name())
+		defer span.End()
+		cmd.SetContext(ctx)
+
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = cmd.Help()
 	},
@@ -67,10 +82,11 @@ func init() {
 				if err != nil {
 					return err
 				}
-				_, err = c.DoSync(cmd.Context(), &api.DoSyncParams{LookbackDays: 30})
+				res, err := c.DoSyncWithResponse(cmd.Context(), &api.DoSyncParams{LookbackDays: 7})
 				if err != nil {
 					return fmt.Errorf("sync: %w", err)
 				}
+				fmt.Printf("%s", res.Body)
 
 				return nil
 			},

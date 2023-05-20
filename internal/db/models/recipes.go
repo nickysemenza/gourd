@@ -1134,7 +1134,7 @@ func (o *Recipe) AddNotionRecipes(ctx context.Context, exec boil.ContextExecutor
 				strmangle.SetParamNames("\"", "\"", 1, []string{"recipe_id"}),
 				strmangle.WhereClause("\"", "\"", 2, notionRecipePrimaryKeyColumns),
 			)
-			values := []interface{}{o.ID, rel.PageID}
+			values := []interface{}{o.ID, rel.NotionID}
 
 			if boil.IsDebug(ctx) {
 				writer := boil.DebugWriterFrom(ctx)

@@ -14,7 +14,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (c *Client) GetKV(ctx context.Context, key string) (string, error) {
@@ -58,16 +57,6 @@ type Image struct {
 	TakenAt  null.Time `db:"taken_at"`
 }
 
-type NotionRecipe struct {
-	PageID    string      `db:"page_id"`
-	PageTitle string      `db:"page_title"`
-	Meta      null.JSON   `db:"meta"`
-	LastSeen  time.Time   `db:"last_seen"`
-	Recipe    zero.String `db:"recipe_id"`
-	Scale     zero.Float  `db:"scale"`
-	AteAt     zero.Time   `db:"ate_at"`
-}
-
 func (c *Client) UpsertGPhotos(ctx context.Context, photos ...GPhoto) error {
 	q := c.psql.Insert("gphotos_photos").Columns("id", "album_id", "creation_time", "image_id")
 	for _, photo := range photos {
@@ -86,17 +75,18 @@ type NotionImage struct {
 	Image    Image
 }
 
-func (c *Client) UpsertNotionImages(ctx context.Context, photos []NotionImage) error {
-	if len(photos) == 0 {
-		return nil
-	}
-	q := c.psql.Insert("notion_image").Columns("block_id", "page_id", "image_id")
+func (c *Client) UpsertNotionImages(ctx context.Context, photos []models.NotionImage) error {
+	ctx, span := c.tracer.Start(ctx, "UpsertNotionImages")
+	defer span.End()
+
 	for _, photo := range photos {
-		q = q.Values(photo.BlockID, photo.PageID, photo.ImageID)
+		err := photo.Upsert(ctx, c.db, true, []string{"block_id", "page_id"}, boil.Infer(), boil.Infer())
+		if err != nil {
+			return err
+		}
+
 	}
-	q = q.Suffix("ON CONFLICT (block_id,page_id) DO UPDATE SET last_seen = ?, image_id = excluded.image_id", time.Now())
-	_, err := c.execContext(ctx, q)
-	return err
+	return nil
 }
 
 func (c *Client) getPhotos(ctx context.Context, addons func(q sq.SelectBuilder) sq.SelectBuilder) ([]GPhoto, error) {
@@ -272,16 +262,26 @@ func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	q := c.psql.Select("page_id", "ate_at", "recipe_id", "meta", "scale").From("notion_recipe").
-		LeftJoin("notion_meal on notion_recipe.page_id = notion_meal.notion_recipe").Where(sq.Eq{"meal_id": nil})
-	var missingMeals []NotionRecipe
-	err := c.selectContext(ctx, q, &missingMeals)
+	ctx = boil.WithDebug(ctx, true)
+
+	ctx, span := c.tracer.Start(ctx, "SyncNotionMealFromNotionRecipe")
+	defer span.End()
+	missingMeals, err := models.NotionRecipes(
+		qm.Load(models.NotionRecipeRels.Meals),
+		qm.Load(models.NotionRecipeRels.Recipe),
+		// Load(models.)
+		// qm.SQL("select * from notion_recipe left join notion_meal on notion_meal.notion_id = notion_recipe.notion_id where notion_meal.meal_id is null"),
+	).All(ctx, c.db)
+
 	if err != nil {
 		return err
 	}
 
 	for _, m := range missingMeals {
 		if !m.AteAt.Valid {
+			continue
+		}
+		if len(m.R.Meals) > 0 {
 			continue
 		}
 		var meta NotionRecipeMeta
@@ -300,21 +300,27 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 			fmt.Sprintf("%s %s", m.AteAt.Time.Add(time.Hour*-24).Format("Mon Jan 2"), suffix),
 		)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to find meal in rage: %w", err)
 		}
 
-		if m.Recipe.Valid {
-			err = c.AddRecipeToMeal(ctx, mealID, m.Recipe.ValueOrZero(), m.Scale.Ptr())
+		if m.R.Recipe != nil {
+			var mult *float64
+			if !m.Scale.IsZero() {
+				val, _ := m.Scale.Float64()
+				mult = &val
+			}
+			err = c.AddRecipeToMeal(ctx, mealID, m.R.Recipe.ID, mult)
+			// m.R.Recipe.AddMealRecipes(ctx, c.db, false, &models.MealRecipe{MealID: mealID})
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to add recipe to meal: %w", err)
 			}
 		}
 
-		q := c.psql.Insert("notion_meal").Columns("meal_id", "notion_recipe").Values(mealID, m.PageID)
-		_, err = c.execContext(ctx, q)
+		err = m.AddMeals(ctx, c.db, false, &models.Meal{ID: mealID})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to add meals: %w", err)
 		}
+
 	}
 
 	return nil
@@ -453,7 +459,7 @@ func (c *Client) GetNotionPhotosForMeal(ctx context.Context, meal string) ([]Not
 	defer span.End()
 	return c.getNotionPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
 		return q.LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
-			LeftJoin("notion_meal on notion_meal.notion_recipe = notion_recipe.page_id").
+			LeftJoin("notion_meal on notion_meal.notion_id = notion_recipe.notion_id").
 			Where(sq.Eq{"meal_id": meal})
 	})
 }

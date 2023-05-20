@@ -104,7 +104,7 @@ func setupEnv() error {
 
 }
 
-func setupMisc() error {
+func setupMisc(mode string) error {
 	if err := setupEnv(); err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func setupMisc() error {
 	)))
 
 	// tracing
-	if err := initTracer(viper.GetString("TRACE_ADDRESS"), viper.GetString("HONEYCOMB_KEY"), "gourd", "dev"); err != nil {
+	if err := initTracer(viper.GetString("TRACE_ADDRESS"), viper.GetString("HONEYCOMB_KEY"), "gourd-"+mode, "dev"); err != nil {
 		err := fmt.Errorf("failed to init tracer: %w", err)
 		return err
 	}

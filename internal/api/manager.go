@@ -84,6 +84,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 	}
 
 	nr := models.NotionRecipe{
+		NotionID:  nRecipe.UID,
 		PageID:    nRecipe.PageID,
 		PageTitle: nRecipe.Title,
 		AteAt:     null.TimeFromPtr(nRecipe.Time),
@@ -102,7 +103,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 
 type notionSyncResult struct {
 	nRecipes []models.NotionRecipe
-	nImages  []db.NotionImage
+	nImages  []models.NotionImage
 	images   []db.Image
 }
 
@@ -143,10 +144,11 @@ func (a *API) processNotionRecipe(ctx context.Context, nRecipe notion.Recipe) (r
 			Source:   "notion",
 			TakenAt:  null.TimeFromPtr(nRecipe.Time),
 		})
-		res.nImages = append(res.nImages, db.NotionImage{
-			PageID:  nRecipe.PageID,
-			BlockID: nPhoto.BlockID,
-			ImageID: id,
+		res.nImages = append(res.nImages, models.NotionImage{
+			PageID:   nRecipe.PageID,
+			BlockID:  nPhoto.BlockID,
+			ImageID:  id,
+			LastSeen: time.Now(),
 		})
 	}
 	return

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/jomei/notionapi"
+	"github.com/volatiletech/null/v8"
 )
 
 type fakeDB struct{}
@@ -188,7 +189,12 @@ func NewFakeNotion(t *testing.T) *Client {
 				},
 				Properties: map[string]notionapi.Property{
 					"title": &notionapi.TitleProperty{
+						Type:  notionapi.PropertyTypeTitle,
 						Title: []notionapi.RichText{{Text: &notionapi.Text{Content: "subpagetitle"}}},
+					},
+					"ID": &notionapi.UniqueIDProperty{
+						Type:     notionapi.PropertyTypeUniqueID,
+						UniqueID: notionapi.UniqueID{Prefix: null.StringFrom("MEAL").Ptr(), Number: 452},
 					},
 				},
 			},

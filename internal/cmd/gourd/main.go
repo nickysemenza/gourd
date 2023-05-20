@@ -9,20 +9,18 @@ import (
 )
 
 func main() {
-	if err := setupMisc(); err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		log.Debug("cleaning up tracer")
-		err := otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
-		if err != nil {
-			log.Error(err)
-		}
-	}()
-	ctx, span := otel.Tracer("client").Start(context.Background(), "gourd main")
-	defer span.End()
+	defer cleanupTracer()
 
-	err := rootCmd.ExecuteContext(ctx)
+	err := rootCmd.ExecuteContext(context.Background())
+	if err != nil {
+		log.Error(err)
+	}
+}
+
+func cleanupTracer() {
+	log.Debug("cleaning up tracer")
+
+	err := otel.GetTracerProvider().(*tracesdk.TracerProvider).ForceFlush(context.Background())
 	if err != nil {
 		log.Error(err)
 	}

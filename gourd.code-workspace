@@ -37,7 +37,7 @@
       "-v",
       "-cover",
       "-race",
-      "-coverpkg=all"
+      "-coverpkg=github.com/nickysemenza/gourd/..."
     ],
     "go.lintTool": "golangci-lint",
     "go.lintFlags": ["--fast"],
