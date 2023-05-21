@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Icon, MinusCircle, PlusCircle } from "react-feather";
 
-interface ButtonProps {
-  // icons from https://feathericons.com/
-  IconLeft?: Icon;
-  IconRight?: Icon;
-  text?: string;
-  onClick: () => void;
-  disabled?: boolean;
-}
+type ButtonProps =
+  | {
+      // icons from https://feathericons.com/
+      IconLeft?: Icon;
+      IconRight?: Icon;
+      text?: string;
+      disabled?: boolean;
+    } & ({ submit: true } | { submit?: false; onClick: () => void });
 interface ButtonGroupProps {
   buttons: ButtonProps[];
   compact?: boolean;
@@ -25,11 +25,12 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   disabled:bg-violet-400 inline-flex items-center`;
   return (
     <div className="inline-flex mx-1" role="group" aria-label="Button group">
-      {buttons.map(({ text, IconLeft, IconRight, ...props }, x) => {
+      {buttons.map(({ text, IconLeft, IconRight, submit, ...props }, x) => {
         const iconMargins = compact ? 1 : 3.5;
         const iconDim = compact ? 12 : 18;
         return (
           <button
+            type={submit ? "submit" : "button"}
             key={x}
             className={`${baseStyles} ${x === 0 && "rounded-l"} ${
               x === buttons.length - 1 && "rounded-r"

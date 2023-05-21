@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { PlusCircle } from "react-feather";
 import { TempFood, useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../util";
 import { ButtonGroup } from "./Button";
 import { UnitMappingList } from "./Misc";
-
+import { useForm } from "react-hook-form";
 const FoodSearch: React.FC<{
   name: string;
   highlightId?: number;
@@ -20,15 +20,16 @@ const FoodSearch: React.FC<{
   enableSearch = false,
   addon,
 }) => {
-  const [ingredientName, setIngredientName] = useState(name);
-
-  useEffect(() => {
-    setIngredientName(name);
-  }, [name]);
+  const {
+    register,
+    // handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
   const { loading, data: foods } = useSearchFoods({
     queryParams: {
-      name: ingredientName,
+      name: watch("name"),
       limit,
     },
   });
@@ -56,18 +57,18 @@ const FoodSearch: React.FC<{
 
   // force search on if no results
   const showSearch = enableSearch || results.length === 0;
+
   return (
     <div className="w-full">
-      {showSearch && (
+      <form>
         <input
           type="text"
           className="border-2 border-gray-300"
-          value={ingredientName}
-          onChange={(e) => {
-            setIngredientName(e.target.value);
-          }}
+          defaultValue={name}
+          {...register("name")}
+          disabled={!showSearch}
         />
-      )}
+      </form>
       {items.map((r, x) => {
         const isHighlighted = highlightId === r.wrapper.fdcId;
         return (
