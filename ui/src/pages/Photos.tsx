@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { CellProps } from "react-table";
 import dayjs from "dayjs";
 import Debug from "../components/Debug";
-import { useListPhotos } from "../api/openapi-hooks/api";
+import { Photo, useListPhotos } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
 import ProgressiveImage from "../components/ProgressiveImage";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const Photos: React.FC = () => {
   let initialParams: PaginationParameters = {
@@ -24,34 +24,28 @@ const Photos: React.FC = () => {
     queryParams: params,
   });
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Taken",
-        accessor: "Taken",
-        Cell: (cell: CellProps<any>) => {
-          const { taken_at } = cell.row.original;
-          const ago = dayjs(taken_at);
+  const columnHelper = createColumnHelper<Photo>();
+  const columns = [
+    columnHelper.accessor((row) => row.taken_at, {
+      id: "taken",
+      cell: (info) => {
+        const ago = dayjs(info.getValue());
 
-          return (
-            <div>
-              {ago.format("dddd, MMMM D, YYYY h:mm A")}
-              <br />
-              {ago.fromNow()}
-            </div>
-          );
-        },
+        return (
+          <div>
+            {ago.format("dddd, MMMM D, YYYY h:mm A")}
+            <br />
+            {ago.fromNow()}
+          </div>
+        );
       },
-      {
-        Header: "test",
-        accessor: "test",
-        Cell: (cell: CellProps<any>) => (
-          <ProgressiveImage photo={cell.row.original} />
-        ),
-      },
-    ],
-    []
-  );
+    }),
+
+    columnHelper.accessor((row) => row, {
+      id: "test",
+      cell: (info) => <ProgressiveImage photo={info.row.original} />,
+    }),
+  ];
 
   return (
     <div>

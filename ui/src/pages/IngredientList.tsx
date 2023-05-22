@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Column, CellProps } from "react-table";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/PaginatedTable";
@@ -14,6 +13,7 @@ import { Code } from "../util";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const IngredientList: React.FC = () => {
   const showIDs = false;
@@ -42,7 +42,9 @@ const IngredientList: React.FC = () => {
 
   type i = (typeof ingredients)[0];
 
-  const columns: Array<Column<i>> = React.useMemo(() => {
+  const columns = React.useMemo(() => {
+    const columnHelper = createColumnHelper<i>();
+
     const iApi = new IngredientsApi(getOpenapiFetchConfig());
 
     const convertToRecipe = async (id: string) => {
@@ -58,10 +60,10 @@ const IngredientList: React.FC = () => {
     };
 
     return [
-      {
-        Header: "Name",
-        width: 30,
-        Cell: ({ row: { original } }: CellProps<i>) => {
+      columnHelper.accessor((row) => row, {
+        id: "name",
+        cell: (info) => {
+          const { original } = info.row;
           const { ingredient, children } = original;
           return (
             <div className="flex flex-col w-20 whitespace-normal">
@@ -81,11 +83,11 @@ const IngredientList: React.FC = () => {
             </div>
           );
         },
-      },
-      {
-        Header: "Recipes",
+      }),
+      columnHelper.accessor((row) => row, {
         id: "recipes",
-        Cell: ({ row: { original } }: CellProps<i>) => {
+        cell: (info) => {
+          const { original } = info.row;
           const recipes = original.recipes || [];
           const children = original.children || [];
           return (
@@ -114,22 +116,21 @@ const IngredientList: React.FC = () => {
             </div>
           );
         },
-      },
-      {
-        Header: "Units",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          const { unit_mappings } = original;
+      }),
+      columnHelper.accessor((row) => row.unit_mappings, {
+        id: "units",
+        cell: (info) => {
           return (
             <div className="flex flex-col">
-              <UnitMappingList unit_mappings={unit_mappings} includeDot />
+              <UnitMappingList unit_mappings={info.getValue()} includeDot />
             </div>
           );
         },
-      },
-      {
-        Header: "Actions",
-        id: "actions",
-        Cell: ({ row: { original } }: CellProps<i>) => {
+      }),
+      columnHelper.accessor((row) => row, {
+        id: "meals",
+        cell: (info) => {
+          const { original } = info.row;
           const { ingredient } = original;
           return (
             <div className="flex flex-col">
@@ -152,12 +153,13 @@ const IngredientList: React.FC = () => {
             </div>
           );
         },
-      },
+      }),
 
-      {
-        Header: "USDA Food",
+      columnHelper.accessor((row) => row, {
+        header: () => <span>USDA Food</span>,
         id: "food",
-        Cell: ({ row: { original } }: CellProps<i>) => {
+        cell: (info) => {
+          const { original } = info.row;
           return (
             <div className="flex flex-col w-full">
               <FoodSearch
@@ -173,7 +175,7 @@ const IngredientList: React.FC = () => {
             </div>
           );
         },
-      },
+      }),
     ];
   }, [onlyMissingFDC, showIDs, justLinked]);
 

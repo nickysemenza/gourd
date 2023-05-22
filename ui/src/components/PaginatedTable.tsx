@@ -1,5 +1,13 @@
 import React from "react";
-import { useTable, Column, usePagination } from "react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  PaginationState,
+  flexRender,
+  ColumnDef,
+} from "@tanstack/react-table";
 
 export interface PaginationParameters {
   offset?: number;
@@ -7,7 +15,7 @@ export interface PaginationParameters {
 }
 
 interface TableProps<T extends object> {
-  columns: Column<T>[];
+  columns: any | ColumnDef<T>[];
   data: T[];
   fetchData: (params: PaginationParameters) => void;
   isLoading: boolean;
@@ -22,32 +30,37 @@ const PaginatedTable = <T extends object>({
   fetchData,
   isLoading,
 }: TableProps<T>) => {
-  // Use the state and functions returned from useTable to build your UI
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    canPreviousPage,
-    canNextPage,
-    pageOptions,
-    nextPage,
-    previousPage,
-    state: { pageIndex, pageSize },
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: 0, pageSize: 50 }, // Pass our hoisted table state
-      manualPagination: true, // Tell the usePagination
-      // hook that we'll handle our own data fetching
-      // This means we'll also have to provide our own
-      // pageCount.
-      pageCount: controlledPageCount,
-    },
-    usePagination
+  const [{ pageIndex, pageSize }, setPagination] =
+    React.useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: 10,
+    });
+
+  const pagination = React.useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize]
   );
+
+  // Use the state and functions returned from useTable to build your UI
+  const table = useReactTable({
+    columns,
+    data,
+    pageCount: controlledPageCount ?? -1,
+    state: {
+      pagination,
+    },
+    manualPagination: true, // Tell the usePagination
+    // hook that we'll handle our own data fetching
+    // This means we'll also have to provide our own
+    // pageCount.
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onPaginationChange: setPagination,
+  });
 
   React.useEffect(() => {
     let params: PaginationParameters = {
@@ -63,30 +76,28 @@ const PaginatedTable = <T extends object>({
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table
-              className="min-w-full divide-y divide-gray-200 w-full"
-              {...getTableProps()}
-              data-cy="recipe-table"
-            >
-              <thead className="bg-gray-50 dark:bg-gray-900">
-                {headerGroups.map((headerGroup) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map((column) => (
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        {...column.getHeaderProps()}
-                      >
-                        {/* @ts-ignore */}
-                        {column.render("Header")}
-                      </th>
-                    ))}
+            <table>
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <th key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder ? null : (
+                            <div>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                            </div>
+                          )}
+                        </th>
+                      );
+                    })}
                   </tr>
                 ))}
               </thead>
-              <tbody
-                className="bg-white divide-y divide-gray-200 dark:divide-gray-700"
-                {...getTableBodyProps()}
-              >
+              <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                 {isLoading && (
                   <tr>
                     <td colSpan={10} className="w-100 text-xl text-center h-16">
@@ -94,21 +105,22 @@ const PaginatedTable = <T extends object>({
                     </td>
                   </tr>
                 )}
-                {rows.map((row) => {
-                  prepareRow(row);
+                {table.getRowModel().rows.map((row) => {
                   return (
                     <tr
-                      {...row.getRowProps()}
+                      key={row.id}
                       className="bg-gray-100 odd:bg-gray-200 dark:bg-slate-500 dark:odd:bg-slate-400"
                     >
-                      {row.cells.map((cell) => {
+                      {row.getVisibleCells().map((cell) => {
                         return (
                           <td
+                            key={cell.id}
                             className="px-6 py-4 whitespace-nowrap"
-                            {...cell.getCellProps()}
                           >
-                            {/* @ts-ignore */}
-                            {cell.render("Cell")}
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
                           </td>
                         );
                       })}
@@ -125,8 +137,8 @@ const PaginatedTable = <T extends object>({
           // href="#prev"
           className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
           aria-label="Previous"
-          onClick={() => previousPage()}
-          disabled={!canPreviousPage}
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
         >
           {/* <!-- Heroicon name: chevron-left --> */}
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -146,8 +158,8 @@ const PaginatedTable = <T extends object>({
         <button
           className="-ml-px relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150"
           aria-label="Next"
-          onClick={() => nextPage()}
-          disabled={!canNextPage}
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
         >
           {/* <!-- Heroicon name: chevron-right --> */}
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -162,7 +174,7 @@ const PaginatedTable = <T extends object>({
       <span>
         Page{" "}
         <strong>
-          {pageIndex + 1} of {pageOptions.length}
+          {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </strong>
       </span>
     </div>

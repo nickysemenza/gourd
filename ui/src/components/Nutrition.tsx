@@ -1,7 +1,7 @@
 import React from "react";
-import { CellProps, Column } from "react-table";
 import { scaledRound } from "../util";
 import PaginatedTable from "./PaginatedTable";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const Nutrient: React.FC<{
   h: string[];
@@ -12,23 +12,22 @@ const Nutrient: React.FC<{
 }> = ({ items, h }) => {
   type i = (typeof items)[0];
 
+  const columnHelper = createColumnHelper<i>();
   const foo = h.map((n) => {
-    const res: Column<i> = {
-      Header: n,
-      Cell: ({ row: { original } }: CellProps<i>) => {
-        const val = original.nutrients.get(n);
+    const res = columnHelper.accessor((row) => row, {
+      id: n,
+      cell: (info) => {
+        const val = info.row.original.nutrients.get(n);
         return val ? scaledRound(val) : "";
       },
-    };
+    });
+
     return res;
   });
-  const columns: Array<Column<i>> = [
-    {
-      Header: "ingredient",
-      Cell: ({ row: { original } }: CellProps<i>) => {
-        return original.ingredient;
-      },
-    },
+  const columns = [
+    columnHelper.accessor((row) => row.ingredient, {
+      id: "ingredient",
+    }),
     ...foo,
   ];
 

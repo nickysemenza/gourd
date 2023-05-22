@@ -20,12 +20,7 @@ const FoodSearch: React.FC<{
   enableSearch = false,
   addon,
 }) => {
-  const {
-    register,
-    // handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+  const { register, watch } = useForm();
 
   const { loading, data: foods } = useSearchFoods({
     queryParams: {

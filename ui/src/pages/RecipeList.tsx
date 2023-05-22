@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { CellProps, Column } from "react-table";
 import Debug from "../components/Debug";
 import { RecipeWrapper, useListRecipes } from "../api/openapi-hooks/api";
 import PaginatedTable, {
@@ -17,6 +16,7 @@ import ProgressiveImage from "../components/ProgressiveImage";
 import { sumIngredients } from "../components/RecipeEditorUtils";
 import dayjs from "dayjs";
 import { RecipeGrid } from "../components/RecipeGrid";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -71,91 +71,88 @@ const RecipeList: React.FC = () => {
   );
 
   type i = (typeof recipes)[0];
+  const columnHelper = createColumnHelper<i>();
 
-  const columns: Array<Column<i>> = React.useMemo(
-    () => [
-      {
-        Header: "Name",
-        // accessor: "name",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          const olderVersions = original.other_versions || [];
-          const versions = [
-            original.detail,
-            ...(showOlder ? olderVersions : []),
-          ];
-          const ing = Object.keys(
-            sumIngredients(original.detail.sections).ingredients
-          );
-          const rec = Object.keys(
-            sumIngredients(original.detail.sections).recipes
-          );
-          return (
-            <div>
-              <ul>
-                {versions.map((i) => (
-                  <li key={i.id}>
-                    <div className="flex">
-                      <RecipeLink recipe={i} />
-                      <input
-                        type="checkbox"
-                        className="form-checkbox"
-                        checked={checked.has(i.id)}
-                        onChange={(e) => {}}
-                        onClick={() =>
-                          setChecked(
-                            update(
-                              checked,
-                              checked.has(i.id)
-                                ? { $remove: [i.id] }
-                                : { $add: [i.id] }
-                            )
+  const columns = [
+    columnHelper.accessor((row) => row, {
+      id: "name",
+      cell: (info) => {
+        const { original } = info.row;
+        const olderVersions = original.other_versions || [];
+        const versions = [original.detail, ...(showOlder ? olderVersions : [])];
+        const ing = Object.keys(
+          sumIngredients(original.detail.sections).ingredients
+        );
+        const rec = Object.keys(
+          sumIngredients(original.detail.sections).recipes
+        );
+        return (
+          <div>
+            <ul>
+              {versions.map((i) => (
+                <li key={i.id}>
+                  <div className="flex">
+                    <RecipeLink recipe={i} />
+                    <input
+                      type="checkbox"
+                      className="form-checkbox"
+                      checked={checked.has(i.id)}
+                      onChange={(e) => {}}
+                      onClick={() =>
+                        setChecked(
+                          update(
+                            checked,
+                            checked.has(i.id)
+                              ? { $remove: [i.id] }
+                              : { $add: [i.id] }
                           )
-                        }
-                      />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <Pill2 color={ing.length + rec.length > 0 ? "green" : "red"}>
-                {ing.length} ing / {rec.length} rec
-              </Pill2>
-            </div>
-          );
-        },
+                        )
+                      }
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <Pill2 color={ing.length + rec.length > 0 ? "green" : "red"}>
+              {ing.length} ing / {rec.length} rec
+            </Pill2>
+          </div>
+        );
       },
-      {
-        Header: "meals",
-        Cell: ({ row: { original } }: CellProps<i>) => (
+    }),
+    columnHelper.accessor((row) => row, {
+      id: "meals",
+      cell: (info) => {
+        const { original } = info.row;
+        return (
           <div className="flex flex-row">
             {(original.linked_photos || []).map((p) => (
               <ProgressiveImage photo={p} key={p.id} className="w-1/6" />
             ))}
           </div>
-        ),
-        // return <Debug data={original.linked_meals} />;
+        );
       },
-      {
-        Header: "created at",
-        Cell: ({ row: { original } }: CellProps<i>) => {
-          const ago = dayjs(original.detail.created_at);
-
-          // return <div>{ago.format("ddd, MMM D, YYYY h:mm A Z")}</div>;
-          return <div>{ago.format("ddd, MMM D, YYYY")}</div>;
-        },
+    }),
+    columnHelper.accessor((row) => row.detail.created_at, {
+      id: "created at",
+      cell: (info) => {
+        const ago = dayjs(info.getValue());
+        return <div>{ago.format("ddd, MMM D, YYYY")}</div>;
       },
-      ...(showIds
-        ? [
-            {
-              Header: "edit",
-              Cell: ({ row: { original } }: CellProps<i>) => {
-                return <Code>{original.id} </Code>;
-              },
+      header: () => <span>Created At</span>,
+    }),
+    ...(showIds
+      ? [
+          columnHelper.accessor((row) => row.id, {
+            id: "id",
+            cell: (info) => {
+              return <Code>{info.getValue()} </Code>;
             },
-          ]
-        : []),
-    ],
-    [checked, showOlder, showIds]
-  );
+            header: () => <span>id</span>,
+          }),
+        ]
+      : []),
+  ];
 
   return (
     <div className="">

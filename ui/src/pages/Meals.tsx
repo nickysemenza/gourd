@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { CellProps, Column } from "react-table";
 import dayjs from "dayjs";
 import Debug from "../components/Debug";
 import { Photo, useListMeals } from "../api/openapi-hooks/api";
@@ -15,6 +14,7 @@ import { MealRecipeUpdateActionEnum, MealsApi } from "../api/openapi-fetch";
 import update from "immutability-helper";
 import queryString from "query-string";
 import { Link } from "react-router-dom";
+import { createColumnHelper } from "@tanstack/react-table";
 const Meals: React.FC = () => {
   let initialParams: PaginationParameters = {
     offset: 0,
@@ -36,26 +36,27 @@ const Meals: React.FC = () => {
   React.useEffect(() => {
     setVal(data?.meals || []);
   }, [data]);
-  type i = typeof meals[0];
+  type i = (typeof meals)[0];
   const [checked, setChecked] = useState(new Set<string>());
-  const columns: Array<Column<i>> = React.useMemo(() => {
+  const columns = React.useMemo(() => {
+    const columnHelper = createColumnHelper<i>();
     const mApi = new MealsApi(getOpenapiFetchConfig());
     return [
-      {
-        Header: "Ate on",
-        accessor: "ate_at",
-        Cell: (cell: CellProps<i>) => {
-          const { ate_at } = cell.row.original;
-          const ago = dayjs(ate_at);
+      columnHelper.accessor((row) => row.ate_at, {
+        id: "ate_at",
+        header: () => <span>Ate on</span>,
+        cell: (info) => {
+          const ago = dayjs(info.getValue());
 
           // return <div>{ago.format("ddd, MMM D, YYYY h:mm A Z")}</div>;
           return <div>{ago.format("ddd, MMM D, YYYY")}</div>;
         },
-      },
-      {
-        Header: "select",
-        Cell: (cell: CellProps<i>) => {
-          const { id } = cell.row.original;
+      }),
+      columnHelper.accessor((row) => row.id, {
+        id: "select",
+        cell: (info) => {
+          // const { original } = info.row;
+          const id = info.getValue();
 
           return (
             <div>
@@ -76,17 +77,15 @@ const Meals: React.FC = () => {
             </div>
           );
         },
-      },
-      {
-        Header: "name",
-        accessor: "name",
-      },
-      {
-        Header: "recipes",
-        accessor: "recipes",
-        Cell: (cell: CellProps<i>) => {
-          const { recipes } = cell.row.original;
+      }),
+      columnHelper.accessor("name", {
+        //accessorKey
+        header: "Name",
+      }),
 
+      columnHelper.accessor((row) => row.recipes, {
+        id: "recipes",
+        cell: (info) => {
           return (
             <div className="w-64">
               <EntitySelector
@@ -94,9 +93,9 @@ const Meals: React.FC = () => {
                 showKind={["recipe"]}
                 placeholder="Pick a Recipe..."
                 onChange={async (a) => {
-                  console.log(a, cell.row.index);
+                  console.log(a, info.row.index);
                   let res = await mApi.updateRecipesForMeal({
-                    mealId: cell.row.original.id,
+                    mealId: info.row.original.id,
                     mealRecipeUpdate: {
                       multiplier: 1.0,
                       action: MealRecipeUpdateActionEnum.ADD,
@@ -105,7 +104,7 @@ const Meals: React.FC = () => {
                   });
                   console.log({ res });
                   setVal(
-                    pushMealRecipe(internalVal, cell.row.index, {
+                    pushMealRecipe(internalVal, info.row.index, {
                       id: a.value,
                       name: a.label,
                       sections: [],
@@ -120,7 +119,7 @@ const Meals: React.FC = () => {
                   );
                 }}
               />
-              {(recipes || []).map((r) => (
+              {(info.getValue() || []).map((r) => (
                 <div className="">
                   <RecipeLink recipe={r.recipe} multiplier={r.multiplier} />
                 </div>
@@ -129,22 +128,20 @@ const Meals: React.FC = () => {
             </div>
           );
         },
-      },
-      {
-        Header: "Photos",
-        accessor: "photos",
-        Cell: (cell: CellProps<i>) => {
-          const { photos } = cell.row.original;
+      }),
+      columnHelper.accessor((row) => row.photos, {
+        id: "photos",
+        cell: (info) => {
           // https://developers.google.com/meals/library/guides/access-media-items#image-base-urls
           return (
             <div className="flex flex-row">
-              {photos.map((photo: Photo) => (
+              {info.getValue().map((photo: Photo) => (
                 <ProgressiveImage photo={photo} key={photo.id} />
               ))}
             </div>
           );
         },
-      },
+      }),
     ];
   }, [internalVal, checked]);
 

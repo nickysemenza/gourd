@@ -1,42 +1,36 @@
 import React from "react";
-import { CellProps } from "react-table";
 import Debug from "../components/Debug";
-import { useListAllAlbums } from "../api/openapi-hooks/api";
+import { GooglePhotosAlbum, useListAllAlbums } from "../api/openapi-hooks/api";
 import PaginatedTable from "../components/PaginatedTable";
 import { Code } from "../util";
+import { createColumnHelper } from "@tanstack/react-table";
 
 const Albums: React.FC = () => {
   const { data, error, loading } = useListAllAlbums({});
 
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: "Name",
-        accessor: "name",
-        Cell: (cell: CellProps<any>) => {
-          const { title } = cell.row.original;
-          return <div>{title}</div>;
+  const columns = React.useMemo(() => {
+    const columnHelper = createColumnHelper<GooglePhotosAlbum>();
+    return [
+      columnHelper.accessor((row) => row.title, {
+        id: "Name",
+        cell: (info) => {
+          return <div>{info.getValue()}</div>;
         },
-      },
-      {
-        Header: "Use case",
-        accessor: "usecase",
-        Cell: (cell: CellProps<any>) => {
-          const { usecase } = cell.row.original;
-          return <div>{usecase}</div>;
+      }),
+      columnHelper.accessor((row) => row.usecase, {
+        id: "Use case",
+        cell: (info) => {
+          return <div>{info.getValue()}</div>;
         },
-      },
-      {
-        Header: "id",
-        accessor: "id",
-        Cell: (cell: CellProps<any>) => {
-          const { id } = cell.row.original;
-          return <Code>{id}</Code>;
+      }),
+      columnHelper.accessor((row) => row.id, {
+        id: "id",
+        cell: (info) => {
+          return <Code>{info.getValue()}</Code>;
         },
-      },
-    ],
-    []
-  );
+      }),
+    ];
+  }, []);
 
   return (
     <div>
