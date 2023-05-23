@@ -13,7 +13,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { ButtonGroup, PillLabel } from "../ui/Button";
+import { ButtonGroup } from "../ui/ButtonGroup";
 import { DragWrapper } from "../DragDrop";
 import {
   addIngredient,
@@ -53,6 +53,7 @@ import { EntitySelector } from "../EntitySelector";
 import { WasmContext } from "../../util/wasmContext";
 import { TableInput } from "../ui/Input";
 import IngredientPopover from "./IngredientPopover";
+import { PillLabel } from "../ui/Pill";
 
 export interface UpdateIngredientProps {
   sectionID: number;

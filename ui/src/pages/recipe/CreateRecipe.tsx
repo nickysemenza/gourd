@@ -1,6 +1,6 @@
 import { EntitySelector } from "../../components/EntitySelector";
 import { useNavigate } from "react-router-dom";
-import { ButtonGroup } from "../../components/ui/Button";
+import { ButtonGroup } from "../../components/ui/ButtonGroup";
 import { RecipesApi } from "../../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../../util/config";
 import { SubmitHandler, useForm } from "react-hook-form";

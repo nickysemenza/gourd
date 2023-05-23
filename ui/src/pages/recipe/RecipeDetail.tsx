@@ -38,7 +38,7 @@ import {
   ButtonGroup,
   HideShowHOC,
   makeHideShowButton,
-} from "../../components/ui/Button";
+} from "../../components/ui/ButtonGroup";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../../components/Nutrition";

@@ -8,6 +8,7 @@
   @apply text-blue-600;
 }
 
+
 .ing-table-row {
   display: grid;
   /* grams, g (BP), ing, amount, unit, adj, actions */
@@ -19,3 +20,4 @@
   /* section, minutes, ing-table-row, instructions */
   grid-template-columns: 1fr 9fr 5fr;
 }
+

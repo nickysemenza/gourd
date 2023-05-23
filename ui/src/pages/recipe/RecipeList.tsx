@@ -10,13 +10,15 @@ import { Helmet } from "react-helmet";
 import update from "immutability-helper";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
-import { ButtonGroup, Pill2 } from "../../components/ui/Button";
+import { ButtonGroup } from "../../components/ui/ButtonGroup";
 import { Grid, List, PlusCircle } from "react-feather";
 import ProgressiveImage from "../../components/ui/ProgressiveImage";
 import { sumIngredients } from "../../components/recipe/RecipeEditorUtils";
 import dayjs from "dayjs";
 import { RecipeGrid } from "../../components/recipe/RecipeGrid";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Pill } from "../../components/ui/Pill";
+import { Button } from "../../components/ui/Button";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -113,9 +115,9 @@ const RecipeList: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <Pill2 color={ing.length + rec.length > 0 ? "green" : "red"}>
+            <Pill color={ing.length + rec.length > 0 ? "green" : "red"}>
               {ing.length} ing / {rec.length} rec
-            </Pill2>
+            </Pill>
           </div>
         );
       },
@@ -216,6 +218,7 @@ const RecipeList: React.FC = () => {
             },
           ]}
         />
+        <Button>foo</Button>
         {checked.size > 0 && (
           <>
             <Link

@@ -6,7 +6,7 @@ import { useListIngredients } from "../api/openapi-hooks/api";
 import { IngredientsApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../util/config";
 import { toast } from "react-toastify";
-import { ButtonGroup } from "../components/ui/Button";
+import { ButtonGroup } from "../components/ui/ButtonGroup";
 import { RecipeLink, UnitMappingList } from "../components/misc/Misc";
 import { AlertTriangle, PlusCircle } from "react-feather";
 import { Code } from "../util/util";

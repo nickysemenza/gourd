@@ -25,7 +25,8 @@ import { EntitySelector } from "../EntitySelector";
 import { RecipeLink } from "../misc/Misc";
 import { scaledRound } from "../../util/util";
 import { getOpenapiFetchConfig } from "../../util/config";
-import { HideShowButton, Pill2 } from "../ui/Button";
+import { HideShowButton } from "../ui/ButtonGroup";
+import { Pill } from "../ui/Pill";
 
 interface SIWithMultiplier {
   si: SectionIngredient | undefined;
@@ -265,7 +266,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
                                   )
                                   .join(" | ")}
                               </div>
-                              <Pill2 color="red">old</Pill2>
+                              <Pill color="red">old</Pill>
                             </div>
                             <hr />
 

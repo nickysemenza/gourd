@@ -3,9 +3,9 @@ import { ActionMeta, GroupBase, SingleValue, StylesConfig } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../util/config";
-import { Pill2 } from "./ui/Button";
 import { IngredientKind } from "./recipe/RecipeEditorUtils";
 import { blankIngredient, blankRecipeWrapperInput } from "../util/util";
+import { Pill } from "./ui/Pill";
 
 type Option = {
   label: string;
@@ -131,7 +131,7 @@ export const EntitySelector: React.FC<{
         formatOptionLabel={(option, meta) => (
           <div className="flex flex-row justify-between">
             <div className="text-orange-600 font-bold pr-1">{option.label}</div>
-            {option.kind && <Pill2 color="green">{option.kind}</Pill2>}
+            {option.kind && <Pill color="green">{option.kind}</Pill>}
           </div>
         )}
         onChange={onSelectChange}
