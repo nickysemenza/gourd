@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { PlusCircle } from "react-feather";
 import { RecipeDetail, RecipeDetailInput } from "../api/openapi-fetch";
-import { WasmContext } from "../wasmContext";
-import { ButtonGroup } from "./Button";
+import { WasmContext } from "../util/wasmContext";
+import { ButtonGroup } from "./ui/Button";
 
 const InstructionsListParser: React.FC<{
   setDetail: (d: RecipeDetail) => void;

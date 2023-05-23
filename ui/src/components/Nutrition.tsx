@@ -1,6 +1,6 @@
 import React from "react";
-import { scaledRound } from "../util";
-import PaginatedTable from "./PaginatedTable";
+import { scaledRound } from "../util/util";
+import PaginatedTable from "./ui/PaginatedTable";
 import { createColumnHelper } from "@tanstack/react-table";
 
 const Nutrient: React.FC<{

@@ -1,8 +1,8 @@
-import { EntitySelector } from "../components/EntitySelector";
+import { EntitySelector } from "../../components/EntitySelector";
 import { useNavigate } from "react-router-dom";
-import { ButtonGroup } from "../components/Button";
-import { RecipesApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
+import { ButtonGroup } from "../../components/ui/Button";
+import { RecipesApi } from "../../api/openapi-fetch";
+import { getOpenapiFetchConfig } from "../../util/config";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const CreateRecipe: React.FC = () => {

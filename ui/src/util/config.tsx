@@ -1,6 +1,6 @@
-import { Configuration, SystemApi } from "./api/openapi-fetch";
+import { Configuration, SystemApi } from "../api/openapi-fetch";
 import { toast } from "react-toastify";
-import { getJWT } from "./auth";
+import { getJWT } from "../auth/auth";
 
 export const getAPIURL = () => getBaseURL() + "/api";
 export const getBaseURL = () => process.env.REACT_APP_API_URL;

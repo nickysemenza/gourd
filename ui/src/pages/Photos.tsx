@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import Debug from "../components/Debug";
+import Debug from "../components/ui/Debug";
 import { Photo, useListPhotos } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
-} from "../components/PaginatedTable";
-import ProgressiveImage from "../components/ProgressiveImage";
+} from "../components/ui/PaginatedTable";
+import ProgressiveImage from "../components/ui/ProgressiveImage";
 import { createColumnHelper } from "@tanstack/react-table";
 
 const Photos: React.FC = () => {

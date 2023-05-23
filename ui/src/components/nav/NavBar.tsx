@@ -2,8 +2,8 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { Menu as MenuIcon, X } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { isLoggedIn, parseJWT } from "../auth";
-import { Logo } from "./Logo";
+import { isLoggedIn, parseJWT } from "../../auth/auth";
+import { Logo } from "../Logo";
 import { navItems } from "./navItems";
 
 const NavBar: React.FC = () => {

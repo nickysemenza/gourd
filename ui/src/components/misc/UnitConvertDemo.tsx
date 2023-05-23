@@ -2,14 +2,14 @@ import React, { useContext } from "react";
 import {
   UnitConversionRequestTargetEnum,
   UnitMapping,
-} from "../api/openapi-fetch";
+} from "../../api/openapi-fetch";
 import {
   IngredientDetail,
   UnitConversionRequest,
-} from "../api/openapi-hooks/api";
-import { wasm, WasmContext, Amount } from "../wasmContext";
-import Debug from "./Debug";
-import { TableInput } from "./Input";
+} from "../../api/openapi-hooks/api";
+import { wasm, WasmContext, Amount } from "../../util/wasmContext";
+import Debug from "../ui/Debug";
+import { TableInput } from "../ui/Input";
 
 type UnitConvertDemoProps = { detail: IngredientDetail };
 export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {

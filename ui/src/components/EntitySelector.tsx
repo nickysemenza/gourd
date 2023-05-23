@@ -2,10 +2,10 @@ import React from "react";
 import { ActionMeta, GroupBase, SingleValue, StylesConfig } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
-import { Pill2 } from "./Button";
-import { IngredientKind } from "./RecipeEditorUtils";
-import { blankIngredient, blankRecipeWrapperInput } from "../util";
+import { getOpenapiFetchConfig } from "../util/config";
+import { Pill2 } from "./ui/Button";
+import { IngredientKind } from "./recipe/RecipeEditorUtils";
+import { blankIngredient, blankRecipeWrapperInput } from "../util/util";
 
 type Option = {
   label: string;

@@ -3,7 +3,7 @@ import queryString from "query-string";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import RecipeDetailTable, {
   UpdateIngredientProps,
-} from "../components/RecipeDetailTable";
+} from "../../components/recipe/RecipeDetailTable";
 import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
@@ -14,8 +14,12 @@ import {
   useListIngredients,
   RecipeWrapper as RecipeWrapper2,
   Amount,
-} from "../api/openapi-hooks/api";
-import { formatTimeRange, getTotalDuration, scaledRound } from "../util";
+} from "../../api/openapi-hooks/api";
+import {
+  formatTimeRange,
+  getTotalDuration,
+  scaledRound,
+} from "../../util/util";
 import {
   calCalc,
   countTotals,
@@ -29,16 +33,16 @@ import {
   RecipeTweaks,
   updateRecipeName,
   updateRecipeSource,
-} from "../components/RecipeEditorUtils";
+} from "../../components/recipe/RecipeEditorUtils";
 import {
   ButtonGroup,
   HideShowHOC,
   makeHideShowButton,
-} from "../components/Button";
+} from "../../components/ui/Button";
 import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
-import Nutrition from "../components/Nutrition";
-import { WasmContext } from "../wasmContext";
+import Nutrition from "../../components/Nutrition";
+import { WasmContext } from "../../util/wasmContext";
 import { Helmet } from "react-helmet";
 import {
   RecipesApi,
@@ -46,14 +50,14 @@ import {
   RecipeWrapper,
   SectionInstructionInput,
   SectionIngredientInput,
-} from "../api/openapi-fetch";
-import { getAPIURL, getOpenapiFetchConfig } from "../config";
-import { RecipeLink } from "../components/Misc";
-import { Alert } from "../components/Alert";
-import ProgressiveImage from "../components/ProgressiveImage";
-import Debug from "../components/Debug";
-import { NYTView } from "../components/NYTView";
-import ErrorBoundary from "../components/ErrorBoundary";
+} from "../../api/openapi-fetch";
+import { getAPIURL, getOpenapiFetchConfig } from "../../util/config";
+import { RecipeLink } from "../../components/misc/Misc";
+import { Alert } from "../../components/ui/Alert";
+import ProgressiveImage from "../../components/ui/ProgressiveImage";
+import Debug from "../../components/ui/Debug";
+import { NYTView } from "../../components/recipe/NYTView";
+import ErrorBoundary from "../../components/ui/ErrorBoundary";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {

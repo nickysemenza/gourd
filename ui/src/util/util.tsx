@@ -4,8 +4,8 @@ import {
   IngredientKind,
   Amount,
   RecipeSection,
-} from "./api/openapi-hooks/api";
-import { RecipeWrapperInput } from "./api/openapi-fetch/models/RecipeWrapperInput";
+} from "../api/openapi-hooks/api";
+import { RecipeWrapperInput } from "../api/openapi-fetch/models/RecipeWrapperInput";
 import { wasm, RichItem } from "./wasmContext";
 
 export const getIngredient = (si: Partial<SectionIngredient>) => {
@@ -33,7 +33,7 @@ export const formatRichText = (w: wasm, text: RichItem[]) => {
           {t.value}
         </div>
       );
-    } else if (t.kind === "Amount") {
+    } else if (t.kind === "Measure") {
       let val = t.value.pop();
       if (!val) {
         return null;

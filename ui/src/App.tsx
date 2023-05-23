@@ -1,8 +1,8 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 
-import Test from "./Test";
-import RecipeList from "./pages/RecipeList";
+import Test from "./Homepage";
+import RecipeList from "./pages/recipe/RecipeList";
 import {
   BrowserRouter as Router,
   Route,
@@ -10,31 +10,36 @@ import {
   Routes,
   useLocation,
 } from "react-router-dom";
-import RecipeDetail from "./pages/RecipeDetail";
-import NavBar from "./components/NavBar";
+import RecipeDetail from "./pages/recipe/RecipeDetail";
+import NavBar from "./components/nav/NavBar";
 import IngredientList from "./pages/IngredientList";
-import CreateRecipe from "./pages/CreateRecipe";
+import CreateRecipe from "./pages/recipe/CreateRecipe";
 import Food from "./pages/Food";
 import Playground from "./pages/Playground";
-import RecipeDiff from "./pages/RecipeDiff";
+import RecipeDiff from "./pages/recipe/RecipeDiff";
 import Search from "./pages/Search";
 
 import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import { getAPIURL, onAPIRequest, onAPIError, getTracingURL } from "./config";
+import {
+  getAPIURL,
+  onAPIRequest,
+  onAPIError,
+  getTracingURL,
+} from "./util/config";
 import { CookiesProvider } from "react-cookie";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import IngredientDetail from "./pages/IngredientDetail";
-import { WasmContextProvider } from "./wasmContext";
+import { WasmContextProvider } from "./util/wasmContext";
 import Graph from "./pages/Graph";
-import ErrorBoundary from "./components/ErrorBoundary";
-import { isLoggedIn } from "./auth";
-import { registerTracing } from "./tracing";
-import ErrorPage from "./components/ErrorPage";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
+import { isLoggedIn } from "./auth/auth";
+import { registerTracing } from "./util/tracing";
+import ErrorPage from "./components/ui/ErrorPage";
 
 registerTracing(getTracingURL(), true);
 

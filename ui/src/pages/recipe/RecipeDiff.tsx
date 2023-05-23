@@ -1,9 +1,9 @@
 import React, { useMemo } from "react";
 import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
-import RecipeDiffView from "../components/RecipeDiffView";
+import RecipeDiffView from "../../components/recipe/RecipeDiffView";
 import queryString from "query-string";
-import { EntitySummary, IngredientKind } from "../api/openapi-fetch";
+import { EntitySummary, IngredientKind } from "../../api/openapi-fetch";
 
 const Playground: React.FC = () => {
   const loc = useLocation();

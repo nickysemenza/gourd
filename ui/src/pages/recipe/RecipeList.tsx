@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import Debug from "../components/Debug";
-import { RecipeWrapper, useListRecipes } from "../api/openapi-hooks/api";
+import Debug from "../../components/ui/Debug";
+import { RecipeWrapper, useListRecipes } from "../../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
-} from "../components/PaginatedTable";
-import { RecipeLink } from "../components/Misc";
-import { Code } from "../util";
+} from "../../components/ui/PaginatedTable";
+import { RecipeLink } from "../../components/misc/Misc";
+import { Code } from "../../util/util";
 import { Helmet } from "react-helmet";
 import update from "immutability-helper";
 import { Link } from "react-router-dom";
 import queryString from "query-string";
-import { ButtonGroup, Pill2 } from "../components/Button";
+import { ButtonGroup, Pill2 } from "../../components/ui/Button";
 import { Grid, List, PlusCircle } from "react-feather";
-import ProgressiveImage from "../components/ProgressiveImage";
-import { sumIngredients } from "../components/RecipeEditorUtils";
+import ProgressiveImage from "../../components/ui/ProgressiveImage";
+import { sumIngredients } from "../../components/recipe/RecipeEditorUtils";
 import dayjs from "dayjs";
-import { RecipeGrid } from "../components/RecipeGrid";
+import { RecipeGrid } from "../../components/recipe/RecipeGrid";
 import { createColumnHelper } from "@tanstack/react-table";
 
 const RecipeList: React.FC = () => {

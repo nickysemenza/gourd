@@ -7,10 +7,10 @@ import {
   Photo,
   RecipeDetail,
   RecipeWrapper,
-} from "../api/openapi-hooks/api";
-import { formatTimeRange, getTotalDuration } from "../util";
-import { WasmContext } from "../wasmContext";
-import ProgressiveImage from "./ProgressiveImage";
+} from "../../api/openapi-hooks/api";
+import { formatTimeRange, getTotalDuration } from "../../util/util";
+import { WasmContext } from "../../util/wasmContext";
+import ProgressiveImage from "../ui/ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);

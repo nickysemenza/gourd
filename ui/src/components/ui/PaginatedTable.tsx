@@ -73,65 +73,62 @@ const PaginatedTable = <T extends object>({
   // Render the UI for your table
   return (
     <div className="flex flex-col">
-      <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <th key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder ? null : (
-                            <div>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                            </div>
-                          )}
-                        </th>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
-                {isLoading && (
-                  <tr>
-                    <td colSpan={10} className="w-100 text-xl text-center h-16">
-                      loading...
-                    </td>
-                  </tr>
-                )}
-                {table.getRowModel().rows.map((row) => {
+      {/* <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"> */}
+      {/* <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"> */}
+      {/* <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"> */}
+      <table>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <th key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder ? null : (
+                      <div>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </div>
+                    )}
+                  </th>
+                );
+              })}
+            </tr>
+          ))}
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+          {isLoading && (
+            <tr>
+              <td colSpan={10} className="w-100 text-xl text-center h-16">
+                loading...
+              </td>
+            </tr>
+          )}
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <tr
+                key={row.id}
+                className="bg-gray-100 odd:bg-gray-200 dark:bg-slate-500 dark:odd:bg-slate-400"
+              >
+                {row.getVisibleCells().map((cell) => {
                   return (
-                    <tr
-                      key={row.id}
-                      className="bg-gray-100 odd:bg-gray-200 dark:bg-slate-500 dark:odd:bg-slate-400"
-                    >
-                      {row.getVisibleCells().map((cell) => {
-                        return (
-                          <td
-                            key={cell.id}
-                            className="px-6 py-4 whitespace-nowrap"
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
+                    <td key={cell.id} className="px-6 py-4 whitespace-nowrap">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {/* </div> */}
+      {/* </div> */}
+      {/* </div> */}
       <nav className="relative z-0 inline-flex shadow-sm">
         <button
           // href="#prev"

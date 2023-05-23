@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import Debug from "../components/Debug";
+import Debug from "../components/ui/Debug";
 import { Photo, useListMeals } from "../api/openapi-hooks/api";
 import PaginatedTable, {
   PaginationParameters,
-} from "../components/PaginatedTable";
-import ProgressiveImage from "../components/ProgressiveImage";
-import { RecipeLink } from "../components/Misc";
+} from "../components/ui/PaginatedTable";
+import ProgressiveImage from "../components/ui/ProgressiveImage";
+import { RecipeLink } from "../components/misc/Misc";
 import { EntitySelector } from "../components/EntitySelector";
-import { pushMealRecipe } from "../components/RecipeEditorUtils";
-import { getOpenapiFetchConfig } from "../config";
+import { pushMealRecipe } from "../components/recipe/RecipeEditorUtils";
+import { getOpenapiFetchConfig } from "../util/config";
 import { MealRecipeUpdateActionEnum, MealsApi } from "../api/openapi-fetch";
 import update from "immutability-helper";
 import queryString from "query-string";

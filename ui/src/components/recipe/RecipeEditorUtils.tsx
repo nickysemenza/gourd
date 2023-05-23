@@ -9,10 +9,10 @@ import {
   RecipeWrapper,
   SectionIngredient,
   Amount as Amount2,
-} from "../api/openapi-hooks/api";
+} from "../../api/openapi-hooks/api";
 import update from "immutability-helper";
-import { wasm } from "../wasmContext";
-import { Amount } from "../api/openapi-fetch";
+import { wasm } from "../../util/wasmContext";
+import { Amount } from "../../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;

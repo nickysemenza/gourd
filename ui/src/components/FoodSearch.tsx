@@ -1,9 +1,9 @@
 import React from "react";
 import { PlusCircle } from "react-feather";
 import { TempFood, useSearchFoods } from "../api/openapi-hooks/api";
-import { Code } from "../util";
-import { ButtonGroup } from "./Button";
-import { UnitMappingList } from "./Misc";
+import { Code } from "../util/util";
+import { ButtonGroup } from "./ui/Button";
+import { UnitMappingList } from "./misc/Misc";
 import { useForm } from "react-hook-form";
 const FoodSearch: React.FC<{
   name: string;

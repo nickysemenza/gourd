@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import {
   UnitConversionRequest,
   UnitConversionRequestTargetEnum,
-} from "../api/openapi-fetch";
-import { RecipeDetail, UnitMapping } from "../api/openapi-hooks/api";
-import { scaledRound } from "../util";
-import { WasmContext } from "../wasmContext";
+} from "../../api/openapi-fetch";
+import { RecipeDetail, UnitMapping } from "../../api/openapi-hooks/api";
+import { scaledRound } from "../../util/util";
+import { WasmContext } from "../../util/wasmContext";
 
 export interface Props {
   recipe: Pick<RecipeDetail, "id" | "name" | "version" | "is_latest_version">;

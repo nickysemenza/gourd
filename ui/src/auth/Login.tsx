@@ -7,8 +7,8 @@ import {
   useGoogleLogin,
 } from "react-google-login";
 import { AuthResp, AuthenticationApi, ConfigData } from "../api/openapi-fetch";
-import { COOKIE_NAME, isLoggedIn, getName } from "../auth";
-import { getOpenapiFetchConfig } from "../config";
+import { COOKIE_NAME, isLoggedIn, getName } from "./auth";
+import { getOpenapiFetchConfig } from "../util/config";
 
 const Login: React.FC<{ config: ConfigData }> = ({ config }) => {
   const api = new AuthenticationApi(getOpenapiFetchConfig());

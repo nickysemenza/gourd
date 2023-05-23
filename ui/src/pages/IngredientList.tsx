@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import PaginatedTable, {
   PaginationParameters,
-} from "../components/PaginatedTable";
+} from "../components/ui/PaginatedTable";
 import { useListIngredients } from "../api/openapi-hooks/api";
 import { IngredientsApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../config";
+import { getOpenapiFetchConfig } from "../util/config";
 import { toast } from "react-toastify";
-import { ButtonGroup } from "../components/Button";
-import { RecipeLink, UnitMappingList } from "../components/Misc";
+import { ButtonGroup } from "../components/ui/Button";
+import { RecipeLink, UnitMappingList } from "../components/misc/Misc";
 import { AlertTriangle, PlusCircle } from "react-feather";
-import { Code } from "../util";
+import { Code } from "../util/util";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";

@@ -1,10 +1,10 @@
 import { Popover, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { AlertCircle } from "react-feather";
-import { IngredientDetail } from "../api/openapi-hooks/api";
-import Debug from "./Debug";
-import { FoodRow } from "./FoodSearch";
-import { UnitMappingList } from "./Misc";
+import { IngredientDetail } from "../../api/openapi-hooks/api";
+import Debug from "../ui/Debug";
+import { FoodRow } from "../FoodSearch";
+import { UnitMappingList } from "../misc/Misc";
 
 const IngredientPopover: React.FC<{ detail: IngredientDetail }> = ({
   detail,

@@ -3,18 +3,18 @@ import {
   RecipeWrapper,
   RecipeSection,
   SectionIngredient,
-} from "../api/openapi-hooks/api";
+} from "../../api/openapi-hooks/api";
 import {
   formatRichText,
   formatTimeRange,
   getIngredient,
   scaledRound,
-} from "../util";
+} from "../../util/util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
-import { ButtonGroup, PillLabel } from "./Button";
-import { DragWrapper } from "./DragDrop";
+import { ButtonGroup, PillLabel } from "../ui/Button";
+import { DragWrapper } from "../DragDrop";
 import {
   addIngredient,
   addInstruction,
@@ -48,10 +48,10 @@ import {
   PlusCircle,
   XSquare,
 } from "react-feather";
-import { RecipeLink } from "./Misc";
-import { EntitySelector } from "./EntitySelector";
-import { WasmContext } from "../wasmContext";
-import { TableInput } from "./Input";
+import { RecipeLink } from "../misc/Misc";
+import { EntitySelector } from "../EntitySelector";
+import { WasmContext } from "../../util/wasmContext";
+import { TableInput } from "../ui/Input";
 import IngredientPopover from "./IngredientPopover";
 
 export interface UpdateIngredientProps {

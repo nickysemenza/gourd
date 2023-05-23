@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IngredientsApi } from "../api/openapi-fetch";
 import { useGetIngredientById } from "../api/openapi-hooks/api";
-import Debug from "../components/Debug";
+import Debug from "../components/ui/Debug";
 import FoodSearch from "../components/FoodSearch";
-import { UnitConvertDemo } from "../components/UnitConvertDemo";
-import { getOpenapiFetchConfig } from "../config";
+import { UnitConvertDemo } from "../components/misc/UnitConvertDemo";
+import { getOpenapiFetchConfig } from "../util/config";
 
 const IngredientDetail: React.FC = () => {
   let { id } = useParams() as { id?: string };

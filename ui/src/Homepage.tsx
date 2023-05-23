@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ConfigData } from "./api/openapi-fetch";
-import Login from "./components/Login";
-import { getConfig } from "./config";
+import Login from "./auth/Login";
+import { getConfig } from "./util/config";
 
 const Test: React.FC = () => {
   const [config, setConfig] = useState<ConfigData>();

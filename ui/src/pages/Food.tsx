@@ -1,8 +1,8 @@
 import React from "react";
 import { useGetFoodById } from "../api/openapi-hooks/api";
-import Debug from "../components/Debug";
-import { UnitMappingList } from "../components/Misc";
-import { Code, scaledRound } from "../util";
+import Debug from "../components/ui/Debug";
+import { UnitMappingList } from "../components/misc/Misc";
+import { Code, scaledRound } from "../util/util";
 
 const Food: React.FC = () => {
   // const [food, setFood]

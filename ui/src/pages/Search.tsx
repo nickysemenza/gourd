@@ -14,9 +14,9 @@ import {
   RecipeDetail,
   TempFood,
 } from "../api/openapi-hooks/api";
-import { WasmContext } from "../wasmContext";
+import { WasmContext } from "../util/wasmContext";
 import { FoodRow } from "../components/FoodSearch";
-import { RecipeGridCell } from "../components/RecipeGrid";
+import { RecipeGridCell } from "../components/recipe/RecipeGrid";
 
 const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
 

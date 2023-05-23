@@ -5,13 +5,13 @@ import {
   RecipesApi,
   SumsResponse,
   UsageValue,
-} from "../api/openapi-fetch";
+} from "../../api/openapi-fetch";
 import {
   SectionIngredient,
   useListIngredients,
   useGetRecipesByIds,
   RecipeDetail,
-} from "../api/openapi-hooks/api";
+} from "../../api/openapi-hooks/api";
 import {
   flatIngredients,
   getMeasureUnitsFromSI,
@@ -21,11 +21,11 @@ import {
   extractIngredientID,
   getMultiplierFromRecipe,
 } from "./RecipeEditorUtils";
-import { EntitySelector } from "./EntitySelector";
-import { RecipeLink } from "./Misc";
-import { scaledRound } from "../util";
-import { getOpenapiFetchConfig } from "../config";
-import { HideShowButton, Pill2 } from "./Button";
+import { EntitySelector } from "../EntitySelector";
+import { RecipeLink } from "../misc/Misc";
+import { scaledRound } from "../../util/util";
+import { getOpenapiFetchConfig } from "../../util/config";
+import { HideShowButton, Pill2 } from "../ui/Button";
 
 interface SIWithMultiplier {
   si: SectionIngredient | undefined;
