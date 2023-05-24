@@ -2412,20 +2412,21 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@ibm-cloud/openapi-ruleset-utilities@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset-utilities/-/openapi-ruleset-utilities-1.0.0.tgz#45a73d8b0752f033156cb13956e2f0e73f12e4d4"
-  integrity sha512-RbjwA84aY1QAX1kAOBwOehUqC15MEINm5cDzADYz6OFiSK8C+vEcFU2aKRIKfFd6n9Kny05TLRAcgFm8X236rA==
+"@ibm-cloud/openapi-ruleset-utilities@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset-utilities/-/openapi-ruleset-utilities-1.1.0.tgz#055eb4b375fabf3ccb13e529815a9dee272c45aa"
+  integrity sha512-plrwx0gzW5T4Ih0flhs4SPgUunOglblyuR/O8x6GFls7jN7DrrXV/J02RpQjaKajFKsCbzmkLOZYeQqMHbrkeQ==
 
-"@ibm-cloud/openapi-ruleset@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-1.0.0.tgz#d8544e9a8beac8bd51640163f87cee2df0590ddd"
-  integrity sha512-UXyuGLh0BnkcD0ZYCyIDWnpghxbB16IIhQbRr/4sHduWvu7fzkmUu+kmDk7KORa64wMYI347H2XWEKogZxdJUg==
+"@ibm-cloud/openapi-ruleset@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@ibm-cloud/openapi-ruleset/-/openapi-ruleset-1.1.0.tgz#cfad6cfc4a43fc548509db91beb57de019ba66d9"
+  integrity sha512-toVdnwM1kx0qM1njivoh34bDnxwmPv5hqDxBI9IS1r+Y7OETvZkgoKE4pU0TtIF0qv6a+Bup7GIp/ssosdU+Lw==
   dependencies:
-    "@ibm-cloud/openapi-ruleset-utilities" "1.0.0"
-    "@stoplight/spectral-formats" "^1.4.0"
+    "@ibm-cloud/openapi-ruleset-utilities" "1.1.0"
+    "@stoplight/spectral-formats" "^1.5.0"
     "@stoplight/spectral-functions" "^1.7.2"
-    "@stoplight/spectral-rulesets" "^1.14.1"
+    "@stoplight/spectral-rulesets" "^1.16.0"
+    chalk "^4.1.1"
     lodash "^4.17.21"
     loglevel "^1.8.1"
     loglevel-plugin-prefix "0.8.4"
@@ -3578,10 +3579,37 @@
     simple-eval "1.0.0"
     tslib "^2.3.0"
 
-"@stoplight/spectral-core@^1.15.1", "@stoplight/spectral-core@^1.16.0":
+"@stoplight/spectral-core@^1.15.1":
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/@stoplight/spectral-core/-/spectral-core-1.17.0.tgz#f897871f394e62ab9fdf15119730db5d82fc5e47"
   integrity sha512-7D9og+iX2bCJMGPY7cvt2YdevFGDeSI7S2jPo7HWeGGitkef1FDSQ9AEapdwmCYvOJ7ztUlQdCCLTOb6Aani8w==
+  dependencies:
+    "@stoplight/better-ajv-errors" "1.0.3"
+    "@stoplight/json" "~3.20.1"
+    "@stoplight/path" "1.3.2"
+    "@stoplight/spectral-parsers" "^1.0.0"
+    "@stoplight/spectral-ref-resolver" "^1.0.0"
+    "@stoplight/spectral-runtime" "^1.0.0"
+    "@stoplight/types" "~13.6.0"
+    "@types/es-aggregate-error" "^1.0.2"
+    "@types/json-schema" "^7.0.11"
+    ajv "^8.6.0"
+    ajv-errors "~3.0.0"
+    ajv-formats "~2.1.0"
+    es-aggregate-error "^1.0.7"
+    jsonpath-plus "7.1.0"
+    lodash "~4.17.21"
+    lodash.topath "^4.5.2"
+    minimatch "3.1.2"
+    nimma "0.2.2"
+    pony-cause "^1.0.0"
+    simple-eval "1.0.0"
+    tslib "^2.3.0"
+
+"@stoplight/spectral-core@^1.18.0":
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/@stoplight/spectral-core/-/spectral-core-1.18.0.tgz#2f6f6c01f54041857f4f5b901ba8c855922e7a91"
+  integrity sha512-0aj+IELHvhjoPWoOFj41EJilPbaexUuWFg7GCsiJ3BXrniRp3GnPl+TIZkC1ZuuAr/oi77RviDhW9Gm7ndKB9Q==
   dependencies:
     "@stoplight/better-ajv-errors" "1.0.3"
     "@stoplight/json" "~3.20.1"
@@ -3641,7 +3669,7 @@
     "@stoplight/types" "12.3.0"
     "@types/json-schema" "^7.0.7"
 
-"@stoplight/spectral-formats@^1.4.0", "@stoplight/spectral-formats@^1.5.0":
+"@stoplight/spectral-formats@^1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@stoplight/spectral-formats/-/spectral-formats-1.5.0.tgz#222dd1e1302c54ba3219b8223b299d9515fed3e3"
   integrity sha512-VskkdU3qBSvI1dfJ79ysjvTssfNlbA6wrf/XkXK6iTyjfIVqOAWVtjypTb2U95tN/X8IjIBBhNWtZ4tNVZilrA==
@@ -3807,10 +3835,10 @@
     lodash "~4.17.21"
     tslib "^2.3.0"
 
-"@stoplight/spectral-rulesets@^1.14.1":
-  version "1.15.0"
-  resolved "https://registry.yarnpkg.com/@stoplight/spectral-rulesets/-/spectral-rulesets-1.15.0.tgz#df0322b725fd3d244662b7cd72431d17f32b83dd"
-  integrity sha512-xgltt54aQPSKKAxPZ2oCA25X/xmDPVCV1e4qxqH5bw/t7LvDWVusBFUrtcl/5HAJIIgkpxOKXKEc2XRC0ea8HQ==
+"@stoplight/spectral-rulesets@^1.16.0":
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/@stoplight/spectral-rulesets/-/spectral-rulesets-1.16.0.tgz#6a0e61da489e559850293fa2c3187ead30134691"
+  integrity sha512-vHnQ50zZARymT+LkLD1l0sXoe76iUf0FWFyTp3xSRFvMIvoqFlUHONjKqFUUQzLaidSWWVah3repmAibHTdaSA==
   dependencies:
     "@asyncapi/specs" "^4.1.0"
     "@stoplight/better-ajv-errors" "1.0.3"
@@ -9193,31 +9221,25 @@ human-signals@^2.1.0:
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-2.1.0.tgz#dc91fcba42e4d06e4abaed33b3e7a3c02f514ea0"
   integrity sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==
 
-ibm-openapi-validator@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-1.0.1.tgz#6dec7d421ff218048209e834d7a1f50c4432027d"
-  integrity sha512-+lWVdeBPVDlWd6hJNk2+xh07KMTKpi5X/uWqeQTEoD1eChmjOqEr2pbHD5y56U+SX2L0QyAN4Gkp7UIoLx3PDg==
+ibm-openapi-validator@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ibm-openapi-validator/-/ibm-openapi-validator-1.1.0.tgz#1f313c87e219b376a8da96b637446cb42017ad2b"
+  integrity sha512-boAoziIrf90uzQaKw4un1DH+gGRlgYcHSKXhLXYkX5Q/hOn+WKFN8PRLVP7S7rfkkNOWHHtZfcUPiMTqYutUQw==
   dependencies:
-    "@ibm-cloud/openapi-ruleset" "1.0.0"
+    "@ibm-cloud/openapi-ruleset" "1.1.0"
     "@stoplight/spectral-cli" "^6.6.0"
-    "@stoplight/spectral-core" "^1.16.0"
+    "@stoplight/spectral-core" "^1.18.0"
     "@stoplight/spectral-parsers" "^1.0.2"
     ajv "^8.12.0"
     chalk "^4.1.1"
     commander "^10.0.0"
-    deepmerge "^2.2.1"
     find-up "^3.0.0"
     globby "^11.0.4"
     js-yaml "^3.14.1"
     json-dup-key-validator "^1.0.3"
-    json-schema-ref-parser "^5.1.3"
-    jsonschema "^1.4.0"
     lodash "^4.17.21"
-    matcher "^1.1.1"
     pad "^2.3.0"
-    require-all "^3.0.0"
     semver "^5.7.1"
-    yaml-js "^0.2.3"
 
 ibm-openapi-validator@^0.46.4:
   version "0.46.4"
