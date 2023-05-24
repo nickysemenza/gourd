@@ -7,6 +7,7 @@ import {
   PaginationState,
   flexRender,
   ColumnDef,
+  Row,
 } from "@tanstack/react-table";
 
 export interface PaginationParameters {
@@ -21,6 +22,7 @@ interface TableProps<T extends object> {
   isLoading: boolean;
   totalCount: number;
   pageCount: number;
+  withSelected?: (rows: Row<T>[]) => JSX.Element;
 }
 
 const PaginatedTable = <T extends object>({
@@ -29,6 +31,7 @@ const PaginatedTable = <T extends object>({
   pageCount: controlledPageCount,
   fetchData,
   isLoading,
+  withSelected,
 }: TableProps<T>) => {
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
@@ -43,6 +46,7 @@ const PaginatedTable = <T extends object>({
     }),
     [pageIndex, pageSize]
   );
+  const [rowSelection, setRowSelection] = React.useState({});
 
   // Use the state and functions returned from useTable to build your UI
   const table = useReactTable({
@@ -51,6 +55,7 @@ const PaginatedTable = <T extends object>({
     pageCount: controlledPageCount ?? -1,
     state: {
       pagination,
+      rowSelection,
     },
     manualPagination: true, // Tell the usePagination
     // hook that we'll handle our own data fetching
@@ -60,6 +65,7 @@ const PaginatedTable = <T extends object>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
   });
 
   React.useEffect(() => {
@@ -73,9 +79,6 @@ const PaginatedTable = <T extends object>({
   // Render the UI for your table
   return (
     <div className="flex flex-col">
-      {/* <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8"> */}
-      {/* <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"> */}
-      {/* <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"> */}
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -126,9 +129,6 @@ const PaginatedTable = <T extends object>({
           })}
         </tbody>
       </table>
-      {/* </div> */}
-      {/* </div> */}
-      {/* </div> */}
       <nav className="relative z-0 inline-flex shadow-sm">
         <button
           // href="#prev"
@@ -174,6 +174,7 @@ const PaginatedTable = <T extends object>({
           {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
         </strong>
       </span>
+      {withSelected && withSelected(table.getSelectedRowModel().rows)}
     </div>
   );
 };

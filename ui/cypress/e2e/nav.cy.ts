@@ -2,8 +2,8 @@
 // https://on.cypress.io/intelligent-code-completion
 /// <reference types="cypress" />
 
-import { navItems } from "../../src/components/navItems";
-import { COOKIE_NAME } from "../../src/auth";
+import { navItems } from "../../src/components/nav/navItems";
+import { COOKIE_NAME } from "../../src/auth/auth";
 
 context("smoke tests", () => {
   beforeEach(() => {

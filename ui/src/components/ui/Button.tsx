@@ -4,22 +4,28 @@ import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "./lib";
 
 const buttonVariants = cva(
-  "text-violet-100 transition-colors duration-150 text-sm bg-violet-700 focus:shadow-outline hover:bg-violet-800 disabled:bg-violet-400 inline-flex items-center",
+  "transition-colors duration-150 text-sm focus:shadow-outline inline-flex items-center",
   {
     variants: {
+      variant: {
+        primary:
+          "text-violet-100 bg-violet-700 hover:bg-violet-800 disabled:bg-violet-400",
+      },
       size: {
-        default: "h-8 py-5",
-        compact: "h-5 px-2",
+        default: "h-8 py-2 px-4",
+        compact: "h-5 py-1 px-2",
       },
       round: {
         left: "rounded-l",
         right: "rounded-r",
-        all: "rounded",
+        all: "rounded-md",
+        none: "",
       },
     },
     defaultVariants: {
       size: "default",
       round: "all",
+      variant: "primary",
     },
   }
 );

@@ -1,9 +1,9 @@
 import { EntitySelector } from "../../components/EntitySelector";
 import { useNavigate } from "react-router-dom";
-import { ButtonGroup } from "../../components/ui/ButtonGroup";
 import { RecipesApi } from "../../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../../util/config";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { Button } from "../../components/ui/Button";
 
 const CreateRecipe: React.FC = () => {
   let history = useNavigate();
@@ -40,15 +40,7 @@ const CreateRecipe: React.FC = () => {
           className="border-2 border-gray-300 w-64"
           {...register("url", { required: true })}
         />
-        <ButtonGroup
-          compact
-          buttons={[
-            {
-              submit: true,
-              text: "scrape",
-            },
-          ]}
-        />
+        <Button type="submit">scrape</Button>
       </form>
     </div>
   );

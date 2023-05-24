@@ -7,8 +7,7 @@ import PaginatedTable, {
 import { RecipeLink } from "../../components/misc/Misc";
 import { Code } from "../../util/util";
 import { Helmet } from "react-helmet";
-import update from "immutability-helper";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import queryString from "query-string";
 import { ButtonGroup } from "../../components/ui/ButtonGroup";
 import { Grid, List, PlusCircle } from "react-feather";
@@ -19,10 +18,10 @@ import { RecipeGrid } from "../../components/recipe/RecipeGrid";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Pill } from "../../components/ui/Pill";
 import { Button } from "../../components/ui/Button";
+import { Checkbox } from "../../components/ui/Checkbox";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
-  const [checked, setChecked] = useState(new Set<string>());
   let initialParams: PaginationParameters = {
     offset: 0,
     limit: 180,
@@ -36,6 +35,7 @@ const RecipeList: React.FC = () => {
   const fetchData = React.useCallback((params: PaginationParameters) => {
     setParams(params);
   }, []);
+  const navigate = useNavigate();
 
   const { data, error, loading } = useListRecipes({
     queryParams: params,
@@ -77,6 +77,25 @@ const RecipeList: React.FC = () => {
 
   const columns = [
     columnHelper.accessor((row) => row, {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    }),
+    columnHelper.accessor((row) => row, {
       id: "name",
       cell: (info) => {
         const { original } = info.row;
@@ -93,25 +112,7 @@ const RecipeList: React.FC = () => {
             <ul>
               {versions.map((i) => (
                 <li key={i.id}>
-                  <div className="flex">
-                    <RecipeLink recipe={i} />
-                    <input
-                      type="checkbox"
-                      className="form-checkbox"
-                      checked={checked.has(i.id)}
-                      onChange={(e) => {}}
-                      onClick={() =>
-                        setChecked(
-                          update(
-                            checked,
-                            checked.has(i.id)
-                              ? { $remove: [i.id] }
-                              : { $add: [i.id] }
-                          )
-                        )
-                      }
-                    />
-                  </div>
+                  <RecipeLink recipe={i} />
                 </li>
               ))}
             </ul>
@@ -195,6 +196,25 @@ const RecipeList: React.FC = () => {
           isLoading={loading}
           totalCount={data?.meta?.total_count || 0}
           pageCount={data?.meta?.page_count || 1}
+          withSelected={(selected) => {
+            const ids = selected.map((r) => r.original.detail.id);
+            return (
+              <div>
+                <Button
+                  disabled={ids.length < 2}
+                  onClick={() =>
+                    navigate(
+                      `/diff?${queryString.stringify({
+                        recipes: ids,
+                      })}`
+                    )
+                  }
+                >
+                  Compare {ids.length} recipes
+                </Button>
+              </div>
+            );
+          }}
         />
       )}
 
@@ -218,18 +238,6 @@ const RecipeList: React.FC = () => {
             },
           ]}
         />
-        <Button>foo</Button>
-        {checked.size > 0 && (
-          <>
-            <Link
-              to={`/diff?${queryString.stringify({
-                recipes: [...checked.keys()],
-              })}`}
-            >
-              Compare {checked.size} recipes
-            </Link>
-          </>
-        )}
       </div>
       <Debug data={{ error }} />
     </div>

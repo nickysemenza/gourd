@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Icon, MinusCircle, PlusCircle } from "react-feather";
+import { Button } from "./Button";
 
 type ButtonProps =
   | {
@@ -18,23 +19,25 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   buttons,
   compact = false,
 }) => {
-  const baseStyles = `${compact ? "h-5" : "h-8"}  ${
-    compact ? "px-2" : "px-5"
-  } text-violet-100 transition-colors duration-150 text-sm
-  bg-violet-700 focus:shadow-outline hover:bg-violet-800
-  disabled:bg-violet-400 inline-flex items-center`;
   return (
     <div className="inline-flex mx-1" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, submit, ...props }, x) => {
         const iconMargins = compact ? 1 : 3.5;
         const iconDim = compact ? 12 : 18;
         return (
-          <button
+          <Button
             type={submit ? "submit" : "button"}
             key={x}
-            className={`${baseStyles} ${x === 0 && "rounded-l"} ${
-              x === buttons.length - 1 && "rounded-r"
-            }`}
+            round={
+              buttons.length === 1
+                ? "all"
+                : x === 0
+                ? "left"
+                : x === buttons.length - 1
+                ? "right"
+                : "none"
+            }
+            size={compact ? "compact" : "default"}
             {...props}
           >
             {!!IconLeft && (
@@ -52,7 +55,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
                 className={`ml-${text ? iconMargins : 0}`}
               />
             )}
-          </button>
+          </Button>
         );
       })}
     </div>
