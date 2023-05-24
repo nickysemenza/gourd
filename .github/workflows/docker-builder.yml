@@ -37,7 +37,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Extract branch name
         shell: bash
-        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
+        run: echo "branch=$(echo sha-${GITHUB_SHA})" >>$GITHUB_OUTPUT
         id: extract_branch
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action

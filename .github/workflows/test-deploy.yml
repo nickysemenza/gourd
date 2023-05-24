@@ -47,9 +47,8 @@ jobs:
           go-version: "stable"
       - name: Extract branch name
         shell: bash
-        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
+        run: echo "branch=$(echo sha-${GITHUB_SHA})" >>$GITHUB_OUTPUT
         id: extract_branch
-      # - run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml pull
       - name: extract wasm for UI
         run: |
           docker create --name=temp ghcr.io/nickysemenza/gourd-ui-builder:${{steps.extract_branch.outputs.branch}}
@@ -101,7 +100,7 @@ jobs:
           go-version: "stable"
       - name: Extract branch name
         shell: bash
-        run: echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >>$GITHUB_OUTPUT
+        run: echo "branch=$(echo sha-${GITHUB_SHA})" >>$GITHUB_OUTPUT
         id: extract_branch
       - run: go mod vendor
       - name: start postgres db + rust server
