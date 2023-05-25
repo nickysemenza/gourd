@@ -11,7 +11,7 @@ all: bin/gourd
 test: unit-test-go lint-go test-rs
 
 dev-env:
-	docker-compose -f docker-compose-deps.yml up -d db collector meilisearch meilisearch-ui
+	docker-compose -f docker-compose-deps.yml -f docker-compose-devdeps.yml up -d db meilisearch meilisearch-ui jaeger
 dev-air: bin/air 
 	HTTP_HOST=127.0.0.1 ./bin/air -c dev/air.conf
 

@@ -5,6 +5,7 @@ import { Code } from "../util/util";
 import { ButtonGroup } from "./ui/ButtonGroup";
 import { UnitMappingList } from "./misc/Misc";
 import { useForm } from "react-hook-form";
+import Loading from "./ui/Loading";
 const FoodSearch: React.FC<{
   name: string;
   highlightId?: number;
@@ -20,7 +21,7 @@ const FoodSearch: React.FC<{
   enableSearch = false,
   addon,
 }) => {
-  const { register, watch } = useForm();
+  const { register, watch } = useForm({ defaultValues: { name } });
 
   const { loading, data: foods } = useSearchFoods({
     queryParams: {
@@ -99,13 +100,11 @@ export const FoodRow: React.FC<{
   descriptionComponent,
   brandOwnerComponent,
 }) => {
-  const loadingClass =
-    (loading && "h-2 bg-gray-400 rounded animate-pulse") || "";
   const food = info.wrapper;
   const brand = info.branded_food;
   return (
     <div
-      style={{ gridTemplateColumns: "1fr 3fr " }}
+      style={{ gridTemplateColumns: "1fr 4fr " }}
       className={`border ${
         isHighlighted ? "border-red-600 " : "border-indigo-600"
       } ${isHighlighted && "bg-indigo-200"} grid p-1 text-sm`}
@@ -139,37 +138,41 @@ export const FoodRow: React.FC<{
       </div>
       <div className={`flex ${wide ? "flex-row" : "flex-col"} p-1`}>
         <div>
-          <div className="flex whitespace-normal">
-            {descriptionComponent || food.description}
+          <div className="flex flex-row justify-between">
+            <div className="flex whitespace-normal text-slate-700 font-bold w-1/2">
+              {descriptionComponent || food.description}
+            </div>
+            <Loading loading={loading}>
+              <UnitMappingList unit_mappings={info.unit_mappings} />
+            </Loading>
           </div>
-          <div className="flex flex-row">
-            <p className="font-mono text-xs">{food?.dataType}</p>
-            <p className="pl-1 text-xs">
-              {info.foodNutrients?.length} nutrients
-            </p>
-          </div>
-          <UnitMappingList unit_mappings={info.unit_mappings} />
-        </div>
-
-        {(brand || loading) && (
-          <div
-            className={`flex ${
-              wide ? "flex-row" : "flex-col w-80"
-            }  ${loadingClass}`}
-          >
-            <div>
-              {brandOwnerComponent || brand?.brandOwner} <br />
-              <p className={`text-sm italic ${loadingClass}`}>
-                {brand?.brandedFoodCategory}
+          <Loading loading={loading}>
+            <div className="flex flex-row justify-between">
+              <p className="font-mono text-xs">{food?.dataType}</p>
+              <p className="pl-1 text-xs">
+                {info.foodNutrients?.length} nutrients
               </p>
             </div>
+          </Loading>
+        </div>
+
+        <div className={`flex ${wide ? "flex-row" : "flex-col w-full"}`}>
+          <div>
+            <Loading loading={loading}>
+              <div className="flex flex-row justify-between">
+                {brandOwnerComponent || brand?.brandOwner}
+                <p className={`text-sm italic`}>{brand?.brandedFoodCategory}</p>
+              </div>
+            </Loading>
+          </div>
+          <Loading loading={loading}>
             <div
-              className={`text-xs text-gray-500 whitespace-normal ${loadingClass}`}
+              className={`text-xs text-emerald-600 whitespace-normal lowercase`}
             >
               {brand?.ingredients}
             </div>
-          </div>
-        )}
+          </Loading>
+        </div>
       </div>
     </div>
   );

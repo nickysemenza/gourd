@@ -8,6 +8,7 @@ import {
 import { RecipeDetail, UnitMapping } from "../../api/openapi-hooks/api";
 import { scaledRound } from "../../util/util";
 import { WasmContext } from "../../util/wasmContext";
+import { cn } from "../ui/lib";
 
 export interface Props {
   recipe: Pick<RecipeDetail, "id" | "name" | "version" | "is_latest_version">;
@@ -65,22 +66,26 @@ export const UnitMappingList: React.FC<{
           className="w-full"
         />
       )}
-      <div className="w-60">
-        {unit_mappings.map((m, x) => (
-          <div
-            key={x}
-            className="flex text-sm text-gray-700 dark:text-gray-400"
-          >
-            <p>
-              {scaledRound(m.a.value)} {m.a.unit}
-            </p>
-            <p className="text-center px-1">=</p>
-            <p>
-              {scaledRound(m.b.value)} {m.b.unit}
-            </p>
-            <p className="text-xs pl-1">{m.source}</p>
-          </div>
-        ))}
+      <div className="">
+        {unit_mappings.map((m, x) => {
+          const hasKCalGrams = m.a.unit === "grams" && m.b.unit === "kcal";
+          return (
+            <div
+              key={x}
+              className={cn(`flex text-sm text-gray-700 dark:text-gray-400`)}
+            >
+              <div>
+                {scaledRound(m.a.value)} {m.a.unit}
+              </div>
+              <div className="text-center px-1">=</div>
+              <div>
+                {scaledRound(m.b.value)} {m.b.unit}
+              </div>
+              <div className="text-xs pl-1">{m.source}</div>
+              {hasKCalGrams && "💪"}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,10 +1,5 @@
-const Pill3: React.FC<{
-  children?: React.ReactNode;
-}> = ({ children }) => (
-  <span className="inline-flex items-center justify-center px-2 py-1 mr-1 text-xs font-bold leading-none bg-violet-200 text-violet-800 rounded-lg">
-    {children}
-  </span>
-);
+import { Badge } from "./Badge";
+
 export const Pill: React.FC<{
   color: "red" | "green";
   children?: React.ReactNode;
@@ -19,4 +14,4 @@ export const Pill: React.FC<{
 export const PillLabel: React.FC<{ x: number; kind: "letter" | "number" }> = ({
   x,
   kind,
-}) => <Pill3>{kind === "letter" ? String.fromCharCode(65 + x) : x}</Pill3>;
+}) => <Badge>{kind === "letter" ? String.fromCharCode(65 + x) : x}</Badge>;

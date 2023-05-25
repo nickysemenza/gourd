@@ -9,6 +9,14 @@ import {
   ColumnDef,
   Row,
 } from "@tanstack/react-table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "./table";
 
 export interface PaginationParameters {
   offset?: number;
@@ -79,34 +87,34 @@ const PaginatedTable = <T extends object>({
   // Render the UI for your table
   return (
     <div className="flex flex-col">
-      <table>
-        <thead>
+      <Table>
+        <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <th key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder ? null : (
-                      <div>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </div>
+                  <TableHead key={header.id} colSpan={header.colSpan}>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
                     )}
-                  </th>
+                  </TableHead>
                 );
               })}
-            </tr>
+            </TableRow>
           ))}
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
+        </TableHeader>
+        {/* <tbody className="bg-white divide-y divide-x divide-gray200 dark:divide-gray-700"> */}
+        <TableBody>
           {isLoading && (
-            <tr>
-              <td colSpan={10} className="w-100 text-xl text-center h-16">
+            <TableRow>
+              <TableCell
+                colSpan={table.getAllColumns().length}
+                className="w-100 text-xl text-center h-16"
+              >
                 loading...
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           )}
           {table.getRowModel().rows.map((row) => {
             return (
@@ -116,19 +124,22 @@ const PaginatedTable = <T extends object>({
               >
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <td key={cell.id} className="px-6 py-4 whitespace-nowrap">
+                    <TableCell
+                      key={cell.id}
+                      className="px-6 py-4 whitespace-nowra"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
-                    </td>
+                    </TableCell>
                   );
                 })}
               </tr>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <nav className="relative z-0 inline-flex shadow-sm">
         <button
           // href="#prev"

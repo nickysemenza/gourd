@@ -542,14 +542,6 @@ const RecipeDetail: React.FC = () => {
           </div>
         </div>
         <div>
-          <p className="text-lg font-bold">raw</p>
-          <HideShowHOC>
-            <pre>
-              {w.encode_recipe_text(
-                toInput(recipe as unknown as RecipeWrapper).detail
-              )}
-            </pre>
-          </HideShowHOC>
           <p className="text-lg font-bold">meals</p>
 
           <HideShowHOC>
@@ -571,7 +563,7 @@ const RecipeDetail: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-row w-full">
-        <div className="w-4/12">
+        <div className="w-1/2">
           <h3>other versions</h3>
           <ul>
             {recipe.other_versions?.map((v) => (
@@ -580,15 +572,22 @@ const RecipeDetail: React.FC = () => {
               </li>
             ))}
           </ul>
-          {/* <Debug data={recipe.detail.other_versions} /> */}
+          <p className="text-lg font-bold">raw</p>
+          <HideShowHOC>
+            <pre className="whitespace-pre-wrap">
+              {w.encode_recipe_text(
+                toInput(recipe as unknown as RecipeWrapper).detail
+              )}
+            </pre>
+          </HideShowHOC>
         </div>
-        <div className="w-8/12">
+        <div className="w-1/2">
           <a href={latexURL} target="_blank" rel="noreferrer" className="link">
             open latex
           </a>
           <iframe
             src={latexURL + "#navpanes=0&toolbar=0"}
-            width="100%"
+            width="90%"
             height="900px"
             title="pdf view"
           ></iframe>

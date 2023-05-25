@@ -14,6 +14,7 @@ import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { createColumnHelper } from "@tanstack/react-table";
+import PageWrapper from "../components/ui/PageWrapper";
 
 const IngredientList: React.FC = () => {
   const showIDs = false;
@@ -180,11 +181,7 @@ const IngredientList: React.FC = () => {
   }, [onlyMissingFDC, showIDs, justLinked]);
 
   return (
-    <>
-      {/* @ts-ignore */}
-      <Helmet>
-        <title>ingredients | gourd</title>
-      </Helmet>
+    <PageWrapper title="ingredients">
       <ButtonGroup
         compact
         buttons={[
@@ -205,7 +202,7 @@ const IngredientList: React.FC = () => {
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />
-    </>
+    </PageWrapper>
   );
 };
 
