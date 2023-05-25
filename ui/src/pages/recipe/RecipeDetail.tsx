@@ -58,6 +58,7 @@ import ProgressiveImage from "../../components/ui/ProgressiveImage";
 import Debug from "../../components/ui/Debug";
 import { NYTView } from "../../components/recipe/NYTView";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
+import PageWrapper from "../../components/ui/PageWrapper";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {
@@ -360,11 +361,7 @@ const RecipeDetail: React.FC = () => {
 
   const latexURL = `${getAPIURL()}/recipes/${recipe.detail.id}/latex`;
   return (
-    <div className="px-1">
-      {/* @ts-ignore */}
-      <Helmet>
-        <title>{recipe.detail.name} | gourd</title>
-      </Helmet>
+    <PageWrapper title={recipe.detail.name}>
       <div className="divide-y">
         <div className="lg:flex lg:items-center lg:justify-between mb-2">
           <div>
@@ -593,7 +590,7 @@ const RecipeDetail: React.FC = () => {
           ></iframe>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 };
 

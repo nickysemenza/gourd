@@ -41,7 +41,7 @@ import { isLoggedIn } from "./auth/auth";
 import { registerTracing } from "./util/tracing";
 import ErrorPage from "./components/ui/ErrorPage";
 
-// registerTracing(getTracingURL(), true);
+registerTracing(getTracingURL(), true);
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   let authed = isLoggedIn() || true;

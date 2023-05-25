@@ -174,8 +174,8 @@ type SectionInstruction struct {
 
 // Ingredient is a globally-scoped ingredient
 type Ingredient struct {
-	Id     string      `json:"id"`
-	Name   string      `json:"name"`
+	Id     string      `db:"id"`
+	Name   string      `db:"name"`
 	FdcID  zero.Int    `db:"fdc_id"`
 	Parent zero.String `db:"parent_ingredient_id"`
 }

@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
     info!("confiig: {:?}", configuration);
 
     if matches.subcommand_matches("server").is_some() {
-        // initialize_tracing("gourd-rs");
+        initialize_tracing("gourd-rs");
         Application::run(configuration).await.unwrap();
     }
     initialize_tracing("gourd-cli");
