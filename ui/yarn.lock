@@ -6827,10 +6827,10 @@ csstype@^3.0.2:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.9.tgz#6410af31b26bd0520933d02cbc64fce9ce3fbf0b"
   integrity sha512-rpw6JPxK6Rfg1zLOYCSwle2GFOOsnjmDYDaBwEcwoOg4qlsIVCN789VkBZDJAGi4T07gI4YSutR43t9Zz4Lzuw==
 
-cypress-terminal-report@5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/cypress-terminal-report/-/cypress-terminal-report-5.1.1.tgz#488c88e68888e4df11eb220e093a1f28facd60b7"
-  integrity sha512-iZxb6QHV/zf4WRIsaNSf4kXLMgU/qWVLErEIs9kWlpR1mFxoLmSyR2SeC2imFupbvuP5FmkqBT2KVrmTDeQsaA==
+cypress-terminal-report@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/cypress-terminal-report/-/cypress-terminal-report-5.2.0.tgz#52a41320d88ec39a61431e7ea439441addbc928c"
+  integrity sha512-XKLt7zGmy1LpFxlwwBOyOoN12zKJ+Ot+YRjplyqew4FfVjlakMnkQ9FPLOLa9ocpK6nxZGRQn/qzTtSZ5NoxHg==
   dependencies:
     chalk "^4.0.0"
     fs-extra "^10.1.0"
