@@ -12,7 +12,6 @@ import { AlertTriangle, PlusCircle } from "react-feather";
 import { Code } from "../util/util";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import { createColumnHelper } from "@tanstack/react-table";
 import PageWrapper from "../components/ui/PageWrapper";
 

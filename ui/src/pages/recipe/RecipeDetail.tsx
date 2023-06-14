@@ -43,7 +43,6 @@ import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../../components/Nutrition";
 import { WasmContext } from "../../util/wasmContext";
-import { Helmet } from "react-helmet";
 import {
   RecipesApi,
   RecipeWrapperInput,
