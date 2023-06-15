@@ -4,7 +4,9 @@
     {
       "matchUpdateTypes": ["minor", "pin", "major"],
       "automergeType": "branch",
-      "automerge": true
+      "automerge": true,
+      "groupName": "all dependencies",
+      "groupSlug": "all-deps"
     },
     {
       "matchUpdateTypes": ["patch", "digest"],
