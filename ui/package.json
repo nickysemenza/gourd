@@ -62,7 +62,7 @@
     "react-toastify": "9.1.1",
     "restful-react": "15.9.4",
     "tailwind-merge": "^1.12.0",
-    "typescript": "5.0.2",
+    "typescript": "5.1.3",
     "universal-cookie": "4.0.4",
     "wasm-loader": "1.3.0"
   },
