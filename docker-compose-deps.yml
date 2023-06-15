@@ -32,7 +32,7 @@ services:
       - 16686:16686 # UI
       - 14268:14268
       - 9411:9411
-    image: "jaegertracing/all-in-one:1.45"
+    image: "jaegertracing/all-in-one:1.46"
   # Collector
   # collector:
   #   image: otel/opentelemetry-collector:0.77.0
