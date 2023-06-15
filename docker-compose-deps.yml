@@ -65,7 +65,7 @@ services:
       - MEILI_MASTER_KEY=FOO
     volumes:
       - './tmp/meili_data:/meili_data'
-    image: 'getmeili/meilisearch:v1.1'
+    image: 'getmeili/meilisearch:v1.2'
   # meilisearch-ui:
   #   restart: always
   #   container_name: meilisearch-ui
