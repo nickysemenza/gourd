@@ -11,12 +11,12 @@ serde_json = "1.0"
 ingredient = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
 openapi = {path = "../openapi"}
 anyhow = "1.0"
-petgraph = "0.6.2"
+petgraph = "0.6.3"
 serde = {version = "1.0", features = ["derive"]}
 tracing = "0.1.37"
-serde_yaml = "0.9.13"
+serde_yaml = "0.9.21"
 [dependencies.uuid]
-version = "1.3.0"
+version = "1.3.4"
 features = [
     "v4",                # Lets you generate random UUIDs
     "fast-rng",          # Use a faster (but still sufficiently random) RNG

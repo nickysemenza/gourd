@@ -16,9 +16,7 @@ var _ notionapi.DatabaseService = &fakeDB{}
 func (f *fakeDB) Get(context.Context, notionapi.DatabaseID) (*notionapi.Database, error) {
 	return nil, fmt.Errorf("not implemented")
 }
-func (f *fakeDB) List(context.Context, *notionapi.Pagination) (*notionapi.DatabaseListResponse, error) {
-	return nil, fmt.Errorf("not implemented")
-}
+
 func (f *fakeDB) Query(context.Context, notionapi.DatabaseID, *notionapi.DatabaseQueryRequest) (*notionapi.DatabaseQueryResponse, error) {
 	var time notionapi.Date
 	return &notionapi.DatabaseQueryResponse{

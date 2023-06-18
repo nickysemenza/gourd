@@ -11,11 +11,11 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-getrandom = {version = "0.2.7", features = ["js"]}# https://docs.rs/getrandom/0.2.3/getrandom/#supported-targets 
+getrandom = {version = "0.2.10", features = ["js"]}# https://docs.rs/getrandom/0.2.3/getrandom/#supported-targets 
 gourd_common = {path = "../common"} 
 indexmap = "=1.9.0" # https://github.com/tkaitchuck/aHash/issues/95
 openapi = {path = "../openapi"} 
-wasm-bindgen = {version = "0.2.83", features = ["serde-serialize"]} 
+wasm-bindgen = {version = "0.2.87", features = ["serde-serialize"]} 
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
@@ -34,7 +34,7 @@ tracing = "0.1.37"
 tracing-wasm = "0.2.1"
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.33"
+wasm-bindgen-test = "0.3.37"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false
