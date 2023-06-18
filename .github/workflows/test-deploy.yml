@@ -70,9 +70,8 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           working-directory: ui/
-          start: yarn run dev
-          wait-on: "http://localhost:5173"
-          config: baseUrl=http://localhost:5173
+          start: npx vite --host
+          wait-on: http://localhost:5173
           record: true
         env:
           CYPRESS_RECORD_KEY: 265312e3-7b8c-4031-ad0a-5f825b95cfce

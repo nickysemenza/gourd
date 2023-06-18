@@ -51,7 +51,7 @@ migrate-down: bin/migrate
 # golang
 bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 	@mkdir -p $(dir $@)
-	go build $(VERSION_FLAGS) -o $@ ./internal/cmd/$(@F)
+	CGO_ENABLED=0 go build $(VERSION_FLAGS) -o $@ ./internal/cmd/$(@F)
 
 bin/air:
 	@mkdir -p $(dir $@)
