@@ -101,7 +101,7 @@ func (s *Server) Run(_ context.Context) error {
 	r.GET("/misc", s.APIManager.Misc)
 
 	r.GET("/*", func(c echo.Context) error {
-		root := "ui/build"
+		root := "ui/dist"
 		fs := http.FileServer(http.Dir(root))
 		if _, err := os.Stat(root + c.Request().RequestURI); os.IsNotExist(err) {
 			http.StripPrefix(c.Request().RequestURI, fs).ServeHTTP(c.Response().Writer, c.Request())

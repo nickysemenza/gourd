@@ -1,4 +1,4 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Helmet } from "react-helmet";
 
 import Test from "./Homepage";
@@ -19,7 +19,6 @@ import Playground from "./pages/Playground";
 import RecipeDiff from "./pages/recipe/RecipeDiff";
 import Search from "./pages/Search";
 
-import "./tailwind.output.css";
 import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
@@ -44,7 +43,7 @@ import ErrorPage from "./components/ui/ErrorPage";
 registerTracing(getTracingURL(), true);
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
-  let authed = isLoggedIn() || true;
+  const authed = isLoggedIn() || true;
   return authed ? (
     children
   ) : (
@@ -66,7 +65,6 @@ function App() {
         onError={onAPIError}
       >
         <WasmContextProvider>
-          {/* @ts-ignore */}
           <Helmet>
             <title>gourd</title>
           </Helmet>
@@ -130,7 +128,7 @@ function App() {
 export default App;
 
 function NoMatch() {
-  let location = useLocation();
+  const location = useLocation();
 
   return (
     <ErrorPage

@@ -15,7 +15,7 @@ const Graph: React.FC = () => {
   HighchartsNetworkGraph(Highcharts);
 
   const { data } = useRecipeDependencies({});
-  let history = useNavigate();
+  const history = useNavigate();
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
   if (!data || !data.items) return null;
@@ -77,7 +77,7 @@ const Graph: React.FC = () => {
         point: {
           events: {
             click: function (this: Point, _event: PointClickEventObject) {
-              var node = this as unknown as CustomPoint;
+              const node = this as unknown as CustomPoint;
               console.log(node);
 
               history(

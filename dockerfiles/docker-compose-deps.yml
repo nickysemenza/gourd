@@ -34,41 +34,25 @@ services:
       - 9411:9411
     image: "jaegertracing/all-in-one:1.45"
   # Collector
-  # collector:
-  #   image: otel/opentelemetry-collector:0.77.0
-  #   platform: linux/amd64
-  #   command: [ "--config=/conf/collector-config.yaml" ]
-  #   volumes:
-  #     - ./dev/collector-config.yaml:/conf/collector-config.yaml
-  #   ports:
-  #     - "9464:9464"
-  #     - "4317:4317"
-  #     - "55680:55680"
-  #     - "55681:55681"
-  #     - "4318:4318"
-  #   depends_on:
-  #     - jaeger
-
-  # # Prometheus
-  # prometheus:
-  #   platform: linux/amd64
-  #   container_name: prometheus
-  #   image: prom/prometheus:latest
-  #   volumes:
-  #     - ./dev/prometheus.yaml:/etc/prometheus/prometheus.yml
-  #   ports:
-  #     - "9090:9090"
+  collector:
+    image: otel/opentelemetry-collector:0.79.0
+    platform: linux/amd64
+    command: [ "--config=/conf/collector-config.yaml" ]
+    volumes:
+      - ../dev/collector-config.yaml:/conf/collector-config.yaml
+    ports:
+      - "9464:9464"
+      - "4317:4317"
+      - "55680:55680"
+      - "55681:55681"
+      - "4318:4318"
+    depends_on:
+      - jaeger
   meilisearch:
     ports:
       - '7700:7700'
     environment:
       - MEILI_MASTER_KEY=FOO
     volumes:
-      - './tmp/meili_data:/meili_data'
+      - '../tmp/meili_data:/meili_data'
     image: 'getmeili/meilisearch:v1.1'
-  # meilisearch-ui:
-  #   restart: always
-  #   container_name: meilisearch-ui
-  #   ports:
-  #     - '24900:24900'
-  #   image: 'riccoxie/meilisearch-ui:latest'

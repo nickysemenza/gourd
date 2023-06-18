@@ -1,6 +1,6 @@
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
-import { CollectorTraceExporter } from "@opentelemetry/exporter-collector";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { ZoneContextManager } from "@opentelemetry/context-zone";
 import { JaegerPropagator } from "@opentelemetry/propagator-jaeger";
@@ -20,13 +20,21 @@ export const registerTracing = (url: string, batch: boolean) => {
   console.info("enabled tracing", url);
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
-  const exporter = new CollectorTraceExporter({
-    url: url,
-    // https://github.com/open-telemetry/opentelemetry-js/issues/2321#issuecomment-889861080
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const collectorOptions = {
+    url, // url is optional and can be omitted - default is http://localhost:4318/v1/traces
+    headers: {}, // an optional object containing custom headers to be sent with each request
+    concurrencyLimit: 10, // an optional limit on pending requests
+  };
+
+  const exporter = new OTLPTraceExporter(collectorOptions);
+
+  // const exporter = new CollectorTraceExporter({
+  //   url: url,
+  //   // https://github.com/open-telemetry/opentelemetry-js/issues/2321#issuecomment-889861080
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // });
 
   registerInstrumentations({
     instrumentations: [
@@ -37,9 +45,9 @@ export const registerTracing = (url: string, batch: boolean) => {
   });
   provider.register({
     contextManager: new ZoneContextManager(),
-    // propagator: new B3Propagator(),
     propagator: new JaegerPropagator(),
   });
+
   if (batch) {
     provider.addSpanProcessor(new BatchSpanProcessor(exporter));
   } else {

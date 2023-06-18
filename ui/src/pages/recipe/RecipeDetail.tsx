@@ -95,8 +95,8 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   };
 };
 const RecipeDetail: React.FC = () => {
-  let { id } = useParams() as { id?: string };
-  let history = useNavigate();
+  const { id } = useParams() as { id?: string };
+  const history = useNavigate();
   const { search } = useLocation();
   const values = queryString.parse(search) as { multiplier?: string };
   const { error, data } = useGetRecipeById({
@@ -267,7 +267,7 @@ const RecipeDetail: React.FC = () => {
                   v[amountIndex].unit = value;
               }
             } else {
-              let toAdd: Amount = { unit: "", value: 0 };
+              const toAdd: Amount = { unit: "", value: 0 };
               switch (attr) {
                 case "grams":
                 case "amount":

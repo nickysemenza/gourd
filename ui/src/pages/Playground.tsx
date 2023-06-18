@@ -18,7 +18,7 @@ const ParseTest: React.FC = () => {
     console.log({ parse3: w.parse3("2 cups (240g) flour, sifted") });
     console.log({ parse4: w.parse4("2 cups (240g) flour, sifted") });
     // ingredients.forEach((i) => {
-    let foo: UnitConversionRequest = {
+    const foo: UnitConversionRequest = {
       target: UnitConversionRequestTargetEnum.MONEY,
       unit_mappings: [
         {
@@ -35,7 +35,7 @@ const ParseTest: React.FC = () => {
       ],
       input: [{ unit: "grams", value: 100 }],
     };
-    let foo2: UnitConversionRequest = {
+    const foo2: UnitConversionRequest = {
       target: UnitConversionRequestTargetEnum.WEIGHT,
       unit_mappings: [
         {
@@ -82,7 +82,6 @@ const Playground: React.FC = () => {
   if (!r2 || !r2.recipes) return null;
   return (
     <div className="grid grid-cols-2 gap-4">
-      {/* @ts-ignore */}
       <Helmet>
         <title>playground | gourd</title>
       </Helmet>

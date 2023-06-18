@@ -9,7 +9,7 @@ import ProgressiveImage from "../components/ui/ProgressiveImage";
 import { createColumnHelper } from "@tanstack/react-table";
 
 const Photos: React.FC = () => {
-  let initialParams: PaginationParameters = {
+  const initialParams: PaginationParameters = {
     offset: 0,
     limit: 2,
   };

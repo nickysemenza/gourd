@@ -61,7 +61,7 @@ export const try_convert = (
   target: UnitConversionRequestTargetEnum,
   msg?: string
 ): Amount | undefined => {
-  let foo: UnitConversionRequest = {
+  const foo: UnitConversionRequest = {
     target,
     unit_mappings,
     input,

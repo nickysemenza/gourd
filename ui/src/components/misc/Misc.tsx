@@ -44,7 +44,7 @@ export const UnitMappingList: React.FC<{
   const w = useContext(WasmContext);
   let dot = "";
   if (unit_mappings.length > 0 && w) {
-    let foo: UnitConversionRequest = {
+    const foo: UnitConversionRequest = {
       target: UnitConversionRequestTargetEnum.MONEY,
       unit_mappings,
       input: [{ unit: "grams", value: 100 }],

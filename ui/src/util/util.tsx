@@ -34,7 +34,7 @@ export const formatRichText = (w: wasm, text: RichItem[]) => {
         </div>
       );
     } else if (t.kind === "Measure") {
-      let val = t.value.pop();
+      const val = t.value.pop();
       if (!val) {
         return null;
       }
@@ -66,7 +66,7 @@ export const formatText = (text: React.ReactText) => {
     return text;
   }
 
-  let pairs = [];
+  const pairs = [];
   const matches = [...text.matchAll(re)];
   if (matches.length === 0) {
     return text;
@@ -100,7 +100,7 @@ export const sumTimeRanges = (
   w: wasm,
   ranges: (Amount | undefined)[]
 ): Amount => {
-  let ranges2 = ranges.filter((r) => r !== undefined) as Amount[];
+  const ranges2 = ranges.filter((r) => r !== undefined) as Amount[];
   return w.sum_time_amounts(ranges2);
 };
 
@@ -113,8 +113,8 @@ export const Code: React.FC<{
 );
 
 export const blankRecipeWrapperInput = (
-  name: string = "",
-  id: string = ""
+  name = "",
+  id = ""
 ): RecipeWrapperInput => ({
   detail: {
     name,

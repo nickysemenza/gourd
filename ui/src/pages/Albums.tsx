@@ -37,7 +37,7 @@ const Albums: React.FC = () => {
       <PaginatedTable
         columns={columns}
         data={data?.albums || []}
-        fetchData={() => {}}
+        fetchData={() => null}
         isLoading={loading}
         totalCount={0}
         pageCount={1}

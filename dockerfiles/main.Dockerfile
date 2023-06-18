@@ -8,5 +8,5 @@ FROM ghcr.io/nickysemenza/docker-magick:main
 WORKDIR /work
 COPY --from=builder-go /work/bin ./bin
 COPY --from=builder-go /work/internal/db/migrations ./internal/db/migrations
-COPY --from=build-ui /work/ui/build ./ui/build
+COPY --from=build-ui /work/ui/dist ./ui/dist
 ENTRYPOINT ["./bin/gourd","server"]

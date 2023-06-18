@@ -52,10 +52,10 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
     async function fetchMyAPI() {
       setSumsLoading(true);
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
-      let recipeSumResp = await rAPI.sumRecipes({
+      const recipeSumResp = await rAPI.sumRecipes({
         sumRecipesRequest: {
           inputs: entitiesToDiff.map((id, x) => {
-            let foo: EntitySummary = {
+            const foo: EntitySummary = {
               id: id.id,
               kind: IngredientKind.RECIPE,
               multiplier: id.multiplier,
@@ -87,9 +87,9 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
     });
   console.log({ recipesIngredients, allSIIDs });
 
-  let sectionIngredientByID: Record<string, SIWithMultiplier[]> = {};
+  const sectionIngredientByID: Record<string, SIWithMultiplier[]> = {};
   allSIIDs.forEach((eachId) => {
-    let res: SIWithMultiplier[] = [];
+    const res: SIWithMultiplier[] = [];
     recipesIngredients.forEach((r) => {
       let result: SectionIngredient | undefined = undefined;
       let multiplier = 1.0;

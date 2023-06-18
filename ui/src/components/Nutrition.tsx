@@ -35,7 +35,7 @@ const Nutrient: React.FC<{
     <PaginatedTable
       columns={columns}
       data={items}
-      fetchData={() => {}}
+      fetchData={() => null}
       isLoading={false}
       totalCount={0}
       pageCount={1}

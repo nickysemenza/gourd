@@ -10,16 +10,15 @@ const Playground: React.FC = () => {
   const ids = useMemo(() => {
     const url = queryString.parse(loc.search).recipes;
     const a = url ? (Array.isArray(url) ? url : [url]) : [];
-    let u = a.filter((x) => x !== null) as string[];
+    const u = a.filter((x) => x !== null) as string[];
     return u;
   }, [loc]);
 
-  let input: EntitySummary[] = ids.map((id) => {
+  const input: EntitySummary[] = ids.map((id) => {
     return { id, multiplier: 1, name: "", kind: IngredientKind.RECIPE };
   });
   return (
     <div>
-      {/* @ts-ignore */}
       <Helmet>
         <title>diff | gourd</title>
       </Helmet>

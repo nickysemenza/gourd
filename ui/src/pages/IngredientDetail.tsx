@@ -9,7 +9,7 @@ import { UnitConvertDemo } from "../components/misc/UnitConvertDemo";
 import { getOpenapiFetchConfig } from "../util/config";
 
 const IngredientDetail: React.FC = () => {
-  let { id } = useParams() as { id?: string };
+  const { id } = useParams() as { id?: string };
 
   const { loading, data } = useGetIngredientById({
     ingredient_id: id || "",
@@ -43,7 +43,7 @@ const IngredientDetail: React.FC = () => {
             name={ingredient.name}
             limit={20}
             enableSearch
-            highlightId={food?.wrapper.fdc_id}
+            highlightId={food?.wrapper.fdcId}
             onLink={(fdcId: number) => {
               linkFoodToIngredient(ingredient.id, fdcId);
             }}

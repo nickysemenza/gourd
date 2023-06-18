@@ -139,11 +139,11 @@ pub fn parse_amount(input: &str) -> Result<IMeasures, JsValue> {
 
 // pub fn decode_recipe(input: &str)
 #[wasm_bindgen]
-pub fn encode_recipe_text(recipe_detail: &JsValue) -> String {
+pub fn encode_recipe_text(recipe_detail: &JsValue) -> Result<String, JsValue> {
     utils::set_panic_hook();
-    // info!("detail: {:?}", recipe_detail);
+    info!("encode_recipe_text: {:?}", recipe_detail);
     let r: RecipeDetailInput = recipe_detail.into_serde().unwrap();
-    gourd_common::codec::encode_recipe(r).unwrap()
+    gourd_common::codec::encode_recipe(r).map_err(|e| JsValue::from_str(&e.to_string()))
 }
 #[wasm_bindgen]
 pub fn encode_recipe_to_compact_json(recipe_detail: &JsValue) -> ICompactR {

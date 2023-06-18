@@ -71,7 +71,7 @@ export const EntitySelector: React.FC<{
         console.log(`selected ${val?.label} (${val?.value})`);
         onChange(val);
         break;
-      case "create-option":
+      case "create-option": {
         console.log(`creating ${createKind} ${val?.label}`);
         const name = val?.label || "";
         const newEntityId =
@@ -95,6 +95,7 @@ export const EntitySelector: React.FC<{
           fdc_id: undefined,
         });
         break;
+      }
     }
   };
 

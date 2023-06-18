@@ -1,0 +1,10 @@
+version: "3.1"
+
+services:
+
+  meilisearch-ui:
+    restart: always
+    container_name: meilisearch-ui
+    ports:
+      - '24900:24900'
+    image: 'riccoxie/meilisearch-ui:latest'

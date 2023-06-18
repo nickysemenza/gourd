@@ -206,7 +206,7 @@ export const updateTimeRange = (
   sectionID: number,
   value?: Amount2
 ) =>
-  !!value
+  value
     ? update(recipe, {
         detail: {
           sections: {
@@ -437,22 +437,20 @@ export const countTotals = (
     .reduce((a, b) => sumStats(a, b), { grams: 0, cents: 0 });
 
 export const sumIngredients = (sections?: RecipeSection[]) => {
-  let recipes: Record<string, SectionIngredient[]> = {};
-  let ingredients: Record<string, SectionIngredient[]> = {};
+  const recipes: Record<string, SectionIngredient[]> = {};
+  const ingredients: Record<string, SectionIngredient[]> = {};
 
   flatIngredients(sections || []).forEach((i) => {
     switch (i.kind) {
       case "recipe":
-        const r = i;
-        if (!!r) {
+        if (i) {
           //todo: don't group by recipe/ingredient
-          recipes[r.id] = [...(recipes[r.id] || []), r];
+          recipes[i.id] = [...(recipes[i.id] || []), i];
         }
         break;
       case "ingredient":
-        const item = i;
-        if (!!item) {
-          ingredients[item.id] = [...(ingredients[item.id] || []), item];
+        if (i) {
+          ingredients[i.id] = [...(ingredients[i.id] || []), i];
         }
         break;
     }
@@ -481,7 +479,7 @@ export const calCalc = (
   const uniqIng = ingredientsSum.ingredients;
   let totalCal = 0;
 
-  let ingredientsWithNutrients: Array<{
+  const ingredientsWithNutrients: Array<{
     ingredient: string;
     nutrients: Map<NutrientLabel, number>;
   }> = [];
@@ -489,7 +487,7 @@ export const calCalc = (
   // const foo = [];
   Object.keys(uniqIng).forEach((k) => {
     uniqIng[k].forEach((si) => {
-      if (!!si.ingredient) {
+      if (si.ingredient) {
         const fdc_id = si.ingredient.ingredient.fdc_id;
         if (fdc_id !== undefined) {
           const hint = hints[fdc_id];
@@ -522,7 +520,7 @@ export const calCalc = (
           }
         }
       }
-      if (!!si.recipe) {
+      if (si.recipe) {
         console.log("recursive calCalc");
         const {
           totalCal: totalCalSub,
@@ -545,9 +543,9 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
     .map((section) =>
       section.ingredients
         .map((ingredient) => {
-          if (!!ingredient.ingredient) {
+          if (ingredient.ingredient) {
             return [ingredient.ingredient.ingredient.fdc_id || 0];
-          } else if (!!ingredient.recipe) {
+          } else if (ingredient.recipe) {
             return getFDCIds(ingredient.recipe.sections);
           } else {
             return [0];
@@ -565,12 +563,12 @@ export const getHint = (
 
 export const extractIngredientID = (
   ingredient?: SectionIngredient,
-  includeRecipe: boolean = false
+  includeRecipe = false
 ) => {
   if (ingredient === undefined) {
     return undefined;
   }
-  let ing =
+  const ing =
     ingredient.ingredient?.ingredient.parent ||
     ingredient.ingredient?.ingredient.id;
   if (ing) {

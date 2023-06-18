@@ -54,12 +54,12 @@ jobs:
           docker create --name=temp ghcr.io/nickysemenza/gourd-ui-builder:${{steps.extract_branch.outputs.branch}}
           docker cp temp:/work/ui/src/wasm ui/src/wasm
       - name: start postgres db
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d db
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db
       - run: go mod vendor
       - name: migrate db
         run: make migrate
       - name: start rust + go servers
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d rs gourd
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d rs gourd
       - name: smoke test rust server
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup
@@ -67,12 +67,12 @@ jobs:
       - uses: codecov/codecov-action@v3
       # - run: ./bin/gourd import dev/testdata/cookies_2.txt
       - name: Cypress run
-        uses: cypress-io/github-action@v4
+        uses: cypress-io/github-action@v5
         with:
           working-directory: ui/
-          start: yarn run build:tailwind, yarn run start:integration
-          wait-on: "http://localhost:3001"
-          config: baseUrl=http://localhost:3001
+          start: yarn run dev
+          wait-on: "http://localhost:5173"
+          config: baseUrl=http://localhost:5173
           record: true
         env:
           CYPRESS_RECORD_KEY: 265312e3-7b8c-4031-ad0a-5f825b95cfce
@@ -104,7 +104,7 @@ jobs:
         id: extract_branch
       - run: go mod vendor
       - name: start postgres db + rust server
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f docker-compose-deps.yml -f docker-compose-gourd.yml up -d db rs
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db rs
       - name: smoke test rust server
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup

@@ -18,7 +18,7 @@ import PageWrapper from "../components/ui/PageWrapper";
 const IngredientList: React.FC = () => {
   const showIDs = false;
 
-  let initialParams: PaginationParameters = {
+  const initialParams: PaginationParameters = {
     offset: 0,
     limit: 2,
   };
@@ -48,7 +48,7 @@ const IngredientList: React.FC = () => {
     const iApi = new IngredientsApi(getOpenapiFetchConfig());
 
     const convertToRecipe = async (id: string) => {
-      let res = await iApi.convertIngredientToRecipe({ ingredientId: id });
+      const res = await iApi.convertIngredientToRecipe({ ingredientId: id });
       toast.success(`created recipe ${res.id} for ${res.name}`);
     };
     const linkFoodToIngredient = async (

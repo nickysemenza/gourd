@@ -1,39 +1,8 @@
-module.exports = {
-  darkMode: "class",
-  content: ["./public/**/*.html", "./src/**/*.{js,jsx,ts,tsx}"],
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    fontFamily: {
-      sans: [
-        "Libre Franklin",
-        "ui-sans-serif",
-        "system-ui",
-        "-apple-system",
-        "BlinkMacSystemFont",
-        '"Segoe UI"',
-        "Roboto",
-        '"Helvetica Neue"',
-        "Arial",
-        '"Noto Sans"',
-        "sans-serif",
-        '"Apple Color Emoji"',
-        '"Segoe UI Emoji"',
-        '"Segoe UI Symbol"',
-        '"Noto Color Emoji"',
-      ],
-      serif: ["ui-serif", "Georgia"],
-    },
+    extend: {},
   },
-  variants: {
-    backgroundColor: ["responsive", "odd", "hover", "focus", "disabled"],
-    borderStyle: ["responsive", "hover", "focus"],
-    borderColor: [
-      "responsive",
-      "hover",
-      "focus",
-      "active",
-      "group-hover",
-      "disabled",
-    ],
-  },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [],
 };

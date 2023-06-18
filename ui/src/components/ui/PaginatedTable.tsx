@@ -77,7 +77,7 @@ const PaginatedTable = <T extends object>({
   });
 
   React.useEffect(() => {
-    let params: PaginationParameters = {
+    const params: PaginationParameters = {
       limit: pageSize,
       offset: pageSize * pageIndex,
     };

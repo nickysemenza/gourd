@@ -21,9 +21,9 @@ import { RecipeGridCell } from "../components/recipe/RecipeGrid";
 const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
 
 function BrandedHit(props: { hit: any }) {
-  let hit = props.hit as BrandedFoodItem;
+  const hit = props.hit as BrandedFoodItem;
   const w = useContext(WasmContext);
-  let f: TempFood | undefined = w?.bfi_to_info(hit);
+  const f: TempFood | undefined = w?.bfi_to_info(hit);
   return (
     <div className="border-1">
       {f && (
@@ -44,7 +44,7 @@ function BrandedHit(props: { hit: any }) {
 }
 
 function RecipeDetailHit(props: { hit: any }) {
-  let hit = props.hit as RecipeDetail;
+  const hit = props.hit as RecipeDetail;
   return (
     <RecipeGridCell
       detail={hit}

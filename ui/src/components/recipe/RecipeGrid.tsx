@@ -62,8 +62,8 @@ export const RecipeGridCell: React.FC<{
 }) => {
   const w = useContext(WasmContext);
 
-  let rs = (detail.sources || []).filter((s) => s.image_url !== undefined);
-  let photo: Photo | undefined =
+  const rs = (detail.sources || []).filter((s) => s.image_url !== undefined);
+  const photo: Photo | undefined =
     linked_photos && linked_photos.length > 0
       ? linked_photos[0]
       : rs.length > 0

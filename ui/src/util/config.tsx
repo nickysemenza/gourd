@@ -3,12 +3,12 @@ import { toast } from "react-toastify";
 import { getJWT } from "../auth/auth";
 
 export const getAPIURL = () => getBaseURL() + "/api";
-export const getBaseURL = () => process.env.REACT_APP_API_URL;
-export const getTracingURL = () => process.env.REACT_APP_TRACING_URL || "";
+export const getBaseURL = () => import.meta.env.VITE_API_URL;
+export const getTracingURL = () => import.meta.env.VITE_TRACING_URL || "";
 
 export const getConfig = async () => {
   const a = new SystemApi(getOpenapiFetchConfig());
-  let config = await a.getConfig();
+  const config = await a.getConfig();
   return config;
 };
 

@@ -16,7 +16,7 @@ import queryString from "query-string";
 import { Link } from "react-router-dom";
 import { createColumnHelper } from "@tanstack/react-table";
 const Meals: React.FC = () => {
-  let initialParams: PaginationParameters = {
+  const initialParams: PaginationParameters = {
     offset: 0,
     limit: 2,
   };
@@ -64,7 +64,6 @@ const Meals: React.FC = () => {
                 type="checkbox"
                 className="form-checkbox"
                 checked={checked.has(id)}
-                onChange={(e) => {}}
                 onClick={() =>
                   setChecked(
                     update(
@@ -94,7 +93,7 @@ const Meals: React.FC = () => {
                 placeholder="Pick a Recipe..."
                 onChange={async (a) => {
                   console.log(a, info.row.index);
-                  let res = await mApi.updateRecipesForMeal({
+                  const res = await mApi.updateRecipesForMeal({
                     mealId: info.row.original.id,
                     mealRecipeUpdate: {
                       multiplier: 1.0,

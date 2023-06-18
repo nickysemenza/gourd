@@ -6,7 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../../components/ui/Button";
 
 const CreateRecipe: React.FC = () => {
-  let history = useNavigate();
+  const history = useNavigate();
 
   type Inputs = {
     url: string;

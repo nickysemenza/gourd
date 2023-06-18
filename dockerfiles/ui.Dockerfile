@@ -17,5 +17,5 @@ RUN yarn build
 
 # can be tiny image, just intermediary
 FROM alpine:3 AS tmp
-COPY --from=build-ui /work/ui/build /work/ui/build 
+COPY --from=build-ui /work/ui/dist /work/ui/dist 
 COPY --from=builder-wasm /work/rust/wasm/pkg /work/ui/src/wasm

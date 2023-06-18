@@ -22,7 +22,7 @@ import { Checkbox } from "../../components/ui/Checkbox";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
-  let initialParams: PaginationParameters = {
+  const initialParams: PaginationParameters = {
     offset: 0,
     limit: 180,
   };
@@ -48,9 +48,9 @@ const RecipeList: React.FC = () => {
       r.detail.name.startsWith("cy-")
   );
 
-  let future = new Set<RecipeWrapper>();
-  let past = new Set<RecipeWrapper>();
-  let other = new Set<RecipeWrapper>();
+  const future = new Set<RecipeWrapper>();
+  const past = new Set<RecipeWrapper>();
+  const other = new Set<RecipeWrapper>();
   recipes.forEach((r) => {
     let added = false;
     (r.linked_meals || []).forEach((m) => {
@@ -159,7 +159,6 @@ const RecipeList: React.FC = () => {
 
   return (
     <div className="">
-      {/* @ts-ignore */}
       <Helmet>
         <title>recipes | gourd</title>
       </Helmet>

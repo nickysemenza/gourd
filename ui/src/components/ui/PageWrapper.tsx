@@ -6,7 +6,6 @@ const PageWrapper: React.FC<{
 }> = ({ children, title }) => {
   return (
     <>
-      {/* @ts-ignore */}
       <Helmet>
         <title>{title} | gourd</title>
       </Helmet>

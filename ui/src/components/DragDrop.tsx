@@ -25,7 +25,7 @@ export const DragWrapper: React.FC<DragWrapperProps> = ({
 }) => {
   // https://github.com/react-dnd/react-dnd/blob/main/packages/examples-hooks/src/04-sortable/simple/Card.tsx
   const ref = useRef<HTMLDivElement>(null);
-  const [, drop] = useDrop({
+  const [, drop] = useDrop<DragItem>({
     accept: TypeSection,
     hover(item: DragItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
