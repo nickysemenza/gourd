@@ -10,6 +10,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/nickysemenza/gourd/internal/common"
+	"github.com/nickysemenza/gourd/internal/db/models"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
@@ -91,8 +93,16 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, pq.FormatTimestamp(t))
 		}
 		// err no rows, need to insert
 		mealID = common.ID("m")
-		iq := c.psql.Insert("meals").Columns("id", "ate_at", "name").Values(mealID, t, name)
-		_, err = c.execContext(ctx, iq)
+
+		newMeal := models.Meal{
+			ID:    mealID,
+			AteAt: t,
+			Name:  name,
+		}
+		err = newMeal.Insert(ctx, c.db, boil.Infer())
+		if err != nil {
+			err = fmt.Errorf("failed to insert meal %v: %w", newMeal, err)
+		}
 	}
 	return
 }

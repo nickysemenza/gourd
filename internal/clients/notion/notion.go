@@ -129,6 +129,9 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 				if slices.Contains(r.Tags, "lunch") {
 					lunchTime := utcTime.Add(time.Hour * 19) // noon
 					r.Time = zero.TimeFrom(lunchTime).Ptr()
+				} else if slices.Contains(r.Tags, "breakfast") {
+					lunchTime := utcTime.Add(time.Hour * 15) // 8am
+					r.Time = zero.TimeFrom(lunchTime).Ptr()
 				}
 			}
 		}

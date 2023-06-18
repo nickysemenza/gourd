@@ -11,6 +11,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"golang.org/x/exp/slices"
 )
 
 type NotionImage struct {
@@ -124,7 +125,7 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 		}
 		suffix := "meal"
 		for _, t := range meta.Tags {
-			if t == "dinner" {
+			if slices.Contains([]string{"dinner", "lunch", "breakfast"}, t) {
 				suffix = t
 			}
 		}
@@ -133,7 +134,7 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 			fmt.Sprintf("%s %s", m.AteAt.Time.Add(time.Hour*-24).Format("Mon Jan 2"), suffix),
 		)
 		if err != nil {
-			return fmt.Errorf("failed to find meal in rage: %w", err)
+			return fmt.Errorf("failed to find meal in range: %w", err)
 		}
 
 		if m.R.Recipe != nil {
