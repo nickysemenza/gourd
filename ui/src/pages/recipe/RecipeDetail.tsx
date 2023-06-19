@@ -15,11 +15,7 @@ import {
   RecipeWrapper as RecipeWrapper2,
   Amount,
 } from "../../api/openapi-hooks/api";
-import {
-  formatTimeRange,
-  getTotalDuration,
-  scaledRound,
-} from "../../util/util";
+import { scaledRound } from "../../util/util";
 import {
   calCalc,
   countTotals,
@@ -58,6 +54,7 @@ import Debug from "../../components/ui/Debug";
 import { NYTView } from "../../components/recipe/NYTView";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import PageWrapper from "../../components/ui/PageWrapper";
+import { formatTimeRange, getTotalDuration } from "../../util/time";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {

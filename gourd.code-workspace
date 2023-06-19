@@ -13,7 +13,10 @@
     }
   ],
   "extensions": {
-    "recommendations": ["bradlc.vscode-tailwindcss"]
+    "recommendations": [
+      "bradlc.vscode-tailwindcss",
+      "zixuanchen.vitest-explorer"
+    ]
   },
   "tasks": {
     "version": "2.0.0",

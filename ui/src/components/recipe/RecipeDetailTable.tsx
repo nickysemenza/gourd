@@ -4,12 +4,7 @@ import {
   RecipeSection,
   SectionIngredient,
 } from "../../api/openapi-hooks/api";
-import {
-  formatRichText,
-  formatTimeRange,
-  getIngredient,
-  scaledRound,
-} from "../../util/util";
+import { getIngredient, scaledRound } from "../../util/util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import update from "immutability-helper";
@@ -54,6 +49,8 @@ import { WasmContext } from "../../util/wasmContext";
 import { TableInput } from "../ui/Input";
 import IngredientPopover from "./IngredientPopover";
 import { PillLabel } from "../ui/Pill";
+import { formatRichText } from "../../util/rich";
+import { formatTimeRange } from "../../util/time";
 
 export interface UpdateIngredientProps {
   sectionID: number;

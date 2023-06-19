@@ -2,8 +2,8 @@ import React from "react";
 import Debug from "../components/ui/Debug";
 import { GooglePhotosAlbum, useListAllAlbums } from "../api/openapi-hooks/api";
 import PaginatedTable from "../components/ui/PaginatedTable";
-import { Code } from "../util/util";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Code } from "../components/Code";
 
 const Albums: React.FC = () => {
   const { data, error, loading } = useListAllAlbums({});

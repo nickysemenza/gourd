@@ -11,7 +11,7 @@ WORKDIR /work/ui
 COPY ui/package.json ui/yarn.lock ./
 RUN yarn
 COPY --from=builder-wasm /work/rust/wasm/pkg /work/ui/src/wasm
-
+ENV NODE_OPTIONS=--max_old_space_size=4096
 COPY ui ./
 RUN yarn build
 

@@ -8,11 +8,11 @@ import {
   RecipeDetail,
   RecipeWrapper,
 } from "../../api/openapi-hooks/api";
-import { formatTimeRange, getTotalDuration } from "../../util/util";
 import { WasmContext } from "../../util/wasmContext";
 import ProgressiveImage from "../ui/ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { formatTimeRange, getTotalDuration } from "../../util/time";
 dayjs.extend(relativeTime);
 
 export const RecipeGrid: React.FC<{

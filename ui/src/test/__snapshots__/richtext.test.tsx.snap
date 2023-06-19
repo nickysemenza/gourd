@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`rich text is displayed properly 1`] = `
+[
+  "heat oven to ",
+  <div
+    className="inline text-green-800 m-0 underline decoration-grey decoration-solid"
+  >
+    150 °f
+  </div>,
+  " for ",
+  <div
+    className="inline text-green-800 m-0 underline decoration-grey decoration-solid"
+  >
+    5 minutes
+  </div>,
+  " and put ",
+  <div
+    className="inline text-green-800 m-0 underline decoration-grey decoration-solid"
+  >
+    1 cup
+  </div>,
+  " ",
+  <div
+    className="inline text-orange-800 m-0 underline decoration-grey decoration-solid"
+  >
+    flour
+  </div>,
+  " in a bowl",
+]
+`;

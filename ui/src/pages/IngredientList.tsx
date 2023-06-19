@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { ButtonGroup } from "../components/ui/ButtonGroup";
 import { RecipeLink, UnitMappingList } from "../components/misc/Misc";
 import { AlertTriangle, PlusCircle } from "react-feather";
-import { Code } from "../util/util";
+import { Code } from "../components/Code";
 import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { createColumnHelper } from "@tanstack/react-table";

@@ -5,7 +5,7 @@ import PaginatedTable, {
   PaginationParameters,
 } from "../../components/ui/PaginatedTable";
 import { RecipeLink } from "../../components/misc/Misc";
-import { Code } from "../../util/util";
+import { Code } from "../../components/Code";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import queryString from "query-string";

@@ -8,7 +8,11 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
   plugins: ["react-refresh"],
-  ignorePatterns: ["src/api/openapi-hooks/**", "src/api/openapi-fetch/**"],
+  ignorePatterns: [
+    "src/api/openapi-hooks/**",
+    "src/api/openapi-fetch/**",
+    "src/wasm/**",
+  ],
 
   rules: {
     "react-refresh/only-export-components": "warn",
