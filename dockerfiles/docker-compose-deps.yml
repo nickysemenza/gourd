@@ -32,7 +32,7 @@ services:
       - 16686:16686 # UI
       - 14268:14268
       - 9411:9411
-    image: "jaegertracing/all-in-one:1.45"
+    image: "jaegertracing/all-in-one:1.46"
   # Collector
   collector:
     image: otel/opentelemetry-collector:0.79.0
@@ -55,4 +55,4 @@ services:
       - MEILI_MASTER_KEY=FOO
     volumes:
       - '../tmp/meili_data:/meili_data'
-    image: 'getmeili/meilisearch:v1.1'
+    image: 'getmeili/meilisearch:v1.2'

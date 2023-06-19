@@ -1,4 +1,4 @@
-FROM rust:1.69 as builder-wasm
+FROM rust:1.70 as builder-wasm
 WORKDIR /work/rust
 RUN cargo install wasm-pack
 COPY rust/ .
