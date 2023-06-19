@@ -65,7 +65,6 @@ jobs:
           curl -v http://localhost:8080/parse?text=1%20cup
           curl -v http://localhost:8080/debug/scrape?url=https://thewoksoflife.com/ma-po-tofu-real-deal/
       - uses: codecov/codecov-action@v3
-      # - run: ./bin/gourd import dev/testdata/cookies_2.txt
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:

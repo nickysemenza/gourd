@@ -205,6 +205,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 	if err != nil {
 		return err
 	}
+	log.Infof("updated %d recipes", len(summary.nRecipes))
 	log.Warnf("deleted %d stale recipes", res)
 
 	return nil
@@ -232,14 +233,14 @@ func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	if err := a.DB().SyncNotionMealFromNotionRecipe(ctx); err != nil {
 		return fmt.Errorf("notion meal: %w", err)
 	}
-	if a.GPhotos != nil {
-		if err := a.GPhotos.SyncAlbums(ctx); err != nil {
-			return fmt.Errorf("gphotos: %w", err)
-		}
-	}
-	if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
-		return fmt.Errorf("gphotos meal: %w", err)
-	}
+	// if a.GPhotos != nil {
+	// 	if err := a.GPhotos.SyncAlbums(ctx); err != nil {
+	// 		return fmt.Errorf("gphotos: %w", err)
+	// 	}
+	// }
+	// if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
+	// 	return fmt.Errorf("gphotos meal: %w", err)
+	// }
 	log.Infof("sync complete in %s", time.Since(now))
 	return nil
 }

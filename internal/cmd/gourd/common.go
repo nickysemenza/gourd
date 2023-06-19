@@ -27,7 +27,9 @@ import (
 
 func initTracer(zipkinURL, honeycombKey, name, env string) error {
 	// Create the zipkin exporter
-	var logger = stdlog.New(log.StandardLogger().Writer(), "zipkin-tracer", stdlog.Ldate|stdlog.Ltime|stdlog.Llongfile)
+	l := log.StandardLogger()
+	l.SetLevel(log.DebugLevel)
+	var logger = stdlog.New(l.Writer(), "zipkin-tracer", stdlog.Ldate|stdlog.Ltime|stdlog.Llongfile)
 
 	var exp tracesdk.SpanExporter
 	var err error
@@ -99,7 +101,6 @@ func setupEnv() error {
 		return nil
 	}
 
-	viper.Debug()
 	return err
 
 }
@@ -129,13 +130,13 @@ func setupMisc(mode string) error {
 		err := fmt.Errorf("failed to init tracer: %w", err)
 		return err
 	}
-	log.Infof("tracer initialized")
+	log.Debugf("tracer initialized")
 
 	if err := sentry.Init(sentry.ClientOptions{
 		Dsn: viper.GetString("SENTRY_DSN"),
 	}); err != nil {
 		return fmt.Errorf("sentry.Init: %w", err)
 	}
-	log.Infof("sentry initialized")
+	log.Debugf("sentry initialized")
 	return nil
 }

@@ -38,7 +38,8 @@ func AutoMigrate(_ context.Context, dbConn *sql.DB, up bool) error {
 		if !errors.Is(err, migrate.ErrNoChange) {
 			return fmt.Errorf("failed to migrate: %w", err)
 		}
+	} else {
+		log.Info("db: migrated")
 	}
-	log.Info("db: migrated")
 	return nil
 }

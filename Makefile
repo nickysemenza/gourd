@@ -13,7 +13,7 @@ test: unit-test-go lint-go test-rs
 dev-env:
 	docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-devdeps.yml up -d db meilisearch meilisearch-ui jaeger collector
 dev-air: bin/air 
-	HTTP_HOST=127.0.0.1 ./bin/air -c dev/air.conf
+	HTTP_HOST=127.0.0.1 ./bin/air -c tooling/dev/air.conf
 
 install-deps:
 	go mod tidy
@@ -86,9 +86,9 @@ generate: wasm-dev openapi # gen-db
 
 .PHONY: openapi
 openapi: internal/api/openapi.yaml
-internal/api/openapi.yaml: schemas/gourd.yaml schemas/usda.yaml
+internal/api/openapi.yaml: tooling/schemas/gourd.yaml tooling/schemas/usda.yaml
 	# generate merged bundle
-	npx @redocly/openapi-cli bundle schemas/gourd.yaml --output internal/api/openapi.yaml 
+	npx @redocly/openapi-cli bundle tooling/schemas/gourd.yaml --output internal/api/openapi.yaml 
 	
 	# ui hooks 1
 	rm -rf ui/src/api/openapi-hooks
@@ -126,7 +126,7 @@ wasm-dev: generate-wasm ui/src/wasm/package.json
 # GO SQL GENERATION
 gen-db:
 	rm -rf db/models/
-	sqlboiler psql --relation-tag rel --config ./dev/sqlboiler.toml --output ./internal/db/models --add-soft-deletes
+	sqlboiler psql --relation-tag rel --config ./tooling/sqlboiler.toml --output ./internal/db/models --add-soft-deletes
 # misc dev
 
 # https://jqplay.org/s/c1T3lLCJwH
@@ -136,7 +136,7 @@ get-detail/%:
 	rm tmp1
 
 seed-testdata: bin/gourd
-	./dev/testdata/seed.sh
+	./tooling/testdata/seed.sh
 
 # todo import usda
 devdata: seed-testdata sync

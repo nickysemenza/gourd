@@ -40,8 +40,17 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+func makeRenderer() *glamour.TermRenderer {
+	r, _ := glamour.NewTermRenderer(
+		glamour.WithAutoStyle(),
+		glamour.WithWordWrap(80),
+	)
+	return r
+}
+
 // nolint:gochecknoinits
 func init() {
+
 	rootCmd.AddCommand(
 		importCommand,
 		&cobra.Command{
@@ -107,8 +116,17 @@ func init() {
 					return err
 				}
 				res, err := c.ScrapeRecipeWithResponse(ctx, api.ScrapeRecipeJSONRequestBody{Url: url})
+				if err != nil {
+					return err
+				}
 
 				log.Println(res.JSON201.Detail.Id)
+
+				out, err := makeRenderer().Render(fmt.Sprintf("# scrape Complete\nScraped `%s` as `%s`", url, res.JSON201.Detail.Id))
+				if err != nil {
+					return err
+				}
+				fmt.Print(out)
 
 				return err
 			},
@@ -161,7 +179,7 @@ func init() {
 				for _, r := range *resp.JSON200.Recipes {
 					sb.WriteString(fmt.Sprintf("# %s \n `v%d` (%s)\n", r.Detail.Name, r.Detail.Version, r.Detail.Id))
 				}
-				res, err := glamour.Render(sb.String(), "dark")
+				res, err := makeRenderer().Render(sb.String())
 				if err != nil {
 					return err
 				}
@@ -193,9 +211,7 @@ var importCommand = &cobra.Command{
 			if err != nil {
 				return err
 			}
-			res, err := glamour.Render(fmt.Sprintf(`
-# Import Complete
-Imported `+" **%s** as `%s`", out.Detail.Name, out.Detail.Id), "dark")
+			res, err := makeRenderer().Render(fmt.Sprintf("# Import Complete\nImported **%s** as `%s`", out.Detail.Name, out.Detail.Id))
 			if err != nil {
 				return err
 			}

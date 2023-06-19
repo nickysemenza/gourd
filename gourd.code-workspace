@@ -62,7 +62,7 @@
     ],
     "yaml.schemas": {
       "https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json": "openapi.yaml",
-      "data/mapping_schema.json": "ingredient_fdc_mapping.yaml"
+      "tooling/mapping_schema.json": "ingredient_fdc_mapping.yaml"
     },
     "go.testTimeout": "60s",
     "files.exclude": {

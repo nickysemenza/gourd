@@ -131,7 +131,7 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	require := require.New(t)
 	_, apiManager := makeHandler(t)
 	ctx := context.Background()
-	r, err := apiManager.RecipeFromFile(ctx, "../../dev/testdata/dep_1.yaml")
+	r, err := apiManager.RecipeFromFile(ctx, "../../tooling/testdata/dep_1.yaml")
 	require.NoError(err)
 	_, err = apiManager.CreateRecipeDetails(ctx, r...)
 	require.NoError(err)
@@ -196,7 +196,7 @@ func mustSeedMappings(t *testing.T, apiManager *API) {
 	t.Helper()
 	require := require.New(t)
 	ctx := context.TODO()
-	mappings, err := IngredientMappingFromFile(ctx, "../../deploy/ingredient_fdc_mapping.yaml")
+	mappings, err := IngredientMappingFromFile(ctx, "../../tooling/ingredient_fdc_mapping.yaml")
 	require.NoError(err)
 	err = apiManager.insertIngredientMappings(ctx, mappings)
 	require.NoError(err)
@@ -209,7 +209,7 @@ func TestInferredUnits(t *testing.T) {
 
 	mustSeedMappings(t, apiManager)
 
-	r, err := apiManager.RecipeFromFile(ctx, "../../dev/testdata/plurals.txt")
+	r, err := apiManager.RecipeFromFile(ctx, "../../tooling/testdata/plurals.txt")
 	require.NoError(err)
 
 	ids, err := apiManager.CreateRecipeDetails(ctx, r...)

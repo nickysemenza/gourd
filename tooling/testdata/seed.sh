@@ -6,9 +6,9 @@
 ./bin/gourd scrape http://cooking.nytimes.com/recipes/1017456-three-cup-chicken
 ./bin/gourd scrape http://www.seriouseats.com/recipes/2011/08/grilled-naan-recipe.html
 ./bin/gourd scrape https://cooking.nytimes.com/recipes/1018177-cornmeal-blueberry-pancakes
-./bin/gourd import dev/testdata/cookies_2.txt
-./bin/gourd import dev/testdata/cookies_2b.txt
-./bin/gourd import dev/testdata/cookies_1.yaml
-./bin/gourd import dev/testdata/pasta.txt
+./bin/gourd import tooling/testdata/cookies_2.txt
+./bin/gourd import tooling/testdata/cookies_2b.txt
+./bin/gourd import tooling/testdata/cookies_1.yaml
+./bin/gourd import tooling/testdata/pasta.txt
 
-./bin/gourd load-ingredients deploy/ingredient_fdc_mapping.yaml
+./bin/gourd load-ingredients tooling/ingredient_fdc_mapping.yaml
