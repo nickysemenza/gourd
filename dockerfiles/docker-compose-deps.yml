@@ -35,7 +35,7 @@ services:
     image: "jaegertracing/all-in-one:1.46"
   # Collector
   collector:
-    image: otel/opentelemetry-collector:0.79.0
+    image: otel/opentelemetry-collector:0.80.0
     platform: linux/amd64
     command: [ "--config=/conf/collector-config.yaml" ]
     volumes:
