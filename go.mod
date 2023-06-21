@@ -11,7 +11,6 @@ require (
 	github.com/cosmtrek/air v1.44.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/deepmap/oapi-codegen v1.13.0
-	github.com/dgraph-io/ristretto v0.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
@@ -413,8 +412,10 @@ require (
 	github.com/bep/golibsass v1.1.1 // indirect
 	github.com/butuzov/mirror v1.1.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
+	github.com/dgraph-io/ristretto v0.0.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

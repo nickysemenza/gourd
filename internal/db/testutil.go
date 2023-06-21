@@ -16,7 +16,6 @@ import (
 // NewTestDB makes a test DB.
 func NewTestDB(t *testing.T) *Client {
 	viper.SetDefault("DATABASE_URL", "postgres://gourd:gourd@localhost:5555/food")
-	viper.SetDefault("DATABASE_URL_USDA", "postgres://gourd:gourd@localhost:5556/usda")
 	viper.AutomaticEnv()
 
 	dsn := viper.GetString("DATABASE_URL") + "?sslmode=disable"

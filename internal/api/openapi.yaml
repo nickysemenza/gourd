@@ -991,18 +991,15 @@ components:
         servings:
           description: num servings
           type: integer
-          format: int64
         quantity:
           description: serving quantity
           type: integer
-          format: int64
         unit:
           description: serving unit
           type: string
         version:
           description: version of the recipe
           type: integer
-          format: int64
         is_latest_version:
           description: whether or not it is the most recent version
           type: boolean
@@ -1041,11 +1038,9 @@ components:
         servings:
           description: num servings
           type: integer
-          format: int64
         quantity:
           description: serving quantity
           type: integer
-          format: int64
         unit:
           description: serving unit
           type: string
@@ -1077,7 +1072,6 @@ components:
         fdc_id:
           description: FDC id equivalent to this ingredient
           type: integer
-          format: int64
     IngredientDetail:
       description: An Ingredient
       type: object

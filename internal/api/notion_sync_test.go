@@ -18,9 +18,9 @@ func TestSync(t *testing.T) {
 	err := apiManager.Sync(ctx, 14)
 	require.NoError(err)
 
-	items, err := apiManager.RecipeListV2(ctx, 10, 0)
+	items, _, err := apiManager.searchRecipes(ctx, DefaultPagination, "subpagetitle")
 	require.NoError(err)
-	require.Len(items, 3)
+	require.Len(items, 1)
 	rd := items[0].Detail.Id
 	res, err := apiManager.recipeById(ctx, rd)
 	require.NoError(err)

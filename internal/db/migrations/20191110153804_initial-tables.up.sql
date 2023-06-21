@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS "recipe_details" (
   "deleted_at" timestamp,
   "tags" TEXT [],
   PRIMARY KEY ("id"),
-  unique("recipe_id", "version")
+  unique("recipe_id", "version"),
+  unique("version", "name")
 );
 -- https://stackoverflow.com/a/11014977
 -- create unique index one_latest_revision_of_recipe on recipe_details (recipe_id)

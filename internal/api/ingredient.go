@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
-	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/nickysemenza/gourd/internal/db/models"
+	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
-	"gopkg.in/guregu/null.v4/zero"
 )
 
 func (a *API) CreateIngredients(c echo.Context) error {
@@ -20,79 +20,25 @@ func (a *API) CreateIngredients(c echo.Context) error {
 		err = fmt.Errorf("invalid format for input: %w", err)
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	ing, err := a.DB().IngredientByName(ctx, i.Name)
+	ing, err := a.ingredientByName(ctx, i.Name)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	return c.JSON(http.StatusCreated, transformIngredient(*ing))
+
+	detail, err := a.ingredientById(ctx, IngredientID(ing.ID))
+	if err != nil {
+		return sendErr(c, http.StatusBadRequest, err)
+	}
+
+	return c.JSON(http.StatusCreated, detail.Ingredient)
 }
 
-func (a *API) IngredientIdByName(ctx context.Context, name, kind string) (string, error) {
-	ing, err := a.DB().IngredientByName(ctx, name)
+func (a *API) IngredientIdByName(ctx context.Context, name string) (string, error) {
+	ing, err := a.ingredientByName(ctx, name)
 	if err != nil {
 		return "", err
 	}
-	return ing.Id, nil
-}
-func (a *API) addDetailsToIngredients(ctx context.Context, ing []db.Ingredient) ([]IngredientDetail, error) {
-	ctx, span := a.tracer.Start(ctx, "addDetailsToIngredients")
-	defer span.End()
-
-	var ingredientIds []string
-	for _, i := range ing {
-		ingredientIds = append(ingredientIds, i.Id)
-	}
-
-	span.AddEvent("ingredient-params", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
-
-	parent, _, err := a.DB().GetIngrientsParent(ctx, ing...)
-	if err != nil {
-		return nil, err
-	}
-	for _, i := range parent {
-		ingredientIds = append(ingredientIds, i.Id)
-		ing = append(ing, i)
-	}
-
-	span.AddEvent("ingredient-plus-parent", trace.WithAttributes(attribute.StringSlice("id", ingredientIds)))
-
-	linkedRecipes, err := a.DB().GetRecipeDetailsWithIngredient(ctx, ingredientIds...)
-	if err != nil {
-		return nil, err
-	}
-
-	items := make([]IngredientDetail, len(ing))
-	for x, i := range ing {
-		// assemble
-
-		detail, err := a.makeDetail(ctx, i, parent, linkedRecipes)
-		if err != nil {
-			return nil, err
-		}
-		unitMappings, err := a.DB().GetIngredientUnits(ctx, []string{i.Id, i.Parent.String})
-		if err != nil {
-			return nil, err
-		}
-
-		for _, m := range unitMappings {
-			detail.UnitMappings = append(detail.UnitMappings, UnitMapping{
-				Amount{Unit: m.UnitA, Value: m.AmountA},
-				Amount{Unit: m.UnitB, Value: m.AmountB},
-				zero.StringFrom(fmt.Sprintf("%s (%s)", m.Source, i.Id)).Ptr(),
-			})
-		}
-		span.AddEvent("mappings", trace.WithAttributes(attribute.String("mappings", spew.Sdump(unitMappings))))
-
-		if i.FdcID.Valid {
-			err := a.enhanceWithFDC(ctx, i.FdcID.Int64, detail)
-			if err != nil {
-				return nil, fmt.Errorf("enhanceWithFDC: %w", err)
-			}
-		}
-		items[x] = *detail
-	}
-
-	return items, nil
+	return ing.ID, nil
 }
 
 func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *IngredientDetail) (err error) {
@@ -120,22 +66,14 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	ctx, span := a.tracer.Start(ctx, "ListIngredients")
 	defer span.End()
 
-	paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	var ids []string
-	if params.IngredientId != nil {
-		ids = *params.IngredientId
-	}
-	ing, count, err := a.DB().GetIngredients(ctx, "", ids, paginationParams...)
+	listMeta := parsePagination(params.Offset, params.Limit)
+
+	items, count, err := a.IngredientListV2(ctx, listMeta)
 	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
+		return handleErr(c, err)
 	}
 
-	items, err := a.addDetailsToIngredients(ctx, ing)
-	if err != nil {
-		return sendErr(c, http.StatusBadRequest, err)
-	}
-
-	listMeta.TotalCount = int(count)
+	listMeta.setTotalCount(uint64(count))
 
 	resp := PaginatedIngredients{
 		Ingredients: &items,
@@ -143,52 +81,69 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 	}
 	return c.JSON(http.StatusOK, resp)
 }
-
-func (a *API) makeDetail(ctx context.Context, i db.Ingredient, bulkParent db.Ingredients, bulkLinked db.RecipeDetails) (*IngredientDetail, error) {
-	ctx, span := a.tracer.Start(ctx, "makeDetail")
+func (a *API) convertIngredientToRecipe(ctx context.Context, ingredientId string) (*models.RecipeDetail, error) {
+	ctx, span := a.tracer.Start(ctx, "convertIngredientToRecipe")
 	defer span.End()
+	convertedPrefix := "[converted]"
 
-	span.AddEvent("parent", trace.WithAttributes(attribute.String("parent", spew.Sdump(bulkParent))))
-
-	// find linked ingredients
-	same := []IngredientDetail{}
-	for _, eachParent := range bulkParent.ByChild(i) {
-		d, err := a.makeDetail(ctx, eachParent, bulkParent, bulkLinked)
-		if err != nil {
-			return nil, err
-		}
-		same = append(same, *d)
+	tx, err := a.db.DB().BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
 	}
 
-	// find linked recipes
-	recipes := []RecipeDetail{}
-	for _, eachLinked := range bulkLinked.ByIngredientId()[i.Id] {
-		tr, err := a.transformRecipe(ctx, eachLinked, false)
-		if err != nil {
-			return nil, err
-		}
-		recipes = append(recipes, tr.Detail)
+	i, err := models.FindIngredient(ctx, tx, ingredientId)
+	if err != nil {
+		return nil, err
+	}
+	name := i.Name
+	if strings.Contains(name, convertedPrefix) {
+		return nil, fmt.Errorf("%s has already been converted to recipe", name)
 	}
 
-	detail := IngredientDetail{
-		Ingredient:   transformIngredient(i),
-		Children:     &same,
-		Recipes:      recipes,
-		UnitMappings: []UnitMapping{},
+	dbVersion, err := a.insertRecipeWrapper(ctx, tx, &RecipeWrapperInput{Detail: RecipeDetailInput{Name: name}})
+	if err != nil {
+		return nil, err
 	}
 
-	return &detail, nil
+	sectionIngredients, err := models.RecipeSectionIngredients(
+		models.RecipeSectionIngredientWhere.IngredientID.EQ(null.StringFrom(ingredientId)),
+	).All(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
+	affected, err := sectionIngredients.UpdateAll(ctx, tx,
+		models.M{
+			models.RecipeSectionIngredientColumns.IngredientID: nil,
+			models.RecipeSectionIngredientColumns.RecipeID:     dbVersion.RecipeID,
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	l(ctx).Infof("updated %d section ingredients to point to recipe", affected)
+
+	i.Name = convertedPrefix + " " + i.Name
+	_, err = i.Update(ctx, tx, boil.Whitelist(models.IngredientColumns.Name))
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return dbVersion, nil
+
 }
-
 func (a *API) ConvertIngredientToRecipe(c echo.Context, ingredientId string) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "ConvertIngredientToRecipe")
 	defer span.End()
 
-	detail, err := a.DB().IngredientToRecipe(ctx, ingredientId)
+	detail, err := a.convertIngredientToRecipe(ctx, ingredientId)
+
 	if err != nil {
 		return handleErr(c, err)
 	}
-	tr, err := a.transformRecipe(ctx, *detail, true)
+	tr, err := a.recipeByDetailID(ctx, detail.ID)
 	if err != nil {
 		return handleErr(c, err)
 	}
@@ -211,31 +166,14 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 		return handleErr(c, err)
 	}
 
-	ing, err := a.DB().GetIngredientById(ctx, ingredientId)
+	detail, err := a.ingredientById(ctx, IngredientID(ingredientId))
 	if err != nil {
 		return handleErr(c, err)
 	}
 
-	return c.JSON(http.StatusCreated, transformIngredient(*ing))
+	return c.JSON(http.StatusCreated, detail.Ingredient)
 }
 
-func (a *API) ingredientById(ctx context.Context, ingredientId IngredientID) (*IngredientDetail, error) {
-	ctx, span := a.tracer.Start(ctx, "IngredientById")
-	defer span.End()
-
-	ing, err := a.DB().GetIngredientById(ctx, string(ingredientId))
-	if err != nil {
-		return nil, err
-	}
-	if ing == nil {
-		return nil, nil
-	}
-	foo, err := a.addDetailsToIngredients(ctx, []db.Ingredient{*ing})
-	if err != nil {
-		return nil, err
-	}
-	return &foo[0], err
-}
 func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetIngredientById")
 	defer span.End()

@@ -8,14 +8,16 @@ linters:
     - noctx
     - gocritic
     - bodyclose
+    - unused
+    - unparam
+    - varcheck
+    - deadcode
+    - ineffassign
   presets:
     - bugs
     - unused
-  disable:
-    - gomnd
 run:
   timeout: 3m
-
   skip-dirs:
     - ui
     - rust

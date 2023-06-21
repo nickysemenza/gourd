@@ -310,7 +310,7 @@ type GooglePhotosAlbum struct {
 // An Ingredient
 type Ingredient struct {
 	// FDC id equivalent to this ingredient
-	FdcId *int64 `json:"fdc_id,omitempty"`
+	FdcId *int `json:"fdc_id,omitempty"`
 
 	// id
 	Id string `json:"id"`
@@ -587,13 +587,13 @@ type RecipeDetail struct {
 	Name string `json:"name"`
 
 	// serving quantity
-	Quantity int64 `json:"quantity"`
+	Quantity int `json:"quantity"`
 
 	// sections of the recipe
 	Sections []RecipeSection `json:"sections"`
 
 	// num servings
-	Servings *int64 `json:"servings,omitempty"`
+	Servings *int `json:"servings,omitempty"`
 
 	// book or websites
 	Sources []RecipeSource `json:"sources"`
@@ -605,7 +605,7 @@ type RecipeDetail struct {
 	Unit string `json:"unit"`
 
 	// version of the recipe
-	Version int64 `json:"version"`
+	Version int `json:"version"`
 }
 
 // A revision of a recipe
@@ -617,13 +617,13 @@ type RecipeDetailInput struct {
 	Name string `json:"name"`
 
 	// serving quantity
-	Quantity int64 `json:"quantity"`
+	Quantity int `json:"quantity"`
 
 	// sections of the recipe
 	Sections []RecipeSectionInput `json:"sections"`
 
 	// num servings
-	Servings *int64 `json:"servings,omitempty"`
+	Servings *int `json:"servings,omitempty"`
 
 	// book or websites
 	Sources *[]RecipeSource `json:"sources,omitempty"`

@@ -25,10 +25,10 @@ pub struct RecipeDetailInput {
     pub sources: Option<Vec<crate::models::RecipeSource>>,
     /// num servings
     #[serde(rename = "servings", skip_serializing_if = "Option::is_none")]
-    pub servings: Option<i64>,
+    pub servings: Option<i32>,
     /// serving quantity
     #[serde(rename = "quantity")]
-    pub quantity: i64,
+    pub quantity: i32,
     /// serving unit
     #[serde(rename = "unit")]
     pub unit: String,
@@ -42,7 +42,7 @@ pub struct RecipeDetailInput {
 
 impl RecipeDetailInput {
     /// A revision of a recipe
-    pub fn new(sections: Vec<crate::models::RecipeSectionInput>, name: String, quantity: i64, unit: String, tags: Vec<String>) -> RecipeDetailInput {
+    pub fn new(sections: Vec<crate::models::RecipeSectionInput>, name: String, quantity: i32, unit: String, tags: Vec<String>) -> RecipeDetailInput {
         RecipeDetailInput {
             sections,
             name,

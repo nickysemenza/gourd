@@ -16,7 +16,6 @@ import (
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"github.com/nickysemenza/gourd/internal/image"
-	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/types"
@@ -117,7 +116,7 @@ func (a *API) processNotionRecipe(ctx context.Context, nRecipe notion.Recipe) (r
 	res.nRecipes = append(res.nRecipes, *dbnr)
 	for _, nPhoto := range nRecipe.Photos {
 
-		l := log.WithField("block_id", nPhoto.BlockID)
+		l := l(ctx).WithField("block_id", nPhoto.BlockID)
 		// nPhoto.BlockID
 		exists, err := a.db.DoesNotionImageExist(ctx, nPhoto.BlockID)
 		if err != nil {
@@ -161,7 +160,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 	if err != nil {
 		return err
 	}
-	log.Infof("got %d notion recipes", len(nRecipes))
+	l(ctx).Infof("got %d notion recipes", len(nRecipes))
 
 	p, _ := workerpool.NewPoolWithResults(8, func(job workerpool.Job[notion.Recipe], workerID int) (notionSyncResult, error) {
 		return a.processNotionRecipe(ctx, job.Payload)
@@ -177,7 +176,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 
 	for result := range p.Results {
 		if result.Error != nil {
-			log.Error(result.Error)
+			l(ctx).Error(result.Error)
 		} else {
 			res := result.Value
 			summary.nRecipes = append(summary.nRecipes, res.nRecipes...)
@@ -205,8 +204,8 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 	if err != nil {
 		return err
 	}
-	log.Infof("updated %d recipes", len(summary.nRecipes))
-	log.Warnf("deleted %d stale recipes", res)
+	l(ctx).Infof("updated %d recipes", len(summary.nRecipes))
+	l(ctx).Warnf("deleted %d stale recipes", res)
 
 	return nil
 }
@@ -229,7 +228,7 @@ func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	if err := a.syncRecipeFromNotion(ctx, time.Hour*24*time.Duration(lookbackDays)); err != nil {
 		return fmt.Errorf("notion: %w", err)
 	}
-	log.Infof("synced recipes from notion")
+	l(ctx).Infof("synced recipes from notion")
 	if err := a.DB().SyncNotionMealFromNotionRecipe(ctx); err != nil {
 		return fmt.Errorf("notion meal: %w", err)
 	}
@@ -241,6 +240,6 @@ func (a *API) Sync(ctx context.Context, lookbackDays int) error {
 	// if err := a.DB().SyncMealsFromGPhotos(ctx); err != nil {
 	// 	return fmt.Errorf("gphotos meal: %w", err)
 	// }
-	log.Infof("sync complete in %s", time.Since(now))
+	l(ctx).Infof("sync complete in %s", time.Since(now))
 	return nil
 }

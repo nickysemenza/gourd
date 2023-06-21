@@ -28,16 +28,16 @@ pub struct RecipeDetail {
     pub sources: Vec<crate::models::RecipeSource>,
     /// num servings
     #[serde(rename = "servings", skip_serializing_if = "Option::is_none")]
-    pub servings: Option<i64>,
+    pub servings: Option<i32>,
     /// serving quantity
     #[serde(rename = "quantity")]
-    pub quantity: i64,
+    pub quantity: i32,
     /// serving unit
     #[serde(rename = "unit")]
     pub unit: String,
     /// version of the recipe
     #[serde(rename = "version")]
-    pub version: i64,
+    pub version: i32,
     /// whether or not it is the most recent version
     #[serde(rename = "is_latest_version")]
     pub is_latest_version: bool,
@@ -51,7 +51,7 @@ pub struct RecipeDetail {
 
 impl RecipeDetail {
     /// A revision of a recipe. does not include any \"generated\" fields. everything directly from db
-    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, sources: Vec<crate::models::RecipeSource>, quantity: i64, unit: String, version: i64, is_latest_version: bool, created_at: String, tags: Vec<String>) -> RecipeDetail {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, sources: Vec<crate::models::RecipeSource>, quantity: i32, unit: String, version: i32, is_latest_version: bool, created_at: String, tags: Vec<String>) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,

@@ -81,7 +81,6 @@ func initTracer(zipkinURL, honeycombKey, name, env string) error {
 func setupEnv() error {
 	viper.SetDefault("LOG_LEVEL", "info")
 	viper.SetDefault("DATABASE_URL", "postgres://gourd:gourd@localhost:5555/food")
-	viper.SetDefault("DATABASE_URL_USDA", "postgres://gourd:gourd@localhost:5556/usda")
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 20)
 	viper.SetDefault("PORT", 4242)
 	viper.SetDefault("HTTP_TIMEOUT", "15m")
@@ -123,6 +122,7 @@ func setupMisc(mode string) error {
 		log.FatalLevel,
 		log.ErrorLevel,
 		log.WarnLevel,
+		log.InfoLevel,
 	)))
 
 	// tracing

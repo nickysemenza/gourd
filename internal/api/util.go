@@ -16,15 +16,17 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/clients/rs_client"
 	"github.com/nickysemenza/gourd/internal/common"
-	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"sigs.k8s.io/yaml"
 )
 
-func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, Items) {
+func l(ctx context.Context) *logrus.Entry {
+	return logrus.WithContext(ctx)
+}
+
+func parsePagination(o *OffsetParam, l *LimitParam) Items {
 	offset := 0
 	limit := 20
 	if o != nil {
@@ -43,7 +45,7 @@ func parsePagination(o *OffsetParam, l *LimitParam) ([]db.SearchOption, Items) {
 		items.PageNumber = offset/limit + 1
 	}
 
-	return []db.SearchOption{db.WithOffset(uint64(offset)), db.WithLimit(uint64(limit))}, items
+	return items
 }
 
 func (l *Items) setTotalCount(count uint64) {
@@ -173,7 +175,7 @@ func (a *API) RecipeFromFile(ctx context.Context, inputPath string) (output []Re
 		}
 		return
 	}
-	log.Infof("loading %s", inputPath)
+	l(ctx).Infof("loading %s", inputPath)
 
 	switch filepath.Ext(inputPath) {
 	case ".txt":
@@ -231,7 +233,7 @@ func IngredientMappingFromFile(ctx context.Context, inputPath string) ([]Ingredi
 }
 
 // FetchAndTransform returns a recipe.
-func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string, kind string) (string, error)) (*RecipeWrapperInput, error) {
+func (a *API) FetchAndTransform(ctx context.Context, addr string, ingredientToId func(ctx context.Context, name string) (string, error)) (*RecipeWrapperInput, error) {
 	ctx, span := otel.Tracer("scraper").Start(ctx, "scraper.GetIngredients")
 	defer span.End()
 

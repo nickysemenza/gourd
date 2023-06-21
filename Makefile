@@ -23,7 +23,7 @@ install-deps:
 
 # frontend dev
 dev-ui:
-	cd ui && yarn run start
+	cd ui && yarn run dev
 cy:
 	cd ui && yarn run cy:open
 
@@ -104,6 +104,7 @@ internal/api/openapi.yaml: tooling/schemas/gourd.yaml tooling/schemas/usda.yaml
 	rm -rf rust/openapi/src/models
 	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml \
 		-o rust/openapi -g rust --global-property models,supportingFiles,modelDocs=false
+	cd rust/openapi && cargo clippy --fix --allow-staged --allow-dirty
 
 	# go
 	go generate ./internal/api

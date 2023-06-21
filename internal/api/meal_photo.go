@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/db"
 )
@@ -82,12 +81,6 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		return nil, err
 	}
 
-	recipesDetails, err := a.DB().GetRecipeDetailWhere(ctx, sq.Eq{"recipe_id": mealRecipes.RecipeIDs()})
-	if err != nil {
-		return nil, err
-	}
-	recipeDetailsById := recipesDetails.ByRecipeId()
-
 	for _, m := range meals {
 		meal := Meal{Id: m.ID,
 			Name:  m.Name,
@@ -96,12 +89,13 @@ func (a *API) GetMealInfo(ctx context.Context, meals db.Meals) ([]Meal, error) {
 		mrs := []MealRecipe{}
 		for _, mr := range mealRecipes.ByMealID()[m.ID] {
 
-			test, err := a.transformRecipes(ctx, recipeDetailsById[mr.RecipeID], true)
+			wrapper, err := a.recipeByWrapperID(ctx, mr.RecipeID)
+
 			if err != nil {
 				return nil, err
 			}
 
-			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: test[0].Detail})
+			mrs = append(mrs, MealRecipe{Multiplier: mr.Multiplier, Recipe: wrapper.Detail})
 		}
 		meal.Recipes = &mrs
 

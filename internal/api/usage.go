@@ -32,7 +32,7 @@ func (a *API) SumRecipes(c echo.Context) error {
 		err = fmt.Errorf("invalid format for input: %w", err)
 		return sendErr(c, http.StatusBadRequest, err)
 	}
-	ingredientSums, err := a.IngredientUsage(ctx, r.Inputs...)
+	ingredientSums, err := a.ingredientUsage(ctx, r.Inputs...)
 	if err != nil {
 		return handleErr(c, err)
 	}
@@ -42,7 +42,7 @@ func (a *API) SumRecipes(c echo.Context) error {
 	}
 
 	for _, eachRecipe := range r.Inputs {
-		recipeSpecific, err := a.IngredientUsage(ctx, eachRecipe)
+		recipeSpecific, err := a.ingredientUsage(ctx, eachRecipe)
 		if err != nil {
 			return handleErr(c, err)
 		}
@@ -67,8 +67,8 @@ func (u UsageSummary) add(ingId IngredientID, usageVal UsageValue) {
 	u[ingId] = pVal
 }
 
-// IngredientUsage calculate usage for provided recipes
-func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary) (UsageSummary, error) {
+// ingredientUsage calculate usage for provided recipes
+func (a *API) ingredientUsage(ctx context.Context, inputRecipes ...EntitySummary) (UsageSummary, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientUsage")
 	defer span.End()
 	summary := make(UsageSummary)
@@ -83,6 +83,7 @@ func (a *API) IngredientUsage(ctx context.Context, inputRecipes ...EntitySummary
 		}
 	}
 
+	l(ctx).Infof("summary has %d ingredients", len(summary))
 	// sum the things
 	for ingredientID, v := range summary {
 		if v.Sum == nil {
@@ -139,6 +140,7 @@ func (a *API) singleIngredientUsage(ctx context.Context, inputRecipe EntitySumma
 	if err != nil {
 		return nil, err
 	}
+	l(ctx).Infof("singleUsage for %s (%v)", recipe.Detail.Name, inputRecipe)
 	inputRecipe.Multiplier = Coalesce(inputRecipe.Multiplier, 1)
 	totalSum := make(UsageSummary)
 	for _, section := range recipe.Detail.Sections {

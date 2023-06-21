@@ -25,7 +25,7 @@ pub struct Ingredient {
     pub parent: Option<String>,
     /// FDC id equivalent to this ingredient
     #[serde(rename = "fdc_id", skip_serializing_if = "Option::is_none")]
-    pub fdc_id: Option<i64>,
+    pub fdc_id: Option<i32>,
 }
 
 impl Ingredient {

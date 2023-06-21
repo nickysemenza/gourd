@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
@@ -70,16 +69,6 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "SearchFoods")
 	defer span.End()
 
-	// paginationParams, listMeta := parsePagination(params.Offset, params.Limit)
-	// dataTypes := []string{}
-	// if params.DataTypes != nil {
-	// 	for _, x := range *params.DataTypes {
-	// 		if x != "" {
-	// 			dataTypes = append(dataTypes, string(x))
-	// 		}
-	// 	}
-	// }
-
 	var byItem []TempFood
 	err := a.R.Send(ctx, "debug/search_usda?name="+url.QueryEscape(string(params.Name)), nil, &byItem)
 	if err != nil {
@@ -88,20 +77,6 @@ func (a *API) SearchFoods(c echo.Context, params SearchFoodsParams) error {
 	resp := FoodSearchResult{
 		Foods: byItem,
 	}
-
-	// if false {
-	// 	foods, count, err := a.usdaDb.SearchFoods(ctx, string(params.Name), dataTypes, nil, paginationParams...)
-	// 	if err != nil {
-	// 		return handleErr(c, err)
-	// 	}
-	// 	listMeta.setTotalCount(count)
-
-	// 	items, err := a.buildPaginatedFood(ctx, foods)
-	// 	if err != nil {
-	// 		return handleErr(c, err)
-	// 	}
-	// 	resp.Foods = items
-	// }
 
 	return c.JSON(http.StatusOK, resp)
 
@@ -156,7 +131,7 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 	}
 	for _, m := range mapping {
 
-		ing, err := a.DB().IngredientByName(ctx, m.Name)
+		ing, err := a.ingredientByName(ctx, m.Name)
 		if err != nil {
 			return err
 		}
@@ -167,9 +142,9 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 				return err
 			}
 			if food == nil {
-				logrus.Warnf("food %d not found,", *m.FdcId)
+				l(ctx).Warnf("food %d not found,", *m.FdcId)
 			}
-			err = a.DB().AssociateFoodWithIngredient(ctx, ing.Id, *m.FdcId)
+			err = a.DB().AssociateFoodWithIngredient(ctx, ing.ID, *m.FdcId)
 			if err != nil {
 				return err
 			}
@@ -177,13 +152,13 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 
 		childIds := []string{}
 		for _, alias := range m.Aliases {
-			ing, err := a.DB().IngredientByName(ctx, alias)
+			ing, err := a.ingredientByName(ctx, alias)
 			if err != nil {
 				return err
 			}
-			childIds = append(childIds, ing.Id)
+			childIds = append(childIds, ing.ID)
 		}
-		err = a.DB().MergeIngredients(ctx, ing.Id, childIds)
+		err = a.DB().MergeIngredients(ctx, ing.ID, childIds)
 		if err != nil {
 			return err
 		}
@@ -192,7 +167,7 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 		loadedPairs := int64(0)
 		for _, u := range m.UnitMappings {
 			u := db.IngredientUnitMapping{
-				IngredientId: ing.Id,
+				IngredientId: ing.ID,
 				UnitA:        u.A.Unit,
 				AmountA:      u.A.Value,
 				UnitB:        u.B.Unit,
@@ -205,7 +180,7 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 			}
 			loadedPairs += num
 		}
-		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcId, ing.Id, loadedPairs, actualPairs)
+		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcId, ing.ID, loadedPairs, actualPairs)
 
 	}
 	return nil
