@@ -148,7 +148,7 @@ jobs:
       image: xd009642/tarpaulin:develop-nightly
       options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           cargo +nightly tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
         working-directory: rust

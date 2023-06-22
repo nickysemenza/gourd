@@ -2,7 +2,7 @@ module github.com/nickysemenza/gourd
 
 go 1.19
 
-replace github.com/ericlagergren/decimal => github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
+replace github.com/ericlagergren/decimal/v3 => github.com/ericlagergren/decimal v3.3.1
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -20,7 +20,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/golangci/golangci-lint v1.53.3
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gphotosuploader/google-photos-api-client-go v1.1.5
+	github.com/gphotosuploader/google-photos-api-client-go/v2 v2.4.1
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5
@@ -136,7 +136,7 @@ require (
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.11.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.0.1 // indirect
-	github.com/ericlagergren/decimal v0.0.0-20221120152707-495c53812d05
+	github.com/ericlagergren/decimal/v3 v3.3.1
 	github.com/esimonov/ifshort v1.0.4 // indirect
 	github.com/ettle/strcase v0.1.1 // indirect
 	github.com/fatih/color v1.15.0 // indirect
@@ -325,7 +325,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
-	github.com/volatiletech/null/v8 v8.1.2
+	github.com/volatiletech/null/v9 v9.0.0
 	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.85.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
