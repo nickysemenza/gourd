@@ -2,65 +2,58 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
-	sq "github.com/Masterminds/squirrel"
+	"github.com/nickysemenza/gourd/internal/db/models"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func (c *Client) SaveImage(ctx context.Context, items ...Image) (err error) {
-	ctx, span := c.tracer.Start(ctx, "db.SaveImage")
+func (c *Client) SaveImage(ctx context.Context, tx *sql.Tx, items ...*models.Image) error {
+	ctx, span := c.tracer.Start(ctx, "saveImage")
 	defer span.End()
-
-	if len(items) == 0 {
-		return nil
-	}
-
-	q := c.psql.Insert("images").Columns("id", "blur_hash", "source", "taken_at")
 	for _, r := range items {
-		q = q.Values(r.ID, r.BlurHash, r.Source, r.TakenAt)
+		if err := r.Insert(ctx, tx, boil.Infer()); err != nil {
+			return err
+		}
 	}
-	_, err = c.execContext(ctx, q)
-
-	return
+	return nil
 }
 
-// Returns photos related to notion; google photos are tied to meals not recipes
-func (c *Client) GetPhotosWithRecipe(ctx context.Context, recipeID ...string) (images map[string][]Image, err error) {
-	ctx, span := c.tracer.Start(ctx, "GetPhotosWithRecipe")
-	defer span.End()
+// TODO?  func that Returns photos related to notion; google photos are tied to meals not recipes
 
-	type res struct {
-		Recipe string `db:"recipe_id"`
-		Image
-	}
-	res2 := []res{}
-	q := c.psql.Select("notion_recipe.recipe_id as recipe_id", "id", "blur_hash", "source").From("images").
-		LeftJoin("notion_image on notion_image.image = images.id").
-		LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
-		Where(sq.Eq{"notion_recipe.recipe_id": recipeID})
-
-	err = c.selectContext(ctx, q, &res2)
-	images = make(map[string][]Image)
-	for _, rec := range res2 {
-		images[rec.Recipe] = append(images[rec.Recipe], rec.Image)
-	}
-	return
-}
-
-func (c *Client) GetPhotosForMeal(ctx context.Context, meal string) ([]GPhoto, error) {
+func (c *Client) GetPhotosForMeal(ctx context.Context, meal string) (models.GphotosPhotoSlice, error) {
 	ctx, span := c.tracer.Start(ctx, "GetPhotosForMeal")
 	defer span.End()
-	return c.getPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.LeftJoin("meal_gphoto on meal_gphoto.gphotos_id = gphotos_photos.id").
-			Where(sq.Eq{"meal_id": meal})
-	})
+
+	return models.GphotosPhotos(
+		qm.InnerJoin("meal_gphoto on meal_gphoto.gphotos_id = gphotos_photos.id"),
+		qm.Where("meal_id = ?", meal),
+		qm.Load(
+			models.GphotosPhotoRels.Image,
+		),
+	).All(ctx, c.db)
 }
 
-func (c *Client) GetNotionPhotosForMeal(ctx context.Context, meal string) ([]NotionImage, error) {
+func (c *Client) GetNotionPhotosForMeal(ctx context.Context, meal string) (models.NotionImageSlice, error) {
 	ctx, span := c.tracer.Start(ctx, "GetNotionPhotosForMeal")
 	defer span.End()
-	return c.getNotionPhotos(ctx, func(q sq.SelectBuilder) sq.SelectBuilder {
-		return q.LeftJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id").
-			LeftJoin("notion_meal on notion_meal.notion_id = notion_recipe.notion_id").
-			Where(sq.Eq{"meal_id": meal})
-	})
+	images, err := models.NotionImages(
+		qm.InnerJoin("notion_recipe on notion_recipe.page_id = notion_image.page_id"),
+		qm.InnerJoin("notion_meal on notion_meal.notion_id = notion_recipe.notion_id"),
+		qm.Where("meal_id = ?", meal),
+		qm.Load(
+			qm.Rels(
+				models.NotionImageRels.Image,
+			),
+		),
+		qm.Load(
+			qm.Rels(
+				models.NotionImageRels.Page,
+				models.NotionRecipeRels.Meals,
+			),
+		),
+	).All(ctx, c.db)
+	return images, err
+
 }

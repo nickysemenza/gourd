@@ -1,6 +1,6 @@
 use strum_macros::{Display, EnumIter};
 
-#[derive(EnumIter, Debug, Clone, Copy, Display)]
+#[derive(EnumIter, Debug, Clone, Copy, Display, PartialEq, Eq)]
 pub enum Index {
     BrandedFoods,
     FoundationFoods,

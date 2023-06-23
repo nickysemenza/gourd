@@ -15,9 +15,11 @@ import (
 	"github.com/nickysemenza/gourd/internal/clients/google"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/nickysemenza/gourd/internal/db/models"
 	"github.com/nickysemenza/gourd/internal/image"
 	log "github.com/sirupsen/logrus"
 	"github.com/volatiletech/null/v8"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 	"go.mitsakis.org/workerpool"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
@@ -139,11 +141,11 @@ func (p *Photos) GetAvailableAlbums(ctx context.Context) ([]photoslibrary.Album,
 }
 
 type PhotoSync struct {
-	db.Image
-	db.GPhoto
+	Image        models.Image
+	GphotosPhoto models.GphotosPhoto
 }
 type PhotoSyncJob struct {
-	album db.GAlbum
+	album models.GphotosAlbum
 	*photoslibrary.MediaItem
 }
 
@@ -179,7 +181,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		if err != nil {
 			return nil, err
 		}
-		i := db.Image{
+		i := models.Image{
 			ID:       id,
 			BlurHash: bh,
 			Source:   "google",
@@ -187,12 +189,11 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		}
 		return &PhotoSync{
 			Image: i,
-			GPhoto: db.GPhoto{
-				AlbumID: m.album.ID,
-				PhotoID: m.Id,
-				Created: t,
-				ImageID: id,
-				// BlurHash: zero.StringFrom(bh),
+			GphotosPhoto: models.GphotosPhoto{
+				AlbumID:      m.album.ID,
+				ID:           m.Id,
+				CreationTime: t,
+				ImageID:      id,
 			},
 		}, nil
 
@@ -206,7 +207,7 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 			PageSize: maxPhotoBatchGet,
 		}).Pages(ctx, func(r *photoslibrary.SearchMediaItemsResponse) error {
 			for _, m := range r.MediaItems {
-				jobs = append(jobs, PhotoSyncJob{album: album, MediaItem: m})
+				jobs = append(jobs, PhotoSyncJob{album: *album, MediaItem: m})
 			}
 			return nil
 		})
@@ -223,22 +224,30 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 		pool.StopAndWait()
 	}()
 
+	tx, err := p.db.DB().BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
 	for result := range pool.Results {
 		if result.Error != nil {
 			log.Error(result.Error)
 		} else {
-			err = p.db.SaveImage(ctx, result.Value.Image)
+			err = p.db.SaveImage(ctx, tx, &result.Value.Image)
 			if err != nil {
 				return err
 			}
-			err = p.db.UpsertGPhotos(ctx, result.Value.GPhoto)
-			if err != nil {
-				return err
-			}
+			result.Value.GphotosPhoto.Upsert(ctx, tx, true,
+				[]string{models.GphotosPhotoColumns.ID},
+				boil.Whitelist(
+					models.GphotosPhotoColumns.ImageID,
+					models.GphotosPhotoColumns.LastSeen,
+				), boil.Infer(),
+			)
 		}
 	}
 
-	return nil
+	return tx.Commit()
+
 }
 
 type BatchGetResult struct {

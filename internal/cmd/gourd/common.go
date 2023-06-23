@@ -123,6 +123,7 @@ func setupMisc(mode string) error {
 		log.ErrorLevel,
 		log.WarnLevel,
 		log.InfoLevel,
+		log.DebugLevel,
 	)))
 
 	// tracing

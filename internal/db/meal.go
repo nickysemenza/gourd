@@ -12,6 +12,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 func (c *Client) GetAllMeals(ctx context.Context) (Meals, error) {
@@ -32,7 +33,7 @@ func (c *Client) GetMealById(ctx context.Context, id string) (*Meal, error) {
 	return &result, err
 }
 
-func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, m *float64) error {
+func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, m *float64, tx *sql.Tx) error {
 	ctx, span := c.tracer.Start(ctx, "AddRecipeToMeal")
 	defer span.End()
 
@@ -45,7 +46,7 @@ func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, m
 	q := c.psql.Insert("meal_recipe").Columns("meal_id", "recipe_id", "multiplier").
 		Values(mealId, recipeId, multiplier).
 		Suffix("ON CONFLICT (recipe_id,meal_id) DO UPDATE SET multiplier = ?", multiplier)
-	_, err := c.execContext(ctx, q)
+	_, err := c.execTx(ctx, tx, q)
 	return err
 }
 
@@ -80,7 +81,7 @@ func (c *Client) GetMealRecipes(ctx context.Context, mealID ...string) (MealReci
 	return results, err
 }
 
-func (c *Client) MealIDInRange(ctx context.Context, t time.Time, name string) (mealID string, err error) {
+func (c *Client) MealIDInRange(ctx context.Context, t time.Time, name string, tx *sql.Tx) (mealID string, err error) {
 	ctx, span := c.tracer.Start(ctx, "db.MealIDInRange")
 	defer span.End()
 
@@ -99,7 +100,7 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, pq.FormatTimestamp(t))
 			AteAt: t,
 			Name:  name,
 		}
-		err = newMeal.Insert(ctx, c.db, boil.Infer())
+		err = newMeal.Insert(ctx, tx, boil.Infer())
 		if err != nil {
 			err = fmt.Errorf("failed to insert meal %v: %w", newMeal, err)
 		}
@@ -108,31 +109,44 @@ AND ate_at < $1::timestamp + INTERVAL '1 hour' limit 1`, pq.FormatTimestamp(t))
 }
 
 func (c *Client) SyncMealsFromGPhotos(ctx context.Context) error {
-	q := c.psql.Select("gphotos_photos.id as id", "album_id", "creation_time").From("gphotos_photos").
-		LeftJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id").
-		LeftJoin("gphotos_albums on gphotos_photos.album_id = gphotos_albums.id").
-		Where(sq.Eq{"meal_id": nil}).Where(sq.Eq{"usecase": "food"})
-	var missingMeals []GPhoto
-	err := c.selectContext(ctx, q, &missingMeals)
+
+	tx, err := c.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	missingMeals, err := models.GphotosPhotos(
+		qm.InnerJoin("meal_gphoto on gphotos_photos.id = meal_gphoto.gphotos_id"),
+		qm.InnerJoin("gphotos_albums on gphotos_photos.album_id = gphotos_albums.id"),
+		qm.Where("meal_id IS NULL"),
+		qm.Where("usecase = ?", "food"),
+		qm.Load(
+			models.GphotosPhotoRels.Image,
+		),
+	).All(ctx, tx)
+
 	if err != nil {
 		return err
 	}
 
 	for _, m := range missingMeals {
 
-		mealID, err := c.MealIDInRange(ctx, m.Created, fmt.Sprintf("meal on %s", m.Created))
+		mealID, err := c.MealIDInRange(ctx, m.CreationTime, fmt.Sprintf("meal on %s", m.CreationTime), tx)
 		if err != nil {
 			return err
 		}
 
-		q := c.psql.Insert("meal_gphoto").Columns("meal_id", "gphotos_id").Values(mealID, m.PhotoID)
-		_, err = c.execContext(ctx, q)
+		photo := models.MealGphoto{
+			MealID:    mealID,
+			GphotosID: m.ID,
+		}
+		err = photo.Insert(ctx, tx, boil.Infer())
+
 		if err != nil {
 			return err
 		}
 	}
 
-	return nil
+	return tx.Commit()
 
 }
 

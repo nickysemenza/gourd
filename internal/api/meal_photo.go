@@ -7,49 +7,48 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/nickysemenza/gourd/internal/db/models"
 )
 
-func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos []db.NotionImage) ([]Photo, error) {
+func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos models.NotionImageSlice) ([]Photo, error) {
 	items := []Photo{}
 	for _, aa := range photos {
-		bh := aa.Image.BlurHash
-		url, err := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		item, err := a.photoFromModel(ctx, aa.R.Image, PhotoSourceNotion)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, Photo{
-			Id:       aa.BlockID,
-			TakenAt:  aa.Image.TakenAt.Ptr(),
-			BlurHash: &bh,
-			Width:    300,
-			Height:   400,
-			BaseUrl:  url,
-			Source:   PhotoSourceNotion,
-		})
+		items = append(items, *item)
 	}
 	return items, nil
 }
+func (a *API) photoFromModel(ctx context.Context, p *models.Image, source PhotoSource) (*Photo, error) {
+	bh := p.BlurHash
+	url, err := a.ImageStore.GetImageURL(ctx, p.ID)
+	if err != nil {
+		return nil, err
+	}
 
-func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos []db.GPhoto) ([]Photo, error) {
+	return &Photo{
+		Id:       p.ID,
+		TakenAt:  p.TakenAt.Ptr(),
+		BlurHash: &bh,
+		Width:    300,
+		Height:   400,
+		BaseUrl:  url,
+		Source:   source,
+	}, nil
+}
+func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos models.GphotosPhotoSlice) ([]Photo, error) {
 	ctx, span := a.tracer.Start(ctx, "fromDBPhoto")
 	defer span.End()
 
 	items := []Photo{}
 	for _, aa := range photos {
-		bh := aa.Image.BlurHash
-		url, err := a.ImageStore.GetImageURL(ctx, aa.Image.ID)
+		item, err := a.photoFromModel(ctx, aa.R.Image, PhotoSourceGoogle)
 		if err != nil {
 			return nil, err
 		}
-		items = append(items, Photo{
-			Id:       aa.PhotoID,
-			TakenAt:  aa.Image.TakenAt.Ptr(),
-			BlurHash: &bh,
-			Width:    300,
-			Height:   400,
-			BaseUrl:  url,
-			Source:   PhotoSourceGoogle,
-		})
+		items = append(items, *item)
 	}
 	return items, nil
 }
@@ -178,8 +177,15 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 	}
 	switch r.Action {
 	case MealRecipeUpdateActionAdd:
-		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, &r.Multiplier)
+		tx, err := a.db.DB().BeginTx(ctx, nil)
 		if err != nil {
+			return handleErr(c, err)
+		}
+		err = a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, &r.Multiplier, tx)
+		if err != nil {
+			return handleErr(c, err)
+		}
+		if err := tx.Commit(); err != nil {
 			return handleErr(c, err)
 		}
 		return a.GetMealById(c, mealId)

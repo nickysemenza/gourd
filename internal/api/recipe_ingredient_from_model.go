@@ -12,6 +12,57 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
+func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *models.RecipeSectionIngredient) (*SectionIngredient, error) {
+	ctx, span := a.tracer.Start(ctx, "recipeSectionIngredientFromModel")
+	defer span.End()
+	si := SectionIngredient{
+		Id:        ingredient.ID,
+		Adjective: ingredient.Adjective.Ptr(),
+		Amounts:   []Amount{},
+		Optional:  ingredient.Optional.Ptr(),
+		Original:  ingredient.Original.Ptr(),
+	}
+
+	if ingredient.SubForIngredientID.Valid {
+		l(ctx).Warnf("SubForIngredientID not implemented for %s", ingredient.ID)
+	}
+	rawAmounts := []Amount{}
+	err := ingredient.Amounts.Unmarshal(&rawAmounts)
+	if err != nil {
+		return nil, err
+	}
+	for _, amt := range rawAmounts {
+		si.Amounts = append(si.Amounts, Amount{
+			Unit:   amt.Unit,
+			Value:  amt.Value,
+			Source: zero.StringFrom("db").Ptr(),
+		})
+	}
+	switch {
+	case ingredient.RecipeID.Valid:
+		si.Kind = IngredientKindRecipe
+		foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe)
+		if err != nil {
+			return nil, err
+		}
+		si.Recipe = &foo.Detail
+	case ingredient.IngredientID.Valid:
+		si.Kind = IngredientKindIngredient
+		var err error
+		si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, true, false)
+		if err != nil {
+			return nil, err
+		}
+		if err := a.enhanceMulti(ctx, &si); err != nil {
+			return nil, err
+		}
+
+	default:
+		return nil, fmt.Errorf("ingredient is not valid")
+	}
+	return &si, nil
+
+}
 func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail) (*RecipeDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeDetailFromModel")
 	defer span.End()
@@ -19,7 +70,8 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail)
 	span.SetAttributes(attribute.String("name", d.Name))
 	span.AddEvent("model", trace.WithAttributes(attribute.String("model", spew.Sdump(d))))
 	sections := make([]RecipeSection, 0)
-	for _, section := range d.R.RecipeSections {
+	for x, section := range d.R.RecipeSections {
+		l(ctx).Debugf("section: %s (%d of %d)", section.ID, x, len(d.R.RecipeSections))
 		rs := RecipeSection{
 			Id:           section.ID,
 			Ingredients:  []SectionIngredient{},
@@ -31,60 +83,21 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail)
 				return nil, err
 			}
 		}
-		for _, instruction := range section.R.SectionRecipeSectionInstructions {
+		for x, instruction := range section.R.SectionRecipeSectionInstructions {
+			l(ctx).Debugf("instruction: %s (%d of %d)", instruction.ID, x, len(section.R.SectionRecipeSectionInstructions))
 			rs.Instructions = append(rs.Instructions, SectionInstruction{
 				Id:          instruction.ID,
 				Instruction: instruction.Instruction.String,
 			})
 		}
-		for _, ingredient := range section.R.SectionRecipeSectionIngredients {
-			si := SectionIngredient{
-				Id:        ingredient.ID,
-				Adjective: ingredient.Adjective.Ptr(),
-				Amounts:   []Amount{},
-				Optional:  ingredient.Optional.Ptr(),
-				Original:  ingredient.Original.Ptr(),
-			}
+		for x, ingredient := range section.R.SectionRecipeSectionIngredients {
+			l(ctx).Debugf("ingredient: %s (%d of %d)", ingredient.ID, x, len(section.R.SectionRecipeSectionIngredients))
 
-			if ingredient.SubForIngredientID.Valid {
-				l(ctx).Warnf("SubForIngredientID not implemented for %s", ingredient.ID)
-			}
-			rawAmounts := []Amount{}
-			err := ingredient.Amounts.Unmarshal(&rawAmounts)
+			si, err := a.recipeSectionIngredientFromModel(ctx, ingredient)
 			if err != nil {
 				return nil, err
 			}
-			for _, amt := range rawAmounts {
-				si.Amounts = append(si.Amounts, Amount{
-					Unit:   amt.Unit,
-					Value:  amt.Value,
-					Source: zero.StringFrom("db").Ptr(),
-				})
-			}
-			switch {
-			case ingredient.RecipeID.Valid:
-				si.Kind = IngredientKindRecipe
-				foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe)
-				if err != nil {
-					return nil, err
-				}
-				si.Recipe = &foo.Detail
-			case ingredient.IngredientID.Valid:
-				si.Kind = IngredientKindIngredient
-				var err error
-				si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, true, false)
-				if err != nil {
-					return nil, err
-				}
-				if err := a.enhanceMulti(ctx, &si); err != nil {
-					return nil, err
-				}
-
-			default:
-				return nil, fmt.Errorf("ingredient is not valid")
-			}
-
-			rs.Ingredients = append(rs.Ingredients, si)
+			rs.Ingredients = append(rs.Ingredients, *si)
 		}
 		sections = append(sections, rs)
 

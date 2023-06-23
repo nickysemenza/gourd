@@ -96,7 +96,6 @@ async fn read_and_load<T: Document>(filename: &str, index: Index) -> Result<Vec<
 
 pub async fn load_json_into_search() -> Result<()> {
     Searcher::new().init_indexes().await;
-    // return;
     if false {
         read_and_load_stream::<SrLegacyFoodItem>("srlegacyfoods.ndjson", Index::SRLegacyFoods)
             .await?;
@@ -173,12 +172,15 @@ async fn get_usda_by_id(id: &str) -> Result<Option<Result<TempFood>>> {
 pub async fn get_usda(info: Query<URLInput>) -> Response {
     let id = info.name.as_str();
 
-    match get_usda_by_id(id).await.unwrap() {
-        Some(item) => match item {
-            Ok(item) => Json(item).into_response(),
-            Err(e) => AppError::from(e).into_response(),
+    match get_usda_by_id(id).await {
+        Ok(res) => match res {
+            Some(item) => match item {
+                Ok(item) => Json(item).into_response(),
+                Err(e) => AppError::from(e).into_response(),
+            },
+            None => (StatusCode::NOT_FOUND, "Not found").into_response(),
         },
-        None => (StatusCode::NOT_FOUND, "Not found").into_response(),
+        Err(e) => AppError::from(e).into_response(),
     }
 }
 

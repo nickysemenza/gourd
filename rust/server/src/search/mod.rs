@@ -90,6 +90,7 @@ impl Searcher {
     #[tracing::instrument]
     pub async fn init_indexes(self) {
         for x in Index::iter().progress() {
+            let mut touched = false;
             if let Some(attr) = x.get_searchable_attributes() {
                 let task: TaskInfo = self
                     .client
@@ -98,6 +99,7 @@ impl Searcher {
                     .await
                     .unwrap();
                 info!("configured searchable attributes for {}: {:?}", x, task);
+                touched = true;
             }
             if let Some(attr) = x.get_filterable_attributes() {
                 let task: TaskInfo = self
@@ -107,6 +109,11 @@ impl Searcher {
                     .await
                     .unwrap();
                 info!("configured filterable attributes for {}: {:?}", x, task);
+                touched = true;
+            }
+            if !touched {
+                let task: TaskInfo = self.client.create_index(x.to_string(), None).await.unwrap();
+                info!("created index without config {}: {:?}", x, task);
             }
         }
     }

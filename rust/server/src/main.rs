@@ -67,7 +67,7 @@ async fn main() -> std::io::Result<()> {
         let _enter = root.enter();
     }
     if let Some(_m) = matches.subcommand_matches("load_usda") {
-        let root = span!(tracing::Level::TRACE, "load_mappings",);
+        let root = span!(tracing::Level::TRACE, "load_usda",);
         let _enter = root.enter();
         usda_loader::load_json_into_search().await.unwrap();
     }
