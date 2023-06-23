@@ -391,7 +391,7 @@ require (
 )
 
 require (
-	github.com/volatiletech/null/v8 v8.1.2
+	github.com/volatiletech/null/v9 v9.0.0
 	go.opentelemetry.io/otel/exporters/zipkin v1.16.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	google.golang.org/grpc v1.56.0
