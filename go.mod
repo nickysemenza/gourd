@@ -325,7 +325,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
-	github.com/volatiletech/null/v8 v8.1.2
+	github.com/volatiletech/null/v9 v9.0.0
 	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.85.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
@@ -391,6 +391,7 @@ require (
 )
 
 require (
+	github.com/volatiletech/null/v8 v8.1.2
 	go.opentelemetry.io/otel/exporters/zipkin v1.16.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	google.golang.org/grpc v1.56.0
