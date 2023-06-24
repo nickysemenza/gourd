@@ -133,7 +133,7 @@ func TestRecipeReferencingRecipe(t *testing.T) {
 	ctx := context.Background()
 	r, err := apiManager.RecipeFromFile(ctx, "../../tooling/testdata/dep_1.yaml")
 	require.NoError(err)
-	_, err = apiManager.CreateRecipeDetails(ctx, r...)
+	_, err = apiManager.createRecipeDetails(ctx, r...)
 	require.NoError(err)
 }
 
@@ -144,7 +144,7 @@ func TestSearches(t *testing.T) {
 
 	rName := fmt.Sprintf("recipe-%s", common.ID(""))
 	iName := fmt.Sprintf("ing-%s", common.ID(""))
-	_, err := api.CreateRecipeDetails(ctx, RecipeDetailInput{
+	_, err := api.createRecipeDetails(ctx, RecipeDetailInput{
 		Name:     rName,
 		Sections: []RecipeSectionInput{{Ingredients: []SectionIngredientInput{{Kind: "ingredient", Name: &iName}}}},
 	})
@@ -212,7 +212,7 @@ func TestInferredUnits(t *testing.T) {
 	r, err := apiManager.RecipeFromFile(ctx, "../../tooling/testdata/plurals.txt")
 	require.NoError(err)
 
-	ids, err := apiManager.CreateRecipeDetails(ctx, r...)
+	ids, err := apiManager.createRecipeDetails(ctx, r...)
 	require.NoError(err)
 	require.Len(ids, 1)
 	rd := ids[0]

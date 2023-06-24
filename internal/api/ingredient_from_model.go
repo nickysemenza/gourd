@@ -4,22 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingredient, recurseIngredients, recurseRecipes bool) (*IngredientDetail, error) {
+func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingredient, withDetail, recurseIngredients, recurseRecipes bool) (*IngredientDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "ingredientFromModel")
 	defer span.End()
 	if ingredient == nil {
 		l(ctx).Warnf("ingredientFromModel called with nil ingredient")
 		return nil, nil
 	}
-	span.SetAttributes(attribute.String("name", ingredient.Name))
-	span.AddEvent("model", trace.WithAttributes(attribute.String("model", spew.Sdump(ingredient))))
+	span.SetAttributes(attribute.String("ingredient-name", ingredient.Name))
 	detail := &IngredientDetail{
 		Ingredient: Ingredient{
 			Id:     ingredient.ID,
@@ -27,7 +24,6 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 			FdcId:  ingredient.FDCID.Ptr(),
 			Parent: ingredient.ParentIngredientID.Ptr(),
 		},
-		// Food:,
 		Recipes:      []RecipeDetail{},
 		UnitMappings: []UnitMapping{},
 	}
@@ -38,7 +34,7 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 	if recurseIngredients {
 		for _, x := range ingredient.R.ParentIngredientIngredients {
 			l(ctx).Infof("checking child ingredient %s", x.ID)
-			res, err := a.ingredientFromModel(ctx, x, false, false)
+			res, err := a.ingredientFromModel(ctx, x, withDetail, false, false)
 			if err != nil {
 				return nil, err
 			}
@@ -48,7 +44,7 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 		}
 		if parent := ingredient.R.ParentIngredient; parent != nil {
 			l(ctx).Infof("checking parent ingredient %s", parent.ID)
-			res, err := a.ingredientFromModel(ctx, parent, false, false)
+			res, err := a.ingredientFromModel(ctx, parent, withDetail, false, false)
 			if err != nil {
 				return nil, err
 			}
@@ -81,7 +77,7 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 		})
 	}
 
-	if ingredient.FDCID.Valid {
+	if ingredient.FDCID.Valid && withDetail {
 		err := a.enhanceWithFDC(ctx, int64(ingredient.FDCID.Int), detail)
 		if err != nil {
 			return nil, fmt.Errorf("enhanceWithFDC: %w", err)

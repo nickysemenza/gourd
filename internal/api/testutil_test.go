@@ -25,7 +25,7 @@ func MustInsert(ctx context.Context, t *testing.T, a *API, cr CompactRecipe) str
 	r, err := a.RecipeFromCompact(ctx, cr)
 	require.NoError(t, err)
 
-	ids, err := a.CreateRecipeDetails(ctx, r.Detail)
+	ids, err := a.createRecipeDetails(ctx, r.Detail)
 	require.NoError(t, err)
 	require.NotEmpty(t, ids[0])
 	return ids[0]

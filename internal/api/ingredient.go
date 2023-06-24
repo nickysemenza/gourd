@@ -25,7 +25,7 @@ func (a *API) CreateIngredients(c echo.Context) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 
-	detail, err := a.ingredientById(ctx, IngredientID(ing.ID))
+	detail, err := a.ingredientById(ctx, IngredientID(ing.ID), true)
 	if err != nil {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
@@ -166,7 +166,7 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 		return handleErr(c, err)
 	}
 
-	detail, err := a.ingredientById(ctx, IngredientID(ingredientId))
+	detail, err := a.ingredientById(ctx, IngredientID(ingredientId), true)
 	if err != nil {
 		return handleErr(c, err)
 	}
@@ -178,7 +178,7 @@ func (a *API) GetIngredientById(c echo.Context, ingredientId string) error {
 	ctx, span := a.tracer.Start(c.Request().Context(), "GetIngredientById")
 	defer span.End()
 
-	ing, err := a.ingredientById(ctx, IngredientID(ingredientId))
+	ing, err := a.ingredientById(ctx, IngredientID(ingredientId), true)
 	if err != nil {
 		return handleErr(c, err)
 	}

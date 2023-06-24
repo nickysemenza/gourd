@@ -16,7 +16,7 @@ import (
 )
 
 func (a *API) grabFood(ctx context.Context, id int) (*TempFood, error) {
-	ctx, span := a.tracer.Start(ctx, "RecipeFromText")
+	ctx, span := a.tracer.Start(ctx, "grabFood")
 	defer span.End()
 	var result *TempFood
 	err := a.R.Send(ctx, "debug/get_usda?name="+url.QueryEscape(fmt.Sprintf("%d", id)), nil, &result)

@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *models.RecipeSectionIngredient) (*SectionIngredient, error) {
+func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *models.RecipeSectionIngredient, withIngredientDetail bool) (*SectionIngredient, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeSectionIngredientFromModel")
 	defer span.End()
 	si := SectionIngredient{
@@ -41,7 +40,7 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	switch {
 	case ingredient.RecipeID.Valid:
 		si.Kind = IngredientKindRecipe
-		foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe)
+		foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe, withIngredientDetail)
 		if err != nil {
 			return nil, err
 		}
@@ -49,12 +48,14 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	case ingredient.IngredientID.Valid:
 		si.Kind = IngredientKindIngredient
 		var err error
-		si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, true, false)
+		si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, withIngredientDetail, true, false)
 		if err != nil {
 			return nil, err
 		}
-		if err := a.enhanceMulti(ctx, &si); err != nil {
-			return nil, err
+		if withIngredientDetail {
+			if err := a.enhanceMulti(ctx, &si); err != nil {
+				return nil, err
+			}
 		}
 
 	default:
@@ -63,12 +64,11 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	return &si, nil
 
 }
-func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail) (*RecipeDetail, error) {
+func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail, withIngredientDetail bool) (*RecipeDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeDetailFromModel")
 	defer span.End()
 
-	span.SetAttributes(attribute.String("name", d.Name))
-	span.AddEvent("model", trace.WithAttributes(attribute.String("model", spew.Sdump(d))))
+	span.SetAttributes(attribute.String("recipe-name", d.Name))
 	sections := make([]RecipeSection, 0)
 	for x, section := range d.R.RecipeSections {
 		l(ctx).Debugf("section: %s (%d of %d)", section.ID, x, len(d.R.RecipeSections))
@@ -93,7 +93,7 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail)
 		for x, ingredient := range section.R.SectionRecipeSectionIngredients {
 			l(ctx).Debugf("ingredient: %s (%d of %d)", ingredient.ID, x, len(section.R.SectionRecipeSectionIngredients))
 
-			si, err := a.recipeSectionIngredientFromModel(ctx, ingredient)
+			si, err := a.recipeSectionIngredientFromModel(ctx, ingredient, withIngredientDetail)
 			if err != nil {
 				return nil, err
 			}
@@ -127,19 +127,23 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail)
 	return &rd, nil
 
 }
-func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe) (*RecipeWrapper, error) {
+func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe, withIngredientDetail bool) (*RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeFromModel")
 	defer span.End()
+
 	if recipe == nil || len(recipe.R.RecipeDetails) == 0 {
 		return nil, nil
 	}
-
+	now := time.Now()
+	defer func() {
+		l(ctx).Warnf("recipeFromModel on %s took %s", recipe.ID, time.Since(now))
+	}()
 	rw := RecipeWrapper{
 		Id: recipe.ID,
 	}
 	other := []RecipeDetail{}
 	for _, d := range recipe.R.RecipeDetails {
-		rd, err := a.recipeDetailFromModel(ctx, d)
+		rd, err := a.recipeDetailFromModel(ctx, d, withIngredientDetail)
 		if err != nil {
 			return nil, err
 		}

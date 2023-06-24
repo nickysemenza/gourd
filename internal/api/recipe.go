@@ -65,7 +65,7 @@ func (a *API) CreateRecipes(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, recipe)
 }
-func (a *API) CreateRecipeDetails(ctx context.Context, recipes ...RecipeDetailInput) (detailIDs []string, err error) {
+func (a *API) createRecipeDetails(ctx context.Context, recipes ...RecipeDetailInput) (detailIDs []string, err error) {
 	for _, r := range recipes {
 		d, err := a.CreateRecipe(ctx, &RecipeWrapperInput{Detail: r})
 		if err != nil {

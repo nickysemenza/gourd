@@ -30,9 +30,9 @@ func TestChildrenParentIngredients(t *testing.T) {
 	ingB := IngIDFromName(t, apiManager, "bchild")
 	// ingC := ingID(t, apiManager, "c")
 
-	resA, err := apiManager.ingredientById(ctx, ingA)
+	resA, err := apiManager.ingredientById(ctx, ingA, true)
 	require.NoError(err)
-	resB, err := apiManager.ingredientById(ctx, ingB)
+	resB, err := apiManager.ingredientById(ctx, ingB, true)
 	require.NoError(err)
 	// resC, err := apiManager.ingredientById(ctx, ingC)
 	// require.NoError(err)

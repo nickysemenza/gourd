@@ -8,6 +8,7 @@ import (
 
 	"github.com/nickysemenza/gourd/internal/db/models"
 	. "github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"go.mitsakis.org/workerpool"
 )
 
 func (a *API) recipeByDetailID(ctx context.Context, detailId string) (*RecipeWrapper, error) {
@@ -33,7 +34,7 @@ func (a *API) recipebyWrapperWhere(ctx context.Context, where ...QueryMod) (*Rec
 	if err != nil {
 		return nil, err
 	}
-	return a.recipeFromModel(ctx, recipe)
+	return a.recipeFromModel(ctx, recipe, true)
 }
 
 func (a *API) recipeByWrapperID(ctx context.Context, wrapperId string) (*RecipeWrapper, error) {
@@ -121,38 +122,37 @@ var recipeQueryMods = []QueryMod{
 func (a *API) RecipeListV2(ctx context.Context, pagination Items, mods ...QueryMod) ([]RecipeWrapper, int64, error) {
 	ctx, span := a.tracer.Start(ctx, "RecipeListV2")
 	defer span.End()
-	filters := []QueryMod{
-		Limit(pagination.Limit),
-		Offset(pagination.Offset),
-	}
-	recipes, err := models.Recipes(
-		append(
-			recipeQueryMods,
-			append(mods, filters...)...,
-		)...,
-	).
-		All(ctx, a.db.DB())
 
+	recipes, count, err := countAndQuery[models.RecipeSlice](ctx, a.db.DB(), models.Recipes, qmWithPagination(recipeQueryMods, pagination, mods...)...)
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := models.Recipes(
-		append(
-			recipeQueryMods,
-			append(mods, filters...)...,
-		)...,
-	).Count(ctx, a.db.DB())
+
+	p, err := workerpool.NewPoolWithResults(
+		8,
+		func(job workerpool.Job[*models.Recipe], workerID int) (*RecipeWrapper, error) {
+			return a.recipeFromModel(ctx, job.Payload, false)
+		})
 	if err != nil {
 		return nil, 0, err
 	}
-	items := []RecipeWrapper{}
-	for _, recipe := range recipes {
-		rw, err := a.recipeFromModel(ctx, recipe)
-		if err != nil {
-			return nil, 0, err
+	go func() {
+		for _, nRecipe := range recipes {
+			p.Submit(nRecipe)
 		}
-		if rw != nil {
-			items = append(items, *rw)
+		p.StopAndWait()
+	}()
+
+	items := []RecipeWrapper{}
+
+	for result := range p.Results {
+		if result.Error != nil {
+			l(ctx).Error(result.Error)
+			return nil, 0, result.Error
+		} else {
+			res := result.Value
+			items = append(items, *res)
+
 		}
 	}
 
