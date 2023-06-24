@@ -1,6 +1,8 @@
+import { getJWT } from "../../auth/auth";
+import { getAPIURL } from "../../util/urls";
 import { GourdApiContext } from "./gourdApiContext";
 
-const baseUrl = "http://localhost:4242/api";
+const baseUrl = getAPIURL();
 
 export type ErrorWrapper<TError> =
   | TError
@@ -41,6 +43,7 @@ export async function gourdApiFetch<
   try {
     const requestHeaders: HeadersInit = {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${getJWT()}`,
       ...headers,
     };
 

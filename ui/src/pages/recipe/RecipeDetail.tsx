@@ -48,7 +48,7 @@ import {
   SectionInstructionInput,
   SectionIngredientInput,
 } from "../../api/openapi-fetch";
-import { getAPIURL, getOpenapiFetchConfig } from "../../util/config";
+import { getOpenapiFetchConfig } from "../../util/config";
 import { RecipeLink } from "../../components/misc/Misc";
 import { Alert } from "../../components/ui/Alert";
 import ProgressiveImage from "../../components/ui/ProgressiveImage";
@@ -57,6 +57,7 @@ import { NYTView } from "../../components/recipe/NYTView";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import PageWrapper from "../../components/ui/PageWrapper";
 import { formatTimeRange, getTotalDuration } from "../../util/time";
+import { getAPIURL } from "../../util/urls";
 
 const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
   return {

@@ -21,7 +21,6 @@ import Search from "./pages/Search";
 
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import { getTracingURL } from "./util/config";
 import { CookiesProvider } from "react-cookie";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,6 +34,7 @@ import { registerTracing } from "./util/tracing";
 import ErrorPage from "./components/ui/ErrorPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { getTracingURL } from "./util/urls";
 
 registerTracing(getTracingURL(), true);
 
