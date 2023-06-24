@@ -91,6 +91,7 @@ models/TempFood.ts
 models/TempFoodWrapper.ts
 models/UnitConversionRequest.ts
 models/UnitMapping.ts
+models/Unused.ts
 models/UsageValue.ts
 models/WweiaFoodCategory.ts
 models/index.ts

@@ -8,13 +8,15 @@ import update, { Spec } from "immutability-helper";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
   useGetRecipeById,
-  RecipeSource,
-  SectionIngredient,
   useGetFoodsByIds,
   useListIngredients,
+} from "../../api/react-query/gourdApiComponents";
+import {
+  RecipeSource,
+  SectionIngredient,
   RecipeWrapper as RecipeWrapper2,
   Amount,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import { scaledRound } from "../../util/util";
 import {
   calCalc,
@@ -97,7 +99,7 @@ const RecipeDetail: React.FC = () => {
   const { search } = useLocation();
   const values = queryString.parse(search) as { multiplier?: string };
   const { error, data } = useGetRecipeById({
-    recipe_id: id || "",
+    pathParams: { recipeId: id || "" },
   });
 
   const w = useContext(WasmContext);
@@ -118,22 +120,14 @@ const RecipeDetail: React.FC = () => {
     setRecipe(r);
   };
   const tweaks: RecipeTweaks = { override, multiplier, edit };
-  // const { mutate: post } = useCreateRecipes({
-  //   onMutate: (_) => {
-  //     // setRecipe(data);
-  //   },
-  // });
 
   const { data: foods } = useGetFoodsByIds({
-    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
       fdc_id: [...getFDCIds(recipe ? recipe.detail.sections : []), 0],
     },
-    // lazy: true,
   });
 
   const { data: ingredientDetails } = useListIngredients({
-    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
       ingredient_id: [
         ...flatIngredients(recipe?.detail.sections || []).map(
@@ -229,8 +223,8 @@ const RecipeDetail: React.FC = () => {
           oops
         </div>
         <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
-          <p>{e.message}</p>
-          <Debug data={e.data} />
+          <p>{e.status}</p>
+          <Debug data={e.payload} />
         </div>
       </div>
     );

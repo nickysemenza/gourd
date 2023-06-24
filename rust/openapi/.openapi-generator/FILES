@@ -6,6 +6,7 @@ git_push.sh
 src/apis/configuration.rs
 src/apis/mod.rs
 src/lib.rs
+src/models/_unused.rs
 src/models/amount.rs
 src/models/auth_resp.rs
 src/models/branded_food_item.rs

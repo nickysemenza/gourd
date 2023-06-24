@@ -6,7 +6,7 @@ import {
 import {
   IngredientDetail,
   UnitConversionRequest,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import { wasm, WasmContext, Amount } from "../../util/wasmContext";
 import Debug from "../ui/Debug";
 import { TableInput } from "../ui/Input";

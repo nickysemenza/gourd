@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/ui/PaginatedTable";
-import { useListIngredients } from "../api/openapi-hooks/api";
 import { IngredientsApi } from "../api/openapi-fetch";
 import { getOpenapiFetchConfig } from "../util/config";
 import { toast } from "react-toastify";
@@ -14,6 +13,7 @@ import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { createColumnHelper } from "@tanstack/react-table";
 import PageWrapper from "../components/ui/PageWrapper";
+import { useListIngredients } from "../api/react-query/gourdApiComponents";
 
 const IngredientList: React.FC = () => {
   const showIDs = false;
@@ -29,7 +29,7 @@ const IngredientList: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, loading } = useListIngredients({
+  const { data, isLoading } = useListIngredients({
     queryParams: params,
   });
 
@@ -197,7 +197,7 @@ const IngredientList: React.FC = () => {
         columns={columns}
         data={ingredients}
         fetchData={fetchData}
-        isLoading={loading}
+        isLoading={isLoading}
         totalCount={data?.meta?.total_count || 0}
         pageCount={data?.meta?.page_count || 1}
       />

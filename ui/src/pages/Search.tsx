@@ -13,7 +13,7 @@ import {
   BrandedFoodItem,
   RecipeDetail,
   TempFood,
-} from "../api/openapi-hooks/api";
+} from "../api/react-query/gourdApiSchemas";
 import { WasmContext } from "../util/wasmContext";
 import { FoodRow } from "../components/FoodSearch";
 import { RecipeGridCell } from "../components/recipe/RecipeGrid";

@@ -82,5 +82,6 @@ export * from './TempFood';
 export * from './TempFoodWrapper';
 export * from './UnitConversionRequest';
 export * from './UnitMapping';
+export * from './Unused';
 export * from './UsageValue';
 export * from './WweiaFoodCategory';

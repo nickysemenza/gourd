@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IngredientsApi } from "../api/openapi-fetch";
-import { useGetIngredientById } from "../api/openapi-hooks/api";
+import { useGetIngredientById } from "../api/react-query/gourdApiComponents";
 import Debug from "../components/ui/Debug";
 import FoodSearch from "../components/FoodSearch";
 import { UnitConvertDemo } from "../components/misc/UnitConvertDemo";
@@ -11,8 +11,8 @@ import { getOpenapiFetchConfig } from "../util/config";
 const IngredientDetail: React.FC = () => {
   const { id } = useParams() as { id?: string };
 
-  const { loading, data } = useGetIngredientById({
-    ingredient_id: id || "",
+  const { isLoading: loading, data } = useGetIngredientById({
+    pathParams: { ingredientId: id || "" },
   });
 
   const iApi = new IngredientsApi(getOpenapiFetchConfig());

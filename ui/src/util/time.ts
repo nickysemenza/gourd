@@ -1,4 +1,4 @@
-import { Amount, RecipeSection } from "../api/openapi-hooks/api";
+import { Amount, RecipeSection } from "../api/react-query/gourdApiSchemas";
 import { wasm } from "./wasmContext";
 
 export const sumTimeRanges = (

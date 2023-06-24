@@ -111,6 +111,7 @@ Class | Method | HTTP request | Description
  - [TempFoodWrapper](docs/TempFoodWrapper.md)
  - [UnitConversionRequest](docs/UnitConversionRequest.md)
  - [UnitMapping](docs/UnitMapping.md)
+ - [Unused](docs/Unused.md)
  - [UsageValue](docs/UsageValue.md)
  - [WweiaFoodCategory](docs/WweiaFoodCategory.md)
 

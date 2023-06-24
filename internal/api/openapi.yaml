@@ -7,6 +7,7 @@ info:
   title: Gourd Recipe Database
   license:
     name: MIT
+    url: https://opensource.org/licenses/MIT
 tags:
   - name: recipes
     description: Recipe operations
@@ -275,6 +276,7 @@ paths:
         - $ref: '#/components/parameters/limitParam'
         - name: ingredient_id
           in: query
+          explode: false
           required: false
           description: ids
           schema:
@@ -465,6 +467,7 @@ paths:
       parameters:
         - name: recipe_id
           in: query
+          explode: false
           required: true
           description: detail ids
           schema:
@@ -738,6 +741,7 @@ paths:
       parameters:
         - name: fdc_id
           in: query
+          explode: false
           required: true
           description: ids
           schema:
@@ -1590,6 +1594,13 @@ components:
           type: array
           items:
             type: string
+    _unused:
+      type: object
+      properties:
+        _compact:
+          $ref: '#/components/schemas/CompactRecipe'
+        _convert:
+          $ref: '#/components/schemas/UnitConversionRequest'
     CompactRecipe:
       type: object
       required:

@@ -3,7 +3,7 @@ import Highcharts, { Point, PointClickEventObject } from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsNetworkGraph from "highcharts/modules/networkgraph";
 
-import { useRecipeDependencies } from "../api/openapi-hooks/api";
+import { useRecipeDependencies } from "../api/react-query/gourdApiComponents";
 import { useNavigate } from "react-router-dom";
 
 type CustomPoint = Highcharts.Point & {

@@ -273,7 +273,7 @@ export class IngredientsApi extends runtime.BaseAPI {
         }
 
         if (requestParameters.ingredientId) {
-            queryParameters['ingredient_id'] = requestParameters.ingredientId;
+            queryParameters['ingredient_id'] = requestParameters.ingredientId.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

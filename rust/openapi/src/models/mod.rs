@@ -162,6 +162,8 @@ pub mod unit_conversion_request;
 pub use self::unit_conversion_request::UnitConversionRequest;
 pub mod unit_mapping;
 pub use self::unit_mapping::UnitMapping;
+pub mod _unused;
+pub use self::_unused::Unused;
 pub mod usage_value;
 pub use self::usage_value::UsageValue;
 pub mod wweia_food_category;

@@ -265,7 +265,7 @@ export class RecipesApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters.recipeId) {
-            queryParameters['recipe_id'] = requestParameters.recipeId;
+            queryParameters['recipe_id'] = requestParameters.recipeId.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

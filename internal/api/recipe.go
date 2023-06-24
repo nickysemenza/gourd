@@ -143,7 +143,7 @@ func (a *API) GetRecipesByIds(c echo.Context, params GetRecipesByIdsParams) erro
 	list := []RecipeWrapper{}
 
 	for _, recipeId := range params.RecipeId {
-		apiR, err := a.recipeById(ctx, recipeId)
+		apiR, err := a.recipeByDetailID(ctx, recipeId)
 		if err != nil {
 			return handleErr(c, err)
 		}

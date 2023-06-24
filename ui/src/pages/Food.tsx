@@ -1,9 +1,10 @@
 import React from "react";
-import { useGetFoodById } from "../api/openapi-hooks/api";
+import { useGetFoodById } from "../api/react-query/gourdApiComponents";
 import Debug from "../components/ui/Debug";
 import { UnitMappingList } from "../components/misc/Misc";
 import { scaledRound } from "../util/util";
 import { Code } from "../components/Code";
+import { HideShowHOC } from "../components/ui/ButtonGroup";
 
 const Food: React.FC = () => {
   // const [food, setFood]
@@ -21,7 +22,7 @@ const Food: React.FC = () => {
 export default Food;
 
 const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
-  const { data } = useGetFoodById({ fdc_id });
+  const { data } = useGetFoodById({ pathParams: { fdcId: fdc_id } });
   if (!data) return null;
   const { description, dataType } = data.wrapper;
   // const
@@ -29,14 +30,14 @@ const FoodInfo: React.FC<{ fdc_id: number }> = ({ fdc_id }) => {
   return (
     <div>
       <h2 className="font-bold text-l">{description}</h2>
-      <div>
+      <div className="flex">
         <Code>{dataType}</Code>
-      </div>
-      <div>
         <Code>{fdc_id}</Code>
       </div>
       <UnitMappingList unit_mappings={unit_mappings} />
-      <Debug data={{ data }} />
+      <HideShowHOC>
+        <Debug data={{ data }} />
+      </HideShowHOC>
 
       <table>
         {(data.foodNutrients || [])

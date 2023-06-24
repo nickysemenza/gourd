@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { RecipeWrapper } from "../../api/openapi-hooks/api";
 import { WasmContext } from "../../util/wasmContext";
 import { getGlobalInstructionNumber } from "./RecipeEditorUtils";
+import { RecipeWrapper } from "../../api/react-query/gourdApiSchemas";
 
 export const NYTView: React.FC<{
   recipe: RecipeWrapper;

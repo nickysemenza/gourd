@@ -325,7 +325,6 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
-	github.com/volatiletech/null/v9 v9.0.0
 	github.com/volatiletech/randomize v0.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.85.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

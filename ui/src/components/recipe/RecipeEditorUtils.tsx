@@ -9,7 +9,7 @@ import {
   RecipeWrapper,
   SectionIngredient,
   Amount as Amount2,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import update from "immutability-helper";
 import { wasm } from "../../util/wasmContext";
 import { Amount } from "../../api/openapi-fetch";

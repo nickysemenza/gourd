@@ -3,7 +3,7 @@ import {
   RecipeWrapper,
   RecipeSection,
   SectionIngredient,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import { getIngredient, scaledRound } from "../../util/util";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -64,7 +64,7 @@ export interface UpdateIngredientProps {
 export interface TableProps {
   recipe: RecipeWrapper;
   updateIngredient: (i: UpdateIngredientProps) => void;
-  setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | null>>;
+  setRecipe: React.Dispatch<React.SetStateAction<RecipeWrapper | undefined>>;
   tweaks: RecipeTweaks;
   hints: FoodsById;
   ing_hints: IngDetailsById;

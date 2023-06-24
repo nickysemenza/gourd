@@ -1,12 +1,13 @@
 import React from "react";
 import Debug from "../components/ui/Debug";
-import { GooglePhotosAlbum, useListAllAlbums } from "../api/openapi-hooks/api";
 import PaginatedTable from "../components/ui/PaginatedTable";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Code } from "../components/Code";
+import { useListAllAlbums } from "../api/react-query/gourdApiComponents";
+import { GooglePhotosAlbum } from "../api/react-query/gourdApiSchemas";
 
 const Albums: React.FC = () => {
-  const { data, error, loading } = useListAllAlbums({});
+  const { data, error, isLoading } = useListAllAlbums({});
 
   const columns = React.useMemo(() => {
     const columnHelper = createColumnHelper<GooglePhotosAlbum>();
@@ -38,7 +39,7 @@ const Albums: React.FC = () => {
         columns={columns}
         data={data?.albums || []}
         fetchData={() => null}
-        isLoading={loading}
+        isLoading={isLoading}
         totalCount={0}
         pageCount={1}
       />

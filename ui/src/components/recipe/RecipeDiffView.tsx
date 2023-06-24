@@ -8,10 +8,8 @@ import {
 } from "../../api/openapi-fetch";
 import {
   SectionIngredient,
-  useListIngredients,
-  useGetRecipesByIds,
   RecipeDetail,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import {
   flatIngredients,
   getMeasureUnitsFromSI,
@@ -27,6 +25,10 @@ import { scaledRound } from "../../util/util";
 import { getOpenapiFetchConfig } from "../../util/config";
 import { HideShowButton } from "../ui/ButtonGroup";
 import { Pill } from "../ui/Pill";
+import {
+  useGetRecipesByIds,
+  useListIngredients,
+} from "../../api/react-query/gourdApiComponents";
 
 interface SIWithMultiplier {
   si: SectionIngredient | undefined;
@@ -35,13 +37,14 @@ interface SIWithMultiplier {
 const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   entitiesToDiff,
 }) => {
-  const { data, loading: recipeLoading } = useGetRecipesByIds({
-    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
-    queryParams: {
-      recipe_id: entitiesToDiff.map((x) => x.id),
+  const { data, isLoading: recipeLoading } = useGetRecipesByIds(
+    {
+      queryParams: {
+        recipe_id: entitiesToDiff.map((x) => x.id),
+      },
     },
-    // lazy: true,
-  });
+    {}
+  );
 
   const [showBP, setShow] = React.useState(false);
   const [sumResp, setSumResp] = React.useState<SumsResponse>();
@@ -54,7 +57,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
       const rAPI = new RecipesApi(getOpenapiFetchConfig());
       const recipeSumResp = await rAPI.sumRecipes({
         sumRecipesRequest: {
-          inputs: entitiesToDiff.map((id, x) => {
+          inputs: entitiesToDiff.map((id) => {
             const foo: EntitySummary = {
               id: id.id,
               kind: IngredientKind.RECIPE,
@@ -112,12 +115,10 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
 
   const ingIds = [...Object.keys(sectionIngredientByID)];
   const { data: ingredientDetails } = useListIngredients({
-    queryParamStringifyOptions: { arrayFormat: "repeat" }, // https://github.com/contiamo/restful-react/issues/313
     queryParams: {
       ingredient_id: ingIds,
       limit: ingIds.length || 0,
     },
-    // lazy: true,
   });
 
   const ing_hints: IngDetailsById = Object.assign(

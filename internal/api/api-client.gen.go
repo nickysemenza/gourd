@@ -739,7 +739,7 @@ func NewGetFoodsByIdsRequest(server string, params *GetFoodsByIdsParams) (*http.
 
 	queryValues := queryURL.Query()
 
-	if queryFrag, err := runtime.StyleParamWithLocation("form", true, "fdc_id", runtime.ParamLocationQuery, params.FdcId); err != nil {
+	if queryFrag, err := runtime.StyleParamWithLocation("form", false, "fdc_id", runtime.ParamLocationQuery, params.FdcId); err != nil {
 		return nil, err
 	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 		return nil, err
@@ -925,7 +925,7 @@ func NewListIngredientsRequest(server string, params *ListIngredientsParams) (*h
 
 	if params.IngredientId != nil {
 
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "ingredient_id", runtime.ParamLocationQuery, *params.IngredientId); err != nil {
+		if queryFrag, err := runtime.StyleParamWithLocation("form", false, "ingredient_id", runtime.ParamLocationQuery, *params.IngredientId); err != nil {
 			return nil, err
 		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 			return nil, err
@@ -1525,7 +1525,7 @@ func NewGetRecipesByIdsRequest(server string, params *GetRecipesByIdsParams) (*h
 
 	queryValues := queryURL.Query()
 
-	if queryFrag, err := runtime.StyleParamWithLocation("form", true, "recipe_id", runtime.ParamLocationQuery, params.RecipeId); err != nil {
+	if queryFrag, err := runtime.StyleParamWithLocation("form", false, "recipe_id", runtime.ParamLocationQuery, params.RecipeId); err != nil {
 		return nil, err
 	} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 		return nil, err

@@ -1,11 +1,12 @@
 import React from "react";
 import { PlusCircle } from "react-feather";
-import { TempFood, useSearchFoods } from "../api/openapi-hooks/api";
 import { Code } from "../components/Code";
 import { ButtonGroup } from "./ui/ButtonGroup";
 import { UnitMappingList } from "./misc/Misc";
 import { useForm } from "react-hook-form";
 import Loading from "./ui/Loading";
+import { useSearchFoods } from "../api/react-query/gourdApiComponents";
+import { TempFood } from "../api/react-query/gourdApiSchemas";
 const FoodSearch: React.FC<{
   name: string;
   highlightId?: number;
@@ -23,7 +24,7 @@ const FoodSearch: React.FC<{
 }) => {
   const { register, watch } = useForm({ defaultValues: { name } });
 
-  const { loading, data: foods } = useSearchFoods({
+  const { isLoading, data: foods } = useSearchFoods({
     queryParams: {
       name: watch("name"),
       limit,
@@ -41,7 +42,7 @@ const FoodSearch: React.FC<{
     unit_mappings: [],
   };
   const results = foods?.foods || [];
-  const reallyLoading = loading && results.length === 0;
+  const reallyLoading = isLoading && results.length === 0;
   const items: TempFood[] = [
     ...(reallyLoading ? Array(5).fill(placeholder) : []),
     ...(addon &&

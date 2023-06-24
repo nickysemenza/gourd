@@ -155,7 +155,7 @@ export class FoodsApi extends runtime.BaseAPI {
         const queryParameters: any = {};
 
         if (requestParameters.fdcId) {
-            queryParameters['fdc_id'] = requestParameters.fdcId;
+            queryParameters['fdc_id'] = requestParameters.fdcId.join(runtime.COLLECTION_FORMATS["csv"]);
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

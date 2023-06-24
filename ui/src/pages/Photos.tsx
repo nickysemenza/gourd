@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import Debug from "../components/ui/Debug";
-import { Photo, useListPhotos } from "../api/openapi-hooks/api";
+import { useListPhotos } from "../api/react-query/gourdApiComponents";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/ui/PaginatedTable";
 import ProgressiveImage from "../components/ui/ProgressiveImage";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Photo } from "../api/react-query/gourdApiSchemas";
 
 const Photos: React.FC = () => {
   const initialParams: PaginationParameters = {
@@ -20,7 +21,11 @@ const Photos: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error, loading } = useListPhotos({
+  const {
+    data,
+    error,
+    isLoading: loading,
+  } = useListPhotos({
     queryParams: params,
   });
 

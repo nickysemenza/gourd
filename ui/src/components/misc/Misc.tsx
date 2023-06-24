@@ -5,7 +5,10 @@ import {
   UnitConversionRequest,
   UnitConversionRequestTargetEnum,
 } from "../../api/openapi-fetch";
-import { RecipeDetail, UnitMapping } from "../../api/openapi-hooks/api";
+import {
+  RecipeDetail,
+  UnitMapping,
+} from "../../api/react-query/gourdApiSchemas";
 import { scaledRound } from "../../util/util";
 import { WasmContext } from "../../util/wasmContext";
 import { cn } from "../ui/lib";

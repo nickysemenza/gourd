@@ -19,15 +19,9 @@ import Playground from "./pages/Playground";
 import RecipeDiff from "./pages/recipe/RecipeDiff";
 import Search from "./pages/Search";
 
-import { RestfulProvider } from "restful-react";
 import Photos from "./pages/Photos";
 import Meals from "./pages/Meals";
-import {
-  getAPIURL,
-  onAPIRequest,
-  onAPIError,
-  getTracingURL,
-} from "./util/config";
+import { getTracingURL } from "./util/config";
 import { CookiesProvider } from "react-cookie";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
@@ -39,6 +33,8 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import { isLoggedIn } from "./auth/auth";
 import { registerTracing } from "./util/tracing";
 import ErrorPage from "./components/ui/ErrorPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 registerTracing(getTracingURL(), true);
 
@@ -54,20 +50,18 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
     />
   );
 };
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <CookiesProvider>
-      {/* @ts-ignore */}
-      <RestfulProvider
-        base={getAPIURL()}
-        onRequest={onAPIRequest}
-        onError={onAPIError}
-      >
+      <QueryClientProvider client={queryClient}>
         <WasmContextProvider>
           <Helmet>
             <title>gourd</title>
           </Helmet>
+          <ReactQueryDevtools initialIsOpen={false} />
+
           <ToastContainer position="bottom-right" />
           <Router>
             <NavBar />
@@ -118,9 +112,9 @@ function App() {
             </div>
           </Router>
         </WasmContextProvider>
+      </QueryClientProvider>
 
-        <hr />
-      </RestfulProvider>
+      <hr />
     </CookiesProvider>
   );
 }

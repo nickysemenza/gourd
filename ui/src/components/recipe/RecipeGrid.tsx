@@ -7,7 +7,7 @@ import {
   Photo,
   RecipeDetail,
   RecipeWrapper,
-} from "../../api/openapi-hooks/api";
+} from "../../api/react-query/gourdApiSchemas";
 import { WasmContext } from "../../util/wasmContext";
 import ProgressiveImage from "../ui/ProgressiveImage";
 import { sumIngredients } from "./RecipeEditorUtils";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Blurhash } from "react-blurhash";
-import { Photo } from "../../api/openapi-hooks/api";
+import { Photo } from "../../api/react-query/gourdApiSchemas";
 
 const ProgressiveImage: React.FC<{
   photo: Photo;

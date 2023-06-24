@@ -230,19 +230,22 @@ func (p *Photos) SyncAlbums(ctx context.Context) error {
 	}
 	for result := range pool.Results {
 		if result.Error != nil {
-			log.Error(result.Error)
+			return result.Error
 		} else {
 			err = p.db.SaveImage(ctx, tx, &result.Value.Image)
 			if err != nil {
 				return err
 			}
-			result.Value.GphotosPhoto.Upsert(ctx, tx, true,
+			err = result.Value.GphotosPhoto.Upsert(ctx, tx, true,
 				[]string{models.GphotosPhotoColumns.ID},
 				boil.Whitelist(
 					models.GphotosPhotoColumns.ImageID,
 					models.GphotosPhotoColumns.LastSeen,
 				), boil.Infer(),
 			)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

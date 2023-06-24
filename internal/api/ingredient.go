@@ -10,6 +10,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/db/models"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -68,7 +69,12 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 
 	listMeta := parsePagination(params.Offset, params.Limit)
 
-	items, count, err := a.IngredientListV2(ctx, listMeta)
+	var mods []qm.QueryMod
+	if params.IngredientId != nil && len(*params.IngredientId) > 0 {
+		qm.Where("ingredients.id = ?", params.IngredientId)
+	}
+
+	items, count, err := a.IngredientListV2(ctx, listMeta, mods...)
 	if err != nil {
 		return handleErr(c, err)
 	}

@@ -897,6 +897,12 @@ type WweiaFoodCategory struct {
 	WweiaFoodCategoryDescription *string `json:"wweiaFoodCategoryDescription,omitempty"`
 }
 
+// Unused defines model for _unused.
+type Unused struct {
+	Compact *CompactRecipe         `json:"_compact,omitempty"`
+	Convert *UnitConversionRequest `json:"_convert,omitempty"`
+}
+
 // LimitParam defines model for limitParam.
 type LimitParam int
 

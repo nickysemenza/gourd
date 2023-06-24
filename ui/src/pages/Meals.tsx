@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import Debug from "../components/ui/Debug";
-import { Photo, useListMeals } from "../api/openapi-hooks/api";
+import { useListMeals } from "../api/react-query/gourdApiComponents";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/ui/PaginatedTable";
@@ -15,6 +15,7 @@ import update from "immutability-helper";
 import queryString from "query-string";
 import { Link } from "react-router-dom";
 import { createColumnHelper } from "@tanstack/react-table";
+import { Photo } from "../api/react-query/gourdApiSchemas";
 const Meals: React.FC = () => {
   const initialParams: PaginationParameters = {
     offset: 0,
@@ -27,7 +28,11 @@ const Meals: React.FC = () => {
     setParams(params);
   }, []);
 
-  const { data, error, loading } = useListMeals({
+  const {
+    data,
+    error,
+    isLoading: loading,
+  } = useListMeals({
     queryParams: params,
   });
 

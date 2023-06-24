@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Debug from "../../components/ui/Debug";
-import { RecipeWrapper, useListRecipes } from "../../api/openapi-hooks/api";
+// import { RecipeWrapper, useListRecipes } from "../../api/react-query/gourdApiComponents";
 import PaginatedTable, {
   PaginationParameters,
 } from "../../components/ui/PaginatedTable";
@@ -19,6 +19,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Pill } from "../../components/ui/Pill";
 import { Button } from "../../components/ui/Button";
 import { Checkbox } from "../../components/ui/Checkbox";
+import { useListRecipes } from "../../api/react-query/gourdApiComponents";
+import { RecipeWrapper } from "../../api/react-query/gourdApiSchemas";
 
 const RecipeList: React.FC = () => {
   const showIds = false;
@@ -37,7 +39,7 @@ const RecipeList: React.FC = () => {
   }, []);
   const navigate = useNavigate();
 
-  const { data, error, loading } = useListRecipes({
+  const { data, error, isLoading } = useListRecipes({
     queryParams: params,
   });
 
@@ -192,7 +194,7 @@ const RecipeList: React.FC = () => {
           columns={columns}
           data={recipes}
           fetchData={fetchData}
-          isLoading={loading}
+          isLoading={isLoading}
           totalCount={data?.meta?.total_count || 0}
           pageCount={data?.meta?.page_count || 1}
           withSelected={(selected) => {

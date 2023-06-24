@@ -73,8 +73,6 @@ func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...Qu
 	defer span.End()
 	filters := []QueryMod{
 		Where("parent_ingredient_id IS NULL"),
-		Limit(pagination.Limit),
-		Offset(pagination.Offset),
 	}
 	ingredients, count, err := countAndQuery[models.IngredientSlice](ctx, a.db.DB(), models.Ingredients, qmWithPagination(ingredientQueryMods, pagination, filters...)...)
 	if err != nil {

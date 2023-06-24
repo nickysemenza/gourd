@@ -9,8 +9,9 @@ module.exports = {
   parserOptions: { ecmaVersion: "latest", sourceType: "module" },
   plugins: ["react-refresh"],
   ignorePatterns: [
-    "src/api/openapi-hooks/**",
+    "src/api//**",
     "src/api/openapi-fetch/**",
+    "src/api/react-query/**",
     "src/wasm/**",
   ],
 
