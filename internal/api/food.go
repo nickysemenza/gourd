@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/common"
-	"github.com/nickysemenza/gourd/internal/db"
+	"github.com/nickysemenza/gourd/internal/db/models"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 	"gopkg.in/guregu/null.v4/zero"
@@ -129,6 +129,9 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 	if err := mapping.Valdiate(); err != nil {
 		return err
 	}
+
+	tx := a.tx(ctx)
+
 	for _, m := range mapping {
 
 		ing, err := a.ingredientByName(ctx, m.Name)
@@ -158,7 +161,7 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 			}
 			childIds = append(childIds, ing.ID)
 		}
-		err = a.DB().MergeIngredients(ctx, ing.ID, childIds)
+		err = a.DB().MergeIngredients(ctx, tx, ing.ID, childIds)
 		if err != nil {
 			return err
 		}
@@ -166,12 +169,12 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 		actualPairs := len(m.UnitMappings)
 		loadedPairs := int64(0)
 		for _, u := range m.UnitMappings {
-			u := db.IngredientUnitMapping{
-				IngredientId: ing.ID,
+			u := models.IngredientUnit{
+				IngredientID: ing.ID,
 				UnitA:        u.A.Unit,
-				AmountA:      u.A.Value,
+				AmountA:      decimalFromFloat(u.A.Value),
 				UnitB:        u.B.Unit,
-				AmountB:      u.B.Value,
+				AmountB:      decimalFromFloat(u.B.Value),
 				Source:       zero.StringFromPtr(u.Source).String,
 			}
 			num, err := a.DB().AddIngredientUnit(ctx, u)
@@ -182,6 +185,9 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 		}
 		log.Printf("loaded %s (%v), fdc: %d=>%s, %d/%d unit pairs", m.Name, strings.Join(m.Aliases, ", "), m.FdcId, ing.ID, loadedPairs, actualPairs)
 
+	}
+	if err := tx.Commit(); err != nil {
+		return err
 	}
 	return nil
 }

@@ -14,10 +14,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-const (
-	ingredientsTable = "ingredients"
-)
-
 // Client is a database client
 type Client struct {
 	db     *sqlx.DB
@@ -35,16 +31,6 @@ type RecipeIngredientDependency struct {
 	IngredientName string `db:"ingredient_name"`
 	IngredientId   string `db:"ingredient_id"`
 	IngredientKind string `db:"ingredient_kind"`
-}
-
-type IngredientUnitMapping struct {
-	Id           int64   `db:"id"`
-	IngredientId string  `db:"ingredient_id"`
-	UnitA        string  `db:"unit_a"`
-	AmountA      float64 `db:"amount_a"`
-	UnitB        string  `db:"unit_b"`
-	AmountB      float64 `db:"amount_b"`
-	Source       string  `db:"source"`
 }
 
 // New creates a new Client.

@@ -92,10 +92,7 @@ func (a *API) convertIngredientToRecipe(ctx context.Context, ingredientId string
 	defer span.End()
 	convertedPrefix := "[converted]"
 
-	tx, err := a.db.DB().BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
+	tx := a.tx(ctx)
 
 	i, err := models.FindIngredient(ctx, tx, ingredientId)
 	if err != nil {
@@ -167,9 +164,14 @@ func (a *API) MergeIngredients(c echo.Context, ingredientId string) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 
-	err := a.DB().MergeIngredients(ctx, ingredientId, r.IngredientIds)
+	tx := a.tx(ctx)
+
+	err := a.DB().MergeIngredients(ctx, tx, ingredientId, r.IngredientIds)
 	if err != nil {
 		return handleErr(c, err)
+	}
+	if err = tx.Commit(); err != nil {
+		return err
 	}
 
 	detail, err := a.ingredientById(ctx, IngredientID(ingredientId), true)

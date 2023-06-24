@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ericlagergren/decimal"
 	"github.com/nickysemenza/gourd/internal/clients/notion"
 	"github.com/nickysemenza/gourd/internal/clients/rs_client"
 	"github.com/nickysemenza/gourd/internal/common"
@@ -16,7 +15,6 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"go.mitsakis.org/workerpool"
 )
 
@@ -73,11 +71,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 		RecipeID:  null.StringFrom(r.Id),
 	}
 
-	if nRecipe.Scale != nil {
-		d := decimal.WithContext(types.DecimalContext)
-		d.SetFloat64(*nRecipe.Scale)
-		nr.Scale = types.NewNullDecimal(d)
-	}
+	nr.Scale = nullDecimalFromFloat(nRecipe.Scale)
 	m := db.NotionRecipeMeta{Tags: nRecipe.Tags}
 	err = nr.Meta.Marshal(m)
 	return &nr, err
@@ -168,7 +162,7 @@ func (a *API) syncRecipeFromNotion(ctx context.Context, lookback time.Duration) 
 		}
 	}
 
-	tx := a.db.DB().MustBeginTx(ctx, nil).Tx
+	tx := a.tx(ctx)
 	err = a.db.SaveImage(ctx, tx, summary.images...)
 	if err != nil {
 		return err

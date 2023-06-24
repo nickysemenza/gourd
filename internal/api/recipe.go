@@ -80,10 +80,7 @@ func (a *API) CreateRecipe(ctx context.Context, r *RecipeWrapperInput) (*RecipeW
 	ctx, span := a.tracer.Start(ctx, "CreateRecipe")
 	defer span.End()
 
-	tx, err := a.db.DB().BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
+	tx := a.tx(ctx)
 
 	dbVersion, err := a.insertRecipeWrapper(ctx, tx, r)
 	if err != nil {

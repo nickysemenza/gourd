@@ -2,35 +2,24 @@ package db
 
 import (
 	"context"
-	"fmt"
+	"database/sql"
 
-	sq "github.com/Masterminds/squirrel"
+	"github.com/nickysemenza/gourd/internal/db/models"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/types"
 )
 
 // MergeIngredients sets the provided ingredients `parent` to the first one.
 // TODO: prevent cyclic loop?
-func (c *Client) MergeIngredients(ctx context.Context, ingredientID string, ids []string) error {
+func (c *Client) MergeIngredients(ctx context.Context, tx *sql.Tx, ingredientID string, ids []string) error {
 	ctx, span := c.tracer.Start(ctx, "MergeIngredients")
 	defer span.End()
 
-	tx, err := c.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	if _, err = c.execTx(ctx,
-		tx,
-		c.psql.
-			Update(ingredientsTable).
-			Set("parent_ingredient_id", ingredientID).
-			Where(sq.Eq{"id": ids})); err != nil {
-		return fmt.Errorf("failed to update ingredient: %w", err)
-	}
+	_, err := models.Ingredients(
+		qm.Where("id = any(?)", types.Array(ids))).
+		UpdateAll(ctx, tx, models.M{models.IngredientColumns.ParentIngredientID: ingredientID})
 
-	if err = tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 func (c *Client) RecipeIngredientDependencies(ctx context.Context) ([]RecipeIngredientDependency, error) {
 	res := []RecipeIngredientDependency{}

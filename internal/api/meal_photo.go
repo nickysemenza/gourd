@@ -177,11 +177,8 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 	}
 	switch r.Action {
 	case MealRecipeUpdateActionAdd:
-		tx, err := a.db.DB().BeginTx(ctx, nil)
-		if err != nil {
-			return handleErr(c, err)
-		}
-		err = a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, &r.Multiplier, tx)
+		tx := a.tx(ctx)
+		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, &r.Multiplier, tx)
 		if err != nil {
 			return handleErr(c, err)
 		}

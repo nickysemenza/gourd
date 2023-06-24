@@ -6,6 +6,7 @@ package api
 
 import (
 	"context"
+	"database/sql"
 	"net/http"
 	"strconv"
 	"time"
@@ -183,4 +184,12 @@ func (a *API) GetConfig(c echo.Context) error {
 		GoogleScopes:   "profile email https://www.googleapis.com/auth/photoslibrary.readonly",
 	}
 	return c.JSON(http.StatusOK, res)
+}
+
+func (a *API) tx(ctx context.Context) *sql.Tx {
+	tx, err := a.db.DB().BeginTx(ctx, nil)
+	if err != nil {
+		panic("failed to start tx: " + err.Error())
+	}
+	return tx
 }
