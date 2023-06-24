@@ -177,7 +177,7 @@ func init() {
 				var sb strings.Builder
 
 				for _, r := range *resp.JSON200.Recipes {
-					sb.WriteString(fmt.Sprintf("# %s \n `v%d` (%s)\n", r.Detail.Name, r.Detail.Version, r.Detail.Id))
+					sb.WriteString(fmt.Sprintf("# %s \n `v%d` (%s)\n", r.Detail.Name, r.Detail.Meta.Version, r.Detail.Id))
 				}
 				res, err := makeRenderer().Render(sb.String())
 				if err != nil {

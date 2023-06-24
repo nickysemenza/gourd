@@ -64,10 +64,8 @@ const toInput = (r: RecipeWrapper): RecipeWrapperInput => {
     id: r.id,
     detail: {
       name: r.detail.name,
-      quantity: r.detail.quantity,
-      unit: r.detail.unit,
+      serving_info: r.detail.serving_info,
       sources: r.detail.sources,
-      servings: r.detail.servings,
       tags: r.detail.tags,
       sections: r.detail.sections.map((s) => {
         const instructions: Array<SectionInstructionInput> = s.instructions.map(
@@ -234,7 +232,7 @@ const RecipeDetail: React.FC = () => {
   if (!recipe || !w) return null;
 
   const { detail } = recipe;
-  const { quantity, unit } = detail;
+  const { quantity, unit } = detail.serving_info;
 
   const updateIngredient = ({
     sectionID,
@@ -347,7 +345,7 @@ const RecipeDetail: React.FC = () => {
   } = countTotals(recipe.detail.sections, w, ing_hints);
 
   const newerVersion = recipe.other_versions
-    ?.filter((r) => r.is_latest_version)
+    ?.filter((r) => r.meta.is_latest_version)
     .pop();
 
   const latexURL = `${getAPIURL()}/recipes/${recipe.detail.id}/latex`;
@@ -368,18 +366,19 @@ const RecipeDetail: React.FC = () => {
             ) : (
               <div className="text-gray-900 flex">
                 <h2 className="text-2xl font-bold leading-7 ">{detail.name}</h2>
-                {!!detail.version && (
+                {!!detail.meta.version && (
                   <h4 className="text-small self-end pl-1">
-                    version {detail.version}
+                    version {detail.meta.version}
                   </h4>
                 )}
               </div>
             )}
 
             <div className="flex flex-col">
-              {detail.unit !== "" && (
+              {detail.serving_info.unit !== "" && (
                 <div className="text-sm text-gray-600">
-                  Makes {detail.quantity} {detail.unit}
+                  Makes {detail.serving_info.quantity}{" "}
+                  {detail.serving_info.unit}
                 </div>
               )}
               <div className="text-sm">
@@ -475,7 +474,7 @@ const RecipeDetail: React.FC = () => {
               <p>
                 newest version is
                 <RecipeLink recipe={newerVersion} multiplier={multiplier} />,
-                this is version{recipe.detail.version}
+                this is version{recipe.detail.meta.version}
               </p>
             }
           />

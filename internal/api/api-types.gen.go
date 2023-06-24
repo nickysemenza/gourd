@@ -580,32 +580,23 @@ type RecipeDetail struct {
 	// id
 	Id string `json:"id"`
 
-	// whether or not it is the most recent version
-	IsLatestVersion bool `json:"is_latest_version"`
+	// metadata about recipe detail
+	Meta RecipeDetailMeta `json:"meta"`
 
 	// recipe name
 	Name string `json:"name"`
 
-	// serving quantity
-	Quantity int `json:"quantity"`
-
 	// sections of the recipe
 	Sections []RecipeSection `json:"sections"`
 
-	// num servings
-	Servings *int `json:"servings,omitempty"`
+	// recipe servings info
+	ServingInfo RecipeServingInfo `json:"serving_info"`
 
 	// book or websites
 	Sources []RecipeSource `json:"sources"`
 
 	// tags
 	Tags []string `json:"tags"`
-
-	// serving unit
-	Unit string `json:"unit"`
-
-	// version of the recipe
-	Version int `json:"version"`
 }
 
 // A revision of a recipe
@@ -616,23 +607,26 @@ type RecipeDetailInput struct {
 	// recipe name
 	Name string `json:"name"`
 
-	// serving quantity
-	Quantity int `json:"quantity"`
-
 	// sections of the recipe
 	Sections []RecipeSectionInput `json:"sections"`
 
-	// num servings
-	Servings *int `json:"servings,omitempty"`
+	// recipe servings info
+	ServingInfo RecipeServingInfo `json:"serving_info"`
 
 	// book or websites
 	Sources *[]RecipeSource `json:"sources,omitempty"`
 
 	// tags
 	Tags []string `json:"tags"`
+}
 
-	// serving unit
-	Unit string `json:"unit"`
+// metadata about recipe detail
+type RecipeDetailMeta struct {
+	// whether or not it is the most recent version
+	IsLatestVersion bool `json:"is_latest_version"`
+
+	// version of the recipe
+	Version int `json:"version"`
 }
 
 // A step in the recipe
@@ -660,6 +654,18 @@ type RecipeSectionInput struct {
 
 	// x
 	Instructions []SectionInstructionInput `json:"instructions"`
+}
+
+// recipe servings info
+type RecipeServingInfo struct {
+	// serving quantity
+	Quantity int `json:"quantity"`
+
+	// num servings
+	Servings *int `json:"servings,omitempty"`
+
+	// serving unit
+	Unit string `json:"unit"`
 }
 
 // where the recipe came from (i.e. book/website)

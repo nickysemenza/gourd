@@ -13,12 +13,24 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { RecipeDetailMeta } from './RecipeDetailMeta';
+import {
+    RecipeDetailMetaFromJSON,
+    RecipeDetailMetaFromJSONTyped,
+    RecipeDetailMetaToJSON,
+} from './RecipeDetailMeta';
 import type { RecipeSection } from './RecipeSection';
 import {
     RecipeSectionFromJSON,
     RecipeSectionFromJSONTyped,
     RecipeSectionToJSON,
 } from './RecipeSection';
+import type { RecipeServingInfo } from './RecipeServingInfo';
+import {
+    RecipeServingInfoFromJSON,
+    RecipeServingInfoFromJSONTyped,
+    RecipeServingInfoToJSON,
+} from './RecipeServingInfo';
 import type { RecipeSource } from './RecipeSource';
 import {
     RecipeSourceFromJSON,
@@ -57,35 +69,17 @@ export interface RecipeDetail {
      */
     sources: Array<RecipeSource>;
     /**
-     * num servings
-     * @type {number}
+     * 
+     * @type {RecipeServingInfo}
      * @memberof RecipeDetail
      */
-    servings?: number;
+    serving_info: RecipeServingInfo;
     /**
-     * serving quantity
-     * @type {number}
+     * 
+     * @type {RecipeDetailMeta}
      * @memberof RecipeDetail
      */
-    quantity: number;
-    /**
-     * serving unit
-     * @type {string}
-     * @memberof RecipeDetail
-     */
-    unit: string;
-    /**
-     * version of the recipe
-     * @type {number}
-     * @memberof RecipeDetail
-     */
-    version: number;
-    /**
-     * whether or not it is the most recent version
-     * @type {boolean}
-     * @memberof RecipeDetail
-     */
-    is_latest_version: boolean;
+    meta: RecipeDetailMeta;
     /**
      * when the version was created
      * @type {Date}
@@ -109,10 +103,8 @@ export function instanceOfRecipeDetail(value: object): boolean {
     isInstance = isInstance && "sections" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "sources" in value;
-    isInstance = isInstance && "quantity" in value;
-    isInstance = isInstance && "unit" in value;
-    isInstance = isInstance && "version" in value;
-    isInstance = isInstance && "is_latest_version" in value;
+    isInstance = isInstance && "serving_info" in value;
+    isInstance = isInstance && "meta" in value;
     isInstance = isInstance && "created_at" in value;
     isInstance = isInstance && "tags" in value;
 
@@ -133,11 +125,8 @@ export function RecipeDetailFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionFromJSON)),
         'name': json['name'],
         'sources': ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
-        'servings': !exists(json, 'servings') ? undefined : json['servings'],
-        'quantity': json['quantity'],
-        'unit': json['unit'],
-        'version': json['version'],
-        'is_latest_version': json['is_latest_version'],
+        'serving_info': RecipeServingInfoFromJSON(json['serving_info']),
+        'meta': RecipeDetailMetaFromJSON(json['meta']),
         'created_at': (new Date(json['created_at'])),
         'tags': json['tags'],
     };
@@ -156,11 +145,8 @@ export function RecipeDetailToJSON(value?: RecipeDetail | null): any {
         'sections': ((value.sections as Array<any>).map(RecipeSectionToJSON)),
         'name': value.name,
         'sources': ((value.sources as Array<any>).map(RecipeSourceToJSON)),
-        'servings': value.servings,
-        'quantity': value.quantity,
-        'unit': value.unit,
-        'version': value.version,
-        'is_latest_version': value.is_latest_version,
+        'serving_info': RecipeServingInfoToJSON(value.serving_info),
+        'meta': RecipeDetailMetaToJSON(value.meta),
         'created_at': (value.created_at.toISOString()),
         'tags': value.tags,
     };

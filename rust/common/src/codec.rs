@@ -2,7 +2,7 @@ use anyhow::bail;
 use ingredient::{rich_text::Rich, unit::Measure};
 use openapi::models::{
     Amount, CompactRecipe, CompactRecipeSection, RecipeDetail, RecipeDetailInput, RecipeSection,
-    RecipeSectionInput, RecipeSource, SectionIngredient, SectionIngredientInput,
+    RecipeSectionInput, RecipeServingInfo, RecipeSource, SectionIngredient, SectionIngredientInput,
     SectionInstruction, SectionInstructionInput,
 };
 use tracing::trace;
@@ -187,7 +187,12 @@ pub fn expand_recipe(r: CompactRecipe) -> Result<(RecipeDetailInput, Vec<Rich>),
                 }]),
                 None => None,
             },
-            ..RecipeDetailInput::new(sections, r.name, 0, "".to_string(), vec![])
+            ..RecipeDetailInput::new(
+                sections,
+                r.name,
+                RecipeServingInfo::new(0, "".to_string()),
+                vec![],
+            )
         },
         rtt,
     ))
@@ -234,8 +239,7 @@ pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
             .map(|s| section_to_input(&s))
             .collect(),
         r.name,
-        r.quantity,
-        r.unit,
+        *r.serving_info,
         r.tags,
     )
 }
@@ -244,7 +248,8 @@ pub fn recipe_to_input(r: RecipeDetail) -> RecipeDetailInput {
 mod tests {
 
     use openapi::models::{
-        Amount, IngredientKind, RecipeDetail, RecipeSection, SectionIngredient, SectionInstruction,
+        Amount, IngredientKind, RecipeDetail, RecipeDetailMeta, RecipeSection, RecipeServingInfo,
+        SectionIngredient, SectionInstruction,
     };
     use pretty_assertions::assert_eq;
 
@@ -304,10 +309,8 @@ mod tests {
             ],
             "cake".to_string(),
             vec![],
-            0,
-            "".to_string(),
-            0,
-            false,
+            RecipeServingInfo::new(0, "".to_string()),
+            RecipeDetailMeta::new(0, false),
             "".to_string(),
             vec![],
         );

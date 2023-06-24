@@ -14,18 +14,18 @@ import { WasmContext } from "../../util/wasmContext";
 import { cn } from "../ui/lib";
 
 export interface Props {
-  recipe: Pick<RecipeDetail, "id" | "name" | "version" | "is_latest_version">;
+  recipe: Pick<RecipeDetail, "id" | "name" | "meta">;
   multiplier?: number;
 }
 export const RecipeLink: React.FC<Props> = ({
-  recipe: { name, version, is_latest_version, id },
+  recipe: { name, meta, id },
   multiplier,
 }) => (
   <span className="inline-block">
     <Link
       to={`/recipe/${id}?multiplier=${multiplier || 1}`}
       className={`font-bold pr-0.5 underline ${
-        is_latest_version
+        meta.is_latest_version
           ? "decoration-blue-300 text-blue-800"
           : "decoration-red-300 text-purple-400"
       }`}
@@ -33,7 +33,9 @@ export const RecipeLink: React.FC<Props> = ({
       {name}
     </Link>
     {/* -1 is used to signal version is unknown */}
-    {version >= 0 && <div className="inline font-mono text-sm">v{version}</div>}
+    {meta.version >= 0 && (
+      <div className="inline font-mono text-sm">v{meta.version}</div>
+    )}
     {multiplier && (
       <div className="inline font-mono text-sm">@{multiplier}x</div>
     )}

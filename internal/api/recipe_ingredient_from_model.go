@@ -104,17 +104,21 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail,
 	}
 
 	rd := RecipeDetail{
-		CreatedAt:       d.CreatedAt,
-		Id:              d.ID,
-		IsLatestVersion: d.IsLatestVersion.Bool,
-		Name:            d.Name,
-		Quantity:        d.Quantity.Int,
-		Sections:        sections,
-		Servings:        d.Servings.Ptr(),
-		Sources:         []RecipeSource{},
-		Tags:            d.Tags,
-		Unit:            d.Unit.String,
-		Version:         d.Version,
+		CreatedAt: d.CreatedAt,
+		Id:        d.ID,
+		Meta: RecipeDetailMeta{
+			IsLatestVersion: d.IsLatestVersion.Bool,
+			Version:         d.Version,
+		},
+		Name: d.Name,
+		ServingInfo: RecipeServingInfo{
+			Quantity: d.Quantity.Int,
+			Servings: d.Servings.Ptr(),
+			Unit:     d.Unit.String,
+		},
+		Sections: sections,
+		Sources:  []RecipeSource{},
+		Tags:     d.Tags,
 	}
 	if rd.Tags == nil {
 		rd.Tags = []string{}
@@ -147,7 +151,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe, withIn
 		if err != nil {
 			return nil, err
 		}
-		if rd.IsLatestVersion {
+		if rd.Meta.IsLatestVersion {
 			rw.Detail = *rd
 			if d.DeletedAt.Valid {
 				return nil, nil

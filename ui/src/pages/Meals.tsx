@@ -113,10 +113,14 @@ const Meals: React.FC = () => {
                       name: a.label,
                       sections: [],
                       tags: [],
-                      quantity: 1,
-                      unit: "",
-                      version: 0,
-                      is_latest_version: false,
+                      serving_info: {
+                        quantity: 1,
+                        unit: "",
+                      },
+                      meta: {
+                        version: 0,
+                        is_latest_version: false,
+                      },
                       created_at: "",
                       sources: [],
                     })

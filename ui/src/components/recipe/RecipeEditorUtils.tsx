@@ -57,13 +57,17 @@ export const updateIngredientInfo = (
                     ? {
                         id,
                         name,
-                        quantity: 0,
-                        unit: "",
+                        serving_info: {
+                          quantity: 0,
+                          unit: "",
+                        },
                         sections: [],
                         sources: [],
                         tags: [],
-                        version: 0,
-                        is_latest_version: false,
+                        meta: {
+                          version: 0,
+                          is_latest_version: false,
+                        },
                         created_at: "",
                       }
                     : undefined,
@@ -371,7 +375,7 @@ export const flatIngredients = (
           ingredient,
           ...flatIngredients(
             // recurse to the recipes as long as they are the latest version?
-            (ingredient.recipe?.is_latest_version &&
+            (ingredient.recipe?.meta.is_latest_version &&
               ingredient.recipe?.sections) ||
               []
           ),
@@ -561,10 +565,7 @@ export const getHint = (
 ): IngredientDetail | undefined =>
   ing_hints[extractIngredientID(ingredient) || ""] || undefined;
 
-export const extractIngredientID = (
-  ingredient?: SectionIngredient,
-  includeRecipe = false
-) => {
+export const extractIngredientID = (ingredient?: SectionIngredient) => {
   if (ingredient === undefined) {
     return undefined;
   }

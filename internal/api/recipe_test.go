@@ -59,7 +59,7 @@ func TestInsertGet(t *testing.T) {
 	r := RecipeDetailInput{
 		Name: rw.Detail.Name,
 	}
-	r.Unit = "items"
+	r.ServingInfo.Unit = "items"
 	r.Sections = []RecipeSectionInput{{
 		Duration:     &Amount{Value: 7, UpperValue: null.Float64From(20).Ptr()},
 		Instructions: []SectionInstructionInput{{Instruction: "add flour"}},
@@ -91,7 +91,7 @@ func TestInsertGet(t *testing.T) {
 	r2w, err := apiManager.recipeById(ctx, dbVersion.Detail.Id)
 	require.NoError(err)
 	r2 := r2w.Detail
-	require.EqualValues("items", r2.Unit)
+	require.EqualValues("items", r2.ServingInfo.Unit)
 	require.EqualValues("add flour", r2.Sections[0].Instructions[0].Instruction)
 	require.EqualValues(.7, r2.Sections[1].Ingredients[1].Amounts[1].Value)
 

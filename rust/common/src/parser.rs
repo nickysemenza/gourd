@@ -113,8 +113,8 @@ mod tests {
     use std::collections::HashMap;
 
     use openapi::models::{
-        Amount, Ingredient, IngredientDetail, IngredientKind, RecipeDetail, RecipeSection,
-        SectionIngredient, SectionIngredientInput,
+        Amount, Ingredient, IngredientDetail, IngredientKind, RecipeDetail, RecipeDetailMeta,
+        RecipeSection, RecipeServingInfo, SectionIngredient, SectionIngredientInput,
     };
     use pretty_assertions::assert_eq;
 
@@ -220,10 +220,8 @@ mod tests {
             )],
             "".to_string(),
             vec![],
-            0,
-            "".to_string(),
-            0,
-            false,
+            RecipeServingInfo::new(0, "".to_string()),
+            RecipeDetailMeta::new(0, false),
             "".to_string(),
             vec![],
         );

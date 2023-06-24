@@ -276,7 +276,7 @@ func (a *API) insertRecipeWrapper(ctx context.Context, tx *sql.Tx, wrapperIsThis
 
 	if modifying != nil {
 		// todo: make sure above 2 only return latest version
-		version = modifying.Detail.Version + 1
+		version = modifying.Detail.Meta.Version + 1
 
 		if len(insert.Sections) == 0 {
 			l(ctx).Infof("no sections, modifying, so just returning")
@@ -291,10 +291,10 @@ func (a *API) insertRecipeWrapper(ctx context.Context, tx *sql.Tx, wrapperIsThis
 		ID:              common.ID("rd"),
 		IsLatestVersion: null.BoolFrom(true),
 		Name:            insert.Name,
-		Quantity:        null.IntFrom(insert.Quantity),
-		Servings:        null.IntFromPtr(insert.Servings),
+		Quantity:        null.IntFrom(insert.ServingInfo.Quantity),
+		Servings:        null.IntFromPtr(insert.ServingInfo.Servings),
 		Tags:            insert.Tags,
-		Unit:            null.StringFrom(insert.Unit),
+		Unit:            null.StringFrom(insert.ServingInfo.Unit),
 		Version:         version,
 	}
 	if insert.Sources != nil {

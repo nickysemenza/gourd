@@ -19,6 +19,12 @@ import {
     RecipeSectionInputFromJSONTyped,
     RecipeSectionInputToJSON,
 } from './RecipeSectionInput';
+import type { RecipeServingInfo } from './RecipeServingInfo';
+import {
+    RecipeServingInfoFromJSON,
+    RecipeServingInfoFromJSONTyped,
+    RecipeServingInfoToJSON,
+} from './RecipeServingInfo';
 import type { RecipeSource } from './RecipeSource';
 import {
     RecipeSourceFromJSON,
@@ -51,23 +57,11 @@ export interface RecipeDetailInput {
      */
     sources?: Array<RecipeSource>;
     /**
-     * num servings
-     * @type {number}
+     * 
+     * @type {RecipeServingInfo}
      * @memberof RecipeDetailInput
      */
-    servings?: number;
-    /**
-     * serving quantity
-     * @type {number}
-     * @memberof RecipeDetailInput
-     */
-    quantity: number;
-    /**
-     * serving unit
-     * @type {string}
-     * @memberof RecipeDetailInput
-     */
-    unit: string;
+    serving_info: RecipeServingInfo;
     /**
      * when it created / updated
      * @type {Date}
@@ -89,8 +83,7 @@ export function instanceOfRecipeDetailInput(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "sections" in value;
     isInstance = isInstance && "name" in value;
-    isInstance = isInstance && "quantity" in value;
-    isInstance = isInstance && "unit" in value;
+    isInstance = isInstance && "serving_info" in value;
     isInstance = isInstance && "tags" in value;
 
     return isInstance;
@@ -109,9 +102,7 @@ export function RecipeDetailInputFromJSONTyped(json: any, ignoreDiscriminator: b
         'sections': ((json['sections'] as Array<any>).map(RecipeSectionInputFromJSON)),
         'name': json['name'],
         'sources': !exists(json, 'sources') ? undefined : ((json['sources'] as Array<any>).map(RecipeSourceFromJSON)),
-        'servings': !exists(json, 'servings') ? undefined : json['servings'],
-        'quantity': json['quantity'],
-        'unit': json['unit'],
+        'serving_info': RecipeServingInfoFromJSON(json['serving_info']),
         'date': !exists(json, 'date') ? undefined : (new Date(json['date'])),
         'tags': json['tags'],
     };
@@ -129,9 +120,7 @@ export function RecipeDetailInputToJSON(value?: RecipeDetailInput | null): any {
         'sections': ((value.sections as Array<any>).map(RecipeSectionInputToJSON)),
         'name': value.name,
         'sources': value.sources === undefined ? undefined : ((value.sources as Array<any>).map(RecipeSourceToJSON)),
-        'servings': value.servings,
-        'quantity': value.quantity,
-        'unit': value.unit,
+        'serving_info': RecipeServingInfoToJSON(value.serving_info),
         'date': value.date === undefined ? undefined : (value.date.toISOString()),
         'tags': value.tags,
     };

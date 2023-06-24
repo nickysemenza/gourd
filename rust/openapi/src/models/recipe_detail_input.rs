@@ -23,15 +23,8 @@ pub struct RecipeDetailInput {
     /// book or websites
     #[serde(rename = "sources", skip_serializing_if = "Option::is_none")]
     pub sources: Option<Vec<crate::models::RecipeSource>>,
-    /// num servings
-    #[serde(rename = "servings", skip_serializing_if = "Option::is_none")]
-    pub servings: Option<i32>,
-    /// serving quantity
-    #[serde(rename = "quantity")]
-    pub quantity: i32,
-    /// serving unit
-    #[serde(rename = "unit")]
-    pub unit: String,
+    #[serde(rename = "serving_info")]
+    pub serving_info: Box<crate::models::RecipeServingInfo>,
     /// when it created / updated
     #[serde(rename = "date", skip_serializing_if = "Option::is_none")]
     pub date: Option<String>,
@@ -42,14 +35,12 @@ pub struct RecipeDetailInput {
 
 impl RecipeDetailInput {
     /// A revision of a recipe
-    pub fn new(sections: Vec<crate::models::RecipeSectionInput>, name: String, quantity: i32, unit: String, tags: Vec<String>) -> RecipeDetailInput {
+    pub fn new(sections: Vec<crate::models::RecipeSectionInput>, name: String, serving_info: crate::models::RecipeServingInfo, tags: Vec<String>) -> RecipeDetailInput {
         RecipeDetailInput {
             sections,
             name,
             sources: None,
-            servings: None,
-            quantity,
-            unit,
+            serving_info: Box::new(serving_info),
             date: None,
             tags,
         }

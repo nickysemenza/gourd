@@ -70,8 +70,10 @@ models/RecipeDependencies200Response.ts
 models/RecipeDependency.ts
 models/RecipeDetail.ts
 models/RecipeDetailInput.ts
+models/RecipeDetailMeta.ts
 models/RecipeSection.ts
 models/RecipeSectionInput.ts
+models/RecipeServingInfo.ts
 models/RecipeSource.ts
 models/RecipeWrapper.ts
 models/RecipeWrapperInput.ts

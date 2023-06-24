@@ -164,6 +164,20 @@ export type RecipeWrapperInput = {
 };
 
 /**
+ * metadata about recipe detail
+ */
+export type RecipeDetailMeta = {
+  /**
+   * version of the recipe
+   */
+  version: number;
+  /**
+   * whether or not it is the most recent version
+   */
+  is_latest_version: boolean;
+};
+
+/**
  * A revision of a recipe. does not include any "generated" fields. everything directly from db
  */
 export type RecipeDetail = {
@@ -183,26 +197,8 @@ export type RecipeDetail = {
    * book or websites
    */
   sources: RecipeSource[];
-  /**
-   * num servings
-   */
-  servings?: number;
-  /**
-   * serving quantity
-   */
-  quantity: number;
-  /**
-   * serving unit
-   */
-  unit: string;
-  /**
-   * version of the recipe
-   */
-  version: number;
-  /**
-   * whether or not it is the most recent version
-   */
-  is_latest_version: boolean;
+  serving_info: RecipeServingInfo;
+  meta: RecipeDetailMeta;
   /**
    * when the version was created
    *
@@ -231,18 +227,7 @@ export type RecipeDetailInput = {
    * book or websites
    */
   sources?: RecipeSource[];
-  /**
-   * num servings
-   */
-  servings?: number;
-  /**
-   * serving quantity
-   */
-  quantity: number;
-  /**
-   * serving unit
-   */
-  unit: string;
+  serving_info: RecipeServingInfo;
   /**
    * when it created / updated
    *
@@ -356,6 +341,24 @@ export type Amount = {
    * if it was explicit, inferred, etc
    */
   source?: string;
+};
+
+/**
+ * recipe servings info
+ */
+export type RecipeServingInfo = {
+  /**
+   * num servings
+   */
+  servings?: number;
+  /**
+   * serving quantity
+   */
+  quantity: number;
+  /**
+   * serving unit
+   */
+  unit: string;
 };
 
 /**

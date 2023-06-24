@@ -82,7 +82,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   );
   const allSIIDs = recipesIngredients
     .map((sectionIngredients) =>
-      sectionIngredients.map((si) => extractIngredientID(si, true))
+      sectionIngredients.map((si) => extractIngredientID(si))
     )
     .flat()
     .filter(function (item, pos, a) {
@@ -342,8 +342,10 @@ const UsageValueShow: React.FC<{ uv: UsageValue; pos: "start" | "end" }> = ({
                     recipe={{
                       name: r.name,
                       id: r.id,
-                      version: -1,
-                      is_latest_version: true,
+                      meta: {
+                        version: -1,
+                        is_latest_version: true,
+                      },
                     }}
                   />
                 </div>
