@@ -84,6 +84,25 @@ func init() {
 			},
 		},
 		&cobra.Command{
+			Use:   "usda",
+			Short: "usda",
+			RunE: func(cmd *cobra.Command, args []string) error {
+				api.Test()
+				return nil
+				// ctx := cmd.Context()
+				// s, err := makeServer(ctx)
+				// if err != nil {
+				// 	return err
+				// }
+				// id := "rd_4b85d29a"
+				// _, err = s.APIManager.Latex(ctx, id)
+				// if err != nil {
+				// 	return err
+				// }
+				// return nil
+			},
+		},
+		&cobra.Command{
 			Use:   "sync",
 			Short: "Run the server",
 			RunE: func(cmd *cobra.Command, args []string) error {

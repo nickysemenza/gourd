@@ -165,7 +165,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       undefined;
     return (
       <div className="flex flex-col">
-        <Debug data={debugInfo} compact />
+        {/* <Debug data={debugInfo} compact /> */}
         <div className={`ing-table-row`} key={y}>
           <div className="flex space-x-0.5">
             {isSub && (

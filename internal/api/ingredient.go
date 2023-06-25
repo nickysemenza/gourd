@@ -11,6 +11,7 @@ import (
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/types"
 	"go.opentelemetry.io/otel/attribute"
 )
 
@@ -71,7 +72,8 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 
 	var mods []qm.QueryMod
 	if params.IngredientId != nil && len(*params.IngredientId) > 0 {
-		qm.Where("ingredients.id = ?", params.IngredientId)
+		mods = append(mods, qm.Where("ingredients.id = any(?)", types.Array(*params.IngredientId)))
+		// qm.Where("id = any(?)", types.Array(ids))).
 	}
 
 	items, count, err := a.IngredientListV2(ctx, listMeta, mods...)

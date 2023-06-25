@@ -120,23 +120,29 @@ const RecipeDetail: React.FC = () => {
   };
   const tweaks: RecipeTweaks = { override, multiplier, edit };
 
-  const { data: foods } = useGetFoodsByIds({
-    queryParams: {
-      fdc_id: [...getFDCIds(recipe ? recipe.detail.sections : []), 0],
+  const fdc_ids = [...getFDCIds(recipe ? recipe.detail.sections : [])];
+  const { data: foods } = useGetFoodsByIds(
+    {
+      queryParams: {
+        fdc_id: fdc_ids,
+      },
     },
-  });
+    { enabled: fdc_ids.length > 0 }
+  );
 
-  const { data: ingredientDetails } = useListIngredients({
-    queryParams: {
-      ingredient_id: [
-        ...flatIngredients(recipe?.detail.sections || []).map(
-          (i) => extractIngredientID(i) || ""
-        ),
-        "",
-      ],
+  const foo = [
+    ...flatIngredients(recipe?.detail.sections || []).map(
+      (i) => extractIngredientID(i) || ""
+    ),
+  ];
+  const { data: ingredientDetails } = useListIngredients(
+    {
+      queryParams: {
+        ingredient_id: foo,
+      },
     },
-    // lazy: true,
-  });
+    { enabled: foo.length > 0 }
+  );
 
   // on the (usually just first) load, seed multiplier state with the value from the URL
   // once the multipler has been 'touched', stop seeding from the URL,
