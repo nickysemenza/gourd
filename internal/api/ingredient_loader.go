@@ -74,6 +74,7 @@ func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...Qu
 	filters := []QueryMod{
 		Where("parent_ingredient_id IS NULL"),
 	}
+	filters = append(filters, mods...)
 	ingredients, count, err := countAndQuery[models.IngredientSlice](ctx, a.db.DB(), models.Ingredients, qmWithPagination(ingredientQueryMods, pagination, filters...)...)
 	if err != nil {
 		return nil, 0, err

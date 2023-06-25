@@ -44,7 +44,7 @@ const PaginatedTable = <T extends object>({
   const [{ pageIndex, pageSize }, setPagination] =
     React.useState<PaginationState>({
       pageIndex: 0,
-      pageSize: 10,
+      pageSize: 100,
     });
 
   const pagination = React.useMemo(

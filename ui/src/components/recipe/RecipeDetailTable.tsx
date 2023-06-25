@@ -51,6 +51,7 @@ import IngredientPopover from "./IngredientPopover";
 import { PillLabel } from "../ui/Pill";
 import { formatRichText } from "../../util/rich";
 import { formatTimeRange } from "../../util/time";
+import Debug from "../ui/Debug";
 
 export interface UpdateIngredientProps {
   sectionID: number;
@@ -149,6 +150,14 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         ingIndex = i;
       }
     });
+    const debugInfo = {
+      hint,
+      kcal,
+      cents,
+      amounts: ingredient.amounts,
+      food: ingredient.ingredient?.food,
+      mappings: ingredient.ingredient?.unit_mappings,
+    };
     const placeholderGrams =
       (gramIndex >= 0 &&
         ingredient.amounts[gramIndex].source !== "db" &&
@@ -156,6 +165,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       undefined;
     return (
       <div className="flex flex-col">
+        <Debug data={debugInfo} compact />
         <div className={`ing-table-row`} key={y}>
           <div className="flex space-x-0.5">
             {isSub && (

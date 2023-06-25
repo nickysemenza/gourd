@@ -2,8 +2,8 @@ import {
   Ingredient,
   SectionIngredient,
   IngredientKind,
+  RecipeWrapperInput,
 } from "../api/react-query/gourdApiSchemas";
-import { RecipeWrapperInput } from "../api/openapi-fetch/models/RecipeWrapperInput";
 
 export const getIngredient = (si: Partial<SectionIngredient>) => {
   let name = "";

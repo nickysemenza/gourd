@@ -106,3 +106,38 @@ func TestInsertGet(t *testing.T) {
 	// })
 	// require.NoError(err)
 }
+
+func TestUnits(t *testing.T) {
+	_, apiManager := makeHandler(t)
+	ctx := context.Background()
+	ctx = boil.WithDebug(ctx, true)
+	detail1 := MustInsert(ctx, t, apiManager, NewCompact("testabc", []string{
+		"1 tsp foo",
+	}, []string{}))
+
+	require.NoError(t, apiManager.insertIngredientMappings(ctx,
+		[]IngredientMapping{
+			{
+				Name:    "foo",
+				Aliases: []string{"bar"},
+				UnitMappings: []UnitMapping{
+					{
+						A: Amount{Unit: "tsp", Value: 1},
+						B: Amount{Unit: "g", Value: 2},
+					},
+				},
+			},
+		},
+	))
+
+	r2w, err := apiManager.recipeById(ctx, detail1)
+	require.NoError(t, err)
+	require.NotNil(t, r2w)
+
+	require.Len(t, r2w.Detail.Sections, 1)
+	require.Len(t, r2w.Detail.Sections[0].Ingredients, 1)
+	amounts := r2w.Detail.Sections[0].Ingredients[0].Amounts
+	require.Len(t, amounts, 2)
+	require.Contains(t, amounts, Amount{Unit: "g", Value: 0.5, Source: null.StringFrom("calculated").Ptr()})
+	require.Contains(t, amounts, Amount{Unit: "tsp", Value: 1, Source: null.StringFrom("db").Ptr()})
+}

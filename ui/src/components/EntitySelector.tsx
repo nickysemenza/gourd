@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { ActionMeta, GroupBase, SingleValue, StylesConfig } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
@@ -6,6 +7,11 @@ import { getOpenapiFetchConfig } from "../util/config";
 import { IngredientKind } from "./recipe/RecipeEditorUtils";
 import { blankIngredient, blankRecipeWrapperInput } from "../util/util";
 import { Pill } from "./ui/Pill";
+import {
+  fetchCreateIngredients,
+  fetchCreateRecipes,
+  fetchSearch,
+} from "../api/react-query/gourdApiComponents";
 
 type Option = {
   label: string;
@@ -30,10 +36,8 @@ export const EntitySelector: React.FC<{
   showKind = ["ingredient", "recipe"],
   tall = false,
 }) => {
-  const iApi = new IngredientsApi(getOpenapiFetchConfig());
-  const rApi = new RecipesApi(getOpenapiFetchConfig());
   const loadOptions = async (inputValue: string) => {
-    const res = await iApi.search({ name: inputValue });
+    const res = await fetchSearch({ queryParams: { name: inputValue } });
     const recipeOptions: Option[] = (res.recipes || [])
       .filter((r) => r.detail.meta.is_latest_version)
       .map((r) => {
@@ -77,13 +81,13 @@ export const EntitySelector: React.FC<{
         const newEntityId =
           createKind === "recipe"
             ? (
-                await rApi.createRecipes({
-                  recipeWrapperInput: blankRecipeWrapperInput(name),
+                await fetchCreateRecipes({
+                  body: blankRecipeWrapperInput(name),
                 })
               ).detail.id
             : (
-                await iApi.createIngredients({
-                  ingredient: blankIngredient(name),
+                await fetchCreateIngredients({
+                  body: blankIngredient(name),
                 })
               ).id;
 
@@ -106,17 +110,17 @@ export const EntitySelector: React.FC<{
       height: height,
       minHeight: height,
     }),
-    valueContainer: (provided, state) => {
+    valueContainer: (provided, _state) => {
       return { ...provided, height: height, padding: "2px" };
     },
-    dropdownIndicator: (provided, state) => {
+    dropdownIndicator: (provided, _state) => {
       return { ...provided, padding: "2px" };
     },
-    indicatorsContainer: (provided, state) => ({
+    indicatorsContainer: (provided, _state) => ({
       ...provided,
       height: height + "px",
     }),
-    indicatorSeparator: (state) => ({
+    indicatorSeparator: (_state) => ({
       display: "none",
     }),
   };

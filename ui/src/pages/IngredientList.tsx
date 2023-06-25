@@ -94,7 +94,9 @@ const IngredientList: React.FC = () => {
             <div className="w-52">
               <ul className="list-disc list-outside pl-4">
                 {recipes.map((r) => (
-                  <li key={`${original.ingredient.id}@${r.name}@${r.version}`}>
+                  <li
+                    key={`${original.ingredient.id}@${r.name}@${r.meta.version}`}
+                  >
                     <RecipeLink recipe={r} />
                   </li>
                 ))}
@@ -104,7 +106,7 @@ const IngredientList: React.FC = () => {
                     <ul className="list-disc list-outside pl-4">
                       {(r.recipes || []).map((r) => (
                         <li
-                          key={`${original.ingredient.id}@${r.name}@${r.version}`}
+                          key={`${original.ingredient.id}@${r.name}@${r.meta.version}`}
                         >
                           <RecipeLink recipe={r} />
                         </li>
