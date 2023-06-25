@@ -10,12 +10,16 @@ import {
   useGetRecipeById,
   useGetFoodsByIds,
   useListIngredients,
+  fetchCreateRecipes,
 } from "../../api/react-query/gourdApiComponents";
 import {
   RecipeSource,
   SectionIngredient,
-  RecipeWrapper as RecipeWrapper2,
   Amount,
+  RecipeWrapper,
+  RecipeWrapperInput,
+  SectionIngredientInput,
+  SectionInstructionInput,
 } from "../../api/react-query/gourdApiSchemas";
 import { scaledRound } from "../../util/util";
 import {
@@ -41,14 +45,7 @@ import { Edit, Eye, Save, X } from "react-feather";
 import { singular } from "pluralize";
 import Nutrition from "../../components/Nutrition";
 import { WasmContext } from "../../util/wasmContext";
-import {
-  RecipesApi,
-  RecipeWrapperInput,
-  RecipeWrapper,
-  SectionInstructionInput,
-  SectionIngredientInput,
-} from "../../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../../util/config";
+
 import { RecipeLink } from "../../components/misc/Misc";
 import { Alert } from "../../components/ui/Alert";
 import ProgressiveImage from "../../components/ui/ProgressiveImage";
@@ -114,10 +111,7 @@ const RecipeDetail: React.FC = () => {
 
   if (recipe)
     console.log({ recipe, a: toInput(recipe as unknown as RecipeWrapper) });
-  const setRecipe2 = (r: RecipeWrapper2) => {
-    console.log("setRecipe", r);
-    setRecipe(r);
-  };
+
   const tweaks: RecipeTweaks = { override, multiplier, edit };
 
   const fdc_ids = [...getFDCIds(recipe ? recipe.detail.sections : [])];
@@ -191,9 +185,8 @@ const RecipeDetail: React.FC = () => {
   const saveUpdate = async () => {
     if (recipe) {
       console.log({ recipe });
-      const bar = new RecipesApi(getOpenapiFetchConfig());
-      const updated = await bar.createRecipes({
-        recipeWrapperInput: toInput(recipe as unknown as RecipeWrapper),
+      const updated = await fetchCreateRecipes({
+        body: toInput(recipe as unknown as RecipeWrapper),
       });
       // const updated = await post(recipe);
       setEdit(false);
@@ -289,7 +282,7 @@ const RecipeDetail: React.FC = () => {
       },
     };
     if (edit) {
-      setRecipe2(
+      setRecipe(
         update(recipe, {
           detail: {
             sections: {

@@ -1,12 +1,15 @@
 import React, { useContext, useState } from "react";
 import { PlusCircle } from "react-feather";
-import { RecipeDetail, RecipeDetailInput } from "../api/openapi-fetch";
 import { WasmContext } from "../util/wasmContext";
 import { ButtonGroup } from "./ui/ButtonGroup";
+import {
+  RecipeDetail,
+  RecipeDetailInput,
+} from "../api/react-query/gourdApiSchemas";
 
 const InstructionsListParser: React.FC<{
   setDetail: (d: RecipeDetail) => void;
-}> = ({ setDetail }) => {
+}> = () => {
   const w = useContext(WasmContext);
   const [area, setArea] = useState("");
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Helmet } from "react-helmet";
 
 import Test from "./Homepage";

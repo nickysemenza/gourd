@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
 import RecipeDiffView from "../../components/recipe/RecipeDiffView";
 import queryString from "query-string";
-import { EntitySummary, IngredientKind } from "../../api/openapi-fetch";
+import { EntitySummary } from "../../api/react-query/gourdApiSchemas";
 
 const Playground: React.FC = () => {
   const loc = useLocation();
@@ -15,7 +15,7 @@ const Playground: React.FC = () => {
   }, [loc]);
 
   const input: EntitySummary[] = ids.map((id) => {
-    return { id, multiplier: 1, name: "", kind: IngredientKind.RECIPE };
+    return { id, multiplier: 1, name: "", kind: "recipe" };
   });
   return (
     <div>

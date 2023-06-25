@@ -1,9 +1,8 @@
 import { EntitySelector } from "../../components/EntitySelector";
 import { useNavigate } from "react-router-dom";
-import { RecipesApi } from "../../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../../util/config";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../../components/ui/Button";
+import { fetchScrapeRecipe } from "../../api/react-query/gourdApiComponents";
 
 const CreateRecipe: React.FC = () => {
   const history = useNavigate();
@@ -14,9 +13,8 @@ const CreateRecipe: React.FC = () => {
 
   const { register, handleSubmit } = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const bar = new RecipesApi(getOpenapiFetchConfig());
-    const recipe = await bar.scrapeRecipe({
-      scrapeRecipeRequest: { url: data.url },
+    const recipe = await fetchScrapeRecipe({
+      body: { url: data.url },
     });
 
     console.log({ recipe });

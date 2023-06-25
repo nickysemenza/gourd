@@ -1,14 +1,11 @@
 import React, { useEffect } from "react";
-import {
-  EntitySummary,
-  IngredientKind,
-  RecipesApi,
-  SumsResponse,
-  UsageValue,
-} from "../../api/openapi-fetch";
+
 import {
   SectionIngredient,
   RecipeDetail,
+  EntitySummary,
+  SumsResponse,
+  UsageValue,
 } from "../../api/react-query/gourdApiSchemas";
 import {
   flatIngredients,
@@ -22,10 +19,10 @@ import {
 import { EntitySelector } from "../EntitySelector";
 import { RecipeLink } from "../misc/Misc";
 import { scaledRound } from "../../util/util";
-import { getOpenapiFetchConfig } from "../../util/config";
 import { HideShowButton } from "../ui/ButtonGroup";
 import { Pill } from "../ui/Pill";
 import {
+  fetchSumRecipes,
   useGetRecipesByIds,
   useListIngredients,
 } from "../../api/react-query/gourdApiComponents";
@@ -54,13 +51,12 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   useEffect(() => {
     async function fetchMyAPI() {
       setSumsLoading(true);
-      const rAPI = new RecipesApi(getOpenapiFetchConfig());
-      const recipeSumResp = await rAPI.sumRecipes({
-        sumRecipesRequest: {
+      const recipeSumResp = await fetchSumRecipes({
+        body: {
           inputs: entitiesToDiff.map((id) => {
             const foo: EntitySummary = {
               id: id.id,
-              kind: IngredientKind.RECIPE,
+              kind: "recipe",
               multiplier: id.multiplier,
               name: "",
             };

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import Debug from "../components/ui/Debug";
-import { useListMeals } from "../api/react-query/gourdApiComponents";
+import {
+  fetchUpdateRecipesForMeal,
+  useListMeals,
+} from "../api/react-query/gourdApiComponents";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/ui/PaginatedTable";
@@ -9,8 +12,6 @@ import ProgressiveImage from "../components/ui/ProgressiveImage";
 import { RecipeLink } from "../components/misc/Misc";
 import { EntitySelector } from "../components/EntitySelector";
 import { pushMealRecipe } from "../components/recipe/RecipeEditorUtils";
-import { getOpenapiFetchConfig } from "../util/config";
-import { MealRecipeUpdateActionEnum, MealsApi } from "../api/openapi-fetch";
 import update from "immutability-helper";
 import queryString from "query-string";
 import { Link } from "react-router-dom";
@@ -45,7 +46,6 @@ const Meals: React.FC = () => {
   const [checked, setChecked] = useState(new Set<string>());
   const columns = React.useMemo(() => {
     const columnHelper = createColumnHelper<i>();
-    const mApi = new MealsApi(getOpenapiFetchConfig());
     return [
       columnHelper.accessor((row) => row.ate_at, {
         id: "ate_at",
@@ -98,11 +98,13 @@ const Meals: React.FC = () => {
                 placeholder="Pick a Recipe..."
                 onChange={async (a) => {
                   console.log(a, info.row.index);
-                  const res = await mApi.updateRecipesForMeal({
-                    mealId: info.row.original.id,
-                    mealRecipeUpdate: {
+                  const res = await fetchUpdateRecipesForMeal({
+                    pathParams: {
+                      mealId: info.row.original.id,
+                    },
+                    body: {
                       multiplier: 1.0,
-                      action: MealRecipeUpdateActionEnum.ADD,
+                      action: "add",
                       recipe_id: a.value,
                     },
                   });

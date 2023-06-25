@@ -1,11 +1,9 @@
 import React, { useContext } from "react";
-import {
-  UnitConversionRequestTargetEnum,
-  UnitMapping,
-} from "../../api/openapi-fetch";
+
 import {
   IngredientDetail,
   UnitConversionRequest,
+  UnitMapping,
 } from "../../api/react-query/gourdApiSchemas";
 import { wasm, WasmContext, Amount } from "../../util/wasmContext";
 import Debug from "../ui/Debug";
@@ -27,12 +25,7 @@ export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {
     //   input: ing,
     // };
     // result = w.dolla(foo);
-    result = try_convert(
-      w,
-      detail.unit_mappings,
-      ing,
-      UnitConversionRequestTargetEnum.WEIGHT
-    );
+    result = try_convert(w, detail.unit_mappings, ing, "weight");
     console.log("success");
   } catch (e) {
     console.error({ e });
@@ -58,8 +51,7 @@ export const try_convert = (
   w: wasm,
   unit_mappings: UnitMapping[],
   input: Amount[],
-  target: UnitConversionRequestTargetEnum,
-  msg?: string
+  target: UnitConversionRequest["target"]
 ): Amount | undefined => {
   const foo: UnitConversionRequest = {
     target,

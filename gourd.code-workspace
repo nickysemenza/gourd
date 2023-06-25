@@ -75,7 +75,6 @@
       "ui/dist/": true
     },
     "search.exclude": {
-      "**/openapi-fetch/**": true,
       "**/react-query/**": true
     },
     "files.associations": {

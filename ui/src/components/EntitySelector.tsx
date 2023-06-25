@@ -2,8 +2,6 @@
 import React from "react";
 import { ActionMeta, GroupBase, SingleValue, StylesConfig } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
-import { IngredientsApi, RecipesApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../util/config";
 import { IngredientKind } from "./recipe/RecipeEditorUtils";
 import { blankIngredient, blankRecipeWrapperInput } from "../util/util";
 import { Pill } from "./ui/Pill";

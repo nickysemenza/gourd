@@ -80,6 +80,7 @@ export const DragWrapper: React.FC<DragWrapperProps> = ({
   const [{ isDragging }, drag] = useDrag({
     type: TypeSection,
     item: () => ({ id, index }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     collect: (monitor: any) => ({
       isDragging: monitor.isDragging(),
     }),

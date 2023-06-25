@@ -71,16 +71,17 @@ export interface TableProps {
   ing_hints: IngDetailsById;
   showOriginalLine: boolean;
   showKcalDollars: boolean;
+  enableDebug?: boolean;
 }
 const RecipeDetailTable: React.FC<TableProps> = ({
   recipe,
   updateIngredient,
   setRecipe,
   tweaks,
-  hints,
   ing_hints,
   showOriginalLine,
   showKcalDollars,
+  enableDebug,
 }) => {
   const { edit } = tweaks;
   const { sections } = recipe.detail;
@@ -165,7 +166,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
       undefined;
     return (
       <div className="flex flex-col">
-        {/* <Debug data={debugInfo} compact /> */}
+        {enableDebug && <Debug data={debugInfo} compact />}
         <div className={`ing-table-row`} key={y}>
           <div className="flex space-x-0.5">
             {isSub && (

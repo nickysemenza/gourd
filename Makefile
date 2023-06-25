@@ -91,10 +91,6 @@ internal/api/openapi.yaml: tooling/schemas/gourd.yaml tooling/schemas/usda.yaml
 	npx @redocly/openapi-cli bundle tooling/schemas/gourd.yaml --output internal/api/openapi.yaml 
 	
 	# ui hooks 1
-	rm -rf ui/src/api/openapi-fetch
-	npx @openapitools/openapi-generator-cli generate -i internal/api/openapi.yaml \
-		-o ui/src/api/openapi-fetch -g typescript-fetch --config ui/openapi-typescript.yaml
-	# ui hooks 2
 	cd ui && npx openapi-codegen gen gourdApi
 	
 	# rust

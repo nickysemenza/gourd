@@ -1,13 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { PaginatedRecipeWrappers, RecipesApi } from "../api/openapi-fetch";
-import {
-  UnitConversionRequest,
-  UnitConversionRequestTargetEnum,
-} from "../api/openapi-fetch/models/UnitConversionRequest";
-import { getOpenapiFetchConfig } from "../util/config";
 import { WasmContext } from "../util/wasmContext";
-import { getAPIURL } from "../util/urls";
+import { UnitConversionRequest } from "../api/react-query/gourdApiSchemas";
 
 const ParseTest: React.FC = () => {
   const w = useContext(WasmContext);
@@ -20,7 +14,7 @@ const ParseTest: React.FC = () => {
     console.log({ parse4: w.parse4("2 cups (240g) flour, sifted") });
     // ingredients.forEach((i) => {
     const foo: UnitConversionRequest = {
-      target: UnitConversionRequestTargetEnum.MONEY,
+      target: "money",
       unit_mappings: [
         {
           a: {
@@ -37,7 +31,7 @@ const ParseTest: React.FC = () => {
       input: [{ unit: "grams", value: 100 }],
     };
     const foo2: UnitConversionRequest = {
-      target: UnitConversionRequestTargetEnum.WEIGHT,
+      target: "weight",
       unit_mappings: [
         {
           a: {
@@ -68,19 +62,6 @@ const ParseTest: React.FC = () => {
 };
 
 const Playground: React.FC = () => {
-  const url = getAPIURL();
-  const [r2, setR2] = useState<PaginatedRecipeWrappers>();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const bar = new RecipesApi(getOpenapiFetchConfig());
-      const result = await bar.listRecipes({});
-      setR2(result);
-    };
-    fetchData();
-  }, [url]);
-
-  if (!r2 || !r2.recipes) return null;
   return (
     <div className="grid grid-cols-2 gap-4">
       <Helmet>

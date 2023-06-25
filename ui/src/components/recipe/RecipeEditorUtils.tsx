@@ -8,11 +8,10 @@ import {
   RecipeSource,
   RecipeWrapper,
   SectionIngredient,
-  Amount as Amount2,
+  Amount,
 } from "../../api/react-query/gourdApiSchemas";
 import update from "immutability-helper";
 import { wasm } from "../../util/wasmContext";
-import { Amount } from "../../api/openapi-fetch";
 export type Override = {
   sectionID: number;
   ingredientID: number;
@@ -208,7 +207,7 @@ export const setDetail = (recipe: RecipeWrapper, detail: RecipeDetail) =>
 export const updateTimeRange = (
   recipe: RecipeWrapper,
   sectionID: number,
-  value?: Amount2
+  value?: Amount
 ) =>
   value
     ? update(recipe, {

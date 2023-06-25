@@ -6,12 +6,11 @@ import {
   GoogleLoginResponseOffline,
   useGoogleLogin,
 } from "react-google-login";
-import { AuthResp, AuthenticationApi, ConfigData } from "../api/openapi-fetch";
 import { COOKIE_NAME, isLoggedIn, getName } from "./auth";
-import { getOpenapiFetchConfig } from "../util/config";
+import { AuthResp, ConfigData } from "../api/react-query/gourdApiSchemas";
+import { fetchAuthLogin } from "../api/react-query/gourdApiComponents";
 
 const Login: React.FC<{ config: ConfigData }> = ({ config }) => {
-  const api = new AuthenticationApi(getOpenapiFetchConfig());
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_cookies, setCookie] = useCookies([COOKIE_NAME]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,7 +22,7 @@ const Login: React.FC<{ config: ConfigData }> = ({ config }) => {
     console.log({ response });
     const { code } = response;
     if (code !== undefined) {
-      const resp = await api.authLogin({ code });
+      const resp = await fetchAuthLogin({ queryParams: { code } });
       console.log({ resp });
       setCookie(COOKIE_NAME, resp.jwt);
       setAuth(resp);
@@ -31,6 +30,7 @@ const Login: React.FC<{ config: ConfigData }> = ({ config }) => {
       throw new Error("bad auth" + response);
     }
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFailure = async (error: any) => {
     console.log("error", error);
   };

@@ -1,12 +1,10 @@
 import Graphviz from "graphviz-react";
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import {
-  UnitConversionRequest,
-  UnitConversionRequestTargetEnum,
-} from "../../api/openapi-fetch";
+
 import {
   RecipeDetail,
+  UnitConversionRequest,
   UnitMapping,
 } from "../../api/react-query/gourdApiSchemas";
 import { scaledRound } from "../../util/util";
@@ -50,7 +48,7 @@ export const UnitMappingList: React.FC<{
   let dot = "";
   if (unit_mappings.length > 0 && w) {
     const foo: UnitConversionRequest = {
-      target: UnitConversionRequestTargetEnum.MONEY,
+      target: "money",
       unit_mappings,
       input: [{ unit: "grams", value: 100 }],
     };

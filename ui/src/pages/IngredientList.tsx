@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import PaginatedTable, {
   PaginationParameters,
 } from "../components/ui/PaginatedTable";
-import { IngredientsApi } from "../api/openapi-fetch";
-import { getOpenapiFetchConfig } from "../util/config";
 import { toast } from "react-toastify";
 import { ButtonGroup } from "../components/ui/ButtonGroup";
 import { RecipeLink, UnitMappingList } from "../components/misc/Misc";
@@ -13,7 +11,11 @@ import FoodSearch from "../components/FoodSearch";
 import { Link } from "react-router-dom";
 import { createColumnHelper } from "@tanstack/react-table";
 import PageWrapper from "../components/ui/PageWrapper";
-import { useListIngredients } from "../api/react-query/gourdApiComponents";
+import {
+  fetchAssociateFoodWithIngredient,
+  fetchConvertIngredientToRecipe,
+  useListIngredients,
+} from "../api/react-query/gourdApiComponents";
 
 const IngredientList: React.FC = () => {
   const showIDs = false;
@@ -45,17 +47,20 @@ const IngredientList: React.FC = () => {
   const columns = React.useMemo(() => {
     const columnHelper = createColumnHelper<i>();
 
-    const iApi = new IngredientsApi(getOpenapiFetchConfig());
-
     const convertToRecipe = async (id: string) => {
-      const res = await iApi.convertIngredientToRecipe({ ingredientId: id });
+      const res = await fetchConvertIngredientToRecipe({
+        pathParams: { ingredientId: id },
+      });
       toast.success(`created recipe ${res.id} for ${res.name}`);
     };
     const linkFoodToIngredient = async (
       ingredientId: string,
       fdcId: number
     ) => {
-      await iApi.associateFoodWithIngredient({ ingredientId, fdcId });
+      await fetchAssociateFoodWithIngredient({
+        pathParams: { ingredientId },
+        queryParams: { fdc_id: fdcId },
+      });
       toast.success(`linked ${ingredientId} to food ${fdcId}`);
     };
 
