@@ -700,7 +700,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IngredientDetail'
+                $ref: '#/components/schemas/IngredientWrapper'
         default:
           description: unexpected error
           content:
@@ -802,7 +802,7 @@ components:
         recipe:
           $ref: '#/components/schemas/RecipeDetail'
         ingredient:
-          $ref: '#/components/schemas/IngredientDetail'
+          $ref: '#/components/schemas/IngredientWrapper'
         amounts:
           description: the various measures
           type: array
@@ -1068,7 +1068,7 @@ components:
         fdc_id:
           description: FDC id equivalent to this ingredient
           type: integer
-    IngredientDetail:
+    IngredientWrapper:
       description: An Ingredient
       type: object
       required:
@@ -1087,7 +1087,7 @@ components:
           description: Ingredients that are equivalent
           type: array
           items:
-            $ref: '#/components/schemas/IngredientDetail'
+            $ref: '#/components/schemas/IngredientWrapper'
         food:
           $ref: '#/components/schemas/TempFood'
         unit_mappings:
@@ -1301,7 +1301,7 @@ components:
           description: The ingredients
           type: array
           items:
-            $ref: '#/components/schemas/Ingredient'
+            $ref: '#/components/schemas/IngredientWrapper'
         recipes:
           description: The recipes
           type: array
@@ -1382,14 +1382,14 @@ components:
           $ref: '#/components/schemas/Items'
     PaginatedIngredients:
       type: object
-      description: pages of IngredientDetail
+      description: pages of IngredientWrapper
       required:
         - meta
       properties:
         ingredients:
           type: array
           items:
-            $ref: '#/components/schemas/IngredientDetail'
+            $ref: '#/components/schemas/IngredientWrapper'
         meta:
           $ref: '#/components/schemas/Items'
     PaginatedPhotos:

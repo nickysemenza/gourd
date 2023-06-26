@@ -10,6 +10,8 @@
 
 /// RecipeDetail : A revision of a recipe. does not include any \"generated\" fields. everything directly from db
 
+
+
 #[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct RecipeDetail {
     /// id
@@ -38,16 +40,7 @@ pub struct RecipeDetail {
 
 impl RecipeDetail {
     /// A revision of a recipe. does not include any \"generated\" fields. everything directly from db
-    pub fn new(
-        id: String,
-        sections: Vec<crate::models::RecipeSection>,
-        name: String,
-        sources: Vec<crate::models::RecipeSource>,
-        serving_info: crate::models::RecipeServingInfo,
-        meta: crate::models::RecipeDetailMeta,
-        created_at: String,
-        tags: Vec<String>,
-    ) -> RecipeDetail {
+    pub fn new(id: String, sections: Vec<crate::models::RecipeSection>, name: String, sources: Vec<crate::models::RecipeSource>, serving_info: crate::models::RecipeServingInfo, meta: crate::models::RecipeDetailMeta, created_at: String, tags: Vec<String>) -> RecipeDetail {
         RecipeDetail {
             id,
             sections,
@@ -60,3 +53,5 @@ impl RecipeDetail {
         }
     }
 }
+
+

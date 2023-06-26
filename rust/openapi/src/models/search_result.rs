@@ -16,7 +16,7 @@
 pub struct SearchResult {
     /// The ingredients
     #[serde(rename = "ingredients", skip_serializing_if = "Option::is_none")]
-    pub ingredients: Option<Vec<crate::models::Ingredient>>,
+    pub ingredients: Option<Vec<crate::models::IngredientWrapper>>,
     /// The recipes
     #[serde(rename = "recipes", skip_serializing_if = "Option::is_none")]
     pub recipes: Option<Vec<crate::models::RecipeWrapper>>,

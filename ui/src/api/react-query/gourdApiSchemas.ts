@@ -16,7 +16,7 @@ export type SectionIngredient = {
    */
   kind: IngredientKind;
   recipe?: RecipeDetail;
-  ingredient?: IngredientDetail;
+  ingredient?: IngredientWrapper;
   /**
    * the various measures
    */
@@ -265,7 +265,7 @@ export type Ingredient = {
 /**
  * An Ingredient
  */
-export type IngredientDetail = {
+export type IngredientWrapper = {
   ingredient: Ingredient;
   /**
    * Recipes referencing this ingredient
@@ -274,7 +274,7 @@ export type IngredientDetail = {
   /**
    * Ingredients that are equivalent
    */
-  children?: IngredientDetail[];
+  children?: IngredientWrapper[];
   food?: TempFood;
   /**
    * mappings of equivalent units
@@ -487,7 +487,7 @@ export type SearchResult = {
   /**
    * The ingredients
    */
-  ingredients?: Ingredient[];
+  ingredients?: IngredientWrapper[];
   /**
    * The recipes
    */
@@ -556,10 +556,10 @@ export type PaginatedRecipeWrappers = {
 };
 
 /**
- * pages of IngredientDetail
+ * pages of IngredientWrapper
  */
 export type PaginatedIngredients = {
-  ingredients?: IngredientDetail[];
+  ingredients?: IngredientWrapper[];
   meta: Items;
 };
 

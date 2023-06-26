@@ -322,22 +322,6 @@ type Ingredient struct {
 	Parent *string `json:"parent,omitempty"`
 }
 
-// An Ingredient
-type IngredientDetail struct {
-	// Ingredients that are equivalent
-	Children *[]IngredientDetail `json:"children,omitempty"`
-	Food     *TempFood           `json:"food,omitempty"`
-
-	// An Ingredient
-	Ingredient Ingredient `json:"ingredient"`
-
-	// Recipes referencing this ingredient
-	Recipes []RecipeDetail `json:"recipes"`
-
-	// mappings of equivalent units
-	UnitMappings []UnitMapping `json:"unit_mappings"`
-}
-
 // IngredientKind defines model for IngredientKind.
 type IngredientKind string
 
@@ -367,6 +351,22 @@ type IngredientUsage struct {
 
 	// mappings of equivalent units
 	RequiredBy []EntitySummary `json:"required_by"`
+}
+
+// An Ingredient
+type IngredientWrapper struct {
+	// Ingredients that are equivalent
+	Children *[]IngredientWrapper `json:"children,omitempty"`
+	Food     *TempFood            `json:"food,omitempty"`
+
+	// An Ingredient
+	Ingredient Ingredient `json:"ingredient"`
+
+	// Recipes referencing this ingredient
+	Recipes []RecipeDetail `json:"recipes"`
+
+	// mappings of equivalent units
+	UnitMappings []UnitMapping `json:"unit_mappings"`
 }
 
 // applies to Foundation foods. Not all inputFoods will have all fields.
@@ -499,9 +499,9 @@ type PaginatedFoods struct {
 	Meta Items `json:"meta"`
 }
 
-// pages of IngredientDetail
+// pages of IngredientWrapper
 type PaginatedIngredients struct {
-	Ingredients *[]IngredientDetail `json:"ingredients,omitempty"`
+	Ingredients *[]IngredientWrapper `json:"ingredients,omitempty"`
 
 	// A generic list (for pagination use)
 	Meta Items `json:"meta"`
@@ -741,7 +741,7 @@ type SampleFoodItem struct {
 // A search result wrapper, which contains ingredients and recipes
 type SearchResult struct {
 	// The ingredients
-	Ingredients *[]Ingredient `json:"ingredients,omitempty"`
+	Ingredients *[]IngredientWrapper `json:"ingredients,omitempty"`
 
 	// A generic list (for pagination use)
 	Meta *Items `json:"meta,omitempty"`
@@ -762,8 +762,8 @@ type SectionIngredient struct {
 	Id string `json:"id"`
 
 	// An Ingredient
-	Ingredient *IngredientDetail `json:"ingredient,omitempty"`
-	Kind       IngredientKind    `json:"kind"`
+	Ingredient *IngredientWrapper `json:"ingredient,omitempty"`
+	Kind       IngredientKind     `json:"kind"`
 
 	// optional
 	Optional *bool `json:"optional,omitempty"`

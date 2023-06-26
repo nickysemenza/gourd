@@ -51,7 +51,7 @@ func (a *API) ingredientByName(ctx context.Context, name string) (*models.Ingred
 	return ingredient, err
 }
 
-func (a *API) ingredientById(ctx context.Context, ingredientId IngredientID, withDetail bool) (*IngredientDetail, error) {
+func (a *API) ingredientById(ctx context.Context, ingredientId IngredientID, withDetail bool) (*IngredientWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "ingredientByIdV2")
 	defer span.End()
 	ingredient, err := models.Ingredients(
@@ -68,14 +68,16 @@ func (a *API) ingredientById(ctx context.Context, ingredientId IngredientID, wit
 	return rw, err
 }
 
-func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...QueryMod) ([]IngredientDetail, int64, error) {
+func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...QueryMod) ([]IngredientWrapper, int64, error) {
 	ctx, span := a.tracer.Start(ctx, "IngredientListV2")
 	defer span.End()
 	filters := []QueryMod{
 		Where("parent_ingredient_id IS NULL"),
 	}
 	filters = append(filters, mods...)
-	ingredients, count, err := countAndQuery[models.IngredientSlice](ctx, a.db.DB(), models.Ingredients, qmWithPagination(ingredientQueryMods, pagination, filters...)...)
+	ingredients, count, err := countAndQuery[models.IngredientSlice](ctx, a.db.DB(),
+		models.Ingredients,
+		qmWithPagination(ingredientQueryMods, pagination, filters...)...)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -83,7 +85,7 @@ func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...Qu
 	if err != nil {
 		return nil, 0, err
 	}
-	items := []IngredientDetail{}
+	items := []IngredientWrapper{}
 	for _, recipe := range ingredients {
 		rw, err := a.ingredientFromModel(ctx, recipe, true, true, true)
 		if err != nil {

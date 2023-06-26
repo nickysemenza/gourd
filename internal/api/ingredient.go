@@ -43,7 +43,7 @@ func (a *API) IngredientIdByName(ctx context.Context, name string) (string, erro
 	return ing.ID, nil
 }
 
-func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *IngredientDetail) (err error) {
+func (a *API) enhanceWithFDC(ctx context.Context, fdcId int64, detail *IngredientWrapper) (err error) {
 	ctx, span := a.tracer.Start(ctx, "enhanceWithFDC")
 	defer span.End()
 

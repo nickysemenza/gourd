@@ -22,7 +22,7 @@ pub struct SectionIngredient {
     #[serde(rename = "recipe", skip_serializing_if = "Option::is_none")]
     pub recipe: Option<Box<crate::models::RecipeDetail>>,
     #[serde(rename = "ingredient", skip_serializing_if = "Option::is_none")]
-    pub ingredient: Option<Box<crate::models::IngredientDetail>>,
+    pub ingredient: Option<Box<crate::models::IngredientWrapper>>,
     /// the various measures
     #[serde(rename = "amounts")]
     pub amounts: Vec<crate::models::Amount>,

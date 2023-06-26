@@ -24,6 +24,8 @@ services:
     container_name: food-jaeger
     environment:
       - 'COLLECTOR_ZIPKIN_HOST_PORT=:9411'
+    command:
+      - --memory.max-traces=10000
     ports:
       - "5775:5775/udp"
       - "6831:6831/udp"

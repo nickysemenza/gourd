@@ -91,7 +91,7 @@ func TestAPI(t *testing.T) {
 			Detail: RecipeDetail{Name: rName,
 				Sections: []RecipeSection{{Duration: &Amount{Value: 3},
 					Instructions: []SectionInstruction{{Instruction: "mix"}},
-					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &IngredientDetail{Ingredient: newIngredient}, Kind: "ingredient"}},
+					Ingredients:  []SectionIngredient{{Amounts: []Amount{{Unit: "grams", Value: w}}, Ingredient: &IngredientWrapper{Ingredient: newIngredient}, Kind: "ingredient"}},
 				}}},
 		}
 		resultRecipe := makeRecipe(newRecipe)

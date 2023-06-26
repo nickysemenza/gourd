@@ -1417,7 +1417,7 @@ export const fetchGetIngredientById = (
   signal?: AbortSignal
 ) =>
   gourdApiFetch<
-    Schemas.IngredientDetail,
+    Schemas.IngredientWrapper,
     GetIngredientByIdError,
     undefined,
     {},
@@ -1433,11 +1433,11 @@ export const fetchGetIngredientById = (
 /**
  * todo
  */
-export const useGetIngredientById = <TData = Schemas.IngredientDetail>(
+export const useGetIngredientById = <TData = Schemas.IngredientWrapper>(
   variables: GetIngredientByIdVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
-      Schemas.IngredientDetail,
+      Schemas.IngredientWrapper,
       GetIngredientByIdError,
       TData
     >,
@@ -1447,7 +1447,7 @@ export const useGetIngredientById = <TData = Schemas.IngredientDetail>(
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<
-    Schemas.IngredientDetail,
+    Schemas.IngredientWrapper,
     GetIngredientByIdError,
     TData
   >(

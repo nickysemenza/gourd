@@ -1,5 +1,11 @@
 @tailwind base;
 
+@layer base {
+  html {
+    @apply text-black dark:text-gray-200;
+  }
+}
+
 @tailwind components;
 
 @tailwind utilities;

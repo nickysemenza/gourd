@@ -24,7 +24,7 @@ import { CookiesProvider } from "react-cookie";
 import Albums from "./pages/Albums";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import IngredientDetail from "./pages/IngredientDetail";
+import IngredientInfo from "./pages/IngredientInfo";
 import { WasmContextProvider } from "./util/wasmContext";
 import Graph from "./pages/Graph";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
@@ -34,6 +34,7 @@ import ErrorPage from "./components/ui/ErrorPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { getTracingURL } from "./util/urls";
+import { Dialog } from "./components/SearchPopover";
 
 registerTracing(getTracingURL(), true);
 
@@ -66,14 +67,12 @@ function App() {
             <NavBar />
             <div className="lg:container lg:mx-auto">
               <ErrorBoundary>
+                <Dialog />
                 <Routes>
                   <Route index element={<Test />} />
                   <Route path="recipe/:id" element={<RecipeDetail />} />
                   <Route path="recipes" element={<RecipeList />} />
-                  <Route
-                    path="ingredients/:id"
-                    element={<IngredientDetail />}
-                  />
+                  <Route path="ingredients/:id" element={<IngredientInfo />} />
                   <Route path="ingredients" element={<IngredientList />} />
                   <Route path="create" element={<CreateRecipe />} />
                   <Route path="food" element={<Food />} />

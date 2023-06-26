@@ -9,7 +9,7 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingredient, withDetail, recurseIngredients, recurseRecipes bool) (*IngredientDetail, error) {
+func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingredient, withDetail, recurseIngredients, recurseRecipes bool) (*IngredientWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "ingredientFromModel")
 	defer span.End()
 	if ingredient == nil {
@@ -17,7 +17,7 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 		return nil, nil
 	}
 	span.SetAttributes(attribute.String("ingredient-name", ingredient.Name))
-	detail := &IngredientDetail{
+	detail := &IngredientWrapper{
 		Ingredient: Ingredient{
 			Id:     ingredient.ID,
 			Name:   ingredient.Name,
@@ -30,7 +30,7 @@ func (a *API) ingredientFromModel(ctx context.Context, ingredient *models.Ingred
 
 	l(ctx).Infof("ingredientFromModel %s %s: recurseRecipes=%v recurseRecipes=%v", ingredient.Name, ingredient.ID, recurseIngredients, recurseRecipes)
 
-	var children []IngredientDetail
+	var children []IngredientWrapper
 	if recurseIngredients {
 		for _, x := range ingredient.R.ParentIngredientIngredients {
 			l(ctx).Infof("checking child ingredient %s", x.ID)

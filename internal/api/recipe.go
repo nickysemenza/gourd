@@ -327,6 +327,7 @@ func (a *API) insertRecipeWrapper(ctx context.Context, tx *sql.Tx, wrapperIsThis
 			return nil, err
 		}
 		currentMostRecent.IsLatestVersion = null.BoolFrom(false)
+
 		touched, err := currentMostRecent.Update(ctx, tx, boil.Whitelist(models.RecipeDetailColumns.IsLatestVersion))
 		if err != nil {
 			return nil, err

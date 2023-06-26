@@ -9,7 +9,7 @@ import Debug from "../components/ui/Debug";
 import FoodSearch from "../components/FoodSearch";
 import { UnitConvertDemo } from "../components/misc/UnitConvertDemo";
 
-const IngredientDetail: React.FC = () => {
+const IngredientInfo: React.FC = () => {
   const { id } = useParams() as { id?: string };
 
   const { isLoading: loading, data } = useGetIngredientById({
@@ -55,4 +55,4 @@ const IngredientDetail: React.FC = () => {
     </div>
   );
 };
-export default IngredientDetail;
+export default IngredientInfo;

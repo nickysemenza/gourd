@@ -44,7 +44,7 @@ const NavBar: React.FC = () => {
                         className={classNames(
                           location.pathname.includes(item.path)
                             ? "bg-gray-500 text-white"
-                            : "text-gray-700 hover:bg-gray-300 hover:text-white",
+                            : "text-gray-700 hover:bg-gray-300 hover:text-white dark:text-gray-500",
                           "rounded-md px-3 py-2 text-sm font-medium"
                         )}
                       >

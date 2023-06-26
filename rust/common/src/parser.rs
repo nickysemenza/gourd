@@ -113,7 +113,7 @@ mod tests {
     use std::collections::HashMap;
 
     use openapi::models::{
-        Amount, Ingredient, IngredientDetail, IngredientKind, RecipeDetail, RecipeDetailMeta,
+        Amount, Ingredient, IngredientKind, IngredientWrapper, RecipeDetail, RecipeDetailMeta,
         RecipeSection, RecipeServingInfo, SectionIngredient, SectionIngredientInput,
     };
     use pretty_assertions::assert_eq;
@@ -176,7 +176,7 @@ mod tests {
     #[test]
     fn test_sum_ingredients() {
         let si_1 = SectionIngredient {
-            ingredient: Some(Box::new(IngredientDetail::new(
+            ingredient: Some(Box::new(IngredientWrapper::new(
                 Ingredient::new("a".to_string(), "foo".to_string()),
                 vec![],
                 vec![],
@@ -188,7 +188,7 @@ mod tests {
             )
         };
         let si_2 = SectionIngredient {
-            ingredient: Some(Box::new(IngredientDetail::new(
+            ingredient: Some(Box::new(IngredientWrapper::new(
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],
@@ -200,7 +200,7 @@ mod tests {
             )
         };
         let si_3 = SectionIngredient {
-            ingredient: Some(Box::new(IngredientDetail::new(
+            ingredient: Some(Box::new(IngredientWrapper::new(
                 Ingredient::new("b".to_string(), "bar".to_string()),
                 vec![],
                 vec![],

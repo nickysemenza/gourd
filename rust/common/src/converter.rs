@@ -1,7 +1,7 @@
 use std::collections::{hash_map::Entry, HashMap};
 
 use openapi::models::{
-    unit_conversion_request::Target, Amount, Ingredient, IngredientDetail, IngredientKind,
+    unit_conversion_request::Target, Amount, Ingredient, IngredientKind, IngredientWrapper,
     RecipeDetail, SectionIngredient, SectionIngredientInput, UnitConversionRequest,
 };
 
@@ -76,8 +76,8 @@ pub fn si_to_ingredient(s: SectionIngredientInput) -> ingredient::Ingredient {
     }
 }
 #[allow(dead_code)]
-pub fn bare_detail(name: String) -> IngredientDetail {
-    IngredientDetail::new(Ingredient::new("".to_string(), name), vec![], vec![])
+pub fn bare_detail(name: String) -> IngredientWrapper {
+    IngredientWrapper::new(Ingredient::new("".to_string(), name), vec![], vec![])
 }
 
 pub fn sum_ingredients(

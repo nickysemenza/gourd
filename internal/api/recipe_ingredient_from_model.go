@@ -11,7 +11,7 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *models.RecipeSectionIngredient, withIngredientDetail bool) (*SectionIngredient, error) {
+func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *models.RecipeSectionIngredient, withIngredientWrapper bool) (*SectionIngredient, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeSectionIngredientFromModel")
 	defer span.End()
 	si := SectionIngredient{
@@ -40,7 +40,7 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	switch {
 	case ingredient.RecipeID.Valid:
 		si.Kind = IngredientKindRecipe
-		foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe, withIngredientDetail)
+		foo, err := a.recipeFromModel(ctx, ingredient.R.Recipe, withIngredientWrapper)
 		if err != nil {
 			return nil, err
 		}
@@ -48,11 +48,11 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	case ingredient.IngredientID.Valid:
 		si.Kind = IngredientKindIngredient
 		var err error
-		si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, withIngredientDetail, true, false)
+		si.Ingredient, err = a.ingredientFromModel(ctx, ingredient.R.Ingredient, withIngredientWrapper, true, false)
 		if err != nil {
 			return nil, err
 		}
-		if withIngredientDetail {
+		if withIngredientWrapper {
 			if err := a.enhanceMulti(ctx, &si); err != nil {
 				return nil, err
 			}
@@ -64,7 +64,7 @@ func (a *API) recipeSectionIngredientFromModel(ctx context.Context, ingredient *
 	return &si, nil
 
 }
-func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail, withIngredientDetail bool) (*RecipeDetail, error) {
+func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail, withIngredientWrapper bool) (*RecipeDetail, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeDetailFromModel")
 	defer span.End()
 
@@ -93,7 +93,7 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail,
 		for x, ingredient := range section.R.SectionRecipeSectionIngredients {
 			l(ctx).Debugf("ingredient: %s (%d of %d)", ingredient.ID, x, len(section.R.SectionRecipeSectionIngredients))
 
-			si, err := a.recipeSectionIngredientFromModel(ctx, ingredient, withIngredientDetail)
+			si, err := a.recipeSectionIngredientFromModel(ctx, ingredient, withIngredientWrapper)
 			if err != nil {
 				return nil, err
 			}
@@ -131,7 +131,7 @@ func (a *API) recipeDetailFromModel(ctx context.Context, d *models.RecipeDetail,
 	return &rd, nil
 
 }
-func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe, withIngredientDetail bool) (*RecipeWrapper, error) {
+func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe, withIngredientWrapper bool) (*RecipeWrapper, error) {
 	ctx, span := a.tracer.Start(ctx, "recipeFromModel")
 	defer span.End()
 
@@ -147,7 +147,7 @@ func (a *API) recipeFromModel(ctx context.Context, recipe *models.Recipe, withIn
 	}
 	other := []RecipeDetail{}
 	for _, d := range recipe.R.RecipeDetails {
-		rd, err := a.recipeDetailFromModel(ctx, d, withIngredientDetail)
+		rd, err := a.recipeDetailFromModel(ctx, d, withIngredientWrapper)
 		if err != nil {
 			return nil, err
 		}

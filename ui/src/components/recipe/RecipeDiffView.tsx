@@ -110,7 +110,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
   });
 
   const ingIds = [...Object.keys(sectionIngredientByID)];
-  const { data: ingredientDetails } = useListIngredients({
+  const { data: IngredientWrappers } = useListIngredients({
     queryParams: {
       ingredient_id: ingIds,
       limit: ingIds.length || 0,
@@ -119,7 +119,7 @@ const RecipeDiffView: React.FC<{ entitiesToDiff: EntitySummary[] }> = ({
 
   const ing_hints: IngDetailsById = Object.assign(
     {},
-    ...(ingredientDetails?.ingredients || []).map((s) => ({
+    ...(IngredientWrappers?.ingredients || []).map((s) => ({
       [s.ingredient.id]: s,
     }))
   );

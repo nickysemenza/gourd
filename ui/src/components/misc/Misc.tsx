@@ -24,7 +24,7 @@ export const RecipeLink: React.FC<Props> = ({
       to={`/recipe/${id}?multiplier=${multiplier || 1}`}
       className={`font-bold pr-0.5 underline ${
         meta.is_latest_version
-          ? "decoration-blue-300 text-blue-800"
+          ? "decoration-blue-300 text-blue-800 dark:text-blue-400"
           : "decoration-red-300 text-purple-400"
       }`}
     >

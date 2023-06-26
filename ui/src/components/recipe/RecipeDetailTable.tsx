@@ -208,7 +208,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
             {showBP && (
               <div
                 className={`${
-                  bp > 0 ? "text-gray-600" : "text-red-300"
+                  bp > 0 ? "text-gray-600 dark:text-gray-300" : "text-red-300"
                 } italic`}
               >
                 ({bp}%)
@@ -350,9 +350,11 @@ const RecipeDetailTable: React.FC<TableProps> = ({
         </div>
         {showOriginalLine && ingredient.original && (
           <div className="italic text-xs inline-flex">
-            <div className="text-slate-700 mr-1">{ingredient.original}</div>
+            <div className="text-slate-700 dark:text-gray-100 mr-1">
+              {ingredient.original}
+            </div>
             <ArrowRight className="pb-2" width={10} />
-            <div className="text-green-800">
+            <div className="text-green-800 dark:text-green-200">
               {w && w.parse(ingredient.original)}
             </div>
           </div>
@@ -447,7 +449,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
                     w.rich(instruction.instruction, allIngredients)
                   )}
               </div>
-              <div className={w && "text-gray-500"}>
+              <div className={w && "text-gray-500 dark:text-gray-100"}>
                 {!w || (showOriginalLine && instruction.instruction)}
               </div>
             </div>
@@ -495,7 +497,7 @@ const RecipeDetailTable: React.FC<TableProps> = ({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="border-gray-100 shadow-xl bg-white dark:bg-gray-700">
+      <div className="border-gray-100 shadow-xl bg-white dark:bg-slate-700">
         <TableRow header>
           <TableCell></TableCell>
           <TableCell>

@@ -2166,7 +2166,7 @@ func (r CreateIngredientsResponse) StatusCode() int {
 type GetIngredientByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *IngredientDetail
+	JSON200      *IngredientWrapper
 	JSONDefault  *Error
 }
 
@@ -3177,7 +3177,7 @@ func ParseGetIngredientByIdResponse(rsp *http.Response) (*GetIngredientByIdRespo
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest IngredientDetail
+		var dest IngredientWrapper
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}

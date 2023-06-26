@@ -1,12 +1,12 @@
 import { Popover, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { AlertCircle } from "react-feather";
-import { IngredientDetail } from "../../api/react-query/gourdApiSchemas";
+import { IngredientWrapper } from "../../api/react-query/gourdApiSchemas";
 import Debug from "../ui/Debug";
 import { FoodRow } from "../FoodSearch";
 import { UnitMappingList } from "../misc/Misc";
 
-const IngredientPopover: React.FC<{ detail: IngredientDetail }> = ({
+const IngredientPopover: React.FC<{ detail: IngredientWrapper }> = ({
   detail,
 }) => {
   const { ingredient, food, unit_mappings } = detail;

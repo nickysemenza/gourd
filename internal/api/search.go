@@ -29,10 +29,10 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	// todo: use this
 	listMeta.setTotalCount(+uint64(recipesCount + ingredientsCount))
 
-	var resIngredients []Ingredient
+	var resIngredients []IngredientWrapper
 
 	for _, x := range ingredients {
-		resIngredients = append(resIngredients, x.Ingredient)
+		resIngredients = append(resIngredients, x)
 	}
 
 	return c.JSON(http.StatusOK, SearchResult{Recipes: &recipes, Ingredients: &resIngredients})
@@ -43,7 +43,7 @@ func (a *API) searchRecipes(ctx context.Context, pagination Items, name string) 
 		qm.Where("lower(name) like lower(?)", fmt.Sprintf("%%%s%%", name)))
 
 }
-func (a *API) searchIngredients(ctx context.Context, pagination Items, name string) ([]IngredientDetail, int64, error) {
+func (a *API) searchIngredients(ctx context.Context, pagination Items, name string) ([]IngredientWrapper, int64, error) {
 	return a.IngredientListV2(ctx, pagination,
 		qm.Where("lower(name) like lower(?)", fmt.Sprintf("%%%s%%", name)))
 

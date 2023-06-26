@@ -10,7 +10,7 @@ import (
 var DefaultPagination = parsePagination(nil, nil)
 
 // ExtractNames pulls names out of ingredient detail
-func ExtractNames(inp []IngredientDetail) (res []string) {
+func ExtractNames(inp []IngredientWrapper) (res []string) {
 	for _, x := range inp {
 		res = append(res, x.Ingredient.Name)
 	}

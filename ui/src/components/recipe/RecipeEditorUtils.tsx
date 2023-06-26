@@ -1,7 +1,7 @@
 import {
   TempFood,
   Ingredient,
-  IngredientDetail,
+  IngredientWrapper,
   Meal,
   RecipeDetail,
   RecipeSection,
@@ -33,7 +33,7 @@ export type FoodsById = {
   [key: number]: TempFood;
 };
 export type IngDetailsById = {
-  [key: string]: IngredientDetail;
+  [key: string]: IngredientWrapper;
 };
 
 export const updateIngredientInfo = (
@@ -374,7 +374,7 @@ export const flatIngredients = (
           ingredient,
           ...flatIngredients(
             // recurse to the recipes as long as they are the latest version?
-            (ingredient.recipe?.meta.is_latest_version &&
+            (ingredient.recipe?.meta?.is_latest_version &&
               ingredient.recipe?.sections) ||
               []
           ),
@@ -561,7 +561,7 @@ export const getFDCIds = (sections: RecipeSection[]): number[] =>
 export const getHint = (
   ingredient: SectionIngredient,
   ing_hints: IngDetailsById
-): IngredientDetail | undefined =>
+): IngredientWrapper | undefined =>
   ing_hints[extractIngredientID(ingredient) || ""] || undefined;
 
 export const extractIngredientID = (ingredient?: SectionIngredient) => {

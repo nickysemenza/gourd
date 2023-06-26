@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import {
-  IngredientDetail,
+  IngredientWrapper,
   UnitConversionRequest,
   UnitMapping,
 } from "../../api/react-query/gourdApiSchemas";
@@ -9,7 +9,7 @@ import { wasm, WasmContext, Amount } from "../../util/wasmContext";
 import Debug from "../ui/Debug";
 import { TableInput } from "../ui/Input";
 
-type UnitConvertDemoProps = { detail: IngredientDetail };
+type UnitConvertDemoProps = { detail: IngredientWrapper };
 export const UnitConvertDemo: React.FC<UnitConvertDemoProps> = ({ detail }) => {
   const [input, setInput] = React.useState("1 cup");
   const w = useContext(WasmContext);
