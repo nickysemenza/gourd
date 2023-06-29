@@ -175,8 +175,8 @@ func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
 	switch kind {
 	case "ingredient":
 		for _, x := range *results.Ingredients {
-			if x.Name == name {
-				id = x.Id
+			if x.Ingredient.Name == name {
+				id = x.Ingredient.Id
 			}
 		}
 	case "recipe":

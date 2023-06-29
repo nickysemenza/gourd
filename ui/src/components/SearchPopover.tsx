@@ -1,25 +1,54 @@
-const SearchPopover: React.FC = () => {
-  return <></>;
-};
-
 import { Transition } from "@headlessui/react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { clsx } from "clsx";
 import React, { Fragment, useState } from "react";
-import { Button } from "./ui/Button";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useSearch } from "../api/react-query/gourdApiComponents";
 import { RecipeLink } from "./misc/Misc";
+import { useNavigate } from "react-router-dom";
 
 const Dialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
+  const navigate = useNavigate();
+
   useHotkeys("meta+k", () => setIsOpen(true));
   const { data } = useSearch(
     { queryParams: { name } },
     { enabled: isOpen && name !== "" }
   );
+
+  const ingredients = data?.ingredients?.map((ingredient, x) => (
+    <a
+      key={x}
+      className="w-full text-left px-3.5 py-2.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-1 focus:ring-gray-300 focus:outline-none flex items-center space-x-2.5 justify-between bg-white/50 dark:bg-gray-800 cursor-pointer"
+      onClick={() => {
+        navigate(`/ingredients/${ingredient.ingredient.id}`);
+        setIsOpen(false);
+      }}
+    >
+      <div className="flex w-3/4 items-center space-x-2.5">
+        {ingredient.ingredient.name}
+      </div>
+      <div className="">
+        {ingredient.recipes
+          .filter((x) => x.meta.is_latest_version)
+          .map((x) => (
+            <RecipeLink recipe={x} key={x.id} />
+          ))}
+      </div>
+    </a>
+  ));
+
+  const recipes = data?.recipes?.map((recipe, x) => (
+    <div
+      key={x}
+      className="w-full text-left px-3.5 py-2.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-1 focus:ring-gray-300 focus:outline-none flex items-center space-x-2.5 justify-between bg-white/50 dark:bg-gray-800 cursor-pointer"
+    >
+      <RecipeLink recipe={recipe.detail} />
+    </div>
+  ));
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={setIsOpen}>
@@ -55,75 +84,34 @@ const Dialog = () => {
               forceMount
               className={clsx(
                 "fixed z-50",
-                "w-[95vw] max-w-md rounded-lg p-4 md:w-full",
+                // "w-[95vw] max-w-md rounded-lg md:w-full",
+                "w-full max-w-3xl",
                 "top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
                 "bg-white dark:bg-gray-800",
-                "focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75"
+                "focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75",
+                "divide-y dark:divide-gray-800"
               )}
             >
-              <DialogPrimitive.Title className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                Edit profile
-              </DialogPrimitive.Title>
-              <DialogPrimitive.Description className="mt-2 text-sm font-normal text-gray-700 dark:text-gray-400">
-                Make changes to your profile here. Click save when you&apos;re
-                done.
-              </DialogPrimitive.Description>
-              <form className="mt-2 space-y-2">
-                <fieldset>
-                  {/* <legend>Choose your favorite monster</legend> */}
-                  <label
-                    htmlFor="firstName"
-                    className="text-xs font-medium text-gray-700 dark:text-gray-400"
-                  >
-                    First Name
-                  </label>
-                  <input
-                    id="firstName"
-                    type="text"
-                    placeholder="Tim"
-                    autoComplete="given-name"
-                    onChange={(e) => setName(e.target.value)}
-                    className={clsx(
-                      "mt-1 block w-full rounded-md",
-                      "text-sm text-gray-700 placeholder:text-gray-500 dark:text-gray-400 dark:placeholder:text-gray-600",
-                      "border border-gray-400 focus-visible:border-transparent dark:border-gray-700 dark:bg-gray-800",
-                      "focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75"
-                    )}
-                  />
-                </fieldset>
-              </form>
-              <div className="w-100">
-                {data?.ingredients?.map((ingredient) => (
-                  <div className="grid grid-cols-4 gap-4 border-gray-100 border-2 p-1 rounded">
-                    <div>{ingredient.ingredient.name}</div>
-                    <div className="col-span-3">
-                      {ingredient.recipes
-                        .filter((x) => x.meta.is_latest_version)
-                        .map((x) => (
-                          <RecipeLink recipe={x} />
-                        ))}
-                    </div>
-                  </div>
-                ))}
-                {data?.recipes?.map((recipe) => (
-                  <RecipeLink recipe={recipe.detail} />
-                  //   <div>{recipe.detail.name}</div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex justify-end">
-                <DialogPrimitive.Close
+              <div className="flex items-center space-x-1.5 pl-3">
+                <input
+                  type="text"
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Search"
                   className={clsx(
-                    "inline-flex select-none justify-center rounded-md px-4 py-2 text-sm font-medium",
-                    "bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-700 dark:text-gray-100 dark:hover:bg-purple-600",
-                    "border border-transparent",
-                    "focus:outline-none focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75"
+                    "py-4 px-0 border-none w-full focus:outline-none focus:border-none focus:ring-0 bg-transparent placeholder-gray-500 dark:text-white"
                   )}
-                >
-                  Save
-                </DialogPrimitive.Close>
+                />
               </div>
-
+              <div className="flex-1 overflow-y-auto focus:outline-none p-2 space-y-4">
+                <h4 className="px-3.5 text-gray-500 text-sm font-medium">
+                  Ingredients
+                </h4>
+                <ul tabIndex={-1}>{ingredients}</ul>
+                <h4 className="px-3.5 text-gray-500 text-sm font-medium">
+                  Recipes
+                </h4>
+                <ul>{recipes}</ul>
+              </div>
               <DialogPrimitive.Close
                 className={clsx(
                   "absolute top-3.5 right-3.5 inline-flex items-center justify-center rounded-full p-1",
