@@ -13,12 +13,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ericlagergren/decimal"
 	"github.com/labstack/echo/v4"
 	"github.com/nickysemenza/gourd/internal/clients/rs_client"
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/sirupsen/logrus"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 	"sigs.k8s.io/yaml"
@@ -256,18 +254,4 @@ func Coalesce[T string | int | float32 | float64](i ...T) T {
 		}
 	}
 	return zeroVal
-}
-
-func decimalFromFloat(f float64) types.Decimal {
-	d := decimal.WithContext(types.DecimalContext)
-	d.SetFloat64(f)
-	return types.NewDecimal(d)
-}
-func nullDecimalFromFloat(f *float64) types.NullDecimal {
-	if f == nil {
-		return types.NewNullDecimal(nil)
-	}
-	d := decimal.WithContext(types.DecimalContext)
-	d.SetFloat64(*f)
-	return types.NewNullDecimal(d)
 }

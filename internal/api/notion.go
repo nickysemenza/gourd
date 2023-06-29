@@ -71,7 +71,7 @@ func (a *API) notionRecipeToDB(ctx context.Context, nRecipe notion.Recipe) (*mod
 		RecipeID:  null.StringFrom(r.Id),
 	}
 
-	nr.Scale = nullDecimalFromFloat(nRecipe.Scale)
+	nr.Scale = common.NullDecimalFromFloat(nRecipe.Scale)
 	m := db.NotionRecipeMeta{Tags: nRecipe.Tags}
 	err = nr.Meta.Marshal(m)
 	return &nr, err

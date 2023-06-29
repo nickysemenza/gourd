@@ -172,9 +172,9 @@ func (a *API) insertIngredientMappings(ctx context.Context, mapping IngredientMa
 			u := models.IngredientUnit{
 				IngredientID: ing.ID,
 				UnitA:        u.A.Unit,
-				AmountA:      decimalFromFloat(u.A.Value),
+				AmountA:      common.DecimalFromFloat(u.A.Value),
 				UnitB:        u.B.Unit,
-				AmountB:      decimalFromFloat(u.B.Value),
+				AmountB:      common.DecimalFromFloat(u.B.Value),
 				Source:       zero.StringFromPtr(u.Source).String,
 			}
 			num, err := a.DB().AddIngredientUnit(ctx, u)

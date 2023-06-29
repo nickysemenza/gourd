@@ -4,6 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+
+	"github.com/ericlagergren/decimal"
+	"github.com/volatiletech/sqlboiler/v4/types"
 )
 
 func ID(prefix string) string {
@@ -18,3 +21,17 @@ func ID(prefix string) string {
 }
 
 var ErrNotFound = fmt.Errorf("not found")
+
+func DecimalFromFloat(f float64) types.Decimal {
+	d := decimal.WithContext(types.DecimalContext)
+	d.SetFloat64(f)
+	return types.NewDecimal(d)
+}
+func NullDecimalFromFloat(f *float64) types.NullDecimal {
+	if f == nil {
+		return types.NewNullDecimal(nil)
+	}
+	d := decimal.WithContext(types.DecimalContext)
+	d.SetFloat64(*f)
+	return types.NewNullDecimal(d)
+}

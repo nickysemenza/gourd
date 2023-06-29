@@ -37,16 +37,15 @@ func (c *Client) AddRecipeToMeal(ctx context.Context, mealId, recipeId string, m
 	ctx, span := c.tracer.Start(ctx, "AddRecipeToMeal")
 	defer span.End()
 
-	multiplier := 1.0
-	if m != nil {
-		multiplier = *m
+	mr := models.MealRecipe{
+		MealID:     mealId,
+		RecipeID:   recipeId,
+		Multiplier: common.NullDecimalFromFloat(m),
 	}
-
-	c.psql.Insert("meals")
-	q := c.psql.Insert("meal_recipe").Columns("meal_id", "recipe_id", "multiplier").
-		Values(mealId, recipeId, multiplier).
-		Suffix("ON CONFLICT (recipe_id,meal_id) DO UPDATE SET multiplier = ?", multiplier)
-	_, err := c.execTx(ctx, tx, q)
+	err := mr.Upsert(ctx, tx, true,
+		[]string{models.MealRecipeColumns.RecipeID, models.MealRecipeColumns.MealID},
+		boil.Whitelist(models.MealRecipeColumns.Multiplier),
+		boil.Infer())
 	return err
 }
 
