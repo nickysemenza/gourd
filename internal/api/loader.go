@@ -13,12 +13,12 @@ type Foo[T any] interface {
 	Count(ctx context.Context, exec boil.ContextExecutor) (int64, error)
 }
 
-func countAndQuery[T any, V Foo[T]](ctx context.Context, exec boil.ContextExecutor, loader func(mods ...QueryMod) V, mods ...QueryMod) (T, int64, error) {
+func countAndQuery[T any, V Foo[T]](ctx context.Context, exec boil.ContextExecutor, loader func(mods ...QueryMod) V, orderBy string, mods ...QueryMod) (T, int64, error) {
 	ctx, span := trace.SpanFromContext(ctx).TracerProvider().Tracer("db").Start(ctx, "countAndQuery")
 	defer span.End()
 
 	var empty T
-	items, err := loader(mods...).All(ctx, exec)
+	items, err := loader(append(mods, OrderBy(orderBy))...).All(ctx, exec)
 	if err != nil {
 		return empty, 0, err
 	}

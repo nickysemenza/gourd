@@ -201,14 +201,9 @@ func (a *API) saveNotionRecipes(ctx context.Context, tx *sql.Tx, items models.No
 			[]string{
 				models.NotionRecipeColumns.PageID,
 			},
-			boil.Whitelist(
-				models.NotionRecipeColumns.PageTitle,
-				models.NotionRecipeColumns.RecipeID,
-				models.NotionRecipeColumns.LastSeen,
-				models.NotionRecipeColumns.Meta,
-				models.NotionRecipeColumns.Scale,
-			),
-			boil.Infer())
+			boil.Infer(),
+			boil.Infer(),
+		)
 		if err != nil {
 			return err
 		}

@@ -45,8 +45,9 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 
 	ctx, span := c.tracer.Start(ctx, "SyncNotionMealFromNotionRecipe")
 	defer span.End()
-	missingMeals, err := models.NotionRecipes(
-		qm.Load(models.NotionRecipeRels.Meals),
+	all, err := models.NotionRecipes(
+		qm.Load(qm.Rels(models.NotionRecipeRels.Meals, models.MealRels.MealRecipes)),
+
 		qm.Load(models.NotionRecipeRels.Recipe),
 	).All(ctx, tx)
 
@@ -54,15 +55,42 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 		return err
 	}
 
-	for _, m := range missingMeals {
-		if !m.AteAt.Valid {
+	for _, notionRecipe := range all {
+		if !notionRecipe.AteAt.Valid {
 			continue
 		}
-		if len(m.R.Meals) > 0 {
-			continue
+		notionAteAtTime := notionRecipe.AteAt.Time
+		if len(notionRecipe.R.Meals) > 0 {
+
+			needsAdjustment := false
+			// checking meals for drift
+
+			for _, linkedMeal := range notionRecipe.R.Meals {
+				drift := linkedMeal.AteAt.Sub(notionAteAtTime)
+				if drift > 0 {
+					needsAdjustment = true
+					fmt.Printf("time difference between %s and %s (%s) is %s\n", linkedMeal.Name, notionRecipe.PageTitle, notionRecipe.NotionID, drift)
+
+					_, err := models.MealRecipes(qm.Where("meal_id = ? and recipe_id = ?", linkedMeal.ID, notionRecipe.RecipeID)).DeleteAll(ctx, tx)
+					if err != nil {
+						return err
+					}
+
+					err = notionRecipe.RemoveMeals(ctx, tx, linkedMeal)
+					if err != nil {
+						return err
+					}
+
+				}
+
+				// notionAteAtTime.Sub(x.AteAt)
+			}
+			if !needsAdjustment {
+				continue
+			}
 		}
 		var meta NotionRecipeMeta
-		err := m.Meta.Unmarshal(&meta)
+		err := notionRecipe.Meta.Unmarshal(&meta)
 		if err != nil {
 			return err
 		}
@@ -73,28 +101,28 @@ func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
 			}
 		}
 
-		mealID, err := c.MealIDInRange(ctx, m.AteAt.Time,
-			fmt.Sprintf("%s %s", m.AteAt.Time.Add(time.Hour*-24).Format("Mon Jan 2"), suffix),
+		mealID, err := c.MealIDInRange(ctx, notionRecipe.AteAt.Time,
+			fmt.Sprintf("%s %s", notionRecipe.AteAt.Time.Add(time.Hour*-24).Format("Mon Jan 2"), suffix),
 			tx,
 		)
 		if err != nil {
 			return fmt.Errorf("failed to find meal in range: %w", err)
 		}
 
-		if m.R.Recipe != nil {
+		if notionRecipe.R.Recipe != nil {
 			var mult *float64
-			if !m.Scale.IsZero() {
-				val, _ := m.Scale.Float64()
+			if !notionRecipe.Scale.IsZero() {
+				val, _ := notionRecipe.Scale.Float64()
 				mult = &val
 			}
-			err = c.AddRecipeToMeal(ctx, mealID, m.R.Recipe.ID, mult, tx)
+			err = c.AddRecipeToMeal(ctx, mealID, notionRecipe.R.Recipe.ID, mult, tx)
 			// m.R.Recipe.AddMealRecipes(ctx, c.db, false, &models.MealRecipe{MealID: mealID})
 			if err != nil {
 				return fmt.Errorf("failed to add recipe to meal: %w", err)
 			}
 		}
 
-		err = m.AddMeals(ctx, tx, false, &models.Meal{ID: mealID})
+		err = notionRecipe.AddMeals(ctx, tx, false, &models.Meal{ID: mealID})
 		if err != nil {
 			return fmt.Errorf("failed to add meals: %w", err)
 		}

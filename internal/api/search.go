@@ -29,13 +29,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	// todo: use this
 	listMeta.setTotalCount(+uint64(recipesCount + ingredientsCount))
 
-	var resIngredients []IngredientWrapper
-
-	for _, x := range ingredients {
-		resIngredients = append(resIngredients, x)
-	}
-
-	return c.JSON(http.StatusOK, SearchResult{Recipes: &recipes, Ingredients: &resIngredients})
+	return c.JSON(http.StatusOK, SearchResult{Recipes: &recipes, Ingredients: &ingredients})
 }
 
 func (a *API) searchRecipes(ctx context.Context, pagination Items, name string) ([]RecipeWrapper, int64, error) {

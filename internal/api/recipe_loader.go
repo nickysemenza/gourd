@@ -123,7 +123,11 @@ func (a *API) RecipeListV2(ctx context.Context, pagination Items, mods ...QueryM
 	ctx, span := a.tracer.Start(ctx, "RecipeListV2")
 	defer span.End()
 
-	recipes, count, err := countAndQuery[models.RecipeSlice](ctx, a.db.DB(), models.Recipes, qmWithPagination(recipeQueryMods, pagination, mods...)...)
+	recipes, count, err := countAndQuery[models.RecipeSlice](ctx,
+		a.db.DB(),
+		models.Recipes,
+		"created_at desc",
+		qmWithPagination(recipeQueryMods, pagination, mods...)...)
 	if err != nil {
 		return nil, 0, err
 	}

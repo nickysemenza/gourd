@@ -49,10 +49,10 @@ export const EntitySelector: React.FC<{
       });
     const ingredientOptions: Option[] = (res.ingredients || []).map((i) => {
       return {
-        label: i.name,
-        value: i.id,
+        label: i.ingredient.name,
+        value: i.ingredient.id,
         kind: "ingredient",
-        fdc_id: i.fdc_id,
+        fdc_id: i.ingredient.fdc_id,
       };
     });
     return [
