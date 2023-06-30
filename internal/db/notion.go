@@ -36,7 +36,6 @@ func (c *Client) DoesNotionImageExist(ctx context.Context, blockID string) (exis
 }
 
 func (c *Client) SyncNotionMealFromNotionRecipe(ctx context.Context) error {
-	ctx = boil.WithDebug(ctx, true)
 
 	tx, err := c.db.BeginTx(ctx, nil)
 	if err != nil {

@@ -29,14 +29,14 @@ type API struct {
 	GPhotos    *gphotos.Photos
 	Auth       *auth.Auth
 	R          *rs_client.Client
-	Notion     *notion.Client
+	Notion     notion.Client
 	ImageStore image.Store
 	tracer     trace.Tracer
 }
 
 type ServerOption func(*API)
 
-func WithNotionClient(n *notion.Client) ServerOption {
+func WithNotionClient(n notion.Client) ServerOption {
 	return func(s *API) {
 		s.Notion = n
 	}

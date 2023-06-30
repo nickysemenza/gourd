@@ -6,9 +6,14 @@ package api
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/nickysemenza/gourd/internal/clients/notion"
+	"github.com/nickysemenza/gourd/internal/clients/notion/mocks"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 func TestSync(t *testing.T) {
@@ -37,5 +42,36 @@ func TestSync(t *testing.T) {
 	// l, err := apiManager.Latex(ctx, rd)
 	// require.NoError(err)
 	// require.Greater(len(l), 10000)
+
+}
+
+func TestSyncThingsChanged(t *testing.T) {
+	nClient := mocks.NewClient(t)
+
+	require := require.New(t)
+	apiManager := makeAPI(t, WithNotionClient(nClient))
+	ctx := context.Background()
+	ctx = boil.WithDebug(ctx, true)
+
+	base := time.Now().Truncate(time.Hour * 24).Add(-time.Hour * 24 * 5)
+	r := notion.Recipe{
+		Title: "example 1",
+		UID:   "MEAL123",
+		Time:  notion.GetTimeByName([]string{"dinner"}, base),
+		Raw:   "name: example 1\n---\n2 cups flour",
+		Tags:  []string{"a"},
+	}
+
+	r.Time = notion.GetTimeByName([]string{"dinner"}, base.Add(time.Hour*24*2))
+	r.Raw = "name: example 1\n---\n3 cups flour"
+	r.Tags = []string{"b"}
+	nClient.On("GetAll", mock.Anything, time.Hour*24*14, "").
+		Return([]notion.Recipe{r}, nil).Once()
+
+	require.NoError(apiManager.Sync(ctx, 14))
+
+	nClient.On("GetAll", mock.Anything, time.Hour*24*14, "").
+		Return([]notion.Recipe{r}, nil).Once()
+	require.NoError(apiManager.Sync(ctx, 14))
 
 }

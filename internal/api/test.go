@@ -17,19 +17,23 @@ import (
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-func makeAPI(t *testing.T) *API {
+func makeAPI(t *testing.T, opts ...ServerOption) *API {
 	t.Helper()
 	tdb := db.NewTestDB(t)
 	i, err := image.NewLocalImageStore("aa")
+
+	baseline := []ServerOption{WithNotionClient(notion.NewFakeNotion(t))}
+	baseline = append(baseline, opts...)
 	require.NoError(t, err)
 	apiManager := New(tdb,
 		rs_client.New("http://localhost:8080/"),
-		i, WithNotionClient(notion.NewFakeNotion(t)))
-
+		i, baseline...)
+	logrus.SetLevel(logrus.DebugLevel)
 	return apiManager
 }
 func makeHandler(t *testing.T) (*echo.Echo, *API) {

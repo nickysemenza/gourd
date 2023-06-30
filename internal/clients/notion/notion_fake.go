@@ -102,7 +102,7 @@ func (f *fakePage) Update(context.Context, notionapi.PageID, *notionapi.PageUpda
 }
 
 // NewFakeNotion makes a fake
-func NewFakeNotion(t *testing.T) *Client {
+func NewFakeNotion(t *testing.T) *rawClient {
 	t.Helper()
 
 	db := &fakeDB{}
@@ -198,7 +198,7 @@ func NewFakeNotion(t *testing.T) *Client {
 			},
 		},
 	}
-	c := Client{
+	c := rawClient{
 		db:    db,
 		block: block,
 		page:  page,

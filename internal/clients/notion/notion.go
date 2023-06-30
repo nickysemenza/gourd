@@ -18,22 +18,25 @@ import (
 	"gopkg.in/guregu/null.v4/zero"
 )
 
-// Client is a notio nclient
-type Client struct {
+// rawClient is a notio nclient
+type rawClient struct {
 	dbID  notionapi.DatabaseID
 	block notionapi.BlockService
 	db    notionapi.DatabaseService
 	page  notionapi.PageService
 }
 
-type ClientWrapper interface {
+//go:generate mockery --name Client
+
+type Client interface {
+	GetAll(ctx context.Context, lookback time.Duration, pageID string) ([]Recipe, error)
 }
 
 // New makes a notion client
-func New(token, database string) *Client {
+func New(token, database string) Client {
 	hClient := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}
 	client := notionapi.NewClient(notionapi.Token(token), notionapi.WithHTTPClient(&hClient))
-	return &Client{
+	return &rawClient{
 		dbID:  notionapi.DatabaseID(database),
 		db:    client.Database,
 		block: client.Block,
@@ -83,9 +86,21 @@ func removeDuplicateValues(intSlice []Photo) []Photo {
 	}
 	return list
 }
+func GetTimeByName(tags []string, utcTime time.Time) (res *time.Time) {
+	dinnerTime := utcTime.Add(time.Hour * 26) // 7pm
+	res = zero.TimeFrom(dinnerTime).Ptr()
+	if slices.Contains(tags, "lunch") {
+		lunchTime := utcTime.Add(time.Hour * 19) // noon
+		res = zero.TimeFrom(lunchTime).Ptr()
+	} else if slices.Contains(tags, "breakfast") {
+		lunchTime := utcTime.Add(time.Hour * 15) // 8am
+		res = zero.TimeFrom(lunchTime).Ptr()
+	}
+	return
+}
 
 // nolint: exhaustive
-func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *Recipe, err error) {
+func (c *rawClient) processPage(ctx context.Context, page notionapi.Page) (recipe *Recipe, err error) {
 
 	switch page.Object {
 	case "column_list", notionapi.ObjectTypePage:
@@ -126,16 +141,8 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 		if dateProp, ok := page.Properties["Date"]; ok {
 			date := dateProp.(*notionapi.DateProperty).Date.Start
 			if date != nil {
-				utcTime := time.Time(*date)
-				dinnerTime := utcTime.Add(time.Hour * 26) // 7pm
-				r.Time = zero.TimeFrom(dinnerTime).Ptr()
-				if slices.Contains(r.Tags, "lunch") {
-					lunchTime := utcTime.Add(time.Hour * 19) // noon
-					r.Time = zero.TimeFrom(lunchTime).Ptr()
-				} else if slices.Contains(r.Tags, "breakfast") {
-					lunchTime := utcTime.Add(time.Hour * 15) // 8am
-					r.Time = zero.TimeFrom(lunchTime).Ptr()
-				}
+				r.Time = GetTimeByName(r.Tags, time.Time(*date))
+
 			}
 		}
 		if id, ok := page.Properties["ID"]; ok {
@@ -161,7 +168,7 @@ func (c *Client) processPage(ctx context.Context, page notionapi.Page) (recipe *
 }
 
 // PageByID gets page by id
-func (c *Client) PageByID(ctx context.Context, id notionapi.PageID) (*Recipe, error) {
+func (c *rawClient) PageByID(ctx context.Context, id notionapi.PageID) (*Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "PageById")
 	defer span.End()
 
@@ -174,7 +181,7 @@ func (c *Client) PageByID(ctx context.Context, id notionapi.PageID) (*Recipe, er
 }
 
 // GetAll looks back the specified number of days. shortcut to filter by a single page id
-func (c *Client) GetAll(ctx context.Context, lookback time.Duration, pageID string) ([]Recipe, error) {
+func (c *rawClient) GetAll(ctx context.Context, lookback time.Duration, pageID string) ([]Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "GetAll")
 	defer span.End()
 
@@ -230,7 +237,7 @@ func (c *Client) GetAll(ctx context.Context, lookback time.Duration, pageID stri
 
 }
 
-func (c *Client) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, r Recipe) (*Recipe, error) {
+func (c *rawClient) detailsFromPage(ctx context.Context, pageID notionapi.ObjectID, r Recipe) (*Recipe, error) {
 	ctx, span := otel.Tracer("notion").Start(ctx, "detailsFromPage")
 	defer span.End()
 

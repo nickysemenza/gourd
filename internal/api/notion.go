@@ -37,6 +37,8 @@ func (a *API) notionRecipeToInput(ctx context.Context, nRecipe notion.Recipe) (*
 	output.Date = nRecipe.Time
 	nRecipe.Tags = append(nRecipe.Tags, "notion")
 	output.Tags = nRecipe.Tags
+
+	l(ctx).Debugf("notionRecipeToInput: %s (%v)", output.Name, output.Tags)
 	return &output, nil
 }
 
