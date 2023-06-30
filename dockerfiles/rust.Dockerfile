@@ -9,7 +9,6 @@ FROM chef AS builder-rs
 COPY --from=planner /app/recipe.json recipe.json
 # Build dependencies - this is the caching Docker layer!
 RUN cargo chef cook --release --recipe-path recipe.json
-# RUN cargo install wasm-pack
 # Build application
 COPY rust/ .
 RUN cargo build --release --bin gourd

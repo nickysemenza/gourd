@@ -12,10 +12,16 @@ jobs:
       file: "dockerfiles/go.Dockerfile"
       name: "go-builder"
   ui-builder-image:
+    needs: [wasm-builder-image]
     uses: ./.github/workflows/docker-builder.yml
     with:
       file: "dockerfiles/ui.Dockerfile"
       name: "ui-builder"
+  wasm-builder-image:
+    uses: ./.github/workflows/docker-builder.yml
+    with:
+      file: "dockerfiles/wasm.Dockerfile"
+      name: "wasm-builder"
   build-main-docker:
     needs: [go-builder-image, ui-builder-image]
     name: main docker
@@ -36,7 +42,7 @@ jobs:
         with:
           version: latest
   test-ui:
-    needs: [ui-builder-image]
+    needs: [wasm-builder-image]
     name: vitest
     runs-on: ubuntu-latest
     steps:
@@ -48,8 +54,8 @@ jobs:
         id: extract_branch
       - name: extract wasm for UI
         run: |
-          docker create --name=temp ghcr.io/nickysemenza/gourd-ui-builder:${{steps.extract_branch.outputs.branch}}
-          docker cp temp:/work/ui/src/wasm ui/src/wasm
+          docker create --name=temp ghcr.io/nickysemenza/gourd-wasm-builder:${{steps.extract_branch.outputs.branch}}
+          docker cp temp:/wasm ui/src/wasm
       - run: yarn install
         working-directory: ui/
       - run: npx vitest --coverage
@@ -78,8 +84,8 @@ jobs:
         id: extract_branch
       - name: extract wasm for UI
         run: |
-          docker create --name=temp ghcr.io/nickysemenza/gourd-ui-builder:${{steps.extract_branch.outputs.branch}}
-          docker cp temp:/work/ui/src/wasm ui/src/wasm
+          docker create --name=temp ghcr.io/nickysemenza/gourd-wasm-builder:${{steps.extract_branch.outputs.branch}}
+          docker cp temp:/wasm ui/src/wasm
       - name: start postgres db
         run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db
       - run: go mod vendor
