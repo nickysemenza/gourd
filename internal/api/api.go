@@ -34,20 +34,41 @@ type API struct {
 	tracer     trace.Tracer
 }
 
-func New(db *db.Client, g *google.Client, auth *auth.Auth,
-	r *rs_client.Client, notion *notion.Client,
-	imageStore image.Store) *API {
+type ServerOption func(*API)
+
+func WithNotionClient(n *notion.Client) ServerOption {
+	return func(s *API) {
+		s.Notion = n
+	}
+}
+
+func WithGoogleClient(g *google.Client) ServerOption {
+	return func(s *API) {
+		s.Google = g
+	}
+}
+func WithAuthClient(a *auth.Auth) ServerOption {
+	return func(s *API) {
+		s.Auth = a
+	}
+}
+
+func New(db *db.Client,
+	r *rs_client.Client,
+	imageStore image.Store,
+	opts ...ServerOption) *API {
 	a := API{
 		db:         db,
-		Google:     g,
-		Auth:       auth,
 		R:          r,
-		Notion:     notion,
 		ImageStore: imageStore,
 		tracer:     otel.Tracer("api"),
 	}
+
+	for _, o := range opts {
+		o(&a)
+	}
 	if a.Google != nil {
-		a.GPhotos = gphotos.New(db, g, imageStore)
+		a.GPhotos = gphotos.New(a.db, a.Google, a.ImageStore)
 	}
 	return &a
 }

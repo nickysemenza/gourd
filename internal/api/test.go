@@ -27,9 +27,8 @@ func makeAPI(t *testing.T) *API {
 	i, err := image.NewLocalImageStore("aa")
 	require.NoError(t, err)
 	apiManager := New(tdb,
-		nil, nil,
 		rs_client.New("http://localhost:8080/"),
-		notion.NewFakeNotion(t), i)
+		i, WithNotionClient(notion.NewFakeNotion(t)))
 
 	return apiManager
 }

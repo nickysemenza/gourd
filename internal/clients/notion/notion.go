@@ -26,6 +26,9 @@ type Client struct {
 	page  notionapi.PageService
 }
 
+type ClientWrapper interface {
+}
+
 // New makes a notion client
 func New(token, database string) *Client {
 	hClient := http.Client{Transport: otelhttp.NewTransport(http.DefaultTransport)}

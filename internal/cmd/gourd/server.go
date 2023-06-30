@@ -85,7 +85,11 @@ func makeServer(ctx context.Context) (*server.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	m := api.New(dbClient, gClient, auth, r, n, i)
+	m := api.New(dbClient, r, i,
+		api.WithNotionClient(n),
+		api.WithGoogleClient(gClient),
+		api.WithAuthClient(auth),
+	)
 	s.APIManager = m
 
 	// server
