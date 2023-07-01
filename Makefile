@@ -130,7 +130,7 @@ get-detail/%:
 	rm tmp1
 
 seed-testdata: bin/gourd
-	./tooling/testdata/seed.sh
+	./tooling/testdata/seed.mjs
 
 # todo import usda
 devdata: seed-testdata sync
