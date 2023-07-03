@@ -522,10 +522,10 @@
     typanion "^3.7.1"
     typescript "4.8.2"
 
-"@openapi-codegen/typescript@^6.2.4":
-  version "6.2.4"
-  resolved "https://registry.yarnpkg.com/@openapi-codegen/typescript/-/typescript-6.2.4.tgz#0004c450486f16e76bbef3b278bb32bebdc7aff7"
-  integrity sha512-wh/J7Ij/furDIYo0yD8SjUZBCHn2+cu7N4cTKJ9M/PW7jaDYHyZk1ThYmtCFAVF2f3Jobpb51+3E0Grk8nqhpA==
+"@openapi-codegen/typescript@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@openapi-codegen/typescript/-/typescript-7.0.0.tgz#862f275110ddafe12fd2b7da48fee0d75c769ef0"
+  integrity sha512-QnY8eR3VNGhukeB376rvUzlj8FLnWo79dEZgksURtvtxR3CBbdyQZottN7TFTjn8RLQ46ISdblX1t0camFYGxg==
   dependencies:
     case "^1.6.3"
     lodash "^4.17.21"
