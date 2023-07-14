@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Icon, MinusCircle, PlusCircle } from "react-feather";
 import { Button } from "./Button";
+import { cn } from "./lib";
 
 type ButtonProps =
   | {
@@ -14,32 +15,17 @@ interface ButtonGroupProps {
   buttons: ButtonProps[];
   compact?: boolean;
 }
-// https://tailwind-starter-kit.now.sh/docs/buttons#
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   buttons,
   compact = false,
 }) => {
   return (
-    <div className="inline-flex mx-1" role="group" aria-label="Button group">
+    <div className="join" role="group" aria-label="Button group">
       {buttons.map(({ text, IconLeft, IconRight, submit, ...props }, x) => {
         const iconMargins = compact ? 1 : 3.5;
         const iconDim = compact ? 12 : 18;
-        return (
-          <Button
-            type={submit ? "submit" : "button"}
-            key={x}
-            round={
-              buttons.length === 1
-                ? "all"
-                : x === 0
-                ? "left"
-                : x === buttons.length - 1
-                ? "right"
-                : "none"
-            }
-            size={compact ? "compact" : "default"}
-            {...props}
-          >
+        const contents = (
+          <>
             {!!IconLeft && (
               <IconLeft
                 width={iconDim}
@@ -55,7 +41,20 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
                 className={`ml-${text ? iconMargins : 0}`}
               />
             )}
-          </Button>
+          </>
+        );
+        return (
+          <button
+            className={cn(
+              "btn btn-xs join-item btn-neutral",
+              compact ? "btn-xs" : ""
+            )}
+            type={submit ? "submit" : "button"}
+            key={x}
+            {...props}
+          >
+            {contents}
+          </button>
         );
       })}
     </div>

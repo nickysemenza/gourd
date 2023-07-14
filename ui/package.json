@@ -83,6 +83,7 @@
     "autoprefixer": "^10.4.14",
     "cypress": "^12.14.0",
     "cypress-vite": "^1.4.0",
+    "daisyui": "^3.1.7",
     "eslint": "^8.38.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",

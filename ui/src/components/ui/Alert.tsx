@@ -3,10 +3,7 @@ export const Alert: React.FC<{
   title: string;
   line: string | React.ReactElement;
 }> = ({ onClose, title, line }) => (
-  <div
-    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex-col"
-    role="alert"
-  >
+  <div className="alert alert-error" role="alert">
     <h2>
       <strong className="font-bold">{title}</strong>
     </h2>
