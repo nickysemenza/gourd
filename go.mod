@@ -20,7 +20,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/golangci/golangci-lint v1.53.3
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gphotosuploader/google-photos-api-client-go/v3 v3.0.0
+	github.com/gphotosuploader/google-photos-api-client-go/v3 v3.0.1
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5
