@@ -18,7 +18,7 @@ require (
 	github.com/getsentry/sentry-go v0.23.0
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/golang-migrate/migrate/v4 v4.16.2
-	github.com/golangci/golangci-lint v1.53.3
+	github.com/golangci/golangci-lint v1.54.0
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -48,8 +48,8 @@ require (
 	go.opentelemetry.io/otel/sdk v1.16.0
 	go.opentelemetry.io/otel/trace v1.16.0
 	golang.org/x/oauth2 v0.11.0
-	golang.org/x/tools v0.11.0
-	google.golang.org/api v0.134.0
+	golang.org/x/tools v0.12.0
+	google.golang.org/api v0.136.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -59,16 +59,16 @@ require (
 require (
 	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect
 	4d63.com/gochecknoglobals v0.2.1 // indirect
-	cloud.google.com/go v0.110.4 // indirect
-	cloud.google.com/go/compute v1.20.1 // indirect
+	cloud.google.com/go v0.110.6 // indirect
+	cloud.google.com/go/compute v1.23.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v1.1.0 // indirect
+	cloud.google.com/go/iam v1.1.1 // indirect
 	cloud.google.com/go/longrunning v0.5.1 // indirect
 	cloud.google.com/go/spanner v1.47.0 // indirect
 	cloud.google.com/go/storage v1.30.1 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.2 // indirect
-	github.com/Abirdcfly/dupword v0.0.11 // indirect
+	github.com/Abirdcfly/dupword v0.0.12 // indirect
 	github.com/Antonboom/errname v0.1.10 // indirect
 	github.com/Antonboom/nilnil v0.1.5 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -86,7 +86,7 @@ require (
 	github.com/alingse/asasalint v0.0.11 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/arran4/golang-ical v0.1.0
-	github.com/ashanbrown/forbidigo v1.5.3 // indirect
+	github.com/ashanbrown/forbidigo v1.6.0 // indirect
 	github.com/ashanbrown/makezero v1.1.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.284 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.20.0
@@ -127,7 +127,7 @@ require (
 	github.com/cockroachdb/cockroach-go/v2 v2.3.5 // indirect
 	github.com/creack/pty v1.1.18 // indirect
 	github.com/curioswitch/go-reassign v0.2.0 // indirect
-	github.com/daixiang0/gci v0.10.1 // indirect
+	github.com/daixiang0/gci v0.11.0 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
 	github.com/denis-tingaikin/go-header v0.4.3 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -146,7 +146,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/go-critic/go-critic v0.8.1 // indirect
+	github.com/go-critic/go-critic v0.8.2 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
@@ -179,7 +179,7 @@ require (
 	github.com/golangci/gofmt v0.0.0-20220901101216-f2edd75033f2 // indirect
 	github.com/golangci/lint-1 v0.0.0-20191013205115-297bf364a8e0 // indirect
 	github.com/golangci/maligned v0.0.0-20180506175553-b1d89398deca // indirect
-	github.com/golangci/misspell v0.4.0 // indirect
+	github.com/golangci/misspell v0.4.1 // indirect
 	github.com/golangci/revgrep v0.0.0-20220804021717-745bb2f7c2e6 // indirect
 	github.com/golangci/unconvert v0.0.0-20180507085042-28b1c447d1f4 // indirect
 	github.com/google/flatbuffers v23.5.26+incompatible // indirect
@@ -229,7 +229,7 @@ require (
 	github.com/klauspost/compress v1.16.6 // indirect
 	github.com/ktrysmt/go-bitbucket v0.9.60 // indirect
 	github.com/kulti/thelper v0.6.3 // indirect
-	github.com/kunwardeep/paralleltest v1.0.7 // indirect
+	github.com/kunwardeep/paralleltest v1.0.8 // indirect
 	github.com/kyoh86/exportloopref v0.1.11 // indirect
 	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/gommon v0.4.0 // indirect
@@ -266,7 +266,7 @@ require (
 	github.com/neo4j/neo4j-go-driver v1.8.3 // indirect
 	github.com/nishanths/exhaustive v0.11.0 // indirect
 	github.com/nishanths/predeclared v0.2.2 // indirect
-	github.com/nunnatsa/ginkgolinter v0.12.1 // indirect
+	github.com/nunnatsa/ginkgolinter v0.13.3 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/openzipkin/zipkin-go v0.4.1 // indirect
 	github.com/ory/viper v1.7.5 // indirect
@@ -278,7 +278,7 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/polyfloyd/go-errorlint v1.4.2 // indirect
+	github.com/polyfloyd/go-errorlint v1.4.3 // indirect
 	github.com/prometheus/client_golang v1.16.0 // indirect
 	github.com/prometheus/client_model v0.4.0 // indirect
 	github.com/quasilyte/go-ruleguard v0.3.19 // indirect
@@ -315,12 +315,12 @@ require (
 	github.com/timonwong/loggercheck v0.9.4 // indirect
 	github.com/tomarrell/wrapcheck/v2 v2.8.1 // indirect
 	github.com/tommy-muehle/go-mnd/v2 v2.5.1 // indirect
-	github.com/ultraware/funlen v0.0.3 // indirect
+	github.com/ultraware/funlen v0.1.0 // indirect
 	github.com/ultraware/whitespace v0.0.5 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.2.1
 	github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.1
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.1 // indirect
-	github.com/uudashr/gocognit v1.0.6 // indirect
+	github.com/uudashr/gocognit v1.0.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/volatiletech/inflect v0.0.1 // indirect
@@ -334,7 +334,7 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yuin/goldmark v1.5.4 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
-	gitlab.com/bosi/decorder v0.2.3 // indirect
+	gitlab.com/bosi/decorder v0.4.0 // indirect
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mitsakis.org/workerpool v0.0.0-20221016122625-07d45f730b5b
 	go.mongodb.org/mongo-driver v1.11.7 // indirect
@@ -357,7 +357,7 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230706204954-ccb25ca9f130 // indirect
+	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -397,10 +397,11 @@ require (
 )
 
 require (
-	github.com/4meepo/tagalign v1.2.2 // indirect
+	github.com/4meepo/tagalign v1.3.2 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0 // indirect
+	github.com/GaijinEntertainment/go-exhaustruct/v3 v3.1.0 // indirect
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/OpenPeeDeeP/depguard/v2 v2.1.0 // indirect
 	github.com/alexkohler/nakedret/v2 v2.0.2 // indirect
@@ -440,10 +441,10 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/xen0n/gosmopolitan v1.2.1 // indirect
-	github.com/ykadowak/zerologlint v0.1.2 // indirect
+	github.com/ykadowak/zerologlint v0.1.3 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	go.tmz.dev/musttag v0.7.0 // indirect
+	go.tmz.dev/musttag v0.7.1 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20230706204954-ccb25ca9f130 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230720185612-659f7aaaa771 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20230803162519-f966b187b2e5 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230807174057-1744710a1577 // indirect
 )
