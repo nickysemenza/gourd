@@ -49,7 +49,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.16.0
 	golang.org/x/oauth2 v0.11.0
 	golang.org/x/tools v0.12.0
-	google.golang.org/api v0.136.0
+	google.golang.org/api v0.137.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
@@ -425,7 +425,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gohugoio/hugo v0.113.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
-	github.com/google/s2a-go v0.1.4 // indirect
+	github.com/google/s2a-go v0.1.5 // indirect
 	github.com/jackc/pgx/v5 v5.4.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/asmfmt v1.3.2 // indirect
