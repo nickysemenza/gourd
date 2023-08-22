@@ -5188,10 +5188,10 @@ ufo@^1.1.2:
   resolved "https://registry.yarnpkg.com/ufo/-/ufo-1.1.2.tgz#d0d9e0fa09dece0c31ffd57bd363f030a35cfe76"
   integrity sha512-TrY6DsjTQQgyS3E3dBaOXf0TpPD8u9FVrVYmKVegJuFw51n/YB9XPt+U6ydzFG5ZIN7+DIjPbNmXoBj9esYhgQ==
 
-universal-cookie@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/universal-cookie/-/universal-cookie-5.0.0.tgz#e20b5a5aabb595cf3eae49dbbcd9a311d9be0e87"
-  integrity sha512-S0i5B1AEoXchHVrSS2fkQDE0LsTGhBaCntXCrq762Eqvi9WXEqij47DHN2FVwbi/prBGwf/p0UMOYlOOngZi0Q==
+universal-cookie@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/universal-cookie/-/universal-cookie-6.1.0.tgz#9b631092f77a2b91d1ec153be5e16465ce95b177"
+  integrity sha512-QBpQWkFJyH9D6nP1ZjPuLDdrgYr3y9ti8OTWf6uWcZwtY06de5f10GPYv3v68LIYWU0a9J2ZF5xFR5gOdD5ZaQ==
   dependencies:
     "@types/cookie" "^0.5.1"
     cookie "^0.5.0"
