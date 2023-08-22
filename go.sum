@@ -762,6 +762,7 @@ github.com/gostaticanalysis/testutil v0.3.1-0.20210208050101-bfb5c8eec0e4/go.mod
 github.com/gostaticanalysis/testutil v0.4.0 h1:nhdCmubdmDF6VEatUNjgUZBJKWRqugoISdUv3PPQgHY=
 github.com/gphotosuploader/google-photos-api-client-go v1.1.6 h1:GmdcvdhKL1yk8aHj7IjXv6bt1IXUT2Eb5YGyDlStos0=
 github.com/gphotosuploader/google-photos-api-client-go v1.1.6/go.mod h1:TduoVN7lluT0HdueUmX7701MdAiMcrSkOFGhax5FEkA=
+github.com/gphotosuploader/google-photos-api-client-go/v3 v3.0.1/go.mod h1:c+HPIbxKUur/pbQ/Dlw05gOQ7nhTcvXB+uJDfIJlNLc=
 github.com/gphotosuploader/googlemirror v0.3.5/go.mod h1:L6A+2KW6d/OwjZ5QH2fGXJXsOtR115tj9w+YxdyjfUI=
 github.com/gphotosuploader/googlemirror v0.5.0 h1:9a9CCUnAFo3qHp7U/epmdTiOvAzXCkVq5AQLo8PWBns=
 github.com/gphotosuploader/googlemirror v0.5.0/go.mod h1:L6A+2KW6d/OwjZ5QH2fGXJXsOtR115tj9w+YxdyjfUI=
