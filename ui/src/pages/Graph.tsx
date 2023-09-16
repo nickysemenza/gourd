@@ -16,7 +16,7 @@ const Graph: React.FC = () => {
 
   const { data } = useRecipeDependencies({});
   const history = useNavigate();
-  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+  const chartComponentRef = useRef(null);
 
   if (!data || !data.items) return null;
 
@@ -76,6 +76,7 @@ const Graph: React.FC = () => {
         },
         point: {
           events: {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             click: function (this: Point, _event: PointClickEventObject) {
               const node = this as unknown as CustomPoint;
               console.log(node);
