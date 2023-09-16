@@ -33,7 +33,7 @@ jobs:
     name: go lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version: stable
@@ -46,7 +46,7 @@ jobs:
     name: vitest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
       - name: Extract branch name
         shell: bash
@@ -73,7 +73,7 @@ jobs:
     name: cypress
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -124,7 +124,7 @@ jobs:
     name: API integration
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -154,7 +154,7 @@ jobs:
       image: xd009642/tarpaulin:develop-nightly
       options: --security-opt seccomp=unconfined
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           cargo +nightly tarpaulin --verbose --all-features --workspace --timeout 120 --out xml
         working-directory: rust
@@ -171,7 +171,7 @@ jobs:
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: curl -L https://fly.io/install.sh | sh
       - run: /home/runner/.fly/bin/flyctl deploy deploy/ --image ghcr.io/nickysemenza/gourd-api-go:main
         env:
