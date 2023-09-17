@@ -34,7 +34,7 @@ jobs:
         with:
           files: ${{ inputs.file }}
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Extract branch name
         shell: bash
         run: echo "branch=$(echo sha-${GITHUB_SHA})" >>$GITHUB_OUTPUT
