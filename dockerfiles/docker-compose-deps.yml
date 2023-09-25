@@ -57,4 +57,4 @@ services:
       - MEILI_MASTER_KEY=FOO
     volumes:
       - '../tmp/meili_data:/meili_data'
-    image: 'getmeili/meilisearch:v1.3'
+    image: 'getmeili/meilisearch:v1.4'
