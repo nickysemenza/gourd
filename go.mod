@@ -10,7 +10,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/buckket/go-blurhash v1.1.0
 	github.com/charmbracelet/glamour v0.6.0
-	github.com/cosmtrek/air v1.45.0
+	github.com/cosmtrek/air v1.46.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/deepmap/oapi-codegen v1.15.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
