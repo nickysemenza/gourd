@@ -410,12 +410,12 @@ func (a *API) enhanceMulti(ctx context.Context, si *SectionIngredient) (err erro
 	defer span.End()
 
 	targets := []UnitConversionRequestTarget{
-		UnitConversionRequestTargetCalories,
-		UnitConversionRequestTargetMoney,
-		UnitConversionRequestTargetVolume,
+		Calories,
+		Money,
+		Volume,
 	}
 	if !hasGrams(si.Amounts) {
-		targets = append(targets, UnitConversionRequestTargetWeight)
+		targets = append(targets, Weight)
 	}
 	for _, t := range targets {
 		err = a.enhance(ctx, t, si)

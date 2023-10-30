@@ -46,10 +46,10 @@ func (a *API) SumRecipes(c echo.Context) error {
 		if err != nil {
 			return handleErr(c, err)
 		}
-		if s.ByRecipe.AdditionalProperties == nil {
-			s.ByRecipe.AdditionalProperties = make(map[string][]UsageValue)
+		if s.ByRecipe == nil {
+			s.ByRecipe = make(map[string][]UsageValue)
 		}
-		s.ByRecipe.AdditionalProperties[eachRecipe.Id] = maps.Values(recipeSpecific)
+		s.ByRecipe[eachRecipe.Id] = maps.Values(recipeSpecific)
 	}
 	return c.JSON(http.StatusOK, s)
 

@@ -60,11 +60,11 @@ export const useAuthLogin = (
     Schemas.AuthResp,
     AuthLoginError,
     AuthLoginVariables
-  >(
-    (variables: AuthLoginVariables) =>
+  >({
+    mutationFn: (variables: AuthLoginVariables) =>
       fetchAuthLogin({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type GetConfigError = Fetcher.ErrorWrapper<{
@@ -100,14 +100,17 @@ export const useGetConfig = <TData = Schemas.ConfigData>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.ConfigData, GetConfigError, TData>(
-    queryKeyFn({ path: "/config", operationId: "getConfig", variables }),
-    ({ signal }) => fetchGetConfig({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+  return reactQuery.useQuery<Schemas.ConfigData, GetConfigError, TData>({
+    queryKey: queryKeyFn({
+      path: "/config",
+      operationId: "getConfig",
+      variables,
+    }),
+    queryFn: ({ signal }) =>
+      fetchGetConfig({ ...fetcherOptions, ...variables }, signal),
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type DoSyncQueryParams = {
@@ -151,14 +154,13 @@ export const useDoSync = <TData = Record<string, any>>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Record<string, any>, DoSyncError, TData>(
-    queryKeyFn({ path: "/sync", operationId: "doSync", variables }),
-    ({ signal }) => fetchDoSync({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+  return reactQuery.useQuery<Record<string, any>, DoSyncError, TData>({
+    queryKey: queryKeyFn({ path: "/sync", operationId: "doSync", variables }),
+    queryFn: ({ signal }) =>
+      fetchDoSync({ ...fetcherOptions, ...variables }, signal),
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type ListPhotosQueryParams = {
@@ -215,15 +217,17 @@ export const useListPhotos = <TData = Schemas.PaginatedPhotos>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.PaginatedPhotos, ListPhotosError, TData>(
-    queryKeyFn({ path: "/photos", operationId: "listPhotos", variables }),
-    ({ signal }) =>
+  return reactQuery.useQuery<Schemas.PaginatedPhotos, ListPhotosError, TData>({
+    queryKey: queryKeyFn({
+      path: "/photos",
+      operationId: "listPhotos",
+      variables,
+    }),
+    queryFn: ({ signal }) =>
       fetchListPhotos({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type ListAllAlbumsError = Fetcher.ErrorWrapper<{
@@ -272,15 +276,17 @@ export const useListAllAlbums = <TData = ListAllAlbumsResponse>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<ListAllAlbumsResponse, ListAllAlbumsError, TData>(
-    queryKeyFn({ path: "/albums", operationId: "listAllAlbums", variables }),
-    ({ signal }) =>
+  return reactQuery.useQuery<ListAllAlbumsResponse, ListAllAlbumsError, TData>({
+    queryKey: queryKeyFn({
+      path: "/albums",
+      operationId: "listAllAlbums",
+      variables,
+    }),
+    queryFn: ({ signal }) =>
       fetchListAllAlbums({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type SearchQueryParams = {
@@ -338,14 +344,13 @@ export const useSearch = <TData = Schemas.SearchResult>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.SearchResult, SearchError, TData>(
-    queryKeyFn({ path: "/search", operationId: "search", variables }),
-    ({ signal }) => fetchSearch({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+  return reactQuery.useQuery<Schemas.SearchResult, SearchError, TData>({
+    queryKey: queryKeyFn({ path: "/search", operationId: "search", variables }),
+    queryFn: ({ signal }) =>
+      fetchSearch({ ...fetcherOptions, ...variables }, signal),
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type ListMealsQueryParams = {
@@ -402,14 +407,17 @@ export const useListMeals = <TData = Schemas.PaginatedMeals>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.PaginatedMeals, ListMealsError, TData>(
-    queryKeyFn({ path: "/meals", operationId: "listMeals", variables }),
-    ({ signal }) => fetchListMeals({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+  return reactQuery.useQuery<Schemas.PaginatedMeals, ListMealsError, TData>({
+    queryKey: queryKeyFn({
+      path: "/meals",
+      operationId: "listMeals",
+      variables,
+    }),
+    queryFn: ({ signal }) =>
+      fetchListMeals({ ...fetcherOptions, ...variables }, signal),
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type GetMealByIdPathParams = {
@@ -456,19 +464,17 @@ export const useGetMealById = <TData = Schemas.Meal>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.Meal, GetMealByIdError, TData>(
-    queryKeyFn({
+  return reactQuery.useQuery<Schemas.Meal, GetMealByIdError, TData>({
+    queryKey: queryKeyFn({
       path: "/meals/{meal_id}",
       operationId: "getMealById",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetMealById({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type UpdateRecipesForMealPathParams = {
@@ -522,11 +528,11 @@ export const useUpdateRecipesForMeal = (
     Schemas.Meal,
     UpdateRecipesForMealError,
     UpdateRecipesForMealVariables
-  >(
-    (variables: UpdateRecipesForMealVariables) =>
+  >({
+    mutationFn: (variables: UpdateRecipesForMealVariables) =>
       fetchUpdateRecipesForMeal({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type ListIngredientsQueryParams = {
@@ -595,19 +601,17 @@ export const useListIngredients = <TData = Schemas.PaginatedIngredients>(
     Schemas.PaginatedIngredients,
     ListIngredientsError,
     TData
-  >(
-    queryKeyFn({
+  >({
+    queryKey: queryKeyFn({
       path: "/ingredients",
       operationId: "listIngredients",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchListIngredients({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type CreateIngredientsError = Fetcher.ErrorWrapper<{
@@ -653,11 +657,11 @@ export const useCreateIngredients = (
     Schemas.Ingredient,
     CreateIngredientsError,
     CreateIngredientsVariables
-  >(
-    (variables: CreateIngredientsVariables) =>
+  >({
+    mutationFn: (variables: CreateIngredientsVariables) =>
       fetchCreateIngredients({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type LoadIngredientMappingsError = Fetcher.ErrorWrapper<undefined>;
@@ -705,11 +709,11 @@ export const useLoadIngredientMappings = (
     Record<string, any>,
     LoadIngredientMappingsError,
     LoadIngredientMappingsVariables
-  >(
-    (variables: LoadIngredientMappingsVariables) =>
+  >({
+    mutationFn: (variables: LoadIngredientMappingsVariables) =>
       fetchLoadIngredientMappings({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type ListRecipesQueryParams = {
@@ -774,15 +778,17 @@ export const useListRecipes = <TData = Schemas.PaginatedRecipeWrappers>(
     Schemas.PaginatedRecipeWrappers,
     ListRecipesError,
     TData
-  >(
-    queryKeyFn({ path: "/recipes", operationId: "listRecipes", variables }),
-    ({ signal }) =>
+  >({
+    queryKey: queryKeyFn({
+      path: "/recipes",
+      operationId: "listRecipes",
+      variables,
+    }),
+    queryFn: ({ signal }) =>
       fetchListRecipes({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type CreateRecipesError = Fetcher.ErrorWrapper<{
@@ -828,11 +834,11 @@ export const useCreateRecipes = (
     Schemas.RecipeWrapper,
     CreateRecipesError,
     CreateRecipesVariables
-  >(
-    (variables: CreateRecipesVariables) =>
+  >({
+    mutationFn: (variables: CreateRecipesVariables) =>
       fetchCreateRecipes({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type GetLatexByRecipeIdPathParams = {
@@ -879,19 +885,17 @@ export const useGetLatexByRecipeId = <TData = undefined>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<undefined, GetLatexByRecipeIdError, TData>(
-    queryKeyFn({
+  return reactQuery.useQuery<undefined, GetLatexByRecipeIdError, TData>({
+    queryKey: queryKeyFn({
       path: "/recipes/{recipe_id}/latex",
       operationId: "getLatexByRecipeId",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetLatexByRecipeId({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type GetRecipeByIdPathParams = {
@@ -942,19 +946,17 @@ export const useGetRecipeById = <TData = Schemas.RecipeWrapper>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.RecipeWrapper, GetRecipeByIdError, TData>(
-    queryKeyFn({
+  return reactQuery.useQuery<Schemas.RecipeWrapper, GetRecipeByIdError, TData>({
+    queryKey: queryKeyFn({
       path: "/recipes/{recipe_id}",
       operationId: "getRecipeById",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetRecipeById({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type GetRecipesByIdsQueryParams = {
@@ -1006,19 +1008,17 @@ export const useGetRecipesByIds = <TData = Schemas.PaginatedRecipeWrappers>(
     Schemas.PaginatedRecipeWrappers,
     GetRecipesByIdsError,
     TData
-  >(
-    queryKeyFn({
+  >({
+    queryKey: queryKeyFn({
       path: "/recipes/bulk",
       operationId: "getRecipesByIds",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetRecipesByIds({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type SumRecipesError = Fetcher.ErrorWrapper<{
@@ -1068,11 +1068,11 @@ export const useSumRecipes = (
     Schemas.SumsResponse,
     SumRecipesError,
     SumRecipesVariables
-  >(
-    (variables: SumRecipesVariables) =>
+  >({
+    mutationFn: (variables: SumRecipesVariables) =>
       fetchSumRecipes({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type ScrapeRecipeError = Fetcher.ErrorWrapper<{
@@ -1122,11 +1122,11 @@ export const useScrapeRecipe = (
     Schemas.RecipeWrapper,
     ScrapeRecipeError,
     ScrapeRecipeVariables
-  >(
-    (variables: ScrapeRecipeVariables) =>
+  >({
+    mutationFn: (variables: ScrapeRecipeVariables) =>
       fetchScrapeRecipe({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type ConvertIngredientToRecipePathParams = {
@@ -1184,11 +1184,11 @@ export const useConvertIngredientToRecipe = (
     Schemas.RecipeDetail,
     ConvertIngredientToRecipeError,
     ConvertIngredientToRecipeVariables
-  >(
-    (variables: ConvertIngredientToRecipeVariables) =>
+  >({
+    mutationFn: (variables: ConvertIngredientToRecipeVariables) =>
       fetchConvertIngredientToRecipe({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type AssociateFoodWithIngredientPathParams = {
@@ -1256,11 +1256,11 @@ export const useAssociateFoodWithIngredient = (
     Schemas.RecipeDetail,
     AssociateFoodWithIngredientError,
     AssociateFoodWithIngredientVariables
-  >(
-    (variables: AssociateFoodWithIngredientVariables) =>
+  >({
+    mutationFn: (variables: AssociateFoodWithIngredientVariables) =>
       fetchAssociateFoodWithIngredient({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type MergeIngredientsPathParams = {
@@ -1327,11 +1327,11 @@ export const useMergeIngredients = (
     Schemas.Ingredient,
     MergeIngredientsError,
     MergeIngredientsVariables
-  >(
-    (variables: MergeIngredientsVariables) =>
+  >({
+    mutationFn: (variables: MergeIngredientsVariables) =>
       fetchMergeIngredients({ ...fetcherOptions, ...variables }),
-    options
-  );
+    ...options,
+  });
 };
 
 export type GetFoodByIdPathParams = {
@@ -1378,19 +1378,17 @@ export const useGetFoodById = <TData = Schemas.TempFood>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
-  return reactQuery.useQuery<Schemas.TempFood, GetFoodByIdError, TData>(
-    queryKeyFn({
+  return reactQuery.useQuery<Schemas.TempFood, GetFoodByIdError, TData>({
+    queryKey: queryKeyFn({
       path: "/foods/{fdc_id}",
       operationId: "getFoodById",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetFoodById({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type GetIngredientByIdPathParams = {
@@ -1450,19 +1448,17 @@ export const useGetIngredientById = <TData = Schemas.IngredientWrapper>(
     Schemas.IngredientWrapper,
     GetIngredientByIdError,
     TData
-  >(
-    queryKeyFn({
+  >({
+    queryKey: queryKeyFn({
       path: "/ingredients/{ingredient_id}",
       operationId: "getIngredientById",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchGetIngredientById({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type SearchFoodsQueryParams = {
@@ -1528,14 +1524,14 @@ export const useSearchFoods = <TData = Schemas.FoodSearchResult>(
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<Schemas.FoodSearchResult, SearchFoodsError, TData>(
-    queryKeyFn({
-      path: "/foods/search",
-      operationId: "searchFoods",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchSearchFoods({ ...fetcherOptions, ...variables }, signal),
     {
+      queryKey: queryKeyFn({
+        path: "/foods/search",
+        operationId: "searchFoods",
+        variables,
+      }),
+      queryFn: ({ signal }) =>
+        fetchSearchFoods({ ...fetcherOptions, ...variables }, signal),
       ...options,
       ...queryOptions,
     }
@@ -1588,14 +1584,14 @@ export const useGetFoodsByIds = <TData = Schemas.PaginatedFoods>(
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<Schemas.PaginatedFoods, GetFoodsByIdsError, TData>(
-    queryKeyFn({
-      path: "/foods/bulk",
-      operationId: "getFoodsByIds",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchGetFoodsByIds({ ...fetcherOptions, ...variables }, signal),
     {
+      queryKey: queryKeyFn({
+        path: "/foods/bulk",
+        operationId: "getFoodsByIds",
+        variables,
+      }),
+      queryFn: ({ signal }) =>
+        fetchGetFoodsByIds({ ...fetcherOptions, ...variables }, signal),
       ...options,
       ...queryOptions,
     }
@@ -1649,19 +1645,17 @@ export const useRecipeDependencies = <TData = RecipeDependenciesResponse>(
     RecipeDependenciesResponse,
     RecipeDependenciesError,
     TData
-  >(
-    queryKeyFn({
+  >({
+    queryKey: queryKeyFn({
       path: "/data/recipe_dependencies",
       operationId: "recipeDependencies",
       variables,
     }),
-    ({ signal }) =>
+    queryFn: ({ signal }) =>
       fetchRecipeDependencies({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
+    ...options,
+    ...queryOptions,
+  });
 };
 
 export type QueryOperation =

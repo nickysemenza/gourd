@@ -13,7 +13,7 @@ import (
 func (a *API) notionPhotosFromDBPhoto(ctx context.Context, photos models.NotionImageSlice) ([]Photo, error) {
 	items := []Photo{}
 	for _, aa := range photos {
-		item, err := a.photoFromModel(ctx, aa.R.Image, PhotoSourceNotion)
+		item, err := a.photoFromModel(ctx, aa.R.Image, Notion)
 		if err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (a *API) googlePhotosFromDBPhoto(ctx context.Context, photos models.Gphotos
 
 	items := []Photo{}
 	for _, aa := range photos {
-		item, err := a.photoFromModel(ctx, aa.R.Image, PhotoSourceGoogle)
+		item, err := a.photoFromModel(ctx, aa.R.Image, Google)
 		if err != nil {
 			return nil, err
 		}
@@ -176,7 +176,7 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 		return sendErr(c, http.StatusBadRequest, err)
 	}
 	switch r.Action {
-	case MealRecipeUpdateActionAdd:
+	case Add:
 		tx := a.tx(ctx)
 		err := a.DB().AddRecipeToMeal(ctx, mealId, r.RecipeId, &r.Multiplier, tx)
 		if err != nil {
@@ -186,7 +186,7 @@ func (a *API) UpdateRecipesForMeal(c echo.Context, mealId string) error {
 			return handleErr(c, err)
 		}
 		return a.GetMealById(c, mealId)
-	case MealRecipeUpdateActionRemove:
+	case Remove:
 		return sendErr(c, http.StatusBadRequest, fmt.Errorf("unsupported %s", r.Action))
 	default:
 		return sendErr(c, http.StatusBadRequest, fmt.Errorf("unknown action %s", r.Action))
