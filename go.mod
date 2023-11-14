@@ -12,7 +12,7 @@ require (
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/cosmtrek/air v1.47.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/deepmap/oapi-codegen v1.15.0
+	github.com/deepmap/oapi-codegen/v2 v2.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
@@ -388,6 +388,7 @@ require (
 )
 
 require (
+	github.com/deepmap/oapi-codegen v1.16.2
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.6
 	github.com/oapi-codegen/runtime v1.0.0
 	github.com/volatiletech/null/v8 v8.1.2
