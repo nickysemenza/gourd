@@ -12,7 +12,6 @@ require (
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/cosmtrek/air v1.47.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/deepmap/oapi-codegen v1.15.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
@@ -21,12 +20,12 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/golangci/golangci-lint v1.54.0
-	github.com/google/uuid v1.3.1 // indirect
+	github.com/google/uuid v1.4.0 // indirect
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/jomei/notionapi v1.12.2-0.20230616065528-b0a0b47e1b3f
-	github.com/labstack/echo/v4 v4.11.1
+	github.com/labstack/echo/v4 v4.11.3
 	github.com/lib/pq v1.10.9
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
@@ -388,8 +387,10 @@ require (
 )
 
 require (
+	github.com/deepmap/oapi-codegen/v2 v2.0.0
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.6
-	github.com/oapi-codegen/runtime v1.0.0
+	github.com/oapi-codegen/runtime v1.1.0
+	github.com/oapi-codegen/testutil v1.1.0
 	github.com/volatiletech/null/v8 v8.1.2
 	go.opentelemetry.io/otel/exporters/zipkin v1.19.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9

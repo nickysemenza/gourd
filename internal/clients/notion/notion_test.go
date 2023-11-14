@@ -12,6 +12,6 @@ func TestSmoke(t *testing.T) {
 	res, err := c.GetAll(context.Background(), 14, "")
 	require.NoError(t, err)
 	require.Len(t, res, 1)
-	require.Equal(t, res[0].Title, "page1title")
+	require.Equal(t, "page1title", res[0].Title)
 	require.Len(t, res[0].Photos, 1)
 }
