@@ -6,7 +6,7 @@ import {
   RefinementList,
   SearchBox,
   useHits,
-} from "react-instantsearch-hooks-web";
+} from "react-instantsearch";
 
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import {
@@ -20,6 +20,7 @@ import { RecipeGridCell } from "../components/recipe/RecipeGrid";
 
 const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function BrandedHit(props: { hit: any }) {
   const hit = props.hit as BrandedFoodItem;
   const w = useContext(WasmContext);
@@ -42,7 +43,7 @@ function BrandedHit(props: { hit: any }) {
     </div>
   );
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RecipeDetailHit(props: { hit: any }) {
   const hit = props.hit as RecipeDetail;
   return (

@@ -67,7 +67,7 @@ bin/go-acc:
 	go build -o $@ ./vendor/github.com/ory/go-acc
 bin/oapi-codegen:
 	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/deepmap/oapi-codegen/cmd/oapi-codegen
+	go build -o $@ ./vendor/github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen
 
 unit-test-go: 
 	go test -v -race -cover ./...
@@ -85,7 +85,7 @@ generate: wasm-dev openapi # gen-db
 
 
 .PHONY: openapi
-openapi: internal/api/openapi.yaml
+openapi: internal/api/openapi.yaml 
 internal/api/openapi.yaml: tooling/schemas/gourd.yaml tooling/schemas/usda.yaml
 	# generate merged bundle
 	npx @redocly/openapi-cli bundle tooling/schemas/gourd.yaml --output internal/api/openapi.yaml 

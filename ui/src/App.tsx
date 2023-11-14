@@ -57,6 +57,7 @@ function App() {
     <CookiesProvider>
       <QueryClientProvider client={queryClient}>
         <WasmContextProvider>
+          {/* @ts-expect-error bug */}
           <Helmet>
             <title>gourd</title>
           </Helmet>

@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/deepmap/oapi-codegen/pkg/testutil"
 	"github.com/labstack/echo/v4"
 	echo_middleware "github.com/labstack/echo/v4/middleware"
 	"github.com/nickysemenza/gourd/internal/clients/notion"
@@ -17,6 +16,7 @@ import (
 	"github.com/nickysemenza/gourd/internal/common"
 	"github.com/nickysemenza/gourd/internal/db"
 	"github.com/nickysemenza/gourd/internal/image"
+	"github.com/oapi-codegen/testutil"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/guregu/null.v4/zero"
@@ -55,7 +55,7 @@ func TestAPI(t *testing.T) {
 	newIngredient := Ingredient{Name: iName}
 
 	{
-		result := testutil.NewRequest().Post("/ingredients").WithJsonBody(newIngredient).Go(t, e)
+		result := testutil.NewRequest().Post("/ingredients").WithJsonBody(newIngredient).GoWithHTTPHandler(t, e)
 		require.Equal(http.StatusCreated, result.Code(), result.Recorder.Body)
 		err := result.UnmarshalBodyToObject(&newIngredient)
 		require.NoError(err)
@@ -63,7 +63,7 @@ func TestAPI(t *testing.T) {
 
 	{
 		var results PaginatedIngredients
-		result := testutil.NewRequest().Get("/ingredients?limit=1000").Go(t, e)
+		result := testutil.NewRequest().Get("/ingredients?limit=1000").GoWithHTTPHandler(t, e)
 		require.Equal(http.StatusOK, result.Code(), result.Recorder.Body)
 		err := result.UnmarshalBodyToObject(&results)
 		require.NoError(err)
@@ -79,7 +79,7 @@ func TestAPI(t *testing.T) {
 	}
 
 	makeRecipe := func(newRecipe RecipeWrapper) RecipeWrapper {
-		result := testutil.NewRequest().Post("/recipes").WithJsonBody(newRecipe).Go(t, e)
+		result := testutil.NewRequest().Post("/recipes").WithJsonBody(newRecipe).GoWithHTTPHandler(t, e)
 		require.Equal(http.StatusCreated, result.Code(), result.Recorder.Body)
 
 		var resultRecipe RecipeWrapper
@@ -112,7 +112,7 @@ func TestAPI(t *testing.T) {
 	}
 
 	{
-		result := testutil.NewRequest().Get("/recipes?offset=0&limit=10").Go(t, e)
+		result := testutil.NewRequest().Get("/recipes?offset=0&limit=10").GoWithHTTPHandler(t, e)
 		require.Equal(http.StatusOK, result.Code())
 		var results PaginatedRecipeWrappers
 		require.NoError(result.UnmarshalBodyToObject(&results))
@@ -120,7 +120,7 @@ func TestAPI(t *testing.T) {
 		// require.Equal(resultRecipe.Detail.Name, newRecipe.Detail.Name)
 	}
 	{
-		result := testutil.NewRequest().Get("/recipes/"+id).Go(t, e)
+		result := testutil.NewRequest().Get("/recipes/"+id).GoWithHTTPHandler(t, e)
 		require.Equal(http.StatusOK, result.Code())
 		var results RecipeWrapper
 		err := result.UnmarshalBodyToObject(&results)
@@ -156,7 +156,7 @@ func TestSearches(t *testing.T) {
 	ingId := SearchByKind(t, e, iName, "ingredient")
 	require.NotEmpty(ingId)
 
-	result := testutil.NewRequest().Post("/ingredients/"+ingId+"/convert_to_recipe").Go(t, e)
+	result := testutil.NewRequest().Post("/ingredients/"+ingId+"/convert_to_recipe").GoWithHTTPHandler(t, e)
 	require.Equal(http.StatusCreated, result.Code())
 	var results RecipeDetail
 	require.NoError(result.UnmarshalBodyToObject(&results))
@@ -170,7 +170,7 @@ func TestSearches(t *testing.T) {
 
 func SearchByKind(t *testing.T, e *echo.Echo, name string, kind string) string {
 	require := require.New(t)
-	result := testutil.NewRequest().Get("/search?name="+name).Go(t, e)
+	result := testutil.NewRequest().Get("/search?name="+name).GoWithHTTPHandler(t, e)
 	require.Equal(http.StatusOK, result.Code())
 	var results SearchResult
 	require.NoError(result.UnmarshalBodyToObject(&results))

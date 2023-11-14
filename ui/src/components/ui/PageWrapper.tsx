@@ -6,6 +6,7 @@ const PageWrapper: React.FC<{
 }> = ({ children, title }) => {
   return (
     <>
+      {/* @ts-expect-error bug */}
       <Helmet>
         <title>{title} | gourd</title>
       </Helmet>

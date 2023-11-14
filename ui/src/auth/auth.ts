@@ -1,5 +1,5 @@
 import Cookies from "universal-cookie";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 export const COOKIE_NAME = "gourd-jwt";
 
@@ -11,7 +11,7 @@ export const getJWT = (): string | undefined => {
 export const parseJWT = (): JWT | undefined => {
   const jwt = getJWT();
   if (jwt === "" || !jwt) return;
-  const d: JWT = jwt_decode(jwt);
+  const d: JWT = jwtDecode(jwt);
   return d;
 };
 export const isLoggedIn = () => {
