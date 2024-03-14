@@ -30,7 +30,7 @@ jobs:
 
       - name: Get specific changed files
         id: changed_files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v43
         with:
           files: ${{ inputs.file }}
       - name: Setup Docker buildx
