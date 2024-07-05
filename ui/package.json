@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@headlessui/react": "1.7.17",
+    "@headlessui/react": "2.1.2",
     "@meilisearch/instant-meilisearch": "^0.13.6",
     "@opentelemetry/api": "1.6.0",
     "@opentelemetry/context-zone": "1.17.0",
