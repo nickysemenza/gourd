@@ -2,30 +2,30 @@ module github.com/nickysemenza/gourd
 
 go 1.21
 
-toolchain go1.21.0
+toolchain go1.22.5
 
 replace github.com/ericlagergren/decimal => github.com/ericlagergren/decimal v0.0.0-20181231230500-73749d4874d5
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/buckket/go-blurhash v1.1.0
-	github.com/charmbracelet/glamour v0.6.0
-	github.com/cosmtrek/air v1.47.0
+	github.com/charmbracelet/glamour v0.7.0
+	github.com/cosmtrek/air v1.52.3
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/friendsofgo/errors v0.9.2
-	github.com/getkin/kin-openapi v0.120.0
-	github.com/getsentry/sentry-go v0.25.0
+	github.com/getkin/kin-openapi v0.126.0
+	github.com/getsentry/sentry-go v0.28.1
 	github.com/go-openapi/swag v0.22.4 // indirect
-	github.com/golang-migrate/migrate/v4 v4.16.2
-	github.com/golangci/golangci-lint v1.54.0
+	github.com/golang-migrate/migrate/v4 v4.17.1
+	github.com/golangci/golangci-lint v1.59.1
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/gphotosuploader/googlemirror v0.5.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/jmoiron/sqlx v1.3.5
-	github.com/jomei/notionapi v1.12.2-0.20230616065528-b0a0b47e1b3f
-	github.com/labstack/echo/v4 v4.11.3
+	github.com/jmoiron/sqlx v1.4.0
+	github.com/jomei/notionapi v1.13.1
+	github.com/labstack/echo/v4 v4.12.0
 	github.com/lib/pq v1.10.9
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/go-server-timing v1.0.1
@@ -36,25 +36,25 @@ require (
 	github.com/prometheus/procfs v0.11.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.7.0
-	github.com/spf13/viper v1.17.0
-	github.com/stretchr/testify v1.8.4
-	github.com/volatiletech/sqlboiler/v4 v4.15.0
+	github.com/spf13/cobra v1.8.1
+	github.com/spf13/viper v1.19.0
+	github.com/stretchr/testify v1.9.0
+	github.com/volatiletech/sqlboiler/v4 v4.16.2
 	github.com/volatiletech/strmangle v0.0.5
 	go.opencensus.io v0.24.0
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.45.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0
-	go.opentelemetry.io/contrib/propagators/jaeger v1.20.0
-	go.opentelemetry.io/otel v1.19.0
-	go.opentelemetry.io/otel/sdk v1.19.0
-	go.opentelemetry.io/otel/trace v1.19.0
-	golang.org/x/oauth2 v0.13.0
-	golang.org/x/tools v0.14.0
-	google.golang.org/api v0.147.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.53.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
+	go.opentelemetry.io/contrib/propagators/jaeger v1.28.0
+	go.opentelemetry.io/otel v1.28.0
+	go.opentelemetry.io/otel/sdk v1.28.0
+	go.opentelemetry.io/otel/trace v1.28.0
+	golang.org/x/oauth2 v0.21.0
+	golang.org/x/tools v0.23.0
+	google.golang.org/api v0.188.0
 	gopkg.in/guregu/null.v4 v4.0.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	sigs.k8s.io/yaml v1.3.0
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
@@ -85,14 +85,14 @@ require (
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/alingse/asasalint v0.0.11 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
-	github.com/arran4/golang-ical v0.1.0
+	github.com/arran4/golang-ical v0.3.1
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
 	github.com/ashanbrown/makezero v1.1.1 // indirect
 	github.com/aws/aws-sdk-go v1.44.284 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.21.0
+	github.com/aws/aws-sdk-go-v2 v1.30.3
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.13 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.18.27
-	github.com/aws/aws-sdk-go-v2/credentials v1.13.26
+	github.com/aws/aws-sdk-go-v2/config v1.27.26
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.26
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.70 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.41 // indirect
@@ -103,7 +103,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.36 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.35 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.15.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2
 	github.com/aws/aws-sdk-go-v2/service/sso v1.12.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.14.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.19.2 // indirect
@@ -316,8 +316,8 @@ require (
 	github.com/tommy-muehle/go-mnd/v2 v2.5.1 // indirect
 	github.com/ultraware/funlen v0.1.0 // indirect
 	github.com/ultraware/whitespace v0.0.5 // indirect
-	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.2.1
-	github.com/uptrace/opentelemetry-go-extra/otelsql v0.2.1
+	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.3.1
+	github.com/uptrace/opentelemetry-go-extra/otelsql v0.3.1
 	github.com/uptrace/opentelemetry-go-extra/otelutil v0.2.1 // indirect
 	github.com/uudashr/gocognit v1.0.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
@@ -337,8 +337,8 @@ require (
 	gitlab.com/nyarla/go-crypt v0.0.0-20160106005555-d9a5dc2b789b // indirect
 	go.mitsakis.org/workerpool v0.0.0-20221016122625-07d45f730b5b
 	go.mongodb.org/mongo-driver v1.11.7 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.28.0
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
@@ -387,12 +387,12 @@ require (
 )
 
 require (
-	github.com/deepmap/oapi-codegen/v2 v2.0.0
+	github.com/deepmap/oapi-codegen/v2 v2.3.0
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.6
 	github.com/oapi-codegen/runtime v1.1.0
 	github.com/oapi-codegen/testutil v1.1.0
 	github.com/volatiletech/null/v8 v8.1.2
-	go.opentelemetry.io/otel/exporters/zipkin v1.19.0
+	go.opentelemetry.io/otel/exporters/zipkin v1.28.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	google.golang.org/grpc v1.58.2
 )

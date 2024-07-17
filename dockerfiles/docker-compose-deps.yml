@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
   db:
-    image: postgres:16.0
+    image: postgres:16.3
     restart: always
     ports:
       - "5555:5432"
@@ -34,10 +34,10 @@ services:
       - 16686:16686 # UI
       - 14268:14268
       - 9411:9411
-    image: "jaegertracing/all-in-one:1.50"
+    image: "jaegertracing/all-in-one:1.59"
   # Collector
   collector:
-    image: otel/opentelemetry-collector:0.87.0
+    image: otel/opentelemetry-collector:0.105.0
     platform: linux/amd64
     command: [ "--config=/conf/collector-config.yaml" ]
     volumes:
@@ -57,4 +57,4 @@ services:
       - MEILI_MASTER_KEY=FOO
     volumes:
       - '../tmp/meili_data:/meili_data'
-    image: 'getmeili/meilisearch:v1.4'
+    image: 'getmeili/meilisearch:v1.9'
