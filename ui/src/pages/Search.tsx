@@ -18,7 +18,7 @@ import { WasmContext } from "../util/wasmContext";
 import { FoodRow } from "../components/FoodSearch";
 import { RecipeGridCell } from "../components/recipe/RecipeGrid";
 
-const searchClient = instantMeiliSearch("http://localhost:7700", "FOO");
+const { searchClient } = instantMeiliSearch("http://localhost:7700", "FOO");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function BrandedHit(props: { hit: any }) {
