@@ -779,6 +779,7 @@ name = "gourd_wasm"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "getrandom",
  "gourd_common",
  "openapi",
  "tracing",
