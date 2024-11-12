@@ -55,7 +55,7 @@ bin/%: $(shell find . -type f -name '*.go' | grep -v '_test.go')
 
 bin/air:
 	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/cosmtrek/air
+	go build -o $@ ./vendor/github.com/air-verse/air
 bin/golangci-lint:
 	@mkdir -p $(dir $@)
 	go build -o $@ ./vendor/github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -65,9 +65,6 @@ bin/migrate:
 bin/go-acc:
 	@mkdir -p $(dir $@)
 	go build -o $@ ./vendor/github.com/ory/go-acc
-bin/oapi-codegen:
-	@mkdir -p $(dir $@)
-	go build -o $@ ./vendor/github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen
 
 unit-test-go: 
 	go test -v -race -cover ./...
