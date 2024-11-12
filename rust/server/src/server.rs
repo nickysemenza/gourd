@@ -5,7 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use axum_tracing_opentelemetry::{opentelemetry_tracing_layer, response_with_trace_layer};
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
 use std::net::SocketAddr;
 
 pub struct Application {
@@ -28,14 +28,16 @@ impl Application {
                 "/index_recipe_detail",
                 post(crate::search::index_recipe_detail),
             )
-            .layer(opentelemetry_tracing_layer())
-            .layer(response_with_trace_layer());
+            // include trace context as header into the response
+            .layer(OtelInResponseLayer::default())
+            //start OpenTelemetry trace on incoming request
+            .layer(OtelAxumLayer::default());
 
         let port = configuration.application.port;
         let addr = SocketAddr::from(([0, 0, 0, 0], port));
         tracing::debug!("listening on {}", addr);
-        axum::Server::bind(&addr)
-            .serve(app.into_make_service())
+        let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+        axum::serve(listener, app.into_make_service())
             .await
             .unwrap();
         Ok(())

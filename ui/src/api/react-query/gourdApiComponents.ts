@@ -95,7 +95,7 @@ export const useGetConfig = <TData = Schemas.ConfigData>(
   variables: GetConfigVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.ConfigData, GetConfigError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -149,7 +149,7 @@ export const useDoSync = <TData = Record<string, any>>(
   variables: DoSyncVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Record<string, any>, DoSyncError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -212,7 +212,7 @@ export const useListPhotos = <TData = Schemas.PaginatedPhotos>(
   variables: ListPhotosVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.PaginatedPhotos, ListPhotosError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -271,7 +271,7 @@ export const useListAllAlbums = <TData = ListAllAlbumsResponse>(
       ListAllAlbumsError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -339,7 +339,7 @@ export const useSearch = <TData = Schemas.SearchResult>(
   variables: SearchVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.SearchResult, SearchError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -402,7 +402,7 @@ export const useListMeals = <TData = Schemas.PaginatedMeals>(
   variables: ListMealsVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.PaginatedMeals, ListMealsError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -459,14 +459,14 @@ export const useGetMealById = <TData = Schemas.Meal>(
   variables: GetMealByIdVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.Meal, GetMealByIdError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<Schemas.Meal, GetMealByIdError, TData>({
     queryKey: queryKeyFn({
-      path: "/meals/{meal_id}",
+      path: "/meals/{mealId}",
       operationId: "getMealById",
       variables,
     }),
@@ -592,7 +592,7 @@ export const useListIngredients = <TData = Schemas.PaginatedIngredients>(
       ListIngredientsError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -769,7 +769,7 @@ export const useListRecipes = <TData = Schemas.PaginatedRecipeWrappers>(
       ListRecipesError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -880,14 +880,14 @@ export const useGetLatexByRecipeId = <TData = undefined>(
   variables: GetLatexByRecipeIdVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<undefined, GetLatexByRecipeIdError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<undefined, GetLatexByRecipeIdError, TData>({
     queryKey: queryKeyFn({
-      path: "/recipes/{recipe_id}/latex",
+      path: "/recipes/{recipeId}/latex",
       operationId: "getLatexByRecipeId",
       variables,
     }),
@@ -941,14 +941,14 @@ export const useGetRecipeById = <TData = Schemas.RecipeWrapper>(
       GetRecipeByIdError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<Schemas.RecipeWrapper, GetRecipeByIdError, TData>({
     queryKey: queryKeyFn({
-      path: "/recipes/{recipe_id}",
+      path: "/recipes/{recipeId}",
       operationId: "getRecipeById",
       variables,
     }),
@@ -999,7 +999,7 @@ export const useGetRecipesByIds = <TData = Schemas.PaginatedRecipeWrappers>(
       GetRecipesByIdsError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -1373,14 +1373,14 @@ export const useGetFoodById = <TData = Schemas.TempFood>(
   variables: GetFoodByIdVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<Schemas.TempFood, GetFoodByIdError, TData>,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
     useGourdApiContext(options);
   return reactQuery.useQuery<Schemas.TempFood, GetFoodByIdError, TData>({
     queryKey: queryKeyFn({
-      path: "/foods/{fdc_id}",
+      path: "/foods/{fdcId}",
       operationId: "getFoodById",
       variables,
     }),
@@ -1439,7 +1439,7 @@ export const useGetIngredientById = <TData = Schemas.IngredientWrapper>(
       GetIngredientByIdError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -1450,7 +1450,7 @@ export const useGetIngredientById = <TData = Schemas.IngredientWrapper>(
     TData
   >({
     queryKey: queryKeyFn({
-      path: "/ingredients/{ingredient_id}",
+      path: "/ingredients/{ingredientId}",
       operationId: "getIngredientById",
       variables,
     }),
@@ -1518,7 +1518,7 @@ export const useSearchFoods = <TData = Schemas.FoodSearchResult>(
       SearchFoodsError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -1578,7 +1578,7 @@ export const useGetFoodsByIds = <TData = Schemas.PaginatedFoods>(
       GetFoodsByIdsError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -1636,7 +1636,7 @@ export const useRecipeDependencies = <TData = RecipeDependenciesResponse>(
       RecipeDependenciesError,
       TData
     >,
-    "queryKey" | "queryFn"
+    "queryKey" | "queryFn" | "initialData"
   >
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } =
@@ -1690,7 +1690,7 @@ export type QueryOperation =
       variables: ListMealsVariables;
     }
   | {
-      path: "/meals/{meal_id}";
+      path: "/meals/{mealId}";
       operationId: "getMealById";
       variables: GetMealByIdVariables;
     }
@@ -1705,12 +1705,12 @@ export type QueryOperation =
       variables: ListRecipesVariables;
     }
   | {
-      path: "/recipes/{recipe_id}/latex";
+      path: "/recipes/{recipeId}/latex";
       operationId: "getLatexByRecipeId";
       variables: GetLatexByRecipeIdVariables;
     }
   | {
-      path: "/recipes/{recipe_id}";
+      path: "/recipes/{recipeId}";
       operationId: "getRecipeById";
       variables: GetRecipeByIdVariables;
     }
@@ -1720,12 +1720,12 @@ export type QueryOperation =
       variables: GetRecipesByIdsVariables;
     }
   | {
-      path: "/foods/{fdc_id}";
+      path: "/foods/{fdcId}";
       operationId: "getFoodById";
       variables: GetFoodByIdVariables;
     }
   | {
-      path: "/ingredients/{ingredient_id}";
+      path: "/ingredients/{ingredientId}";
       operationId: "getIngredientById";
       variables: GetIngredientByIdVariables;
     }

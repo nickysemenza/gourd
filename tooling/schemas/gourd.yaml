@@ -1468,7 +1468,6 @@ components:
           description: id
           type: string
         ingredient_kind:
-          description: what kind of ingredient
           $ref: "#/components/schemas/IngredientKind"
     EntitySummary:
       description: holds name/id and multiplier for a Kind of entity
@@ -1490,7 +1489,6 @@ components:
           type: number
           format: double
         kind:
-          description: what kind of entity
           $ref: "#/components/schemas/IngredientKind"
     IngredientUsage:
       description: todo
@@ -1533,7 +1531,6 @@ components:
           items:
             $ref: "#/components/schemas/Amount"
         meta:
-          description: detail about it
           $ref: "#/components/schemas/EntitySummary"
     UnitConversionRequest:
       type: object

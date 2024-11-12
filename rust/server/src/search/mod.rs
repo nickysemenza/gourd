@@ -3,7 +3,7 @@ mod index;
 use anyhow::{Context, Result};
 use axum::{extract, response::IntoResponse, Json};
 use indicatif::ProgressIterator;
-use meilisearch_sdk::task_info::TaskInfo;
+use meilisearch_sdk::{client::Client, task_info::TaskInfo};
 use openapi::models::RecipeDetail;
 use serde::{de::DeserializeOwned, Serialize};
 use strum::IntoEnumIterator;
@@ -11,16 +11,16 @@ use tracing::info;
 
 pub use self::index::Index;
 
-fn get_client() -> meilisearch_sdk::Client {
+fn get_client() -> Client {
     let meilisearch_url = option_env!("MEILISEARCH_URL").unwrap_or("http://localhost:7700");
     let meilisearch_api_key = option_env!("MEILISEARCH_API_KEY").unwrap_or("FOO");
-    meilisearch_sdk::Client::new(meilisearch_url, Some(meilisearch_api_key))
+    Client::new(meilisearch_url, Some(meilisearch_api_key)).expect("failed to create client")
 }
 
 #[derive(Debug)]
 
 pub struct Searcher {
-    client: meilisearch_sdk::Client,
+    client: Client,
 }
 impl Searcher {
     pub fn new() -> Self {
