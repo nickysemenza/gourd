@@ -81,7 +81,7 @@ func (a *API) ListIngredients(c echo.Context, params ListIngredientsParams) erro
 		return handleErr(c, err)
 	}
 
-	listMeta.setTotalCount(uint64(count))
+	listMeta.setTotalCount(int64(count))
 
 	resp := PaginatedIngredients{
 		Ingredients: &items,

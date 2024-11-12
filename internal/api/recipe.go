@@ -39,7 +39,7 @@ func (a *API) ListRecipes(c echo.Context, params ListRecipesParams) error {
 		return handleErr(c, err)
 	}
 
-	listMeta.setTotalCount(uint64(count))
+	listMeta.setTotalCount(int64(count))
 
 	resp := PaginatedRecipeWrappers{
 		Recipes: &items,

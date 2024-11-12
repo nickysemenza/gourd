@@ -56,7 +56,7 @@ func (a *API) GetFoodsByIds(c echo.Context, params GetFoodsByIdsParams) error {
 	}
 
 	listMeta := Items{PageCount: 1}
-	listMeta.setTotalCount(uint64(len(items)))
+	listMeta.setTotalCount(int64(len(items)))
 
 	resp := PaginatedFoods{
 		Foods: &items,

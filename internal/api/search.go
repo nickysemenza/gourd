@@ -27,7 +27,7 @@ func (a *API) Search(c echo.Context, params SearchParams) error {
 	}
 
 	// todo: use this
-	listMeta.setTotalCount(+uint64(recipesCount + ingredientsCount))
+	listMeta.setTotalCount(int64(recipesCount + ingredientsCount))
 
 	return c.JSON(http.StatusOK, SearchResult{Recipes: &recipes, Ingredients: &ingredients})
 }

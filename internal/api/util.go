@@ -48,7 +48,7 @@ func parsePagination(o *OffsetParam, l *LimitParam) Items {
 	return items
 }
 
-func (l *Items) setTotalCount(count uint64) {
+func (l *Items) setTotalCount(count int64) {
 	c := int(count)
 	l.TotalCount = c
 	l.PageCount = int(math.Ceil(float64(c) / float64(l.Limit)))

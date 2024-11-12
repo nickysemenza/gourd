@@ -83,9 +83,6 @@ func (a *API) IngredientListV2(ctx context.Context, pagination Items, mods ...Qu
 		return nil, 0, err
 	}
 
-	if err != nil {
-		return nil, 0, err
-	}
 	items := []IngredientWrapper{}
 	for _, recipe := range ingredients {
 		rw, err := a.ingredientFromModel(ctx, recipe, true, true, true)

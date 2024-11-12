@@ -87,12 +87,12 @@ jobs:
           docker create --name=temp ghcr.io/nickysemenza/gourd-wasm-builder:${{steps.extract_branch.outputs.branch}}
           docker cp temp:/wasm ui/src/wasm
       - name: start postgres db
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db
       - run: go mod vendor
       - name: migrate db
         run: make migrate
       - name: start rust + go servers
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d rs gourd
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d rs gourd
       - name: smoke test rust server
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup
@@ -135,7 +135,7 @@ jobs:
         id: extract_branch
       - run: go mod vendor
       - name: start postgres db + rust server
-        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker-compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db rs
+        run: DOCKER_TAG=${{steps.extract_branch.outputs.branch}} docker compose -f dockerfiles/docker-compose-deps.yml -f dockerfiles/docker-compose-gourd.yml up -d db rs
       - name: smoke test rust server
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup
