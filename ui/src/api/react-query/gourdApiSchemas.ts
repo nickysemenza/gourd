@@ -972,7 +972,7 @@ export type FoodUpdateLog = {
    */
   foodClass?: string;
   /**
-   * @example 077034085228
+   * @example 77034085228
    */
   gtinUpc?: string;
   /**
@@ -1041,7 +1041,7 @@ export type BrandedFoodItem = {
    */
   foodClass?: string;
   /**
-   * @example 077034085228
+   * @example 77034085228
    */
   gtinUpc?: string;
   /**

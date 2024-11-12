@@ -11,36 +11,24 @@ name = "gourd"
 path = "src/main.rs"
 
 [dependencies]
-tower-http = { version = "0.4.0", features = ["trace"] }
-axum = {version = "0.6", features= ["tracing"] }
-axum-tracing-opentelemetry = "0.14.1"
+axum = {version = "0.7", features= ["tracing"] }
+axum-tracing-opentelemetry = "0.23.0"
 anyhow = "1.0"
 clap = "4"
-config = {version = "0.13.3", default-features = false, features = ["yaml"]}
+config = {version = "0.14.0", default-features = false, features = ["yaml"]}
 futures = "0.3"
 gourd_common = {path = "../common"}
 openapi = {path = "../openapi"}
-opentelemetry = "0.20.0"
-opentelemetry-jaeger = "0.19"
 serde = {version = "1.0", features = ["derive"]}
 serde-aux = "4.2.0"
-serde_derive = "^1.0"
 serde_json = "1.0"
 tracing = "0.1"
-tracing-opentelemetry = "0.21.0"
-tracing-subscriber = {version = "0.3.17", features=["env-filter"]}
-console-subscriber = "0.2.0"
 tokio = { version = "1", features = ["full","tracing"] }
 url = "2.4"
 recipe_scraper_fetcher = {git = "https://github.com/nickysemenza/ingredient-parser", branch = "main"}
-meilisearch-sdk = "0.24"
-strum = "0.25"
-strum_macros = "0.25"
-itertools = "0.11.0"
+meilisearch-sdk = "0.27"
+strum = "0.26"
+strum_macros = "0.26"
+itertools = "0.13.0"
 indicatif = "0.17.5"
-[dependencies.uuid]
-version = "1.4.0"
-features = [
-    "v4",                # Lets you generate random UUIDs
-    "fast-rng",          # Use a faster (but still sufficiently random) RNG
-]
+init-tracing-opentelemetry = { version = "0.23.0", features = ["jaeger", "opentelemetry-otlp", "tracing_subscriber_ext"] }

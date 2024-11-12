@@ -64,7 +64,6 @@ const ParseTest: React.FC = () => {
 const Playground: React.FC = () => {
   return (
     <div className="grid grid-cols-2 gap-4">
-      {/* @ts-expect-error bug */}
       <Helmet>
         <title>playground | gourd</title>
       </Helmet>

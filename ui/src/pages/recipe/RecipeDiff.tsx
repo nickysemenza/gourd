@@ -19,7 +19,6 @@ const Playground: React.FC = () => {
   });
   return (
     <div>
-      {/* @ts-expect-error bug */}
       <Helmet>
         <title>diff | gourd</title>
       </Helmet>
