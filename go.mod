@@ -50,7 +50,7 @@ require (
 	golang.org/x/oauth2 v0.24.0
 	golang.org/x/tools v0.27.0
 	google.golang.org/api v0.205.0
-	gopkg.in/guregu/null.v4 v4.0.0
+	gopkg.in/guregu/null.v5 v5.0.0
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.4.0
