@@ -359,6 +359,7 @@ require (
 require (
 	github.com/air-verse/air v1.61.1
 	github.com/gphotosuploader/google-photos-api-client-go v1.1.6
+	github.com/gphotosuploader/google-photos-api-client-go/v3 v3.0.6
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/oapi-codegen/testutil v1.1.0
