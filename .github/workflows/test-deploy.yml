@@ -65,7 +65,7 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           working-directory: ui/
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           working-directory: ui/
   test-e2e:
@@ -97,7 +97,7 @@ jobs:
         run: |
           curl -v http://localhost:8080/parse?text=1%20cup
           curl -v http://localhost:8080/debug/scrape?url=https://thewoksoflife.com/ma-po-tofu-real-deal/
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
@@ -108,7 +108,7 @@ jobs:
         env:
           CYPRESS_RECORD_KEY: 265312e3-7b8c-4031-ad0a-5f825b95cfce
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
       - name: Archive cypress results
         uses: actions/upload-artifact@v4
         if: always()
@@ -145,7 +145,7 @@ jobs:
         env:
           MIGRATIONS_DIR: file://../../internal/db/migrations
           PDFLATEX_BINARY: /usr/bin/pdflatex
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
   test-rust:
     name: rust tests
     runs-on: ubuntu-latest
@@ -159,7 +159,7 @@ jobs:
           cargo +nightly tarpaulin --verbose --all-features --workspace --timeout 120 --out xml
         working-directory: rust
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           working-directory: rust
   deploy:
