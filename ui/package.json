@@ -64,7 +64,7 @@
     "react-hotkeys-hook": "4.6.1",
     "react-instantsearch": "^7.3.0",
     "react-json-view": "1.21.3",
-    "react-router-dom": "6.28.0",
+    "react-router-dom": "7.0.1",
     "react-select": "5.8.0",
     "react-toastify": "10.0.0",
     "tailwind-merge": "^2.0.0",
